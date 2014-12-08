@@ -1,0 +1,124 @@
+/*
+    **********************************************************************************
+    *                                                                                *
+    * @package URBEM CNM - Soluções em Gestão Pública                                *
+    * @copyright (c) 2013 Confederação Nacional de Municípos                         *
+    * @author Confederação Nacional de Municípios                                    *
+    *                                                                                *
+    * O URBEM CNM é um software livre; você pode redistribuí-lo e/ou modificá-lo sob *
+    * os  termos  da Licença Pública Geral GNU conforme  publicada  pela Fundação do *
+    * Software Livre (FSF - Free Software Foundation); na versão 2 da Licença.       *
+    *                                                                                *
+    * Este  programa  é  distribuído  na  expectativa  de  que  seja  útil,   porém, *
+    * SEM NENHUMA GARANTIA; nem mesmo a garantia implícita  de  COMERCIABILIDADE  OU *
+    * ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral do GNU *
+    * para mais detalhes.                                                            *
+    *                                                                                *
+    * Você deve ter recebido uma cópia da Licença Pública Geral do GNU "LICENCA.txt" *
+    * com  este  programa; se não, escreva para  a  Free  Software Foundation  Inc., *
+    * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
+    *                                                                                *
+    **********************************************************************************
+*/
+CREATE OR REPLACE FUNCTION orcamentosuplementacoescreditosuplementar (character varying, numeric, character varying, integer, character varying, integer, character varying ) RETURNS INTEGER AS $$
+DECLARE
+    EXERCICIO       ALIAS FOR $1;
+    VALOR           ALIAS FOR $2;
+    COMPLEMENTO     ALIAS FOR $3;
+    CODLOTE         ALIAS FOR $4;
+    TIPOLOTE        ALIAS FOR $5;
+    CODENTIDADE     ALIAS FOR $6;
+    CREDSUPLEMENTAR ALIAS FOR $7;
+
+    SEQUENCIA INTEGER;
+    TIPOCREDSUPLEMENTAR VARCHAR := '';
+BEGIN
+    TIPOCREDSUPLEMENTAR := '' || CREDSUPLEMENTAR || '';
+    IF EXERCICIO::integer > 2013 THEN
+        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '522130300' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '522130400' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213020000' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010000' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522130300' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+    ELSIF EXERCICIO::integer = 2013 THEN
+        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '522130104' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010300' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010201' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '52213010100' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '522130104' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+    ELSE
+        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120100020000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+            SEQUENCIA := FAZERLANCAMENTO(  '191110000000000' , '291120000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120100030000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120200010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Doacoes' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120200020000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120200030000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
+            SEQUENCIA := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        END IF;
+    END IF;
+
+    RETURN SEQUENCIA;
+END;
+$$ LANGUAGE 'plpgsql';

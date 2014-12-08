@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+    <property name="units">in</property>
+    <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <text-property name="displayName">Template Urbem Retrato Entidade</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem.rptlibrary</property>
+            <property name="namespace">urbem</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="term_user" id="6666">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="exercicio" id="563">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2007</value>
+            </simple-property-list>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_acao" id="564">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_driver" id="565">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">org.postgresql.Driver</value>
+            </simple-property-list>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_conn_url" id="566">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.30.4:5432/gp_mariana_virada_organograma</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_user" id="567">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">sw.suporte</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_password" id="568">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">suporte</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="entidade" id="569">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmCodClassificacao" id="1356">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmCodAssunto" id="1357">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmResumo" id="1358">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmCodOrgao" id="1359">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmNumCgm" id="1365">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDtIni" id="1450">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDtFim" id="1451">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmExeFinal" id="1452">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmExeInicial" id="1453">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmProcessoInicial" id="1454">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmProcessoFinal" id="1455">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmProcessoIni" id="1456">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmProcessoFim" id="1457">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmExercicioFinal" id="1458">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmExercicioInicial" id="1459">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDataIni" id="1460">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDataFim" id="1461">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmProcesso" id="1462">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmAnoExercicio" id="1463">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDtInicial" id="1464">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="prmDtFinal" id="1465">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="teste" id="1467">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="562">
+            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
+	extensionProperties.odaDriverClass = params["db_driver"].value;
+    extensionProperties.odaURL = params["db_conn_url"].value;
+    extensionProperties.odaUser = params["db_user"].value;
+extensionProperties.odaPassword = params["db_password"].value;
+ extensionProperties.charSet = "utf8";
+}]]></method>
+            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
+            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsEtiquetas" id="570">
+            <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[if ((params["prmProcesso"] != "") &amp;&amp; (params["prmAnoExercicio"] != "")){
+	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcesso"];
+	this.queryText = this.queryText + " AND sw_processo.ano_exercicio = '" +params["prmAnoExercicio"]+"'";
+}
+if ((params["prmProcessoInicial"] != "") &amp;&amp; (params["prmProcessoFinal"] == "")){
+	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcessoInicial"];
+}
+
+if ((params["prmProcessoFinal"] != "") &amp;&amp; (params["prmProcessoInicial"] == "")){
+	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcessoFinal"];
+}
+
+if ((params["prmProcessoIni"] != "") &amp;&amp; (params["prmProcessoFim"] != "")){
+	this.queryText = this.queryText + " AND sw_processo.cod_processo BETWEEN " +params["prmProcessoIni"]+ " AND " +params["prmProcessoFim"];
+}
+
+if ((params["prmExeInicial"] != "") &amp;&amp; (params["prmExeFinal"] == "")){
+	this.queryText = this.queryText + " AND sw_processo.ano_exercicio = '" +params["prmExeInicial"]+"'";
+}
+
+if ((params["prmExeFinal"] != "") &amp;&amp; (params["prmExeInicial"] == "")){
+	this.queryText = this.queryText + " AND sw_processo.ano_exercicio = '" +params["prmExeFinal"]+"'";
+}
+
+if ((params["prmExercicioInicial"] != "") &amp;&amp; (params["prmExercicioFinal"] != "")){
+	this.queryText = this.queryText + " AND sw_processo.ano_exercicio::INTEGER BETWEEN " +params["prmExercicioInicial"]+ " AND " +params["prmExercicioFinal"];
+}
+
+if (params["prmCodClassificacao"] != ""){
+	this.queryText = this.queryText + " AND sw_processo.cod_classificacao = " +params["prmCodClassificacao"];
+}
+
+if (params["prmCodAssunto"] != ""){
+	this.queryText = this.queryText + " AND sw_processo.cod_assunto = " +params["prmCodAssunto"];
+}
+
+if (params["prmResumo"] != ""){
+	this.queryText = this.queryText + " AND sw_processo.resumo_assunto = " +params["prmResumo"];
+}
+
+if (params["prmCodOrgao"] != ""){
+	this.queryText = this.queryText + " AND sw_ultimo_andamento.cod_orgao = " +params["prmCodOrgao"];
+}
+
+if (params["prmNumCgm"] != ""){
+	this.queryText = this.queryText + " AND sw_processo_interessado.numcgm = " +params["prmNumCgm"];
+}
+
+if ((params["prmDtIni"] != "") &amp;&amp; (params["prmDtFim"] != "")){
+	this.queryText = this.queryText + " AND sw_processo.timestamp between '"+params["prmDtIni"]+"' AND '"+params["prmDtFim"]+"'";
+}
+
+if ((params["prmDtInicial"] != "") &amp;&amp; (params["prmDtFinal"] != "")){
+	this.queryText = this.queryText + " AND sw_processo.timestamp between '"+params["prmDtInicial"]+"' AND '"+params["prmDtFinal"]+"'";
+}
+
+if ((params["prmDataIni"] != "") &amp;&amp; (params["prmDataFim"]) != ""){
+	this.queryText = this.queryText + " AND sw_processo.timestamp between '"+params["prmDataIni"]+"' AND '"+params["prmDataFim"]+"'";
+}
+this.queryText = this.queryText + " ORDER BY sw_processo.cod_processo, sw_processo.ano_exercicio DESC";
+
+//params['teste'] = this.queryText;]]></method>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_processo
+     ,  initcap(LOWER(sw_cgm.nom_cgm)) as nom_cgm
+     ,  sw_classificacao.nom_classificacao
+     ,  sw_assunto.nom_assunto
+     ,  recuperaDescricaoOrgao(sw_ultimo_andamento.cod_orgao, sw_ultimo_andamento.timestamp::date) as nom_setor
+
+  FROM  sw_processo
+     ,  sw_cgm
+     ,  sw_classificacao
+     ,  sw_assunto
+     ,  sw_situacao_processo
+     ,  sw_ultimo_andamento
+     ,  organograma.orgao
+     ,  sw_processo_interessado
+
+ WHERE  sw_processo_interessado.numcgm        = sw_cgm.numcgm
+   AND  sw_classificacao.cod_classificacao    = sw_processo.cod_classificacao
+   AND  sw_assunto.cod_classificacao 	      = sw_processo.cod_classificacao
+   AND  sw_assunto.cod_assunto 			      = sw_processo.cod_assunto
+   AND  sw_processo.cod_classificacao 	      = sw_assunto.cod_classificacao
+   AND  sw_processo.cod_situacao      	      = sw_situacao_processo.cod_situacao
+   AND  sw_processo.cod_processo      	      = sw_ultimo_andamento.cod_processo
+   AND  sw_processo.ano_exercicio     	      = sw_ultimo_andamento.ano_exercicio
+   AND  sw_assunto.cod_classificacao  	      = sw_classificacao.cod_classificacao
+   AND  sw_ultimo_andamento.cod_orgao         = orgao.cod_orgao
+   AND  sw_processo_interessado.cod_processo  = sw_processo.cod_processo
+   AND  sw_processo_interessado.ano_exercicio = sw_processo.ano_exercicio]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">10.46mm</property>
+            <property name="leftMargin">7mm</property>
+            <property name="bottomMargin">0mm</property>
+            <property name="rightMargin">0.1in</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="1121">
+            <property name="pageBreakAfter">auto</property>
+            <property name="pageBreakBefore">auto</property>
+            <property name="height">1.9895833333in</property>
+            <property name="width">7.8854166667in</property>
+            <method name="onPrepare"><![CDATA[function UCWords(str){
+  var arrStr = str.split(" ");
+  var strOut = "";
+  var i = 0;
+  while (i < arrStr.length) {
+     firstChar  = arrStr[i].substring(0,1);
+     remainChar = arrStr[i].substring(1);
+     firstChar  = firstChar.toUpperCase(); 
+     remainChar = remainChar.toLowerCase();
+     strOut += firstChar + remainChar + ' ';
+     i++;
+  }
+  return strOut.substr(0,40);
+}]]></method>
+            <column id="1122"/>
+            <column id="1123">
+                <property name="width">4.0416666667in</property>
+            </column>
+            <row id="1124">
+                <property name="height">1.25in</property>
+                <cell id="1125">
+                    <table id="1143">
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="width">96mm</property>
+                        <property name="dataSet">dsEtiquetas</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">cod_ano_processo</property>
+                                <expression name="expression">dataSetRow["cod_ano_processo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_cgm</property>
+                                <expression name="expression">dataSetRow["nom_cgm"];</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_classificacao</property>
+                                <expression name="expression">dataSetRow["nom_classificacao"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_assunto</property>
+                                <expression name="expression">dataSetRow["nom_assunto"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_setor</property>
+                                <expression name="expression">dataSetRow["nom_setor"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="repeatHeader">true</property>
+                        <property name="pageBreakInterval">16</property>
+                        <column id="1150">
+                            <property name="width">28mm</property>
+                        </column>
+                        <column id="1177">
+                            <property name="width">68mm</property>
+                        </column>
+                        <detail>
+                            <row id="1146">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1147">
+                                    <text id="1292">
+                                        <property name="fontSize">medium</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Processo:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1176">
+                                    <data id="1346">
+                                        <property name="fontSize">medium</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">cod_ano_processo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1178">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1179">
+                                    <text id="1262">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Interessado:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1180">
+                                    <data id="1266">
+                                        <property name="fontSize">medium</property>
+                                        <structure name="stringFormat">
+                                            <property name="category">Unformatted</property>
+                                        </structure>
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_cgm</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1246">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1247">
+                                    <text id="1263">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Classificação:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1248">
+                                    <data id="1267">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_classificacao</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1249">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1250">
+                                    <text id="1264">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Assunto:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1251">
+                                    <data id="1268">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_assunto</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1252">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1253">
+                                    <text id="1265">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Localização:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1254">
+                                    <data id="1269">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_setor</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1413">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 != 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1414">
+                                    <label id="1420"/>
+                                </cell>
+                                <cell id="1415">
+                                    <label id="1421"/>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+                <cell id="1126">
+                    <table id="1165">
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="width">96.5mm</property>
+                        <property name="dataSet">dsEtiquetas</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">data item</property>
+                                <expression name="expression">row.__rownum</expression>
+                                <property name="dataType">any</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_cgm</property>
+                                <expression name="expression">dataSetRow["nom_cgm"];</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_setor</property>
+                                <expression name="expression">dataSetRow["nom_setor"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_assunto</property>
+                                <expression name="expression">dataSetRow["nom_assunto"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_classificacao</property>
+                                <expression name="expression">dataSetRow["nom_classificacao"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cod_ano_processo</property>
+                                <expression name="expression">dataSetRow["cod_ano_processo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="repeatHeader">true</property>
+                        <property name="pageBreakInterval">16</property>
+                        <column id="1388">
+                            <property name="width">0.5mm</property>
+                        </column>
+                        <column id="1170">
+                            <property name="width">28mm</property>
+                        </column>
+                        <column id="1271">
+                            <property name="width">68mm</property>
+                        </column>
+                        <detail>
+                            <row id="1166">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1383"/>
+                                <cell id="1167">
+                                    <text id="596">
+                                        <property name="fontSize">medium</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Processo:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1270">
+                                    <data id="1347">
+                                        <property name="fontSize">medium</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">cod_ano_processo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1272">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1384"/>
+                                <cell id="1273">
+                                    <text id="1284">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Interessado:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1274">
+                                    <data id="1353">
+                                        <structure name="stringFormat">
+                                            <property name="category">Unformatted</property>
+                                        </structure>
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_cgm</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1275">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1385"/>
+                                <cell id="1276">
+                                    <text id="1291">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Classificação:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1277">
+                                    <data id="1349">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_classificacao</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1278">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1386"/>
+                                <cell id="1279">
+                                    <text id="1293">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Assunto:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1280">
+                                    <data id="1350">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_assunto</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1281">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1387"/>
+                                <cell id="1282">
+                                    <text id="1294">
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Localização:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="1283">
+                                    <data id="1351">
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">nom_setor</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1416">
+                                <property name="height">4.7mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">row.__rownum % 2 == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1417"/>
+                                <cell id="1418">
+                                    <label id="1422"/>
+                                </cell>
+                                <cell id="1419">
+                                    <label id="1423"/>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

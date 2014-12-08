@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="author">Diego Lemos de Souza</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+    <property name="units">mm</property>
+    <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <text-property name="displayName">Template Urbem Retrato</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem.rptlibrary</property>
+            <property name="namespace">urbem</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="term_user" id="6666">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="exercicio" id="186">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_acao" id="187">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_driver" id="188">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_conn_url" id="189">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_user" id="190">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_password" id="191">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pAlmoxarifado" id="1175">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pCodCatalogo" id="1178">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pDescricao" id="1179">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pSaldo" id="1180">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pEstrutural" id="1181">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="imgPath" id="1207">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">http://localhost/URBEM-1.0</value>
+            </simple-property-list>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stSql" id="6667">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
+            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
+            	extensionProperties.odaDriverClass = params["db_driver"].value;
+				extensionProperties.odaURL = params["db_conn_url"].value;
+				extensionProperties.odaUser = params["db_user"].value;
+extensionProperties.odaPassword = params["db_password"].value;
+ extensionProperties.charSet = "utf8";
+			}]]></method>
+            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
+            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsEtiquetas" id="931">
+            <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[inTeste = 0;
+
+if ( params['pAlmoxarifado'] != '' ) {
+	this.queryText = this.queryText + ' AND estoque_material.cod_almoxarifado = ' +params['pAlmoxarifado'] ;
+}
+if ( params['pCodCatalogo'] != '' ){
+	this.queryText = this.queryText + ' AND catalogo_item.cod_catalogo = '+params['pCodCatalogo'];
+}
+if ( params['pDescricao'] != '' ){
+	this.queryText = this.queryText + " AND catalogo_item.descricao_resumida ilike '" + params['pDescricao'] + "'";
+}
+if ( params['pSaldo'] == 'S' ){
+	this.queryText = this.queryText + "   AND EXISTS(SELECT * FROM (                                             \n";
+	this.queryText = this.queryText + "                SELECT                                                    \n";
+	this.queryText = this.queryText + "                  lancamento_material.cod_item                            \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_almoxarifado                    \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_marca                           \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_centro                          \n";
+	this.queryText = this.queryText + "                , SUM(lancamento_material.quantidade) AS saldo_estoque    \n";
+	this.queryText = this.queryText + "                FROM                                                      \n";
+	this.queryText = this.queryText + "                    almoxarifado.lancamento_material                      \n";
+	this.queryText = this.queryText + "                GROUP BY                                                  \n";
+	this.queryText = this.queryText + "                  lancamento_material.cod_item                            \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_almoxarifado                    \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_marca                           \n";
+	this.queryText = this.queryText + "                , lancamento_material.cod_centro ) as saldo               \n";
+	this.queryText = this.queryText + " WHERE saldo.saldo_estoque > 0                                            \n";
+	this.queryText = this.queryText + "   AND saldo.cod_item          = estoque_material.cod_item                \n";
+	this.queryText = this.queryText + "   AND saldo.cod_almoxarifado  = estoque_material.cod_almoxarifado        \n";
+	this.queryText = this.queryText + "   AND saldo.cod_marca         = estoque_material.cod_marca               \n";
+	this.queryText = this.queryText + "   AND saldo.cod_centro        = estoque_material.cod_centro        )     \n";
+}
+if ( params['pEstrutural'] != '' ){
+	this.queryText = this.queryText + " and catalogo_classificacao.cod_estrutural like '" + params['pEstrutural'] + "%'";
+}
+params['stSql'] = this.queryText;
+]]></method>
+            <property name="dataSource">Postgres</property>
+            <xml-property name="queryText"><![CDATA[	 SELECT --catalogo_item_barras.codigo_barras
+    	    TRIM(catalogo_item.descricao_resumida) AS descricao_resumida
+      	  , catalogo_item.cod_item as codigo_barras
+	   FROM almoxarifado.catalogo_item
+
+ INNER JOIN almoxarifado.catalogo_item_marca
+         ON  catalogo_item.cod_item = catalogo_item_marca.cod_item 
+         
+  LEFT JOIN almoxarifado.catalogo_item_barras
+         ON catalogo_item_barras.cod_item  = catalogo_item_marca.cod_item
+        AND catalogo_item_barras.cod_marca = catalogo_item_marca.cod_marca 
+
+INNER JOIN almoxarifado.estoque_material
+        ON estoque_material.cod_item  = catalogo_item_marca.cod_item
+       AND estoque_material.cod_marca = catalogo_item_marca.cod_marca
+
+INNER JOIN almoxarifado.catalogo_classificacao
+        ON catalogo_item.cod_classificacao = catalogo_classificacao.cod_classificacao
+       AND catalogo_item.cod_catalogo      = catalogo_classificacao.cod_catalogo 
+
+  WHERE NOT catalogo_item.cod_item is null]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>codigo_barras</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>30</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>codigo_barras</design:label>
+            <design:formattingHints>
+              <design:displaySize>30</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>descricao_resumida</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>descricao_resumida</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">0.28in</property>
+            <property name="leftMargin">0.375in</property>
+            <property name="bottomMargin">0.208in</property>
+            <property name="rightMargin">0.312in</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="1121">
+            <property name="width">7.583333333333333in</property>
+            <column id="1122">
+                <property name="width">99mm</property>
+            </column>
+            <column id="1123">
+                <property name="width">3.65625in</property>
+            </column>
+            <row id="1124">
+                <property name="height">32mm</property>
+                <cell id="1125">
+                    <table id="1189">
+                        <property name="width">3.5729166666666665in</property>
+                        <property name="dataSet">dsEtiquetas</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">descricao_resumida</property>
+                                <expression name="expression">dataSetRow["descricao_resumida"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">codigo_barras</property>
+                                <expression name="expression">dataSetRow["codigo_barras"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">14</property>
+                        <column id="1196">
+                            <property name="width">3.5729166666666665in</property>
+                        </column>
+                        <detail>
+                            <row id="1192">
+                                <property name="height">32mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">(row.__rownum % 2) != inTeste</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1193">
+                                    <property name="textAlign">center</property>
+                                    <data id="1197">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">10px</property>
+                                        <property name="resultSetColumn">descricao_resumida</property>
+                                    </data>
+                                    <image id="1198">
+                                        <property name="source">url</property>
+                                        <expression name="uri">params["imgPath"]+'?numeracao=' +row["codigo_barras"]+'&amp;altura=80'</expression>
+                                    </image>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+                <cell id="1126">
+                    <table id="1199">
+                        <property name="width">3.5520833333333335in</property>
+                        <property name="dataSet">dsEtiquetas</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">descricao_resumida</property>
+                                <expression name="expression">dataSetRow["descricao_resumida"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">codigo_barras</property>
+                                <expression name="expression">dataSetRow["codigo_barras"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">14</property>
+                        <column id="1204">
+                            <property name="width">3.5520833333333335in</property>
+                        </column>
+                        <detail>
+                            <row id="1200">
+                                <property name="height">32mm</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">(row.__rownum % 2) == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1201">
+                                    <property name="textAlign">center</property>
+                                    <data id="1203">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">10px</property>
+                                        <property name="resultSetColumn">descricao_resumida</property>
+                                    </data>
+                                    <image id="1202">
+                                        <property name="source">url</property>
+                                        <expression name="uri">params["imgPath"] +'?numeracao=' +row["codigo_barras"]+'&amp;altura=80'</expression>
+                                    </image>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

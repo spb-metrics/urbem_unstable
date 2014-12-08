@@ -1,0 +1,21 @@
+INSTALAÇÃO
+- http://urbem.cnm.org.br/downloads/manual_instalacao_urbem.pdf
+
+ATUALIZAÇÃO       
+
+- Desempacote o urbem-x.x.x.tar.bz2 em um diretório temporário
+     
+    $tar jxvf urbem-x.x.x.tar.bz2
+
+- Como "root" execute o programa de instalação.
+
+    #./instalar.sh
+
+- Escolha a opção de Atualização (2).
+
+- Durante a atualização o sistema fica inativo. Com isso nenhum usuário poderá efetuar login no sistema.
+  Os usuários que efetuarem login antes do início da atualização poderão continuar trabalhando normalmente.
+  É recomendado iniciar o procedimento de atualização nos horários em que o sistema é pouco usado.
+
+- Leia atentamente as mensagens do instalador e siga o procedimento
+  proposto por ele.

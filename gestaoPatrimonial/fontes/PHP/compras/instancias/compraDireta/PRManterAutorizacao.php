@@ -1,0 +1,447 @@
+<?php
+/*
+    **********************************************************************************
+    *                                                                                *
+    * @package URBEM CNM - Soluções em Gestão Pública                                *
+    * @copyright (c) 2013 Confederação Nacional de Municípos                         *
+    * @author Confederação Nacional de Municípios                                    *
+    *                                                                                *
+    * O URBEM CNM é um software livre; você pode redistribuí-lo e/ou modificá-lo sob *
+    * os  termos  da Licença Pública Geral GNU conforme  publicada  pela Fundação do *
+    * Software Livre (FSF - Free Software Foundation); na versão 2 da Licença.       *
+    *                                                                                *
+    * Este  programa  é  distribuído  na  expectativa  de  que  seja  útil,   porém, *
+    * SEM NENHUMA GARANTIA; nem mesmo a garantia implícita  de  COMERCIABILIDADE  OU *
+    * ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral do GNU *
+    * para mais detalhes.                                                            *
+    *                                                                                *
+    * Você deve ter recebido uma cópia da Licença Pública Geral do GNU "LICENCA.txt" *
+    * com  este  programa; se não, escreva para  a  Free  Software Foundation  Inc., *
+    * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
+    *                                                                                *
+    **********************************************************************************
+*/
+?>
+<?php
+/**
+ * Página de Processamento de Aut. Empenho
+ * Data de Criação: 10/02/2007
+
+ * @author Analista: Anelise Schwengber
+ * @author Desenvolvedor: Andre Almeida
+
+ * @ignore
+
+ $Id: PRManterAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+
+ * Casos de uso: uc-03.04.32
+ */
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+
+$stPrograma = "ManterAutorizacao";
+$pgForm     = "FM".$stPrograma.".php";
+$pgProc     = "PR".$stPrograma.".php";
+$pgList     = "LS".$stPrograma.".php";
+$pgOcul     = "OC".$stPrograma.".php";
+$pgGera     = CAM_GF_EMP_INSTANCIAS."autorizacao/OCGeraRelatorioAutorizacao.php";
+
+$obErro = new Erro();
+
+Sessao::setTrataExcecao(true);
+
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasCompraDireta.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasSolicitacao.class.php";
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoReservaSaldos.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenhoAssinatura.class.php";
+
+$obTCompraDireta           = new TComprasCompraDireta;
+$obTOrcamentoReservaSaldos = new TOrcamentoReservaSaldos;
+
+$stFiltroAut  = " AND  compra_direta.cod_compra_direta  = ".$_REQUEST['inCodCompraDireta'];
+$stFiltroAut .= " AND  compra_direta.cod_modalidade     = ".$_REQUEST['inCodModalidade'];
+$stFiltroAut .= " AND  compra_direta.cod_entidade       = ".$_REQUEST['inCodEntidade'];
+$stFiltroAut .= " AND  compra_direta.exercicio_entidade = ".$_REQUEST['stExercicioEntidade']."::VARCHAR";
+
+$stFiltroAut .= "
+            -- Não pode existir uma cotação anulada.
+            AND NOT EXISTS
+                (
+                    SELECT  1
+                      FROM  compras.cotacao_anulada
+                     WHERE  cotacao_anulada.cod_cotacao = cotacao.cod_cotacao
+                       AND  cotacao_anulada.exercicio   = cotacao.exercicio
+                ) ";
+
+$obTCompraDireta->recuperaItensAgrupadosAutorizacao( $rsAutEmpenho, $stFiltroAut );
+
+$stDtCompraDireta = $_REQUEST['stDtCompraDireta'];
+
+    /* Validações das datas de autorização de empenho */
+    while ((!$rsAutEmpenho->eof()) && (!$obErro->ocorreu())) {
+
+        if (!empty($_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')])) {
+            // Não pode ser menor que a data da Ultima Compra Direta.
+            if (SistemaLegado::comparaDatas($stDtCompraDireta, $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')], false)) {
+                $obErro->setDescricao("Data da Compra Direta superior à última data de autorização da entidade ".$rsAutEmpenho->getCampo('cod_entidade').".");
+            } else {
+                // Não pode ser menor que a data corrente.
+                if (SistemaLegado::comparaDatas($_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')], date("d/m/Y"), false)) {
+                    $obErro->setDescricao("Data da Autorização deve ser menor ou igual a data atual.");
+                }
+
+               //Recupera última data da Autorização
+               include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+               $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+
+               $stFiltro = "      AND  empenho.cod_entidade = ".$rsAutEmpenho->getCampo('cod_entidade')." \n";
+               $stFiltro.= "      AND  empenho.exercicio    = '".Sessao::getExercicio()."'                \n";
+               $stOrdem  = " ORDER BY  empenho.dt_empenho DESC LIMIT 1                               	  \n";
+
+               $obTEmpenhoEmpenho->recuperaUltimaDataEmpenho( $rsRecordSet,$stFiltro,$stOrdem );
+
+                if ($dataUltimoEmpenho != "") {
+                    $dataUltimoEmpenho = SistemaLegado::dataToBr($rsRecordSet->getCampo('dt_empenho'));
+                }
+
+                $obREmpenhoAutorizacaoEmpenho = new REmpenhoAutorizacaoEmpenho;
+                $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $rsAutEmpenho->getCampo('cod_entidade'));
+                $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
+                $obREmpenhoAutorizacaoEmpenho->listarMaiorData( $rsMaiorData );
+
+                if ( ($rsMaiorData->getCampo( "data_autorizacao" ) !="") ) {
+                    $stDtAutorizacao = $rsMaiorData->getCampo( "data_autorizacao" );
+                    $stExercicioDtAutorizacao = substr($stDtAutorizacao, 6, 4);
+                } elseif ( ( $dataUltimoEmpenho !="") ) {
+                    $stDtAutorizacao = $dataUltimoEmpenho;
+                    $stExercicioDtAutorizacao = substr($dataUltimoEmpenho, 6, 4);
+                } else {
+                    $stDtAutorizacao = "01/01/".Sessao::getExercicio();
+                    $stExercicioDtAutorizacao = Sessao::getExercicio();
+                }
+                // Não pode ser menor que a data da Ultima autorização.
+                if (SistemaLegado::comparaDatas($stDtAutorizacao, $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')], false)) {
+                    $obErro->setDescricao("A Data da Autorização deve ser superior à última data de autorização "."(".$stDtAutorizacao.")"." da entidade ".$rsAutEmpenho->getCampo('cod_entidade').".");
+                }
+            }
+        } else {
+            $obErro->setDescricao("A data da autorização da entidade ".$rsAutEmpenho->getCampo('cod_entidade')." não pode ser vazia.");
+        }
+
+        $rsAutEmpenho->proximo();
+    }
+
+    if (!$obErro->ocorreu()) {
+        $stFiltroAut   = " AND  compra_direta.cod_compra_direta  = ".$_REQUEST['inCodCompraDireta'];
+        $stFiltroAut  .= " AND  compra_direta.cod_modalidade     = ".$_REQUEST['inCodModalidade'];
+        $stFiltroAut  .= " AND  compra_direta.cod_entidade       = ".$_REQUEST['inCodEntidade'];
+        $stFiltroAut  .= " AND  compra_direta.exercicio_entidade = ".$_REQUEST['stExercicioEntidade']."::VARCHAR";
+
+        $stFiltroAut  .= " --   Não pode existir uma cotação anulada.
+                          AND  NOT EXISTS
+                               (
+                                 SELECT  1
+                                   FROM  compras.cotacao_anulada
+                                  WHERE  cotacao_anulada.cod_cotacao = cotacao.cod_cotacao
+                                    AND  cotacao_anulada.exercicio   = cotacao.exercicio
+                               ) ";
+
+        $obTCompraDireta->recuperaItensAgrupadosAutorizacao( $rsAutEmpenho, $stFiltroAut );
+
+        //busca Informações da Observacao/Justificativa da solicitação
+        $stFiltroSolicitacaoCompra  = " AND  compra_direta.cod_compra_direta  = ".$_REQUEST['inCodCompraDireta'];
+        $stFiltroSolicitacaoCompra .= " AND  compra_direta.cod_modalidade     = ".$_REQUEST['inCodModalidade'];
+        $stFiltroSolicitacaoCompra .= " AND  compra_direta.cod_entidade       = ".$_REQUEST['inCodEntidade'];
+        $stFiltroSolicitacaoCompra .= " AND  compra_direta.exercicio_entidade = ".$_REQUEST['stExercicioEntidade']."::VARCHAR";
+
+        $stFiltroSolicitacaoCompra.= "
+                AND NOT EXISTS (
+                                 SELECT  1
+                                   FROM  compras.cotacao_anulada
+                                  WHERE  cotacao_anulada.cod_cotacao = cotacao.cod_cotacao
+                                    AND  cotacao_anulada.exercicio   = cotacao.exercicio
+                               )
+
+                AND NOT EXISTS (
+                                 SELECT 1
+                                   FROM compras.solicitacao_anulacao
+                                  WHERE solicitacao_anulacao.cod_solicitacao = solicitacao.cod_solicitacao
+                                    AND solicitacao_anulacao.exercicio   = solicitacao.exercicio
+                                    AND solicitacao_anulacao.cod_entidade   = solicitacao.cod_entidade
+                                )
+
+                      GROUP BY  solicitacao.cod_solicitacao
+                             ,  solicitacao.observacao
+                             ,  solicitacao.exercicio
+                             ,  solicitacao.cod_almoxarifado
+                             ,  solicitacao.cod_entidade
+                             ,  solicitacao.cgm_solicitante
+                             ,  solicitacao.cgm_requisitante
+                             ,  solicitacao.cod_objeto
+                             ,  solicitacao.prazo_entrega
+                             ,  solicitacao.timestamp";
+
+        $obTComprasSolicitacao = new TComprasSolicitacao;
+        $obTComprasSolicitacao->recuperaSolicitacaoAgrupadaNaoAnulada($rsSolicitacaoAtiva, $stFiltroSolicitacaoCompra);
+
+        while (!$rsSolicitacaoAtiva->EOF()) {
+            $observacaoSolicitacao .= $rsSolicitacaoAtiva->getCampo('observacao').'§§';
+            $rsSolicitacaoAtiva->proximo();
+        }
+
+        Sessao::write('observacaoSolicitacao', $observacaoSolicitacao);
+
+        $arAutorizacao = Sessao::read('arAutorizacao');
+        $inCont = 0;
+
+        while ((!$rsAutEmpenho->eof()) and (!$obErro->ocorreu())) {
+
+            $obAutorizacaoEmpenho = new REmpenhoAutorizacaoEmpenho;
+
+            $obAutorizacaoEmpenho->boAutViaPatrimonial = false;
+            $obAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
+            $obAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $rsAutEmpenho->getCampo('cod_entidade') );
+            $obAutorizacaoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( 0 );
+
+            $obAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $rsAutEmpenho->getCampo("cod_despesa") );
+            $obAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $rsAutEmpenho->getCampo("mascara_classificacao") );
+            $obAutorizacaoEmpenho->obRCGM->setNumCGM( $rsAutEmpenho->getCampo("fornecedor") );
+            $obAutorizacaoEmpenho->obRUsuario->obRCGM->setNumCGM( Sessao::read('numCgm') );
+            $obAutorizacaoEmpenho->obREmpenhoHistorico->setCodHistorico( 0 );
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeInicial( $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')] );
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeFinal( '31/12/'.date('Y') );
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setDtInclusao( $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')] );
+            $obAutorizacaoEmpenho->setDescricao( $rsAutEmpenho->getCampo("cod_objeto") . " - " . $rsAutEmpenho->getCampo("desc_objeto"));
+            $obAutorizacaoEmpenho->setDtAutorizacao( $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')] );
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setVlReserva( $rsAutEmpenho->getCampo("reserva") );
+            $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $rsAutEmpenho->getCampo("num_orgao") );
+            $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->setNumeroUnidade( $rsAutEmpenho->getCampo("num_unidade") );
+            $obAutorizacaoEmpenho->setCodCategoria ( 1 );
+
+            // atributo modalidade
+            // array temporario para relação entre modalidade licitacao e atributo modalidade do empenho
+            $arModalidade = array(1 => 2, 2 => 3, 3 => 4, 4 => 0, 5 => 1, 6 => 11, 7 => 12,8 => 5,9 => 6, 10 => 13, 11 => 14);
+            $inAtribModalidade = $arModalidade[$rsAutEmpenho->getCampo("cod_modalidade")];
+            $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '101' , $inAtribModalidade );
+
+            // atributo tipo credor
+                        // segundo Valtair não está sendo utilizado o atributo tipo credor
+            //$obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '103' , 1 );
+
+            // atributo complementar
+            $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '100' , 2 );
+
+            // itens
+            $stFiltroTmp = $stFiltroAut;
+            $stFiltroTmp .= " and cotacao_fornecedor_item.cgm_fornecedor = " . $rsAutEmpenho->getCampo("fornecedor");
+            $stFiltroTmp .= " and solicitacao_item_dotacao.cod_despesa = " . $rsAutEmpenho->getCampo("cod_despesa");
+            $stFiltroTmp .= " and solicitacao_item_dotacao.cod_conta = " .   $rsAutEmpenho->getCampo("cod_conta" );
+
+            $obTCompraDireta->recuperaItensAutorizacao( $rsItensAutEmpenho, $stFiltroTmp );
+
+            $inNumItemCont = 1;
+            while ( !$rsItensAutEmpenho->eof() ) {
+                // atualizar saldo do item na solicitação ou anula caso seja zero
+                // busca info da reserva
+                require_once( CAM_GF_ORC_MAPEAMENTO . "TOrcamentoReservaSaldosAnulada.class.php");
+                $obTOrcamentoReservaSaldosAnulada = new TOrcamentoReservaSaldosAnulada();
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'cod_reserva' , $rsItensAutEmpenho->getCampo( 'cod_reserva') );
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'exercicio'   , $rsItensAutEmpenho->getCampo( 'exercicio_solicitacao' ) );
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'motivo_anulacao' , 'Anulação Automática. Entidade: '.$rsAutEmpenho->getCampo( 'cod_entidade' ).' - '.$rsAutEmpenho->getCampo( 'nom_entidade' ).', Mapa de compras: '. $rsItensAutEmpenho->getCampo( 'cod_mapa' ) . '/'. $rsItensAutEmpenho->getCampo( 'exercicio_mapa' ) . '' );
+                $obTOrcamentoReservaSaldosAnulada->consultar();
+
+                if (Sessao::getExcecao()->getDescricao() == "Nenhum registro encontrado!") {
+                    Sessao::getExcecao()->setDescricao("");
+                }
+
+                if ( !$obTOrcamentoReservaSaldosAnulada->getDado ( 'dt_anulacao' ) ) {
+                    $obTOrcamentoReservaSaldosAnulada->setDado( 'dt_anulacao' , $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')] );
+                    $obErro = $obTOrcamentoReservaSaldosAnulada->inclusao( Sessao::getTransacao() );
+                }
+                $rsItensAutEmpenho->proximo();
+            }
+
+            //anula reserva de saldo dos itens que não possuem cotação
+            $stItens = '';
+            $rsItensAutEmpenho->setPrimeiroElemento();
+            while (!$rsItensAutEmpenho->eof()) {
+                $stItens .= ','.$rsItensAutEmpenho->getCampo('cod_item');
+                $rsItensAutEmpenho->proximo();
+            }
+
+            $rsItensAutEmpenho->setPrimeiroElemento();
+            $stItens = substr($stItens, 1);
+            $rsItensSemCotacao = new RecordSet();
+
+            //recupera itens que nao tiveram cotacao
+            require_once(CAM_GP_COM_MAPEAMENTO."TComprasMapaItemReserva.class.php");
+            $obTComprasMapaItemReserva = new TComprasMapaItemReserva();
+            $stFiltroMapaItemReserva = " LEFT JOIN compras.mapa_cotacao
+                            ON mapa_cotacao.cod_mapa = mapa_item_reserva.cod_mapa
+                               AND mapa_cotacao.exercicio_mapa = mapa_item_reserva.exercicio_mapa
+
+                         LEFT JOIN compras.cotacao
+                            ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+                               AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+
+                         LEFT JOIN compras.cotacao_anulada
+                            ON cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
+                               AND cotacao.exercicio = cotacao_anulada.exercicio
+
+                         LEFT JOIN compras.cotacao_item
+                            ON cotacao.cod_cotacao = cotacao_item.cod_cotacao
+                               AND cotacao.exercicio = cotacao_item.exercicio
+
+                         LEFT JOIN compras.cotacao_fornecedor_item
+                            ON cotacao_item.exercicio = cotacao_fornecedor_item.exercicio
+                               AND cotacao_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
+                               AND cotacao_item.cod_item = cotacao_fornecedor_item.cod_item
+                               AND cotacao_item.lote = cotacao_fornecedor_item.lote
+
+                        WHERE mapa_item_reserva.cod_item NOT IN (".$stItens.")
+                               AND mapa_item_reserva.cod_mapa = ".$rsItensAutEmpenho->getCampo('cod_mapa')."
+                               AND mapa_item_reserva.exercicio_mapa = '".$rsItensAutEmpenho->getCampo('exercicio_mapa')."'
+                               AND mapa_item_reserva.cod_solicitacao = ".$rsItensAutEmpenho->getCampo('cod_solicitacao')."
+                               AND mapa_item_reserva.exercicio_mapa = '".$rsItensAutEmpenho->getCampo('exercicio_solicitacao')."'
+                               AND cotacao_fornecedor_item.cod_cotacao IS NULL
+                               AND cotacao_anulada.cod_cotacao IS NULL
+
+                         GROUP BY  mapa_item_reserva.exercicio_reserva
+                            ,  mapa_item_reserva.cod_reserva
+                            ,  mapa_item_reserva.cod_despesa
+                            ,  mapa_item_reserva.cod_conta
+                            ,  mapa_item_reserva.cod_item
+                            ,  mapa_item_reserva.cod_centro
+                            ,  mapa_item_reserva.cod_entidade
+                            ,  solicitacao_homologada_reserva.cod_reserva
+                            ,  solicitacao_homologada_reserva.exercicio
+                            ,  reserva_saldos_solicitacao.vl_reserva
+                            ,  reserva_saldos.vl_reserva
+                               ";
+            $obTComprasMapaItemReserva->recuperaReservas($rsItensSemCotacao, $stFiltroMapaItemReserva);
+
+            $rsItensSemCotacao->setPrimeiroElemento();
+                while (!$rsItensSemCotacao->eof()) {
+                $obTOrcamentoReservaSaldosAnulada = new TOrcamentoReservaSaldosAnulada();
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'cod_reserva' , $rsItensSemCotacao->getCampo( 'cod_reserva') );
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'exercicio'   , $rsItensSemCotacao->getCampo( 'exercicio_reserva' ) );
+                $obErro2 = $obTOrcamentoReservaSaldosAnulada->consultar();
+                if (Sessao::getExcecao()->getDescricao() == "Nenhum registro encontrado!") {
+                    Sessao::getExcecao()->setDescricao("");
+                }
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'motivo_anulacao' , 'Anulação Automática. Entidade: '.$rsAutEmpenho->getCampo( 'cod_entidade' ).' - '.$rsAutEmpenho->getCampo( 'nom_entidade' ).', Mapa de compras: '. $rsItensAutEmpenho->getCampo( 'cod_mapa' ) . '/'. $rsItensAutEmpenho->getCampo( 'exercicio_mapa' ) . '' );
+                $obTOrcamentoReservaSaldosAnulada->setDado( 'dt_anulacao' , $_REQUEST['dtAutorizacao_'.$rsAutEmpenho->getCampo('cod_entidade')] );
+                if ($obErro2->ocorreu()) {
+                    $obErro = $obTOrcamentoReservaSaldosAnulada->inclusao( Sessao::getTransacao() );
+                }
+
+                $rsItensSemCotacao->proximo();
+            }
+
+            unset($rsItensSemCotacao, $stFiltroMapaItemReserva);
+
+            $stOrdem = " ORDER BY catalogo_item.descricao ";
+            $obTCompraDireta->recuperaInfoItensAgrupadosSolicitacao( $rsItensSolicitacaoAgrupados, $stFiltroTmp, $stOrdem );
+
+            unset($stFiltroHomologacao, $stFiltroTmp);
+
+            while (!$rsItensSolicitacaoAgrupados->eof()) {
+                // gerar autorização
+                $obAutorizacaoEmpenho->addItemPreEmpenho();
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCompra( true );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNumItem    	        ( $inNumItemCont++ );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodItem    	        ( $rsItensSolicitacaoAgrupados->getCampo( 'cod_item' )           );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCotacao 	        ( $rsItensSolicitacaoAgrupados->getCampo( 'cod_cotacao' )        );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setExercicioJulgamento   ( $rsItensSolicitacaoAgrupados->getCampo( 'exercicio' )          );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCgmFornecedor         ( $rsItensSolicitacaoAgrupados->getCampo( 'fornecedor' )         );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setLoteCompras 	        ( $rsItensSolicitacaoAgrupados->getCampo( 'lote' )               );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setQuantidade            ( $rsItensSolicitacaoAgrupados->getCampo( 'qtd_cotacao' )        );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNomUnidade            ( $rsItensSolicitacaoAgrupados->getCampo( 'nom_unidade' )        );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setValorTotal            ( $rsItensSolicitacaoAgrupados->getCampo( 'vl_cotacao' )         );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNomItem               ( $rsItensSolicitacaoAgrupados->getCampo( 'descricao_completa' ) );
+                //descricao_completa do item do catalogo concatenada com complemento do item na solicitacao
+                $complemento = "";
+                if (trim($rsItensSolicitacaoAgrupados->getCampo( 'descricao_completa' ))) {
+                    $complemento .= trim($rsItensSolicitacaoAgrupados->getCampo( 'descricao_completa' ))." ";
+                }
+                if (trim($rsItensSolicitacaoAgrupados->getCampo( 'complemento' ))) {
+                    $complemento .= trim($rsItensSolicitacaoAgrupados->getCampo( 'complemento' ));
+                }
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setComplemento($complemento);
+                //
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $rsItensSolicitacaoAgrupados->getCampo( 'cod_unidade' )  );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $rsItensSolicitacaoAgrupados->getCampo( 'cod_grandeza') );
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade( $rsItensSolicitacaoAgrupados->getCampo( 'simbolo') );
+
+                $rsItensSolicitacaoAgrupados->proximo();
+            }
+
+            $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
+
+            # Salvar Assinaturas configuráveis se houverem
+            $arAssinaturas = Sessao::read('assinaturas');
+
+            if (is_array($arAssinaturas) && count($arAssinaturas['selecionadas']) > 0) {
+                $arAssinatura = $arAssinaturas['selecionadas'];
+
+                $obTEmpenhoAutorizacaoEmpenhoAssinatura = new TEmpenhoAutorizacaoEmpenhoAssinatura;
+                $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('exercicio'       , $obAutorizacaoEmpenho->getExercicio());
+                $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cod_entidade'    , $obAutorizacaoEmpenho->obROrcamentoEntidade->getCodigoEntidade());
+                $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cod_autorizacao' , $obAutorizacaoEmpenho->getCodAutorizacao());
+                $arPapel = $obTEmpenhoAutorizacaoEmpenhoAssinatura->arrayPapel();
+
+                foreach ($arAssinatura as $arAssina) {
+
+                    if (isset($arAssina['papel'])) {
+                        if (is_numeric($arAssina['papel'])) {
+                            $inNumAssina = $arAssina['papel'];
+                        } else {
+                            $inNumAssina = $arPapel[$arAssina['papel']];
+                        }
+                    }
+
+                    $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('num_assinatura', $inNumAssina);
+                    $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('numcgm'        , $arAssina['inCGM']);
+                    $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cargo'         , $arAssina['stCargo']);
+                    $obErro = $obTEmpenhoAutorizacaoEmpenhoAssinatura->inclusao($boTransacao);
+                }
+
+                unset($obTEmpenhoAutorizacaoEmpenhoAssinatura);
+            }
+
+            # Armazena os dados da autorização em array para depois ser usado na impressão.
+            $arAutorizacao[$inCont] = array( "inCodAutorizacao"	=> $obAutorizacaoEmpenho->getCodAutorizacao(),
+                                             "inCodPreEmpenho" 	=> $obAutorizacaoEmpenho->getCodPreEmpenho(),
+                                             "inCodEntidade" 	=> $obAutorizacaoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
+                                             "stDtAutorizacao" 	=> $obAutorizacaoEmpenho->getDtAutorizacao(),
+                                             "inCodDespesa" 	=> $obAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa(),
+                                             "stExercicio"      => $obAutorizacaoEmpenho->getExercicio()
+                                           );
+            $rsAutEmpenho->proximo();
+            $inCont++;
+        }
+
+        $stMsg  = '';
+        $indice = count($arAutorizacao) - 1;
+
+        if (count($arAutorizacao) == 1) {
+            $stMsg = $arAutorizacao[0]['inCodAutorizacao']. "/".Sessao::getExercicio() ;
+        } else {
+            $stMsg = "Autorizações de " . $arAutorizacao[0]['inCodAutorizacao']. "/".Sessao::getExercicio() . " até " . $arAutorizacao[$indice]['inCodAutorizacao']. "/".Sessao::getExercicio() ;
+        }
+
+        # Grava no array as autorizações geradas.
+        Sessao::write('arAutorizacao', $arAutorizacao);
+
+        # Exibe a mensagem e redireciona para a tela de download.
+        SistemaLegado::alertaAviso($pgGera.'?'.Sessao::getId(), $stMsg , "incluir", "aviso", Sessao::getId(), "../");
+    } else {
+        SistemaLegado::exibeAviso( $obErro->getDescricao(),"n_incluir","erro");
+        echo "<script>LiberaFrames(true,true);</script>";
+    }
+
+Sessao::encerraExcecao();
+
+?>

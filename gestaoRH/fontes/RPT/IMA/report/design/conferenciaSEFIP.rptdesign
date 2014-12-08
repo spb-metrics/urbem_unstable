@@ -1,0 +1,1187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+    <property name="units">in</property>
+    <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
+            <property name="namespace">urbem_221</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="term_user" id="6666">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="exercicio" id="186">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_acao" id="187">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_driver" id="188">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">org.postgresql.Driver</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_conn_url" id="189">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_user" id="190">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">[usuario]</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="db_password" id="191">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">[usuario]</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="entidade" id="1123">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="inCodPeriodoMovimentacao" id="1157">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="inCodRecolhimento" id="1158">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="inCodAtributo" id="1159">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="inCodTipoAtributo" id="1160">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stCompetencia" id="1161">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stTipoFiltro" id="1162">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stCodigos" id="1163">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stEntidade" id="1164">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
+            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
+                extensionProperties.odaDriverClass = params["db_driver"].value;
+                extensionProperties.odaURL = params["db_conn_url"].value;
+                extensionProperties.odaUser = params["db_user"].value;
+extensionProperties.odaPassword = params["db_password"].value;
+ extensionProperties.charSet = "utf8";
+            }]]></method>
+            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
+            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="servidores" id="1148">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">stTipoFiltro</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">stCodigos</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_3</property>
+                    <property name="paramName">inCodPeriodoMovimentacao</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_4</property>
+                    <property name="paramName">inCodAtributo</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_5</property>
+                    <property name="paramName">inCodTipoAtributo</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_6</property>
+                    <property name="paramName">stEntidade</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[select * from conferenciaSefip(?,?,?,?,?,?);]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>2</design:position>
+        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>3</design:position>
+        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>4</design:position>
+        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>5</design:position>
+        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>6</design:position>
+        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Unknown</design:nullability>
+      </design:attributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="crosstab" id="4">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="NewStyle" id="1145">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">8pt</property>
+        </style>
+        <style name="padrao_urbem" id="1146">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">8pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.3in</property>
+            <property name="leftMargin">0.2in</property>
+            <property name="bottomMargin">0.21in</property>
+            <property name="rightMargin">0.1in</property>
+            <page-header>
+                <grid name="cabecalho_paisagem" id="1147" extends="urbem_221.cabecalho_paisagem"/>
+            </page-header>
+            <page-footer>
+                <grid name="rodape" id="1134" extends="urbem_221.rodape">
+                    <property name="marginTop">0pt</property>
+                    <property name="width">285mm</property>
+                    <overridden-values>
+                        <ref-entry baseId="180" id="180"/>
+                        <ref-entry baseId="181" id="181"/>
+                        <ref-entry baseId="182" id="182"/>
+                        <ref-entry baseId="183" name="NewText2" id="183"/>
+                    </overridden-values>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="252">
+            <property name="style">padrao_urbem</property>
+            <property name="width">280mm</property>
+            <property name="dataSet">servidores</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">data item</property>
+                    <expression name="expression">Total.sum(row["base_fgts"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_1</property>
+                    <expression name="expression">Total.count(row["registro"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_2</property>
+                    <expression name="expression">Total.sum(row["base_previdencia"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_3</property>
+                    <expression name="expression">Total.sum(row["desconto_previdencia"])</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_4</property>
+                    <expression name="expression">Total.sum(row["base_fgts_decimo"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_5</property>
+                    <expression name="expression">Total.sum(row["base_previdencia_decimo"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_6</property>
+                    <expression name="expression">Total.sum(row["desconto_previdencia_decimo"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_7</property>
+                    <expression name="expression">Total.sum(row["salario_familia"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">data item_8</property>
+                    <expression name="expression">Total.sum(row["salario_maternidade"])</expression>
+                    <property name="dataType">any</property>
+                </structure>
+                <structure>
+                    <property name="name">base_previdencia</property>
+                    <expression name="expression">dataSetRow["base_previdencia"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">nom_cgm</property>
+                    <expression name="expression">dataSetRow["nom_cgm"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">registro</property>
+                    <expression name="expression">dataSetRow["registro"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">servidor_pis_pasep</property>
+                    <expression name="expression">dataSetRow["servidor_pis_pasep"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">cod_categoria</property>
+                    <expression name="expression">dataSetRow["cod_categoria"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">num_ocorrencia</property>
+                    <expression name="expression">dataSetRow["num_ocorrencia"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">base_fgts</property>
+                    <expression name="expression">dataSetRow["base_fgts"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">desconto_previdencia</property>
+                    <expression name="expression">dataSetRow["desconto_previdencia"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">base_fgts_decimo</property>
+                    <expression name="expression">dataSetRow["base_fgts_decimo"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">base_previdencia_decimo</property>
+                    <expression name="expression">dataSetRow["base_previdencia_decimo"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">desconto_previdencia_decimo</property>
+                    <expression name="expression">dataSetRow["desconto_previdencia_decimo"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">salario_familia</property>
+                    <expression name="expression">dataSetRow["salario_familia"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">salario_maternidade</property>
+                    <expression name="expression">dataSetRow["salario_maternidade"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">periodo</property>
+                    <expression name="expression">dataSetRow["periodo"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">num_sefip</property>
+                    <expression name="expression">dataSetRow["num_sefip"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <property name="pageBreakInterval">50</property>
+            <column id="301">
+                <property name="width">15mm</property>
+                <property name="textAlign">right</property>
+            </column>
+            <column id="302">
+                <property name="width">60mm</property>
+            </column>
+            <column id="303">
+                <property name="width">25mm</property>
+            </column>
+            <column id="304">
+                <property name="width">10mm</property>
+                <property name="textAlign">center</property>
+            </column>
+            <column id="305">
+                <property name="width">10mm</property>
+                <property name="textAlign">center</property>
+            </column>
+            <column id="306">
+                <property name="width">15mm</property>
+                <property name="textAlign">right</property>
+            </column>
+            <column id="307">
+                <property name="width">15mm</property>
+            </column>
+            <column id="308">
+                <property name="width">15mm</property>
+            </column>
+            <column id="309">
+                <property name="width">15mm</property>
+            </column>
+            <column id="310">
+                <property name="width">15mm</property>
+            </column>
+            <column id="311">
+                <property name="width">15mm</property>
+            </column>
+            <column id="312">
+                <property name="width">15mm</property>
+            </column>
+            <column id="313">
+                <property name="width">15mm</property>
+            </column>
+            <column id="314">
+                <property name="width">10mm</property>
+            </column>
+            <column id="315">
+                <property name="width">30mm</property>
+            </column>
+            <header>
+                <row id="1321">
+                    <property name="backgroundColor">#E5E5E5</property>
+                    <property name="borderTopColor">#000000</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">thin</property>
+                    <cell id="1322">
+                        <property name="colSpan">5</property>
+                        <property name="rowSpan">1</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingRight">5px</property>
+                        <property name="verticalAlign">bottom</property>
+                        <text id="1338">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">left</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Relatório de Conferência SEFIP: <VALUE-OF>params["stCompetencia"].value</VALUE-OF>]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1327">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1328">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1329">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1330">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1331">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1332">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1333">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1334">
+                        <property name="verticalAlign">bottom</property>
+                    </cell>
+                    <cell id="1335">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <label id="1337">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Movimentação</text-property>
+                        </label>
+                    </cell>
+                </row>
+                <row id="253">
+                    <property name="backgroundColor">#E5E5E5</property>
+                    <cell id="422">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingRight">5px</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="323">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Matrícula</text-property>
+                        </label>
+                    </cell>
+                    <cell id="423">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="325">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Nome</text-property>
+                        </label>
+                    </cell>
+                    <cell id="424">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="327">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Pis/Pasep</text-property>
+                        </label>
+                    </cell>
+                    <cell id="425">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="329">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Cat</text-property>
+                        </label>
+                    </cell>
+                    <cell id="426">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="331">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Ocorr.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="427">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="481">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Base FGTS</text-property>
+                        </label>
+                    </cell>
+                    <cell id="428">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="483">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Base Prev.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="429">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="485">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Desc. Prev.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="430">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="487">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Base FGTS 13°</text-property>
+                        </label>
+                    </cell>
+                    <cell id="431">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="489">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Base Prev. 13°</text-property>
+                        </label>
+                    </cell>
+                    <cell id="432">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="491">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Desc. Prev. 13°</text-property>
+                        </label>
+                    </cell>
+                    <cell id="433">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="493">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Sal. Família</text-property>
+                        </label>
+                    </cell>
+                    <cell id="434">
+                        <property name="colSpan">1</property>
+                        <property name="rowSpan">1</property>
+                        <property name="verticalAlign">bottom</property>
+                        <label id="495">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Sal. Matern.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="267">
+                        <label id="539">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Cód</text-property>
+                        </label>
+                    </cell>
+                    <cell id="268">
+                        <label id="540">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Período</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="269">
+                    <cell id="270">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingRight">5px</property>
+                        <data id="607">
+                            <property name="resultSetColumn">registro</property>
+                        </data>
+                    </cell>
+                    <cell id="271">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="605">
+                            <property name="resultSetColumn">nom_cgm</property>
+                        </data>
+                    </cell>
+                    <cell id="272">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="609">
+                            <property name="resultSetColumn">servidor_pis_pasep</property>
+                        </data>
+                    </cell>
+                    <cell id="273">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="611">
+                            <property name="resultSetColumn">cod_categoria</property>
+                        </data>
+                    </cell>
+                    <cell id="274">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="613">
+                            <property name="resultSetColumn">num_ocorrencia</property>
+                        </data>
+                    </cell>
+                    <cell id="275">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="614">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">base_fgts</property>
+                        </data>
+                    </cell>
+                    <cell id="276">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="573">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">base_previdencia</property>
+                        </data>
+                    </cell>
+                    <cell id="277">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="615">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">desconto_previdencia</property>
+                        </data>
+                    </cell>
+                    <cell id="278">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="616">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">base_fgts_decimo</property>
+                        </data>
+                    </cell>
+                    <cell id="279">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="617">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">base_previdencia_decimo</property>
+                        </data>
+                    </cell>
+                    <cell id="280">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="618">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">desconto_previdencia_decimo</property>
+                        </data>
+                    </cell>
+                    <cell id="281">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="619">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">salario_familia</property>
+                        </data>
+                    </cell>
+                    <cell id="282">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="textAlign">right</property>
+                        <data id="620">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">salario_maternidade</property>
+                        </data>
+                    </cell>
+                    <cell id="283">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="622">
+                            <property name="textAlign">center</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">"|145|307|317|327|337|345|".indexOf("|"+params["inCodRecolhimento"]+"|") >= 0</expression>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">num_sefip</property>
+                        </data>
+                    </cell>
+                    <cell id="284">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="621">
+                            <property name="textAlign">center</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">"|145|307|317|327|337|345|".indexOf("|"+params["inCodRecolhimento"]+"|") >= 0</expression>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">periodo</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="285">
+                    <property name="backgroundColor">#E5E5E5</property>
+                    <cell id="286">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                    </cell>
+                    <cell id="287">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <label id="498">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Total de Matrículas:</text-property>
+                        </label>
+                    </cell>
+                    <cell id="289">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="499">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">data item_1</property>
+                        </data>
+                    </cell>
+                    <cell id="291">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="497">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item</property>
+                        </data>
+                    </cell>
+                    <cell id="292">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="500">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_2</property>
+                        </data>
+                    </cell>
+                    <cell id="293">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="501">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_3</property>
+                        </data>
+                    </cell>
+                    <cell id="294">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="502">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_4</property>
+                        </data>
+                    </cell>
+                    <cell id="295">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="503">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_5</property>
+                        </data>
+                    </cell>
+                    <cell id="296">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="504">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_6</property>
+                        </data>
+                    </cell>
+                    <cell id="297">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="505">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_7</property>
+                        </data>
+                    </cell>
+                    <cell id="298">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <data id="506">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">###,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">data item_8</property>
+                        </data>
+                    </cell>
+                    <cell id="299">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                    </cell>
+                    <cell id="300">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                    </cell>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>
