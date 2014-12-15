@@ -390,7 +390,7 @@ ELSE
     )
     ';
     EXECUTE stSql1;
-   
+    
     INSERT INTO tmp_receitas VALUES (6, 'militar1', 4, 'Pessoal Militar');
     INSERT INTO tmp_receitas VALUES (6, 'militar2', 5, 'Ativo');
     INSERT INTO tmp_receitas VALUES (6, 'militar3', 5, 'Inativo');
@@ -416,8 +416,8 @@ ELSE
             cast(''RECEITAS PREVIDENCIÁRIAS - RPPS (EXCETO INTRA-ORÇAMENTÁRIAS) (I)'' as varchar) as nom_conta,
             (sum(coalesce(receitas.previsao_inicial, 0.00)) - sum(coalesce(deducao.previsao_inicial, 0.00))) as previsao_inicial,
             (sum(coalesce(receitas.previsao_inicial, 0.00)) - sum(coalesce(deducao.previsao_inicial, 0.00))) as previsao_atualizada,
-            (sum(coalesce(receitas.no_bimestre,0.00))    - sum(coalesce(deducao.no_bimestre,0.00))) as no_bimestre,
-            (sum(coalesce(receitas.ate_bimestre,0.00))   - sum(coalesce(deducao.ate_bimestre,0.00))) as ate_bimestre,
+            (sum(coalesce(receitas.no_bimestre,0.00))) as no_bimestre,
+            (sum(coalesce(receitas.ate_bimestre,0.00))) as ate_bimestre,
             (sum(coalesce(receitas.ate_bimestre_anterior,0.00)) - sum(coalesce(deducao.ate_bimestre_anterior,0.00))) as ate_bimestre_anterior
         FROM    tmp_receitas AS receitas
             ,   ( SELECT    CAST(SUM(COALESCE(previsao_inicial, 0.00)) AS numeric(14,2)) AS previsao_inicial
@@ -768,7 +768,6 @@ ELSE
     ';
     
 END IF;
-
 
     FOR reRegistro IN EXECUTE stSql
     LOOP

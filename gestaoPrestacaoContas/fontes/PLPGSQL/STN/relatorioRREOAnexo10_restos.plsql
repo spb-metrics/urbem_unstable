@@ -28,22 +28,12 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 59612 $
+* $Revision: 61149 $
 * $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Author: diogo.zarpelon $
+* $Date: 2014-12-11 14:24:09 -0200 (Qui, 11 Dez 2014) $
 *
 * Casos de uso: uc-06.01.10
-*/
-
-/*
-$Log$
-Revision 1.1  2006/09/26 10:15:54  cleisson
-Inclusão
-
-Revision 1.1  2006/08/23 13:41:48  cako
-Implementação do uc-06.01.10
-
 */
 
 CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_restos( stExercicio VARCHAR, inBimestre INTEGER, stEntidades VARCHAR ) RETURNS SETOF RECORD AS $$

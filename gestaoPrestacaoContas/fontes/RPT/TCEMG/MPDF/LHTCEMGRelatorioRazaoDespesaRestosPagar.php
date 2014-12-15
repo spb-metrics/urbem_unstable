@@ -15,7 +15,7 @@
                 <th class='text_align_left border' style="width:15mm;">Data Liq.</th>
                 <th class='text_align_left border' style="width:15mm;">Data Pag.</th>
                 <th class='text_align_left border' style="width:35mm;">Credor</th>
-                <th class='text_align_left border' style="width:40mm;">Banco</th>
+                <th class='text_align_left border' style="width:40mm;">Banco / Ag. / Cc.</th>
                 <th class='text_align_left border' style="width:10mm;">Recurso</th>
                 <th class='text_align_right border' style="width:15mm;">Valor Pag.</th>
                 <th class='text_align_left border' style="width:45mm;">Dotação</th>
@@ -52,6 +52,12 @@
     </p>
     
     <?php
+            $totalGeralPago += $totalPago;
             $totalPago      = 0;
         endforeach;
     ?>
+    
+    <p>
+        <h5>Total Geral</h5>
+        Pago: <?= number_format($totalGeralPago, '2', ',', '.') ?>
+    </p>

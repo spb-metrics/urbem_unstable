@@ -41,7 +41,16 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                    );
 
-if ($_POST['stAcao'] == "anexo9novo") {
+$obErro = new Erro();
+
+if (!$request->get("cmbMes") && !$request->get("cmbBimestre")) {
+    $stTipoRelatorio = $request->get("stTipoRelatorio") == "Mes" ? "Mês" : $request->get("stTipoRelatorio");
+    $obErro->setDescricao('É preciso selecionar ao menos um '.$stTipoRelatorio.'.');
+}
+
+if ( $request->get("stAcao") == "anexo9novo" && $request->get("stTipoRelatorio") == "Mes" ){
+    $preview = new PreviewBirt(6,36,62);    
+} elseif ($request->get("stAcao") == "anexo9novo") {
     $preview = new PreviewBirt(6,36,43);
 } else {
     $preview = new PreviewBirt(6,36,29);
@@ -86,43 +95,73 @@ if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
 }
 
 switch ($_REQUEST['stTipoRelatorio']) {
-    case 'Bimestre'    :$preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'    ] ); break;
-    case 'Quadrimestre':$preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] ); break;
-    case 'Semestre'    :$preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'    ] ); break;
+    case 'Mes':
+        $preview->addParametro( 'periodo', $_REQUEST['cmbMes']          );
+        $stMesExtenso = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio());
+        $preview->addParametro( 'mes_extenso'  , $stMesExtenso  );
+        $preview->addParametro( 'peridiocidade', "mes"          );
+    break;
+    case 'Bimestre'    :
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbBimestre'] );
+        $preview->addParametro( 'peridiocidade', "bimestre"               );
+    break;
+    case 'Quadrimestre':
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbQuadrimestre'] );
+        $preview->addParametro( 'peridiocidade', "quadrimestre"               );
+    break;
+    case 'Semestre'    :
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbSemestre'] );
+        $preview->addParametro( 'peridiocidade', "semestre"               );
+    break;
 }
 
 $stDtInicio = '';
 $stDtFinal = '';
 
-switch ($_REQUEST['cmbBimestre']) {
-case '1':
-    $stDtInicio = '01/01/' . Sessao::getExercicio();
-    if ( ( Sessao::getExercicio() % 4 ) == 0 ) {
-        $stDtFinal = '29/02/' . Sessao::getExercicio();
-    } else {
-       $stDtFinal = '28/02/' . Sessao::getExercicio();
+if(isset($_REQUEST['cmbBimestre'])){
+
+    switch ($_REQUEST['cmbBimestre']) {
+        
+        case '1':
+            $stDtInicio = '01/01/' . Sessao::getExercicio();
+            if ( ( Sessao::getExercicio() % 4 ) == 0 ) {
+                $stDtFinal = '29/02/' . Sessao::getExercicio();
+            } else {
+               $stDtFinal = '28/02/' . Sessao::getExercicio();
+            }
+            break;
+        
+        case '2':
+            $stDtInicio = '01/03/' . Sessao::getExercicio();
+            $stDtFinal = '30/04/' . Sessao::getExercicio();
+            break;
+        
+        case '3':
+            $stDtInicio = '01/05/' . Sessao::getExercicio();
+            $stDtFinal = '30/06/' . Sessao::getExercicio();
+            break;
+        
+        case '4':
+            $stDtInicio = '01/07/' . Sessao::getExercicio();
+            $stDtFinal = '31/08/' . Sessao::getExercicio();
+            break;
+        
+        case '5':
+            $stDtInicio = '01/09/' . Sessao::getExercicio();
+            $stDtFinal = '31/10/' . Sessao::getExercicio();
+            break;
+        
+        case '6':
+            $stDtInicio = '01/10/' . Sessao::getExercicio();
+            $stDtFinal = '31/12/' . Sessao::getExercicio();
+            break;
     }
-    break;
-case '2':
-    $stDtInicio = '01/03/' . Sessao::getExercicio();
-    $stDtFinal = '30/04/' . Sessao::getExercicio();
-    break;
-case '3':
-    $stDtInicio = '01/05/' . Sessao::getExercicio();
-    $stDtFinal = '30/06/' . Sessao::getExercicio();
-    break;
-case '4':
-    $stDtInicio = '01/07/' . Sessao::getExercicio();
-    $stDtFinal = '31/08/' . Sessao::getExercicio();
-    break;
-case '5':
-    $stDtInicio = '01/09/' . Sessao::getExercicio();
-    $stDtFinal = '31/10/' . Sessao::getExercicio();
-    break;
-case '6':
-    $stDtInicio = '01/10/' . Sessao::getExercicio();
-    $stDtFinal = '31/12/' . Sessao::getExercicio();
-    break;
+    
+} elseif (isset($_REQUEST['cmbMes'])) {
+    
+    $stDtInicio  = "01/".$_REQUEST['cmbMes']."/".Sessao::getExercicio();
+    $stDtFinal   = sistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'], Sessao::getExercicio());
+        
 }
 
 #############################Modificações do tce para o novo layout##############################
@@ -148,8 +187,19 @@ if ($_REQUEST['stAcao'] == 'anexo9novo') {
 }
 #################################################################################################
 
+if ($request->get("stTipoRelatorio") == "Mes") {
+    $preview->addParametro( 'mes'     , $_REQUEST['cmbMes'] );
+}
 $preview->addParametro( 'bimestre', $_REQUEST['cmbBimestre'] );
+
 $preview->addParametro( 'dt_inicio', $stDtInicio );
 $preview->addParametro( 'dt_final', $stDtFinal );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
-$preview->preview();
+
+if ( !$obErro->ocorreu() ) {
+    $preview->preview();
+} else {
+    SistemaLegado::alertaAviso("FLModelosRREO.php?'.Sessao::getId().&stAcao=".$_REQUEST['stAcao'], $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}
+
+?>

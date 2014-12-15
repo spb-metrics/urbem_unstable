@@ -557,8 +557,12 @@ BEGIN
     ELSE
         SELECT no_bi INTO nuSubTotalD FROM tcemg.fn_relatorio_anexo_valor_conta(stExercicio, 'R', '2.4.0.0.00.00.00.00.00',stEntidades, stDtIni,stDtFim, true, 4, 2, 1) ;
     END IF;
-    
-    INSERT INTO tmp_tcemg_anI_receita VALUES (4,2,1,'Subtotal', 0.00,0.00,nuSubTotalD,0.00,0.00);
+    /*#22472 
+      Ajusta a coluna:
+      D - Transferências de Capital:
+      onde hoje é demonstrado valor - deixar parametrizado 0,00
+    */
+    INSERT INTO tmp_tcemg_anI_receita VALUES (4,2,1,'Subtotal', 0.00,0.00,0.00,0.00,0.00);
 
 
     ----------------------------------------
@@ -618,7 +622,14 @@ BEGIN
     END LOOP;
     INSERT INTO tmp_tcemg_anI_receita VALUES (5,2,1,'Subtotal', 0.00,0.00,nuSubTotalE,0.00,0.00);
 
-    nuTotalReceitas := nuSubTotalA + nuSubTotalB + nuSubTotalC + nuSubTotalD - nuSubTotalE;
+    /*#22472 
+      Ajusta a coluna:
+      D - Transferências de Capital:
+      Total das Receitas (A + B + C + D - E)
+      Não considerar mais o D na soma. Como ficará parametrizado 0,00 não terá mais esse valor na soma
+      soma da versao anterior ao ticket #22472 = nuTotalReceitas := nuSubTotalA + nuSubTotalB + nuSubTotalC + nuSubTotalD - nuSubTotalE;
+    */
+    nuTotalReceitas := nuSubTotalA + nuSubTotalB + nuSubTotalC - nuSubTotalE;
     
 	-- --------------------------------------
 	-- Select de Retorno

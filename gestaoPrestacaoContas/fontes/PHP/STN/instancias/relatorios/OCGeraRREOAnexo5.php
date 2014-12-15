@@ -43,6 +43,8 @@
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/Bimestre.class.php';
 require_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
 
 $stAcao = $request->get('stAcao');
@@ -53,11 +55,19 @@ if ($stAcao == 'anexo5') {
     $preview->setVersaoBirt( '2.5.0' );
     $preview->setExportaExcel(true);
 } else {
-    $preview = new PreviewBirt(6,36,28);
-    $preview->setTitulo('Relatório do Birt');
-    $preview->setTitulo('Dem. Receitas  e Despesas  Previdenciárias do RPPS');
-    $preview->setVersaoBirt( '2.5.0' );
-    $preview->setExportaExcel(true);
+    if (Sessao::getExercicio() >= '2015') {
+        $preview = new PreviewBirt(6,36,61);
+        $preview->setTitulo('Relatório do Birt');
+        $preview->setTitulo('Dem. Receitas  e Despesas  Previdenciárias do RPPS');
+        $preview->setVersaoBirt( '2.5.0' );
+        $preview->setExportaExcel(true);    
+    }else{
+        $preview = new PreviewBirt(6,36,28);
+        $preview->setTitulo('Relatório do Birt');
+        $preview->setTitulo('Dem. Receitas  e Despesas  Previdenciárias do RPPS');
+        $preview->setVersaoBirt( '2.5.0' );
+        $preview->setExportaExcel(true);    
+    }
 }
 
 if (is_array($request->get('inCodEntidade'))) {
@@ -99,11 +109,8 @@ switch ($request->get('stTipoRelatorio')) {
         $preview->addParametro( 'periodicidade', "bimestre" );
         $preview->addParametro( 'periodo_referencia', utf8_encode($request->get('cmbBimestre')."º BIMESTRE DE ".Sessao::getExercicio()) );
         
-        $arDatas = explode(',',SistemaLegado::pegaDado('bimestre',"publico.bimestre('".Sessao::getExercicio()."',".$request->get('cmbBimestre').")"));
-        $stDataInicial = substr($arDatas[0],7);
-        $stDataFinal = substr($arDatas[1],0,-1);
-        //$stDataIniAnterior = substr($stDataInicial,0,-4).(Sessao::getExercicio()-1);
-        //$stDataFimAnterior = substr($stDataFinal,0,-4).(Sessao::getExercicio()-1);
+        $stDataInicial = Bimestre::getDataInicial($request->get('cmbBimestre'), Sessao::getExercicio());
+        $stDataFinal = Bimestre::getDataFinal($request->get('cmbBimestre'), Sessao::getExercicio());
         
         $inMesAnterior = (($request->get('cmbBimestre') * 2) -1);
         switch ($inMesAnterior) {

@@ -89,14 +89,11 @@ class TTCEPEFolhaPagamento extends Persistente
                                                                     ano_folha TEXT,
                                                                     cod_fonte_recurso INTEGER,
                                                                     horas_semanais INTEGER,
-                                                                    cod_evento INTEGER,
                                                                     tipo_folha INTEGER,
                                                                     valor_previdencia NUMERIC,
-                                                                    valor_irrf NUMERIC,
-                                                                    tipo_evento VARCHAR
+                                                                    valor_irrf NUMERIC
                                                                 )
                 ";
-                
         return $stSql;
     }
 

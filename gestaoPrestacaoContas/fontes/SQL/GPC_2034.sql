@@ -31,6 +31,60 @@
 */
 
 ----------------
+-- Ticket #22456
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo
+     )
+SELECT 6
+     , 36
+     , 60
+     , 'Dem. Dívida Consolidada Líquida'
+     , 'RGFAnexo2Mensal.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 60
+           )
+     ;
+
+
+----------------
+-- Ticket #22457
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo
+     )
+SELECT 6
+     , 36
+     , 12
+     , 'Relatório RGF Anexo 3 Mensal'
+     , 'RGFAnexo3Mensal.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 12
+           )
+     ;
+
+
+----------------
 -- Ticket #22458
 ----------------
 
@@ -41,11 +95,134 @@ INSERT
      , cod_relatorio
      , nom_relatorio
      , arquivo )
-     VALUES
-     ( 6
+SELECT 6
      , 36
      , 59
      , 'RGF - Anexo 4 - Demonstrativo das Operações de Crédito'
      , 'RGFAnexo4NovoMensal.rptdesign'
-     );
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 59
+           )
+     ;
+
+
+----------------
+-- Ticket #22332
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 61
+     , 'Dem. Receitas e Despesas Previdenciárias do RPPS'
+     , 'RREOAnexo4_2015.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 61
+           )
+     ;
+
+
+----------------
+-- Ticket #22469
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 62
+     , 'RREO - Anexo 9 - Demonstrativo das Receitas de Operações de Crédito e Despesas de Capital'
+     , 'RREOAnexo9_mensal.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 62
+           )
+     ;
+
+
+----------------
+-- Ticket #22471
+----------------
+
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+
+BEGIN
+    PERFORM 1
+       FROM pg_type
+      WHERE typname = 'tp_rreo_valor_conta'
+          ;
+    IF NOT FOUND THEN
+        CREATE TYPE stn.tp_rreo_valor_conta AS ( grupo          INTEGER
+                                               , subgrupo       INTEGER
+                                               , item           INTEGER
+                                               , exercicio      CHARACTER
+                                               , cod_conta      INTEGER
+                                               , nivel          INTEGER
+                                               , cod_estrutural VARCHAR
+                                               , masc_red       VARCHAR
+                                               , descricao      VARCHAR
+                                               , tipo           CHARACTER
+                                               , ini            NUMERIC
+                                               , cred_adi       NUMERIC
+                                               , atu            NUMERIC
+                                               , no_bi          NUMERIC
+                                               , ate_bi         NUMERIC
+                                               , pct            NUMERIC
+                                               );
+
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
+
+
+----------------
+-- Ticket #22335
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 63
+     , 'RREO - Anexo 8 - Demonstrativo das Receitas e Despesas com Manutenção e Desenvolvimentolvimento do Ensino-MDE'
+     , 'RREOAnexo8_2015.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 63
+           )
+     ;
 

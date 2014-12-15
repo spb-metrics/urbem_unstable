@@ -30,7 +30,7 @@
     *
     * @author: Evandro Melos
     *
-    * $Id: PagamentoFinanceiro.inc.php 60923 2014-11-25 13:38:10Z carlos.silva $
+    * $Id: PagamentoFinanceiro.inc.php 61164 2014-12-12 12:31:56Z lisiane $
     *
     * @ignore
     *
@@ -40,8 +40,8 @@ include_once CAM_GPC_TCETO_MAPEAMENTO.'TTCETOPagamentoFinanceiro.class.php';
 $obTTCETOPagamentoFinanceiro = new TTCETOPagamentoFinanceiro();
 $obTTCETOPagamentoFinanceiro->setDado('exercicio'   , Sessao::getExercicio());
 $obTTCETOPagamentoFinanceiro->setDado('cod_entidade', $inCodEntidade        );
-$obTTCETOPagamentoFinanceiro->setDado('dtInicial'   , '01/09/2014'          );
-$obTTCETOPagamentoFinanceiro->setDado('dtFinal'     , '02/09/2014'          );
+$obTTCETOPagamentoFinanceiro->setDado('dtInicial'   , $stDataInicial        );
+$obTTCETOPagamentoFinanceiro->setDado('dtFinal'     , $stDataFinal          );
 $obTTCETOPagamentoFinanceiro->recuperaPagamentoFinanceiro($rsRecordSet, $stCondicao="", $stOrdem="", $boTransacao);
 
 $idCount=0;
@@ -61,7 +61,6 @@ while (!$rsRecordSet->eof()) {
     $arResult[$idCount]['contaContabil']        = $rsRecordSet->getCampo('cod_conta_balancete');
     $arResult[$idCount]['sinal']                = $rsRecordSet->getCampo('sinal');
     $arResult[$idCount]['valor']                = $rsRecordSet->getCampo('valor');
-    $arResult[$idCount]['TipoPagamento']        = $rsRecordSet->getCampo('tipo_pagamento');
     $arResult[$idCount]['numeroCheque']         = $rsRecordSet->getCampo('num_documento');
     $arResult[$idCount]['tipoPagamento']        = $rsRecordSet->getCampo('tipo_pagamento');
 

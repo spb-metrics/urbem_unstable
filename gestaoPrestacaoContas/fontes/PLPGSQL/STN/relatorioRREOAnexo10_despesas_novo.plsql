@@ -60,26 +60,24 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_despesas_novo(stExercicio VARCHAR, stEntidades VARCHAR, inOpcao INTEGER, inBimestre INTEGER) RETURNS SETOF RECORD AS 
-
-$$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_despesas_novo(stExercicio VARCHAR, stEntidades VARCHAR, inOpcao INTEGER, stDtIni VARCHAR, stDtFim VARCHAR) RETURNS SETOF RECORD AS $$
 
 DECLARE 
 
-    stDtIniExercicio 	VARCHAR := '';	
-    stDtIni 		VARCHAR := '';
-    stDtFim 		VARCHAR := '';
-    arDatas 		VARCHAR[];
-    stOperacao 		CHARACTER(1);
-    stSQL 		VARCHAR := '';
-    stSQLaux            VARCHAR := '';
-    reReg		RECORD;
+    stDtIniExercicio VARCHAR := '';	
+    --stDtIni 		 VARCHAR := '';
+    --stDtFim 		 VARCHAR := '';
+    --arDatas 		 VARCHAR[];
+    stOperacao 		 CHARACTER(1);
+    stSQL 		     VARCHAR := '';
+    stSQLaux         VARCHAR := '';
+    reReg		     RECORD;
 
 BEGIN 
 
-    arDatas := publico.bimestre ( stExercicio, inBimestre );
-    stDtIni := arDatas[0];
-    stDtFim := arDatas[1];
+    --arDatas := publico.bimestre ( stExercicio, inBimestre );
+    --stDtIni := arDatas[0];
+    --stDtFim := arDatas[1];
     
     -- Definicao de Datas conforme Bimestre selecionado
     stDtIniExercicio := '01/01/' || stExercicio;

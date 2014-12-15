@@ -410,6 +410,40 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="data_inicial" id="6667">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <property name="autoSuggestThreshold">1</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="descricaoPeriodo" id="6668">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="periodo_extenso" id="6669">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
@@ -441,13 +475,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
                     <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_4</property>
+                    <property name="paramName">data_final</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -457,7 +499,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -474,7 +516,7 @@ extensionProperties.odaPassword = params["db_password"].value;
     	 , COALESCE(previsao_atualizada,0) AS previsao_atualizada
     	 , COALESCE(ate_periodo,0) AS ate_periodo
     	 , COALESCE(porc_periodo,0) AS porc_periodo
-      FROM stn.fn_rreo_anexo12_receitas( ?,?,? ) AS tbl
+      FROM stn.fn_rreo_anexo12_receitas( ?,?,?,? ) AS tbl
            (
             grupo integer,
             subgrupo integer,
@@ -731,9 +773,9 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
@@ -743,11 +785,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_3</property>
-                    <property name="paramName">cod_entidade</property>
+                    <property name="paramName">data_final</property>
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                     <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_3_1</property>
+                    <property name="paramName">cod_entidade</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -765,7 +817,7 @@ extensionProperties.odaPassword = params["db_password"].value;
          , COALESCE(porcentagem_empenhada,0) AS porcentagem_empenhada
          , COALESCE(despesa_liquidada,0) AS despesa_liquidada
          , COALESCE(porcentagem,0) AS porcentagem
-      FROM stn.fn_rreo_anexo12_despesas( ?,?,? ) AS tbl
+      FROM stn.fn_rreo_anexo12_despesas( ?,?,?,? ) AS tbl
            (    
             grupo integer,
             subgrupo integer,
@@ -819,6 +871,9 @@ extensionProperties.odaPassword = params["db_password"].value;
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
+          <design:defaultValues>
+            <design:values>JS_EXPR</design:values>
+          </design:defaultValues>
           <design:optional>false</design:optional>
           <design:masksValue>false</design:masksValue>
           <design:uiHints>
@@ -1023,13 +1078,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
                     <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_4</property>
+                    <property name="paramName">data_final</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -1039,7 +1102,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -1057,7 +1120,7 @@ extensionProperties.odaPassword = params["db_password"].value;
          , porcentagem_empenhada
          , despesa_liquidada
          , porcentagem
-      FROM stn.fn_rreo_anexo12_despesas_acoes_servicos( ?,?,? ) AS tbl
+      FROM stn.fn_rreo_anexo12_despesas_acoes_servicos( ?,?,?,? ) AS tbl
            (    
             grupo integer,
             subgrupo integer,
@@ -1162,13 +1225,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
                     <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_4</property>
+                    <property name="paramName">data_final</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -1178,7 +1249,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -1191,7 +1262,7 @@ extensionProperties.odaPassword = params["db_password"].value;
     	 , tipo 
     	 , vl_restos_pagar
          , vl_restos_pagar_cancelados
-      FROM stn.fn_rreo_anexo12_restos_pagar_saude(?,?,?) AS tbl
+      FROM stn.fn_rreo_anexo12_restos_pagar_saude(?,?,?,?) AS tbl
            (  
               exerc varchar
             , tipo varchar
@@ -1216,9 +1287,9 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
@@ -1228,11 +1299,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_3</property>
-                    <property name="paramName">cod_entidade</property>
+                    <property name="paramName">data_final</property>
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                     <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_3_1</property>
+                    <property name="paramName">cod_entidade</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -1250,7 +1331,7 @@ extensionProperties.odaPassword = params["db_password"].value;
          , porcentagem_empenhada
          , despesa_liquidada
          , porcentagem
-      FROM stn.fn_rreo_anexo12_despesas_subfuncao( ?,?,? ) AS tbl
+      FROM stn.fn_rreo_anexo12_despesas_subfuncao( ?,?,?,? ) AS tbl
            (    
             grupo integer,
             subgrupo integer,
@@ -1304,6 +1385,9 @@ extensionProperties.odaPassword = params["db_password"].value;
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
+          <design:defaultValues>
+            <design:values>JS_EXPR</design:values>
+          </design:defaultValues>
           <design:optional>false</design:optional>
           <design:masksValue>false</design:masksValue>
           <design:uiHints>
@@ -1595,13 +1679,21 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">periodo</property>
+                    <property name="paramName">data_inicial</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
                     <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_4</property>
+                    <property name="paramName">data_final</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -1611,7 +1703,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeName"></property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                     <property name="isOptional">true</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -1628,7 +1720,7 @@ extensionProperties.odaPassword = params["db_password"].value;
     	 , COALESCE(previsao_atualizada,0) AS previsao_atualizada
     	 , COALESCE(ate_periodo,0) AS ate_periodo
     	 , COALESCE(porc_periodo,0) AS porc_periodo
-      FROM stn.fn_rreo_anexo12_receitas_financiamento( ?,?,? ) AS tbl
+      FROM stn.fn_rreo_anexo12_receitas_financiamento( ?,?,?,? ) AS tbl
            (
             grupo integer,
             subgrupo integer,
@@ -1907,21 +1999,13 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
-                <structure>
-                    <property name="name">param_4</property>
-                    <property name="paramName">periodo</property>
-                    <property name="dataType">integer</property>
-                    <property name="position">4</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[                                  
     SELECT  *                               
         
-      FROM stn.fn_rreo_anexo12_restos_pagar_saude_nao_processado(?,?,?,?) as retorno(                                          
+      FROM stn.fn_rreo_anexo12_restos_pagar_saude_nao_processado(?,?,?) as retorno(                                          
                                
            exercicio char(4),                               
       inscritos numeric,                     
@@ -2019,7 +2103,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                         <property name="fontFamily">sans-serif</property>
                         <property name="fontSize">6pt</property>
                         <property name="textAlign">center</property>
-                        <expression name="valueExpr">params["periodo"]+"º Bimestre de "+params["exercicio"]</expression>
+                        <expression name="valueExpr">params["descricaoPeriodo"]</expression>
                         <property name="contentType">html</property>
                     </text-data>
                 </cell>
@@ -2236,8 +2320,8 @@ Total.sum(row["ate_periodo"],row["subgrupo"]==0)</expression>
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (b)]]></text-property>
                         </text>
                     </cell>
@@ -2623,8 +2707,8 @@ Total.sum(row["ate_periodo"],row["subgrupo"]==0)</expression>
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (d)]]></text-property>
                         </text>
                     </cell>
@@ -3071,8 +3155,8 @@ DESPESAS COM SAÚDE
                             <property name="paddingBottom">0pt</property>
                             <property name="paddingRight">0pt</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">plain</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (f)]]></text-property>
                         </text>
                     </cell>
@@ -3120,8 +3204,8 @@ DESPESAS COM SAÚDE
                             <property name="paddingBottom">0pt</property>
                             <property name="paddingRight">0pt</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">plain</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (g)]]></text-property>
                         </text>
                     </cell>
@@ -3738,8 +3822,8 @@ Total.sum(row["dotacao_inicial"],row["subgrupo"]==1)</expression>
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (h)]]></text-property>
                         </text>
                     </cell>
@@ -3774,8 +3858,8 @@ Total.sum(row["dotacao_inicial"],row["subgrupo"]==1)</expression>
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (i)]]></text-property>
                         </text>
                     </cell>
@@ -8373,8 +8457,8 @@ DESPESAS COM SAÚDE
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR>
 (l)]]></text-property>
                         </text>
                     </cell>
@@ -8401,8 +8485,8 @@ DESPESAS COM SAÚDE
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Até o Bimestre
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Até o <VALUE-OF>params["periodo_extenso"].value;</VALUE-OF><BR/>
 (m)]]></text-property>
                         </text>
                     </cell>

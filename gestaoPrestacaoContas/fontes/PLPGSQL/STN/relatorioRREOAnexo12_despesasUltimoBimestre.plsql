@@ -35,26 +35,25 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_ultimo_bimestre( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_ultimo_bimestre( varchar, varchar, varchar, varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
-    inBimestre     	ALIAS FOR $2;
-    stCodEntidades 	ALIAS FOR $3;
+    stDataInicial  	ALIAS FOR $2;
+    stDataFinal     ALIAS FOR $3;
+    stCodEntidades 	ALIAS FOR $4;
 
-    dtInicial  		varchar := '''';
-    dtFinal    		varchar := '''';
-    dtIniExercicio 	VARCHAR := '''';
-    stExercicioAnterior VARCHAR := '''';
-    stDtFinalExercicioAnterior VARCHAR := '''';
-    arDatas 		varchar[] ;
+    dtInicial  		varchar := '';
+    dtFinal    		varchar := '';
+    dtIniExercicio 	VARCHAR := '';
+    stExercicioAnterior VARCHAR := '';
+    stDtFinalExercicioAnterior VARCHAR := '';
     reRegistro 		record ;
-    stSql 			varchar := '''';
+    stSql 			varchar := '';
 
 BEGIN
 
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
-    dtInicial := arDatas [ 0 ];
-    dtFinal   := arDatas [ 1 ];
+    dtInicial := stDataInicial;
+    dtFinal   := stDataFinal;
    
     dtIniExercicio := '01/01/' || stExercicio;
 

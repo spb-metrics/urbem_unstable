@@ -13,7 +13,7 @@
                 <th class='text_align_left border' style="width:15mm;">Data Pag.</th>
                 <th class='text_align_left border' style="width:45mm;">Despesa</th>
                 <th class='text_align_right border' style="width:15mm;">Valor Pag.</th>
-                <th class='text_align_left border' style="width:30mm;">Banco</th>
+                <th class='text_align_left border' style="width:30mm;">Banco / Ag. / Cc.</th>
                 <th class='text_align_left border' style="width:35mm;">Conta Recurso</th>
             </tr>
         </thead>
@@ -27,7 +27,6 @@
                 <td class='text_align_right border'><?= number_format($registro['valor_pago'], '2', ',', '.') ?></td>
                 <td class='text_align_left border'><?= $registro['banco'] ?></td>
                 <td class='text_align_left border'><?= $registro['nom_recurso'] ?></td>
-                <!-- <td class='text_align_left border'><?= $registro['cod_recurso_banco'] ?></td> -->
             </tr>
             <?php
                     $totalPago = $totalPago + $registro['valor_pago'];
@@ -43,7 +42,12 @@
     </p>
     
     <?php
-            $totalEmpenhado = 0;
+            $totalGeralPago += $totalPago;
             $totalPago      = 0;
         endforeach;
     ?>
+    
+    <p>
+        <h5>Total Geral</h5>
+        Pago:      <?= number_format($totalGeralPago, '2', ',', '.') ?>
+    </p>

@@ -72,25 +72,38 @@ class TTCEPEVantagemDesconto extends Persistente
 
     public function montaRecuperaVantagemDesconto()
     { 
-        $stSql = " SELECT * FROM tcepe.recupera_vantagem_desconto ('".$this->getDado('stDataInicial')."',
-                                                                   '".$this->getDado('stDataFinal')."',
-                                                                   ".$this->getDado('inCodPeriodoMovimentacao').",
-                                                                   ".$this->getDado('inCodComplementar').",
-                                                                   '".$this->getDado('stEntidade')."'
-                                                                ) AS retorno
-                                                                (
-                                                                    resarvado_tce INTEGER,
-                                                                    matricula INTEGER,
-                                                                    cod_cargo INTEGER,
-                                                                    cpf VARCHAR,
-                                                                    mes_folha TEXT,
-                                                                    ano_folha TEXT,
-                                                                    justificativa VARCHAR,
-                                                                    tipo_folha INTEGER,
-                                                                    vl_vantdesc NUMERIC,
-                                                                    cod_vantdesc INTEGER
-                                                                )
-                ";
+        $stSql = "SELECT reservado_tce
+                       , matricula
+                       , cod_cargo
+                       , cpf
+                       , mes_folha
+                       , ano_folha
+                       , justificativa
+                       , tipo_folha
+                       , SUM(vl_vantdesc) AS vl_vantdesc
+                       , cod_vantdesc
+                    FROM tcepe.recupera_vantagem_desconto ('".$this->getDado('stDataInicial')."', '".$this->getDado('stDataFinal')."', ".$this->getDado('inCodPeriodoMovimentacao').", ".$this->getDado('inCodComplementar').", '".$this->getDado('stEntidade')."' )
+                      AS retorno ( reservado_tce INTEGER
+                                 , matricula INTEGER
+                                 , cod_cargo INTEGER
+                                 , cpf VARCHAR
+                                 , mes_folha TEXT
+                                 , ano_folha TEXT
+                                 , justificativa VARCHAR
+                                 , tipo_folha INTEGER
+                                 , vl_vantdesc NUMERIC
+                                 , cod_vantdesc INTEGER
+                                 )
+                GROUP BY reservado_tce
+                       , matricula
+                       , cod_cargo
+                       , cpf
+                       , mes_folha
+                       , ano_folha
+                       , justificativa
+                       , tipo_folha
+                       , cod_vantdesc
+        ";
                 
         return $stSql;
     }

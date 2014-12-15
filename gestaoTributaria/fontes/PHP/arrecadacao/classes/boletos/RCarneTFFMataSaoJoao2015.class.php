@@ -572,33 +572,33 @@ class RProtocolo extends FPDF2File
 class RCarneDiversosPetropolis extends RProtocolo
 {
     /* labels */
-    public $lblTitulo1 = 'MATA DE SÃO JOÃO - Sec. de Adm. e Fin.';
-    public $lblTitulo2 = 'IPTU';
-    public $lblExercicio = 'EXERCÍCIO';
-    public $lblInscricao = 'INSCRIÇÃO';
-    public $lblCodDivida = 'CÓD. DÍVIDA';
-    public $lblTributo   = 'TRIBUTO';
-    public $lblParcela   = 'PARCELA';
-    public $lblReferencia = 'REFERÊNCIA';
-    public $lblDataProcessamento = 'DATA PROCESSAMENTO';
-    public $lblVencimento = 'VENCIMENTO';
-    public $lblValorCotaUnica = 'VALOR COTA ÚNICA';
-    public $lblContribuinte = 'CONTRIBUINTE';
-    public $lblData = 'DATA';
-    public $lblCorrecao = 'CORREÇÃO';
-    public $lblMonetaria = 'MONET(%)';
-    public $lblObs       = 'OBSERVAÇÃO';
+    public $lblTitulo1              = 'MATA DE SÃO JOÃO - Sec. de Adm. e Fin.';
+    public $lblTitulo2              = 'IPTU';
+    public $lblExercicio            = 'EXERCÍCIO';
+    public $lblInscricao            = 'INSCRIÇÃO';
+    public $lblCodDivida            = 'CÓD. DÍVIDA';
+    public $lblTributo              = 'TRIBUTO';
+    public $lblParcela              = 'PARCELA';
+    public $lblReferencia           = 'REFERÊNCIA';
+    public $lblDataProcessamento    = 'DATA PROCESSAMENTO';
+    public $lblVencimento           = 'VENCIMENTO';
+    public $lblValorCotaUnica       = 'VALOR COTA ÚNICA';
+    public $lblContribuinte         = 'CONTRIBUINTE';
+    public $lblData                 = 'DATA';
+    public $lblCorrecao             = 'CORREÇÃO';
+    public $lblMonetaria            = 'MONET(%)';
+    public $lblObs                  = 'OBSERVAÇÃO';
 
-    public $lblMulta = '(+) MULTA DE MORA';
-    public $lblJuros = '(+) JUROS DE MORA';
-    public $lblOutros = '(+) ATUALIZAÇÃO MONETÁRIA';
+    public $lblMulta                = '(+) MULTA DE MORA';
+    public $lblJuros                = '(+) JUROS DE MORA';
+    public $lblOutros               = '(+) ATUALIZAÇÃO MONETÁRIA';
 
-    public $lblValorParcela = 'VALOR PARCELA';
-    public $lblReal = '(REAL)';
-    public $lblNumeracao = 'NOSSO NÚMERO';
+    public $lblValorParcela         = 'VALOR PARCELA';
+    public $lblReal                 = '(REAL)';
+    public $lblNumeracao            = 'NOSSO NÚMERO';
 
-    public $lblValorPrincipal = "(=) VALOR PRINCIPAL";
-    public $lblValorTotal     = "(=) TOTAL";
+    public $lblValorPrincipal       = "(=) VALOR PRINCIPAL";
+    public $lblValorTotal           = "(=) TOTAL";
 
     /* variaveis */
     public $ImagemCarne;
@@ -1052,17 +1052,17 @@ class RCarneDadosTFFMataSaoJoao extends RCarneDiversosPetropolis
     }
     public function desenhaCarne($x , $y)
     {
-$stComposição =
-" \n
-Pela Lei Municipal nº 280/2006 e suas alterações, que institui o Código Tributário e de Rendas do Município a Taxa de Fiscalização do Funcionamento - TFF - dos estabelecimentos em geral tem como fato gerador a sua fiscalização quanto as normas constantes desta Lei, do Código de Polícia Administrativa e do Plano Diretor Urbano, relativas a higiene, poluição do meio ambiente, costumes, ordem, tranqüilidade e segurança pública e será calculada de acordo com a Tabela de receitas Correspondente, anexa a esta Lei.\n
-A Tabela de Receitas da Lei citada acima traz os valores da Taxa de Fiscalização do Funcionamento dos estabelecimentos, de acordo com a atividade exercida. A Taxa de Fiscalização do Funcionamento terá vencimento estabelecido por Ato do Poder Executivo. Será realizado desconto de 5% (cinco por cento) do valor da Taxa, quando o contribuinte ou responsável efetuar o recolhimento integralmente, em cota única, no prazo estabelecido.\n
-O contribuinte que não efetuar o recolhimento da taxa em quota única poderá fazê-lo em até 03 (três) parcelas mensais, na forma e prazos estabelecidos por Ato do Poder Executivo, fixado o vencimento da primeira parcela em 15 de janeiro de 2015.\n
-Quando ocorrer o lançamento no curso do exercício, a Taxa de Fiscalização do Funcionamento será calculada proporcionalmente ao número de meses restantes, e o seu recolhimento será efetuado no prazo de 05 (cinco) dias após deferimento da solicitação do lançamento.\n
-A expedição do alvará definitivo dar-se-á apenas mediante total quitação da respectiva taxa. Caso o contribuinte ou responsável pela taxa opte pelo pagamento parcelado, será expedida uma licença temporária com validade até o vencimento da parcela subseqüente, devendo o contribuinte ou responsável apresentar o pagamento da(s) parcela(s) no órgão responsável pela emissão do alvará, para solicitar a expedição de nova licença temporária, até que, mediante quitação total da taxa, possa receber o alvará definitivo.\n
-Necessitando alterar os dados cadastrais, compareça munido de documentos comprobatórios ao Setor de Tributos e Fiscalização, órgão da Secretaria Municipal de Administração e Finanças, situado no Centro administrativo, Rua Luiz Antônio Garcez, nº 140 - Centro - CEP: 48.280-000 - Mata de São João/BA. Poderá comparecer também ao posto de Apoio Tributário, situado na Alameda da Amendoeiras, s/nº - Imbassaí - Mata de São João/BA.\n
-Telefones: (71) 3635-1310 / 3009 / 1669, (71) 9957-6798, (71) 9630-1106.\n
-Horário para atendimento: de 8h às 11h - de 13h às 14:30 min\n
-Emails: atendimento.tributacao@pmsj.ba.gov.br / arrecadacao.iss@pmsj.ba.gov.br\n";
+        $stComposição =
+        " \n
+        Pela Lei Municipal nº 280/2006 e suas alterações, que institui o Código Tributário e de Rendas do Município a Taxa de Fiscalização do Funcionamento - TFF - dos estabelecimentos em geral tem como fato gerador a sua fiscalização quanto as normas constantes desta Lei, do Código de Polícia Administrativa e do Plano Diretor Urbano, relativas a higiene, poluição do meio ambiente, costumes, ordem, tranqüilidade e segurança pública e será calculada de acordo com a Tabela de receitas Correspondente, anexa a esta Lei.\n
+        A Tabela de Receitas da Lei citada acima traz os valores da Taxa de Fiscalização do Funcionamento dos estabelecimentos, de acordo com a atividade exercida. A Taxa de Fiscalização do Funcionamento terá vencimento estabelecido por Ato do Poder Executivo. Será realizado desconto de 5% (cinco por cento) do valor da Taxa, quando o contribuinte ou responsável efetuar o recolhimento integralmente, em cota única, no prazo estabelecido.\n
+        O contribuinte que não efetuar o recolhimento da taxa em quota única poderá fazê-lo em até 03 (três) parcelas mensais, na forma e prazos estabelecidos por Ato do Poder Executivo, fixado o vencimento da primeira parcela em 15 de janeiro de 2015.\n
+        Quando ocorrer o lançamento no curso do exercício, a Taxa de Fiscalização do Funcionamento será calculada proporcionalmente ao número de meses restantes, e o seu recolhimento será efetuado no prazo de 05 (cinco) dias após deferimento da solicitação do lançamento.\n
+        A expedição do alvará definitivo dar-se-á apenas mediante total quitação da respectiva taxa. Caso o contribuinte ou responsável pela taxa opte pelo pagamento parcelado, será expedida uma licença temporária com validade até o vencimento da parcela subseqüente, devendo o contribuinte ou responsável apresentar o pagamento da(s) parcela(s) no órgão responsável pela emissão do alvará, para solicitar a expedição de nova licença temporária, até que, mediante quitação total da taxa, possa receber o alvará definitivo.\n
+        Necessitando alterar os dados cadastrais, compareça munido de documentos comprobatórios ao Setor de Tributos e Fiscalização, órgão da Secretaria Municipal de Administração e Finanças, situado no Centro administrativo, Rua Luiz Antônio Garcez, nº 140 - Centro - CEP: 48.280-000 - Mata de São João/BA. Poderá comparecer também ao posto de Apoio Tributário, situado na Alameda das Amendoeiras, s/nº - Imbassaí - Mata de São João/BA.\n
+        Telefones: (71) 3635-1310 / 3009 / 1669, (71) 9957-6798, (71) 9630-1106.\n
+        Horário para atendimento: de 8h às 11h - de 13h às 14:30 min\n
+        Emails: atendimento.tributacao@pmsj.ba.gov.br / arrecadacao.iss@pmsj.ba.gov.br\n";
 
         //$inTamY = 1.15;
         $inTamY = 1.0;
@@ -1079,7 +1079,7 @@ Emails: atendimento.tributacao@pmsj.ba.gov.br / arrecadacao.iss@pmsj.ba.gov.br\n
          * Retangulos
          */
         /* Retangulo da Composicação */
-        $this->Rect( $x, $y, 189, 95*$inTamY );
+        $this->Rect( $x, $y, 189, 75*$inTamY );
 
         $y += 20;
         /* Retangulo Dados Cadastrais */

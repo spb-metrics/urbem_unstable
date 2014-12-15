@@ -85,7 +85,7 @@ BEGIN
     IF stExercicio::INTEGER > 2012 THEN
         SELECT SUM(despesa_empenhada) AS despesa_empenhada
           INTO vlDespesa
-          FROM stn.fn_rreo_anexo12_despesas( stExercicio,inBimestre,stEntidades ) AS tbl
+          FROM stn.fn_rreo_anexo12_despesas( stExercicio,dtInicial, dtFinal,stEntidades ) AS tbl
                (    
                 grupo integer,
                 subgrupo integer,
@@ -101,7 +101,7 @@ BEGIN
     ELSE
         SELECT SUM(despesa_liquidada) AS despesa_liquidada
           INTO vlDespesa
-          FROM stn.fn_rreo_anexo16_despesas_acoes_servicos( stExercicio,inBimestre,stEntidades ) AS tbl
+          FROM stn.fn_rreo_anexo16_despesas_acoes_servicos( stExercicio,dtInicial, dtFinal,stEntidades ) AS tbl
                (    
                   grupo INTEGER
                 , subgrupo INTEGER
@@ -139,7 +139,7 @@ BEGIN
     IF stExercicio::INTEGER > 2012 THEN
     SELECT SUM(despesa_empenhada) AS despesa_empenhada
       INTO vlRestos
-      FROM stn.fn_rreo_anexo12_despesas_acoes_servicos(stExercicio,inBimestre,stEntidades) AS tbl
+      FROM stn.fn_rreo_anexo12_despesas_acoes_servicos(stExercicio,dtInicial, dtFinal,stEntidades) AS tbl
            (    
             grupo integer,
             subgrupo integer,
@@ -155,7 +155,7 @@ BEGIN
     ELSE
         SELECT vl_restos_pagar_cancelados
           INTO vlRestos
-          FROM stn.fn_rreo_anexo16_restos_pagar_saude(stExercicio,inBimestre,stEntidades) AS tbl
+          FROM stn.fn_rreo_anexo16_restos_pagar_saude(stExercicio,dtInicial, dtFinal,stEntidades) AS tbl
                (
                   vl_restos_pagar numeric
                 , vl_restos_pagar_cancelados numeric

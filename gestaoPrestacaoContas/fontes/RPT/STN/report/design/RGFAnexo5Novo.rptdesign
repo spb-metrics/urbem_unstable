@@ -238,6 +238,17 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="mes_extenso" id="6673">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4">
@@ -509,8 +520,12 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                         <property name="fontFamily">sans-serif</property>
                         <property name="fontSize">7pt</property>
                         <property name="textAlign">center</property>
-                        <expression name="valueExpr">params["periodo"]+'º '+params["tipo_periodo"]+' / '+params["exercicio"]</expression>
-                        <property name="contentType">html</property>
+                        <expression name="valueExpr">if (params["tipo_periodo"].value  !=  "Mes") {
+	params["periodo"]+'º '+params["tipo_periodo"]+' / '+params["exercicio"];
+} else {
+   params["mes_extenso"];
+}</expression>
+                        <property name="contentType">auto</property>
                     </text-data>
                 </cell>
             </row>

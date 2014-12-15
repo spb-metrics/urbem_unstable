@@ -28,10 +28,10 @@
   * @author Desenvolvedor:
   *
   * @ignore
-  * $Id: VantagemDesconto.inc.php 60620 2014-11-04 13:50:09Z carolina $
-  * $Date: 2014-11-04 11:50:09 -0200 (Ter, 04 Nov 2014) $
-  * $Author: carolina $
-  * $Rev: 60620 $
+  * $Id: VantagemDesconto.inc.php 61157 2014-12-11 20:28:05Z franver $
+  * $Date: 2014-12-11 18:28:05 -0200 (Qui, 11 Dez 2014) $
+  * $Author: franver $
+  * $Rev: 61157 $
   *
 */
 
@@ -45,12 +45,7 @@ $rsRecordSet = new RecordSet();
 $obTTCEPEVantagemDesconto = new TTCEPEVantagemDesconto();
 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
 
-
-if ($inCodCopetencia < 10) {
-    $inCodCompetencia = "0".$inCodCompetencia;
-}
-
-$dtCompetencia = $inCodCompetencia.'/'.Sessao::getExercicio();
+$dtCompetencia = str_pad($inCodCompetencia,2,"0",STR_PAD_LEFT).'/'.Sessao::getExercicio();
 
 $stFiltroPeriodo = " AND to_char(dt_final,'mm/yyyy') = '".$dtCompetencia."'";
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaPeriodoMovimentacao($rsPeriodoMovimentacao,$stFiltroPeriodo);

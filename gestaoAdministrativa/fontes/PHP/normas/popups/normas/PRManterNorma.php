@@ -50,7 +50,7 @@ $stLink = "&pg=".Sessao::read('linkPopUp_pg')."&pos=".Sessao::read('linkPopUp_po
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterNorma";
 $pgFilt = "FL".$stPrograma.".php";
-$pgList = "LSNorma.php?".$stLink;
+$pgList = "LSNorma.php?".Sessao::getId()."&stAcao=$stAcao&inCodNorma=".$_POST['inCodNorma']."&inCodTipoNorma=".$_POST['inCodTipoNorma'].$stLink;
 $pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao&inCodNorma=".$_POST['inCodNorma']."&inCodTipoNorma=".$_POST['inCodTipoNorma'];
 $pgProc = "PR".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao&inCodNorma=".$_POST['inCodNorma']."&inCodTipoNorma=".$_POST['inCodTipoNorma'];
 $pgOcul = "OC".$stPrograma.".php";
@@ -70,17 +70,20 @@ switch ($stAcao) {
                 $value = implode(",",$value);
             $obRegra->obRTipoNorma->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
         }
-        $obRegra->setNumNorma                  ( $_POST['inNumNorma'] );
-        $obRegra->setExercicio                 ( $_POST['stExercicio'] );
-        $obRegra->setDataPublicacao            ( $_POST['stDataPublicacao'] );
-        $obRegra->setDataAssinatura            ( $_POST['stDataAssinatura'] );
-        $obRegra->setDataTermino               ( $_POST['stDataTermino'] );
-        $obRegra->setNomeNorma                 ( $_POST['stNomeNorma'] );
-        $obRegra->setDescricaoNorma            ( $_POST['stDescricao'] );
+        SistemaLegado::mostraVar($_POST);
+        $obRegra->setNumNorma                  ( $_POST['inNumNorma']        );
+        $obRegra->setExercicio                 ( $_POST['stExercicio']       );
+        $obRegra->setDataPublicacao            ( $_POST['stDataPublicacao']  );
+        $obRegra->setDataAssinatura            ( $_POST['stDataAssinatura']  );
+        $obRegra->setDataTermino               ( $_POST['stDataTermino']     );
+        $obRegra->setNomeNorma                 ( $_POST['stNomeNorma']       );
+        $obRegra->setDescricaoNorma            ( $_POST['stDescricao']       );
         $obRegra->setUrl                       ( Sessao::read('stNormaLink') );
-        $obRegra->obRTipoNorma->setCodTipoNorma( $_POST['inCodTipoNorma'] );
+        $obRegra->obRTipoNorma->setCodTipoNorma( $_POST['inCodTipoNorma']    );
 
-        $obErro = $obRegra->salvar();
+        $obTransacao = new Transacao;
+        $obErro = $obRegra->salvar($obTransacao);
+        
         if ( !$obErro->ocorreu() )
             sistemaLegado::alertaAvisoPopUp($pgList,"Norma: ".$_POST['inNumNorma'],"incluir","aviso", Sessao::getId(), "../");
         else

@@ -29,7 +29,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TARRCarne.class.php 60703 2014-11-11 09:21:31Z carolina $
+    $Id: TARRCarne.class.php 61187 2014-12-12 18:59:43Z carolina $
 
     * Casos de uso: uc-05.03.11
 */
@@ -7093,18 +7093,23 @@ function montaRecuperaDetalheCreditosBaixaDivida($dtDataBase)
                              AND carne.numeracao = '".$this->getDado('numero_carne')."'
 
                      LEFT JOIN
-                            (
-                                    SELECT MIN(parcela_reemissao.timestamp)
-                                              , parcela_reemissao.cod_parcela
-                                              , parcela_reemissao.vencimento
-                                       FROM arrecadacao.parcela_reemissao
-                                         JOIN arrecadacao.parcela
-                                          ON parcela.cod_parcela = parcela_reemissao.cod_parcela
-                                         JOIN arrecadacao.carne
-                                          ON carne.cod_parcela = parcela.cod_parcela
-                                    WHERE carne.numeracao = '".$this->getDado('numero_carne')."'
-                               GROUP BY parcela_reemissao.cod_parcela
-                                             , parcela_reemissao.vencimento
+                            (          SELECT parcela_reemissao.timestamp
+                                         , parcela_reemissao.cod_parcela
+                                         , parcela_reemissao.vencimento
+                                     FROM arrecadacao.parcela_reemissao
+                               INNER JOIN (SELECT MIN(parcela_reemissao.timestamp) as timestamp
+                                                , parcela_reemissao.cod_parcela
+                                             FROM arrecadacao.parcela_reemissao
+                                             JOIN arrecadacao.parcela
+                                               ON parcela.cod_parcela = parcela_reemissao.cod_parcela
+                                             JOIN arrecadacao.carne
+                                               ON carne.cod_parcela = parcela.cod_parcela
+                                            WHERE carne.numeracao = '".$this->getDado('numero_carne')."'
+                                         GROUP BY parcela_reemissao.cod_parcela
+                                         ) AS min_parcela_remissao
+                              ON parcela_reemissao.cod_parcela = min_parcela_remissao.cod_parcela
+                             AND parcela_reemissao.timestamp = min_parcela_remissao.timestamp  
+
                             )AS reemissao
                         ON reemissao.cod_parcela = parcela.cod_parcela
                     ) AS parcela

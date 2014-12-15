@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCTB.class.php 60393 2014-10-17 12:23:28Z lisiane $
+    * $Id: TTCEMGCTB.class.php 61121 2014-12-10 12:11:19Z lisiane $
 
 */
 
@@ -62,7 +62,9 @@ class TTCEMGCTB extends Persistente
                             , c.num_conta_corrente as conta_bancaria
                             , c.conta_corrente
                             , c.tipo_conta	 
-                            , LPAD(c.tipo_aplicacao::VARCHAR,2,'0') AS tipo_aplicacao
+                            , CASE WHEN c.tipo_conta = '1' THEN ''
+                                   ELSE LPAD(c.tipo_aplicacao::VARCHAR,2,'0') 
+                              END AS tipo_aplicacao
                             , nro_seq_aplicacao
                             , desc_conta_bancaria
                             , c.conta_convenio
@@ -142,25 +144,25 @@ class TTCEMGCTB extends Persistente
                                         , convenio_plano_banco.dt_assinatura
                              ) AS c
 
-                                GROUP BY  c.tipo_registro
-                                        , c.cod_ctb
-                                        , c.num_banco
-                                        , c.num_agencia
-                                        , c.conta_corrente
-                                        , c.tipo_aplicacao
-                                        , c.tipo_conta   
-                                        , c.cod_orgao
-                                        , c.num_conta_corrente
-                                        , digito_verificador_agencia
-                                        , c.digito_verificador_conta_bancaria
-                                        , nro_seq_aplicacao
-                                        , desc_conta_bancaria
-                                        , c.conta_convenio
-                                        , c.num_convenio
-                                        , c.dt_assinatura
-                                        , c.conta
+                      GROUP BY c.tipo_registro
+                             , c.cod_ctb
+                             , c.num_banco
+                             , c.num_agencia
+                             , c.conta_corrente
+                             , c.tipo_aplicacao
+                             , c.tipo_conta   
+                             , c.cod_orgao
+                             , c.num_conta_corrente
+                             , digito_verificador_agencia
+                             , c.digito_verificador_conta_bancaria
+                             , nro_seq_aplicacao
+                             , desc_conta_bancaria
+                             , c.conta_convenio
+                             , c.num_convenio
+                             , c.dt_assinatura
+                             , c.conta
 
-                             ORDER BY c.cod_ctb";
+                      ORDER BY c.cod_ctb";
         return $stSql;
     }
     
@@ -183,6 +185,7 @@ class TTCEMGCTB extends Persistente
                         , c.cod_recurso as cod_fonte_recursos
                         , ABS(SUM(c.vl_saldo_inicial_fonte)) as vl_saldo_inicial_fonte 
                         , SUM(c.vl_saldo_final_fonte) as vl_saldo_final_fonte
+                        , c.movimentacao
                     FROM  ( 
                               SELECT '20'::int  AS  tipo_registro
                                         , (banco.num_banco || agencia.num_agencia || plano_banco.conta_corrente) AS conta
@@ -327,6 +330,7 @@ class TTCEMGCTB extends Persistente
                                                 WHERE  pa.cod_plano = plano_analitica.cod_plano
                                                   AND  pa.exercicio = plano_analitica.exercicio
                                            )   AS  vl_saldo_final_fonte
+                                           , CASE WHEN (vl_lancamento IS NOT NULL) THEN 1 END AS movimentacao  
 
                                    FROM  contabilidade.plano_banco
                              
@@ -356,6 +360,61 @@ class TTCEMGCTB extends Persistente
                               LEFT JOIN  tcemg.convenio_plano_banco 
                                      ON  convenio_plano_banco.cod_plano = plano_banco.cod_plano 
                                     AND  convenio_plano_banco.exercicio = plano_banco.exercicio
+                                    
+                                    
+                              LEFT JOIN ( SELECT cod_plano
+						, exercicio
+						, cod_lote
+						, tipo
+						, sequencia
+						, tipo_valor
+						, cod_entidade
+						, '1'::VARCHAR AS tipo_movimentacao 
+					   FROM contabilidade.conta_debito
+
+				      UNION ALL
+
+					SELECT cod_plano
+					      , exercicio
+                                              , cod_lote
+                                              , tipo
+                                              , sequencia
+                                              , tipo_valor
+                                              , cod_entidade
+                                              , '2'::VARCHAR AS tipo_movimentacao 
+                                          FROM contabilidade.conta_credito
+                                      ) AS conta_debito_credito
+                                     ON plano_analitica.cod_plano = conta_debito_credito.cod_plano
+                                    AND plano_analitica.exercicio = conta_debito_credito.exercicio
+
+                              LEFT JOIN contabilidade.valor_lancamento AS vl
+                                     ON conta_debito_credito.cod_lote     = vl.cod_lote
+                                    AND conta_debito_credito.tipo         = vl.tipo
+                                    AND conta_debito_credito.sequencia    = vl.sequencia
+                                    AND conta_debito_credito.exercicio    = vl.exercicio
+                                    AND conta_debito_credito.tipo_valor   = vl.tipo_valor
+                                    AND conta_debito_credito.cod_entidade = vl.cod_entidade
+
+                              LEFT JOIN contabilidade.lancamento
+                                     ON lancamento.exercicio    = vl.exercicio
+                                    AND lancamento.cod_entidade = vl.cod_entidade
+                                    AND lancamento.tipo         = vl.tipo
+                                    AND lancamento.cod_lote     = vl.cod_lote
+                                    AND lancamento.sequencia    = vl.sequencia
+
+                              LEFT JOIN contabilidade.lancamento_receita
+                                     ON lancamento_receita.exercicio    = lancamento.exercicio
+                                    AND lancamento_receita.cod_entidade = lancamento.cod_entidade
+                                    AND lancamento_receita.tipo         = lancamento.tipo
+                                    AND lancamento_receita.cod_lote     = lancamento.cod_lote
+                                    AND lancamento_receita.sequencia    = lancamento.sequencia
+
+                              LEFT JOIN contabilidade.lote AS lo
+                                     ON vl.cod_lote     = lo.cod_lote
+                                    AND vl.exercicio    = lo.exercicio
+                                    AND vl.cod_entidade = lo.cod_entidade
+		                    AND  lo.dt_lote BETWEEN TO_DATE('01/01/2014','dd/mm/yyyy') AND TO_DATE('31/01/2014','dd/mm/yyyy')
+                                    AND  lo.exercicio = '2014'
 
                                   WHERE  plano_banco.exercicio = '".$this->getDado('exercicio')."'
                                     AND  plano_banco.cod_entidade IN (".$this->getDado('entidades').")
@@ -371,16 +430,19 @@ class TTCEMGCTB extends Persistente
                                       , plano_recurso.cod_recurso
                                       , plano_analitica.cod_plano
                                       , plano_analitica.exercicio
+                                      , movimentacao
                              ) as c
-                             GROUP BY c.tipo_registro
-                                    , c.cod_ctb
-                                    , c.tipo_aplicacao
-                                    , c.tipo_conta 
-                                    , c.cod_orgao
-                                    , c.cod_recurso
-                                    , c.conta
-                                
-                ORDER BY c.cod_ctb ";
+                         WHERE movimentacao = 1   
+                      GROUP BY c.tipo_registro
+                             , c.cod_ctb
+                             , c.tipo_aplicacao
+                             , c.tipo_conta 
+                             , c.cod_orgao
+                             , c.cod_recurso
+                             , c.conta
+                             , c.movimentacao
+                            
+                      ORDER BY c.cod_ctb ";
         return $stSql;
     }
     
@@ -406,7 +468,6 @@ class TTCEMGCTB extends Persistente
                        , a.cod_ctb_transf AS cod_ctb_transf
                        , a.tipo_conta||a.cod_ctb AS cod_ctb_transf_view
                        , a.cod_fonte_ctb_transf
-                       , a.tipo
                        , a.tipo_conta  AS tipo_conta
                        , SUM(a.valor_entr_saida) AS valor_entr_saida
 
@@ -414,11 +475,7 @@ class TTCEMGCTB extends Persistente
                        
                         SELECT
                             '21'::int  AS  tipo_registro
-                             , CASE WHEN (substr(conta_receita.cod_estrutural,1,1) = '9') THEN
-					SUM(vl.vl_lancamento * -1)
-				     ELSE 
-					SUM(vl.vl_lancamento )
-				END AS valor_entr_saida
+                             , SUM(vl.vl_lancamento ) AS valor_entr_saida
                              , plano_banco.cod_entidade as cod_orgao
                              , conta_bancaria.cod_ctb_anterior AS cod_ctb
                              , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
@@ -428,11 +485,13 @@ class TTCEMGCTB extends Persistente
                              , pa.exercicio 
                              , plano_recurso.cod_recurso AS cod_fonte_recursos
                              , '1'::VARCHAR AS tipo_movimentacao 
-                             , lo.tipo
                              , CASE
-                                  WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) <> '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
-                                  WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '02'
-                                  WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true THEN '03'
+                                  WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9' AND lancamento_receita.estorno = false
+                                        AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
+                                  WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1)= '9' 
+                                        AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325'  
+                                        AND  (RDE.vl_estornado IS NULL ) AND ((ARR.vl_arrecadacao IS NULL ) OR (AR.devolucao = true)) THEN '02'
+                                  WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9' THEN '03'
                                   WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) = '1325' THEN '04'
                                   WHEN lo.tipo = 'T' AND transferencia.cod_tipo = 5 THEN '05'
                                   WHEN lo.tipo = 'T' AND transferencia.cod_tipo = 4 THEN '07'
@@ -474,7 +533,8 @@ class TTCEMGCTB extends Persistente
                                                                     OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451300000' ) 
                                                     ) THEN '12'
                             
-                              WHEN lo.tipo = 'A' AND SUBSTR(pc.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = true THEN '16'                            
+                              WHEN lo.tipo = 'A'AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) = '9' 
+                                    AND ( (RDE.vl_estornado IS NOT NULL) OR (ARR.vl_arrecadacao IS NOT NULL AND AR.devolucao = false) ) THEN '16'                              
                               ELSE '99'
                               END AS tipo_entr_saida 
 
@@ -640,12 +700,29 @@ class TTCEMGCTB extends Persistente
                        AND cod_ctb_transferencia.sequencia = cd.sequencia
                        AND cod_ctb_transferencia.cod_lote = cd.cod_lote
                        AND cod_ctb_transferencia.tipo = cd.tipo
-                       AND cod_ctb_transferencia.cod_plano_debito = cd.cod_plano 
+                       AND cod_ctb_transferencia.cod_plano_debito = cd.cod_plano
+                       
+                 LEFT JOIN tesouraria.arrecadacao_receita_dedutora AS RD
+			ON RD.cod_receita_dedutora = lancamento_receita.cod_receita
+		       AND RD.vl_deducao = vl.vl_lancamento
+                       AND TO_DATE(RD.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+
+		 LEFT JOIN tesouraria.arrecadacao_receita_dedutora_estornada AS RDE
+		        ON RDE.cod_receita_dedutora = RD.cod_receita_dedutora
+		       AND RDE.cod_arrecadacao = RD.cod_arrecadacao
+                
+                 LEFT JOIN tesouraria.arrecadacao_receita AS ARR
+                        ON ARR.cod_receita = RD.cod_receita_dedutora
+                       AND TO_DATE(ARR.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+
+                 LEFT JOIN tesouraria.arrecadacao AS AR
+                        ON AR.cod_arrecadacao = ARR.cod_arrecadacao 
+                       AND AR.timestamp_arrecadacao = ARR.timestamp_arrecadacao
                         
                      WHERE pc.exercicio   = '".$this->getDado('exercicio')."' 
                        AND plano_banco.cod_entidade IN (".$this->getDado('entidades').")
                        AND SUBSTR(REPLACE(pc.cod_estrutural, '.', ''), 1, 7) <> '1111101'
-                                              
+                       AND vl.tipo <> 'I'                       
                   GROUP BY tipo_registro
                          , cod_ctb
 		         , conta_bancaria.cod_tipo_aplicacao
@@ -657,11 +734,10 @@ class TTCEMGCTB extends Persistente
                          , tipo_entr_saida
                          , cod_ctb_transf
                          , cod_fonte_ctb_transf
-                         , lo.tipo
                          , conta_receita.cod_estrutural
                     ) AS a
                     
-                      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
                     UNION
                     
                        SELECT b.tipo_registro
@@ -677,7 +753,6 @@ class TTCEMGCTB extends Persistente
                             , b.cod_ctb_transf AS cod_ctb_transf
                             , b.tipo_conta||b.cod_ctb AS cod_ctb_transf_view
                             , b.cod_fonte_ctb_transf
-                            , b.tipo
                             , b.tipo_conta AS tipo_conta
                            , SUM(b.valor_entr_saida) AS valor_entr_saida
                        FROM (
@@ -694,11 +769,12 @@ class TTCEMGCTB extends Persistente
                           , pa.exercicio
                           , plano_recurso.cod_recurso as cod_fonte_recursos
                           , '2'::VARCHAR AS tipo_movimentacao
-                          , lo.tipo
                           , CASE 
-                             WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) <> '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
-                             WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '02'
-                             WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true THEN '03'
+                             WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
+                             WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1)= '9' 
+                                  AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325'  
+                                  AND  (RDE.vl_estornado IS NULL ) AND ((ARR.vl_arrecadacao IS NULL ) OR (AR.devolucao = true)) THEN '02'
+                             WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9' THEN '03'
                              WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) = '1325' THEN '04'
                              WHEN lo.tipo = 'T' AND transferencia.cod_tipo = 5 THEN '06'
                              WHEN lo.tipo = 'T' AND transferencia.cod_tipo = 4 THEN '07'
@@ -742,8 +818,8 @@ class TTCEMGCTB extends Persistente
                                                               OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '351220199'
                                                               OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '351300000' ) 
                                                     ) THEN '13'    
-                         
-                            WHEN lo.tipo = 'A' AND SUBSTR(pc.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = true THEN '16'
+                            WHEN lo.tipo = 'A'AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) = '9' 
+		 		 AND ( (RDE.vl_estornado IS NOT NULL) OR (ARR.vl_arrecadacao IS NOT NULL AND AR.devolucao = false) ) THEN '16' 
                              ELSE '99'
                             END AS tipo_entr_saida
 
@@ -893,43 +969,59 @@ class TTCEMGCTB extends Persistente
 			 LEFT JOIN tcemg.conta_bancaria
 				ON conta_bancaria.cod_conta = plano_analitica.cod_conta
 			       AND conta_bancaria.exercicio = plano_analitica.exercicio
-			WHERE conta_credito.exercicio = '".$this->getDado('exercicio')."' 
-				AND conta_credito.cod_entidade IN (".$this->getDado('entidades').")";
-                        if ($inMes == '01') {
-                            $stSql.= "
+			     WHERE conta_credito.exercicio = '".$this->getDado('exercicio')."' 
+			       AND conta_credito.cod_entidade IN (".$this->getDado('entidades').")";
+                            if ($inMes == '01') {
+                                $stSql.= "
                                     AND  lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
                                     AND  lo.exercicio = '".$this->getDado('exercicio')."'";
-                        } else {
-                            $stSql.= " AND  lo.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
-                        }
+                            } else {
+                                $stSql.= " AND  lo.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
+                            }
                             $stSql.= "
-				AND conta_credito.tipo         = 'T'
-                 )AS cod_ctb_transferencia
+			      AND conta_credito.tipo         = 'T'
+                        )AS cod_ctb_transferencia
                         ON cod_ctb_transferencia.exercicio = cc.exercicio                             
                        AND cod_ctb_transferencia.sequencia = cc.sequencia
                        AND cod_ctb_transferencia.cod_lote = cc.cod_lote
                        AND cod_ctb_transferencia.tipo = cc.tipo
                        AND cod_ctb_transferencia.cod_plano_credito = cc.cod_plano 
                  
+                 LEFT JOIN tesouraria.arrecadacao_receita_dedutora AS RD
+                        ON RD.cod_receita_dedutora = lancamento_receita.cod_receita
+                       AND RD.vl_deducao = vl.vl_lancamento
+                       AND TO_DATE(RD.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+
+                 LEFT JOIN tesouraria.arrecadacao_receita_dedutora_estornada AS RDE
+                        ON RDE.cod_receita_dedutora = RD.cod_receita_dedutora
+                       AND RDE.cod_arrecadacao = RD.cod_arrecadacao
+               
+                 LEFT JOIN tesouraria.arrecadacao_receita AS ARR
+                        ON ARR.cod_receita = RD.cod_receita_dedutora
+                       AND TO_DATE(ARR.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+
+                 LEFT JOIN tesouraria.arrecadacao AS AR
+                        ON AR.cod_arrecadacao = ARR.cod_arrecadacao 
+                       AND AR.timestamp_arrecadacao = ARR.timestamp_arrecadacao
+                 
                      WHERE pc.exercicio   = '".$this->getDado('exercicio')."' 
                        AND plano_banco.cod_entidade IN (".$this->getDado('entidades').")
                        AND SUBSTR(REPLACE(pc.cod_estrutural, '.', ''), 1, 7) <> '1111101'
-                
-                  GROUP BY
-                         tipo_registro
-                       , cod_ctb
-		       , conta_bancaria.cod_tipo_aplicacao
-		       , tipo_conta
-                      , plano_banco.cod_entidade
-                      , plano_recurso.cod_recurso
-                      , pa.exercicio
-                      , tipo_entr_saida
-                      , cod_ctb_transf
-                      , cod_fonte_ctb_transf
-                      , lo.tipo
+                       AND vl.tipo <> 'I'
+                       
+                  GROUP BY tipo_registro
+                         , cod_ctb
+		         , conta_bancaria.cod_tipo_aplicacao
+		         , tipo_conta
+                         , plano_banco.cod_entidade
+                         , plano_recurso.cod_recurso
+                         , pa.exercicio
+                         , tipo_entr_saida
+                         , cod_ctb_transf
+                         , cod_fonte_ctb_transf
                 ) AS b
-                 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
-                  order by  cod_ctb,tipo_entr_saida, tipo_movimentacao
+         GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+         ORDER BY  cod_ctb,tipo_entr_saida, tipo_movimentacao
         ";
         return $stSql;
     }
@@ -965,11 +1057,18 @@ class TTCEMGCTB extends Persistente
                           '2'::INTEGER
                          END AS e_deducao_de_receita
                        , receita_indentificadores_peculiar_receita.cod_identificador as identificador_deducao
-                       , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS natureza_receita
+                       , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 8)::integer
+                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                     THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                                 END
+                           END AS natureza_receita
                        , SUM(vl.vl_lancamento) as vlr_receita_cont
                        , plano_banco.cod_entidade as cod_orgao
                        , (banco.num_banco || agencia.num_agencia || plano_banco.conta_corrente) AS conta
-                                        , conta_bancaria.cod_ctb_anterior as cod_ctb
+                       , conta_bancaria.cod_ctb_anterior as cod_ctb
 		       , banco.num_banco AS num_banco
 		       , agencia.num_agencia AS num_agencia
 		       , plano_banco.conta_corrente AS conta_corrente
@@ -978,37 +1077,33 @@ class TTCEMGCTB extends Persistente
                               WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.50%' OR pc.cod_estrutural LIKE '1.1.4%') THEN '2'
                          END AS tipo_conta
                        , lo.tipo
-                        , CASE
-                                  WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) <> '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
-                                  WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
-                                  WHEN lo.tipo = 'A' AND SUBSTR(conta_receita.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = true AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '02'
-                                  WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true THEN '03'
-                                  WHEN lo.tipo = 'A' AND SUBSTR(pc.cod_estrutural, 0, 1) = '9' AND lancamento_receita.estorno = true THEN '16'                            
-                              ELSE '99'
+                       , CASE WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9'
+                                    AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
+                               WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) = '9'
+                                    AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325'
+                                    AND  (RDE.vl_estornado IS NULL) AND ((ARR.vl_arrecadacao IS NULL ) OR (AR.devolucao = true)) THEN '02'
+                               WHEN lo.tipo = 'A' AND lancamento_receita.estorno = true AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9' THEN '03'
+                               WHEN lo.tipo = 'A'AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) = '9' 
+					AND ( (RDE.vl_estornado IS NOT NULL) OR (ARR.vl_arrecadacao IS NOT NULL AND AR.devolucao = false) ) THEN '16'                       
+                               ELSE '99'
                            END AS tipo_entr_saida 
                       , conta_debito_credito.tipo_movimentacao
                       , plano_recurso.cod_recurso AS cod_fonte_recursos
-                      
                     FROM contabilidade.plano_conta AS pc
               INNER JOIN contabilidade.plano_analitica AS pa
                       ON pc.cod_conta = pa.cod_conta
                      AND pc.exercicio = pa.exercicio 
-
               INNER JOIN contabilidade.plano_banco
                       ON plano_banco.cod_plano = pa.cod_plano
                      AND plano_banco.exercicio = pa.exercicio 
-                
               INNER JOIN monetario.agencia
                       ON agencia.cod_banco   = plano_banco.cod_banco
                      AND agencia.cod_agencia = plano_banco.cod_agencia
-                
               INNER JOIN monetario.banco
                       ON banco.cod_banco = plano_banco.cod_banco
-                      
                LEFT JOIN tcemg.conta_bancaria
 		      ON conta_bancaria.cod_conta = pc.cod_conta
 	             AND conta_bancaria.exercicio = pc.exercicio
-
               INNER JOIN (
                            SELECT cod_plano
                                 , exercicio
@@ -1034,7 +1129,6 @@ class TTCEMGCTB extends Persistente
                        ) AS conta_debito_credito
                       ON pa.cod_plano = conta_debito_credito.cod_plano
                      AND pa.exercicio = conta_debito_credito.exercicio
-
               INNER JOIN contabilidade.valor_lancamento AS vl
                       ON conta_debito_credito.cod_lote     = vl.cod_lote
                      AND conta_debito_credito.tipo         = vl.tipo
@@ -1042,75 +1136,80 @@ class TTCEMGCTB extends Persistente
                      AND conta_debito_credito.exercicio    = vl.exercicio
                      AND conta_debito_credito.tipo_valor   = vl.tipo_valor
                      AND conta_debito_credito.cod_entidade = vl.cod_entidade
-
               INNER JOIN contabilidade.lancamento
                       ON lancamento.exercicio    = vl.exercicio
                      AND lancamento.cod_entidade = vl.cod_entidade
                      AND lancamento.tipo         = vl.tipo
                      AND lancamento.cod_lote     = vl.cod_lote
                      AND lancamento.sequencia    = vl.sequencia
-
                LEFT JOIN contabilidade.lancamento_receita
                       ON lancamento_receita.exercicio    = lancamento.exercicio
                      AND lancamento_receita.cod_entidade = lancamento.cod_entidade
                      AND lancamento_receita.tipo         = lancamento.tipo
                      AND lancamento_receita.cod_lote     = lancamento.cod_lote
                      AND lancamento_receita.sequencia    = lancamento.sequencia
-
               INNER JOIN contabilidade.lote AS lo
                       ON vl.cod_lote     = lo.cod_lote
                      AND vl.exercicio    = lo.exercicio
                      AND vl.cod_entidade = lo.cod_entidade
                      AND lo.tipo = 'A'
-
                LEFT JOIN orcamento.receita
                       ON receita.cod_receita = lancamento_receita.cod_receita
                      AND receita.exercicio   = lancamento_receita.exercicio
-
                LEFT JOIN contabilidade.plano_recurso
                       ON pa.cod_plano = plano_recurso.cod_plano
                      AND pa.exercicio = plano_recurso.exercicio
-              
                LEFT JOIN orcamento.recurso
                       ON recurso.exercicio   = plano_recurso.exercicio
                      AND recurso.cod_recurso = plano_recurso.cod_recurso
-              
                LEFT JOIN contabilidade.lancamento_empenho
                       ON lancamento_empenho.exercicio    = lancamento.exercicio
                      AND lancamento_empenho.tipo         = lancamento.tipo
                      AND lancamento_empenho.cod_entidade = lancamento.cod_entidade
                      AND lancamento_empenho.cod_lote     = lancamento.cod_lote
                      AND lancamento_empenho.sequencia    = lancamento.sequencia
-
                LEFT JOIN orcamento.conta_receita
                       ON conta_receita.exercicio = receita.exercicio
                      AND conta_receita.cod_conta = receita.cod_conta 
-
                LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
                       ON receita_indentificadores_peculiar_receita.exercicio   = receita.exercicio
                      AND receita_indentificadores_peculiar_receita.cod_receita = receita.cod_receita 
-
+               LEFT JOIN tesouraria.arrecadacao_receita_dedutora AS RD
+                      ON RD.cod_receita_dedutora = lancamento_receita.cod_receita
+                     AND RD.vl_deducao = vl.vl_lancamento
+                     AND TO_DATE(RD.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+               LEFT JOIN tesouraria.arrecadacao_receita_dedutora_estornada AS RDE
+                      ON RDE.cod_receita_dedutora = RD.cod_receita_dedutora
+                     AND RDE.cod_arrecadacao = RD.cod_arrecadacao
+               LEFT JOIN tesouraria.arrecadacao_receita AS ARR
+                      ON ARR.cod_receita = RD.cod_receita_dedutora
+                     AND TO_DATE(ARR.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') = lo.dt_lote
+               LEFT JOIN tesouraria.arrecadacao AS AR
+                      ON AR.cod_arrecadacao = ARR.cod_arrecadacao 
+                     AND AR.timestamp_arrecadacao = ARR.timestamp_arrecadacao
+            
                    WHERE pc.exercicio = '".$this->getDado('exercicio')."'
                      AND plano_banco.cod_entidade IN (".$this->getDado('entidades').")
                      AND lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
                 
                 GROUP BY 2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18
               ) AS c
-              GROUP BY c.tipo_registro
-                     , c.cod_ctb
-		     , c.tipo_aplicacao
-		     , c.tipo_conta
-		     , c.e_deducao_de_receita
-		     , c.identificador_deducao
-		     , c.natureza_receita
-		     , c.tipo
-		     , c.vlr_receita_cont
-                     , tipo_entr_saida
-                     , c.tipo_movimentacao
-                     , c.cod_fonte_recursos
+          WHERE tipo_entr_saida != '99'
+       GROUP BY c.tipo_registro
+              , c.cod_ctb
+	      , c.tipo_aplicacao
+	      , c.tipo_conta
+	      , c.e_deducao_de_receita
+	      , c.identificador_deducao
+	      , c.natureza_receita
+	      , c.tipo
+	      , c.vlr_receita_cont
+              , tipo_entr_saida
+              , c.tipo_movimentacao
+              , c.cod_fonte_recursos
 
        ORDER BY c.cod_ctb, c.natureza_receita";
-        return $stSql;
+    return $stSql;
     }
     
     public function __destruct(){}

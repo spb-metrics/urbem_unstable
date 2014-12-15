@@ -130,7 +130,7 @@ $obFormulario->show();
 
 $jsOnLoad = "jQuery('#stRestos').prop('disabled',true);
              jQuery('#inTipoRelatorio').change(function(){
-                if( jQuery(this).val() == 1 || jQuery(this).val() == ''){
+                if( jQuery(this).val() == 1 || jQuery(this).val() == '' || jQuery(this).val() == 2 ){
                     jQuery('#stRestos').prop('disabled',true);
                 }else{
                     jQuery('#stRestos').prop('disabled',false);

@@ -577,30 +577,45 @@ class TTCEMGRestosPagar extends Persistente
                      AND configuracao_entidade.cod_modulo = 55
                      AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
 
-                    JOIN ( SELECT * FROM (
-                                            SELECT  despesa.num_orgao
-                                                    , despesa.num_unidade
-                                                    , despesa.exercicio
-                                                    , pre_empenho_despesa.cod_pre_empenho
-                                            FROM empenho.pre_empenho_despesa
-                                            JOIN orcamento.despesa
-                                              ON despesa.exercicio = pre_empenho_despesa.exercicio
-                                             AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                                            JOIN orcamento.conta_despesa
-                                              ON conta_despesa.exercicio = despesa.exercicio
-                                             AND conta_despesa.cod_conta = despesa.cod_conta
-                                            UNION
-                                            SELECT  restos_pre_empenho.num_orgao
-                                                    , restos_pre_empenho.num_unidade
-                                                    , restos_pre_empenho.exercicio
-                                                    , restos_pre_empenho.cod_pre_empenho
-                                            FROM empenho.restos_pre_empenho
-                                        ) as tbl
-                                GROUP BY num_orgao, exercicio, num_unidade, cod_pre_empenho
-                                ORDER BY tbl.exercicio, tbl.num_orgao
-                        ) AS orgao
-                      ON orgao.exercicio = pre_empenho.exercicio
-                     AND orgao.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                    JOIN (  SELECT pre_empenho.exercicio
+                                 , pre_empenho.cod_pre_empenho
+                                 , CASE WHEN ( pre_empenho.implantado = true )
+                                        THEN restos_pre_empenho.num_orgao
+                                        ELSE despesa.num_orgao
+                                   END AS num_orgao
+                                 , CASE WHEN ( pre_empenho.implantado = true )
+                                        THEN restos_pre_empenho.num_unidade
+                                        ELSE despesa.num_unidade
+                                   END AS num_unidade
+                                 , conta_despesa.cod_estrutural
+                                 , CASE WHEN SUBSTR(conta_despesa.cod_estrutural, 9, 2) IN ('01','03','04','05','09','11','16','48','94')
+                                        THEN true
+								   WHEN ''||SUBSTR(conta_despesa.cod_estrutural, 9, 2)||SUBSTR(conta_despesa.cod_estrutural, 12, 2) IN ('3626','3628','3699')
+										THEN true
+								   WHEN SUBSTR(conta_despesa.cod_estrutural, 0, 14) IN ('3.1.9.0.92.01','3.1.9.0.92.02','3.1.7.1.92.01','3.1.7.1.92.02','3.1.9.1.92.01','3.1.9.1.92.02','3.3.9.0.36.07')
+										THEN true
+										ELSE false
+								   END AS folha
+                              FROM empenho.pre_empenho
+                         LEFT JOIN empenho.restos_pre_empenho
+                                ON restos_pre_empenho.exercicio = pre_empenho.exercicio
+                               AND restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                         LEFT JOIN empenho.pre_empenho_despesa
+                                ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
+                               AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                         LEFT JOIN orcamento.despesa
+                                ON despesa.exercicio = pre_empenho_despesa.exercicio
+                               AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                              JOIN orcamento.conta_despesa
+								ON (    conta_despesa.exercicio = despesa.exercicio
+									AND conta_despesa.cod_conta = despesa.cod_conta
+								   )
+								OR (    replace( conta_despesa.cod_estrutural, '.', '') = restos_pre_empenho.cod_estrutural
+                                    AND conta_despesa.exercicio = restos_pre_empenho.exercicio
+                                   )
+						 ) AS orgao
+					  ON orgao.exercicio = pre_empenho.exercicio
+					 AND orgao.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
                     JOIN sw_cgm
                       ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
@@ -633,6 +648,9 @@ class TTCEMGRestosPagar extends Persistente
                    WHERE empenho.cod_entidade IN (".$this->getDado('entidades').")
                      AND empenho.exercicio <= '".$this->getDado('exercicio')."'
                      AND empenho.exercicio <> '2013'
+					 AND (   (orgao.folha IS false AND (sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
+                          OR (orgao.folha IS true  AND (sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
+                         )
         ";
 
         return $stSql;

@@ -33,40 +33,37 @@
     $Id:$
 */
 
-/*
-SELECT
-    TRIM(cod_estrutural),
-    TRIM(descricao)
-FROM
-    orcamento.conta_receita 
-WHERE
-    exercicio = '2008' AND
-    cod_estrutural LIKE '2%' AND 
-    publico.fn_nivel(cod_estrutural) <= 2 
-ORDER BY 
-    cod_estrutural;
-*/
-
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo11_receitas(stExercicio VARCHAR, stEntidades VARCHAR, inBimestre INTEGER) RETURNS SETOF RECORD AS 
-$$
-
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo11_receitas(VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 
 
-    stDtIniEx    	VARCHAR := '';	
-    stDtIni 		VARCHAR := '';
-    stDtFim 		VARCHAR := '';
-    arDatas 		VARCHAR[];
+    stExercicio       ALIAS FOR $1;
+    stEntidades       ALIAS FOR $2;
+    stPerdidiocidade  ALIAS FOR $3;
+    inValor           ALIAS FOR $4;
     
-    inMin               INTEGER;
-    inMax               INTEGER;
+    stDtIniExercicio  VARCHAR := '';	
+    stDtIni 	      VARCHAR := '';
+    stDtFim 	      VARCHAR := '';
+    stSQL 	      VARCHAR := '';
+    stSQLaux          VARCHAR := '';
+    arDatas 	      VARCHAR[];
+    inMin             INTEGER;
+    inMax             INTEGER;
     
-    stSQL 		VARCHAR := '';
-    stSQLaux            VARCHAR := '';
-    reReg		RECORD;
+    reReg	      RECORD;
 
 BEGIN
 
-    stDtIniEx := '01/01/' || stExercicio;
+    stDtIniExercicio := '01/01/' || stExercicio;
+    
+    IF stPerdidiocidade = 'mes' THEN
+        arDatas := publico.mes ( stExercicio, inValor );
+    ELSEIF stPerdidiocidade = 'bimestre' THEN
+        arDatas := publico.bimestre ( stExercicio, inValor );
+    END IF;
+        
+    stDtIni := arDatas [ 0 ];
+    stDtFim := arDatas [ 1 ];
     
     -- ---------------------------------------
     -- Criação de Tabelas Temporarias

@@ -30,7 +30,7 @@
     * @author Analista: Valtair
     * @author Desenvolvedor: Carlos Adriano
 
-    $Id: TTCEMGAOP.class.php 61054 2014-12-03 14:04:01Z evandro $
+    $Id: TTCEMGAOP.class.php 61177 2014-12-12 17:37:18Z lisiane $
 
     * @package URBEM
     * @subpackage Mapeamento
@@ -77,15 +77,7 @@ class TTCEMGAOP extends Persistente
     public function montaRecuperaDadosAOP10()
     {
         $stSql  = "  SELECT * FROM ( SELECT   '10' AS tiporegistro
-                                            , CASE WHEN  (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho and pre_empenho.implantado = 't') THEN
-                                                    CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL) THEN
-                                                            LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')||ordem_pagamento.cod_ordem
-                                                    ELSE
-                                                            LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')||ordem_pagamento.cod_ordem
-                                                    END
-                                                ELSE
-                                                    LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD((lpad(despesa.num_orgao::VARCHAR, 3, '0')||LPAD(despesa.num_unidade::VARCHAR, 2, '0')),5,'0')||ordem_pagamento.cod_ordem
-                                              END AS codreduzido
+                                            , ordem_pagamento.cod_ordem AS codreduzido
                                             , LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0') AS codorgao
                                             , CASE WHEN  (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho and pre_empenho.implantado = 't') THEN
                                                     CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL) THEN
@@ -96,7 +88,7 @@ class TTCEMGAOP extends Persistente
                                                 ELSE LPAD((lpad(despesa.num_orgao::VARCHAR, 3, '0')||LPAD(despesa.num_unidade::VARCHAR, 2, '0')),5,'0')
                                               END AS codunidadesub
                                             , ordem_pagamento.cod_ordem AS nroop
-                                            , TO_CHAR(ordem_pagamento.dt_emissao,'ddmmyyyy') AS dtpagamento
+                                            , TO_CHAR(nota_liquidacao_paga.timestamp,'ddmmyyyy') AS dtpagamento
                                             , ordem_pagamento.cod_ordem AS nroanulacaoop
                                             , TO_CHAR(nota_liquidacao_paga_anulada.timestamp_anulada,'ddmmyyyy') AS dtanulacaoop
                                             , CASE WHEN nota_liquidacao_paga_anulada.observacao = '' THEN
@@ -126,6 +118,7 @@ class TTCEMGAOP extends Persistente
                                                         , cod_entidade
                                                         , cod_nota
                                                         , observacao
+                                                        , timestamp
                                             ) AS nota_liquidacao_paga_anulada
                                           ON nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio
                                          AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade
@@ -226,20 +219,12 @@ class TTCEMGAOP extends Persistente
      
         $stSql  = "    
             SELECT  '11' AS tiporegistro
-                    , CASE WHEN  (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho and pre_empenho.implantado = 't') THEN
-                            CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL) THEN
-                                    LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')||ordem_pagamento.cod_ordem
-                            ELSE
-                                    LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')||ordem_pagamento.cod_ordem
-                            END
-                        ELSE
-                            LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')||LPAD((lpad(despesa.num_orgao::VARCHAR, 3, '0')||LPAD(despesa.num_unidade::VARCHAR, 2, '0')),5,'0')||ordem_pagamento.cod_ordem
-                      END AS codreduzido
-                    , CASE WHEN  (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho and pre_empenho.implantado = 't') THEN
-                                    CASE WHEN substr(restos_pre_empenho.cod_estrutural, 1, 3) = '4.6' THEN
-                                            '2'
+                    , ordem_pagamento.cod_ordem AS codreduzido
+                    , CASE WHEN (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho ) THEN
+                                    CASE WHEN (pre_empenho.implantado = 't')  THEN
+                                            '3'
                                     ELSE
-                                            '1'
+                                            '4'
                                     END
                         WHEN substr(conta_despesa.cod_estrutural, 1, 3) = '4.6' THEN
                             '2'
@@ -285,6 +270,7 @@ class TTCEMGAOP extends Persistente
                            , cod_entidade
                             , cod_nota
                             , observacao
+                            , timestamp
                 ) AS nota_liquidacao_paga_anulada
                   ON nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio
                  AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade

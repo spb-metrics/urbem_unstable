@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 60922 $
+    $Revision: 61133 $
     $Name$
     $Author: franver $
-    $Date: 2014-11-25 11:27:49 -0200 (Ter, 25 Nov 2014) $
+    $Date: 2014-12-10 16:35:28 -0200 (Qua, 10 Dez 2014) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -1679,7 +1679,7 @@ class TTGOCTB extends Persistente
                               ) as receita                                                   
                            ON receita.cod_receita = ordem_pagamento_retencao.cod_receita   
                           AND receita.exercicio = ordem_pagamento_retencao.exercicio       
-                        WHERE lote.dt_lote BETWEEN to_date('01/09/2014', 'dd/mm/yyyy') AND to_date('30/09/2014', 'dd/mm/yyyy')
+                        WHERE lote.dt_lote BETWEEN to_date('".$this->getDado('dtInicio')."', 'dd/mm/yyyy') AND to_date('".$this->getDado('dtFim')."', 'dd/mm/yyyy')
                           AND ordem_pagamento_retencao.exercicio = '".$this->getDado('exercicio')."'
                           AND ordem_pagamento_retencao.cod_entidade IN (".$this->getDado('cod_entidade').")
                           AND lancamento_retencao.tipo = 'T'

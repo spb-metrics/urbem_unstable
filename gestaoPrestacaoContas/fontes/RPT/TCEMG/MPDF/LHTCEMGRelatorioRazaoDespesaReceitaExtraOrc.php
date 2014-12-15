@@ -13,7 +13,7 @@
                 <th class='text_align_left border' style="width:15mm;">Data Transf.</th>
                 <th class='text_align_left border' style="width:45mm;">Conta</th>
                 <th class='text_align_right border' style="width:15mm;">Valor</th>
-                <th class='text_align_left border' style="width:30mm;">Banco</th>
+                <th class='text_align_left border' style="width:30mm;">Banco / Ag. / Cc.</th>
                 <th class='text_align_left border' style="width:35mm;">Conta Recurso</th>
             </tr>
         </thead>
@@ -42,6 +42,14 @@
     </p>
     
     <?php
+            $totalGeralPago += $totalPago;
             $totalPago      = 0;
         endforeach;
     ?>
+    
+    <p>
+        <h5>Total Geral</h5>
+        Pago: <?= number_format($totalGeralPago, '2', ',', '.') ?>
+    </p>
+    
+    

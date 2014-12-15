@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OPS.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: OPS.csv.inc.php 61155 2014-12-11 19:31:56Z evandro $
+  * $Date: 2014-12-11 17:31:56 -0200 (Qui, 11 Dez 2014) $
+  * $Author: evandro $
+  * $Rev: 61155 $
   *  
 */
 /**
@@ -238,6 +238,17 @@ if (count($rsRecordSetOPS10->getElementos()) > 0) {
                 if ($stChave10 == $stChave12) {
                     $rsBloco12 = 'rsBloco12_'.$inCount;
                     unset($$rsBloco12);
+                    
+                    /*
+                    Se o campo tipoDocumentoOP estiver preenchido como “05 – Dinheiro”:
+                    1.3.1. O campo nrDocumento, codCTB e codFonteCTB não deve estar informados.
+                    */
+                    if ($arOPS12['tipodocumentoop'] == '05') {
+                        $arOPS12['nrodocumento']    = '';
+                        $arOPS12['codctb']          = '';
+                        $arOPS12['codfontectb']     = '';
+                    }
+
                     $$rsBloco12 = new RecordSet();
                     $$rsBloco12->preenche(array($arOPS12));
                     $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
@@ -264,14 +275,14 @@ if (count($rsRecordSetOPS10->getElementos()) > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codctb");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codfontectb");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(3);
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dtemissao");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");

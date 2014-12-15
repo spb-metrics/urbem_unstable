@@ -31,10 +31,10 @@
   * @author Desenvolvedor:Lisiane Morais
   *
   * @ignore
-  * $Id: FolhaPagamento.inc.php 60591 2014-11-03 11:38:47Z lisiane $
-  * $Date: 2014-11-03 09:38:47 -0200 (Seg, 03 Nov 2014) $
-  * $Author: lisiane $
-  * $Rev: 60591 $
+  * $Id: FolhaPagamento.inc.php 61158 2014-12-12 10:44:35Z jean $
+  * $Date: 2014-12-12 08:44:35 -0200 (Sex, 12 Dez 2014) $
+  * $Author: jean $
+  * $Rev: 61158 $
   *
 */
 
@@ -71,7 +71,6 @@ $obTTCEPEFolhaPagamento->setDado('stEntidade'              , $inCodEntidade  );
 $obTTCEPEFolhaPagamento->setDado('inCodPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao')  );
 
 $obTTCEPEFolhaPagamento->recuperaFolhaPagamento($rsRecordSet, "" ,"" , $boTransacao );
-
 $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tce");

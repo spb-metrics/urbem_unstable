@@ -75,7 +75,7 @@ BEGIN
                                                         '''',
                                                         '|| quote_literal(stDataInicial) ||',
                                                         '|| quote_literal(stDataFinal) ||',
-                                                        ''2'',
+                                                        ''1,2,3'',
                                                         '''','''','''','''','''','''',''''
                                                         ) AS retorno (cod_estrutural      VARCHAR,                                           
                                                                       receita             INTEGER,                                           
@@ -88,7 +88,7 @@ BEGIN
                                                                     )
                     ORDER BY cod_estrutural
                 )';
-                
+
         EXECUTE stSql;
 
         stSql := ' CREATE TEMPORARY TABLE tmp_receitas AS (
@@ -98,7 +98,7 @@ BEGIN
                                 ''01'' as cod_estrutural,
                                 ''RECEITA CORRENTE DO MUNÍCIPIO'' AS descricao,
                                 1 AS nivel,
-                                COALESCE((SELECT SUM(arrecadado_periodo)*-1 FROM tmp_balancete_receita_corrente WHERE tmp_balancete_receita_corrente.cod_estrutural  like ''1.0.0.0.00.00.00.00.00%''), 0.00) AS valor,
+                                COALESCE((SELECT SUM(arrecadado_periodo)*-1 FROM tmp_balancete_receita_corrente WHERE tmp_balancete_receita_corrente.cod_estrutural like ''1.0.0.0.00.00.00.00.00%''), 0.00) AS valor,
                                 0.00 AS total
                                         
                         UNION
@@ -147,7 +147,7 @@ BEGIN
                                 0.00 AS total
                     )
         ';
-        
+
         EXECUTE stSql;
         
         stSql := '
@@ -167,7 +167,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.1.1.2.01.01.02%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.1.1.2.01.01.02%''), 0.00) AS valor
                             
                     UNION
                     
@@ -175,7 +175,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.1.02.05%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.1.02.05%''), 0.00) AS valor
                     
                     UNION
                     
@@ -183,7 +183,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.1.02.06%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.1.02.06%''), 0.00) AS valor
                     
                     UNION
                     
@@ -191,7 +191,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.1.01.05.04%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.1.01.05%''), 0.00) AS valor
                             
                     UNION
                     
@@ -199,7 +199,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.1.36.00.05%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.1.36.00%''), 0.00) AS valor
                             
                     UNION
                     
@@ -207,7 +207,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.2.01.01.05%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.2.01.01%''), 0.00) AS valor
                             
                     UNION
                     
@@ -215,7 +215,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.2.01.02.04%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.2.01.02%''), 0.00) AS valor
                             
                     UNION
                     
@@ -223,7 +223,7 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.2.01.04.05%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.2.01.04%''), 0.00) AS valor
                             
                     UNION
                     
@@ -231,8 +231,15 @@ BEGIN
                             ''9.9.9.9.9.99.99'' as cod_estrutural,
                             ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
                             14 as nivel,
-                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural = ''9.1.7.2.4%''), 0.00) AS valor
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.4%''), 0.00) AS valor
                             
+                    UNION
+                    
+                    SELECT
+                            ''9.9.9.9.9.99.99'' as cod_estrutural,
+                            ''(-) DEDUÇÃO RECEITA PARA FORMAÇÃO FUNDEB'' AS descricao,
+                            14 as nivel,
+                            COALESCE((SELECT arrecadado_periodo FROM tmp_balancete_receita WHERE tmp_balancete_receita.cod_estrutural like ''9.1.7.2.1.01.02%''), 0.00) AS valor
                 ) as retorno
                 
                 GROUP BY cod_estrutural, descricao, nivel

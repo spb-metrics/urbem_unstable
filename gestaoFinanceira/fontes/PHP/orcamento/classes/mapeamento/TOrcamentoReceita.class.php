@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 60446 2014-10-22 11:46:53Z carlos.silva $
+    $Id: TOrcamentoReceita.class.php 61151 2014-12-11 16:59:38Z michel $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -1782,7 +1782,7 @@ function montaRecuperaCorrecoesReceitas20()
     , deducao_receita
     , indentificador_deducao_reduzida AS identificador_deducao
     , natureza_receita_reduzida AS natureza_receita_estornada
-    , especificacao_reduzida AS especificacao_estornada
+    , REPLACE(sem_acentos(especificacao_reduzida), '–', '-') AS especificacao_estornada
     , SUM(vl_reduzido_acrescido) AS vl_estornado
     , cod_receita
     , cod_correcao
@@ -1880,7 +1880,8 @@ function montaRecuperaCorrecoesReceitas20()
     
             JOIN orcamento.conta_receita
             ON conta_receita.cod_conta = receita.cod_conta
-            AND conta_receita.exercicio = receita.exercicio        
+            AND conta_receita.exercicio = receita.exercicio
+            AND SUBSTR(conta_receita.cod_estrutural, 1, 1) != '9'
     
             LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
             ON receita_indentificadores_peculiar_receita.exercicio = receita.exercicio

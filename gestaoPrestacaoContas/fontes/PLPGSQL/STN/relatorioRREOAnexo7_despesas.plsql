@@ -38,14 +38,12 @@
     *
 */
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo7_despesas( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo7_despesas( varchar,varchar,varchar,varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
-    inBimestre     	ALIAS FOR $2;
-    stCodEntidades 	ALIAS FOR $3;
-
-    dtInicial  		varchar := '';
-    dtFinal    		varchar := '';
+    stCodEntidades 	ALIAS FOR $2;
+    dtInicial  		ALIAS FOR $3;
+    dtFinal    		ALIAS FOR $4;
     dtIniExercicio 	VARCHAR := '';
     stExercicioAnterior VARCHAR := '';
     dtInicialExercicioAnterior VARCHAR := '';
@@ -63,17 +61,11 @@ DECLARE
 
 BEGIN
 
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
-    dtInicial := arDatas [ 0 ];
-    dtFinal   := arDatas [ 1 ];
-
     stExercicioAnterior := cast((cast(stExercicio as integer) - 1) as varchar);
 
-    arDatasExercicioAnterior := publico.bimestre (stExercicioAnterior, inBimestre);
-
     dtIniExercicio := '01/01/'||stExercicio;
-    dtInicialExercicioAnterior := '01/01/' || (cast(stExercicio as integer) - 1);
-    dtFinalExercicioAnterior := arDatasExercicioAnterior [ 1 ];
+    dtInicialExercicioAnterior := '01/01/' || stExercicioAnterior;
+    dtFinalExercicioAnterior :=  SUBSTRING(dtFinal,0,6) || stExercicioAnterior;
 
 	-- TABELAS TEMPORARIAS
 	
@@ -245,14 +237,18 @@ BEGIN
     		COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), ''' || stExercicioAnterior || ''', ''' ||  stCodEntidades ||''', '''||dtInicialExercicioAnterior||''', '''||dtFinalExercicioAnterior||''', true )), 0.00) AS ate_bimestre_exercicio_anterior 
     	FROM 
     		orcamento.conta_despesa ocd 
-    		LEFT JOIN 
-    		tmp_despesa tmp ON 
-    			ocd.exercicio = tmp.exercicio AND 
-    			tmp.cod_estrutural LIKE publico.fn_mascarareduzida(ocd.cod_estrutural) ||''%'' 
+    	LEFT JOIN tmp_despesa tmp
+               ON ocd.exercicio = tmp.exercicio
+              AND tmp.cod_estrutural LIKE publico.fn_mascarareduzida(ocd.cod_estrutural) ||''%'' 
     	WHERE 
             ocd.cod_estrutural = ''3.1.0.0.00.00.00.00.00'' AND
             publico.fn_nivel(ocd.cod_estrutural) = 2 AND 
-            ocd.exercicio = '|| quote_literal(stExercicio) ||' 
+            ocd.exercicio = '|| quote_literal(stExercicio) ||'
+            
+            -- Exceto intra
+	    AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
+            AND substring(tmp.cod_estrutural, 5, 3) <> ''9.1''
+            
         GROUP BY
             ocd.descricao,
             ocd.cod_estrutural
@@ -272,9 +268,9 @@ BEGIN
             cast(''Juros e Encargos da Dívida (IX)'' as varchar) as descricao ,
             2 as nivel ,
             CAST(COALESCE(SUM((tmp.vl_original + tmp.vl_suplementacoes)), 0.00 )as numeric(14,2)) as dotacao_atualizada ,
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', ''' ||  stCodEntidades ||''', '''||dtInicial||''', '''||dtFinal||''', true )), 0.00) AS no_bimestre ,
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', ''' ||  stCodEntidades ||''', '''||dtIniExercicio||''', '''||dtFinal||''', true )), 0.00) AS ate_bimestre,
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '''|| stExercicioAnterior || ''', ''' ||  stCodEntidades ||''', '''||dtInicialExercicioAnterior||''', '''||dtFinalExercicioAnterior||''', true )), 0.00) AS ate_bimestre_exercicio_anterior
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', ''' ||  stCodEntidades ||''', '''||dtInicial||''', '''||dtFinal||''', false )), 0.00) AS no_bimestre ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', ''' ||  stCodEntidades ||''', '''||dtIniExercicio||''', '''||dtFinal||''', false )), 0.00) AS ate_bimestre,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '''|| stExercicioAnterior || ''', ''' ||  stCodEntidades ||''', '''||dtInicialExercicioAnterior||''', '''||dtFinalExercicioAnterior||''', false )), 0.00) AS ate_bimestre_exercicio_anterior
         FROM
             orcamento.conta_despesa ocd
             LEFT JOIN
@@ -285,8 +281,12 @@ BEGIN
             publico.fn_mascarareduzida(ocd.cod_estrutural) like ''3.2%'' AND
             publico.fn_nivel(ocd.cod_estrutural) >  1 AND  
             publico.fn_nivel(ocd.cod_estrutural) < 3 AND
+            
             -- Exceto intra
-            ocd.exercicio = '|| quote_literal(stExercicio) ||'
+                ocd.exercicio = '|| quote_literal(stExercicio) ||'
+            AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
+            AND substring(tmp.cod_estrutural, 5, 3) <> ''9.1'' 
+            
         GROUP BY
             ocd.descricao,
             ocd.cod_estrutural
@@ -733,10 +733,10 @@ BEGIN
                     ,cod_estrutural
                     ,cast(trim(descricao) as varchar) AS descricao
                     ,nivel
-                    ,CAST(dotacao_atualizada as numeric(14,2))
-                    ,CAST(no_bimestre as numeric(14,2))
-                    ,CAST(ate_bimestre as numeric(14,2))
-                    ,CAST(ate_bimestre_exercicio_anterior as numeric(14,2))
+                    ,dotacao_atualizada
+                    ,no_bimestre
+                    ,ate_bimestre
+                    ,ate_bimestre_exercicio_anterior
                FROM tmp_rreo_an7_despesa ORDER BY ordem';
   
     FOR reRegistro IN EXECUTE stSql

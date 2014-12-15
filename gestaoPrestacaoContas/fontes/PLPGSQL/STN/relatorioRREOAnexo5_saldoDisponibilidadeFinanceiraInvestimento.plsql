@@ -76,7 +76,7 @@ BEGIN
             stEstruturalInvestimentosAnterior := ' (plano_conta.cod_estrutural like ''''1.1.1.1.1.50%'''' OR plano_conta.cod_estrutural like ''''1.1.4%'''') ';
             stEstruturalBancosAnterior := ' (plano_conta.cod_estrutural like ''''1.1.1.1.1.19%'''' OR plano_conta.cod_estrutural like ''''1.1.1.12.08%'''') ';
         END IF;
-
+        
     	stSql := '
                 
                 SELECT  CAST(''CAIXA'' AS VARCHAR) AS descricao
@@ -122,7 +122,7 @@ BEGIN
                     , stn.pl_saldo_contas (     ''' || stExercicio || '''
                                             , ''' || dtInicioAno || '''
                                             , ''' || dtFinal || '''
-                                            , '' (plano_conta.cod_estrutural like ''''1.1.1.1.1.19%'''' OR plano_conta.cod_estrutural like ''''1.1.1.12.08%'''') ''
+                                            , '' (plano_conta.cod_estrutural like ''''1.1.1.1.1.19%'''' OR plano_conta.cod_estrutural like ''''1.1.1.1.1.05%'''') ''
                                             , ''' || stCodEntidades|| '''
                                             , ''''
                     ) as vl_final_bimestre
@@ -147,7 +147,7 @@ BEGIN
                     , stn.pl_saldo_contas (     ''' || stExercicio || '''
                                             , ''' || dtInicioAno || '''
                                             , ''' || dtFinal || '''
-                                            , '' (plano_conta.cod_estrutural like ''''1.1.1.1.1.50%'''' OR plano_conta.cod_estrutural like ''''1.1.4%'''') ''
+                                            , '' (plano_conta.cod_estrutural like ''''1.1.1.1.1.50%'''' OR plano_conta.cod_estrutural like ''''1.1.4%'''') AND lancamento.tipo = ''''I'''' ''
                                             , ''' || stCodEntidades|| '''
                                             , ''''
                     ) as vl_final_bimestre
@@ -236,7 +236,6 @@ BEGIN
                 ) as vl_final_bimestre
         ';
     END IF;
-    
     
     FOR reRegistro IN EXECUTE stSql
     LOOP

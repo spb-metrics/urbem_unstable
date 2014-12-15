@@ -21,43 +21,22 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?php
-/**
-    * Página de Relatório RREO Anexo1
-    * Data de Criação   : 10/04/2008
-
-    * @author Leopoldo Braga Barreiro
-
-    * @ignore
-
-    * Casos de uso :
-
-    $Id: $
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
-include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
-include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                    );
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoUsuario.class.php";
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
 
-if ($_REQUEST['stAcao'] == 'anexo8novo') {
-    $preview = new PreviewBirt(6,36,54);
-    $preview->addParametro( 'relatorio_novo', 'sim' );
-} else {
-    $preview = new PreviewBirt(6,36,27);
-    $preview->addParametro( 'relatorio_novo', 'nao' );
-}
-
-// $preview = new PreviewBirt(6,36,49); //código do relatório para entidades consórcio
+$preview = new PreviewBirt(6,36,27);
+$preview->addParametro( 'relatorio_novo', 'nao' );
 $preview->setTitulo('Demonst. Receitas/Despesas com Manut. e Desenvol. do Ensino - MDE');
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel ( true );
 
-/**
- * Faz o update do parametro meta_resultado_nominal_fixada na table administracao.configuracao
- */
+# Faz o update do parametro meta_resultado_nominal_fixada na table administracao.configuracao
 $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao();
 $obTAdministracaoConfiguracao->setDado('exercicio',Sessao::getExercicio());
 $obTAdministracaoConfiguracao->setDado('cod_modulo',36);
@@ -106,15 +85,41 @@ if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
     $preview->addParametro( 'poder' , 'Legislativo' );
 }
 
+$stDtInicio = $stDtFinal = '';
+
 switch ($_REQUEST['stTipoRelatorio']) {
-    case 'Bimestre'    :$preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'    ] ); break;
-    case 'Quadrimestre':$preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] ); break;
-    case 'Semestre'    :$preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'    ] ); break;
+    case 'Mes':
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbMes'] );
+        $preview->addParametro( 'nome_periodo' , SistemaLegado::mesExtensoBR($_REQUEST['cmbMes'])." de ".Sessao::getExercicio() );
+        $preview->addParametro( 'tipo_periodo', "Mês" ); 
+
+        $stDtInicio = "01/".$request->get('cmbMes')."/".Sessao::getExercicio();
+        $stDtFinal  = SistemaLegado::retornaUltimoDiaMes($request->get('cmbMes'),Sessao::getExercicio());
+    break;
+
+    case 'Bimestre':
+        $preview->addParametro( 'bimestre'     , $_REQUEST['cmbBimestre'] );
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbBimestre'] ); 
+        $preview->addParametro( 'nome_periodo' , $_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio() );
+        $preview->addParametro( 'tipo_periodo' , "Bimestre" ); 
+
+        $stDtInicio = Bimestre::getDataInicial( $_REQUEST['cmbBimestre'], Sessao::getExercicio() );
+        $stDtFinal  = Bimestre::getDataFinal( $_REQUEST['cmbBimestre'], Sessao::getExercicio() );
+    break;
+
+    case 'Quadrimestre':
+        $preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] ); 
+        $preview->addParametro( 'tipo_periodo', "Quadrimestre" ); 
+    break;
+    
+    case 'Semestre':
+        $preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'] ); 
+        $preview->addParametro( 'tipo_periodo', "Semestre" ); 
+    break;
 }
 
-$stDtInicio = '';
-$stDtFinal = '';
 
+/*
 switch ($_REQUEST['cmbBimestre']) {
     case '1':
         $stDtInicio = '01/01/' . Sessao::getExercicio();
@@ -146,31 +151,27 @@ switch ($_REQUEST['cmbBimestre']) {
     break;
 }
 
-#############################Modificações do tce para o novo layout##############################
-//adiciona unidade responsável ao relatório
-include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoUsuario.class.php" );
-$stFiltro = " WHERE sw_cgm.numcgm = ".Sessao::read('numCgm');
+if ($request->get('cmbMes')) {
+    $stDtInicio = "01/".$request->get('cmbMes')."/".Sessao::getExercicio();
+    $stDtFinal = SistemaLegado::retornaUltimoDiaMes($request->get('cmbMes'),Sessao::getExercicio());
+}
+*/
+
 $obTAdministracaoUsuario = new TAdministracaoUsuario;
+
+$stFiltro = " WHERE sw_cgm.numcgm = ".Sessao::read('numCgm');
 $obTAdministracaoUsuario->recuperaRelacionamento($rsUsuario, $stFiltro);
 
 $preview->addParametro( 'unidade_responsavel', $rsUsuario->getCampo('orgao') );
 
-//adicionada data de emissão no rodapé do relatório
+# Data de emissão no rodapé
 $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
 $preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
-
-if ($_REQUEST['stAcao'] == 'anexo8novo') {
-    $preview->addParametro( 'relatorio_novo', 'sim' );
-} else {
-    $preview->addParametro( 'relatorio_novo', 'nao' );
-}
-#################################################################################################
-
-$preview->addParametro( 'bimestre', $_REQUEST['cmbBimestre'] );
-$preview->addParametro( 'dt_inicio', $stDtInicio );
-$preview->addParametro( 'dt_final', $stDtFinal );
+$preview->addParametro( 'dt_inicio' , $stDtInicio );
+$preview->addParametro( 'dt_final'  , $stDtFinal );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
+
 $preview->preview();

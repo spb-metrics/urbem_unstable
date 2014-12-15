@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Filtro para Relatório de MODELOS
     * Data de Criação   : 24/01/2006
 
@@ -38,7 +35,7 @@
                      uc-06.02.17
                      uc-06.02.18
 
-    $Id: FLModelosRREO.php 61067 2014-12-03 18:56:31Z carlos.silva $
+    $Id: FLModelosRREO.php 61160 2014-12-12 11:22:08Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -94,8 +91,10 @@ case 'anexo7novo':
     $pgGera = 'OCGeraRREOAnexo9.php';
     break;
 case 'anexo10':
-case 'anexo8novo':
     $pgGera = 'OCGeraRREOAnexo10.php';
+    break;
+case 'anexo8novo':
+    $pgGera = 'OCGeraRREOAnexo8.php';
     break;
 case 'anexo11':
 case 'anexo9novo':
@@ -140,9 +139,15 @@ $obCmbTipoRelatorio->addOption('', 'Selecione');
 //Se estado for Minas Gerais
 if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) && (Sessao::getExercicio() >= 2014)) {
     switch ($_REQUEST['stAcao']) {
+        case 'anexo12novo':
         case 'anexo1novo':
         case 'anexo2novo':
         case 'anexo4novo':
+        case 'anexo5novo':
+        case 'anexo6novo':
+        case 'anexo7novo':
+        case 'anexo8novo':
+        case 'anexo9novo':
             $obCmbTipoRelatorio->addOption('Mes', 'Mês');
         break;
     }

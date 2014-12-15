@@ -1313,7 +1313,7 @@ this.queryText += "         + SUM(rcl.total_mes_4) \n";
 this.queryText += "         + SUM(rcl.total_mes_3) \n";
 this.queryText += "         + SUM(rcl.total_mes_2) \n";
 this.queryText += "         + SUM(rcl.total_mes_1) \n";
-this.queryText += "         + COALESCE(CAST(stn.fn_calcula_rcl_vinculada('" + params["exercicio"] + "','01/01/" + params["exercicio"] + "','" + params["cod_entidade"] + "') AS numeric),0) AS valor \n";
+this.queryText += "         AS valor               \n";
 this.queryText += "      FROM ( SELECT ordem \n";
 this.queryText += "                  , cod_conta \n";
 this.queryText += "                  , nom_conta \n";
@@ -1374,6 +1374,7 @@ this.queryText += "                     , total_mes_10   NUMERIC                
 this.queryText += "                     , total_mes_11   NUMERIC                          \n";
 this.queryText += "                     , total_mes_12   NUMERIC )  \n";
 this.queryText += "            ) AS rcl ) AS rcl_total_exercicio_anterior  \n";
+
 this.queryText += " ,( SELECT SUM(rcl.total_mes_12) \n";
 this.queryText += "         + SUM(rcl.total_mes_11) \n";
 this.queryText += "         + SUM(rcl.total_mes_10) \n";
@@ -1386,7 +1387,7 @@ this.queryText += "         + SUM(rcl.total_mes_4) \n";
 this.queryText += "         + SUM(rcl.total_mes_3) \n";
 this.queryText += "         + SUM(rcl.total_mes_2) \n";
 this.queryText += "         + SUM(rcl.total_mes_1) \n";
-this.queryText += "         + COALESCE(CAST(stn.fn_calcula_rcl_vinculada('" + params["exercicio"] + "','01/04/" + params["exercicio"] + "','" + params["cod_entidade"] + "') AS numeric),0) AS valor \n";
+this.queryText += "         AS valor               \n";
 this.queryText += "      FROM ( SELECT ordem \n";
 this.queryText += "                  , cod_conta \n";
 this.queryText += "                  , nom_conta \n";
@@ -1447,6 +1448,7 @@ this.queryText += "                     , total_mes_10   NUMERIC                
 this.queryText += "                     , total_mes_11   NUMERIC                          \n";
 this.queryText += "                     , total_mes_12   NUMERIC )  \n";
 this.queryText += "            ) AS rcl ) AS rcl_total_primeiro_quadrimestre  \n";
+
 this.queryText += " ,( SELECT SUM(rcl.total_mes_12) \n";
 this.queryText += "         + SUM(rcl.total_mes_11) \n";
 this.queryText += "         + SUM(rcl.total_mes_10) \n";
@@ -1459,7 +1461,7 @@ this.queryText += "         + SUM(rcl.total_mes_4) \n";
 this.queryText += "         + SUM(rcl.total_mes_3) \n";
 this.queryText += "         + SUM(rcl.total_mes_2) \n";
 this.queryText += "         + SUM(rcl.total_mes_1) \n";
-this.queryText += "         + COALESCE(CAST(stn.fn_calcula_rcl_vinculada('" + params["exercicio"] + "','01/08/" + params["exercicio"] + "','" + params["cod_entidade"] + "') AS numeric),0) AS valor \n";
+this.queryText += "         AS valor               \n";
 this.queryText += "      FROM ( SELECT ordem \n";
 this.queryText += "                  , cod_conta \n";
 this.queryText += "                  , nom_conta \n";
@@ -1532,7 +1534,7 @@ this.queryText += "         + SUM(rcl.total_mes_4) \n";
 this.queryText += "         + SUM(rcl.total_mes_3) \n";
 this.queryText += "         + SUM(rcl.total_mes_2) \n";
 this.queryText += "         + SUM(rcl.total_mes_1) \n";
-this.queryText += "         + COALESCE(CAST(stn.fn_calcula_rcl_vinculada('" + params["exercicio"] + "','01/12/" + params["exercicio"] + "','" + params["cod_entidade"] + "') AS numeric),0) AS valor \n";
+this.queryText += "         AS valor               \n";
 this.queryText += "      FROM ( SELECT ordem \n";
 this.queryText += "                  , cod_conta \n";
 this.queryText += "                  , nom_conta \n";
@@ -1605,7 +1607,7 @@ this.queryText += "         + SUM(rcl.total_mes_4) \n";
 this.queryText += "         + SUM(rcl.total_mes_3) \n";
 this.queryText += "         + SUM(rcl.total_mes_2) \n";
 this.queryText += "         + SUM(rcl.total_mes_1) \n";
-this.queryText += "         + COALESCE(CAST(stn.fn_calcula_rcl_vinculada('" + params["exercicio"] + "','01/06/" + params["exercicio"] + "','" + params["cod_entidade"] + "') AS numeric),0) AS valor \n";
+this.queryText += "         AS valor               \n";
 this.queryText += "      FROM ( SELECT ordem \n";
 this.queryText += "                  , cod_conta \n";
 this.queryText += "                  , nom_conta \n";
@@ -1666,10 +1668,6 @@ this.queryText += "                     , total_mes_10   NUMERIC                
 this.queryText += "                     , total_mes_11   NUMERIC                          \n";
 this.queryText += "                     , total_mes_12   NUMERIC )  \n";
 this.queryText += "            ) AS rcl ) AS rcl_total_primeiro_semestre                                                                                                                                                                         \n";
-
-
-
-
 
 params["qry"] = this.queryText;]]></method>
             <property name="dataSource">dataSource</property>
@@ -2243,17 +2241,29 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo_primeiro_quadrimestre_externo_aval</property>
-                    <expression name="expression">dataSetRow["saldo_primeiro_quadrimestre_externo_aval"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["saldo_primeiro_quadrimestre_externo_aval"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_segundo_quadrimestre_externo_aval</property>
-                    <expression name="expression">dataSetRow["saldo_segundo_quadrimestre_externo_aval"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["saldo_segundo_quadrimestre_externo_aval"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_externo_aval</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
@@ -2263,18 +2273,30 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo_primeiro_quadrimestre_externo_outro</property>
-                    <expression name="expression">dataSetRow["saldo_primeiro_quadrimestre_externo_outro"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["saldo_primeiro_quadrimestre_externo_outro"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_segundo_quadrimestre_externo_outro</property>
-                    <expression name="expression">dataSetRow["saldo_segundo_quadrimestre_externo_outro"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["saldo_segundo_quadrimestre_externo_outro"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_externo_outro</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_interno_aval</property>
@@ -2283,18 +2305,30 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo_primeiro_quadrimestre_interno_aval</property>
-                    <expression name="expression">dataSetRow["saldo_primeiro_quadrimestre_interno_aval"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["saldo_primeiro_quadrimestre_interno_aval"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_segundo_quadrimestre_interno_aval</property>
-                    <expression name="expression">dataSetRow["saldo_segundo_quadrimestre_interno_aval"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["saldo_segundo_quadrimestre_interno_aval"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_interno_aval</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_interno_outro</property>
@@ -2303,17 +2337,29 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo_primeiro_quadrimestre_interno_outro</property>
-                    <expression name="expression">dataSetRow["saldo_primeiro_quadrimestre_interno_outro"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["saldo_primeiro_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_segundo_quadrimestre_interno_outro</property>
-                    <expression name="expression">dataSetRow["saldo_segundo_quadrimestre_interno_outro"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["saldo_segundo_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_interno_outro</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
@@ -2443,17 +2489,29 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">gexaf_qua1_+_gexog_qua1</property>
-                    <expression name="expression">dataSetRow["gexaf_qua1_+_gexog_qua1"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["gexaf_qua1_+_gexog_qua1"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">gexaf_qua2_+_gexog_qua2</property>
-                    <expression name="expression">dataSetRow["gexaf_qua2_+_gexog_qua2"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["gexaf_qua2_+_gexog_qua2"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">gexaf_qua3_+_gexog_qua3</property>
-                    <expression name="expression">dataSetRow["gexaf_qua3_+_gexog_qua3"]</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["gexaf_qua3_+_gexog_qua3"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2463,17 +2521,29 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">ginaf_qua1_+_ginog_qua1</property>
-                    <expression name="expression">dataSetRow["ginaf_qua1_+_ginog_qua1"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["ginaf_qua1_+_ginog_qua1"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ginaf_qua2_+_ginog_qua2</property>
-                    <expression name="expression">dataSetRow["ginaf_qua2_+_ginog_qua2"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["ginaf_qua2_+_ginog_qua2"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ginaf_qua3_+_ginog_qua3</property>
-                    <expression name="expression">dataSetRow["ginaf_qua3_+_ginog_qua3"]</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["ginaf_qua3_+_ginog_qua3"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2543,12 +2613,20 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">rcl_total_primeiro_quadrimestre</property>
-                    <expression name="expression">dataSetRow["rcl_total_primeiro_quadrimestre"]</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["rcl_total_primeiro_quadrimestre"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">rcl_total_segundo_quadrimestre</property>
-                    <expression name="expression">dataSetRow["rcl_total_segundo_quadrimestre"]</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["rcl_total_segundo_quadrimestre"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2558,8 +2636,12 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">rcl_total_terceiro_quadrimestre</property>
-                    <expression name="expression">dataSetRow["rcl_total_terceiro_quadrimestre"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["rcl_total_terceiro_quadrimestre"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">teste</property>
@@ -2568,12 +2650,20 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">teste1</property>
-                    <expression name="expression">dataSetRow["rcl_total_primeiro_quadrimestre"]*0.22</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["rcl_total_primeiro_quadrimestre"]*0.22
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">teste3</property>
-                    <expression name="expression">dataSetRow["rcl_total_segundo_quadrimestre"]*0.22</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["rcl_total_segundo_quadrimestre"]*0.22
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2587,35 +2677,39 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_1</property>
-                    <expression name="expression">if ( dataSetRow["rcl_total_primeiro_quadrimestre"] != 0 ){
+                    <expression name="expression">if ( dataSetRow["rcl_total_primeiro_quadrimestre"] != 0&amp;&amp;params["periodo"]>="1" ){
 	((dataSetRow["gexaf_qua1_+_gexog_qua1"]+dataSetRow["ginaf_qua1_+_ginog_qua1"])*100)/dataSetRow["rcl_total_primeiro_quadrimestre"]
 }else{
 	0
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_2</property>
-                    <expression name="expression">if ( dataSetRow["rcl_total_segundo_quadrimestre"] != 0 ){
+                    <expression name="expression">if ( dataSetRow["rcl_total_segundo_quadrimestre"] != 0&amp;&amp;params["periodo"]>="2" ){
 	((dataSetRow["gexaf_qua2_+_gexog_qua2"]+dataSetRow["ginaf_qua2_+_ginog_qua2"])*100)/dataSetRow["rcl_total_segundo_quadrimestre"]
 }else{
 	0
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_3</property>
-                    <expression name="expression">if ( dataSetRow["rcl_total_primeiro_semestre"]!= 0 ){
+                    <expression name="expression">if ( dataSetRow["rcl_total_primeiro_semestre"]!= 0&amp;&amp;params["periodo"]=="3" ){
 	((dataSetRow["gexaf_qua3_+_gexog_qua3"]+dataSetRow["ginaf_qua3_+_ginog_qua3"])*100)/dataSetRow["rcl_total_primeiro_semestre"]
 }else{
 	0
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_4</property>
-                    <expression name="expression">dataSetRow["gexaf_qua2_+_gexog_qua2"]+dataSetRow["ginaf_qua2_+_ginog_qua2"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	dataSetRow["gexaf_qua2_+_gexog_qua2"]+dataSetRow["ginaf_qua2_+_ginog_qua2"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_5</property>
@@ -2624,13 +2718,21 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_6</property>
-                    <expression name="expression">dataSetRow["gexaf_qua1_+_gexog_qua1"]+dataSetRow["ginaf_qua1_+_ginog_qua1"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	dataSetRow["gexaf_qua1_+_gexog_qua1"]+dataSetRow["ginaf_qua1_+_ginog_qua1"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_7</property>
-                    <expression name="expression">dataSetRow["gexaf_qua3_+_gexog_qua3"]+dataSetRow["ginaf_qua3_+_ginog_qua3"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["gexaf_qua3_+_gexog_qua3"]+dataSetRow["ginaf_qua3_+_ginog_qua3"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">cgexaf_ant_+_cgexog_ant_1</property>
@@ -2699,7 +2801,11 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">teste4</property>
-                    <expression name="expression">dataSetRow["rcl_total_terceiro_quadrimestre"]*0.22</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	dataSetRow["rcl_total_terceiro_quadrimestre"]*0.22
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2711,19 +2817,31 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 <structure>
                     <property name="name">limite_alerta_1_qua</property>
                     <property name="displayName">limite_alerta_1_qua</property>
-                    <expression name="expression">row["teste1"]*(params["perc_limite_alerta"]/100)</expression>
+                    <expression name="expression">if(params["periodo"]>="1"){
+	row["teste1"]*(params["perc_limite_alerta"]/100)
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_qua_2</property>
                     <property name="displayName">lomite_alerta_qua_2</property>
-                    <expression name="expression">row["teste3"]*(params["perc_limite_alerta"]/100)</expression>
+                    <expression name="expression">if(params["periodo"]>="2"){
+	row["teste3"]*(params["perc_limite_alerta"]/100)
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_qua_3</property>
                     <property name="displayName">limite_alerta_qua_3</property>
-                    <expression name="expression">row["teste4"]*(params["perc_limite_alerta"]/100)</expression>
+                    <expression name="expression">if(params["periodo"]=="3"){
+	row["teste4"]*(params["perc_limite_alerta"]/100)
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
@@ -3102,7 +3220,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                             <property name="category">Currency</property>
                                             <property name="pattern">#,##0.00</property>
                                         </structure>
-                                        <property name="resultSetColumn">saldo_segundo_quadrimestre_externo_outro</property>
+                                        <property name="resultSetColumn">saldo_terceiro_quadrimestre_externo_outro</property>
                                     </data>
                                 </cell>
                             </row>

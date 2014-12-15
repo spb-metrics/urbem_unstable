@@ -54,7 +54,9 @@ DECLARE
     i           INTEGER;
     
     nuVlMesalDespesa      NUMERIC := 0.00;
-    nuVlTotalMesalDespesa NUMERIC := 0.00;
+    nuVlTotalMesalDespesaCamara     NUMERIC := 0.00;
+    nuVlTotalMesalDespesaPrefeitura NUMERIC := 0.00;
+    nuVlTotalMesalDespesaInstituto  NUMERIC := 0.00;
     
     stMes       VARCHAR;
     arDatas     VARCHAR[];
@@ -189,40 +191,24 @@ BEGIN
                          JOIN empenho.restos_pre_empenho
                            ON restos_pre_empenho.exercicio       = pre_empenho.exercicio
                           AND restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                    
+
                          JOIN orcamento.conta_despesa
                            ON conta_despesa.exercicio      = restos_pre_empenho.exercicio
                           AND REPLACE(conta_despesa.cod_estrutural,''.'','''') = restos_pre_empenho.cod_estrutural
-                    
-                         JOIN (SELECT cod_conta, exercicio
-                                 FROM (SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.0.04.%''
-                                       UNION
-                                       SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.0.05.%''
-                                       UNION
-                                       SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.0.11.%''
-                                       UNION
-                                       SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.0.13.%''
-                                       UNION
-                                       SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.0.16.%''
-                                       UNION
-                                       SELECT cod_conta, exercicio FROM orcamento.conta_despesa WHERE cod_estrutural ILIKE ''3.1.9.1.13.%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319004%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319005%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319011%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319013%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319016%''
-                                       UNION
-                                       SELECT cod_estrutural, exercicio FROM empenho.restos_pre_empenho WHERE cod_estrutural ILIKE ''319113%''
-                                      ) AS despesa
-                              ) AS despesas_pessoal 
-                           ON despesas_pessoal.cod_conta = conta_despesa.cod_conta
-                          AND despesas_pessoal.exercicio = conta_despesa.exercicio
-            
+                          AND (
+                                 conta_despesa.cod_estrutural ILIKE ''3.1.9.0.04.%''
+                              OR conta_despesa.cod_estrutural ILIKE ''3.1.9.0.05.%''
+			                  OR conta_despesa.cod_estrutural ILIKE ''3.1.9.0.11.%''
+			                  OR conta_despesa.cod_estrutural ILIKE ''3.1.9.0.13.%''
+			                  OR conta_despesa.cod_estrutural ILIKE ''3.1.9.0.16.%''
+			                  OR conta_despesa.cod_estrutural ILIKE ''3.1.9.1.13.%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319004%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319005%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319011%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319013%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319016%''
+			                  OR restos_pre_empenho.cod_estrutural ILIKE ''319113%''
+			                  )            
             ';
             
             EXECUTE stSql;
@@ -724,13 +710,26 @@ BEGIN
     i := 12;
     WHILE i >= 1 LOOP
 
-        IF SUBSTR(arDatas[i],7,4)::INTEGER < 2014 THEN
-            SELECT COALESCE(SUM(valor), 0) INTO nuVlMesalDespesa FROM stn.despesa_pessoal WHERE mes = SUBSTR(arDatas[i],4,2)::INTEGER AND ano = SUBSTR(arDatas[i],7,4) AND cod_entidade IN (1,2,3);
+        IF SUBSTR(arDatas[i],7,4)::INTEGER < inExercicio THEN
+            SELECT COALESCE(SUM(valor), 0) INTO nuVlMesalDespesa FROM stn.despesa_pessoal WHERE mes = SUBSTR(arDatas[i],4,2)::INTEGER AND ano = SUBSTR(arDatas[i],7,4) AND cod_entidade IN (1);
         ELSE
             nuVlMesalDespesa := 0.00;
         END IF;
+        nuVlTotalMesalDespesaCamara := nuVlTotalMesalDespesaCamara + nuVlMesalDespesa;
         
-        nuVlTotalMesalDespesa := nuVlTotalMesalDespesa + nuVlMesalDespesa;
+        IF SUBSTR(arDatas[i],7,4)::INTEGER < inExercicio THEN
+            SELECT COALESCE(SUM(valor), 0) INTO nuVlMesalDespesa FROM stn.despesa_pessoal WHERE mes = SUBSTR(arDatas[i],4,2)::INTEGER AND ano = SUBSTR(arDatas[i],7,4) AND cod_entidade IN (2);
+        ELSE
+            nuVlMesalDespesa := 0.00;
+        END IF;
+        nuVlTotalMesalDespesaPrefeitura := nuVlTotalMesalDespesaPrefeitura + nuVlMesalDespesa;
+        
+        IF SUBSTR(arDatas[i],7,4)::INTEGER < inExercicio THEN
+            SELECT COALESCE(SUM(valor), 0) INTO nuVlMesalDespesa FROM stn.despesa_pessoal WHERE mes = SUBSTR(arDatas[i],4,2)::INTEGER AND ano = SUBSTR(arDatas[i],7,4) AND cod_entidade IN (3);
+        ELSE
+            nuVlMesalDespesa := 0.00;
+        END IF;
+        nuVlTotalMesalDespesaInstituto := nuVlTotalMesalDespesaInstituto + nuVlMesalDespesa;
         
         i := i - 1;
     
@@ -749,7 +748,9 @@ BEGIN
                , empenhado
                , liquidado
                , pago
-               , 0.00 AS valor_ano_anterior
+               , 0.00 AS valor_ano_anterior_camara
+               , 0.00 AS valor_ano_anterior_prefeitura
+               , 0.00 AS valor_ano_anterior_instituto
             FROM tmp_valor_despesa
         GROUP BY cod_entidade
                , nome_entidade
@@ -759,13 +760,18 @@ BEGIN
                , empenhado
                , liquidado
                , pago
-               , valor_ano_anterior
+               , valor_ano_anterior_camara
+               , valor_ano_anterior_prefeitura
+               , valor_ano_anterior_instituto
         ORDER BY cod_estrutural
     ';
  	
     FOR reRegistro IN EXECUTE stSql
     LOOP
-        reRegistro.valor_ano_anterior := nuVlTotalMesalDespesa;
+        reRegistro.valor_ano_anterior_camara        := nuVlTotalMesalDespesaCamara;
+        reRegistro.valor_ano_anterior_prefeitura    := nuVlTotalMesalDespesaPrefeitura;
+        reRegistro.valor_ano_anterior_instituto     := nuVlTotalMesalDespesaInstituto;
+
         RETURN next reRegistro;
     END LOOP;
 

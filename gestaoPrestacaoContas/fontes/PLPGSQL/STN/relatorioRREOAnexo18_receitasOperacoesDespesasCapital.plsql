@@ -33,11 +33,13 @@
 
 */
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo18_receitas_operacoes_despesas_capital(varchar, integer ,varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo18_receitas_operacoes_despesas_capital(varchar, integer ,varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     inBimestre          ALIAS FOR $2;
     stEntidades         ALIAS FOR $3;
+    stPeridiocidade     ALIAS FOR $4;
+    
     dtInicioAno         VARCHAR := '';
     stSql               VARCHAR := '';
     reRegistro          RECORD;
@@ -69,7 +71,7 @@ BEGIN
          , ate_bi
          , saldo 
       INTO reRegistro
-      FROM stn.fn_rreo_anexo11_receitas(stExercicio, stEntidades, inBimestre) AS tbl
+      FROM stn.fn_rreo_anexo11_receitas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
            (
               grupo INTEGER
             , nivel INTEGER
@@ -90,7 +92,7 @@ BEGIN
     SELECT SUM(dot_atu) AS dot_atu
          , SUM(liq_tot) AS liq_tot
       INTO reRegistro
-      FROM stn.fn_rreo_anexo11_despesas(stExercicio, stEntidades, inBimestre) AS tbl
+      FROM stn.fn_rreo_anexo11_despesas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
          (
             grupo INTEGER 
           , nivel INTEGER

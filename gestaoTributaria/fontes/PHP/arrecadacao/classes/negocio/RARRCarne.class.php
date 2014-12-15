@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RARRCarne.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RARRCarne.class.php 61188 2014-12-12 19:11:24Z carolina $
 
    * Casos de uso: uc-05.03.11, uc-02.04.04
 
@@ -632,7 +632,7 @@ function listarNomeDevolucao(&$rsRecordSet, $obTransacao)
     $stFiltro = '';
 
     if ($this->stNumeracao) {
-        $stFiltro .= " ac.numeracao = ".$this->stNumeracao." and ";
+        $stFiltro .= " ac.numeracao = '".$this->stNumeracao."' and ";
     }
 
     if ($this->stExercicio) {

@@ -160,4 +160,52 @@ function executaFuncao(&$rsRecordSet, $boTransacao = "")
     return $obErro;
 }
 
+function verificaConta(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql = $this->montaVerificaConta();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaVerificaConta()
+{
+    $stSql = "SELECT plano_analitica.cod_plano 
+                                 FROM contabilidade.plano_conta 
+                                 JOIN contabilidade.plano_analitica
+                                   ON plano_analitica.cod_conta = plano_conta.cod_conta
+                                  AND plano_analitica.exercicio = plano_conta.exercicio
+                                WHERE plano_conta.exercicio = '".$this->getDado('exercicio')."'
+                                  AND plano_conta.cod_estrutural LIKE '".$this->getDado('cod_estrutural')."%'";
+    
+    return $stSql;
+}
+
+function buscaContaComMascara(&$rsRecordSet,$boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql = $this->montaBuscaContaComMascara();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaBuscaContaComMascara (){
+    
+  $stSql = " SELECT
+                   publico.fn_mascara_completa((select valor from administracao.configuracao where cod_modulo = 9 and
+                    exercicio = '".$this->getDado('exercicio')."' and parametro = 'masc_plano_contas'), '".$this->getDado('cod_estrutural')."') ";
+                    
+ return $stSql;
+            
+}
 }

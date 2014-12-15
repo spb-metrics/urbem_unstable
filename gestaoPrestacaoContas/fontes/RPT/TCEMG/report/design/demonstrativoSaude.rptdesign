@@ -293,6 +293,16 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="stDescricaoPeriodo" id="6927">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
@@ -303,8 +313,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     extensionProperties.odaUser = params["db_user"].value;
     extensionProperties.odaPassword = params["db_password"].value;
 }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30:[port]/[data_base]</property>
+            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
+            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -615,97 +625,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="leftMargin">10mm</property>
             <property name="bottomMargin">20mm</property>
             <property name="rightMargin">10mm</property>
-            <page-header>
-                <grid name="cabecalho" id="1158" extends="urbem_250.cabecalho_retrato">
-                    <overridden-values>
-                        <ref-entry baseId="1051" id="1051"/>
-                        <ref-entry baseId="1052" id="1052"/>
-                        <ref-entry baseId="1053" id="1053"/>
-                        <ref-entry baseId="1054" id="1054"/>
-                        <ref-entry baseId="1055" id="1055"/>
-                        <ref-entry baseId="1397" name="NewText61221" id="1397"/>
-                        <ref-entry baseId="1398" name="NewText612111" id="1398"/>
-                        <ref-entry baseId="1056" id="1056"/>
-                        <ref-entry baseId="1061" name="NewGrid" id="1061"/>
-                        <ref-entry baseId="1062" id="1062"/>
-                        <ref-entry baseId="1063" id="1063"/>
-                        <ref-entry baseId="1064" id="1064"/>
-                        <ref-entry baseId="1102" name="NewData" id="1102"/>
-                        <ref-entry baseId="1137" name="NewData6" id="1137"/>
-                        <ref-entry baseId="1065" id="1065"/>
-                        <ref-entry baseId="1066" id="1066"/>
-                        <ref-entry baseId="1103" name="NewData1" id="1103"/>
-                        <ref-entry baseId="1138" name="NewData7" id="1138"/>
-                        <ref-entry baseId="1067" id="1067"/>
-                        <ref-entry baseId="1068" id="1068"/>
-                        <ref-entry baseId="1105" name="NewData2" id="1105"/>
-                        <ref-entry baseId="1139" name="NewData8" id="1139"/>
-                        <ref-entry baseId="1069" id="1069"/>
-                        <ref-entry baseId="1070" id="1070"/>
-                        <ref-entry baseId="1106" name="NewData3" id="1106"/>
-                        <ref-entry baseId="1140" name="NewData9" id="1140"/>
-                        <ref-entry baseId="1071" id="1071"/>
-                        <ref-entry baseId="1072" id="1072"/>
-                        <ref-entry baseId="1107" name="NewData4" id="1107"/>
-                        <ref-entry baseId="1141" name="NewData10" id="1141"/>
-                        <ref-entry baseId="1073" id="1073"/>
-                        <ref-entry baseId="1074" id="1074"/>
-                        <ref-entry baseId="1108" name="NewData5" id="1108"/>
-                        <ref-entry baseId="1143" name="NewData11" id="1143"/>
-                        <ref-entry baseId="1057" id="1057"/>
-                        <ref-entry baseId="1075" name="NewGrid1" id="1075"/>
-                        <ref-entry baseId="1076" id="1076"/>
-                        <ref-entry baseId="1077" id="1077"/>
-                        <ref-entry baseId="1078" id="1078"/>
-                        <ref-entry baseId="1109" name="NewGrid3" id="1109"/>
-                        <ref-entry baseId="1110" id="1110"/>
-                        <ref-entry baseId="1111" id="1111"/>
-                        <ref-entry baseId="1112" id="1112"/>
-                        <ref-entry baseId="1113" id="1113"/>
-                        <ref-entry baseId="735" name="NewData1212" id="735"/>
-                        <ref-entry baseId="1114" id="1114"/>
-                        <ref-entry baseId="744" name="NewData1412" id="744"/>
-                        <ref-entry baseId="1079" id="1079"/>
-                        <ref-entry baseId="1080" id="1080"/>
-                        <ref-entry baseId="1115" name="NewGrid31" id="1115"/>
-                        <ref-entry baseId="1116" id="1116"/>
-                        <ref-entry baseId="1117" id="1117"/>
-                        <ref-entry baseId="1118" id="1118"/>
-                        <ref-entry baseId="1119" id="1119"/>
-                        <ref-entry baseId="747" name="NewData1312" id="747"/>
-                        <ref-entry baseId="1120" id="1120"/>
-                        <ref-entry baseId="756" name="NewData152" id="756"/>
-                        <ref-entry baseId="1081" id="1081"/>
-                        <ref-entry baseId="1082" id="1082"/>
-                        <ref-entry baseId="759" name="NewData1112" id="759"/>
-                        <ref-entry baseId="1083" id="1083"/>
-                        <ref-entry baseId="1084" id="1084"/>
-                        <ref-entry baseId="762" name="NewData162" id="762"/>
-                        <ref-entry baseId="1085" id="1085"/>
-                        <ref-entry baseId="1086" id="1086"/>
-                        <ref-entry baseId="1087" name="NewGrid2" id="1087"/>
-                        <ref-entry baseId="1088" id="1088"/>
-                        <ref-entry baseId="1089" id="1089"/>
-                        <ref-entry baseId="1090" id="1090"/>
-                        <ref-entry baseId="1091" id="1091"/>
-                        <ref-entry baseId="1092" id="1092"/>
-                        <ref-entry baseId="1093" id="1093"/>
-                        <ref-entry baseId="1094" id="1094"/>
-                        <ref-entry baseId="1095" id="1095"/>
-                        <ref-entry baseId="765" name="NewText72" id="765"/>
-                        <ref-entry baseId="1096" id="1096"/>
-                        <ref-entry baseId="767" name="NewText112" id="767"/>
-                        <ref-entry baseId="1097" id="1097"/>
-                        <ref-entry baseId="776" name="NewLabel212" id="776"/>
-                        <ref-entry baseId="1098" id="1098"/>
-                        <ref-entry baseId="778" name="NewAutoText1" id="778"/>
-                        <ref-entry baseId="1099" id="1099"/>
-                        <ref-entry baseId="1101" name="NewLabel2121" id="1101"/>
-                        <ref-entry baseId="1100" id="1100"/>
-                        <ref-entry baseId="782" name="NewAutoText" id="782"/>
-                    </overridden-values>
-                </grid>
-            </page-header>
             <page-footer>
                 <grid name="rodape" id="1159" extends="urbem_250.rodape">
                     <overridden-values>
@@ -719,6 +638,104 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         </simple-master-page>
     </page-setup>
     <body>
+        <grid name="cabecalho1" id="6841" extends="urbem_250.cabecalho_retrato">
+            <overridden-values>
+                <ref-entry baseId="1051" id="6842"/>
+                <ref-entry baseId="1052" id="6843"/>
+                <ref-entry baseId="1053" id="6844"/>
+                <ref-entry baseId="1054" id="6845"/>
+                <ref-entry baseId="1055" id="6846"/>
+                <ref-entry baseId="1397" name="NewText612211" id="6847"/>
+                <ref-entry baseId="1398" name="NewText6121111" id="6848"/>
+                <ref-entry baseId="1056" id="6849"/>
+                <ref-entry baseId="1061" name="NewGrid4" id="6850"/>
+                <ref-entry baseId="1062" id="6851"/>
+                <ref-entry baseId="1063" id="6852"/>
+                <ref-entry baseId="1064" id="6853"/>
+                <ref-entry baseId="1102" name="NewData14" id="6854"/>
+                <ref-entry baseId="1137" name="NewData61" id="6855"/>
+                <ref-entry baseId="1065" id="6856"/>
+                <ref-entry baseId="1066" id="6857"/>
+                <ref-entry baseId="1103" name="NewData15" id="6858"/>
+                <ref-entry baseId="1138" name="NewData71" id="6859"/>
+                <ref-entry baseId="1067" id="6860"/>
+                <ref-entry baseId="1068" id="6861"/>
+                <ref-entry baseId="1105" name="NewData21" id="6862"/>
+                <ref-entry baseId="1139" name="NewData81" id="6863"/>
+                <ref-entry baseId="1069" id="6864"/>
+                <ref-entry baseId="1070" id="6865"/>
+                <ref-entry baseId="1106" name="NewData31" id="6866"/>
+                <ref-entry baseId="1140" name="NewData91" id="6867"/>
+                <ref-entry baseId="1071" id="6868"/>
+                <ref-entry baseId="1072" id="6869"/>
+                <ref-entry baseId="1107" name="NewData41" id="6870"/>
+                <ref-entry baseId="1141" name="NewData101" id="6871"/>
+                <ref-entry baseId="1073" id="6872"/>
+                <ref-entry baseId="1074" id="6873"/>
+                <ref-entry baseId="1108" name="NewData51" id="6874"/>
+                <ref-entry baseId="1143" name="NewData111" id="6875"/>
+                <ref-entry baseId="1057" id="6876"/>
+                <ref-entry baseId="1075" name="NewGrid11" id="6877"/>
+                <ref-entry baseId="1076" id="6878"/>
+                <ref-entry baseId="1077" id="6879"/>
+                <ref-entry baseId="1078" id="6880"/>
+                <ref-entry baseId="1109" name="NewGrid32" id="6881"/>
+                <ref-entry baseId="1110" id="6882"/>
+                <ref-entry baseId="1111" id="6883"/>
+                <ref-entry baseId="1112" id="6884"/>
+                <ref-entry baseId="1113" id="6885"/>
+                <ref-entry baseId="735" name="NewData12121" id="6886"/>
+                <ref-entry baseId="1114" id="6887"/>
+                <ref-entry baseId="744" name="NewData14121" id="6888"/>
+                <ref-entry baseId="1079" id="6889"/>
+                <ref-entry baseId="1080" id="6890"/>
+                <ref-entry baseId="1115" name="NewGrid311" id="6891"/>
+                <ref-entry baseId="1116" id="6892"/>
+                <ref-entry baseId="1117" id="6893"/>
+                <ref-entry baseId="1118" id="6894"/>
+                <ref-entry baseId="1119" id="6895"/>
+                <ref-entry baseId="747" name="NewData13121" id="6896"/>
+                <ref-entry baseId="1120" id="6897"/>
+                <ref-entry baseId="756" name="NewData1521" id="6898"/>
+                <ref-entry baseId="1081" id="6899"/>
+                <ref-entry baseId="1082" id="6900"/>
+                <ref-entry baseId="759" name="NewData11121" id="6901"/>
+                <ref-entry baseId="1083" id="6902"/>
+                <ref-entry baseId="1084" id="6903"/>
+                <ref-entry baseId="762" name="NewData1621" id="6904">
+                    <property name="resultSetColumn">exercicio</property>
+                    <list-property name="boundDataColumns">
+                        <structure>
+                            <property name="name">exercicio</property>
+                            <expression name="expression">params["stDescricaoPeriodo"] + " - Fonte recurso 102";</expression>
+                            <property name="dataType">string</property>
+                        </structure>
+                    </list-property>
+                </ref-entry>
+                <ref-entry baseId="1085" id="6905"/>
+                <ref-entry baseId="1086" id="6906"/>
+                <ref-entry baseId="1087" name="NewGrid21" id="6907"/>
+                <ref-entry baseId="1088" id="6908"/>
+                <ref-entry baseId="1089" id="6909"/>
+                <ref-entry baseId="1090" id="6910"/>
+                <ref-entry baseId="1091" id="6911"/>
+                <ref-entry baseId="1092" id="6912"/>
+                <ref-entry baseId="1093" id="6913"/>
+                <ref-entry baseId="1094" id="6914"/>
+                <ref-entry baseId="1095" id="6915"/>
+                <ref-entry baseId="765" name="NewText721" id="6916"/>
+                <ref-entry baseId="1096" id="6917"/>
+                <ref-entry baseId="767" name="NewText1121" id="6918"/>
+                <ref-entry baseId="1097" id="6919"/>
+                <ref-entry baseId="776" name="NewLabel2122" id="6920"/>
+                <ref-entry baseId="1098" id="6921"/>
+                <ref-entry baseId="778" name="NewAutoText11" id="6922"/>
+                <ref-entry baseId="1099" id="6923"/>
+                <ref-entry baseId="1101" name="NewLabel21211" id="6924"/>
+                <ref-entry baseId="1100" id="6925"/>
+                <ref-entry baseId="782" name="NewAutoText2" id="6926"/>
+            </overridden-values>
+        </grid>
         <text id="6832">
             <property name="fontWeight">bold</property>
             <property name="textAlign">center</property>
@@ -753,17 +770,17 @@ DEMONSTRATIVO DOS GASTOS NAS AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE
                 </structure>
                 <structure>
                     <property name="name">descricao</property>
-                    <expression name="expression">dataSetRow["descricao"]</expression>
+                    <expression name="expression">dataSetRow["descricao"];</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <expression name="expression">Math.abs(dataSetRow["valor"])</expression>
+                    <expression name="expression">Math.abs(dataSetRow["valor"]);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">cod_estrutural</property>
-                    <expression name="expression">dataSetRow["cod_estrutural"]</expression>
+                    <expression name="expression">dataSetRow["cod_estrutural"];</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
@@ -781,7 +798,10 @@ DEMONSTRATIVO DOS GASTOS NAS AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE
                     <list-property name="arguments">
                         <structure>
                             <property name="name">Expression</property>
-                            <expression name="value">row["valor"]</expression>
+                            <expression name="value">if(row["tipo_receita"] == 'D' )
+	0;
+else
+	row["valor"];</expression>
                         </structure>
                     </list-property>
                 </structure>
@@ -925,11 +945,23 @@ DEMONSTRATIVO DOS GASTOS NAS AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE
                     <property name="borderRightWidth">thin</property>
                     <cell id="6673">
                         <data id="6695">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">row["tipo_receita"] == 'D'</expression>
+                                </structure>
+                            </list-property>
                             <property name="resultSetColumn">cod_estrutural</property>
                         </data>
                     </cell>
                     <cell id="6674">
                         <data id="6696">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">row["tipo_receita"] == 'D'</expression>
+                                </structure>
+                            </list-property>
                             <property name="resultSetColumn">descricao</property>
                         </data>
                     </cell>
@@ -940,6 +972,12 @@ DEMONSTRATIVO DOS GASTOS NAS AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE
                                 <property name="pattern">#,##0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">row["tipo_receita"] == 'D'</expression>
+                                </structure>
+                            </list-property>
                             <property name="resultSetColumn">valor</property>
                         </data>
                     </cell>
@@ -975,7 +1013,7 @@ DEMONSTRATIVO DOS GASTOS NAS AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE
                         <property name="rowSpan">1</property>
                         <label id="6738">
                             <property name="fontWeight">bold</property>
-                            <text-property name="text">02 - Total das Receitas (A + B + C + D - E)</text-property>
+                            <text-property name="text">02 - Total das Receitas (A + B + C - E)</text-property>
                         </label>
                     </cell>
                     <cell id="6679">

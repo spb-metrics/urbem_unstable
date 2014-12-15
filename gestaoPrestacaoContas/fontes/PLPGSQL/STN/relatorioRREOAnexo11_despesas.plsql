@@ -45,32 +45,39 @@
     4.5.9.0.66.99.00.00.00 | OUTROS EMPRESTIMOS E FINANCIAMENTOS
 */
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo11_despesas(stExercicio VARCHAR, stEntidades VARCHAR, inBimestre INTEGER) RETURNS SETOF RECORD AS 
-$$
-
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo11_despesas(VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 
 
-    stDtIniEx    	VARCHAR := '';	
-    stDtIni 		VARCHAR := '';
-    stDtFim 		VARCHAR := '';
-    arDatas 		VARCHAR[];
+    stExercicio        ALIAS FOR $1;
+    stEntidades        ALIAS FOR $2;
+    stPerdidiocidade   ALIAS FOR $3;
+    inValor            ALIAS FOR $4;
     
-    inMin           INTEGER;
-    inMax           INTEGER;
+    stDtIniExercicio   VARCHAR := '';
+    stDtIni 	       VARCHAR := '';
+    stDtFim 	       VARCHAR := '';
+    stSQL 	       VARCHAR := '';
+    stSQLaux           VARCHAR := '';
+    arDatas 	       VARCHAR[];
+    inMin              INTEGER;
+    inMax              INTEGER;
     
-    stSQL 	    	VARCHAR := '';
-    stSQLaux        VARCHAR := '';
-    reReg		    RECORD;
-    boRotinaRP      BOOLEAN := FALSE;
+    reReg	       RECORD;
+    boRotinaRP         BOOLEAN := FALSE;
 
 BEGIN
 
-    stDtIniEx := '01/01/' || stExercicio;
+    stDtIniExercicio := '01/01/' || stExercicio;
     
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
+    IF stPerdidiocidade = 'mes' THEN
+        arDatas := publico.mes ( stExercicio, inValor );
+    ELSEIF stPerdidiocidade = 'bimestre' THEN
+        arDatas := publico.bimestre ( stExercicio, inValor );
+    END IF;
+    
     stDtIni := arDatas [ 0 ];
     stDtFim := arDatas [ 1 ];
-
+    
     -- ---------------------------------------------------
     -- Verifica se a rotina de inscricao de RP foi rodada
     -- ---------------------------------------------------
@@ -607,7 +614,7 @@ BEGIN
 
     /*
     Despesas Liquidadas do primeiro dia do exercicio
-    até o último dia do bimestre selecionado
+    até o último dia do periodo selecionado
     */
     
     
@@ -661,7 +668,7 @@ BEGIN
     WHERE 
         e.exercicio = ''' || stExercicio || ''' AND 
         e.cod_entidade IN (' || stEntidades || ') AND 
-        nl.dt_liquidacao BETWEEN to_date(''' || stDtIniEx || ''', ''dd/mm/yyyy'') AND 
+        nl.dt_liquidacao BETWEEN to_date(''' || stDtIniExercicio || ''', ''dd/mm/yyyy'') AND 
                                  to_date(''' || stDtFim || ''', ''dd/mm/yyyy'') 
     GROUP BY
         pedcd.exercicio, 
@@ -674,83 +681,31 @@ BEGIN
     stSQL := '
     CREATE TEMPORARY TABLE tmp_rreo_despesa AS (
 
-    SELECT * FROM (
-        SELECT 
-            CAST(1 AS INTEGER) AS grupo, 
-            publico.fn_nivel(cd.cod_estrutural) AS nivel,
-            cd.cod_estrutural, 
-            cd.descricao, 
-            (COALESCE(SUM(d.vl_original), 0.00) + (COALESCE(SUM(ts_sup.vl_suplementado), 0.00) - COALESCE(SUM(ts_red.vl_reduzido), 0.00))) AS dot_atu, 
-            (COALESCE(SUM(tt.vl_liquidado), 0.00) - COALESCE(SUM(tt.vl_estornado), 0.00)) AS liq_tot,
+    SELECT grupo
+                , nivel
+                , cod_estrutural
+                , descricao 
+                , dotacao_atualizada AS dot_atu
+                , vl_liquidado_total  AS liq_tot,
             CAST(0.00 AS NUMERIC(14,2)) AS resto 
-        FROM 
-            orcamento.conta_despesa cd  
-            LEFT JOIN
-            orcamento.despesa d ON
-                d.exercicio = cd.exercicio AND
-                d.cod_conta = cd.cod_conta 
-            
-            -- suplementacoes de despesa
-            LEFT JOIN 
-            (SELECT
-                sups.exercicio, 
-                sups.cod_despesa, 
-                COALESCE(SUM(sups.valor), 0.00) AS vl_suplementado 
-            FROM
-                orcamento.suplementacao sup
-                INNER JOIN
-                orcamento.suplementacao_suplementada sups ON
-                    sup.exercicio = sups.exercicio AND 
-                    sup.cod_suplementacao = sups.cod_suplementacao
-            WHERE
-                sups.exercicio = ''' || stExercicio || ''' 
-            GROUP BY
-                sups.exercicio, sups.cod_despesa 
-            ) AS ts_sup ON 
-                ts_sup.exercicio   = d.exercicio AND 
-                ts_sup.cod_despesa = d.cod_despesa 
-            -- reducoes de despesa
-            LEFT JOIN (
-            SELECT
-                supr.exercicio , 
-                supr.cod_despesa , 
-                COALESCE(SUM(supr.valor), 0.00) AS vl_reduzido 
-            FROM 
-                orcamento.suplementacao sup 
-                INNER JOIN 
-                orcamento.suplementacao_reducao supr ON 
-                    supr.exercicio = sup.exercicio AND 
-                    supr.cod_suplementacao = sup.cod_suplementacao
-            WHERE
-                supr.exercicio = ''' || stExercicio || '''
-            GROUP BY
-                supr.exercicio, supr.cod_despesa 
-            ) AS ts_red ON 
-                ts_red.exercicio   = d.exercicio AND 
-                ts_red.cod_despesa = d.cod_despesa 
-                
-            -- liquidacao total no exercicio 
-            LEFT JOIN 
-            tmp_rreo_despesa_liquidada_total tt ON 
-                tt.exercicio   = d.exercicio AND 
-                tt.cod_despesa = d.cod_despesa
-                
-            -- Restos
-            
-            LEFT JOIN
-            tmp_resto res ON
-                res.exercicio = cd.exercicio AND 
-                res.cod_estrutural = cd.cod_estrutural 
-        
-        WHERE 
-            cd.cod_estrutural LIKE ''4%'' AND
-            cd.exercicio = ''' || stExercicio || ''' 
-        GROUP BY 
-            cd.cod_estrutural,
-            cd.descricao 
-        ORDER BY 
-            cd.cod_estrutural
-    ) AS tbl1
+         FROM (            SELECT * FROM contabilidade.fn_relatorio_balanco_orcamentario_despesa_novo(''' || stExercicio || ''',''' || stDtIni || ''' ,''' || stDtFim || ''', ''' || stEntidades || ''') as
+            retorno (                                                                                          
+            grupo                   integer ,                                                                  
+         cod_estrutural          varchar ,                                                                  
+         descricao               varchar ,                                                                  
+         nivel                   integer ,                                                                  
+         dotacao_inicial         numeric ,                                                            
+         creditos_adicionais     numeric ,                                                            
+         dotacao_atualizada      numeric ,                                                            
+         vl_empenhado_bimestre   numeric ,                                                            
+         vl_empenhado_total      numeric ,                                                            
+         vl_liquidado_bimestre   numeric ,                                                            
+         vl_liquidado_total      numeric ,                                                            
+         vl_pago_total	        numeric ,       
+         percentual              numeric ,                                                            
+         saldo_liquidar          numeric ) 
+         WHERE cod_estrutural LIKE ''4%''
+ ) AS tab1
     
     UNION ALL
     
@@ -787,9 +742,6 @@ BEGIN
     UPDATE
         tmp_rreo_despesa 
     SET
-        descricao = ''DESPESAS DE CAPITAL'', 
-        dot_atu   = ( SELECT SUM(dot_atu) FROM tmp_rreo_despesa WHERE grupo = 1 AND nivel > 1),
-        liq_tot   = ( SELECT SUM(liq_tot) FROM tmp_rreo_despesa WHERE grupo = 1 AND nivel > 1),
     ';
     
     IF( boRotinaRP = TRUE ) THEN
@@ -811,9 +763,7 @@ BEGIN
     stSQL := '
     UPDATE
         tmp_rreo_despesa 
-    SET 
-        dot_atu = ( SELECT SUM(dot_atu) FROM tmp_rreo_despesa WHERE cod_estrutural LIKE ''4.5.9.0.66%'' ),
-        liq_tot = ( SELECT SUM(liq_tot) FROM tmp_rreo_despesa WHERE cod_estrutural LIKE ''4.5.9.0.66%'' ),
+    SET         
         resto   = COALESCE(( SELECT SUM(valor_resto) FROM tmp_resto WHERE cod_estrutural LIKE ''4.5.9.0.66%''), 0.00) 
     WHERE 
         grupo = 2 AND 

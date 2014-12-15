@@ -61,18 +61,22 @@ class TTCEPEClasseNivelFaixa extends Persistente
                       
                     JOIN folhapagamento".$this->getDado('cod_entidade').".padrao_padrao
                       ON padrao_padrao.cod_padrao = padrao.cod_padrao
-                      
-                   WHERE cargo_padrao.timestamp = (
+                     AND padrao_padrao.timestamp = (SELECT MAX(FPP.timestamp) FROM folhapagamento.padrao_padrao AS FPP
+                                                                             WHERE FPP.cod_padrao = padrao_padrao.cod_padrao) 
+                   WHERE padrao_padrao.timestamp <= (
                                                     
-                        SELECT MAX(cargo_padrao.timestamp) AS timestamp
-                          FROM pessoal".$this->getDado('cod_entidade').".cargo_padrao
-                         WHERE cargo_padrao.timestamp::date <= (
+                        SELECT MAX(padrao_padrao.timestamp) AS timestamp
+                          FROM folhapagamento".$this->getDado('cod_entidade').".padrao_padrao
+                         WHERE padrao_padrao.timestamp::date <= (
                                                                     SELECT ultimoTimestampPeriodoMovimentacao(cod_periodo_movimentacao,'".$this->getDado('cod_entidade')."')
                                                                       FROM folhapagamento".$this->getDado('cod_entidade').".periodo_movimentacao
                                                                      WHERE TO_CHAR(periodo_movimentacao.dt_inicial,'dd/mm/yyyy') = '".$this->getDado('dt_inicial')."'
                                                                        AND TO_CHAR(periodo_movimentacao.dt_final,'dd/mm/yyyy') = '".$this->getDado('dt_final')."'
                                                                 )::date
                         )
+                        
+                GROUP BY cod_cargo,cod_classe,nomenclatura,vencimento_base
+                ORDER BY cod_cargo, cod_classe
                         
         ";
         

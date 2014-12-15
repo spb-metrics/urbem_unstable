@@ -29,10 +29,10 @@
    * @author Desenvolvedor: Franver Sarmento de Moraes
    *
    * @ignore
-   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 59612 2014-09-02 12:00:51Z gelson $
-   * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
-   * $Author: gelson $
-   * $Rev: 59612 $
+   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 61191 2014-12-12 21:03:55Z jean $
+   * $Date: 2014-12-12 19:03:55 -0200 (Sex, 12 Dez 2014) $
+   * $Author: jean $
+   * $Rev: 61191 $
    *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -69,6 +69,11 @@ class RTCEMGRelatorioDemostrativoRCL {
     * @access Private
     */
     var $stTipoConsulta;
+     /**
+    * @var String
+    * @access Private
+    */
+    var $stExercicioRestos;
     
     public function getCodEntidades() { return $this->arCodEntidades; }
     public function setCodEntidades( $arCodEntidades ) { $this->arCodEntidades = $arCodEntidades; }
@@ -87,6 +92,9 @@ class RTCEMGRelatorioDemostrativoRCL {
 
     public function getTipoConsulta() { return $this->stTipoConsulta; }
     public function setTipoConsulta( $stTipoConsulta ) { $this->stTipoConsulta = $stTipoConsulta; }
+    
+    public function getExercicioRestos() { return $this->stExercicioRestos; }
+    public function setExercicioRestos( $stExercicioRestos ) { $this->stExercicioRestos = $stExercicioRestos; }
     
     /**
     * Método Construtor
@@ -115,6 +123,7 @@ class RTCEMGRelatorioDemostrativoRCL {
         $obTTCEMGRelatorioDemostrativoRCL->setDado( "cod_entidades", $this->getCodEntidades());
         $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_despesa" , 1);
         $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_situacao", $this->getTipoSituacao());
+        $obTTCEMGRelatorioDemostrativoRCL->setDado("exercicio_restos", $this->getExercicioRestos());
         $obTTCEMGRelatorioDemostrativoRCL->recuperaReceitasDemonstrativoRCL( $rsReceitas );
                 
         // Inicio da tabela Receitas.
@@ -271,7 +280,8 @@ class RTCEMGRelatorioDemostrativoRCL {
         // Só vai trazer despesas sem as deduções 1.
         $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_despesa", 1);
         $obTTCEMGRelatorioDemostrativoRCL->recuperaDespesasDemonstrativoRCL( $rsDespesas );
-        
+        sistemaLegado::mostravar($rsDespesas);
+        die('Fim');
         $vlTotalDespesasMes1  = 0;
         $vlTotalDespesasMes2  = 0;
         $vlTotalDespesasMes3  = 0;

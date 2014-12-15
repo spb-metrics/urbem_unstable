@@ -35,7 +35,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoEmpenho.class.php 60868 2014-11-19 18:18:01Z evandro $
+    $Id: REmpenhoEmpenho.class.php 61103 2014-12-08 20:37:09Z diogo.zarpelon $
 
     $Revision: 30805 $
     $Name$
@@ -1148,6 +1148,7 @@ function anular($boTransacao = "")
                             }
                         }
                     }
+                   
                     if ( !$obErro->ocorreu() ) {
                         $obTContabilidadeLancamentoEmpenho->setDado( 'cod_lote'    , $inCodLote  );
                         $obTContabilidadeLancamentoEmpenho->setDado( 'tipo'        , 'E'                                                     );
@@ -1187,6 +1188,9 @@ function anular($boTransacao = "")
                                 if (!$this->obREmpenhoAutorizacaoEmpenho->getDtAnulacao()) {
                                     $this->obREmpenhoAutorizacaoEmpenho->setDtAnulacao($this->getDtEmpenho());
                                     $this->obREmpenhoAutorizacaoEmpenho->setMotivoAnulacao("Anulada a partir do empenho ".$this->inCodEmpenho."/".$this->stExercicio);
+                                    echo '<br>transacao? ' . $boTransacao;
+                                    echo '<br>flag '. $boFlagTransacao;
+
                                     $obErro = $this->obREmpenhoAutorizacaoEmpenho->anular($boTransacao);
                                 }
                             }
@@ -1196,8 +1200,9 @@ function anular($boTransacao = "")
             }
         }
     }
+
     $this->setDtAnulacao( $stDataAnulacao );
-    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTEmpenhoEmpenho );
+    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTEmpenhoEmpenhoAnulado );
 
     return $obErro;
 }

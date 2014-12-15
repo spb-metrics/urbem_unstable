@@ -38,12 +38,12 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_saldos( stExercicio VARCHAR, inBimestre INTEGER, stEntidades VARCHAR ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_saldos( stExercicio VARCHAR, stDtFim VARCHAR, stEntidades VARCHAR ) RETURNS SETOF RECORD AS $$
 DECLARE
 
-    arDatas         VARCHAR[] ;
+    --arDatas         VARCHAR[] ;
     stDtIni         VARCHAR := '';
-    stDtFim         VARCHAR := '';
+    --stDtFim         VARCHAR := '';
     arRetorno       NUMERIC[];
 
     reRegistro      RECORD;
@@ -52,8 +52,8 @@ DECLARE
 BEGIN
 
     stDtIni := '01/01/' || stExercicio;
-    arDatas := publico.bimestre ( stExercicio, inBimestre );
-    stDtFim := arDatas [ 1 ];
+    --arDatas := publico.bimestre ( stExercicio, inBimestre );
+    --stDtFim := arDatas [ 1 ];
 
     stSQL := '
     CREATE TEMPORARY TABLE tmp_debito AS (

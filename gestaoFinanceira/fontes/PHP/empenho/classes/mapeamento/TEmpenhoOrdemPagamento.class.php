@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamento.class.php 61064 2014-12-03 18:30:58Z franver $
+    $Id: TEmpenhoOrdemPagamento.class.php 61181 2014-12-12 18:12:21Z franver $
 
     * Casos de uso: uc-02.03.12,uc-02.03.16,uc-02.03.05,uc-02.04.05,uc-02.03.28
 */
@@ -380,6 +380,7 @@ class TEmpenhoOrdemPagamento extends Persistente
         $stSql .= "       ,coalesce(sum(itensOP.vl_pagamento),0.00) as valor_op \n";
         $stSql .= "       ,coalesce(sum(itensOP.vl_anulado),0.00) as valor_anulado \n";
         $stSql .= "       ,itensOP.credor as beneficiario \n";
+        $stSql .= "       ,itensOP.implantado \n";
         $stSql .= "       ,'A Pagar' as situacao \n";
         $stSql .= "from empenho.ordem_pagamento as op \n";
         $stSql .= "     join ( \n";
@@ -392,6 +393,7 @@ class TEmpenhoOrdemPagamento extends Persistente
         $stSql .= "                   ,pagamento.exercicio \n";
         $stSql .= "                   ,pagamento.vl_pagamento \n";
         $stSql .= "                   ,pagamento.vl_anulado \n";
+        $stSql .= "                   ,pre.implantado \n";
         $stSql .= "            from empenho.empenho as emp \n";
         $stSql .= "                 join empenho.pre_empenho as pre \n";
         $stSql .= "                      on ( \n";
@@ -516,6 +518,7 @@ class TEmpenhoOrdemPagamento extends Persistente
         $stSql .= "         ,itensOP.cgm_beneficiario \n";
         $stSql .= "         ,itensOP.credor \n";
         $stSql .= "         ,situacao \n";
+        $stSql .= "       ,itensOP.implantado \n";
 
         return $stSql;
     }
@@ -2169,17 +2172,18 @@ class TEmpenhoOrdemPagamento extends Persistente
                                 ON m_b.cod_banco = m_a.cod_banco
                             LEFT JOIN compras.fornecedor_conta  as c_fc
                                  ON c_fc.cod_agencia    = m_a.cod_agencia
-                                AND c_fc.cod_banco      = m_a.cod_banco
-                            ,( SELECT max(valor) AS masc_despesa                                                            
+                                AND c_fc.cod_banco      = m_a.cod_banco ";
+            if ( $this->getDado('conta_padrao') ) {
+                $stSql .= " AND c_fc.padrao = true ";
+            }
+
+        $stSql .= "      ,( SELECT max(valor) AS masc_despesa                                                            
                                     FROM administracao.configuracao                                                              
                                     WHERE  parametro  = 'masc_despesa'                                                           
                                       AND  exercicio  = '".$this->getDado('exercicio')."'                                        
                                       AND  cod_modulo = 8                                                                        
                             ) as tabela
                         ";
-            if ( $this->getDado('conta_padrao') ) {
-                $stSql .= " WHERE c_fc.padrao = true ";
-            }
         $stSql .= "                   
                     ) as tabela                                                                                         
                     ,(                                                                                                  

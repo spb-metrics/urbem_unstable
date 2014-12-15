@@ -591,22 +591,22 @@ BEGIN
         ) as tmp';
 
         if (inSituacao is not null and inSituacao<>'') then
-            if(inSituacao = 1) then
+            if(inSituacao = '1') then
                 stSql := stSql || ' WHERE empenhado > 0 ';
             end if;
-            if(inSituacao = 2) then
+            if(inSituacao = '2') then
                 stSql := stSql || ' WHERE anulado > 0 ';
             end if;
-            if(inSituacao = 3) then
+            if(inSituacao = '3') then
                 stSql := stSql || ' WHERE liquidado > 0 ';
             end if;
-            if(inSituacao = 4) then
+            if(inSituacao = '4') then
                 stSql := stSql || ' WHERE aliquidar > 0 ';
             end if;
-            if(inSituacao = 5) then
+            if(inSituacao = '5') then
                 stSql := stSql || ' WHERE pago > 0 ';
             end if;
-            if(inSituacao = 6) then
+            if(inSituacao = '6') then
                 stSql := stSql || ' WHERE empenhadoapagar > 0 ';
             end if;
         end if;

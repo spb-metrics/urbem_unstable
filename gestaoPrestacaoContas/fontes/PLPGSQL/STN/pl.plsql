@@ -903,18 +903,66 @@ BEGIN
                                        ,cast( retorno.cod_conta as varchar )
                                        ,cast( retorno.nom_conta as varchar) as nom_conta
                                        ,cast(''9.'' || substring(retorno.cod_estrutural from 3)   as varchar) as cod_estrutural
-                                       ,cast( retorno.mes_1  * -1 as numeric )
-                                       ,cast( retorno.mes_2  * -1 as numeric )
-                                       ,cast( retorno.mes_3  * -1 as numeric )
-                                       ,cast( retorno.mes_4  * -1 as numeric )
-                                       ,cast( retorno.mes_5  * -1 as numeric )
-                                       ,cast( retorno.mes_6  * -1 as numeric )
-                                       ,cast( retorno.mes_7  * -1 as numeric )
-                                       ,cast( retorno.mes_8  * -1 as numeric )
-                                       ,cast( retorno.mes_9  * -1 as numeric )
-                                       ,cast( retorno.mes_10 * -1 as numeric )
-                                       ,cast( retorno.mes_11 * -1 as numeric )
-                                       ,cast( retorno.mes_12 * -1 as numeric )
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_1 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_1 * -1 as numeric )
+                                        END AS mes_1
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_2 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_2 * -1 as numeric )
+                                        END AS mes_2
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_3 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_3 * -1 as numeric )
+                                        END AS mes_3
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_4 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_4 * -1 as numeric )
+                                        END AS mes_4
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_5 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_5 * -1 as numeric )
+                                        END AS mes_5
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_6 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_6 * -1 as numeric )
+                                        END AS mes_6
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_7 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_7 * -1 as numeric )
+                                        END AS mes_7
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_8 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_8 * -1 as numeric )
+                                        END AS mes_8
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_9 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_9 * -1 as numeric )
+                                        END AS mes_9
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_10 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_10 * -1 as numeric )
+                                        END AS mes_10
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_11 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_11 * -1 as numeric )
+                                        END AS mes_11
+                                       ,CASE WHEN substring(retorno.cod_estrutural from  1 for 1) = ''9'' THEN
+                                                cast( retorno.mes_12 as numeric )
+                                             ELSE
+                                                cast( retorno.mes_12 * -1 as numeric )
+                                        END AS mes_12
                                        ,cast(0 as numeric) as total_mes_1
                                        ,cast(0 as numeric) as total_mes_2
                                        ,cast(0 as numeric) as total_mes_3
@@ -1793,7 +1841,8 @@ BEGIN
        end if;
        
        if ( ( reRegistro.cod_estrutural = '4.9.0.0.0.00.00.00.00.00' )
-         or ( reRegistro.cod_estrutural = stContaDedutora||'1.0.0.0.00.00.00.00.00' ) )
+         or ( reRegistro.cod_estrutural = stContaDedutora||'1.0.0.0.00.00.00.00.00' )
+         or ( substring(reRegistro.cod_estrutural from  1 for 1) = '9' ) )
        then
           reRegistro.total_mes_1  := reRegistro.mes_1; 
           reRegistro.total_mes_2  := reRegistro.mes_2; 
@@ -1811,7 +1860,7 @@ BEGIN
        
        RETURN next reRegistro;
     END LOOP;
-    drop TABLE tmp_valor ;
+    DROP TABLE tmp_valor ;
 
 RETURN;
 

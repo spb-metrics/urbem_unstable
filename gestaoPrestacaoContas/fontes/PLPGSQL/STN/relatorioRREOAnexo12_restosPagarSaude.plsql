@@ -35,11 +35,12 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_restos_pagar_saude( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_restos_pagar_saude( varchar, varchar,varchar,varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
-    exerc                       ALIAS FOR $1;
-    inBimestre               ALIAS FOR $2;
-    stCodEntidade         ALIAS FOR $3;
+    exerc          ALIAS FOR $1;
+    stDtInicial    ALIAS FOR $2;
+    stDtFinal      ALIAS FOR $3;  
+    stCodEntidade  ALIAS FOR $4;
 
     dtInicial                    varchar := '''';
     dtFinal                     varchar := '''';
@@ -52,25 +53,24 @@ DECLARE
     stExercicio              varchar := '''';
     qtdExercicio       INTEGER;
     exercicio  varchar := '''';
+    inMesFinal INTEGER;
 BEGIN
     
-   -- arDatas   := publico.bimestre ( exercicio, inBimestre );   
-   -- dtFinal   := arDatas [ 1 ];
-  --  dtInicial := '01/01/' || stExercicio;
+    inMesFinal := TO_CHAR(TO_DATE(stDtFinal,'dd/mm/yyyy'),'mm')::INTEGER;
 
-IF inBimestre <> 6 THEN
-   exercicio := trim(to_char((to_number(exerc,'9999')-1),'9999'));
-  ELSE
-    exercicio := exerc;
-  END IF;
-   -- stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));
- stSql:= 'select count(distinct(exercicio)) from empenho.nota_liquidacao ';
- qtdExercicio:= selectIntoInteger(stSql);
- WHILE aux < qtdExercicio LOOP
+    IF inMesFinal <> 12 THEN
+        exercicio := trim(to_char((to_number(exerc,'9999')-1),'9999'));
+    ELSE
+        exercicio := exerc;
+    END IF;
+    
+    -- stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));
+    stSql:= 'select count(distinct(exercicio)) from empenho.nota_liquidacao ';
+    qtdExercicio:= selectIntoInteger(stSql);
+    WHILE aux < qtdExercicio LOOP
     
     stExercicio:=  trim(to_char((to_number(exercicio,'9999')-aux),'9999'));
-    arDatas   := publico.bimestre ( stExercicio, inBimestre );   
-    dtFinal   := arDatas [ 1 ];
+    dtFinal   := stDtFinal;
     dtInicial := '01/01/' || stExercicio;
 
     stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));

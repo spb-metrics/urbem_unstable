@@ -868,10 +868,9 @@ this.queryText +="              ,'30/06/"+params["exercicio"]+"'                
 this.queryText +="          ),0.00) as saldo_primeiro_semestre_recebido_interna_outro                                        \n";
 
 this.queryText += " ,( SELECT \n";
-this.queryText += "         sum(cast( ( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6 \n";
-this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 \n";
-this.queryText += "                    + stn.fn_calcula_rcl_vinculada('2008','01/01/" + params["exercicio"] + "','" + params["cod_entidade"] + "') \n";
-this.queryText += "                     ) as numeric(14,2))) as valor \n";
+this.queryText += "         cast( ( SUM( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4 + total_mes_5 + total_mes_6      \n";
+this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 ) \n";
+this.queryText += "               ) as numeric(14,2) ) as valor                                                                 \n";
 this.queryText += "     FROM stn.pl_total_subcontas ('31/12/"+params["exercicio_anterior"]+"') as retorno ( \n";
 this.queryText += "                                                                   ordem      integer \n";
 this.queryText += "                                                                  ,cod_conta      varchar \n"; 
@@ -904,10 +903,9 @@ this.queryText += "                                                             
 this.queryText += " ) AS rcl_total_exercicio_anterior \n";
 
 this.queryText += " ,( SELECT \n";
-this.queryText += "         sum(cast( ( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6 \n";
-this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 \n";
-this.queryText += "                    + stn.fn_calcula_rcl_vinculada('2008','01/12/" + params["exercicio"] + "','" + params["cod_entidade"] + "') \n";
-this.queryText += "                     ) as numeric(14,2))) as valor \n";
+this.queryText += "         cast( ( SUM( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4 + total_mes_5 + total_mes_6      \n";
+this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 ) \n";
+this.queryText += "               ) as numeric(14,2) ) as valor                                                                 \n";
 this.queryText += "     FROM stn.pl_total_subcontas ('31/12/"+params["exercicio"]+"') as retorno ( \n";
 this.queryText += "                                                                   ordem      integer \n";
 this.queryText += "                                                                  ,cod_conta      varchar \n"; 
@@ -940,10 +938,9 @@ this.queryText += "                                                             
 this.queryText += " ) AS rcl_total_terceiro_quadrimestre \n";
 
 this.queryText += " ,( SELECT \n";
-this.queryText += "         sum(cast( ( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6 \n";
-this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 \n";
-this.queryText += "                    + stn.fn_calcula_rcl_vinculada('2008','01/06/" + params["exercicio"] + "','" + params["cod_entidade"] + "') \n";
-this.queryText += "                     ) as numeric(14,2))) as valor \n";
+this.queryText += "         cast( ( SUM( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4 + total_mes_5 + total_mes_6      \n";
+this.queryText += "                    + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 ) \n";
+this.queryText += "               ) as numeric(14,2) ) as valor                                                                 \n";
 this.queryText += "     FROM stn.pl_total_subcontas ('30/06/"+params["exercicio"]+"') as retorno ( \n";
 this.queryText += "                                                                   ordem      integer \n";
 this.queryText += "                                                                  ,cod_conta      varchar \n"; 
@@ -975,11 +972,7 @@ this.queryText += "                                                             
 this.queryText += "                                                                  ,total_mes_12 numeric) \n";
 this.queryText += " ) AS rcl_total_primeiro_semestre \n";
 
-//this.queryText += ",(stn.pl_saldo_contas ( '"+params['exercicio'] + "' ";
-//this.queryText += ",'01/01/"+params['exercicio']+"'";
-//this.queryText += ",'30/06/"+params['exercicio']+"'";
-//this.queryText += ", ' plano_conta.cod_estrutural like \\'4.1%\\'  '";
-//this.queryText += ", '"+params['cod_entidade']+"' ))*-1  as rcl_total_primeiro_semestre\n";]]></method>
+params["qry"] = this.queryText;]]></method>
             <property name="dataSource">dataSource</property>
             <list-property name="resultSet">
                 <structure>
@@ -1327,8 +1320,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_externo_aval</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_externo_outro</property>
@@ -1337,8 +1334,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_externo_outro</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_interno_aval</property>
@@ -1347,8 +1348,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_interno_aval</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_interno_outro</property>
@@ -1357,8 +1362,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">saldo_terceiro_quadrimestre_interno_outro</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]</expression>
-                    <property name="dataType">integer</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_anterior_recebido_externo_aval</property>
@@ -1447,7 +1456,11 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">rcl_total_terceiro_quadrimestre</property>
-                    <expression name="expression">dataSetRow["rcl_total_terceiro_quadrimestre"]</expression>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["rcl_total_terceiro_quadrimestre"]
+}else{
+ 	0
+ }</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -1467,8 +1480,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">Column Binding_1</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]+dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]+dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_2</property>
@@ -1482,8 +1499,12 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">Column Binding_4</property>
-                    <expression name="expression">dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]+dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]+dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_5</property>
@@ -1525,7 +1546,7 @@ INNER JOIN administracao.acao
                 </structure>
                 <structure>
                     <property name="name">Column Binding_8</property>
-                    <expression name="expression">if ( dataSetRow["rcl_total_terceiro_quadrimestre"] != 0 ){
+                    <expression name="expression">if ( dataSetRow["rcl_total_terceiro_quadrimestre"] != 0 &amp;&amp;params["periodo"]=="2"){
 	( row["TGC_2_sem"] *100 )/ dataSetRow["rcl_total_terceiro_quadrimestre"]
 }else{
 	0.00
@@ -1610,10 +1631,12 @@ dataSetRow["rcl_total_primeiro_semestre"]*(params["perc_limite"]/100)
                 </structure>
                 <structure>
                     <property name="name">Column Binding_31</property>
-                    <expression name="expression">dataSetRow["rcl_total_terceiro_quadrimestre"]*(params["perc_limite"]/100)
-
-//row["TGC_2_sem"]*params["perc_limite"]/100</expression>
-                    <property name="dataType">any</property>
+                    <expression name="expression">if(params["periodo"]=="2"){
+	dataSetRow["rcl_total_terceiro_quadrimestre"]*(params["perc_limite"]/100)
+}else{
+ 	0
+ }</expression>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_21</property>
@@ -2287,7 +2310,11 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                         <list-property name="boundDataColumns">
                                             <structure>
                                                 <property name="name">tgc_2_sem</property>
-                                                <expression name="expression">params["tgc_2_sem"].value =dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]+dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]+dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]+dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]</expression>
+                                                <expression name="expression">if(params["periodo"]=="2"){
+	params["tgc_2_sem"].value =dataSetRow["saldo_terceiro_quadrimestre_externo_aval"]+dataSetRow["saldo_terceiro_quadrimestre_externo_outro"]+dataSetRow["saldo_terceiro_quadrimestre_interno_aval"]+dataSetRow["saldo_terceiro_quadrimestre_interno_outro"]
+}else{
+ 	0
+ }</expression>
                                                 <property name="dataType">float</property>
                                             </structure>
                                         </list-property>
@@ -2630,7 +2657,11 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                         <list-property name="boundDataColumns">
                                             <structure>
                                                 <property name="name">limite_alerta_2_sem</property>
-                                                <expression name="expression">params["limite_alerta_2_sem"].value = row["Column Binding_31"]*(params["perc_limite_alerta"]/100)</expression>
+                                                <expression name="expression">if(params["periodo"]=="2"){
+	params["limite_alerta_2_sem"].value = row["Column Binding_31"]*(params["perc_limite_alerta"]/100)
+}else{
+ 	0
+ }</expression>
                                                 <property name="dataType">decimal</property>
                                             </structure>
                                         </list-property>

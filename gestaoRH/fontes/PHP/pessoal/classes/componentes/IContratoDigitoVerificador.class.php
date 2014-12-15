@@ -453,8 +453,8 @@ function IContratoDigitoVerificador($inContrato="",$stSituacao=false, $boRegistr
     $this->obHdnRegistroContrato->setValue                    ( $inContrato                                       );
 
     $this->setHdnContratoPensionista(new Hidden);
-    $this->obHdnContratoPensionista->setName                  ( "hdnContratoPensionista"                                      );
-    $this->obHdnContratoPensionista->setId                    ( "hdnContratoPensionista"     );                    
+    $this->obHdnContratoPensionista->setName                  ( "inContratoPensionista"                                      );
+    $this->obHdnContratoPensionista->setId                    ( "inContratoPensionista"     );                    
     
     if ($inContrato != "") {
         $this->setRPessoalContrato(new RPessoalContrato);

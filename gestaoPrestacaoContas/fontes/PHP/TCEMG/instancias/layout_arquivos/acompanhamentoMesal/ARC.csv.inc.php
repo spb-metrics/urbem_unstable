@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ARC.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: ARC.csv.inc.php 61151 2014-12-11 16:59:38Z michel $
+  * $Date: 2014-12-11 14:59:38 -0200 (Qui, 11 Dez 2014) $
+  * $Author: michel $
+  * $Rev: 61151 $
   *
 */
 /**
@@ -94,7 +94,7 @@ if (count($rsRecordSetARC10->getElementos()) > 0) {
     foreach ($rsRecordSetARC10->getElementos() as $arARC10) {
         $inCount++;
         $stChave = $arARC10['cod_correcao'];
-        
+        /*
         $rsBloco = 'rsBloco_'.$inCount;
         unset($$rsBloco);
         $$rsBloco = new RecordSet();
@@ -228,6 +228,7 @@ if (count($rsRecordSetARC10->getElementos()) > 0) {
                 }
             }
         }
+        */
 
         if (count($rsRecordSetARC20->getElementos()) > 0) {
             foreach ($rsRecordSetARC20->getElementos() as $arARC20) {

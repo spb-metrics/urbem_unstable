@@ -33,12 +33,12 @@
     * @package URBEM
     * @subpackage Mapeamento
     
-    $Id: TTGOAOP.class.php 60941 2014-11-25 18:13:25Z franver $
+    $Id: TTGOAOP.class.php 61100 2014-12-08 18:56:59Z franver $
 
-    $Revision: 60941 $
+    $Revision: 61100 $
     $Name$
     $Author: franver $
-    $Date: 2014-11-25 16:13:25 -0200 (Ter, 25 Nov 2014) $
+    $Date: 2014-12-08 16:56:59 -0200 (Seg, 08 Dez 2014) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -700,6 +700,7 @@ class TTGOAOP extends Persistente
                 ON tcmgo.tipo_documento.cod_tipo  =  pagamento_tipo_documento.cod_tipo_documento
          LEFT JOIN ( SELECT sum(vl_pago) as valor_total
                           , pagamento_tipo_documento.num_documento as nrDocumento
+                          , TO_DATE(nlp.timestamp::varchar,'YYYY-MM') AS mesAno
                        FROM empenho.nota_liquidacao_paga as nlp
                   LEFT JOIN empenho.nota_liquidacao_paga_anulada as nlpa
                          ON nlp.exercicio    = nlpa.exercicio
@@ -712,12 +713,12 @@ class TTGOAOP extends Persistente
                         AND tesouraria.pagamento_tipo_documento.exercicio  = nlp.exercicio
                         AND pagamento_tipo_documento.timestamp             = nlp.timestamp
         
-                      WHERE TO_DATE(nlp.timestamp::varchar,'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dtInicioAnt')."','dd/mm/yyyy')
-                                                                             AND TO_DATE('".$this->getDado('dtFimAnt')."','dd/mm/yyyy')
-        
                   GROUP BY pagamento_tipo_documento.num_documento
+                         , mesAno
                    ) AS total
                 ON total.nrDocumento = pagamento_tipo_documento.num_documento
+               AND total.mesAno      = TO_DATE(nlp.timestamp::varchar,'YYYY-MM')
+
          LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
                           , ordem_pagamento_retencao.cod_entidade
                           , ordem_pagamento_retencao.exercicio

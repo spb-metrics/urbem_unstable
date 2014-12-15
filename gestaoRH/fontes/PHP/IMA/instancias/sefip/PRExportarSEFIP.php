@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.03
 
-    $Id: PRExportarSEFIP.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarSEFIP.php 61106 2014-12-09 13:25:55Z dagiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -111,11 +111,12 @@ switch ($stAcao) {
             $arModalidades[] = array("cod_modalidade"=>4,"sefip"=>"8");
             $rsModalidades = new RecordSet();
             $rsModalidades->preenche($arModalidades);
-        } elseif ($_POST["boCompetencia13"]) { // se retificadora tiver sido selecionada, ela tem preferencia sobre competencia13
+       } /*elseif ($_POST["boCompetencia13"]) { // se retificadora tiver sido selecionada, ela tem preferencia sobre competencia13
             $arModalidades[] = array("cod_modalidade"=>1,"sefip"=>"0"); //conforme tabela ima.modalidade_recolhimento
             $rsModalidades = new RecordSet();
             $rsModalidades->preenche($arModalidades);
-        } else {
+        } */ 
+         else {
             $obTIMACategoriaSefip->recuperaModalidades($rsModalidades);
         }
         $inIndexArquivo = 1;
@@ -220,11 +221,12 @@ switch ($stAcao) {
             $arHeaderArquivo[0]['email']                                         = $stEmailContato;
             if ($_POST["boCompetencia13"]) {
                 $dtCompetencia = $_POST["inAno"]."13";
-                if ($_POST["boSefipRetificadora"]) {
+       /*        if ($_POST["boSefipRetificadora"]) {
                     $stModalidade = 9;
                 } else {
                     $stModalidade = 1;
                 }
+      */
             } else {
                 $inMes = (  $_POST["inCodMes"] < 10 ) ? "0".$_POST["inCodMes"] : $_POST["inCodMes"];
                 $dtCompetencia = $_POST["inAno"].$inMes;
@@ -462,7 +464,7 @@ switch ($stAcao) {
             $arHeaderEmpresa[0]['unid_federal']                                  = $rsUf->getCampo("sigla_uf");
             $arHeaderEmpresa[0]['fone']                                          = (trim($rsCGMEntidade->getCampo("fone_residencial")) != "") ? trim($rsCGMEntidade->getCampo("fone_residencial")) : trim($rsCGMEntidade->getCampo("fone_comercial"));
             $arHeaderEmpresa[0]['indicador_alteracao']                           = "n";
-            $arHeaderEmpresa[0]['cnae_fiscal']                                   = preg_replace("[A-Za-z/.\-]","",$_POST["cnae_fiscal"]);
+            $arHeaderEmpresa[0]['cnae_fiscal']                                   = preg_replace("/[A-Za-z.\/-]/","",$_POST["cnae_fiscal"]);
             $arHeaderEmpresa[0]['indicador_alteracao_cnae']                      = "n";
             include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPrevidenciaRegimeRat.class.php");
             $obTFolhaPagamentoPrevidenciaRegimeRat = new TFolhaPagamentoPrevidenciaRegimeRat();

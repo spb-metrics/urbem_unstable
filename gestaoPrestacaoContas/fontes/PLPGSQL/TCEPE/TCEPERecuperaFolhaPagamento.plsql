@@ -169,7 +169,17 @@ BEGIN
      
     EXECUTE stSqlAux;
 
-    stSql := 'SELECT *
+    stSql := 'SELECT    reservado_tce,
+                        matricula,
+                        cod_cargo,
+                        cpf,
+                        mes_folha,
+                        ano_folha,
+                        cod_fonte_recurso,
+                        horas_semanais,
+                        tipo_folha,
+                        COALESCE(SUM(valor_previdencia),0.00) AS valor_previdencia,
+                        COALESCE(SUM(valor_irrf),0.00) AS valor_irrf
                 FROM (
                         SELECT
                                 tmp_tabela.reservado_tce,
@@ -186,10 +196,8 @@ BEGIN
                                      WHEN tmp_eventos.tipo_evento = ''rescisao_calculado'' AND tmp_eventos.valor IS NOT NULL THEN CASE WHEN tmp_eventos.desdobramento = ''D'' THEN 1 ELSE 0 END
                                      WHEN tmp_eventos.tipo_evento = ''ferias_calculado''   AND tmp_eventos.valor IS NOT NULL THEN 0
                                 END AS tipo_folha,
-                                tmp_eventos.cod_evento,
                                 tmp_eventos.valor_previdencia,
-                                tmp_eventos.valor_irrf,
-                                tmp_eventos.tipo_evento
+                                tmp_eventos.valor_irrf
                                 
                         FROM tmp_tabela
                         
@@ -205,13 +213,22 @@ BEGIN
                                  tmp_tabela.ano_folha,
                                  tmp_tabela.cod_fonte_recurso,
                                  tmp_tabela.horas_semanais,
-                                 tmp_eventos.cod_evento,
                                  tmp_eventos.valor_previdencia,
                                  tmp_eventos.valor_irrf,
                                  tmp_eventos.tipo_evento,
                                  tmp_eventos.valor,
                                  tmp_eventos.desdobramento
                 ) AS retorno
+                GROUP BY
+                            reservado_tce,
+                            matricula,
+                            cod_cargo,
+                            cpf,
+                            mes_folha,
+                            ano_folha,
+                            cod_fonte_recurso,
+                            horas_semanais,
+                            tipo_folha
                 
             ORDER BY retorno.matricula
             ';

@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-06.01.22
 
- $Id: FLModelosRGF.php 61069 2014-12-04 12:42:40Z michel $
+ $Id: FLModelosRGF.php 61096 2014-12-08 16:56:24Z arthur $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -247,8 +247,15 @@ switch ($stAcao) {
 
     case 'anexo5':
     case 'anexo5novo':
-        $obCmbTipoRelatorio->addOption('UltimoQuadrimestre', 'Quadrimestre');
-        $obCmbTipoRelatorio->addOption('UltimoSemestre', 'Semestre');
+        //Estado de Minas Gerais(MG)
+        if ( ($inCodUF == 11) && (Sessao::getExercicio() >= '2014') ) {
+            $obCmbTipoRelatorio->addOption('Mes', 'Mês');
+            $obCmbTipoRelatorio->addOption('Quadrimestre', 'Quadrimestre');
+            $obCmbTipoRelatorio->addOption('Semestre'    , 'Semestre'    );
+        }else{
+            $obCmbTipoRelatorio->addOption('Quadrimestre', 'Quadrimestre');
+            $obCmbTipoRelatorio->addOption('Semestre'    , 'Semestre'    );
+        }
     break;
 
     case 'anexo6':

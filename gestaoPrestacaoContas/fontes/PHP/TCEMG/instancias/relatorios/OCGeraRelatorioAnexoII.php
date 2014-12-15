@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCGeraRelatorioAnexoII.php 59612 2014-09-02 12:00:51Z gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
-  * $Author: gelson $
-  * $Rev: 59612 $
+  * $Id: OCGeraRelatorioAnexoII.php 61189 2014-12-12 19:46:17Z arthur $
+  * $Date: 2014-12-12 17:46:17 -0200 (Sex, 12 Dez 2014) $
+  * $Author: arthur $
+  * $Rev: 61189 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -53,6 +53,6 @@ $preview->addParametro("stDataInicial", $request->get("stDataInicial"));
 $preview->addParametro("stDataFinal"  , $request->get("stDataFinal"));
 $preview->addParametro("stSituacao"   , $request->get("stSituacao"));
 $preview->addParametro("boRestos"     , $boRestos);
-$preview->addParametro("stPeriodo"    , $request->get("stDataInicial")." - ".$request->get("stDataFinal"));
+$preview->addParametro("stPeriodo"    , $request->get("stDataInicial")." at&eacute; ".$request->get("stDataFinal"));
 $preview->preview();
 ?>

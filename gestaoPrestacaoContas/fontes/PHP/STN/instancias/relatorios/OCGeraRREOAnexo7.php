@@ -139,6 +139,20 @@ switch ($_REQUEST['cmbBimestre']) {
     break;
 }
 
+($request->get('cmbBimestre')) ? $periodicidade = 'bimestre' : $periodicidade = 'mes';
+
+if ($request->get('cmbBimestre')) {
+    $descricaoPeriodo = $request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio();
+} else if ($request->get('cmbMes')) {
+    $descricaoPeriodo = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio());
+}
+
+if ($request->get('cmbMes')) {
+    $stDtInicio = "01/".$request->get('cmbMes')."/".Sessao::getExercicio();
+    $stDtFinal = SistemaLegado::retornaUltimoDiaMes($request->get('cmbMes'),Sessao::getExercicio());
+}
+
+
 #############################Modificações do tce para o novo layout##############################
 //adiciona unidade responsável ao relatório
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoUsuario.class.php"                                   );
@@ -161,10 +175,10 @@ if ($_REQUEST['stAcao'] == 'anexo6novo') {
     $preview->addParametro( 'relatorio_novo', 'nao' );
 }
 #################################################################################################
-
-$preview->addParametro( 'bimestre', $_REQUEST['cmbBimestre'] );
+$preview->addParametro( 'periodicidade', $periodicidade );
 $preview->addParametro( 'dt_inicio', $stDtInicio );
 $preview->addParametro( 'dt_final', $stDtFinal );
+$preview->addParametro( 'descricao', $descricaoPeriodo );
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 

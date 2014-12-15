@@ -539,7 +539,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
      , SUM(empenhado) AS empenhado
      , SUM(liquidado) AS liquidado
      , SUM(pago) AS pago
-     , valor_ano_anterior AS exercicio_anterior
+     , valor_ano_anterior_camara AS exercicio_anterior_camara
+     , valor_ano_anterior_prefeitura AS exercicio_anterior_prefeitura
+     , valor_ano_anterior_instituto AS exercicio_anterior_instituto
   from tcemg.fn_relatorio_despesa_pessoal (?,?,?,'1,2,3',?,?) AS retorno (
        cod_entidade       INTEGER
      , nome_entidade      VARCHAR
@@ -549,14 +551,18 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
      , empenhado          NUMERIC
      , liquidado          NUMERIC
      , pago               NUMERIC
-     , valor_ano_anterior NUMERIC
+     , valor_ano_anterior_camara 	 NUMERIC
+     , valor_ano_anterior_prefeitura NUMERIC
+     , valor_ano_anterior_instituto	 NUMERIC
 )
  GROUP BY cod_entidade
 	    , nome_entidade
         , nivel
         , cod_estrutural 
         , descricao 
-        , valor_ano_anterior
+        , valor_ano_anterior_camara
+     	, valor_ano_anterior_prefeitura
+     	, valor_ano_anterior_instituto
  ORDER BY nome_entidade
 	    , cod_estrutural]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -1179,15 +1185,27 @@ x
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
-                    <property name="name">exercicio_anterior</property>
-                    <expression name="expression">params["total_exercicio_anterior"] = dataSetRow["exercicio_anterior"];
-dataSetRow["exercicio_anterior"];</expression>
+                    <property name="name">total_despesa_pessoal_base</property>
+                    <expression name="expression">params["total_despesas_base"]=row["total_base"]+ row["exercicio_anterior_camara"]+ row["exercicio_anterior_prefeitura"]+ row["exercicio_anterior_instituto"];
+row["total_base"] + row["exercicio_anterior_camara"]+ row["exercicio_anterior_prefeitura"]+ row["exercicio_anterior_instituto"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
-                    <property name="name">total_despesa_pessoal_base</property>
-                    <expression name="expression">params["total_despesas_base"]=row["total_base"]+ row["exercicio_anterior"];
-row["total_base"]+ row["exercicio_anterior"]</expression>
+                    <property name="name">exercicio_anterior_camara</property>
+                    <expression name="expression">params["total_exercicio_anterior_camara"] = dataSetRow["exercicio_anterior_camara"];
+dataSetRow["exercicio_anterior_camara"];</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">exercicio_anterior_prefeitura</property>
+                    <expression name="expression">params["total_exercicio_anterior_prefeitura"] = dataSetRow["exercicio_anterior_prefeitura"];
+dataSetRow["exercicio_anterior_prefeitura"];</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">exercicio_anterior_instituto</property>
+                    <expression name="expression">params["total_exercicio_anterior_instituto"] = dataSetRow["exercicio_anterior_instituto"];
+dataSetRow["exercicio_anterior_instituto"];</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
@@ -1733,7 +1751,7 @@ if( this.getRowData().getColumnValue('nivel') == 6 ){
                             <property name="fontSize">6pt</property>
                             <property name="paddingTop">0pt</property>
                             <property name="paddingBottom">0pt</property>
-                            <text-property name="text">TOTAL DE DESPESAS COM PESSOAL DO EXERCÍCIO ANTERIOR</text-property>
+                            <text-property name="text">TOTAL DE DESPESAS COM PESSOAL DO EXERCÍCIO ANTERIOR (CAMARA) </text-property>
                         </label>
                     </cell>
                     <cell id="6867">
@@ -1799,7 +1817,185 @@ if( this.getRowData().getColumnValue('nivel') == 6 ){
                             <property name="pageBreakInside">auto</property>
                             <property name="showIfBlank">false</property>
                             <property name="canShrink">false</property>
-                            <property name="resultSetColumn">exercicio_anterior</property>
+                            <property name="resultSetColumn">exercicio_anterior_camara</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="6902">
+                    <property name="backgroundColor">#F5F5F5</property>
+                    <cell id="6903">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="verticalAlign">middle</property>
+                        <label id="6905">
+                            <property name="fontSize">6pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <text-property name="text">TOTAL DE DESPESAS COM PESSOAL DO EXERCÍCIO ANTERIOR (PREFEITURA)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="6904">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="verticalAlign">middle</property>
+                        <data id="6907">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">R$#,##0.00</property>
+                                <property name="locale">pt_BR</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="resultSetColumn">exercicio_anterior_prefeitura</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="6899">
+                    <property name="backgroundColor">#F5F5F5</property>
+                    <cell id="6900">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="verticalAlign">middle</property>
+                        <label id="6906">
+                            <property name="fontSize">6pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <text-property name="text">TOTAL DE DESPESAS COM PESSOAL DO EXERCÍCIO ANTERIOR (INSTITUTO)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="6901">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="verticalAlign">middle</property>
+                        <data id="6908">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">R$#,##0.00</property>
+                                <property name="locale">pt_BR</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="resultSetColumn">exercicio_anterior_instituto</property>
                         </data>
                     </cell>
                 </row>

@@ -31,7 +31,7 @@
 
  * Casos de uso: uc-06.01.15
 
- $Id: OCGeraRREOAnexo18.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCGeraRREOAnexo18.php 61131 2014-12-10 17:56:24Z arthur $
 
  */
 
@@ -114,5 +114,8 @@ if ($_REQUEST['stAcao'] == 'anexo14novo') {
 #################################################################################################
 
 $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
+$preview->addParametro( 'peridiocidade', "bimestre" );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 $preview->preview();
+
+?>

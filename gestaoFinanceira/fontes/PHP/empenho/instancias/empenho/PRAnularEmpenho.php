@@ -65,6 +65,9 @@ $pgOcul    = "OC".$stPrograma.".php";
 
 $obREmpenhoEmpenhoAutorizacao = new REmpenhoEmpenhoAutorizacao;
 
+$obTransacao = new Transacao();
+$obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
 $obAtributos = new MontaAtributos;
@@ -86,12 +89,12 @@ if ($stAcao != 'incluir') {
 
 //valida a utilização da rotina de encerramento do mês contábil
 $arDtAutorizacao = explode('/', $_POST['stDtAnulacao']);
-$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
+$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9, $boTransacao);
 include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
-$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
+$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ', $boTransacao);
 
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
     SistemaLegado::LiberaFrames(true,False);
@@ -136,12 +139,12 @@ switch ($stAcao) {
     $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade']);
     $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->setCodEmpenho($_REQUEST['inCodEmpenho']);
     $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->setExercicio ($_REQUEST['stDtExercicioEmpenho']);
-    $obREmpenhoNotaLiquidacao->listarMaiorDataAnulacaoEmpenho($rsMaiorData);
+    $obREmpenhoNotaLiquidacao->listarMaiorDataAnulacaoEmpenho($rsMaiorData, '', $boTransacao);
 
     if ( !$rsMaiorData->getCampo("dataanulacao") ) {
         $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade'] );
         $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( Sessao::getExercicio());
-        $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->listarMaiorDataAnulacao( $rsMaiorData );
+        $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->listarMaiorDataAnulacao( $rsMaiorData, '', $boTransacao );
     }
 
     if ( $rsMaiorData->getCampo("dataanulacao") && strlen($rsMaiorData->getCampo("dataanulacao")) > 0 ) {
@@ -162,15 +165,44 @@ switch ($stAcao) {
         //$obErro->setDescricao("A data de anulação deve ser maior ou igual a ". $rsMaiorData->getCampo("dataanulacao"));
         $obErro->setDescricao("A data de anulação deve ser maior ou igual a ". $stMaiorData);
     }
+   
+    
     if ( !$obErro->ocorreu() ) {
         if (isset($_REQUEST['inRestos'])) {
             Sessao::write('inRestos', $_REQUEST['inRestos']);
+            
+            //Verifica se as contas estão configuradas, se nao estiver nao conclui a anulação
+            if ( $_REQUEST['inRestos'] == 0) {
+                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1', '8.2.1.1.2', '8.2.1.1.1');
+            }elseif ($_REQUEST['inRestos'] == 1){
+                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1', '8.2.1.1.2', '8.2.1.1.1', '4.6.4.0.1.00' );
+            }elseif ($_REQUEST['inRestos'] == 2){
+                $arContasLancamentoAnulacao = array('4.6.4.0.1.00' , '6.3.2.1', '6.3.2.9.9' , '8.2.1.1.3', '8.2.1.1.1');
+            }
+         
+            foreach($arContasLancamentoAnulacao AS $arConta ){
+                include_once ( CAM_GF_EMP_MAPEAMENTO     ."FEmpenhoEmpenhoEstornoRestosAPagar.class.php" );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar =  new FEmpenhoEmpenhoEstornoRestosAPagar;
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'exercicio'       , Sessao::getExercicio() );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'cod_estrutural'  , $arConta );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->verificaConta($rsRecordset, $boTransacao);
+                
+                if($rsRecordset->getNumLinhas() < 0){
+                    $obFEmpenhoEmpenhoEstornoRestosAPagar->buscaContaComMascara($rsRecordset, $boTransacao);
+                    $obErro->setDescricao("A conta ".$rsRecordset->getCampo('fn_mascara_completa')." não é analítica ou não está cadastrada!");
+                }
+            }
+            
         }
-
-        $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtAnulacao( $_POST['stDtAnulacao'] );
-        $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_POST['stDtExercicioEmpenho'] );
-        $obErro = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->anular();
+        if ( !$obErro->ocorreu() ) {
+            $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtAnulacao( $_POST['stDtAnulacao'] );
+            $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_POST['stDtExercicioEmpenho'] );
+            $obErro = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->anular($boTransacao);
+        }
     }
+
+    $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obREmpenhoEmpenhoAutorizacao->obTEmpenhoEmpenhoAutorizacao);
+
     if ( !$obErro->ocorreu() ) {
         SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId().$stFiltro, $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho()."/".$_POST['stDtExercicioEmpenho'], "incluir", "aviso", Sessao::getId(), "../");
         $stCaminho = CAM_GF_EMP_INSTANCIAS."empenho/OCRelatorioEmpenhoOrcamentarioAnulado.php";

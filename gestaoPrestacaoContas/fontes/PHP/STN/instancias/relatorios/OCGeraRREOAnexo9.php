@@ -33,7 +33,7 @@
 
     * Casos de uso :
 
-    $Id: OCGeraRREOAnexo9.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCGeraRREOAnexo9.php 61114 2014-12-09 17:41:12Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -75,29 +75,72 @@ switch ($_REQUEST['stTipoRelatorio']) {
 
 $stDtFinal = '';
 
-switch ($_REQUEST['cmbBimestre']) {
-    case '1':
-        if ( ( Sessao::getExercicio() % 4 ) == 0 ) {
-            $stDtFinal = '29/02/' . Sessao::getExercicio();
-        } else {
-           $stDtFinal = '28/02/' . Sessao::getExercicio();
-        }
-    break;
-    case '2':
-        $stDtFinal = '30/04/' . Sessao::getExercicio();
-    break;
-    case '3':
-        $stDtFinal = '30/06/' . Sessao::getExercicio();
-    break;
-    case '4':
-        $stDtFinal = '31/08/' . Sessao::getExercicio();
-    break;
-    case '5':
-        $stDtFinal = '31/10/' . Sessao::getExercicio();
-    break;
-    case '6':
-        $stDtFinal = '31/12/' . Sessao::getExercicio();
-    break;
+if ($request->get('cmbBimestre')) {
+     $descricaoPeriodo = $request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio();
+     switch ($_REQUEST['cmbBimestre']) {
+          case '1':
+              if ( ( Sessao::getExercicio() % 4 ) == 0 ) {
+                  $stDtFinal = '29/02/' . Sessao::getExercicio();
+              } else {
+                 $stDtFinal = '28/02/' . Sessao::getExercicio();
+              }
+          break;
+          case '2':
+              $stDtFinal = '30/04/' . Sessao::getExercicio();
+          break;
+          case '3':
+              $stDtFinal = '30/06/' . Sessao::getExercicio();
+          break;
+          case '4':
+              $stDtFinal = '31/08/' . Sessao::getExercicio();
+          break;
+          case '5':
+              $stDtFinal = '31/10/' . Sessao::getExercicio();
+          break;
+          case '6':
+              $stDtFinal = '31/12/' . Sessao::getExercicio();
+          break;
+     }
+}else if ($request->get('cmbMes')) {
+     $stDtFinal = SistemaLegado::retornaUltimoDiaMes($request->get('cmbMes'),Sessao::getExercicio());
+     switch ($request->get('cmbMes')) {
+          case '01':
+              $descricaoPeriodo = "Janeiro de ".Sessao::getExercicio();
+          break;
+          case '02':
+              $descricaoPeriodo = "Fevereiro de ".Sessao::getExercicio();
+          break;
+          case '03':
+              $descricaoPeriodo = "Março de ".Sessao::getExercicio();
+          break;
+          case '04':
+              $descricaoPeriodo = "Abril de ".Sessao::getExercicio();
+          break;
+          case '05':
+              $descricaoPeriodo = "Maio de ".Sessao::getExercicio();
+          break;
+          case '06':
+              $descricaoPeriodo = "Junho de ".Sessao::getExercicio();
+          break;
+          case '07':
+              $descricaoPeriodo = "Julho de ".Sessao::getExercicio();
+          break;
+          case '08':
+              $descricaoPeriodo = "Agosto de ".Sessao::getExercicio();
+          break;
+          case '09':
+              $descricaoPeriodo = "Setembro de ".Sessao::getExercicio();
+          break;
+          case '10':
+              $descricaoPeriodo = "Outubro de ".Sessao::getExercicio();
+          break;
+          case '11':
+              $descricaoPeriodo = "Novembro de ".Sessao::getExercicio();
+          break;
+          case '12':
+              $descricaoPeriodo = "Dezembro de ".Sessao::getExercicio();
+          break;
+     }
 }
 
 #############################Modificações do tce para o novo layout##############################
@@ -125,5 +168,6 @@ if ($_REQUEST['stAcao'] == 'anexo7novo') {
 
 $preview->addParametro( 'bimestre', $_REQUEST['cmbBimestre'] );
 $preview->addParametro( 'dt_final', $stDtFinal );
+$preview->addParametro( 'descricao', utf8_encode($descricaoPeriodo) );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 $preview->preview();

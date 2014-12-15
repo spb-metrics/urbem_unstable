@@ -198,7 +198,7 @@ BEGIN
 
     INSERT INTO tmp_rreo_an12_receita 
          SELECT grupo, subgrupo, item, descricao, ini, atu, no_bi, ate_bi, pct 
-           FROM stn.fn_rreo_valor_conta( ''||stExercicio||'' , 'R', '1.1.1.2.02.00.00.00.00', ''||stEntidades||'' , dtInicial ,   dtFinal, true, 1, 1, 1);
+           FROM stn.fn_rreo_valor_conta( stExercicio , 'R', '1.1.1.2.02.00.00.00.00', stEntidades , dtInicial ,   dtFinal, true, 1, 1, 1);
 
     INSERT INTO tmp_rreo_an12_receita 
          SELECT grupo, subgrupo, item, descricao, ini, atu, no_bi, ate_bi, pct 

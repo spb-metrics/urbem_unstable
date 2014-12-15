@@ -35,7 +35,7 @@
 
 Casos de uso: uc-01.01.00
 
-$Id: cgmLegado.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: cgmLegado.class.php 61137 2014-12-10 21:41:22Z carlos.silva $
 
 */
 
@@ -285,15 +285,27 @@ Retorna bool
                                 , nom_fantasia       = '".str_replace('\'','\'\'',$altCgm['nomFantasia'])."'
                                 , cod_orgao_registro = ".$altCgm['cod_orgao_registro']."
                                 , num_registro       = '".$altCgm['num_registro']."'
-                                , dt_registro        = TO_DATE('".$altCgm['dt_registro']."', 'DD/MM/YYYY')
                                 , num_registro_cvm   = '".$altCgm['num_registro_cvm']."'
-                                , dt_registro_cvm    = TO_DATE('".$altCgm['dt_registro_cvm']."', 'DD/MM/YYYY')
-                                , objeto_social      = '".$altCgm['objeto_social']."'
-                              WHERE numcgm = '".$altCgm['numCgm']."'; \n";
+                                , objeto_social      = '".$altCgm['objeto_social']."'";
+                                
+                    if($altCgm['dt_registro'] != '') {
+                        $sql .= "   , dt_registro = TO_DATE('".$altCgm['dt_registro']."', 'DD/MM/YYYY') ";
+                    } else {
+                        $sql .= "   , dt_registro = NULL";
+                    }
+                    
+                    if($altCgm['dt_registro_cvm'] != '') {
+                        $sql .= "   , dt_registro_cvm = TO_DATE('".$altCgm['dt_registro_cvm']."', 'DD/MM/YYYY') ";
+                    } else {
+                        $sql .= "   , dt_registro_cvm = NULL";
+                    }
+                    
+                    $sql .= " WHERE numcgm = '".$altCgm['numCgm']."'; \n";
+                    
                 } else {
                     $sql .= "INSERT INTO sw_cgm_pessoa_juridica (numcgm, cnpj, insc_estadual
                                                                 , nom_fantasia, cod_orgao_registro, num_registro
-                                                                , dt_registro, num_registro_cvm, dt_registro_cvm, objeto_social)
+                                                                , num_registro_cvm, objeto_social, dt_registro, dt_registro_cvm )
                              VALUES( '".$altCgm['numCgm']."'
                                     ,".$altCgm['cnpj']."
                                     ,'".$altCgm['inscEst']."'
@@ -303,9 +315,23 @@ Retorna bool
                                     ,TO_DATE('".$altCgm['dt_registro']."', 'DD/MM/YYYY')
                                     ,'".$altCgm['num_registro_cvm']."'
                                     ,TO_DATE('".$altCgm['dt_registro_cvm']."', 'DD/MM/YYYY')
-                                    ,'".$altCgm['objeto_social']."'
-                                    ); \n";
+                                    ,'".$altCgm['objeto_social']."'";
+                                    
+                    if($altCgm['dt_registro'] != '') {
+                        $sql .= ", TO_DATE('".$altCgm['dt_registro']."', 'DD/MM/YYYY')";
+                    } else {
+                        $sql .= ", NULL ";
+                    }
+                    
+                    if($altCgm['dt_registro_cvm'] != '') {
+                        $sql .= ", TO_DATE('".$altCgm['dt_registro_cvm']."', 'DD/MM/YYYY')";
+                    } else {
+                        $sql .= ", NULL";
+                    }
+                                    
+                    $sql .= "); \n";
                 }
+                
             } elseif ($altCgm['pessoa'] == 'fisica' || $altCgm['pessoa'] == 'outros') {
 
                 $dtValidadeCnh              = $altCgm['dtValidadeCnh']    ? "TO_DATE('".$altCgm['dtValidadeCnh']."', 'DD/MM/YYYY')": "NULL";

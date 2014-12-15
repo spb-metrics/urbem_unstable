@@ -70,59 +70,75 @@ BEGIN
         IF ( stTipoSituacao = 'empenhado' ) THEN
             stSql := 'CREATE TEMPORARY TABLE tmp_empenhado AS (
                        SELECT
-                             EE.dt_empenho         as dt_empenho,
-                             EIPE.vl_total         as vl_total,
-                             OCD.cod_conta         as cod_conta,
-                             OD.num_orgao          as num_orgao,
-                             OD.num_unidade        as num_unidade,
-                             OD.cod_funcao         as cod_funcao,
-                             OD.cod_subfuncao      as cod_subfuncao,
-                             acao.num_acao         as num_pao,
-                             programa.num_programa as cod_programa,
-                             OD.cod_entidade       as cod_entidade,
-                             OD.cod_recurso        as cod_recurso,
-                             OD.cod_despesa        as cod_despesa
+                             EE.dt_empenho         AS dt_empenho,
+                             EIPE.vl_total         AS vl_total,
+                             OCD.cod_conta         AS cod_conta,
+                             OD.num_orgao          AS num_orgao,
+                             OD.num_unidade        AS num_unidade,
+                             OD.cod_funcao         AS cod_funcao,
+                             OD.cod_subfuncao      AS cod_subfuncao,
+                             acao.num_acao         AS num_pao,
+                             programa.num_programa AS cod_programa,
+                             OD.cod_entidade       AS cod_entidade,
+                             OD.cod_recurso        AS cod_recurso,
+                             OD.cod_despesa        AS cod_despesa
         
-                        FROM orcamento.despesa     as OD
+                        FROM orcamento.despesa     AS OD
                              
-                             JOIN orcamento.recurso(''' || stExercicio || ''') as oru
-                               ON ( oru.cod_recurso = od.cod_recurso
-                              AND oru.exercicio   = od.exercicio )
+                       INNER JOIN orcamento.recurso(''' || stExercicio || ''') AS oru
+                               ON oru.cod_recurso = od.cod_recurso
+                              AND oru.exercicio   = od.exercicio
                              
-                             JOIN orcamento.programa_ppa_programa
+                       INNER JOIN orcamento.programa_ppa_programa
                                ON programa_ppa_programa.cod_programa = od.cod_programa
-                              AND programa_ppa_programa.exercicio   = od.exercicio
+                              AND programa_ppa_programa.exercicio    = od.exercicio
                              
-                             JOIN ppa.programa
+                       INNER JOIN ppa.programa
                                ON ppa.programa.cod_programa = programa_ppa_programa.cod_programa_ppa
                              
-                             JOIN orcamento.pao_ppa_acao
-                               ON pao_ppa_acao.num_pao = od.num_pao
+                       INNER JOIN orcamento.pao_ppa_acao
+                               ON pao_ppa_acao.num_pao   = od.num_pao
                               AND pao_ppa_acao.exercicio = od.exercicio
                              
-                             JOIN ppa.acao 
+                       INNER JOIN ppa.acao 
                                ON ppa.acao.cod_acao = pao_ppa_acao.cod_acao
                              
-                             ,orcamento.conta_despesa     as OCD,
-                              empenho.pre_empenho_despesa as EPED,
-                              empenho.empenho             as EE,
-                              empenho.pre_empenho         as EPE,
-                              empenho.item_pre_empenho    as EIPE
+                       INNER JOIN empenho.pre_empenho_despesa as EPED
+                               ON EPED.exercicio   = OD.exercicio
+                              And EPED.cod_despesa = OD.cod_despesa 
                        
-                        WHERE OCD.cod_conta               = EPED.cod_conta
-                          And OCD.exercicio               = EPED.exercicio
-                          And OD.exercicio                = EPED.exercicio
-                          And OD.cod_despesa              = EPED.cod_despesa
-                        
-                          And EPED.exercicio              = EPE.exercicio
-                          And EPED.cod_pre_empenho        = EPE.cod_pre_empenho
-                        
-                          And EPE.exercicio               = EE.exercicio
-                          And EPE.cod_pre_empenho         = EE.cod_pre_empenho
-                          
-                          And EPE.exercicio               = EIPE.exercicio
-                          And EPE.cod_pre_empenho         = EIPE.cod_pre_empenho
-                          And EPE.exercicio               = ''' || stExercicio  ||''' ' || stFiltro ;
+                       INNER JOIN orcamento.conta_despesa as OCD
+                               ON OCD.cod_conta = EPED.cod_conta
+                              AND OCD.exercicio = EPED.exercicio
+                     
+                       INNER JOIN empenho.pre_empenho AS EPE
+                               ON EPED.exercicio        = EPE.exercicio
+                              AND EPED.cod_pre_empenho  = EPE.cod_pre_empenho
+                              
+                       INNER JOIN  empenho.empenho AS EE
+                               ON EPE.exercicio        = EE.exercicio
+                              AND EPE.cod_pre_empenho  = EE.cod_pre_empenho
+                              
+                       INNER JOIN empenho.item_pre_empenho AS EIPE
+                               ON EPE.exercicio       = EIPE.exercicio
+                              AND EPE.cod_pre_empenho = EIPE.cod_pre_empenho
+
+                        LEFT JOIN empenho.empenho_anulado AS ea
+                               ON ea.exercicio    = EE.exercicio
+                              AND ea.cod_entidade = EE.cod_entidade
+                              AND ea.cod_empenho  = EE.cod_empenho
+                              AND TO_DATE( TO_CHAR( ea.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'') BETWEEN TO_DATE('''|| stDataInicial ||''',''dd/mm/yyyy'') AND TO_DATE('''|| stDataFinal ||''',''dd/mm/yyyy'')
+          
+                        LEFT JOIN empenho.empenho_anulado_item AS eai
+                               ON eai.exercicio       = ea.exercicio
+                              AND eai.cod_entidade    = ea.cod_entidade
+                              AND eai.cod_empenho     = ea.cod_empenho
+                              AND eai.timestamp       = ea.timestamp
+                              AND eai.exercicio       = EE.exercicio
+                              AND eai.cod_pre_empenho = EIPE.cod_pre_empenho
+                              AND eai.num_item        = EIPE.num_item
+                            
+                            WHERE EPE.exercicio = ''' || stExercicio  ||''' ' || stFiltro ;
                       stSql := stSql || ')';
         
                       EXECUTE stSql;

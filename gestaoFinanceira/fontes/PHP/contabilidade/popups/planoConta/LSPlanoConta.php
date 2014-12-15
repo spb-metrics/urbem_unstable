@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 60837 2014-11-18 16:00:47Z michel $
+    * $Id: LSPlanoConta.php 61128 2014-12-10 16:58:44Z silvia $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -362,6 +362,7 @@ if ($_REQUEST['tipoBusca']) {
                 if ( SistemaLegado::is_tcems() ) {
                     $stFiltro .= "\n ( pc.cod_estrutural like '1.1.2.%'
                                     OR pc.cod_estrutural like '1.1.3.%'
+                                    OR pc.cod_estrutural like '1.1.4.9%' 
                                     OR pc.cod_estrutural like '1.2.1.%'
                                     OR pc.cod_estrutural like '2.1.1.%'
                                     OR pc.cod_estrutural like '2.1.2.%'
@@ -454,6 +455,7 @@ if ($_REQUEST['tipoBusca']) {
                 if ( SistemaLegado::is_tcems() ) {
                     $stFiltro .= "\n ( pc.cod_estrutural like '1.1.2.%'
                                     OR pc.cod_estrutural like '1.1.3.%'
+                                    OR pc.cod_estrutural like '1.1.4.9.%'
                                     OR pc.cod_estrutural like '1.2.1.%'
                                     OR pc.cod_estrutural like '2.1.1.%'
                                     OR pc.cod_estrutural like '2.1.2.%'

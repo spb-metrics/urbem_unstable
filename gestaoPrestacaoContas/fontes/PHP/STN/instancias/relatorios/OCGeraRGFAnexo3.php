@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.22
 
-    $Id: OCGeraRGFAnexo3.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCGeraRGFAnexo3.php 61108 2014-12-09 16:05:31Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -45,7 +45,11 @@ $obErro = new Erro();
 
 if ($_REQUEST['stTipoRelatorio'] == 'Semestre') {
     $preview = new PreviewBirt(6,36,11);
-} else {
+}
+else if ($_REQUEST['stTipoRelatorio'] == 'Mes') {
+    $preview = new PreviewBirt(6,36,12);
+}
+else {
     $preview = new PreviewBirt(6,36,4);
 }
 
@@ -79,9 +83,18 @@ if ( preg_match( "/PREFEITURA/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
     $preview->addParametro( 'poder' , 'Legislativo' );
 }
 
+$arStMes = array('01'=>'Janeiro', '02'=>'Fevereiro', '03'=>'Março', '04'=>'Abril', '05'=>'Maio', '06'=>'Junho', '07'=>'Julho', '08'=>'Agosto', '09'=>'Setembro', '10'=>'Outubro', '11'=>'Novembro', '12'=>'Dezembro');
+$stDtInicial= "01/".str_pad($_REQUEST['cmbMensal'], 2, "0", STR_PAD_LEFT)."/".Sessao::getExercicio();
+$stDtFinal  = SistemaLegado::retornaUltimoDiaMes(str_pad($_REQUEST['cmbMensal'], 2, "0", STR_PAD_LEFT), Sessao::getExercicio());
+
 if ($_REQUEST['stTipoRelatorio'] == 'Semestre') {
     $preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'] );
-} else {
+}else if ($_REQUEST['stTipoRelatorio'] == 'Mes') {
+    $preview->addParametro( 'periodo'       , $_REQUEST['cmbMensal']            );
+    $preview->addParametro( 'mes'           , $arStMes[$_REQUEST['cmbMensal']]  );
+    $preview->addParametro( 'stDtInicial'   , $stDtInicial                      );
+    $preview->addParametro( 'stDtFinal'     , $stDtFinal                        );
+}else {
     $preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] );
 }
 

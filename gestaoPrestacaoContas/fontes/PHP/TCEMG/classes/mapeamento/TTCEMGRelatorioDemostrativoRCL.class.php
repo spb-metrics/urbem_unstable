@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 59719 2014-09-08 15:00:53Z franver $
-  $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  $Author: franver $
-  $Rev: 59719 $
+  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 61191 2014-12-12 21:03:55Z jean $
+  $Date: 2014-12-12 19:03:55 -0200 (Sex, 12 Dez 2014) $
+  $Author: jean $
+  $Rev: 61191 $
 */
 
 class TTCEMGRelatorioDemostrativoRCL extends Persistente
@@ -144,6 +144,8 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
                            , mes_12         numeric(14,2)
                            );        
         ";
+        sistemaLegado::mostravar($stSql);
+        die('Fim');
         return $stSql;
     }
 	

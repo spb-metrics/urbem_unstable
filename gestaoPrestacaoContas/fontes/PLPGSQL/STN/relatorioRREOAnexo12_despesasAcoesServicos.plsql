@@ -35,11 +35,12 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_acoes_servicos( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_acoes_servicos( varchar, varchar, varchar, varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
-    stExercicio    	ALIAS FOR $1;
-    inBimestre     	ALIAS FOR $2;
-    stCodEntidades 	ALIAS FOR $3;
+    stExercicio    ALIAS FOR $1;
+    stDtInicial    ALIAS FOR $2;
+    stDtFinal      ALIAS FOR $3;  
+    stCodEntidades ALIAS FOR $4;
 
     dtInicial  		varchar := '''';
     dtFinal    		varchar := '''';
@@ -50,10 +51,8 @@ DECLARE
     stSql 			varchar := '''';
 
 BEGIN
-
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
-    dtInicial := arDatas [ 0 ];
-    dtFinal   := arDatas [ 1 ];
+    dtInicial := stDtInicial;
+    dtFinal   := stDtFinal;
     
     dtIniExercicio := '01/01/' || stExercicio;
 
@@ -501,7 +500,7 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
     DROP TABLE tmp_retorno;
     DROP TABLE tmp_despesa;
     DROP TABLE tmp_despesa_liquidada;
- --   DROP TABLE tmp_balancete_despesa;
+    DROP TABLE tmp_balancete_despesa;
 
     RETURN;
  

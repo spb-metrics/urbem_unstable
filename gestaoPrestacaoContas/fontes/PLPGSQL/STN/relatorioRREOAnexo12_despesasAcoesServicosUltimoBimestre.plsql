@@ -35,26 +35,25 @@
 */
 
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_acoes_servicos_ultimo_bimestre( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo12_despesas_acoes_servicos_ultimo_bimestre( varchar, varchar, varchar, varchar  ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
-    inBimestre     	ALIAS FOR $2;
-    stCodEntidades 	ALIAS FOR $3;
+    stDataInicial  	ALIAS FOR $2;
+    stDataFinal     ALIAS FOR $3;
+    stCodEntidades 	ALIAS FOR $4;
 
-    dtInicial  		varchar := '''';
-    dtFinal    		varchar := '''';
-    dtIniExercicio 	VARCHAR := '''';
-    stExercicioAnterior VARCHAR := '''';
-    stDtFinalExercicioAnterior VARCHAR := '''';
-    arDatas 		varchar[] ;
+    dtInicial  		varchar := '';
+    dtFinal    		varchar := '';
+    dtIniExercicio 	VARCHAR := '';
+    stExercicioAnterior VARCHAR := '';
+    stDtFinalExercicioAnterior VARCHAR := '';
     reRegistro 		record ;
-    stSql 			varchar := '''';
+    stSql 			varchar := '';
 
 BEGIN
 
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
-    dtInicial := arDatas [ 0 ];
-    dtFinal   := arDatas [ 1 ];
+    dtInicial := stDataInicial;
+    dtFinal   := stDataFinal;
     
     dtIniExercicio := '01/01/' || stExercicio;
 
@@ -374,10 +373,10 @@ BEGIN
     INSERT INTO tmp_retorno SELECT 3
                                  , 1
                                  , 'DESPESAS CUSTEADAS COM OUTROS RECURSOS '
-                                 , SUM(COALESCE(dotacao_inicial,0)) 
-                                 , SUM(COALESCE(dotacao_atualizada,0))
-                                 , SUM( restos_nao_processados) 
-                                 , SUM(COALESCE(despesa_liquidada,0))
+                                 , SUM(COALESCE(dotacao_inicial,0.00)) 
+                                 , SUM(COALESCE(dotacao_atualizada,0.00))
+                                 , SUM(COALESCE(restos_nao_processados,0.00)) 
+                                 , SUM(COALESCE(despesa_liquidada,0.00))
                                  , 0
                               FROM tmp_retorno
                              WHERE grupo = 3;
@@ -434,7 +433,7 @@ BEGIN
              , descricao
              , COALESCE(dotacao_inicial,0) AS dotacao_inicial
              , COALESCE(dotacao_atualizada,0) AS dotacao_atualizada
-             , restos_nao_processados 
+             , COALESCE(restos_nao_processados,0) AS restos_nao_processados 
              , COALESCE(despesa_liquidada,0) AS despesa_liquidada
              , COALESCE(porcentagem,0) AS porcentagem
           FROM tmp_retorno

@@ -49,10 +49,10 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="bimestre" id="1231">
+        <scalar-parameter name="periodicidade" id="1231">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">integer</property>
+            <property name="dataType">string</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <property name="distinct">true</property>
@@ -245,6 +245,50 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="dt_inicio" id="6718">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="dt_final" id="6719">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="descricao" id="6722">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_estrutural_a" id="6726">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
@@ -263,9 +307,9 @@ extensionProperties.odaPassword = params["db_password"].value;
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="receitas" id="1232">
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if (params['relatorio_novo'] == 'sim') {
-	this.queryText = " SELECT * FROM stn.fn_rreo_anexo7_receitas_novo('"+params['exercicio']+"', "+params['bimestre']+", '"+params['entidade']+"') AS ( ";
+	this.queryText = " SELECT * FROM stn.fn_rreo_anexo7_receitas_novo('"+params['exercicio']+"', '"+params['entidade']+"', '"+params['dt_inicio']+"', '"+params['dt_final']+"') AS ( ";
 } else {
-	this.queryText = " SELECT * FROM stn.fn_rreo_anexo7_receitas('"+params['exercicio']+"', "+params['bimestre']+", '"+params['entidade']+"') AS ( ";
+	this.queryText = " SELECT * FROM stn.fn_rreo_anexo7_receitas('"+params['exercicio']+"', '"+params['entidade']+"', '"+params['dt_inicio']+"', '"+params['dt_final']+"') AS ( ";
 }
 this.queryText += "         ordem INTEGER , ";
 this.queryText += "         grupo INTEGER , ";
@@ -278,7 +322,9 @@ this.queryText += "         ate_bimestre NUMERIC , ";
 this.queryText += "         ate_bimestre_exercicio_anterior NUMERIC ";
 this.queryText += " ) ";
 
-this.queryText += " ORDER BY ordem ";]]></method>
+this.queryText += " ORDER BY ordem ";
+
+//params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[SELECT]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -501,117 +547,33 @@ this.queryText += " ORDER BY ordem ";]]></method>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
-                    <property name="name">param2</property>
-                    <property name="paramName">bimestre</property>
-                    <property name="dataType">integer</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
                     <property name="name">param3</property>
                     <property name="paramName">entidade</property>
                     <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_inicio</property>
+                    <property name="paramName">dt_inicio</property>
+                    <property name="dataType">string</property>
                     <property name="position">3</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
-            </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">grupo</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">cod_estrutural</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">nom_conta</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">nivel</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">dotacao_atualizada</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">no_bimestre</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">7</property>
-                        <property name="name">ate_bimestre</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">8</property>
-                        <property name="name">ate_bimestre_exercicio_anterior</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
-            <list-property name="resultSet">
                 <structure>
-                    <property name="position">1</property>
-                    <property name="name">grupo</property>
-                    <property name="nativeName">grupo</property>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="position">2</property>
-                    <property name="name">cod_estrutural</property>
-                    <property name="nativeName">cod_estrutural</property>
+                    <property name="name">dt_final</property>
+                    <property name="paramName">dt_final</property>
                     <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">nom_conta</property>
-                    <property name="nativeName">nom_conta</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
                     <property name="position">4</property>
-                    <property name="name">nivel</property>
-                    <property name="nativeName">nivel</property>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="position">5</property>
-                    <property name="name">dotacao_atualizada</property>
-                    <property name="nativeName">dotacao_atualizada</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">6</property>
-                    <property name="name">no_bimestre</property>
-                    <property name="nativeName">no_bimestre</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">7</property>
-                    <property name="name">ate_bimestre</property>
-                    <property name="nativeName">ate_bimestre</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">8</property>
-                    <property name="name">ate_bimestre_exercicio_anterior</property>
-                    <property name="nativeName">ate_bimestre_exercicio_anterior</property>
-                    <property name="dataType">decimal</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[//params['query'] = this.queryText;]]></method>
+            <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[SELECT      
      grupo
     ,cod_estrutural
@@ -622,16 +584,16 @@ this.queryText += " ORDER BY ordem ";]]></method>
     ,ate_bimestre
     ,ate_bimestre_exercicio_anterior
 FROM (
-    SELECT * FROM stn.fn_rreo_anexo7_despesas( ? , ? , ? ) AS
+    SELECT * FROM stn.fn_rreo_anexo7_despesas( ? , ? , ?, ? ) AS
     retorno (                                                                                      
         grupo                                   integer ,                                          
         cod_estrutural                          varchar ,                                          
         descricao                               varchar ,                                          
         nivel                                   integer ,                                          
-        dotacao_atualizada                      numeric(14,2) ,                                    
-        no_bimestre                   numeric(14,2) ,                                    
-        ate_bimestre                      numeric(14,2) ,
-        ate_bimestre_exercicio_anterior   numeric(14,2)
+        dotacao_atualizada                      numeric ,                                    
+        no_bimestre                             numeric ,                                    
+        ate_bimestre                            numeric ,
+        ate_bimestre_exercicio_anterior         numeric
     )
 ) AS rreo_anexo7]]></xml-property>
         </oda-data-set>
@@ -957,7 +919,7 @@ FROM (
                         <property name="fontFamily">sans-serif</property>
                         <property name="fontSize">7pt</property>
                         <property name="textAlign">center</property>
-                        <expression name="valueExpr">params["bimestre"]+"º Bimestre de "+params["exercicio"]</expression>
+                        <expression name="valueExpr">params["descricao"]</expression>
                         <property name="contentType">html</property>
                     </text-data>
                 </cell>
@@ -1057,12 +1019,20 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre</property>
-                    <expression name="expression">dataSetRow["ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') { 0.00 } else { dataSetRow["ate_bimestre"] };</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_exercicio_anterior</property>
-                    <expression name="expression">dataSetRow["ate_bimestre_exercicio_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+
+0.00
+
+} else {
+
+dataSetRow["ate_bimestre_exercicio_anterior"]
+
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -1096,7 +1066,13 @@ params["rec_no_bim"] = ( y + x );
                 </structure>
                 <structure>
                     <property name="name">total_primaria_ate_bimestre</property>
-                    <expression name="expression">if (params['relatorio_novo'] == 'sim') {
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+
+0.00
+
+} else {
+
+if (params['relatorio_novo'] == 'sim') {
 	var y = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "1.0.0.0.00.00.00.00.00" );
 	var x = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "3.0.0.0.00.00.00.00.00" );
 } else {
@@ -1105,12 +1081,19 @@ params["rec_no_bim"] = ( y + x );
 }
 
 params["rec_ate_bim"] = ( y + x );
-(y + x)</expression>
+(y + x)
+};</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_primaria_ate_bimestre_anterior</property>
-                    <expression name="expression">if (params['relatorio_novo'] == 'sim') {
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+
+0.00
+
+} else {
+
+if (params['relatorio_novo'] == 'sim') {
 	var y = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "1.0.0.0.00.00.00.00.00" );
 	var x = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "3.0.0.0.00.00.00.00.00" );
 } else {
@@ -1119,7 +1102,9 @@ params["rec_ate_bim"] = ( y + x );
 }
 
 params["rec_ate_bim_ant"] = ( y + x );
-(y + x)</expression>
+(y + x)
+
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
@@ -1213,13 +1198,17 @@ params["rec_ate_bim_ant"] = ( y + x );
                         <property name="borderRightStyle">solid</property>
                         <property name="borderRightWidth">thin</property>
                         <property name="verticalAlign">middle</property>
-                        <text id="1226">
+                        <text-data id="6731">
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
-                        </text>
+                            <expression name="valueExpr">if(params["periodicidade"].value ==  "mes"){
+   	"No Mês";  
+}else{
+    "No Período";
+}</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
                     </cell>
                     <cell id="1223">
                         <property name="borderBottomColor">#000000</property>
@@ -1233,7 +1222,7 @@ params["rec_ate_bim_ant"] = ( y + x );
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1246,7 +1235,7 @@ params["rec_ate_bim_ant"] = ( y + x );
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+(params["exercicio"]-1)</expression>
+                            <expression name="valueExpr">'Até o Período/'+(params["exercicio"]-1)</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1459,30 +1448,41 @@ params["rec_ate_bim_ant"] = ( y + x );
                 </structure>
                 <structure>
                     <property name="name">no_bimestre</property>
-                    <expression name="expression">if (dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	"-";
+                    <expression name="expression">if ( dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00" ) {
+	0.00
 } else {
-	dataSetRow["no_bimestre"];
+dataSetRow["no_bimestre"];
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre</property>
-                    <expression name="expression">if (dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	"-";
+                    <expression name="expression">if ( params['periodicidade'] == 'mes' ) {
+0.00
+} else {
+
+if (dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
+	0.00;
 } else {
 	dataSetRow["ate_bimestre"]
+}
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_exercicio_anterior</property>
-                    <expression name="expression">if (dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	"-";
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+0.00
+} else {
+
+if (dataSetRow["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
+	0.00;
 } else {
 	dataSetRow["ate_bimestre_exercicio_anterior"]
+}
+
 }</expression>
-                    <property name="dataType">any</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">dotacao_total</property>
@@ -1503,18 +1503,34 @@ var w = Total.sum( dataSetRow.no_bimestre, dataSetRow.cod_estrutural == "7.7.9.9
                 </structure>
                 <structure>
                     <property name="name">total_ate_bimestre</property>
-                    <expression name="expression">var a = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "4.9.0.0.00.00.00.00.00" );
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+
+0.00
+
+} else {
+
+var a = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "4.9.0.0.00.00.00.00.00" );
 var b = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "4.7.0.0.00.00.00.00.00" );
 var c = Total.sum( dataSetRow.ate_bimestre, dataSetRow.cod_estrutural == "7.7.9.9.99.00.00.00.00" );
-( a + b + c);</expression>
+( a + b + c);
+
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_ate_bimestre_anterior</property>
-                    <expression name="expression">var d = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "4.9.0.0.00.00.00.00.00" );
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+
+0.00
+
+} else {
+
+var d = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "4.9.0.0.00.00.00.00.00" );
 var e = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "4.7.0.0.00.00.00.00.00" );
 var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_estrutural == "7.7.9.9.99.00.00.00.00" );
-( d + e + f);</expression>
+( d + e + f);
+
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -1529,13 +1545,34 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                 </structure>
                 <structure>
                     <property name="name">resultado_ate_bimestre</property>
-                    <expression name="expression">params["rec_ate_bim"] - row["total_ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+
+0.00
+
+} else {
+
+params["rec_ate_bim"] - row["total_ate_bimestre"]
+
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_ate_bimestre_anterior</property>
-                    <expression name="expression">params["rec_ate_bim_ant"] - row["total_ate_bimestre_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ) {
+
+0.00
+
+} else {
+
+params["rec_ate_bim_ant"] - row["total_ate_bimestre_anterior"]
+
+}</expression>
                     <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">no_bimestre_label</property>
+                    <expression name="expression">"-"</expression>
+                    <property name="dataType">string</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -1581,16 +1618,57 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                     <cell id="1312">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
+                        <property name="backgroundAttachment">scroll</property>
+                        <property name="backgroundPositionX">0%</property>
+                        <property name="backgroundPositionY">0%</property>
+                        <property name="backgroundRepeat">repeat</property>
+                        <property name="backgroundSizeHeight">auto</property>
+                        <property name="backgroundSizeWidth">auto</property>
+                        <property name="fontFamily">serif</property>
+                        <property name="fontSize">medium</property>
+                        <property name="fontWeight">normal</property>
+                        <property name="fontStyle">normal</property>
+                        <property name="fontVariant">normal</property>
+                        <property name="color">black</property>
+                        <property name="textLineThrough">none</property>
+                        <property name="textOverline">none</property>
+                        <property name="textUnderline">none</property>
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
                         <property name="borderRightWidth">thin</property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="marginLeft">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="marginRight">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <property name="textAlign">center</property>
+                        <property name="textIndent">0em</property>
+                        <property name="letterSpacing">normal</property>
+                        <property name="lineHeight">normal</property>
+                        <property name="orphans">2</property>
+                        <property name="textTransform">none</property>
                         <property name="verticalAlign">middle</property>
+                        <property name="whiteSpace">normal</property>
+                        <property name="widows">2</property>
+                        <property name="wordSpacing">normal</property>
+                        <property name="display">block</property>
+                        <property name="pageBreakAfter">auto</property>
+                        <property name="pageBreakBefore">auto</property>
+                        <property name="pageBreakInside">auto</property>
+                        <property name="showIfBlank">false</property>
+                        <property name="canShrink">false</property>
                         <label id="1317">
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
@@ -1623,11 +1701,17 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                         <property name="borderRightStyle">solid</property>
                         <property name="borderRightWidth">thin</property>
                         <property name="verticalAlign">middle</property>
-                        <label id="1319">
+                        <text-data id="6727">
+                            <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <text-property name="text">No Bimestre</text-property>
-                        </label>
+                            <expression name="valueExpr">if(params["periodicidade"].value ==  "mes"){
+   	"No Mês";  
+}else{
+    "No Período";
+}</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
                     </cell>
                     <cell id="1267">
                         <property name="borderBottomColor">#000000</property>
@@ -1640,7 +1724,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1652,7 +1736,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+(params["exercicio"]-1)</expression>
+                            <expression name="valueExpr">'Até o Período/'+(params["exercicio"]-1)</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1690,6 +1774,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                         </data>
                     </cell>
                     <cell id="1271">
+                        <property name="textAlign">right</property>
                         <data id="1325">
                             <property name="fontSize">6pt</property>
                             <structure name="numberFormat">
@@ -1698,7 +1783,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                             </structure>
                             <property name="textAlign">right</property>
                             <method name="onCreate"><![CDATA[if (row["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	this.getStyle().textAlign = "center";
+	this.getStyle().textAlign = "right";
 } else {
 	this.getStyle().textAlign = "right";
 }]]></method>
@@ -1712,6 +1797,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
                         <property name="borderRightWidth">thin</property>
+                        <property name="textAlign">right</property>
                         <data id="1326">
                             <property name="fontSize">6pt</property>
                             <structure name="numberFormat">
@@ -1720,7 +1806,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                             </structure>
                             <property name="textAlign">right</property>
                             <method name="onCreate"><![CDATA[if (row["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	this.getStyle().textAlign = "center";
+	this.getStyle().textAlign = "right";
 } else {
 	this.getStyle().textAlign = "right";
 }]]></method>
@@ -1728,6 +1814,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                         </data>
                     </cell>
                     <cell id="1303">
+                        <property name="textAlign">right</property>
                         <data id="1327">
                             <property name="fontSize">6pt</property>
                             <structure name="numberFormat">
@@ -1736,7 +1823,7 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                             </structure>
                             <property name="textAlign">right</property>
                             <method name="onCreate"><![CDATA[if (row["cod_estrutural"] == "9.9.9.9.99.00.00.00.00") {
-	this.getStyle().textAlign = "center";
+	this.getStyle().textAlign = "right";
 } else {
 	this.getStyle().textAlign = "right";
 }]]></method>
@@ -2246,6 +2333,16 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                 </cell>
             </row>
         </grid>
+        <data id="6723">
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">query</property>
+                    <expression name="expression">params["query"].value</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <property name="resultSetColumn">query</property>
+        </data>
         <grid name="assinaturas" id="2376" extends="urbem_250.assinaturas">
             <property name="marginTop">50pt</property>
             <overridden-values>
@@ -2284,5 +2381,16 @@ var f = Total.sum( dataSetRow.ate_bimestre_exercicio_anterior, dataSetRow.cod_es
                 <ref-entry baseId="1217" id="2390"/>
             </overridden-values>
         </grid>
+        <text-data id="6730">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">7pt</property>
+            <property name="textAlign">center</property>
+            <expression name="valueExpr">if(params["periodicidade"].value ==  "mes"){
+   	"No Mês";  
+}else{
+    "No Período";
+}</expression>
+            <property name="contentType">html</property>
+        </text-data>
     </body>
 </report>

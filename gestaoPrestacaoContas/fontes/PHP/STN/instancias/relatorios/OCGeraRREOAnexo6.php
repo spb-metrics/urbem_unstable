@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * PÃ¡gina de RelatÃ³rio RREO Anexo3
     * Data de CriaÃ§Ã£o   : 14/11/2007
 
@@ -50,6 +47,13 @@ if ($request->get('stAcao') == 'anexo5novo') {
 $preview->setTitulo('Demonstrativo do Resultado Nominal');
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel (true );
+
+$obErro = new Erro();
+
+if (!$_REQUEST['cmbMes'] && !$_REQUEST['cmbBimestre']) {
+    $stTipoRelatorio = $_REQUEST['stTipoRelatorio'] == "Mes" ? "Mês" : $_REQUEST['stTipoRelatorio'];
+    $obErro->setDescricao('É preciso selecionar ao menos um '.$stTipoRelatorio.'.');
+}
 
 /**
  * Faz a inserção/update do parametro meta_resultado_nominal_fixada na table administracao.configuracao
@@ -158,7 +162,10 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
         break;
     endswitch;
     $preview->addParametro( 'periodo', $request->get('cmbBimestre') );
+    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio()) );
+        
 } elseif ( $request->get('stTipoRelatorio') == 'Quadrimestre' ) {
+    
     switch( $request->get('cmbQuadrimestre')):
         case 1:
             $preview->addParametro( 'dt_final_periodo', '30/04/'.Sessao::getExercicio() );
@@ -173,8 +180,12 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
             $preview->addParametro( 'mes', 12 );
         break;
     endswitch;
+
     $preview->addParametro( 'periodo', $request->get('cmbQuadrimestre') );
+    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbQuadrimestre')."º Quadrimestre de ".Sessao::getExercicio()) );
+    
 } elseif ( $request->get('stTipoRelatorio') == 'Semestre' ) {
+
     switch( $request->get('cmbSemestre')):
         case 1:
             $preview->addParametro( 'dt_final_periodo', '30/06/'.Sessao::getExercicio() );
@@ -185,7 +196,37 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
             $preview->addParametro( 'mes', 12 );
         break;
     endswitch;
+    
     $preview->addParametro( 'periodo', $request->get('cmbSemestre') );
+    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbSemestre')."º Semestre de ".Sessao::getExercicio()) );
+    
+} elseif ( $request->get('stTipoRelatorio') == 'Mes' ) {
+    
+    $dtInicial = "01/".$_REQUEST["cmbMes"]."/".Sessao::getExercicio();
+    
+    if($_REQUEST["cmbMes"] == '01'){          
+        $dtInicialAnterior = "01/12/".(Sessao::getExercicio()-1);
+        $dtFInalAnterior = "31/12/".(Sessao::getExercicio()-1);
+    } else {
+        $mesAnterior       = (int)($_REQUEST["cmbMes"]) -1;
+        $mesAnterior       = $mesAnterior < 10 ? "0".(string)$mesAnterior : (string)$mesAnterior;
+        $dtInicialAnterior = "01/".$mesAnterior."/".(Sessao::getExercicio());
+        $dtFinalAnterior   = SistemaLegado::retornaUltimoDiaMes($mesAnterior,Sessao::getExercicio());
+        
+    }
+    
+    $dtFinal = SistemaLegado::retornaUltimoDiaMes($_REQUEST["cmbMes"],Sessao::getExercicio());
+
+     $preview->addParametro( 'dtInicioMes', $dtInicial );
+     $preview->addParametro( 'dtFimMes', $dtFinal );
+     $preview->addParametro( 'dtInicioMesAnterior', $dtInicialAnterior );
+     $preview->addParametro( 'dtFimMesAnterior', $dtFinalAnterior );
+     
+     $preview->addParametro( 'mes', $_REQUEST["cmbMes"] );
+     $codUF = SistemaLegado::pegaConfiguracao( 'cod_uf', 2, Sessao::getExercicio());
+     $preview->addParametro( 'cod_uf', $codUF );
+     $preview->addParametro( 'tipo_relatorio', $request->get('stTipoRelatorio')  );
+     $preview->addParametro( 'descricaoPeriodo', utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio()));
 }
 
 #############################Modificações do tce para o novo layout##############################
@@ -212,4 +253,11 @@ if ($request->get('stAcao') == 'anexo5novo') {
 #################################################################################################
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
-$preview->preview();
+
+if ( !$obErro->ocorreu() ) {
+    $preview->preview();
+} else {
+    SistemaLegado::alertaAviso("FLModelosRREO.php?'.Sessao::getId().&stAcao=".$_REQUEST['stAcao'], $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}
+
+?>

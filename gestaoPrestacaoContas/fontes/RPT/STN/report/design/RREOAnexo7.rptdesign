@@ -194,6 +194,17 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="descricao" id="6852">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
@@ -781,7 +792,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </text>
                     <text id="1162">
                         <property name="contentType">html</property>
-                        <text-property name="content"><![CDATA[<VALUE-OF>params["bimestre"]</VALUE-OF>º Bimestre de <VALUE-OF>params["exercicio"]</VALUE-OF>]]></text-property>
+                        <text-property name="content"><![CDATA[<VALUE-OF>params["descricao"]</VALUE-OF>]]></text-property>
                     </text>
                 </cell>
             </row>
@@ -794,6 +805,12 @@ extensionProperties.odaPassword = params["db_password"].value;
             <property name="marginRight">25mm</property>
             <property name="width">240mm</property>
             <property name="dataSet">RREOAnexo9</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">params['exercicio'] >  '2014'</expression>
+                </structure>
+            </list-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">tipo</property>

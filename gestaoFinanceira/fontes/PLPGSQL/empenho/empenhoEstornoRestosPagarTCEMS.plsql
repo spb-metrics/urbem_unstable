@@ -37,14 +37,21 @@ DECLARE
     
     CODPLANODEB         INTEGER;
     CODPLANOCRED        INTEGER;
+    
+    boImplantado        BOOLEAN;
 
     inCodNota            INTEGER;
     inCodDespesa         INTEGER;
     stExercicioLiquidacao VARCHAR;
     SQLCONTAFIXA         VARCHAR;
-    REREGISTROSCONTAFIXA RECORD;
-BEGIN
+    DEBITO2              VARCHAR;
+    DEBITO3              VARCHAR;
+    CREDITO2             VARCHAR;
 
+    REREGISTROSCONTAFIXA RECORD;
+    
+    
+BEGIN
     IF STEXERCICIO::INTEGER < 2014 THEN
         IF RESTOS = '0' THEN
         -- não processado
@@ -88,7 +95,33 @@ BEGIN
                 SEQUENCIA := FAZERLANCAMENTO('632100000000000', '532100000000000', 918, STEXERCICIO, VALOR, COMPLEMENTO, CODLOTE, TIPOLOTE, CODENTIDADE, CODPLANODEB, CODPLANOCRED);
         END IF;
     ELSE
-        IF RESTOS = '0' THEN
+    
+        inCodDespesa := selectIntoInteger(' SELECT despesa.cod_despesa
+                                          FROM empenho.empenho
+                                    INNER JOIN empenho.pre_empenho
+                                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                           AND pre_empenho.exercicio       = empenho.exercicio
+                                    INNER JOIN empenho.pre_empenho_despesa
+                                            ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                           AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                                    INNER JOIN orcamento.despesa
+                                            ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                                           AND despesa.exercicio   = pre_empenho_despesa.exercicio
+                                         WHERE pre_empenho.cod_pre_empenho = ' || CODPREEMPENHO || '
+                                           AND pre_empenho.exercicio = ''' || EXERCRP || '''
+                                           ');
+                                           
+        boImplantado := selectIntoBoolean(' SELECT pre_empenho.implantado
+                                          FROM empenho.empenho
+                                    INNER JOIN empenho.pre_empenho
+                                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                           AND pre_empenho.exercicio       = empenho.exercicio
+                                         WHERE empenho.cod_pre_empenho = ' || CODPREEMPENHO || '
+                                           AND empenho.exercicio = ''' || EXERCRP || '''
+                                           ');
+    
+    
+        IF RESTOS = '0' THEN 
         -- não processado
 
             SELECT nota_liquidacao.cod_nota
@@ -111,15 +144,15 @@ BEGIN
 
             IF inCodNota IS NOT NULL THEN
             SQLCONTAFIXA := '
-                SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS conta_debito
+                SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS plano_debito
                      , (SELECT plano_analitica.cod_plano 
                           FROM contabilidade.plano_conta 
                           JOIN contabilidade.plano_analitica
                             ON plano_analitica.cod_conta = plano_conta.cod_conta
                            AND plano_analitica.exercicio = plano_conta.exercicio
                          WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%'', ''.'', '''')
-                           ) AS conta_credito
+                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
+                           ) AS plano_credito
                      , configuracao_lancamento_debito.cod_conta_despesa
                      , REPLACE(plano_conta_debito.cod_estrutural, ''.'', '''') as estrutural_debito
                      , (SELECT plano_conta.cod_estrutural
@@ -128,7 +161,7 @@ BEGIN
                             ON plano_analitica.cod_conta = plano_conta.cod_conta
                            AND plano_analitica.exercicio = plano_conta.exercicio
                          WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%'', ''.'', '''')
+                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
                            ) AS estrutural_credito
                   FROM empenho.nota_liquidacao
             INNER JOIN empenho.empenho
@@ -211,7 +244,8 @@ BEGIN
             LOOP
                     SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
             END LOOP;
-              
+        
+        IF boImplantado = FALSE THEN       
             SQLCONTAFIXA := '
                 SELECT tabela_debito.plano_debito
                      , tabela_debito.estrutural_debito
@@ -262,40 +296,90 @@ BEGIN
                  WHERE pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
                    AND pre_empenho.exercicio = '''||EXERCRP||'''
             ';
+        
+        ELSE
+            SQLCONTAFIXA := '
+                SELECT tabela_debito.plano_debito
+                     , tabela_debito.estrutural_debito
+                     , tabela_credito.plano_credito
+                     , tabela_credito.estrutural_credito
+                  FROM empenho.pre_empenho
+            INNER JOIN empenho.restos_pre_empenho
+                    ON restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                   AND restos_pre_empenho.exercicio       = pre_empenho.exercicio
+            INNER JOIN orcamento.conta_despesa
+                    ON REPLACE(conta_despesa.cod_estrutural, ''.'', '''') = restos_pre_empenho.cod_estrutural
+                   AND conta_despesa.exercicio = '''||STEXERCICIO||'''
+                  JOIN orcamento.recurso
+                    ON recurso.cod_recurso = restos_pre_empenho.recurso
+                   AND recurso.exercicio   = '''||STEXERCICIO||'''
+                  JOIN ( SELECT plano_recurso.cod_recurso
+                              , plano_recurso.exercicio
+                              , plano_analitica.cod_plano AS plano_debito
+                              , plano_conta.cod_estrutural AS estrutural_debito
+                           FROM contabilidade.plano_recurso
+                           JOIN contabilidade.plano_analitica
+                             ON plano_analitica.cod_plano = plano_recurso.cod_plano
+                            AND plano_analitica.exercicio = plano_recurso.exercicio
+                           JOIN contabilidade.plano_conta
+                             ON plano_conta.cod_conta = plano_analitica.cod_conta
+                            AND plano_conta.exercicio = plano_analitica.exercicio
+                          WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.2%''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
+                     ) AS tabela_debito
+                    ON tabela_debito.cod_recurso = recurso.cod_recurso
+                   AND tabela_debito.exercicio   = recurso.exercicio
+                  JOIN ( SELECT plano_recurso.cod_recurso
+                              , plano_recurso.exercicio
+                              , plano_analitica.cod_plano AS plano_credito
+                              , plano_conta.cod_estrutural AS estrutural_credito
+                           FROM contabilidade.plano_recurso
+                           JOIN contabilidade.plano_analitica
+                             ON plano_analitica.cod_plano = plano_recurso.cod_plano
+                            AND plano_analitica.exercicio = plano_recurso.exercicio
+                           JOIN contabilidade.plano_conta
+                             ON plano_conta.cod_conta = plano_analitica.cod_conta
+                            AND plano_conta.exercicio = plano_analitica.exercicio
+                          WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.1%''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
+                     ) AS tabela_credito
+                    ON tabela_credito.cod_recurso = recurso.cod_recurso
+                   AND tabela_credito.exercicio   = recurso.exercicio
+                 WHERE pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
+                   AND pre_empenho.exercicio = '''||EXERCRP||'''
+            ';
+        END IF ; 
             
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                 SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
             END LOOP;
+        
+      ELSE
+      --  nao processado Liquidado
 
+        IF RESTOS = '1'  THEN            
+            DEBITO2 = '6311%';
+            CREDITO2 = '63191%';
+            DEBITO3 = '82112%';
         ELSE
-        -- processado   
+        --processado 
+            DEBITO2 = '6321%';
+            CREDITO2 = '63299%';
+            DEBITO3 = '82113%';
+       END IF;
 
-            inCodDespesa := selectIntoInteger(' SELECT despesa.cod_despesa
-                                          FROM empenho.empenho
-                                    INNER JOIN empenho.pre_empenho
-                                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                                           AND pre_empenho.exercicio       = empenho.exercicio
-                                    INNER JOIN empenho.pre_empenho_despesa
-                                            ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                           AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-                                    INNER JOIN orcamento.despesa
-                                            ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                                           AND despesa.exercicio   = pre_empenho_despesa.exercicio
-                                         WHERE empenho.cod_pre_empenho = ' || CODPREEMPENHO || '
-                                           AND empenho.exercicio = ''' || EXERCRP || '''
-                                           ');
-
-            SQLCONTAFIXA := '
-                SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS conta_debito
+           
+        IF boImplantado = FALSE  THEN
+            SQLCONTAFIXA := 'SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS plano_debito
                      , (SELECT plano_analitica.cod_plano 
                           FROM contabilidade.plano_conta 
                           JOIN contabilidade.plano_analitica
                             ON plano_analitica.cod_conta = plano_conta.cod_conta
                            AND plano_analitica.exercicio = plano_conta.exercicio
                          WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%'', ''.'', '''')
-                           ) AS conta_credito
+                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
+                           ) AS plano_credito
                      , configuracao_lancamento_debito.cod_conta_despesa
                      , REPLACE(plano_conta_debito.cod_estrutural, ''.'', '''') as estrutural_debito
                      , (SELECT plano_conta.cod_estrutural
@@ -304,9 +388,9 @@ BEGIN
                             ON plano_analitica.cod_conta = plano_conta.cod_conta
                            AND plano_analitica.exercicio = plano_conta.exercicio
                          WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%'', ''.'', '''')
+                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
                            ) AS estrutural_credito
-                  FROM empenho.empenho
+                  FROM empenho.empenho  
             INNER JOIN empenho.pre_empenho
                     ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
                    AND pre_empenho.exercicio       = empenho.exercicio
@@ -342,12 +426,76 @@ BEGIN
                    AND despesa.cod_despesa = '||inCodDespesa||'
                    AND despesa.exercicio = '''||STEXERCICIO||'''
         ';
-
+            
+      ELSE
+    
+       SQLCONTAFIXA :='SELECT plano_analitica_credito.cod_plano AS plano_debito
+                            , configuracao_lancamento_debito.cod_conta_despesa
+                            , REPLACE(plano_conta_credito.cod_estrutural, ''.'', '''') as estrutural_debito
+                            , (SELECT plano_analitica.cod_plano 
+                                 FROM contabilidade.plano_conta 
+                                 JOIN contabilidade.plano_analitica
+                                   ON plano_analitica.cod_conta = plano_conta.cod_conta
+                                  AND plano_analitica.exercicio = plano_conta.exercicio
+                                WHERE plano_conta.exercicio = '''||STEXERCICIO||'''
+                                  AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
+                             ) AS plano_credito
+                            , (SELECT  REPLACE(plano_conta.cod_estrutural, ''.'', '''') 
+                                 FROM contabilidade.plano_conta 
+                                 JOIN contabilidade.plano_analitica
+                                   ON plano_analitica.cod_conta = plano_conta.cod_conta
+                                AND plano_analitica.exercicio = plano_conta.exercicio
+                                WHERE plano_conta.exercicio = '''||STEXERCICIO||'''
+                                  AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
+                            ) AS estrutural_credito
+                        FROM empenho.empenho  
+                  INNER JOIN empenho.pre_empenho
+                          ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                         AND pre_empenho.exercicio       = empenho.exercicio
+                  INNER JOIN ( SELECT DISTINCT conta_despesa.cod_conta
+                                     , restos_pre_empenho.cod_pre_empenho 
+                                     , restos_pre_empenho.exercicio
+                                     , restos_pre_empenho.cod_estrutural
+                                 FROM orcamento.conta_despesa
+                           INNER JOIN empenho.restos_pre_empenho 
+                                   ON REPLACE(conta_despesa.cod_estrutural,''.'', '''') = restos_pre_empenho.cod_estrutural
+                                  AND conta_despesa.exercicio = '''||STEXERCICIO||'''
+                                WHERE restos_pre_empenho.exercicio = '''||EXERCRP||'''
+                                  AND restos_pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
+		      	    ) AS despesa
+		           ON pre_empenho.cod_pre_empenho = despesa.cod_pre_empenho
+                          AND pre_empenho.exercicio       = despesa.exercicio
+                   INNER JOIN contabilidade.configuracao_lancamento_credito
+                           ON configuracao_lancamento_credito.cod_conta_despesa = despesa.cod_conta
+                          AND configuracao_lancamento_credito.exercicio         = '''||STEXERCICIO||'''
+                   INNER JOIN contabilidade.configuracao_lancamento_debito
+                           ON configuracao_lancamento_credito.exercicio = configuracao_lancamento_debito.exercicio
+                          AND configuracao_lancamento_credito.cod_conta_despesa = configuracao_lancamento_debito.cod_conta_despesa
+                          AND configuracao_lancamento_credito.tipo = configuracao_lancamento_debito.tipo
+                          AND configuracao_lancamento_credito.estorno = configuracao_lancamento_debito.estorno
+                   INNER JOIN contabilidade.plano_conta plano_conta_credito
+                           ON plano_conta_credito.cod_conta = configuracao_lancamento_credito.cod_conta
+                          AND plano_conta_credito.exercicio = configuracao_lancamento_credito.exercicio
+                   INNER JOIN contabilidade.plano_analitica plano_analitica_credito
+                           ON plano_conta_credito.cod_conta = plano_analitica_credito.cod_conta
+                          AND plano_conta_credito.exercicio = plano_analitica_credito.exercicio
+                   INNER JOIN contabilidade.plano_conta plano_conta_debito
+                           ON plano_conta_debito.cod_conta = configuracao_lancamento_debito.cod_conta
+                          AND plano_conta_debito.exercicio = configuracao_lancamento_debito.exercicio
+                   INNER JOIN contabilidade.plano_analitica plano_analitica_debito
+                           ON plano_conta_debito.cod_conta = plano_analitica_debito.cod_conta
+                          AND plano_conta_debito.exercicio = plano_analitica_debito.exercicio
+                        WHERE configuracao_lancamento_credito.estorno = ''false''
+                          AND configuracao_lancamento_credito.exercicio = '''||STEXERCICIO||'''
+                ';
+            END IF;
+                  
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                     SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
             END LOOP;
-
+   
+  
             SQLCONTAFIXA := '
                 SELECT debito.cod_estrutural AS estrutural_debito
                      , credito.cod_estrutural AS estrutural_credito
@@ -362,7 +510,7 @@ BEGIN
                      INNER JOIN contabilidade.plano_analitica
                              ON plano_conta.cod_conta = plano_analitica.cod_conta
                             AND plano_conta.exercicio = plano_analitica.exercicio
-                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE ''6321%''
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE '''||DEBITO2||'''
                        ) AS debito
             INNER JOIN (
                          SELECT plano_conta.cod_estrutural
@@ -372,17 +520,19 @@ BEGIN
                      INNER JOIN contabilidade.plano_analitica
                              ON plano_conta.cod_conta = plano_analitica.cod_conta
                             AND plano_conta.exercicio = plano_analitica.exercicio
-                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''63299%''
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE '''||CREDITO2||'''
                        ) AS credito
                      ON debito.exercicio = credito.exercicio
                   WHERE debito.exercicio = '''||STEXERCICIO||'''
             ';
-
+ 
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                     SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
             END LOOP;
-              
+   
+
+        IF boImplantado = FALSE  THEN      
             SQLCONTAFIXA := '
                 SELECT tabela_debito.plano_debito
                      , tabela_debito.estrutural_debito
@@ -409,8 +559,8 @@ BEGIN
                            JOIN contabilidade.plano_conta
                              ON plano_conta.cod_conta = plano_analitica.cod_conta
                             AND plano_conta.exercicio = plano_analitica.exercicio
-                          WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.3%''
-                            AND plano_conta.exercicio = '''||EXERCRP||'''
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE '''||DEBITO3||'''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
                      ) AS tabela_debito
                     ON tabela_debito.cod_recurso = recurso.cod_recurso
                    AND tabela_debito.exercicio   = recurso.exercicio
@@ -425,8 +575,8 @@ BEGIN
                            JOIN contabilidade.plano_conta
                              ON plano_conta.cod_conta = plano_analitica.cod_conta
                             AND plano_conta.exercicio = plano_analitica.exercicio
-                          WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.1%''
-                            AND plano_conta.exercicio = '''||EXERCRP||'''
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE ''82111%''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
                      ) AS tabela_credito
                     ON tabela_credito.cod_recurso = recurso.cod_recurso
                    AND tabela_credito.exercicio   = recurso.exercicio
@@ -434,6 +584,59 @@ BEGIN
                    AND pre_empenho.exercicio = '''||EXERCRP||'''
             ';
             
+        ELSE
+        
+            SQLCONTAFIXA := '
+                SELECT tabela_debito.plano_debito
+                     , tabela_debito.estrutural_debito
+                     , tabela_credito.plano_credito
+                     , tabela_credito.estrutural_credito
+                  FROM empenho.pre_empenho
+            INNER JOIN empenho.restos_pre_empenho
+                    ON restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                   AND restos_pre_empenho.exercicio       = pre_empenho.exercicio
+            INNER JOIN orcamento.conta_despesa
+                    ON REPLACE(conta_despesa.cod_estrutural, ''.'', '''') = restos_pre_empenho.cod_estrutural
+                   AND conta_despesa.exercicio = '''||STEXERCICIO||'''
+                  JOIN orcamento.recurso
+                    ON recurso.cod_recurso = restos_pre_empenho.recurso
+                   AND recurso.exercicio   = '''||STEXERCICIO||'''
+                  JOIN ( SELECT plano_recurso.cod_recurso
+                              , plano_recurso.exercicio
+                              , plano_analitica.cod_plano AS plano_debito
+                              , plano_conta.cod_estrutural AS estrutural_debito
+                           FROM contabilidade.plano_recurso
+                           JOIN contabilidade.plano_analitica
+                             ON plano_analitica.cod_plano = plano_recurso.cod_plano
+                            AND plano_analitica.exercicio = plano_recurso.exercicio
+                           JOIN contabilidade.plano_conta
+                             ON plano_conta.cod_conta = plano_analitica.cod_conta
+                            AND plano_conta.exercicio = plano_analitica.exercicio
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE '''||DEBITO3||'''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
+                     ) AS tabela_debito
+                    ON tabela_debito.cod_recurso = recurso.cod_recurso
+                   AND tabela_debito.exercicio   = recurso.exercicio
+                  JOIN ( SELECT plano_recurso.cod_recurso
+                              , plano_recurso.exercicio
+                              , plano_analitica.cod_plano AS plano_credito
+                              , plano_conta.cod_estrutural AS estrutural_credito
+                           FROM contabilidade.plano_recurso
+                           JOIN contabilidade.plano_analitica
+                             ON plano_analitica.cod_plano = plano_recurso.cod_plano
+                            AND plano_analitica.exercicio = plano_recurso.exercicio
+                           JOIN contabilidade.plano_conta
+                             ON plano_conta.cod_conta = plano_analitica.cod_conta
+                            AND plano_conta.exercicio = plano_analitica.exercicio
+                          WHERE REPLACE(plano_conta.cod_estrutural, ''.'',  '''') LIKE ''82111%''
+                            AND plano_conta.exercicio = '''||STEXERCICIO||'''
+                     ) AS tabela_credito
+                    ON tabela_credito.cod_recurso = recurso.cod_recurso
+                   AND tabela_credito.exercicio   = recurso.exercicio
+                 WHERE pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
+                   AND pre_empenho.exercicio = '''||EXERCRP||'''
+            ';
+            END IF ; 
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                 SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );

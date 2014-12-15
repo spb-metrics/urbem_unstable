@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.23
 
-    $Id: OCGeraRGFAnexo4.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCGeraRGFAnexo4.php 61130 2014-12-10 17:25:29Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -45,6 +45,8 @@ if ($_REQUEST['stTipoRelatorio'] == 'Semestre'  && $_REQUEST['stAcao'] == 'anexo
     $preview = new PreviewBirt(6,36,45);
 } elseif ($_REQUEST['stTipoRelatorio'] == 'Quadrimestre'  && $_REQUEST['stAcao'] == 'anexo4novo') {
     $preview = new PreviewBirt(6,36,46);
+} elseif ($_REQUEST['stTipoRelatorio'] == 'Mes'  && $_REQUEST['stAcao'] == 'anexo4novo') {
+    $preview = new PreviewBirt(6,36,59);
 } else {
     $preview = new PreviewBirt(6,36,5);
 }
@@ -80,8 +82,51 @@ if ( preg_match( "/c[âa]mara/i", $rsEntidade->getCampo( 'nom_cgm' ) ) && ( coun
 
 if ( Sessao::getExercicio() > '2012' ) {
     if ($_REQUEST['stTipoRelatorio'] == 'Semestre') {
-         $preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'] );
-    } else {
+        $preview->addParametro( 'periodo', $_REQUEST['cmbSemestre'] );
+    } else if ($_REQUEST['stTipoRelatorio'] == 'Mes') {
+        switch ($_REQUEST['cmbMensal']) {
+            case '01':
+                $descricaoPeriodo = "Janeiro de ".Sessao::getExercicio();
+            break;
+            case '02':
+                $descricaoPeriodo = "Fevereiro de ".Sessao::getExercicio();
+            break;
+            case '03':
+                $descricaoPeriodo = "Março de ".Sessao::getExercicio();
+            break;
+            case '04':
+                $descricaoPeriodo = "Abril de ".Sessao::getExercicio();
+            break;
+            case '05':
+                $descricaoPeriodo = "Maio de ".Sessao::getExercicio();
+            break;
+            case '06':
+                $descricaoPeriodo = "Junho de ".Sessao::getExercicio();
+            break;
+            case '07':
+                $descricaoPeriodo = "Julho de ".Sessao::getExercicio();
+            break;
+            case '08':
+                $descricaoPeriodo = "Agosto de ".Sessao::getExercicio();
+            break;
+            case '09':
+                $descricaoPeriodo = "Setembro de ".Sessao::getExercicio();
+            break;
+            case '10':
+                $descricaoPeriodo = "Outubro de ".Sessao::getExercicio();
+            break;
+            case '11':
+                $descricaoPeriodo = "Novembro de ".Sessao::getExercicio();
+            break;
+            case '12':
+                $descricaoPeriodo = "Dezembro de ".Sessao::getExercicio();
+            break;
+        }
+        
+        $preview->addParametro( 'dt_inicial' , "01/".$_REQUEST['cmbMensal']."/".Sessao::getExercicio());
+        $preview->addParametro( 'dt_final'   , SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMensal'], Sessao::getExercicio()));
+        $preview->addParametro( 'periodo', $descricaoPeriodo );
+   } else {
         $preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] );
     }
 } else {

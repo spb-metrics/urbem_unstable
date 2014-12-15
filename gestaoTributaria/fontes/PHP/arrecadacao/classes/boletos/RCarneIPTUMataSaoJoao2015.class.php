@@ -1535,7 +1535,7 @@ class RCarneDadosCadastraisMataSaoJoao extends RCarneDiversosPetropolis
         $this->Text( $x+9, $y+(66*$inTamY), 'Necessitando   alterar   os    dados  cadastrais,  compareça,   munido  de   documentos  comprobatórios,   ao   Setor   de   Tributos  e' );
         $this->Text( $x+9, $y+(69*$inTamY), 'Fiscalização, órgão  da  Secretaria   Municipal  de  Administração e  Finanças,   situado   no  Centro  Administrativo, Rua Luiz Antônio' );
         $this->Text( $x+9, $y+(72*$inTamY), 'Garcez,  140  -  Centro  -  CEP:  48.280-000  -   Mata   de  São   João/BA.  Poderá comparecer também ao   posto  de  Apoio  Tributário,' );
-        $this->Text( $x+9, $y+(75*$inTamY), 'situado  na Alameda da Amendoeiras, s/nº - Imbassaí -  Mata  de    São  João/BA. ' );
+        $this->Text( $x+9, $y+(75*$inTamY), 'situado  na Alameda das Amendoeiras, s/nº - Imbassaí -  Mata  de    São  João/BA. ' );
         $this->Text( $x+9, $y+(78*$inTamY), 'Telefones:  (71) 3635-1669/1310  /  (71)  9617-7254   /   (71)  9957-6798   /   (71)  9630-1106.' );
     $this->setFont( 'Arial','BU', 8);
     $this->Text( $x+9, $y+(81*$inTamY), 'Horário  para  atendimento: de 08h às 11h - de 13h às 14:30min. ');

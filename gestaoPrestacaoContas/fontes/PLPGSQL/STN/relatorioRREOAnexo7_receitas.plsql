@@ -39,16 +39,16 @@
 
 --select * from stn.fn_rreo_anexo7('2006',1,'1,2');
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo7_receitas(varchar,integer,varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo7_receitas(varchar,varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio                     ALIAS FOR $1;
-    inBimestre                      ALIAS FOR $2;
-    stCodEntidades                  ALIAS FOR $3;
-    dtInicioBimestre                VARCHAR;
-    dtFimBimestre                   VARCHAR;
+    stCodEntidades                  ALIAS FOR $2;
+    dtInicio                        ALIAS FOR $3;
+    dtFim                           ALIAS FOR $4;
     dtInicioExercicio               VARCHAR := '01/01/'||stExercicio;
     dtInicioExercicioAnterior       VARCHAR;
-    dtFimBimestreExercicioAnterior  VARCHAR;
+    dtInicioAnterior                VARCHAR;
+    dtFimAnterior                   VARCHAR;
     stExercicioAnterior             VARCHAR   := '';
     stSql                           VARCHAR   := '';
     stSQLsubgrupo                   VARCHAR   := '';
@@ -78,14 +78,12 @@ BEGIN
         stExAnteriorMascRedDedutora := '9.1';
     END IF;
     
-    arDatas := publico.bimestre(stExercicio, inBimestre);
-    
-    dtInicioBimestre := arDatas[0];
-    dtFimBimestre := arDatas[1]; 
-    dtInicioExercicioAnterior := '01/01/'||cast(cast(stExercicio as int)-1 as varchar);
-    arDatas := publico.bimestre(cast(cast(stExercicio as int)-1 as varchar), inBimestre);
-    dtFimBimestreExercicioAnterior := arDatas[1];
     stExercicioAnterior := cast((cast(stExercicio as integer) - 1) as varchar);
+    
+    dtInicioExercicioAnterior := '01/01/'||cast(cast(stExercicio as int)-1 as varchar);
+    
+    dtInicioAnterior := SUBSTRING(dtInicio,0,6) || stExercicioAnterior;
+    dtFimAnterior := SUBSTRING(dtFinal,0,6) || stExercicioAnterior;
 
     stSql := '
     CREATE TEMPORARY TABLE tmp_valor AS (
@@ -240,16 +238,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -306,16 +304,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   as plano_conta,
@@ -359,16 +357,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -428,16 +426,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -483,16 +481,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -536,16 +534,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -587,16 +585,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -638,16 +636,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -704,16 +702,16 @@ BEGIN
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -768,16 +766,16 @@ BEGIN
                                                     , ''' || stCodEntidades || '''
                 ) as previsao_inicial,
                 orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                         ,''' || dtInicioBimestre || '''
-                                                         ,''' || dtFimBimestre || '''
+                                                         ,''' || dtInicio || '''
+                                                         ,''' || dtFim || '''
                 ) as no_bimestre,
                 orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                          ,''' || dtInicioExercicio || '''
-                                                         ,''' || dtFimBimestre || '''
+                                                         ,''' || dtFim || '''
                 ) as ate_bimestre,
                 orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                          ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFimBimestreExercicioAnterior || '''
+                                                         ,''' || dtFimAnterior || '''
                 ) as ate_bimestre_exercicio_anterior
             FROM
                 contabilidade.plano_conta   ,
@@ -818,7 +816,7 @@ BEGIN
         cast(sum(coalesce(ate_bimestre,0.00)) as numeric(14,2))* -1 as ate_bimestre_dedutora, 
         cast(sum(coalesce((
             SELECT
-                orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural), ''' || dtInicioExercicioAnterior || ''' , ''' || dtFimBimestreExercicioAnterior || ''' ) AS ate_bimestre_exercicio_anterior 
+                orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural), ''' || dtInicioExercicioAnterior || ''' , ''' || dtFimAnterior || ''' ) AS ate_bimestre_exercicio_anterior 
             FROM
                 contabilidade.plano_conta, 
                 orcamento.conta_receita 
@@ -846,8 +844,8 @@ BEGIN
             plano_conta.cod_estrutural, 
             plano_conta.nom_conta, 
             orcamento.fn_receita_valor_previsto( '|| quote_literal(stExercicio) || ' , publico.fn_mascarareduzida(conta_receita.cod_estrutural) , ''' || stCodEntidades || ''' ) AS previsao_inicial,
-            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural) , ''' || dtInicioBimestre || ''' , ''' || dtFimBimestre || ''' ) AS no_bimestre, 
-            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural) , ''' || dtInicioExercicio || ''' , ''' || dtFimBimestre || ''' ) AS ate_bimestre
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural) , ''' || dtInicio || ''' , ''' || dtFim || ''' ) AS no_bimestre, 
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural) , ''' || dtInicioExercicio || ''' , ''' || dtFim || ''' ) AS ate_bimestre
         FROM
             contabilidade.plano_conta, 
             orcamento.conta_receita 
@@ -938,16 +936,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -989,16 +987,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -1059,16 +1057,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -1111,16 +1109,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -1164,16 +1162,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   as plano_conta,
@@ -1232,16 +1230,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,
@@ -1283,16 +1281,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta, 
@@ -1339,16 +1337,16 @@ UNION
                                                 , ''' || stCodEntidades || '''
             ) as previsao_inicial,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioBimestre || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
             ) as no_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicio || '''
-                                                     ,''' || dtFimBimestre || '''
+                                                     ,''' || dtFim || '''
             ) as ate_bimestre,
             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                      ,''' || dtInicioExercicioAnterior || '''
-                                                     ,''' || dtFimBimestreExercicioAnterior || '''
+                                                     ,''' || dtFimAnterior || '''
             ) as ate_bimestre_exercicio_anterior
         FROM
             contabilidade.plano_conta   ,

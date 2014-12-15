@@ -48,6 +48,11 @@ $stAno = Sessao::getExercicio();
 
 $obErro = new Erro();
 
+if (!$_REQUEST['cmbMensal'] && !$_REQUEST['cmbQuadrimestre'] && !$_REQUEST['cmbSemestre']) {
+    $stTipoRelatorio = $_REQUEST['stTipoRelatorio'] == "Mes" ? "Mês" : $_REQUEST['stTipoRelatorio'];
+    $obErro->setDescricao('É preciso selecionar ao menos um '.$stTipoRelatorio.'.');
+}
+
 if (Sessao::getExercicio() < '2013') {
     $preview = new PreviewBirt(6,36,6);
     $preview->setTitulo('Dem Disponibilidades de Caixa');
@@ -83,22 +88,72 @@ if (count($_REQUEST['inCodEntidade']) == 1 ) {
 }
 
 switch ($_REQUEST['stTipoRelatorio']) {
-    case 'UltimoQuadrimestre':
-        $preview->addParametro('periodo', $_REQUEST['cmbQuadrimestre']);
-        $numPeriodo = 'Quadrimestre';
+    case 'Mes':
+        $preview->addParametro('periodo', intval($_REQUEST['cmbMensal']));
+        $numPeriodo   = 'Mes';
+        $stMesExtenso = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMensal']))." de ".$stAno);
     break;
-    case 'UltimoSemestre':
+    case 'Quadrimestre':
+        $preview->addParametro('periodo', $_REQUEST['cmbQuadrimestre']);
+        $numPeriodo   = 'Quadrimestre';
+        $stMesExtenso = "";
+    break;
+    case 'Semestre':
         $preview->addParametro('periodo', $_REQUEST['cmbSemestre']);
-        $numPeriodo = 'Semestre';
+        $numPeriodo   = 'Semestre';
+        $stMesExtenso = "";
     break;
 }
 
 $preview->addParametro('tipo_periodo', $numPeriodo);
+$preview->addParametro('mes_extenso' , $stMesExtenso);
 
 $inPeriodo = $request->get('cmbQuadrimestre') != '' ? $request->get('cmbQuadrimestre') : $request->get('cmbSemestre');
 
-$stDataInicial = '01/01/'.$stAno;
-$stDataFinal = '31/12/'.$stAno;
+// Somente para estado de MG
+if ( (SistemaLegado::pegaConfiguracao( 'cod_uf', 2, Sessao::getExercicio() ) == 11) && (Sessao::getExercicio() >= '2014')) {
+ 
+    if ($request->get('stTipoRelatorio') == "Mes") {
+       
+        $stDataInicial = "01/".$_REQUEST['cmbMensal']."/".$stAno;
+        $stDataFinal   = sistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMensal'], $stAno);
+ 
+    } elseif ( $request->get('stTipoRelatorio') == "Quadrimestre" ) {
+       
+       switch ( $request->get('cmbQuadrimestre') ) {
+           case 1:
+               $stDataInicial = "01/01/".$stAno;
+               $stDataFinal   = "30/04/".$stAno;
+           break;
+           case 2:
+                $stDataInicial = "01/05/".$stAno;
+                $stDataFinal   = "31/08/".$stAno;
+           break;
+           case 3:
+                $stDataInicial = "01/09/".$stAno;
+                $stDataFinal   = "31/12/".$stAno;
+           break;
+       }
+       
+    } elseif ( $request->get('stTipoRelatorio') == 'Semestre') {
+        
+        switch ( $request->get('cmbSemestre') ) {
+            case 1:
+                $stDataInicial = "01/01/".$stAno;
+                $stDataFinal   = "30/06/".$stAno;
+            break;
+            case 2:
+                $stDataInicial = "01/07/".$stAno;
+                $stDataFinal   = "31/12/".$stAno;
+            break;
+        }
+        
+    }
+    
+} else {   
+    $stDataInicial = '01/01/'.$stAno;
+    $stDataFinal = '31/12/'.$stAno; 
+}
 
 $preview->addParametro( 'data_inicio', $stDataInicial );
 $preview->addParametro( 'data_fim'   , $stDataFinal );
@@ -137,7 +192,11 @@ $preview->addParametro( 'tipoAnexo', 'anexo5novo');
 #################################################################################################
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
-if( !$obErro->ocorreu() )
+
+if ( !$obErro->ocorreu() ) {
     $preview->preview();
-else
-    SistemaLegado::alertaAviso("FLModelosRGF.php?'.Sessao::getId().&stAcao=$stAcao", $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+} else {
+    SistemaLegado::alertaAviso("FLModelosRGF.php?'.Sessao::getId().&stAcao=".$_REQUEST['stAcao'], $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}
+
+?>

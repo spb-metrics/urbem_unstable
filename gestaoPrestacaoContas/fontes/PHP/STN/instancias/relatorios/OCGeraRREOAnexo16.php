@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-06.01.15
 
-    $Id: OCGeraRREOAnexo16.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCGeraRREOAnexo16.php 61154 2014-12-11 19:27:51Z franver $
 
 */
 
@@ -42,10 +42,21 @@ include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 
 if ($_REQUEST['stAcao'] == 'anexo12novo') {
-    if ($_REQUEST['cmbBimestre'] != 6) {
-        $preview = new PreviewBirt(6,36,47);
-    } else {
-        $preview = new PreviewBirt(6,36,48);
+    switch ($_REQUEST['stTipoRelatorio']) {
+        case 'Mes':
+            if ($_REQUEST['cmbMes'] != 12) {
+                $preview = new PreviewBirt(6,36,47);
+            } else {
+                $preview = new PreviewBirt(6,36,48);
+            }
+        break;
+        case 'Bimestre':
+            if ($_REQUEST['cmbBimestre'] != 6) {
+                $preview = new PreviewBirt(6,36,47);
+            } else {
+                $preview = new PreviewBirt(6,36,48);
+            }
+        break;
     }
 } else {
     $preview = new PreviewBirt(6,36,32);
@@ -110,21 +121,29 @@ $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHo
 $preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
 
 if ($_REQUEST['stAcao'] == 'anexo12novo') {
+    switch ($_REQUEST['stTipoRelatorio']) {
+        case 'Mes':
+            $preview->addParametro( 'descricaoPeriodo',utf8_encode(SistemaLegado::mesExtensoBR((intval($_REQUEST['cmbMes'])))." de ". Sessao::getExercicio()));
+            $preview->addParametro( 'periodo_extenso',utf8_encode('Mês'));
+            $preview->addParametro( 'periodo'  , $_REQUEST['cmbMes'] );
+            $preview->addParametro( 'data_inicial', '01/'.$_REQUEST['cmbMes'].'/'.Sessao::getExercicio() );
+            $preview->addParametro( 'data_final', SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'],Sessao::getExercicio()));
+        break;
+        case 'Bimestre':
+            SistemaLegado::periodoInicialFinalBimestre($stDataInicial,$stDataFinal,$_REQUEST['cmbBimestre'],Sessao::getExercicio());
+            $preview->addParametro( 'descricaoPeriodo', utf8_encode($_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio()) );
+            $preview->addParametro( 'periodo_extenso',utf8_encode('Bimestre'));
+            $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
+            $preview->addParametro( 'data_inicial', $stDataInicial );
+            $preview->addParametro( 'data_final'  , $stDataFinal );
+        break;
+    }
     $preview->addParametro( 'relatorio_novo', 'sim' );
-    $obTAdministracao = new TAdministracaoConfiguracao();
-    $obTAdministracao->setDado('exercicio',Sessao::getExercicio());
-    $obTAdministracao->setDado('cmbBimestre',$_REQUEST['cmbBimestre']);
-    $obTAdministracao->recuperaBimestre( $rsData);
-    $dataFinal = explode('=', $rsData->getCampo('bimestre'));
-    $dataFinal = explode(',', $dataFinal[1]);
-    $dataFinal =substr($dataFinal[1], 0, -1);
-    $dataFinal= str_replace("'"," ",$dataFinal);
 
-    $preview->addParametro( 'data_final', $dataFinal );
 } else {
+    $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
     $preview->addParametro( 'relatorio_novo', 'nao' );
 }
 #################################################################################################
-$preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'    ] );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 $preview->preview();

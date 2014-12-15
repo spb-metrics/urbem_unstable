@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCGeraRelatorioDemonstrativoRCL.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCGeraRelatorioDemonstrativoRCL.php 61191 2014-12-12 21:03:55Z jean $
   * $Date: 2014-08-12 10:06:21 -0300 (Tue, 12 Aug 2014) $
   * $Author: franver $
   * $Rev: 59281 $
@@ -39,6 +39,7 @@
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/Bimestre.class.php';
 include_once CAM_GPC_TCEMG_NEGOCIO."RTCEMGRelatorioDemostrativoRCL.class.php";
 include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoEntidade.class.php';
 include_once CLA_MPDF;
@@ -52,6 +53,8 @@ $obTOrcamentoEntidade->recuperaRelacionamentoNomes( $rsEntidade, $stCondicao );
 $inPrefeituraInstituto = null;
 $inCamara = null;
 
+$arEntidades = array();
+
 foreach($inEntidades as $stCodEntidade) {
     $tipoEntidade = SistemaLegado::pegaDado("parametro"
                                            ,"administracao.configuracao"
@@ -64,8 +67,23 @@ foreach($inEntidades as $stCodEntidade) {
     
     switch($tipoEntidade){
         case "prefeitura":
+            $inPrefeitura = SistemaLegado::pegaDado("valor"
+                                                            ,"administracao.configuracao"
+                                                            ,"WHERE cod_modulo = 8 
+                                                                AND parametro ilike 'cod_entidade_prefeitura'
+                                                                AND exercicio = '".Sessao::getExercicio()."';");
+            $arEntidades[] = $inPrefeitura;
+        break;
+            
         case "rpps":
-            $inPrefeituraInstituto = SistemaLegado::pegaDado("valor"
+            $rpps = SistemaLegado::pegaDado("valor"
+                                                            ,"administracao.configuracao"
+                                                            ,"WHERE cod_modulo = 8 
+                                                                AND parametro ilike 'cod_entidade_rpps'
+                                                                AND exercicio = '".Sessao::getExercicio()."';");
+            $arEntidades[] = $rpps;
+            
+            /*$inPrefeituraInstituto = SistemaLegado::pegaDado("valor"
                                                             ,"administracao.configuracao"
                                                             ,"WHERE cod_modulo = 8 
                                                                 AND parametro ilike 'cod_entidade_prefeitura'
@@ -73,7 +91,7 @@ foreach($inEntidades as $stCodEntidade) {
                                                             ,"administracao.configuracao"
                                                             ,"WHERE cod_modulo = 8 
                                                                 AND parametro ilike 'cod_entidade_rpps'
-                                                                AND exercicio = '".Sessao::getExercicio()."';");
+                                                                AND exercicio = '".Sessao::getExercicio()."';");*/
              break;
         
         case "camara":
@@ -82,26 +100,76 @@ foreach($inEntidades as $stCodEntidade) {
                                                ,"WHERE cod_modulo = 8 
                                                    AND parametro ilike 'cod_entidade_camara'
                                                    AND exercicio = '".Sessao::getExercicio()."';");
-             break;
+            $arEntidades[] = $inCamara;
+            break;
     }
 }
 
+$inCodEntidades = implode(",", $arEntidades);
+
 $obRTCEMGRelatorioDemostrativoRCL = new RTCEMGRelatorioDemostrativoRCL();
 
-if(!is_null($inPrefeituraInstituto) && !is_null($inCamara)){
-    $inCodEntidades = $inPrefeituraInstituto.",".$inCamara;
+if ((!is_null($inPrefeitura) && !is_null($rpps) && !is_null($inCamara))){
     $obRTCEMGRelatorioDemostrativoRCL->setTipoConsulta(null);
-}else if(!is_null($inPrefeituraInstituto)){
-    $inCodEntidades = $inPrefeituraInstituto;
+} else if (!is_null($inPrefeitura) || !is_null($rpps)) {
     $obRTCEMGRelatorioDemostrativoRCL->setTipoConsulta('PrefeituraInstituto');
-}else{
-    $inCodEntidades = $inCamara;
+} else {
     $obRTCEMGRelatorioDemostrativoRCL->setTipoConsulta('Camara');
 }
 
 $stExercicio = Sessao::getExercicio();
 $inPeriodo = $request->get('cmbPeriodo');
 
+switch ($request->get('stPeriodicidade')) {
+    case 'Bimestre':
+        $stDataInicial = Bimestre::getDataInicial($inPeriodo, $stExercicio);
+        $stDataFinal = Bimestre::getDataFinal($inPeriodo, $stExercicio);
+        $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
+        switch ($inPeriodo) {
+            case 1:
+                $data_ini = "01/03/".($stAno - 1);
+                $stExercicioRestos = $stAno - 1;
+            case 2:
+                $data_ini = "01/05/".($stAno - 1);
+                $stExercicioRestos = $stAno - 1;
+            break;
+            case 3:
+                $data_ini = "01/07/".($stAno - 1);
+                $stExercicioRestos = $stAno - 1;
+            break;
+            case 4:
+                $data_ini = "01/09/".($stAno - 1);
+                $stExercicioRestos = $stAno - 1;
+            break;
+            case 5:
+                $data_ini = "01/11/".($stAno - 1);
+                $stExercicioRestos = $stAno - 1;
+            break;
+            case 6:
+                $data_ini = "01/01/".$stAno;
+                $stExercicioRestos = $stAno;
+            break;
+        }
+    break;
+    case 'Semestre':
+        if ($inPeriodo == 1) {
+            $stDataInicial = "01/01/".$stExercicio;
+            $stDataFinal = SistemaLegado::retornaUltimoDiaMes(6,$stExercicio);
+        } else {
+            $stDataInicial = "01/07".$stExercicio;
+            $stDataFinal = SistemaLegado::retornaUltimoDiaMes(12,$stExercicio);
+        }
+    break;
+    case 'Mes':
+        $stDataInicial = "01/".$inPeriodo."/".$stExercicio;
+        $stDataFinal = SistemaLegado::retornaUltimoDiaMes($inPeriodo,$stExercicio);
+    break;
+}
+//sistemaLegado::mostravar($stDataInicial);
+//sistemaLegado::mostravar($stDataFinal);
+//die('Fim');
+//die('Fim');
+/*
 if ($request->get('stPeriodicidade') == 'Bimestre'){
     $stDataInicial = "01/".str_pad((string)(($inPeriodo*2)-1),2,'0',STR_PAD_LEFT)."/".$stExercicio;
     $stDataFinal = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stExercicio);
@@ -112,12 +180,13 @@ if ($request->get('stPeriodicidade') == 'Bimestre'){
     $stDataInicial = "01/".$inPeriodo."/".$stExercicio;
     $stDataFinal = SistemaLegado::retornaUltimoDiaMes($inPeriodo,$stExercicio);
 }
-
+*/
 $obRTCEMGRelatorioDemostrativoRCL->setExercicio    ($stExercicio);
 $obRTCEMGRelatorioDemostrativoRCL->setCodEntidades ($inCodEntidades);
 $obRTCEMGRelatorioDemostrativoRCL->setDataInicial  ($stDataInicial);
 $obRTCEMGRelatorioDemostrativoRCL->setDataFinal    ($stDataFinal);
 $obRTCEMGRelatorioDemostrativoRCL->setDataFinal    ($stDataFinal);
+$obRTCEMGRelatorioDemostrativoRCL->setExercicioRestos ($stExercicioRestos);
 $obRTCEMGRelatorioDemostrativoRCL->setTipoSituacao ($request->get("stSituacao"));
 
 $obRTCEMGRelatorioDemostrativoRCL->geraRecordSet($rsRecordSet);
@@ -148,7 +217,10 @@ $arDados = array( "arReceitas"                    => $rsRecordSet["arReceitas"],
                   "arValoresDemostrativoRCL"      => $rsRecordSet["arValoresDemostrativoRCL"],
                   "arCabecalhoMes"                => $arCabecalhoMeses
                   );
-
+//sistemaLegado::mostravar($stDataInicial);
+//sistemaLegado::mostravar($stDataFinal);
+//sistemaLegado::mostravar($arDados);
+//die('Fim');
 $obMPDF = new FrameWorkMPDF(6,55,7);
 $obMPDF->setCodEntidades($inCodEntidades);
 $obMPDF->setDataInicio($stDataInicial);

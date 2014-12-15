@@ -26,22 +26,17 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-*
-* $Revision: $
-* $Name: $
-* $Author: $
-* $Date: $
-*
-  $Id: $
+
+*  $Id: $
 *
 * Casos de uso: 
 */
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_pagamentos( stExercicio VARCHAR, inBimestre INTEGER, stEntidades VARCHAR ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo10_pagamentos( stExercicio VARCHAR, stDtFim VARCHAR, stEntidades VARCHAR ) RETURNS SETOF RECORD AS $$
 DECLARE
 
-    arDatas         VARCHAR[] ;
+    --arDatas         VARCHAR[] ;
     stDtIni         VARCHAR := '';
-    stDtFim         VARCHAR := '';
+    --stDtFim         VARCHAR := '';
 
     reRegistro      RECORD;
     stSql           VARCHAR := '';
@@ -49,8 +44,8 @@ DECLARE
 BEGIN
 
     stDtIni := '01/01/' || stExercicio;
-    arDatas := publico.bimestre ( stExercicio, inBimestre );
-    stDtFim := arDatas [ 1 ];
+    --arDatas := publico.bimestre ( stExercicio, inBimestre );
+    --stDtFim := arDatas [ 1 ];
 
     stSQL := '
     SELECT CAST(COALESCE(SUM(vl_pago), 0.00) AS NUMERIC(14,2)) AS vl_pago
@@ -97,7 +92,7 @@ BEGIN
          AND nlp.timestamp = nlpa.timestamp 
        WHERE nlp.cod_entidade IN (' || stEntidades || ')
          AND TO_DATE(nlp.timestamp::VARCHAR, ''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtIni || ''', ''dd/mm/yyyy'')
-                                                                 AND TO_DATE(''' || stDtfim || ''', ''dd/mm/yyyy'')  
+                                                                 AND TO_DATE(''' || stDtFim || ''', ''dd/mm/yyyy'')  
          AND r.exercicio =''' || stExercicio || '''
             /* Recursos do Fundeb devem ser definidos aqui.
                Em stn.vinculo_stn_recurso, cod_vinculo = 1 */
@@ -120,7 +115,7 @@ BEGIN
          WHERE tt.tipo =''T''
            AND tt.cod_entidade IN (' || stEntidades || ')
            AND tt.dt_autenticacao BETWEEN TO_DATE(''' || stDtIni || ''', ''dd/mm/yyyy'')
-                                      AND TO_DATE(''' || stDtfim || ''', ''dd/mm/yyyy'')
+                                      AND TO_DATE(''' || stDtFim || ''', ''dd/mm/yyyy'')
     UNION
         -- transferencia da conta debito
         SELECT (COALESCE(SUM(tt.valor), 0.00) * -1) as vl_pago
@@ -132,7 +127,7 @@ BEGIN
          WHERE tt.tipo = ''T''
            AND tt.cod_entidade IN (' || stEntidades || ')
            AND tt.dt_autenticacao BETWEEN TO_DATE(''' || stDtIni || ''', ''dd/mm/yyyy'')
-                                      AND TO_DATE(''' || stDtfim || ''', ''dd/mm/yyyy'')
+                                      AND TO_DATE(''' || stDtFim || ''', ''dd/mm/yyyy'')
     ) AS tabela 
     ';
 

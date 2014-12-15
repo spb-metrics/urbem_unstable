@@ -47,16 +47,23 @@ $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in ("
 
 $obErro = new Erro();
 
-if ( !$request->get('cmbBimestre') && !$request->get('cmbQuadrimestre') && !$request->get('cmbSemestre') ) {
+if ( !$request->get('cmbBimestre') && !$request->get('cmbQuadrimestre') && !$request->get('cmbSemestre') && !$request->get('cmbMensal') ) {
     $obErro->setDescricao('É preciso selecionar ao menos um '.$_REQUEST['stTipoRelatorio'].'.');
 }
 
 $stAno = Sessao::getExercicio();
 
-$preview = new PreviewBirt(6,36,2);
-$preview->setTitulo('Dem Dívida Consolidada Líquida');
-$preview->setVersaoBirt( '2.5.0' );
-$preview->setExportaExcel( true );
+if ($_REQUEST['stTipoRelatorio'] == "Mes") {    
+    $preview = new PreviewBirt(6,36,60);
+    $preview->setTitulo('Dem Dívida Consolidada Líquida');
+    $preview->setVersaoBirt( '2.5.0' );
+    $preview->setExportaExcel( true );
+}else{
+    $preview = new PreviewBirt(6,36,2);
+    $preview->setTitulo('Dem Dívida Consolidada Líquida');
+    $preview->setVersaoBirt( '2.5.0' );
+    $preview->setExportaExcel( true );
+}
 
 $preview->addParametro( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
@@ -90,8 +97,12 @@ if (in_array($stEntidadeRPPS, $_REQUEST['inCodEntidade'])) {
 }
 
 $inPeriodo="";
-
 switch( $_REQUEST['stTipoRelatorio'] ):
+    case 'Mes':
+        $preview->addParametro( 'periodo', $_REQUEST['cmbMensal'] );
+        $preview->addParametro( 'mes'    , SistemaLegado::mesExtensoBR($_REQUEST['cmbMensal']) );
+        $numPeriodo = $_REQUEST['cmbMensal'];
+        $inPeriodo = $_REQUEST['cmbMensal'];
     case 'Quadrimestre':
         $preview->addParametro( 'periodo', $_REQUEST['cmbQuadrimestre'] );
         $numPeriodo = $_REQUEST['cmbQuadrimestre'];

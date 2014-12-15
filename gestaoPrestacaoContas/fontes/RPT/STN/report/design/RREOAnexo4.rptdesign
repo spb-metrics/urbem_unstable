@@ -372,7 +372,7 @@ this.queryText += "          ate_bimestre        	numeric, \n";
 this.queryText += "          ate_bimestre_anterior 	numeric \n";
 this.queryText += " 		) \n";
 
-//params['query'] = this.queryText;]]></method>
+params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[SELECT ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -587,7 +587,7 @@ this.queryText += " 		) \n";
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[params['query'] = this.queryText;]]></method>
+            <method name="beforeOpen"><![CDATA[//params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[select * 
 from stn.fn_rreo_anexo5_despesas(?, ?, ?, ?, ?) as
@@ -676,6 +676,7 @@ this.queryText += ") 											\n";
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[//params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[select * from stn.fn_rreo_anexo5_saldo_disponivel(?, ?, ?, ?, ?) as 
 retorno (   descricao          varchar
@@ -1410,12 +1411,20 @@ INNER JOIN orcamento.despesa
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre</property>
-                    <expression name="expression">dataSetRow["ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes' ){
+0.00
+} else {
+dataSetRow["ate_bimestre"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_anterior</property>
-                    <expression name="expression">dataSetRow["ate_bimestre_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes'){
+0.00
+} else {
+dataSetRow["ate_bimestre_anterior"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -1664,7 +1673,7 @@ total</expression>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
+                            <text-property name="content"><![CDATA[No Período]]></text-property>
                         </text>
                     </cell>
                     <cell id="1183">
@@ -1686,7 +1695,7 @@ total</expression>
                             <property name="fontWeight">normal</property>
                             <property name="paddingTop">1pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1705,7 +1714,7 @@ total</expression>
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2011,12 +2020,20 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre</property>
                     <property name="displayName">vl_empenhado_ate_bimestre</property>
-                    <expression name="expression">dataSetRow["vl_empenhado_ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["vl_empenhado_ate_bimestre"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_anterior</property>
-                    <expression name="expression">dataSetRow["vl_empenhado_ate_bimestre_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["vl_empenhado_ate_bimestre_anterior"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2268,7 +2285,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
+                            <text-property name="content"><![CDATA[No Período]]></text-property>
                         </text>
                     </cell>
                     <cell id="1261">
@@ -2289,7 +2306,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2308,7 +2325,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2999,7 +3016,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
+                            <text-property name="content"><![CDATA[No Período]]></text-property>
                         </text>
                     </cell>
                     <cell id="2877">
@@ -3011,7 +3028,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -3021,7 +3038,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -3717,12 +3734,20 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre</property>
-                    <expression name="expression">dataSetRow["ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["ate_bimestre"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_anterior</property>
-                    <expression name="expression">dataSetRow["ate_bimestre_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["ate_bimestre_anterior"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -3971,7 +3996,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
+                            <text-property name="content"><![CDATA[No Período]]></text-property>
                         </text>
                     </cell>
                     <cell id="1460">
@@ -3993,7 +4018,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="paddingTop">1pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4012,7 +4037,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4355,12 +4380,20 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre</property>
-                    <expression name="expression">dataSetRow["vl_empenhado_ate_bimestre"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["vl_empenhado_ate_bimestre"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_anterior</property>
-                    <expression name="expression">dataSetRow["vl_empenhado_ate_bimestre_anterior"]</expression>
+                    <expression name="expression">if (params['periodicidade'] == 'mes') {
+0.00
+} else {
+dataSetRow["vl_empenhado_ate_bimestre_anterior"]
+}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -4552,7 +4585,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[No Bimestre]]></text-property>
+                            <text-property name="content"><![CDATA[No Período]]></text-property>
                         </text>
                     </cell>
                     <cell id="1510">
@@ -4573,7 +4606,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4592,7 +4625,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>

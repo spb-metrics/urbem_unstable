@@ -39,8 +39,8 @@ $preview->setTitulo(' Demonstrativo da Aplicação nas Ações e Serviços Públ
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel( true );
 
-$stFiltroAplicacao = ' AND od.cod_entidade IN  ('.implode(',', $_REQUEST['inCodEntidade']).') AND od.cod_recurso = 102 AND od.cod_funcao = 10 AND od.cod_subfuncao IN (122,272,301,302,303,304,305)';
-$boRestos   = $request->get("stRestos") == "true" ? "true" : "false";
+$stFiltroAplicacao = " AND od.cod_entidade IN  (".implode(",", $_REQUEST["inCodEntidade"]).") AND od.cod_recurso = 102 AND od.cod_funcao = 10 AND od.cod_subfuncao IN (122,272,301,302,303,304,305) ";
+$boRestos          = $request->get("stRestos") == "true" ? "true" : "false";
 
 switch ($_REQUEST['stDemonstrarDespesa']){
     case "E": $stTipoSituacao = "empenhado"; break;
@@ -48,7 +48,25 @@ switch ($_REQUEST['stDemonstrarDespesa']){
     case "P": $stTipoSituacao = "pago";      break;
 }
 
-$preview->addParametro('stExercicio'      , Sessao::getExercicio() );
+switch ($request->get('inPeriodicidade')) {
+    case 1: // Dia
+            $preview->addParametro('stDescricaoPeriodo' , "Dia: ".$request->get('stDia') );
+    break;
+    
+    case 2: // Mês
+            $preview->addParametro('stDescricaoPeriodo' , $request->get('stDataInicial')." at&eacute; ".$request->get('stDataFinal') );
+    break;
+    
+    case 3: // Ano
+            $preview->addParametro('stDescricaoPeriodo' ,  Sessao::getExercicio() );
+    break;
+    
+    case 4: // Intervalo
+            $preview->addParametro('stDescricaoPeriodo' , "Intervalo de ".$request->get('stPeriodoInicial')." at&eacute; ".$request->get('stPeriodoFinal') );
+    break;
+}
+
+$preview->addParametro('stExercicio'      , Sessao::getExercicio()     );
 $preview->addParametro('filtro_aplicacao' , $stFiltroAplicacao         );
 $preview->addParametro('data_inicial'     , $_REQUEST['stDataInicial'] );
 $preview->addParametro('data_final'       , $_REQUEST['stDataFinal']   );
