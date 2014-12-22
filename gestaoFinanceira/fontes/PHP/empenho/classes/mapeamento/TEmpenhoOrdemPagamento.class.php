@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamento.class.php 61181 2014-12-12 18:12:21Z franver $
+    $Id: TEmpenhoOrdemPagamento.class.php 61219 2014-12-17 15:18:49Z michel $
 
     * Casos de uso: uc-02.03.12,uc-02.03.16,uc-02.03.05,uc-02.04.05,uc-02.03.28
 */
@@ -2277,7 +2277,8 @@ class TEmpenhoOrdemPagamento extends Persistente
                             ,oa.timestamp              
                             ,sum(opla.vl_anulado) as valor
                             ,op.exercicio                         
-                            ,c.nom_cgm as beneficiario                                     
+                            ,c.nom_cgm as beneficiario
+                            ,pe.implantado
                     FROM                                                               
                          empenho.ordem_pagamento AS op                                 
                     JOIN empenho.ordem_pagamento_anulada AS oa 
@@ -2336,7 +2337,8 @@ class TEmpenhoOrdemPagamento extends Persistente
                             ,to_char(oa.timestamp,'dd/mm/yyyy')    
                             ,oa.timestamp        
                             ,op.exercicio
-                            ,c.nom_cgm                                 
+                            ,c.nom_cgm
+                            ,pe.implantado
                     ";
 
         $stSql = $this->montaRecuperaRelacionamentoReemitir().$stCondicao.$stGrupo.$stOrdem;

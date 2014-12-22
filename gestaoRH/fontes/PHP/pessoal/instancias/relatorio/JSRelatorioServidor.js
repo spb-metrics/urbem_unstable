@@ -21,34 +21,8 @@
     *                                                                                *
     **********************************************************************************
 */
-</script>
-<?php
-/**
-* Página de JavaScript para relatório de Servidor
-* Data de Criação   : 15/07/2005
 
 
-* @author Analista: Vandré Miguel Ramos
-* @author Desenvolvedor: Diego Lemos de Souza
-
-* @ignore
-
-$Revision: 30566 $
-$Name$
-$Author: vandre $
-$Date: 2006-08-08 14:53:12 -0300 (Ter, 08 Ago 2006) $
-
-* Casos de uso: uc-04.04.12
-*/
-
-/*
-$Log$
-Revision 1.4  2006/08/08 17:48:19  vandre
-Adicionada tag log.
-
-*/
-?>
-<script language="JavaScript">
 function atualizaFormularioFiltro(){
     document.frm.stCtrl.value = 'atualizaFormularioFiltro';    
     var stTraget = document.frm.target;
@@ -92,13 +66,25 @@ function limpaForm() {
 function selecionarTodos(){
     if (jq('#boTodos').prop('checked')) {
         jq(':checkbox').each(function() {
-                                            this.checked = true;           
-                                        });
+            this.checked = true;           
+        });
     } else {
         jq(':checkbox').each(function() {
-                                            this.checked = false;                   
-                                        });
+            this.checked = false;                   
+        });
     }
+}
+
+function validaVisualizacoes(){
+
+    $checkedInputs = jQuery('#frm').find(':checkbox:checked');
+        
+    if ($checkedInputs.length) {
+        return true;    
+    } else {
+        alertaAviso('@Informe ao menos uma opção de visualização.','form','erro','<?=Sessao::getId();?>');
+    }    
+
 }
 
 </script>

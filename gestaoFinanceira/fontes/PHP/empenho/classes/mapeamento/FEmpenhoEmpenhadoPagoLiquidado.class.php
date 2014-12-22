@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: FEmpenhoEmpenhadoPagoLiquidado.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FEmpenhoEmpenhadoPagoLiquidado.class.php 61245 2014-12-19 21:08:54Z arthur $
 
     $Revision: 32880 $
     $Name$
@@ -185,6 +185,48 @@ function montaConsultaValorConta()
     $stSql .= " WHERE                                                    ".$stQuebra;
     $stSql .= "     empenho NOT NULL                                 ".$stQuebra;
 
+    return $stSql;
+}
+
+function recuperaLiquidadoTotal(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stGroup = "";
+    
+    $stSql = $this->montaRecuperaLiquidadoTotal().$stFiltro.$stGroup.$stOrdem;
+    
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+    return $obErro;
+}
+
+function montaRecuperaLiquidadoTotal()
+{
+    $stSql  = "SELECT * FROM empenho.fn_empenho_liquidado_total('".$this->getDado("exercicio")."', ".$this->getDado("stEntidade").", '".$this->getDado("stDataInicial")."', '".$this->getDado("stDataFinal")."') AS vl_total;";
+    return $stSql;
+}
+
+function recuperaLiquidadoAnuladoTotal(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stGroup = "";
+    
+    $stSql = $this->montaRecuperaLiquidadoAnuladoTotal().$stFiltro.$stGroup.$stOrdem;
+    
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+    return $obErro;
+}
+
+function montaRecuperaLiquidadoAnuladoTotal()
+{
+    $stSql  = "SELECT * FROM empenho.fn_empenho_liquidado_anulado_total('".$this->getDado("exercicio")."', ".$this->getDado("stEntidade").", '".$this->getDado("stDataInicial")."', '".$this->getDado("stDataFinal")."') AS vl_total_anulado;";
     return $stSql;
 }
 

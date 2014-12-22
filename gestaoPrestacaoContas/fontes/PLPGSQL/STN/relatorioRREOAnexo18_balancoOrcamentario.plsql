@@ -129,7 +129,8 @@ BEGIN
            , vl_empenhado_bimestre   NUMERIC  
            , vl_empenhado_total      NUMERIC  
            , vl_liquidado_bimestre   NUMERIC  
-           , vl_liquidado_total      NUMERIC  
+           , vl_liquidado_total      NUMERIC
+           , vl_pago_total           NUMERIC
            , percentual              NUMERIC  
            , saldo_liquidar          NUMERIC
            )

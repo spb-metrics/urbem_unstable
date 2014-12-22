@@ -34,7 +34,8 @@ DECLARE
     
     SEQUENCIA           INTEGER;
     SEQUENCIAAUX        INTEGER;
-    
+    INCONTCONFIGURACAO INTEGER := 0;
+        
     CODPLANODEB         INTEGER;
     CODPLANOCRED        INTEGER;
     
@@ -207,7 +208,13 @@ BEGIN
                 FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
                 LOOP
                         SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
+                        INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
                 END LOOP;
+                
+                IF ( INCONTCONFIGURACAO = 0 ) THEN
+                    RAISE EXCEPTION 'Configuração dos lançamentos de despesa não configurados para esta despesa.';
+                END IF;
+        
             END IF;
 
             SQLCONTAFIXA := '
@@ -298,6 +305,7 @@ BEGIN
             ';
         
         ELSE
+        
             SQLCONTAFIXA := '
                 SELECT tabela_debito.plano_debito
                      , tabela_debito.estrutural_debito
@@ -353,8 +361,13 @@ BEGIN
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                 SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
+                INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
             END LOOP;
-        
+            
+         IF ( INCONTCONFIGURACAO = 0 ) THEN
+            RAISE EXCEPTION 'Contas do recurso não cadastradas!.';
+         END IF;
+         
       ELSE
       --  nao processado Liquidado
 
@@ -368,7 +381,6 @@ BEGIN
             CREDITO2 = '63299%';
             DEBITO3 = '82113%';
        END IF;
-
            
         IF boImplantado = FALSE  THEN
             SQLCONTAFIXA := 'SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS plano_debito
@@ -493,8 +505,12 @@ BEGIN
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                     SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
+                    INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
             END LOOP;
    
+            IF ( INCONTCONFIGURACAO = 0 ) THEN
+              RAISE EXCEPTION 'Configuração dos lançamentos de despesa não configurados para esta despesa.';
+            END IF;
   
             SQLCONTAFIXA := '
                 SELECT debito.cod_estrutural AS estrutural_debito

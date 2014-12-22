@@ -67,7 +67,10 @@ BEGIN
         dtFim := '31/12/' || stExercicio;
     END IF;
 
-    stSql := 'SELECT SUM( CASE WHEN TE.dt_empenho >= TO_DATE('|| quote_literal(dtInicioAno) ||',''dd/mm/yyyy'') AND
+    stSql := 'SELECT (coalesce(Empenhado.empenhado_ano - (coalesce(EAnulada.anulado_ano,0.00)),0.00)) AS empenhado_ano,
+                     (coalesce(Empenhado.empenhado_per - (coalesce(EAnulada.anulado_per,0.00)),0.00)) AS empenhado_per
+               FROM
+               (SELECT SUM( CASE WHEN TE.dt_empenho >= TO_DATE('|| quote_literal(dtInicioAno) ||',''dd/mm/yyyy'') AND
                                     TE.dt_empenho <= TO_DATE('|| quote_literal(stDtFinal) ||',''dd/mm/yyyy'') 
                                THEN TE.vl_total
                                ELSE 0.00
@@ -90,8 +93,33 @@ BEGIN
                  And TE.cod_subfuncao  = ' || inCodSubFuncao  || '
                  And TE.cod_programa   = ' || inCodPrograma   || '
                  And TE.cod_recurso    = ' || inCodRecurso    || '
-                 And TE.cod_despesa    = ' || inCodReduzido;
-    
+                 And TE.cod_despesa    = ' || inCodReduzido   || ') AS Empenhado,
+
+               (SELECT SUM( CASE WHEN TEA.dt_anulado >= TO_DATE('|| quote_literal(dtInicioAno) ||',''dd/mm/yyyy'') AND
+                                    TEA.dt_anulado <= TO_DATE('|| quote_literal(stDtFinal) ||',''dd/mm/yyyy'') 
+                               THEN TEA.vl_anulado
+                               ELSE 0.00
+                          END
+                    ) AS anulado_ano,
+                    SUM( CASE WHEN TEA.dt_anulado >= TO_DATE('|| quote_literal(stDtInicial) ||',''dd/mm/yyyy'') AND
+                                   TEA.dt_anulado <= TO_DATE('|| quote_literal(stDtFinal) ||',''dd/mm/yyyy'')  
+                               THEN TEA.vl_anulado
+                               ELSE 0.00
+                         END
+                    ) AS  anulado_per
+               from
+                    tmp_empenhado_anulada  as TEA
+
+               WHERE TEA.cod_conta      = ' || inCodConta      || '
+                 And TEA.num_unidade    = ' || inCodUnidade    || '
+                 And TEA.num_orgao      = ' || inCodOrgao      || '
+                 And TEA.num_pao        = ' || inCodNumPAO     || '
+                 And TEA.cod_funcao     = ' || inCodFuncao     || '
+                 And TEA.cod_subfuncao  = ' || inCodSubFuncao  || '
+                 And TEA.cod_programa   = ' || inCodPrograma   || '
+                 And TEA.cod_recurso    = ' || inCodRecurso    || '
+                 And TEA.cod_despesa    = ' || inCodReduzido   || ') AS EAnulada';
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
         nuRetorno := reRegistro.empenhado_per;

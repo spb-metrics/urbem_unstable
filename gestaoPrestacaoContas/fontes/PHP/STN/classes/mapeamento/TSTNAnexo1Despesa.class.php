@@ -42,7 +42,7 @@ class TSNT_RREO_AnexoI_Despesa extends Persistente
     public function TSNT_RREO_AnexoI_Despesa()
     {
         parent::Persistente();
-        $this->setTabela('stn.fn_rreo_anexo1_desepesas');
+        $this->setTabela('stn.fn_rreo_anexo1_despesas');
 
         $this->AddCampo( 'grupo'                 ,'integer', false, ''    , false, false );
         $this->AddCampo( 'nivel'                 ,'integer', false, ''    , false, false );
@@ -55,13 +55,14 @@ class TSNT_RREO_AnexoI_Despesa extends Persistente
         $this->AddCampo( 'vl_empenhado_total'    ,'numeric', false, '14.2', false, false );
         $this->AddCampo( 'vl_liquidado_bimestre' ,'numeric', false, '14.2', false, false );
         $this->AddCampo( 'vl_liquidado_total'    ,'numeric', false, '14.2', false, false );
+        $this->AddCampo( 'vl_pago_total'         ,'numeric', false, '14.2', false, false );
         $this->AddCampo( 'percentual'            ,'numeric', false, '14.2', false, false );
         $this->AddCampo( 'saldo_liquidar'        ,'numeric', false, '14.2', false, false );
     }
 
     public function montaRecuperaTodos()
     {
-        $stSql .= "select * from stn.fn_rreo_anexo1_despesas( '".$this->getDado("exercicio")."', " . $this->getDado("bimestre"). " , '". $this->getDado('entidades')."'  ) as\n";
+        $stSql .= "select * from stn.fn_rreo_anexo1_despesas( '".$this->getDado("exercicio")."', '" . $this->getDado("dt_inicial"). "' , '" . $this->getDado("dt_final"). "', '". $this->getDado('entidades')."'  ) as\n";
         $stSql .= "retorno (                                                                                          \n";
         $stSql .= "grupo                   integer ,                                                                  \n";
         $stSql .= "cod_estrutural          varchar ,                                                                  \n";
@@ -74,6 +75,7 @@ class TSNT_RREO_AnexoI_Despesa extends Persistente
         $stSql .= "vl_empenhado_total      numeric(14,2) ,                                                            \n";
         $stSql .= "vl_liquidado_bimestre   numeric(14,2) ,                                                            \n";
         $stSql .= "vl_liquidado_total      numeric(14,2) ,                                                            \n";
+        $stSql .= "vl_pago_total           numeric(14,2) ,                                                            \n";
         $stSql .= "percentual              numeric(14,2) ,                                                            \n";
         $stSql .= "saldo_liquidar          numeric(14,2) )                                                            \n";
 

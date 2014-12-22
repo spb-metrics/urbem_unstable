@@ -43,6 +43,7 @@ include_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoConta.class.php';
 include_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoContaAnalitica.class.php';
 include_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoContaGeral.class.php';
 include_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoContaEstrutura.class.php';
+include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoUF.class.php");
 
 //Define o nome dos arquivos PHP
 $stPrograma = 'ManterEscolhaPlanoConta';
@@ -60,6 +61,17 @@ $obRContabilidadePlanoContaHistorico = new RContabilidadePlanoContaHistorico;
 $obRContabilidadePlanoContaHistorico->setExercicio($_REQUEST['stExercicio']);
 $obRContabilidadePlanoContaHistorico->verificaUltimoPlanoEscolhido($rsPlanos, '', $boTransacao);
 
+//Busca o UF do sistema
+$inCodUFSistema = trim(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()));
+
+$obTUF = new TUF;
+$stFiltroUF = " WHERE cod_uf = ".$inCodUFSistema;
+$obTUF->recuperaTodos( $rsUF, $stFiltroUF, "nom_uf");
+while (!$rsUF->eof()) {
+    $inStUFSistema = trim($rsUF->getCampo('nom_uf'));
+    $rsUF->proximo();
+}
+
 // $boIncluir
 if ($rsPlanos->getNumLinhas() > 0) {
     //Já tem um plano configurado para este ano, então deve-se alterar o existente
@@ -70,26 +82,24 @@ if ($rsPlanos->getNumLinhas() > 0) {
 
 if ($_REQUEST['inCodPlano']) {
     $arCodPlano = explode('_', $_REQUEST['inCodPlano']);
-    $inCodUF = $arCodPlano[0];
+    $inCodUF = trim($arCodPlano[0]);
     $inCodPlano = $arCodPlano[1];
 
-    if ($boPlanoConfigurado) {
-        if ($inCodUF == $rsPlanos->getCampo('cod_uf') && $inCodPlano == $rsPlanos->getCampo('cod_plano') && $request->get('stExercicio') == $rsPlanos->getCampo('exercicio')) {
-            $obErro->setDescricao('Plano escolhido já é o Plano atual.');
+    if($inCodUFSistema==$inCodUF||$inCodUF==0){
+        if ($boPlanoConfigurado) {
+            if ($inCodUF == $rsPlanos->getCampo('cod_uf') && $inCodPlano == $rsPlanos->getCampo('cod_plano') && $request->get('stExercicio') == $rsPlanos->getCampo('exercicio')) {
+                $obErro->setDescricao('Plano escolhido já é o Plano atual.');
+            }
+    
+            if ($inCodUF == $rsPlanos->getCampo('cod_uf') && $inCodPlano < $rsPlanos->getCampo('cod_plano') && $request->get('stExercicio') == $rsPlanos->getCampo('exercicio')) {
+                $obErro->setDescricao('Não é possível escolher uma versão anterior a atual.');
+            }
         }
-
-        if ($inCodUF == $rsPlanos->getCampo('cod_uf') && $inCodPlano < $rsPlanos->getCampo('cod_plano') && $request->get('stExercicio') == $rsPlanos->getCampo('exercicio')) {
-            $obErro->setDescricao('Não é possível escolher uma versão anterior a atual.');
-        }
+    }else{
+        $obErro->setDescricao('O estado do plano de contas não pode ser alterado. Selecione uma versão do plano de contas do Estado '.$inStUFSistema.' ou da União.');
     }
 } else {
     $obErro->setDescricao('Deve ser selecionada uma versão do plano de contas.');
-}
-
-if ($_REQUEST['hdnVersaoAtual'] != '') {
-    if ($_REQUEST['hdnVersaoAtual'] != $inCodUF) {
-        $obErro->setDescricao('O estado do plano de contas não pode ser alterado. Selecione uma versão do plano de contas do '.$_REQUEST['hdnNomeVersaoAtual']);
-    }
 }
 
 $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao;

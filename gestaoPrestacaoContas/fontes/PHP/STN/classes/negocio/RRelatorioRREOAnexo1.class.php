@@ -64,10 +64,13 @@ class RRelatorioRREOAnexo1 extends PersistenteRelatorio
         if (count($this->arEntidades) >0 ) {
             $stEntidades = implode ( ',', $this->arEntidades) ;
         }
+        
+        SistemaLegado::periodoInicialFinalBimestre($stDtInicial, $stDtFinal, $this->getBimestre(), Sessao::getExercicio());
 
         $obTReceita = new TSNT_RREO_AnexoI_Receita;
-        $obTReceita->setDado( 'exercicio', $this->getExercicio() );
-        $obTReceita->setDado( 'bimestre' , $this->getBimestre()  );
+        $obTReceita->setDado( 'exercicio', $this->getExercicio() );        
+        $obTReceita->setDado( 'dt_inicial', $stDtInicial         );
+        $obTReceita->setDado( 'dt_final'  , $stDtFinal           );
         $obTReceita->setDado( 'entidades', $stEntidades          );
         $obTReceita->recuperaTodos( $rsRecordset );
         $arDados['receita'] = $rsRecordset->arElementos;
@@ -136,7 +139,8 @@ class RRelatorioRREOAnexo1 extends PersistenteRelatorio
 
         $obTDespesa = new TSNT_RREO_AnexoI_Despesa;
         $obTDespesa->setDado( 'exercicio' , $this->getExercicio() );
-        $obTDespesa->setDado( 'bimestre'  ,  $this->getBimestre() );
+        $obTDespesa->setDado( 'dt_inicial', $stDtInicial          );
+        $obTDespesa->setDado( 'dt_final'  , $stDtFinal            );
         $obTDespesa->setDado( 'entidades', $stEntidades           );
         $obTDespesa->recuperaTodos( $rsRecordset );
         $arDados['despesas'] = $rsRecordset->arElementos;

@@ -114,7 +114,6 @@ BEGIN
                                     , total_mes_11   NUMERIC
                                     , total_mes_12   NUMERIC
                                    );
-
     ----------------------------------------------------
     -- Retorna o valor do vinculo da RCL 
     ----------------------------------------------------
@@ -141,7 +140,7 @@ BEGIN
              , ordem
              , descricao
              , vl_no_periodo
-             , vl_ate_periodo + COALESCE(' || flValorRCL || ',0)
+             , vl_ate_periodo -- + COALESCE(' || flValorRCL || ',0)
           FROM tmp_retorno  
       ORDER BY grupo
              , ordem';

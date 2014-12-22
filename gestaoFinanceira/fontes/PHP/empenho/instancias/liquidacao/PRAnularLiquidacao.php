@@ -89,11 +89,14 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
 
 switch ($stAcao) {
     case "anular":
+        SistemaLegado::LiberaFrames(true, false);
+        Sessao::setTrataExcecao(true);
+
         $obREmpenhoEmpenho->setExercicio ( $_REQUEST["dtExercicioEmpenho"] );
         $obREmpenhoEmpenho->setCodEmpenho ( $_REQUEST["inCodEmpenho"] );
         $obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
         $obREmpenhoEmpenho->obROrcamentoDespesa->setCodDespesa( $_REQUEST["inCodDespea"] );
-        $obErro = $obREmpenhoEmpenho->consultar();
+        $obErro = $obREmpenhoEmpenho->consultar($boTransacao);
         if (SistemaLegado::comparaDatas( $_POST['stDtEstorno'], date('d/m/Y'))) {
             $obErro->setDescricao("Campo Data de Anulação deve ser menor ou igual a data de hoje.");
         }
@@ -106,7 +109,6 @@ switch ($stAcao) {
             $obREmpenhoNotaLiquidacao->setDtVencimento ( $_REQUEST["dtValidadeFinal"] );
             $obREmpenhoNotaLiquidacao->setCodNota ( $_REQUEST["inCodNota"] );
             $obREmpenhoNotaLiquidacao->setCodContaContabilFinanc ( $_REQUEST["inCodContaContabilFinanc"] );
-
             $obREmpenhoNotaLiquidacao->setCodHistorico ( $_REQUEST["inCodHistoricoPatrimon"] );
             $obREmpenhoNotaLiquidacao->setComplemento ( $_REQUEST["stComplemento"] );
             $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $_POST['inNumOrgao'] );
@@ -125,9 +127,11 @@ switch ($stAcao) {
                 $obREmpenhoEmpenho->arItemPreEmpenho[$inContItens]->setValorAAnular( $arItemPreEmpenho[$obREmpenhoEmpenho->arItemPreEmpenho[$inContItens]->getNumItem()] );
             }
         }
-    if ( !$obErro->ocorreu() ) {
-        $obErro = $obREmpenhoNotaLiquidacao->anularItens();
-    }
+        
+        if ( !$obErro->ocorreu() ) {
+            $obErro = $obREmpenhoNotaLiquidacao->anularItens($boTransacao );
+        }
+        
         if ( !$obErro->ocorreu() ) {
             $stLink = "&pg=".Sessao::read('pg')."&pos=".Sessao::read('pos');
             SistemaLegado::alertaAviso($pgList.$stLink, "Nota n. ".$obREmpenhoNotaLiquidacao->getCodNota()."/".$obREmpenhoNotaLiquidacao->getExercicio() , "incluir", "aviso", Sessao::getId(), "../");
@@ -140,6 +144,7 @@ switch ($stAcao) {
             SistemaLegado::exibeAviso( urlencode( $obErro->getDescricao()), "n_incluir", "erro" );
         }
         SistemaLegado::LiberaFrames(true, false);
+        Sessao::encerraExcecao();
     break;
 
 }

@@ -43,7 +43,11 @@ include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"             
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
 
 if ($_REQUEST['stAcao'] == 'anexo6novo') {
-    $preview = new PreviewBirt(6,36,25);
+    if (Sessao::getExercicio() >= '2015') {
+        $preview = new PreviewBirt(6,36,64);
+    }else{
+        $preview = new PreviewBirt(6,36,25);
+    }
 } else {
     $preview = new PreviewBirt(6,36,56);
 }

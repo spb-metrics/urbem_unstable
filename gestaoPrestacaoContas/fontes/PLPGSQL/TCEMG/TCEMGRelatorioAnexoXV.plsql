@@ -59,6 +59,7 @@ DECLARE
     arPaga                        NUMERIC[] := Array[0];
     arLiquidado                   NUMERIC[] := Array[0];
     nuValorSubTotal               NUMERIC;
+    nuValorTotalAnuladas          NUMERIC := 0.00;
     
     reRegistro                    RECORD;
 BEGIN
@@ -122,14 +123,74 @@ BEGIN
                        INNER JOIN empenho.item_pre_empenho AS EIPE
                                ON EPE.exercicio       = EIPE.exercicio
                               AND EPE.cod_pre_empenho = EIPE.cod_pre_empenho
+                            
+                            WHERE EPE.exercicio = ''' || stExercicio  ||''' ' || stFiltro ;
+                      stSql := stSql || ')';
 
-                        LEFT JOIN empenho.empenho_anulado AS ea
+                      EXECUTE stSql;
+                      
+            stSql := 'CREATE TEMPORARY TABLE tmp_empenhado_anulada AS (
+                       SELECT
+                             ea.timestamp          AS dt_anulado,
+                             eai.vl_anulado        AS vl_anulado,
+                             OCD.cod_conta         AS cod_conta,
+                             OD.num_orgao          AS num_orgao,
+                             OD.num_unidade        AS num_unidade,
+                             OD.cod_funcao         AS cod_funcao,
+                             OD.cod_subfuncao      AS cod_subfuncao,
+                             acao.num_acao         AS num_pao,
+                             programa.num_programa AS cod_programa,
+                             OD.cod_entidade       AS cod_entidade,
+                             OD.cod_recurso        AS cod_recurso,
+                             OD.cod_despesa        AS cod_despesa
+        
+                        FROM orcamento.despesa     AS OD
+                             
+                       INNER JOIN orcamento.recurso(''' || stExercicio || ''') AS oru
+                               ON oru.cod_recurso = od.cod_recurso
+                              AND oru.exercicio   = od.exercicio
+                             
+                       INNER JOIN orcamento.programa_ppa_programa
+                               ON programa_ppa_programa.cod_programa = od.cod_programa
+                              AND programa_ppa_programa.exercicio    = od.exercicio
+                             
+                       INNER JOIN ppa.programa
+                               ON ppa.programa.cod_programa = programa_ppa_programa.cod_programa_ppa
+                             
+                       INNER JOIN orcamento.pao_ppa_acao
+                               ON pao_ppa_acao.num_pao   = od.num_pao
+                              AND pao_ppa_acao.exercicio = od.exercicio
+                             
+                       INNER JOIN ppa.acao 
+                               ON ppa.acao.cod_acao = pao_ppa_acao.cod_acao
+                             
+                       INNER JOIN empenho.pre_empenho_despesa as EPED
+                               ON EPED.exercicio   = OD.exercicio
+                              And EPED.cod_despesa = OD.cod_despesa 
+                       
+                       INNER JOIN orcamento.conta_despesa as OCD
+                               ON OCD.cod_conta = EPED.cod_conta
+                              AND OCD.exercicio = EPED.exercicio
+                     
+                       INNER JOIN empenho.pre_empenho AS EPE
+                               ON EPED.exercicio        = EPE.exercicio
+                              AND EPED.cod_pre_empenho  = EPE.cod_pre_empenho
+                              
+                       INNER JOIN  empenho.empenho AS EE
+                               ON EPE.exercicio        = EE.exercicio
+                              AND EPE.cod_pre_empenho  = EE.cod_pre_empenho
+                              
+                       INNER JOIN empenho.item_pre_empenho AS EIPE
+                               ON EPE.exercicio       = EIPE.exercicio
+                              AND EPE.cod_pre_empenho = EIPE.cod_pre_empenho
+
+                       INNER JOIN empenho.empenho_anulado AS ea
                                ON ea.exercicio    = EE.exercicio
                               AND ea.cod_entidade = EE.cod_entidade
                               AND ea.cod_empenho  = EE.cod_empenho
                               AND TO_DATE( TO_CHAR( ea.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'') BETWEEN TO_DATE('''|| stDataInicial ||''',''dd/mm/yyyy'') AND TO_DATE('''|| stDataFinal ||''',''dd/mm/yyyy'')
           
-                        LEFT JOIN empenho.empenho_anulado_item AS eai
+                       INNER JOIN empenho.empenho_anulado_item AS eai
                                ON eai.exercicio       = ea.exercicio
                               AND eai.cod_entidade    = ea.cod_entidade
                               AND eai.cod_empenho     = ea.cod_empenho
@@ -140,7 +201,7 @@ BEGIN
                             
                             WHERE EPE.exercicio = ''' || stExercicio  ||''' ' || stFiltro ;
                       stSql := stSql || ')';
-        
+
                       EXECUTE stSql;
             END IF;
         
@@ -1205,14 +1266,24 @@ stSql := '
            GROUP BY cod_funcao, cod_subfuncao
     ) AS tab;
 
+    IF ( stTipoSituacao = 'empenhado' ) THEN
+        --ATUALIZAR COM OS VALORES DAS ANULADAS
+        SELECT SUM(vl_anulado) INTO nuValorTotalAnuladas
+            FROM tmp_empenhado_anulada 
+            WHERE cod_funcao = 10 
+            AND cod_recurso = 102
+            AND cod_subfuncao IN ( 122,272,301,302,303,304,305 );
+    END IF;
+
    FOR reRegistro IN EXECUTE stSql
-   LOOP
-      reRegistro.vl_sub_total = nuValorSubTotal;
+   LOOP    
+      reRegistro.vl_sub_total = nuValorSubTotal - nuValorTotalAnuladas;
       RETURN next reRegistro; 
    END LOOP;
 
     IF stVerificaCreateDropTables = '' or stVerificaCreateDropTables = null or stVerificaCreateDropTables = 'drop' THEN
         DROP TABLE IF EXISTS tmp_empenhado;
+        DROP TABLE IF EXISTS tmp_empenhado_anulada;
         DROP TABLE IF EXISTS tmp_nota_liquidacao;
         DROP TABLE IF EXISTS tmp_nota_liquidacao_anulada;
         DROP TABLE IF EXISTS tmp_nota_liquidacao_paga;
@@ -1225,5 +1296,4 @@ stSql := '
     
     RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;

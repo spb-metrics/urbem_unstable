@@ -236,7 +236,7 @@ $obBtnClean->obEvento->setOnClick   ( "limpaForm();"    );
 $obBtnClean->setDisabled            ( false                         );
 
 $obBtnOK = new Ok;
-$obBtnOK->obEvento->setOnClick ( "eval(jQuery('#hdnTipoFiltro').val()); Salvar();" );
+$obBtnOK->obEvento->setOnClick ( "eval(jQuery('#hdnTipoFiltro').val()); if (validaVisualizacoes()) { Salvar(); }" );
 $botoesForm = array ( $obBtnOK , $obBtnClean );
 
 $obFormulario->defineBarra($botoesForm);

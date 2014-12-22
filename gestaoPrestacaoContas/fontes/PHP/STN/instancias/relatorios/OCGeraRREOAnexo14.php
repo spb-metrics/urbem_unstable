@@ -59,9 +59,11 @@ for ($i=0; $i< count($arValores); $i++ ) {
     }
 }
 
-if ($_POST['stAcao'] == "anexo11novo") {
+if ($_POST['stAcao'] == "anexo11novo" && Sessao::getExercicio() < '2015') {
     $preview = new PreviewBirt(6,36,44);
-} else {
+} else if ($_POST['stAcao'] == "anexo11novo" && Sessao::getExercicio() >= '2015' ) {
+    $preview = new PreviewBirt(6,36,65);
+}else {
     $preview = new PreviewBirt(6,36,23);
 }
 $preview->setTitulo('Dem. Receita de Alienação Ativos e Aplicação Recursos');

@@ -38,13 +38,13 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 
 $boDestinacaoRecurso = sistemaLegado::pegaConfiguracao('recurso_destinacao',8,Sessao::getExercicio());
+
 if ($boDestinacaoRecurso == 'true') {
     $preview = new PreviewBirt(2,9,5);
 } else {
     $preview = new PreviewBirt(2,9,4);
 }
 
-//$preview->setTitulo('Balanço Orçamentário');
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setFormato('pdf');
 
@@ -53,3 +53,5 @@ $preview->addParametro('cod_entidade', $_REQUEST['stEntidades']);
 $preview->addParametro('data_final', '31/12/' . Sessao::getExercicio());
 
 $preview->preview();
+
+?>

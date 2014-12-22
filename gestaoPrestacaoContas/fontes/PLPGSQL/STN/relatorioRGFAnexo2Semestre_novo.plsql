@@ -632,14 +632,6 @@ BEGIN
                                                                ,total_mes_12 numeric)
   WHERE ordem = 1;
         
-  --
-  -- Acrescenta o valor da rcl vinculada ao periodo
-  --
-  SELECT stn.fn_calcula_rcl_vinculada(stExercicio,'01/01/' || stExercicio,stCodEntidade)
-    INTO flValorRCL;
-
-  vlExercicioAnterior := vlExercicioAnterior + flValorRCL;
-
   SELECT
       sum(cast( ( total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6
                  + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12 ) as numeric(14,2))) as valor
@@ -675,13 +667,6 @@ BEGIN
                                                                ,total_mes_12 numeric)
   WHERE ordem = 1;
 
-  --
-  -- Acrescenta o valor da rcl vinculada ao periodo
-  --
-  SELECT stn.fn_calcula_rcl_vinculada(stExercicio,arDtFinal[1],stCodEntidade)
-    INTO flValorRCL;
-
-  vlPeriodo1 := vlPeriodo1 + flValorRCL;
   
   IF(inPeriodo>1) THEN
   SELECT
@@ -719,13 +704,6 @@ BEGIN
                                                                ,total_mes_12 numeric)
   WHERE ordem = 1;
 
-  --
-  -- Acrescenta o valor da rcl vinculada ao periodo
-  --
-  SELECT stn.fn_calcula_rcl_vinculada(stExercicio,arDtFinal[2],stCodEntidade)
-    INTO flValorRCL;
-
-  vlPeriodo2 := vlPeriodo2 + flValorRCL;
 
   ELSE
     vlPeriodo2 := 0;
@@ -767,13 +745,7 @@ BEGIN
                                                                ,total_mes_12 numeric)
   WHERE ordem = 1;
 
-  --
-  -- Acrescenta o valor da rcl vinculada ao periodo
-  --
-  SELECT stn.fn_calcula_rcl_vinculada(stExercicio,arDtFinal[3],stCodEntidade)
-    INTO flValorRCL;
 
-  vlPeriodo3 := vlPeriodo3 + flValorRCL;
   ELSE
     vlPeriodo3 := 0;
 

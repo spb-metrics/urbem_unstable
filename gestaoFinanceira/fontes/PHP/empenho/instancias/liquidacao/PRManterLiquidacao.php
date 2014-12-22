@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterLiquidacao.php 60708 2014-11-11 13:02:53Z franver $
+    $Id: PRManterLiquidacao.php 61229 2014-12-18 17:10:10Z lisiane $
 
     $Revision: 32142 $
     $Name$
@@ -63,8 +63,11 @@ $stAcaoEmpenho = $request->get('stAcaoEmpenho');
 $acaoEmpenho = ($request->get('acaoEmpenho')!='') ? $request->get('acaoEmpenho'): 822;
 $moduloEmpenho = $request->get('moduloEmpenho');
 $funcionalidadeEmpenho = $request->get('funcionalidadeEmpenho');
+ 
+$obTransacao = new Transacao();
+$obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
-if (strtolower(SistemaLegado::pegaConfiguracao( 'seta_tipo_documento_liq_tceam',30, Sessao::getExercicio()))=='true') {
+if (strtolower(SistemaLegado::pegaConfiguracao( 'seta_tipo_documento_liq_tceam',30, Sessao::getExercicio(),$boTransacao))=='true') {
 
     if (empty($_REQUEST['inCodTipoDocumentoTxt'])) {
            SistemaLegado::exibeAviso('Campo Tipo Documento inválido!',"n_incluir","erro");
@@ -94,7 +97,7 @@ if (strtolower(SistemaLegado::pegaConfiguracao( 'seta_tipo_documento_liq_tceam',
 
 
 //se fro prefeitura de Tocantins
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 27) { 
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(),$boTransacao) == 27) { 
     if (empty($_REQUEST['inCodTipoDocumentoTxt'])) {
            SistemaLegado::exibeAviso('Campo Tipo Documento inválido!',"n_incluir","erro");
            SistemaLegado::liberaFrames(true,true);
@@ -132,7 +135,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 27) 
 }
 
 //se for prefeitura de Alagoas
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02) { 
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 02) { 
 
     if (empty($_REQUEST['inCodTipoDocumentoTxt'])) {
            SistemaLegado::exibeAviso('Campo Tipo Documento inválido!',"n_incluir","erro");
@@ -192,7 +195,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02) 
 }
 
 //se for prefeitura de Minas Gerais
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) { 
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) { 
     if($_REQUEST['stIncluirNF']=="Sim"){
         if (empty($_REQUEST['inCodTipoNota'])) {
             SistemaLegado::exibeAviso('Campo Tipo Docto Fiscal inválido!',"n_incluir","erro");
@@ -239,7 +242,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) 
 }
 
 // se a prefeitura for Pernambuco
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 16) { 
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) { 
 
     if (empty($_REQUEST['inCodTipoDocumentoTxt'])) {
            SistemaLegado::exibeAviso('Campo Tipo Documento inválido!',"n_incluir","erro");
@@ -294,12 +297,12 @@ if ( Sessao::read('filtro') ) {
 
 //valida a utilização da rotina de encerramento do mês contábil
 $arDtAutorizacao = explode('/', $_POST['stDtLiquidacao']);
-$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
+$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9, '', $boTransacao );
 include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
-$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
+$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ', $boTransacao);
 
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
     SistemaLegado::LiberaFrames(true,true);
@@ -309,8 +312,11 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
 
 switch ($stAcao) {
     case "liquidar":
-        $obErro = new Erro();
-        $boTransacao = false;
+        
+        SistemaLegado::LiberaFrames(true,true);
+        Sessao::setTrataExcecao(true);
+
+        $obErro = new Erro;
         //ATRIBUTOS
         foreach ($arChave as $key=>$value) {
             $arChaves = preg_split( "/[^a-zA-Z0-9]/", $key );
@@ -336,7 +342,7 @@ switch ($stAcao) {
             $obREmpenhoEmpenho->setCodPreEmpenho ( $_REQUEST["inCodPreEmpenho"] );
             $obREmpenhoEmpenho->obROrcamentoDespesa->setCodDespesa( $_POST['inCodDespesa'] );
             $obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
-            $obErro = $obREmpenhoEmpenho->consultar();
+            $obErro = $obREmpenhoEmpenho->consultar( $boTransacao );
 
             if ( !$obErro->ocorreu() ) {
 
@@ -350,12 +356,12 @@ switch ($stAcao) {
                 // Definição das contas credito e debito
                 $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->setExercicio ( Sessao::getExercicio() );
                 isset($_REQUEST["inCodContaDebito"]) AND $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->setCodPlano ( $_REQUEST["inCodContaDebito"] );
-                $obErro = $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->consultar();
+                $obErro = $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->consultar( $boTransacao );
 
                 if ( !$obErro->ocorreu() ) {
                     $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaCredito->setExercicio ( Sessao::getExercicio() );
                     isset($_REQUEST["inCodContaCredito"]) AND $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaCredito->setCodPlano ( $_REQUEST["inCodContaCredito"] );
-                    $obErro = $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaCredito->consultar();
+                    $obErro = $obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaCredito->consultar( $boTransacao );
                 }
 
                 isset($_REQUEST["inCodHistoricoPatrimon"]) AND $obREmpenhoNotaLiquidacao->setCodHistorico( $_REQUEST["inCodHistoricoPatrimon"] );
@@ -379,7 +385,7 @@ switch ($stAcao) {
         }
 
         if ( !$obErro->ocorreu() ) {
-            $obErro = $obREmpenhoNotaLiquidacao->incluir( $boTransacao );
+            $obErro = $obREmpenhoNotaLiquidacao->incluir( $boTransacao ); 
         }
 
         if (!$obErro->ocorreu()) {
@@ -388,7 +394,7 @@ switch ($stAcao) {
             $boIncluirDocumento = $rsAdministracaoConfiguracao->getCampo('valor');
 
             //se for prefeitura do Rio Grande do Norte, inclui as informações da nota fiscal
-            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20 ) {
+            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 20 ) {
                 if ($request->get('stNumeroNF') || $request->get('stSerieNF') || $request->get('stCodValidacaoNF') || $request->get('stCodValidacaoNF') || $request->get('stModeloNF')) {
                     include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNNotaFiscal.class.php';
                     $obTTCERNNotaFiscal = new TTCERNNotaFiscal;
@@ -400,12 +406,12 @@ switch ($stAcao) {
                     $obTTCERNNotaFiscal->setDado('data_emissao'       , $request->get('stDtEmissaoNF',''));
                     $obTTCERNNotaFiscal->setDado('cod_validacao'      , $request->get('stCodValidacaoNF',''));
                     $obTTCERNNotaFiscal->setDado('modelo'             , $request->get('stModeloNF',''));
-                    $obTTCERNNotaFiscal->inclusao();
+                    $obTTCERNNotaFiscal->inclusao( $boTransacao );
                 }
             }
             
              //se for prefeitura de Alagoas, inclui as informações de documento
-            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02 ) { 
+            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(),$boTransacao ) == 02 ) { 
                 include_once CAM_GPC_TCEAL_MAPEAMENTO.'TTCEALDocumento.class.php';
                 $obTTCEALDocumento = new TTCEALDocumento;
                 
@@ -421,7 +427,7 @@ switch ($stAcao) {
                     $obTTCEALDocumento->setDado('modelo'         , $_POST['stModelo']);
                     if($_POST['inCodTipoDocumento'] == 6)
                         $obTTCEALDocumento->setDado('nro_xml_nfe', $_REQUEST['stNumXmlNFe']);
-                    $obTTCEALDocumento->inclusao();
+                    $obTTCEALDocumento->inclusao( $boTransacao );
                 }
                 
                 if ( $_POST['inCodTipoDocumento'] == 7 ) {
@@ -439,7 +445,7 @@ switch ($stAcao) {
                         $obTTCEALDocumento->setDado('modelo'         , $_POST['stModelo']);
                     }
                     
-                    $obTTCEALDocumento->inclusao();
+                    $obTTCEALDocumento->inclusao( $boTransacao );
                 }
                 
                 if ( $_POST['inCodTipoDocumento'] == 2 OR $_POST['inCodTipoDocumento'] == 3 OR $_POST['inCodTipoDocumento'] == 4 OR $_POST['inCodTipoDocumento'] == 5 ) {
@@ -451,7 +457,7 @@ switch ($stAcao) {
                     $obTTCEALDocumento->setDado('nro_documento'  , $_POST['inNumeroDocumento']);
                     $obTTCEALDocumento->setDado('dt_documento'   , $_POST['dtDocumento']);
                     $obTTCEALDocumento->setDado('descricao'      , $_POST['stDescricao']);
-                    $obTTCEALDocumento->inclusao();
+                    $obTTCEALDocumento->inclusao( $boTransacao );
                 
                 }
                 
@@ -469,12 +475,12 @@ switch ($stAcao) {
                     if(!empty($_POST['stModelo'])){
                         $obTTCEALDocumento->setDado('modelo'         , $_POST['stModelo']);
                     }
-                    $obTTCEALDocumento->inclusao();
+                    $obTTCEALDocumento->inclusao( $boTransacao );
                 }
             }
             
              //se for prefeitura de Tocantins, inclui as informações de documento
-            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 27 ) {
+            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 27 ) {
                 include_once CAM_GPC_TCETO_MAPEAMENTO.'TTCETONotaLiquidacaoDocumento.class.php';
                 $obTTCETONotaLiquidacaoDocumento = new TTCETONotaLiquidacaoDocumento;
                 
@@ -490,7 +496,7 @@ switch ($stAcao) {
                     $obTTCETONotaLiquidacaoDocumento->setDado('modelo'         , $_POST['stModelo']);
                     if($_POST['inCodTipoDocumento'] == 6)
                         $obTTCETONotaLiquidacaoDocumento->setDado('nro_xml_nfe', $_REQUEST['stNumXmlNFe']);
-                    $obTTCETONotaLiquidacaoDocumento->inclusao();
+                    $obTTCETONotaLiquidacaoDocumento->inclusao( $boTransacao );
                 }
                 
                 if ( $_POST['inCodTipoDocumento'] == 7 ) {
@@ -508,7 +514,7 @@ switch ($stAcao) {
                         $obTTCETONotaLiquidacaoDocumento->setDado('modelo'         , $_POST['stModelo']);
                     }
                     
-                    $obTTCETONotaLiquidacaoDocumento->inclusao();
+                    $obTTCETONotaLiquidacaoDocumento->inclusao( $boTransacao );
                 }
                 
                 if ( $_POST['inCodTipoDocumento'] == 2 OR $_POST['inCodTipoDocumento'] == 3 OR $_POST['inCodTipoDocumento'] == 4 OR $_POST['inCodTipoDocumento'] == 5 ) {
@@ -520,7 +526,7 @@ switch ($stAcao) {
                     $obTTCETONotaLiquidacaoDocumento->setDado('nro_documento'  , $_POST['inNumeroDocumento']);
                     $obTTCETONotaLiquidacaoDocumento->setDado('dt_documento'   , $_POST['dtDocumento']);
                     $obTTCETONotaLiquidacaoDocumento->setDado('descricao'      , $_POST['stDescricao']);
-                    $obTTCETONotaLiquidacaoDocumento->inclusao();
+                    $obTTCETONotaLiquidacaoDocumento->inclusao( $boTransacao );
                 
                 }
                 
@@ -538,7 +544,7 @@ switch ($stAcao) {
                     if(!empty($_POST['stModelo'])){
                         $obTTCETONotaLiquidacaoDocumento->setDado('modelo'         , $_POST['stModelo']);
                     }
-                    $obTTCETONotaLiquidacaoDocumento->inclusao();
+                    $obTTCETONotaLiquidacaoDocumento->inclusao( $boTransacao );
                 }
             }
             
@@ -555,7 +561,7 @@ switch ($stAcao) {
                     $obTTCEAMDocumento->setDado('cod_nota'       , $obREmpenhoNotaLiquidacao->getCodNota());
                     $obTTCEAMDocumento->setDado('vl_comprometido', $_POST['nuValorComprometido']);
                     $obTTCEAMDocumento->setDado('vl_total'       , $_POST['nuValorTotal']);
-                    $obTTCEAMDocumento->inclusao();
+                    $obTTCEAMDocumento->inclusao( $boTransacao );
 
                     if ($_REQUEST['inCodTipoDocumento'] == 1) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoBilhete.class.php';
@@ -571,7 +577,7 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoBilhete->setDado('dt_chegada'                , $_POST['dtChegada']);
                         $obTTCEAMTipoDocumentoBilhete->setDado('hora_chegada'              , $_POST['hrChegada']);
                         $obTTCEAMTipoDocumentoBilhete->setDado('motivo'                    , $_POST['stMotivo']);
-                        $obTTCEAMTipoDocumentoBilhete->inclusao();
+                        $obTTCEAMTipoDocumentoBilhete->inclusao( $boTransacao );
 
                     } elseif ($_REQUEST['inCodTipoDocumento'] == 2) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoDiaria.class.php';
@@ -587,7 +593,7 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoDiaria->setDado('dt_retorno'               , $_POST['dtRetorno']);
                         $obTTCEAMTipoDocumentoDiaria->setDado('hora_retorno'             , $_POST['hrRetorno']);
                         $obTTCEAMTipoDocumentoDiaria->setDado('motivo'                   , $_POST['stMotivo']);
-                        $obTTCEAMTipoDocumentoDiaria->inclusao();
+                        $obTTCEAMTipoDocumentoDiaria->inclusao( $boTransacao );
 
                     } elseif ($_REQUEST['inCodTipoDocumento'] == 3) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoDiverso.class.php';
@@ -599,7 +605,7 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoDiverso->setDado('data'                      , $_POST['dtDiverso']);
                         $obTTCEAMTipoDocumentoDiverso->setDado('descricao'                 , $_POST['stDescricao']);
                         $obTTCEAMTipoDocumentoDiverso->setDado('nome_documento'            , $_POST['stNomeDocumento']);
-                        $obTTCEAMTipoDocumentoDiverso->inclusao();
+                        $obTTCEAMTipoDocumentoDiverso->inclusao( $boTransacao );
 
                     } elseif ($_REQUEST['inCodTipoDocumento'] == 4) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoFolha.class.php';
@@ -609,7 +615,7 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoFolha->setDado('cod_documento'           , $inCodDocumento);
                         $obTTCEAMTipoDocumentoFolha->setDado('mes'                     , $_POST['inMes']);
                         $obTTCEAMTipoDocumentoFolha->setDado('exercicio'               , $_POST['stExercicio']);
-                        $obTTCEAMTipoDocumentoFolha->inclusao();
+                        $obTTCEAMTipoDocumentoFolha->inclusao( $boTransacao );
 
                     } elseif ($_REQUEST['inCodTipoDocumento'] == 5) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoNota.class.php';
@@ -621,7 +627,7 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoNota->setDado('numero_serie'           , $_POST['stNumeroSerie']);
                         $obTTCEAMTipoDocumentoNota->setDado('numero_subserie'        , $_POST['stNumeroSubserie']);
                         $obTTCEAMTipoDocumentoNota->setDado('data'                   , $_POST['dtNota']);
-                        $obTTCEAMTipoDocumentoNota->inclusao();
+                        $obTTCEAMTipoDocumentoNota->inclusao( $boTransacao );
 
                     } elseif ($_REQUEST['inCodTipoDocumento'] == 6) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoRecibo.class.php';
@@ -633,14 +639,14 @@ switch ($stAcao) {
                         $obTTCEAMTipoDocumentoRecibo->setDado('numero'                   , $_POST['stNumero']);
                         $obTTCEAMTipoDocumentoRecibo->setDado('valor'                    , $_POST['nuValor']);
                         $obTTCEAMTipoDocumentoRecibo->setDado('data'                     , $_POST['dtRecibo']);
-                        $obTTCEAMTipoDocumentoRecibo->inclusao();
+                        $obTTCEAMTipoDocumentoRecibo->inclusao( $boTransacao );
 
                     }
                 }
             }
             
              //se for prefeitura de Pernambuco, inclui as informações de documento
-            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 16 ) { 
+            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16 ) { 
                 include_once CAM_GPC_TCEPE_MAPEAMENTO.'TTCEPEDocumento.class.php';
                 $obTTCEPEDocumento = new TTCEPEDocumento;
                 
@@ -652,7 +658,7 @@ switch ($stAcao) {
                     $obTTCEPEDocumento->setDado('nro_documento'  , $_POST['inNumeroDocumento']);
                     $obTTCEPEDocumento->setDado('serie'          , $_POST['inSerieDocumento']);
                     $obTTCEPEDocumento->setDado('cod_uf'         , $_POST['stUfDocumento']);
-                    $obTTCEPEDocumento->inclusao();
+                    $obTTCEPEDocumento->inclusao( $boTransacao );
                 }
                 
                 if ( $_POST['inCodTipoDocumento'] == 9 ) {
@@ -663,12 +669,12 @@ switch ($stAcao) {
                     $obTTCEPEDocumento->setDado('nro_documento'  , $_POST['inNumeroDocumento']);
                     $obTTCEPEDocumento->setDado('serie'          , $_POST['inSerieDocumento']);
                     $obTTCEPEDocumento->setDado('cod_uf'         , $_POST['stUfDocumento']);
-                    $obTTCEPEDocumento->inclusao();
+                    $obTTCEPEDocumento->inclusao( $boTransacao );
                 }
             }
             
             //se for prefeitura de Minas Gerais, inclui as informações de documento fiscal
-            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11 && $_REQUEST['stIncluirNF']=="Sim") {
+            if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11 && $_REQUEST['stIncluirNF']=="Sim") {
                 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNotaFiscal.class.php";
                 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNotaFiscalEmpenhoLiquidacao.class.php";
                 
@@ -712,7 +718,7 @@ switch ($stAcao) {
                 $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , (float)$nuVlDescontoDoctoFiscal);
                 $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
     
-                $obErro = $obTTCEMGNotaFiscal->inclusao();
+                $obErro = $obTTCEMGNotaFiscal->inclusao( $boTransacao );
                 
                 if (!$obErro->ocorreu()) {
                     $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
@@ -727,7 +733,7 @@ switch ($stAcao) {
                     $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $nuVlTotalDoctoFiscal         );
                     $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $nuVlTotalDoctoFiscal         );
 
-                    $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao();
+                    $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao($boTransacao);
                 }
             }
         }
@@ -855,5 +861,8 @@ switch ($stAcao) {
             
             SistemaLegado::liberaFrames(true,true);
        }
+       
+       Sessao::encerraExcecao();
+
     break;
 }

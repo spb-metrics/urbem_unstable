@@ -42,13 +42,13 @@ DECLARE
     stDtFinal      ALIAS FOR $3;  
     stCodEntidades ALIAS FOR $4;
 
-    dtInicial  		varchar := '';
-    dtFinal    		varchar := '';
-    dtIniExercicio 	VARCHAR := '';
+    dtInicial       varchar := '';
+    dtFinal         varchar := '';
+    dtIniExercicio  VARCHAR := '';
     
-    arDatas 		varchar[] ;
-    reRegistro 		record ;
-    stSql 			varchar := '';
+    arDatas         varchar[] ;
+    reRegistro      record ;
+    stSql           varchar := '';
 
 BEGIN
 
@@ -58,7 +58,7 @@ BEGIN
     dtIniExercicio := '01/01/' || stExercicio;
 
     -- --------------------
-	-- TABELAS TEMPORARIAS
+    -- TABELAS TEMPORARIAS
     -- --------------------
 
     --
@@ -75,9 +75,9 @@ BEGIN
         despesa_liquidada NUMERIC(14,2) DEFAULT 0.00,
         porcentagem_liquidada NUMERIC(14,2) DEFAULT 0.00
     );        
-	
+    
     --
-	-- Saldo Inicial e atualizado das Despesas
+    -- Saldo Inicial e atualizado das Despesas
     --
     stSql := '
         CREATE TEMPORARY TABLE tmp_despesa AS
@@ -116,14 +116,8 @@ BEGIN
                    ) AS reducao
                 ON reducao.exercicio = despesa.exercicio
                AND reducao.cod_despesa = despesa.cod_despesa
-             WHERE (    conta_despesa.cod_estrutural LIKE ''3.1%''
-                     OR conta_despesa.cod_estrutural LIKE ''3.2%''
-                     OR conta_despesa.cod_estrutural LIKE ''3.3%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.4%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.5%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.6%''
-                   )
-               AND conta_despesa.exercicio = '''||stExercicio||'''
+             WHERE 
+               conta_despesa.exercicio = '''||stExercicio||'''
                AND despesa.cod_funcao = 10
                AND despesa.cod_entidade IN ( '||stCodEntidades||' )
          GROUP BY conta_despesa.cod_estrutural
@@ -206,17 +200,77 @@ BEGIN
                AND despesa.cod_entidade IN ('||stCodEntidades||')
                AND nota_liquidacao.cod_entidade IN ('||stCodEntidades||')
                AND empenho.dt_empenho BETWEEN TO_DATE('''||dtIniExercicio||''',''dd/mm/yyyy'') AND TO_DATE('''||dtFinal||''',''dd/mm/yyyy'')
-               AND (    conta_despesa.cod_estrutural LIKE ''3.1%''
-                     OR conta_despesa.cod_estrutural LIKE ''3.2%''
-                     OR conta_despesa.cod_estrutural LIKE ''3.3%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.4%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.5%''
-                     OR conta_despesa.cod_estrutural LIKE ''4.6%''
-                   )
+               
     ';
     
     EXECUTE stSql;
     
+    stSql := '
+        CREATE TEMPORARY TABLE tmp_balancete_despesa AS
+            SELECT 
+                classificacao as cod_estrutural
+                ,exercicio
+                ,(empenhado_ano - anulado_ano) as despesa_empenhada
+            FROM(
+                    SELECT  *            
+                            FROM orcamento.fn_balancete_despesa('|| quote_literal(stExercicio) ||',
+                                                                ''AND od.cod_entidade IN  ( '||stCodEntidades||') AND od.cod_funcao = 10 '',
+                                                                '|| quote_literal(dtInicial) ||',
+                                                                '|| quote_literal(dtFinal) || ',
+                                                                '''',
+                                                                '''',
+                                                                '''',
+                                                                '''',
+                                                                '''',
+                                                                '''',
+                                                                '''',
+                                                                ''''
+                            ) AS retorno (
+                                    exercicio           CHAR(4), 
+                                    cod_despesa      INTEGER, 
+                                    cod_entidade           INTEGER,                                                                                
+                                    cod_programa        INTEGER, 
+                                    cod_conta        INTEGER, 
+                                    num_pao                INTEGER,                                                                                
+                                    num_orgao           INTEGER, 
+                                    num_unidade      INTEGER, 
+                                    cod_recurso            INTEGER,                                                                                
+                                    cod_funcao          INTEGER, 
+                                    cod_subfuncao    INTEGER, 
+                                    tipo_conta             VARCHAR,
+                                    vl_original         NUMERIC, 
+                                    dt_criacao       DATE,    
+                                    classificacao          VARCHAR,                                                                                
+                                    descricao           VARCHAR, 
+                                    num_recurso      VARCHAR, 
+                                    nom_recurso            VARCHAR,                                                                                
+                                    nom_orgao           VARCHAR, 
+                                    nom_unidade      VARCHAR, 
+                                    nom_funcao             VARCHAR,                                                                                
+                                    nom_subfuncao       VARCHAR, 
+                                    nom_programa     VARCHAR, 
+                                    nom_pao                VARCHAR,
+                                    empenhado_ano       NUMERIC, 
+                                    empenhado_per    NUMERIC, 
+                                    anulado_ano            NUMERIC,                                                                                
+                                    anulado_per         NUMERIC, 
+                                    pago_ano         NUMERIC, 
+                                    pago_per               NUMERIC,                                                                                 
+                                    liquidado_ano       NUMERIC, 
+                                    liquidado_per    NUMERIC, 
+                                    saldo_inicial          NUMERIC,                                                                                
+                                    suplementacoes      NUMERIC, 
+                                    reducoes         NUMERIC, 
+                                    total_creditos         NUMERIC,                                                                                
+                                    credito_suplementar NUMERIC, 
+                                    credito_especial NUMERIC, 
+                                    credito_extraordinario NUMERIC,
+                                    num_programa        VARCHAR, 
+                                    num_acao         VARCHAR
+                                   )                          
+            )as foo';
+    EXECUTE stSql;
+
     -- --------------------------------------
     -- Povoa a tabela temporaria tmp_retorno
     -- --------------------------------------
@@ -225,7 +279,7 @@ BEGIN
                                      , 'Pessoal e Encargos Sociais'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.1%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.1%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.1%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '3.1%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '3.1%' )
                                      , 0
@@ -236,7 +290,7 @@ BEGIN
                                      , 'Juros e Encargos Da Dívida'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.2%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.2%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.2%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '3.2%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '3.2%' )
                                      , 0
@@ -247,7 +301,7 @@ BEGIN
                                      , 'Outras Despesas Correntes'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.3%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.3%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '3.3%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '3.3%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '3.3%' )
                                      , 0
@@ -258,7 +312,7 @@ BEGIN
                                      , 'Investimentos'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.4%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.4%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4,4%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '4.4%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '4.4%' )
                                      , 0
@@ -269,7 +323,7 @@ BEGIN
                                      , 'Inversões Financeiras'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.5%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.5%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4,5%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '4.5%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '4.5%' )
                                      , 0
@@ -280,7 +334,7 @@ BEGIN
                                      , 'Amortização da Dívida'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.6%' )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.6%' )
-                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_estrutural LIKE '4.6%' )
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_balancete_despesa WHERE cod_estrutural LIKE '4.6%' )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_estrutural LIKE '4.6%' )
                                      , 0
@@ -291,9 +345,9 @@ BEGIN
                                  , 'DESPESAS CORRENTES'
                                  , SUM(COALESCE(dotacao_inicial,0))
                                  , SUM(COALESCE(dotacao_atualizada,0))
-                                 , SUM(COALESCE(despesa_empenhada,0)) 
+                                 , (SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_retorno WHERE grupo = 1 and subgrupo != 1 )
                                  , 0
-                                 , SUM(COALESCE(despesa_liquidada,0))
+                                 , SUM(COALESCE(despesa_liquidada,0)) 
                                  , 0
                               FROM tmp_retorno
                              WHERE grupo = 1;
@@ -305,7 +359,7 @@ BEGIN
                                  , SUM(COALESCE(dotacao_atualizada,0))
                                  , SUM(COALESCE(despesa_empenhada,0)) 
                                  , 0
-                                 , SUM(COALESCE(despesa_liquidada,0))
+                                 , (SELECT SUM(COALESCE(despesa_liquidada,0)) FROM tmp_retorno WHERE grupo = 2 and subgrupo != 1 ) 
                                  , 0
                               FROM tmp_retorno
                              WHERE grupo = 2;
@@ -338,6 +392,7 @@ BEGIN
     DROP TABLE tmp_retorno;
     DROP TABLE tmp_despesa;
     DROP TABLE tmp_despesa_liquidada;
+    DROP TABLE tmp_balancete_despesa;
 
     RETURN;
  

@@ -547,7 +547,7 @@ function consultarExistenciaDespesa($boTransacao = "")
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
         $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
         $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
-
+        
         $obTEmpenhoPreEmpenho->setDado( "cod_pre_empenho", $this->inCodPreEmpenho );
         $obTEmpenhoPreEmpenho->setDado( "exercicio"      , $this->stExercicio     );
         $obErro = $obTEmpenhoPreEmpenho->recuperaPorChave( $rsRecordSet, $boTransacao );
@@ -601,7 +601,7 @@ function consultarExistenciaDespesa($boTransacao = "")
                                                         
                                                         $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma($rsDespesa->getCampo( 'cod_programa' ));
                                                         $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio($rsDespesa->getCampo( 'exercicio' ));
-                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma);
+                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $obTransacao);
                                                         if ( !$obErro->ocorreu() ) {
                                                             $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao($rsPrograma->getCampo( 'descricao' ));   
                                                         }

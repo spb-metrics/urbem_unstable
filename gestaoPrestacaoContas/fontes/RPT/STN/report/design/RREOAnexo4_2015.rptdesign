@@ -95,7 +95,7 @@
         </scalar-parameter>
         <scalar-parameter name="bimestre" id="1301">
             <property name="valueType">static</property>
-            <property name="isRequired">true</property>
+            <property name="isRequired">false</property>
             <property name="dataType">integer</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
@@ -345,7 +345,7 @@ this.queryText += "          no_bimestre         	numeric, \n";
 this.queryText += "          ate_bimestre        	numeric, \n";
 this.queryText += "          ate_bimestre_anterior 	numeric \n";
 this.queryText += " 		) \n";
-
+  
 //params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[SELECT ]]></xml-property>

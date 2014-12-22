@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 61123 2014-12-10 12:31:43Z carlos.silva $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 61211 2014-12-16 19:14:50Z carlos.silva $
     *
     * $Name: $
     * $Date: $
@@ -73,7 +73,35 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
     }
 
     public function montaRecuperaDadosConsultaPrincipal() {
-        $stSql  = "
+        $stSql  = "CREATE TEMPORARY TABLE tmp_liquidado_razaodespesa AS (
+                        SELECT nota_liquidacao.cod_entidade,
+                               nota_liquidacao.cod_empenho,
+                               nota_liquidacao.exercicio_empenho,
+                               SUM(nota_liquidacao_item.vl_total) - SUM(coalesce(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_total
+                                
+                          FROM empenho.nota_liquidacao
+                    
+                    INNER JOIN empenho.nota_liquidacao_item
+                            ON nota_liquidacao_item.exercicio    = nota_liquidacao.exercicio
+                           AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade 
+                           AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota 
+                    
+                     LEFT JOIN empenho.nota_liquidacao_item_anulado
+                            ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                           AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
+                           AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
+                           AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item				      
+                           AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                           AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
+                    
+                         WHERE nota_liquidacao_item.exercicio_item = '".$this->getDado('exercicio')."'
+                           AND to_date( to_char(nota_liquidacao.dt_liquidacao, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                    
+                      GROUP BY nota_liquidacao.cod_entidade,
+                         nota_liquidacao.cod_empenho,
+                         nota_liquidacao.exercicio_empenho
+                    );
+                    
                  SELECT entidade, 
                         empenho, 
                         exercicio, 
@@ -88,7 +116,6 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                         recurso, 
                         cod_estrutural||' - '||descricao_despesa AS despesa,
                         dotacao,
-                        dt_liquidacao,
                         dt_pagamento,
                         num_banco||' / '||num_agencia||' / '||num_conta_corrente AS banco,
                         cod_recurso_banco,
@@ -104,17 +131,20 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                sw_cgm.nom_cgm AS nome_conta, 
                                to_char(empenho.dt_empenho,'dd/mm/yyyy') AS dt_empenho,
 
-                               coalesce(sum(empenho.vl_anulado), 0.00) AS valor_anulado, 
-                               coalesce(sum(empenho.vl_total), 0.00) AS valor,                                                      
-                               coalesce(liquidacao.vl_total, 0.00) - coalesce(liquidacao.vl_anulado, 0.00) AS valor_liquidado,
+                               sum(coalesce(empenho.vl_total, 0.00)) - sum(coalesce(empenho.vl_anulado, 0.00)) AS valor,
                                coalesce(pago.vl_total, 0.00) - coalesce(pago.vl_anulado, 0.00) AS valor_pago,
+                               
+                               ( SELECT vl_total 
+                                   FROM tmp_liquidado_razaodespesa tlr 
+                                  WHERE tlr.cod_entidade      = empenho.cod_entidade 
+                                    AND tlr.exercicio_empenho = empenho.exercicio
+                                    AND tlr.cod_empenho 	  = empenho.cod_empenho) AS valor_liquidado,
 
                                ped_d_cd.cod_recurso,
                                ped_d_cd.nom_recurso AS recurso, 
                                ped_d_cd.cod_estrutural AS cod_estrutural,
                                ped_d_cd.descricao AS descricao_despesa,
                                ped_d_cd.dotacao,
-                               to_char(liquidacao.dt_liquidacao,'dd/mm/yyyy') AS dt_liquidacao,
                                to_char(pago.timestamp,'dd/mm/yyyy') AS dt_pagamento,
                                banco.num_banco,
                                agencia.num_agencia,
@@ -123,27 +153,28 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                pago.num_documento
                             FROM 
                               (
-                                 SELECT    
-                                      empenho.cod_entidade
-                                    , empenho.cod_empenho
-                                    , empenho.exercicio
-                                    , empenho.dt_empenho
-                                    , empenho.cod_categoria
-                                    , item_pre_empenho.vl_total
-                                    , item_pre_empenho.cod_pre_empenho
-                                    , item_pre_empenho.num_item
-                                    , sum(empenho_anulado_item.vl_anulado) AS vl_anulado
-                                FROM empenho.empenho
+                                 SELECT
+                                        empenho.cod_entidade
+                                      , empenho.cod_empenho
+                                      , empenho.exercicio
+                                      , empenho.dt_empenho
+                                      , empenho.cod_categoria
+                                      , item_pre_empenho.vl_total
+                                      , item_pre_empenho.cod_pre_empenho
+                                      , item_pre_empenho.num_item
+                                      , sum(empenho_anulado_item.vl_anulado) AS vl_anulado
+                                      
+                                    FROM empenho.empenho
                 
                               INNER JOIN empenho.item_pre_empenho
-                                  ON empenho.exercicio       = item_pre_empenho.exercicio
-                                 AND empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho 
+                                      ON empenho.exercicio       = item_pre_empenho.exercicio
+                                     AND empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho 
                 
                                LEFT JOIN empenho.empenho_anulado
-                                  ON empenho_anulado.exercicio    = empenho.exercicio
-                                 AND empenho_anulado.cod_entidade = empenho.cod_entidade
-                                 AND empenho_anulado.cod_empenho  = empenho.cod_empenho
-                                 AND to_date( to_char(empenho_anulado.timestamp, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                                      ON empenho_anulado.exercicio    = empenho.exercicio
+                                     AND empenho_anulado.cod_entidade = empenho.cod_entidade
+                                     AND empenho_anulado.cod_empenho  = empenho.cod_empenho
+                                     AND to_date( to_char(empenho_anulado.timestamp, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
                 
                                LEFT JOIN empenho.empenho_anulado_item
                                       ON empenho_anulado_item.exercicio    = empenho_anulado.exercicio
@@ -154,14 +185,14 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                      AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                                      AND empenho_anulado_item.num_item = item_pre_empenho.num_item
                                 
-                                GROUP BY empenho.cod_entidade
-                                   , empenho.cod_empenho
-                                   , empenho.exercicio
-                                   , empenho.dt_empenho
-                                   , empenho.cod_categoria
-                                   , item_pre_empenho.vl_total
-                                   , item_pre_empenho.cod_pre_empenho
-                                   , item_pre_empenho.num_item
+                                GROUP BY  empenho.cod_entidade
+                                        , empenho.cod_empenho
+                                        , empenho.exercicio
+                                        , empenho.dt_empenho
+                                        , empenho.cod_categoria
+                                        , item_pre_empenho.vl_total
+                                        , item_pre_empenho.cod_pre_empenho
+                                        , item_pre_empenho.num_item
                                 ) AS empenho
                                   
                          INNER JOIN empenho.pre_empenho
@@ -175,98 +206,63 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                          INNER JOIN sw_cgm
                                  ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
                                
-			INNER JOIN (SELECT nota_liquidacao.cod_entidade, 
-					   nota_liquidacao.cod_empenho,  
-					   nota_liquidacao.exercicio_empenho,    
-					   nota_liquidacao.dt_liquidacao,
-					   sum(nota_liquidacao_item.vl_total) AS vl_total,
-					   sum(coalesce(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_anulado
-					    
-   				     FROM empenho.nota_liquidacao
-
-			       INNER JOIN empenho.nota_liquidacao_item
-				       ON nota_liquidacao_item.exercicio    = nota_liquidacao.exercicio
-				      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade 
-				      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota 
-
-			        LEFT JOIN empenho.nota_liquidacao_item_anulado
-                                       ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
-                                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
-				      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-				      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item				      
-				      AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
-				      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
-
-				    WHERE to_date(to_char(nota_liquidacao.dt_liquidacao, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
-
-   		                 GROUP BY nota_liquidacao.cod_entidade, 
-					  nota_liquidacao.cod_empenho,  
-					  nota_liquidacao.exercicio_empenho,
-					  nota_liquidacao.dt_liquidacao
-				   ) AS liquidacao 
-
-				 ON liquidacao.exercicio_empenho = empenho.exercicio
-				AND liquidacao.cod_entidade      = empenho.cod_entidade
-			        AND liquidacao.cod_empenho   = empenho.cod_empenho 
-                       
-
-			INNER JOIN ( SELECT nota_liquidacao.cod_entidade,
-					    nota_liquidacao.cod_empenho,
-					    nota_liquidacao.exercicio,
-					    nota_liquidacao.exercicio_empenho,
-					    nota_liquidacao_paga.timestamp,
-					    nota_liquidacao_conta_pagadora.cod_plano,
-					    pagamento_tipo_documento.num_documento,
-					    sum(nota_liquidacao_paga.vl_pago)            as vl_total,
-					    sum(nota_liquidacao_paga_anulada.vl_anulado) as vl_anulado
-
-				       FROM empenho.nota_liquidacao
-		   
-				 INNER JOIN empenho.nota_liquidacao_paga 
-				  	 ON nota_liquidacao_paga.exercicio    = nota_liquidacao.exercicio 
-					AND nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade
-					AND nota_liquidacao_paga.cod_nota     = nota_liquidacao.cod_nota
-					       
-			          LEFT JOIN empenho.nota_liquidacao_paga_anulada 
-				         ON nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio 
-					AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade
-					AND nota_liquidacao_paga_anulada.cod_nota     = nota_liquidacao_paga.cod_nota
-					AND nota_liquidacao_paga_anulada.timestamp    = nota_liquidacao_paga.timestamp 
-
-				 INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
-					 ON pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = nota_liquidacao_paga.cod_entidade
-					AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = nota_liquidacao_paga.cod_nota
-					AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = nota_liquidacao_paga.exercicio
-					AND pagamento_liquidacao_nota_liquidacao_paga.timestamp            = nota_liquidacao_paga.timestamp 
-
-				 INNER JOIN empenho.nota_liquidacao_conta_pagadora
-					 ON nota_liquidacao_conta_pagadora.cod_entidade         = nota_liquidacao_paga.cod_entidade
-					AND nota_liquidacao_conta_pagadora.cod_nota             = nota_liquidacao_paga.cod_nota
-					AND nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
-					AND nota_liquidacao_conta_pagadora.timestamp            = nota_liquidacao_paga.timestamp 
-
- 				  LEFT JOIN tcemg.pagamento_tipo_documento
-					 ON pagamento_tipo_documento.exercicio    = nota_liquidacao_paga.exercicio
-					AND pagamento_tipo_documento.cod_nota     = nota_liquidacao_paga.cod_nota
-					AND pagamento_tipo_documento.cod_entidade = nota_liquidacao_paga.cod_entidade
-					AND pagamento_tipo_documento.timestamp    = nota_liquidacao_paga.timestamp
-
-				      WHERE to_date(to_char(nota_liquidacao_paga.timestamp, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
-
-				   GROUP BY nota_liquidacao.cod_entidade,
-				    	    nota_liquidacao.cod_empenho,
-					    nota_liquidacao.exercicio,
-					    nota_liquidacao.exercicio_empenho,
-					    nota_liquidacao_paga.timestamp,
-					    pagamento_tipo_documento.num_documento,
-					    nota_liquidacao_conta_pagadora.cod_plano
-				  ) AS pago
-
-				 ON pago.exercicio_empenho = empenho.exercicio
-				AND pago.cod_entidade      = empenho.cod_entidade
-				AND pago.cod_empenho 	   = empenho.cod_empenho	
+                            INNER JOIN ( SELECT nota_liquidacao.cod_entidade,
+                                        nota_liquidacao.cod_empenho,
+                                        nota_liquidacao.exercicio,
+                                        nota_liquidacao.exercicio_empenho,
+                                        nota_liquidacao_paga.timestamp,
+                                        nota_liquidacao_conta_pagadora.cod_plano,
+                                        pagamento_tipo_documento.num_documento,
+                                        sum(nota_liquidacao_paga.vl_pago)            as vl_total,
+                                        sum(nota_liquidacao_paga_anulada.vl_anulado) as vl_anulado
+                
+                                       FROM empenho.nota_liquidacao
+                           
+                                 INNER JOIN empenho.nota_liquidacao_paga 
+                                     ON nota_liquidacao_paga.exercicio    = nota_liquidacao.exercicio 
+                                    AND nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade
+                                    AND nota_liquidacao_paga.cod_nota     = nota_liquidacao.cod_nota
+                                           
+                                      LEFT JOIN empenho.nota_liquidacao_paga_anulada 
+                                         ON nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio 
+                                    AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade
+                                    AND nota_liquidacao_paga_anulada.cod_nota     = nota_liquidacao_paga.cod_nota
+                                    AND nota_liquidacao_paga_anulada.timestamp    = nota_liquidacao_paga.timestamp 
+                
+                                 INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
+                                     ON pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = nota_liquidacao_paga.cod_entidade
+                                    AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = nota_liquidacao_paga.cod_nota
+                                    AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                                    AND pagamento_liquidacao_nota_liquidacao_paga.timestamp            = nota_liquidacao_paga.timestamp 
+                
+                                 INNER JOIN empenho.nota_liquidacao_conta_pagadora
+                                     ON nota_liquidacao_conta_pagadora.cod_entidade         = nota_liquidacao_paga.cod_entidade
+                                    AND nota_liquidacao_conta_pagadora.cod_nota             = nota_liquidacao_paga.cod_nota
+                                    AND nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                                    AND nota_liquidacao_conta_pagadora.timestamp            = nota_liquidacao_paga.timestamp 
+                
+                                  LEFT JOIN tcemg.pagamento_tipo_documento
+                                     ON pagamento_tipo_documento.exercicio    = nota_liquidacao_paga.exercicio
+                                    AND pagamento_tipo_documento.cod_nota     = nota_liquidacao_paga.cod_nota
+                                    AND pagamento_tipo_documento.cod_entidade = nota_liquidacao_paga.cod_entidade
+                                    AND pagamento_tipo_documento.timestamp    = nota_liquidacao_paga.timestamp
+                
+                                      WHERE to_date(to_char(nota_liquidacao_paga.timestamp, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                
+                                   GROUP BY nota_liquidacao.cod_entidade,
+                                            nota_liquidacao.cod_empenho,
+                                            nota_liquidacao.exercicio,
+                                            nota_liquidacao.exercicio_empenho,
+                                            nota_liquidacao_paga.timestamp,
+                                            pagamento_tipo_documento.num_documento,
+                                            nota_liquidacao_conta_pagadora.cod_plano
+                                  ) AS pago
+                
+                                 ON pago.exercicio_empenho = empenho.exercicio
+                                AND pago.cod_entidade      = empenho.cod_entidade
+                                AND pago.cod_empenho 	   = empenho.cod_empenho	
                                
-                       INNER JOIN contabilidade.plano_analitica
+                        INNER JOIN contabilidade.plano_analitica
                                 ON plano_analitica.exercicio = pago.exercicio
                                AND plano_analitica.cod_plano = pago.cod_plano
                 
@@ -290,7 +286,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                         INNER JOIN monetario.banco
                                 ON banco.cod_banco = conta_corrente.cod_banco
                 
-			LEFT JOIN (
+                        LEFT JOIN (
                                     SELECT
                                         pre_empenho_despesa.exercicio, 
                                         pre_empenho_despesa.cod_pre_empenho,
@@ -346,8 +342,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                            AND pre_empenho.cod_pre_empenho = ped_d_cd.cod_pre_empenho 
                 
                        WHERE empenho.exercicio = '".$this->getDado('exercicio')."'
-                         AND empenho.cod_entidade  IN (".$this->getDado('entidade').") 
-                         AND liquidacao.vl_total >= pago.vl_total";
+                         AND empenho.cod_entidade  IN (".$this->getDado('entidade').") ";
                          
                          
                     switch($this->getDado('tipo_relatorio')) {
@@ -389,30 +384,27 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                             $stSql .= " AND ped_d_cd.num_pao = ".$this->getDado('num_pao');
                          }     
 
-                   $stSql.= "GROUP BY empenho.dt_empenho, 
-                             empenho.cod_pre_empenho, 
-                             empenho.cod_entidade, 
-                             empenho.cod_empenho, 
-                             empenho.exercicio, 
-                             pre_empenho.cgm_beneficiario, 
-                             sw_cgm.nom_cgm, 
-                             pre_empenho.descricao, 
-                             ped_d_cd.cod_estrutural, 
-                             ped_d_cd.cod_recurso,
-                             ped_d_cd.nom_recurso, 
-                             ped_d_cd.descricao,
-                             ped_d_cd.dotacao,
-                             liquidacao.vl_total,
-                             liquidacao.vl_anulado,
-                             liquidacao.dt_liquidacao,
-                             pago.vl_total,
-                             pago.vl_anulado,
-                             pago.timestamp,
-                             banco.num_banco,
-                             agencia.num_agencia,
-                             conta_corrente.num_conta_corrente,
-                             plano_recurso.cod_recurso,
-                             pago.num_documento
+                   $stSql.= " GROUP BY empenho.dt_empenho, 
+                                       empenho.cod_pre_empenho, 
+                                       empenho.cod_entidade, 
+                                       empenho.cod_empenho, 
+                                       empenho.exercicio, 
+                                       pre_empenho.cgm_beneficiario, 
+                                       sw_cgm.nom_cgm, 
+                                       pre_empenho.descricao, 
+                                       ped_d_cd.cod_estrutural, 
+                                       ped_d_cd.cod_recurso,
+                                       ped_d_cd.nom_recurso, 
+                                       ped_d_cd.descricao,
+                                       ped_d_cd.dotacao,
+                                       pago.vl_total,
+                                       pago.vl_anulado,
+                                       pago.timestamp,
+                                       banco.num_banco,
+                                       agencia.num_agencia,
+                                       conta_corrente.num_conta_corrente,
+                                       plano_recurso.cod_recurso,
+                                       pago.num_documento
                     ) AS tbl
         
                     WHERE valor <> '0.00'
@@ -420,8 +412,8 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                  ORDER BY cod_estrutural,
                           empenho,
                           dt_empenho, 
-                          dt_liquidacao,
-                          dt_pagamento";
+                          dt_pagamento ;
+        ";
                           
                           
         //SistemaLegado::mostravar($stSql);

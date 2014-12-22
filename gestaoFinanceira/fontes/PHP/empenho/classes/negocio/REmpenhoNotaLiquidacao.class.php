@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoNotaLiquidacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: REmpenhoNotaLiquidacao.class.php 61229 2014-12-18 17:10:10Z lisiane $
 
     $Revision: 30805 $
     $Name:  $
@@ -198,6 +198,7 @@ var $inCodPlanoRetencao;
 */
 var $stExercicioPlano;
 
+function setTransacao($valor) { $this->obTransacao           = $valor; }
 /**
     * @access Public
     * @param Object $Valor
@@ -1154,8 +1155,10 @@ function anularItens($boTransacao = "")
                     $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "conta_debito", $this->obRContabilidadePlanoContaAnaliticaDebito->getCodEstrutural() );
                     $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "conta_credito", $this->obRContabilidadePlanoContaAnaliticaCredito->getCodEstrutural() );
                 }
-
+                Sessao::setTrataExcecao(true);
                 $obErro = $obFEmpenhoEmpenhoLiquidacaoAnulacao->executaFuncao( $rsRecordSet, $boTransacao );
+                Sessao::encerraExcecao();
+
                 $inSequencia = $obFEmpenhoEmpenhoLiquidacaoAnulacao->getDado( 'sequencia' );
                 $inCodLote = $obFEmpenhoEmpenhoLiquidacaoAnulacao->getDado( 'cod_lote' );
             } else {

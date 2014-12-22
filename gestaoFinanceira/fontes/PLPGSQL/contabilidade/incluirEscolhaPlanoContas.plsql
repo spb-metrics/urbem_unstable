@@ -29,7 +29,7 @@
  * @package URBEM
  * @subpackage 
 
- $Id: incluirEscolhaPlanoContas.plsql 60462 2014-10-23 12:44:33Z michel $
+ $Id: incluirEscolhaPlanoContas.plsql 61206 2014-12-16 12:45:54Z michel $
 */
 
 CREATE OR REPLACE FUNCTION contabilidade.incluir_escolha_plano_contas(VARCHAR, INTEGER, INTEGER) RETURNS SETOF RECORD AS $$
@@ -67,7 +67,8 @@ BEGIN
                         ELSE
                            ''alterar''
                         END AS acao
-                        , tabela.atributo_tcepe                                                    
+                        , tabela.atributo_tcepe
+                        , tabela.atributo_tcemg
                 FROM (
                         SELECT  plano_conta_estrutura.titulo                                          
                                 , publico.fn_mascara_completa(''' || stMascara || ''', plano_conta_estrutura.codigo_estrutural) AS cod_estrutural
@@ -101,6 +102,7 @@ BEGIN
                                 END AS indicador_superavit
                                 
                                 , plano_conta_estrutura.atributo_tcepe
+                                , plano_conta_estrutura.atributo_tcemg
 
                         FROM contabilidade.plano_conta_geral                                       
                         
@@ -174,6 +176,14 @@ BEGIN
                 stSqlInsert := stSqlInsert || '
                     , atributo_tcepe = ' || quote_literal(reRecord.atributo_tcepe) || ' ';
             END IF;
+            
+            IF reRecord.atributo_tcemg IS NULL THEN
+                stSqlInsert := stSqlInsert || '
+                    , atributo_tcemg = NULL ';
+            ELSE
+                stSqlInsert := stSqlInsert || '
+                    , atributo_tcemg = ' || quote_literal(reRecord.atributo_tcemg) || ' ';
+            END IF;
 
             stSqlInsert := stSqlInsert || '
                     , funcao = ' || quote_literal(stFuncao) || ' 
@@ -196,7 +206,8 @@ BEGIN
 
                 stSqlInsert := stSqlInsert || '
                           , funcao
-                          , atributo_tcepe ) 
+                          , atributo_tcepe
+                          , atributo_tcemg ) 
                      VALUES 
                           ( (SELECT COALESCE(MAX(cod_conta), 0) +1 FROM contabilidade.plano_conta WHERE exercicio = ' || quote_literal(stExercicio) || ' )
                           , ' || quote_literal(stExercicio) || '
@@ -213,9 +224,15 @@ BEGIN
                 stSqlInsert := stSqlInsert || ', ' || quote_literal(stFuncao);
                 
                 IF reRecord.atributo_tcepe IS NULL THEN
+                    stSqlInsert := stSqlInsert || ' , NULL ';
+                ELSE
+                    stSqlInsert := stSqlInsert || ' , ' || quote_literal(reRecord.atributo_tcepe) ||' ';
+                END IF;
+                
+                IF reRecord.atributo_tcemg IS NULL THEN
                     stSqlInsert := stSqlInsert || ' , NULL  ); ';
                 ELSE
-                    stSqlInsert := stSqlInsert || ' , ' || quote_literal(reRecord.atributo_tcepe) ||' ); ';
+                    stSqlInsert := stSqlInsert || ' , ' || quote_literal(reRecord.atributo_tcemg) ||' ); ';
                 END IF;
         END IF;
 
@@ -396,6 +413,10 @@ BEGIN
 
         END IF;
     END LOOP;
+    
+    stSqlUpdate := 'DELETE FROM contabilidade.posicao_plano where exercicio = ''' || stExercicio || ''';';
+
+    EXECUTE stSqlUpdate;
     
     stSql := '    SELECT unnest(string_to_array(valor, ''.'', '''')) AS posicao_plano
                     FROM administracao.configuracao

@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 61191 2014-12-12 21:03:55Z jean $
-  $Date: 2014-12-12 19:03:55 -0200 (Sex, 12 Dez 2014) $
-  $Author: jean $
-  $Rev: 61191 $
+  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 61205 2014-12-16 12:31:49Z evandro $
+  $Date: 2014-12-16 10:31:49 -0200 (Ter, 16 Dez 2014) $
+  $Author: evandro $
+  $Rev: 61205 $
 */
 
 class TTCEMGRelatorioDemostrativoRCL extends Persistente
@@ -103,7 +103,7 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
 	    $obConexao   = new Conexao;
 	    $rsRecordSet = new RecordSet;
 	    $stSql = $this->montaRecuperaDespesasDemonstrativoRCL().$stFiltro.$stOrdem;
-	    $this->stDebug = $stSql;
+	    $this->stDebug = $stSql;        
 	    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
     }
     
@@ -126,7 +126,7 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
                  , mes_11        
                  , mes_12
                  , cast((mes_1+mes_2+mes_3+mes_4+mes_5+mes_6+mes_7+mes_8+mes_9+mes_10+mes_11+mes_12) as numeric(14,2)) AS total
-              FROM tcemg.fn_relatorio_demostrativo_rcl_despesa('".$this->getDado('exercicio')."','".$this->getDado('cod_entidades')."','".$this->getDado('dt_incial')."','".$this->getDado('dt_final')."',".$this->getDado('tipo_despesa').",'".$this->getDado('tipo_situacao')."')
+              FROM tcemg.fn_relatorio_demostrativo_rcl_despesa('".$this->getDado('exercicio')."','".$this->getDado('cod_entidades')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."',".$this->getDado('tipo_despesa').",'".$this->getDado('tipo_situacao')."')
                 AS retorno ( cod_conta      varchar
                            , nom_conta      varchar
                            , cod_estrutural varchar
@@ -142,10 +142,9 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
                            , mes_10         numeric(14,2)
                            , mes_11         numeric(14,2)
                            , mes_12         numeric(14,2)
+                           , total          numeric(14,2)
                            );        
         ";
-        sistemaLegado::mostravar($stSql);
-        die('Fim');
         return $stSql;
     }
 	

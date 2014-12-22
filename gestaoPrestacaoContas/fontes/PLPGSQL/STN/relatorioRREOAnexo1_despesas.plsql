@@ -40,25 +40,19 @@
  *Colocada a tag de log
  **/
 
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo1_despesas( varchar, integer,varchar ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo1_despesas( varchar, varchar, varchar,varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
-    inBimestre     	ALIAS FOR $2;
-    stCodEntidades 	ALIAS FOR $3;
+    dtInicial     	ALIAS FOR $2;
+    dtFinal     	ALIAS FOR $3;
+    stCodEntidades 	ALIAS FOR $4;
 
-    dtInicial  		varchar := '';
-    dtFinal    		varchar := '';
     dtIniExercicio 	VARCHAR := '';
     
-    arDatas 		varchar[] ;
     reRegistro 		record ;
     stSql 			varchar := '';
 
 BEGIN
-
-    arDatas := publico.bimestre ( stExercicio, inBimestre );   
-    dtInicial := arDatas [ 0 ];
-    dtFinal   := arDatas [ 1 ];
     
     dtIniExercicio := '01/01/'|| stExercicio;
 
@@ -167,7 +161,8 @@ BEGIN
 			CAST(0.00 AS NUMERIC(14,2)) as vl_empenhado_bimestre, 
 			CAST(0.00 AS NUMERIC(14,2)) as vl_liquidado_bimestre, 
 			CAST(0.00 AS NUMERIC(14,2)) as vl_empenhado_total, 
-			CAST(0.00 AS NUMERIC(14,2)) as vl_liquidado_total 
+			CAST(0.00 AS NUMERIC(14,2)) as vl_liquidado_total,
+            CAST(0.00 AS NUMERIC(14,2)) as vl_pago_total
 		FROM 
 			orcamento.despesa de 
 			INNER JOIN 
@@ -217,6 +212,7 @@ BEGIN
 			COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_total    ,
 			COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_bimestre ,
 			COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_pago_total         ,
 			CAST(0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST(0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 
@@ -253,7 +249,8 @@ BEGIN
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_bimestre , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_total , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_bimestre , 
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total , 
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_pago_total         ,
 			CAST(0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST(0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 
@@ -290,7 +287,8 @@ BEGIN
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_bimestre , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_total    , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_bimestre , 
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    , 
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_pago_total         ,
 			CAST (0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST (0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 
@@ -327,7 +325,8 @@ BEGIN
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_bimestre , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_total    , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_bimestre , 
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    , 
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_pago_total         ,
 			CAST (0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST (0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 
@@ -364,7 +363,8 @@ BEGIN
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_bimestre , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_empenhado_total    , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_bimestre , 
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    , 
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_liquidado_total    ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', false )), 0.00) AS vl_pago_total         ,
 			CAST (0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST (0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 
@@ -400,7 +400,9 @@ BEGIN
 		SUM(vl_empenhado_bimestre) AS vl_empenhado_bimestre , 
 		SUM(vl_empenhado_total) AS vl_empenhado_total , 
 		SUM(vl_liquidado_bimestre) AS vl_liquidado_bimestre , 
-		SUM(vl_liquidado_total) AS vl_liquidado_total , 
+		SUM(vl_liquidado_total) AS vl_liquidado_total ,
+        SUM(vl_pago_total) AS vl_pago_total,
+        
 		SUM(percentual) AS percentual , 
 		SUM(saldo_liquidar) AS saldo_liquidar  
 	 FROM 
@@ -417,7 +419,8 @@ BEGIN
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_empenhado_bimestre , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_empenhado_total    , 
             COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtInicial)      ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_liquidado_bimestre , 
-            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_liquidado_total    , 
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_liquidado_total    ,
+            COALESCE((SELECT * FROM stn.fn_rreo_despesa_paga     ( publico.fn_mascarareduzida(ocd.cod_estrutural), '|| quote_literal(stExercicio) ||', '|| quote_literal(stCodEntidades) ||', '|| quote_literal(dtIniExercicio) ||', '|| quote_literal(dtFinal) ||', true )), 0.00) AS vl_pago_total         ,
 			CAST(0.00 AS NUMERIC(14,2)) AS percentual , 
 			CAST(0.00 AS NUMERIC(14,2)) AS saldo_liquidar 
 		FROM 

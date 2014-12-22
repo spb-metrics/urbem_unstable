@@ -33,8 +33,10 @@
 * $Name: $
 * $Author: $
 * $Date: $
-* $Id: OCGeraRelatorioServidor.php 61020 2014-11-28 21:07:27Z jean $ 
+* $Id: OCGeraRelatorioServidor.php 61236 2014-12-19 11:22:40Z diogo.zarpelon $ 
 */
+
+set_time_limit(0);
 
 include_once '../../../../../../config.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';

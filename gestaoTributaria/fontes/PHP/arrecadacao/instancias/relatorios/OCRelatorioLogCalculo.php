@@ -36,52 +36,42 @@
     * Casos de uso: uc-05.04.10
 */
 
-/*
-$Log: ,v $
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 
-    $stFiltro = ' WHERE ';
+$stFiltro = ' WHERE 1=1 ';
 
-//Grupo Credito
+if ($_REQUEST['inCodGrupo']) {
+    $arGrupo = explode('/', $_REQUEST['inCodGrupo']);
+    $stFiltro .= " AND calculo_grupo_credito.cod_grupo = ".$arGrupo[0]." AND calculo_grupo_credito.ano_exercicio = '".$arGrupo[1]."'";
+}
 
-    if ($_REQUEST['inCodGrupo']) {
-        $arGrupo = explode('/', $_REQUEST['inCodGrupo']);
-        $stFiltro .= " calculo.cod_grupo = ".$arGrupo[0]." AND calculo.ano_exercicio = '".$arGrupo[1]."' AND ";
+if ($_REQUEST['inNumInscricaoEconomicaInicial'] && $_REQUEST['inNumInscricaoEconomicaFinal']) {
+    $stFiltro .= ' AND cec.inscricao_economica between '.$_REQUEST['inNumInscricaoEconomicaInicial'].' AND '.$_REQUEST['inNumInscricaoEconomicaFinal'];
+} elseif ($_REQUEST['inNumInscricaoEconomicaInicial']) {
+    $stFiltro .= ' AND cec.inscricao_economica = '.$_REQUEST['inNumInscricaoEconomicaInicial'].'';
+}
+
+if ($_REQUEST['inCodImovelInicial'] && $_REQUEST['inCodImovelFinal']) {
+    $stFiltro .= ' AND imovel_calculo.inscricao_municipal between '.$_REQUEST['inCodImovelInicial'].' AND '. $_REQUEST['inCodImovelFinal'];
+} elseif ($_REQUEST['inCodImovelInicial']) {
+    $stFiltro .= ' AND imovel_calculo.inscricao_municipal = '.$_REQUEST['inCodImovelInicial'];
+}
+
+if (isset($_REQUEST['stSituacao']) && !empty($_REQUEST['stSituacao'])) {
+    if ($_REQUEST['stSituacao'] == 'E') {
+        $stFiltroAlc .= " WHERE LOWER(alc.valor) <> 'ok' ";
+    } elseif ($_REQUEST['stSituacao'] == 'C') {
+        $stFiltroAlc .= " WHERE POSITION('ok' in LOWER(alc.valor)) > 0 ";
     }
+}
 
-    if ($_REQUEST['inNumInscricaoEconomicaInicial'] && $_REQUEST['inNumInscricaoEconomicaFinal']) {
-        $stFiltro .= ' calculo.inscricao_economica between '.$_REQUEST['inNumInscricaoEconomicaInicial'].' AND '.
-                     $_REQUEST['inNumInscricaoEconomicaFinal']. ' AND ';
-    } elseif ($_REQUEST['inNumInscricaoEconomicaInicial']) {
-        $stFiltro .= ' calculo.inscricao_economica = '.$_REQUEST['inNumInscricaoEconomicaInicial'].' AND ';
-    }
-
-    if ($_REQUEST['inCodImovelInicial'] && $_REQUEST['inCodImovelFinal']) {
-        $stFiltro .= ' calculo.inscricao_municipal between '.$_REQUEST['inCodImovelInicial'].' AND '.
-                     $_REQUEST['inCodImovelFinal'] . ' AND ';
-    } elseif ($_REQUEST['inCodImovelInicial']) {
-        $stFiltro .= ' calculo.inscricao_municipal = '.$_REQUEST['inCodImovelInicial'].' AND ';
-    }
-
-    if (isset($_REQUEST['stSituacao']) && !empty($_REQUEST['stSituacao'])) {
-        if ($_REQUEST['stSituacao'] == 'E') {
-            $stFiltro .= " LOWER(alc.valor) <> 'ok' AND ";
-        } elseif ($_REQUEST['stSituacao'] == 'C') {
-            $stFiltro .= " POSITION('ok' in LOWER(alc.valor)) > 0 AND ";
-        }
-    }
-
-    $stFiltro = substr( $stFiltro, 0, strlen($stFiltro)-4);
-
-    $preview = new PreviewBirt(5,25,2);
-    $preview->setVersaoBirt('2.5.0');
-    $preview->setTitulo('Relatório de Log de Cálculo');
-    $preview->addParametro( 'stFiltro', $stFiltro );
-    $preview->setFormato('pdf');
-    $preview->preview();
-
+$preview = new PreviewBirt(5,25,2);
+$preview->setVersaoBirt('2.5.0');
+$preview->setTitulo('Relatório de Log de Cálculo');
+$preview->addParametro( 'stFiltro'    , $stFiltro );
+$preview->addParametro( 'stFiltroAlc' , $stFiltroAlc );
+$preview->setFormato('pdf');
+$preview->preview();
+    
 ?>

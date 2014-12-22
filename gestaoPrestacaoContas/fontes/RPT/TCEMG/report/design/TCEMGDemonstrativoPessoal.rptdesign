@@ -368,6 +368,31 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="aposentadorias" id="6909">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">decimal</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pensao" id="6910">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">decimal</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0.00</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
@@ -1150,8 +1175,10 @@ x
 }
 
 if (x == null){
+ params["aposentadorias"] = 0.00;
  0.00
 } else {
+ params["aposentadorias"] = x;
 x
 }</expression>
                     <property name="dataType">decimal</property>
@@ -1173,8 +1200,10 @@ x
 	}
 }
 if (x == null) {
+params["pensao"] = 0.00
 0.00
 } else {
+params["pensao"] = x
 x
 }</expression>
                     <property name="dataType">decimal</property>
@@ -2587,19 +2616,19 @@ row["total_base_receita"]+row["valor_receita_ano_anterior"];</expression>
                 <structure>
                     <property name="name">percentual_prefeitura</property>
                     <expression name="expression">//(valor total despesa da entidade + valor despesa do exercício anterior x 100 / total da receita corrente líquida) 
-(( (params["total_prefeitura"]+params["total_exercicio_anterior"]) *100 ) / params["total_receita_base"])</expression>
+((((params["total_prefeitura"]  + params["total_exercicio_anterior_prefeitura"])-(params["pensao"]+params["aposentadorias"]))*100 ) / params["total_receita_base"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">percentual_camara</property>
                     <expression name="expression">//(valor total despesa da entidade + valor despesa do exercício anterior x 100 / total da receita corrente líquida) 
-(( (params["total_camara"]+params["total_exercicio_anterior"]) *100 ) / params["total_receita_base"])</expression>
+(( (params["total_camara"]+params["total_exercicio_anterior_camara"]) *100 ) / params["total_receita_base"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">percentual_rpps</property>
                     <expression name="expression">//(valor total despesa da entidade + valor despesa do exercício anterior x 100 / total da receita corrente líquida) 
-(( (params["total_rpps"]+params["total_exercicio_anterior"]) *100 ) / params["total_receita_base"])</expression>
+(( (params["total_rpps"]+params["total_exercicio_anterior_instituto"]) *100 ) / params["total_receita_base"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -2626,7 +2655,7 @@ row["total_base_receita"]+row["valor_receita_ano_anterior"];</expression>
                             <property name="backgroundPositionX">0%</property>
                             <property name="backgroundPositionY">0%</property>
                             <property name="backgroundRepeat">repeat</property>
-                            <property name="fontFamily">serif</property>
+                            <property name="fontFamily">"Century Schoolbook L"</property>
                             <property name="fontSize">6pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="fontStyle">normal</property>

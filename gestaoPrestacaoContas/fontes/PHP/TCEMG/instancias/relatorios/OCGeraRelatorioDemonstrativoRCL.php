@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCGeraRelatorioDemonstrativoRCL.php 61191 2014-12-12 21:03:55Z jean $
+  * $Id: OCGeraRelatorioDemonstrativoRCL.php 61205 2014-12-16 12:31:49Z evandro $
   * $Date: 2014-08-12 10:06:21 -0300 (Tue, 12 Aug 2014) $
   * $Author: franver $
   * $Rev: 59281 $
@@ -165,29 +165,14 @@ switch ($request->get('stPeriodicidade')) {
         $stDataFinal = SistemaLegado::retornaUltimoDiaMes($inPeriodo,$stExercicio);
     break;
 }
-//sistemaLegado::mostravar($stDataInicial);
-//sistemaLegado::mostravar($stDataFinal);
-//die('Fim');
-//die('Fim');
-/*
-if ($request->get('stPeriodicidade') == 'Bimestre'){
-    $stDataInicial = "01/".str_pad((string)(($inPeriodo*2)-1),2,'0',STR_PAD_LEFT)."/".$stExercicio;
-    $stDataFinal = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stExercicio);
-} elseif ($request->get('stPeriodicidade') == 'Trimestre') {
-    $stDataInicial = "01/".str_pad((string)(($inPeriodo*3)-2),2,'0',STR_PAD_LEFT)."/".$stExercicio;
-    $stDataFinal = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*3),2,'0',STR_PAD_LEFT),$stExercicio);
-} else {
-    $stDataInicial = "01/".$inPeriodo."/".$stExercicio;
-    $stDataFinal = SistemaLegado::retornaUltimoDiaMes($inPeriodo,$stExercicio);
-}
-*/
-$obRTCEMGRelatorioDemostrativoRCL->setExercicio    ($stExercicio);
-$obRTCEMGRelatorioDemostrativoRCL->setCodEntidades ($inCodEntidades);
-$obRTCEMGRelatorioDemostrativoRCL->setDataInicial  ($stDataInicial);
-$obRTCEMGRelatorioDemostrativoRCL->setDataFinal    ($stDataFinal);
-$obRTCEMGRelatorioDemostrativoRCL->setDataFinal    ($stDataFinal);
-$obRTCEMGRelatorioDemostrativoRCL->setExercicioRestos ($stExercicioRestos);
-$obRTCEMGRelatorioDemostrativoRCL->setTipoSituacao ($request->get("stSituacao"));
+
+$obRTCEMGRelatorioDemostrativoRCL->setExercicio         ($stExercicio);
+$obRTCEMGRelatorioDemostrativoRCL->setCodEntidades      ($inCodEntidades);
+$obRTCEMGRelatorioDemostrativoRCL->setDataInicial       ($stDataInicial);
+$obRTCEMGRelatorioDemostrativoRCL->setDataFinal         ($stDataFinal);
+$obRTCEMGRelatorioDemostrativoRCL->setDataFinal         ($stDataFinal);
+$obRTCEMGRelatorioDemostrativoRCL->setExercicioRestos   ($stExercicioRestos);
+$obRTCEMGRelatorioDemostrativoRCL->setTipoSituacao      ($request->get("stSituacao"));
 
 $obRTCEMGRelatorioDemostrativoRCL->geraRecordSet($rsRecordSet);
 
@@ -217,10 +202,7 @@ $arDados = array( "arReceitas"                    => $rsRecordSet["arReceitas"],
                   "arValoresDemostrativoRCL"      => $rsRecordSet["arValoresDemostrativoRCL"],
                   "arCabecalhoMes"                => $arCabecalhoMeses
                   );
-//sistemaLegado::mostravar($stDataInicial);
-//sistemaLegado::mostravar($stDataFinal);
-//sistemaLegado::mostravar($arDados);
-//die('Fim');
+
 $obMPDF = new FrameWorkMPDF(6,55,7);
 $obMPDF->setCodEntidades($inCodEntidades);
 $obMPDF->setDataInicio($stDataInicial);

@@ -41,11 +41,12 @@
  **/
 
 --select * from stn.fn_anexo1('2006','01/03/2006','30/04/2006','1,2');
-CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo1_receitas(varchar, integer ,varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo1_receitas(varchar, varchar, varchar ,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio             ALIAS FOR $1;
-    inBimestre              ALIAS FOR $2;
-    stCodEntidades          ALIAS FOR $3;
+    dtInicial     	        ALIAS FOR $2;
+    dtFinal     	        ALIAS FOR $3;
+    stCodEntidades          ALIAS FOR $4;
     dtInicioAno             VARCHAR := '';
     dtFimAno                VARCHAR := '';
     stSql                   VARCHAR := '';
@@ -53,16 +54,9 @@ DECLARE
     stMascClassReceita      VARCHAR := '';
     stMascRecurso           VARCHAR := '';
     reRegistro              RECORD;
-    dtInicial               varchar := '';
-    dtFinal                 varchar := '';
-
-    arDatas varchar[] ;
 
 BEGIN
         dtInicioAno := '01/01/' || stExercicio;
-        arDatas := publico.bimestre ( stExercicio, inBimestre );
-        dtInicial := arDatas [ 0 ];
-        dtFinal   := arDatas [ 1 ];
 
         stSql := 'CREATE TEMPORARY TABLE tmp_valor AS (
             SELECT

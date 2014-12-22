@@ -35,7 +35,6 @@
 
 * Casos de uso: uc-02.03.06
 */
-
 CREATE OR REPLACE FUNCTION empenho.fn_empenho_empenhado_pago_liquidado(varchar,varchar,varchar,varchar,varchar,varchar, varchar, varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar, varchar, varchar, varchar, boolean) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio                    ALIAS FOR $1;
@@ -61,8 +60,8 @@ DECLARE
     inCodDotacao                   ALIAS FOR $21;
     boMostrarAnuladoMesmoPeriodo   ALIAS FOR $22;
     
-    stSql               VARCHAR   := '';
-    reRegistro          RECORD;
+    stSql                          VARCHAR   := '';
+    reRegistro                     RECORD;
 BEGIN
     
     if (stSituacao = '2') then
@@ -82,25 +81,25 @@ BEGIN
                 contabilidade.plano_conta pc
             WHERE
                 --Ligação PAGAMENTO : LANCAMENTO EMPENHO
-                    p.cod_entidade      IN (' || stCodEntidades || ')
+                    p.cod_entidade  IN (' || stCodEntidades || ')
                 AND p.exercicio     = ''' || stExercicio || '''
-                AND p.cod_lote = le.cod_lote
-                AND p.tipo = le.tipo
-                AND p.sequencia = le.sequencia
-                AND p.exercicio = le.exercicio
-                AND p.cod_entidade = le.cod_entidade
-                AND le.estorno = false
+                AND p.cod_lote      = le.cod_lote
+                AND p.tipo          = le.tipo
+                AND p.sequencia     = le.sequencia
+                AND p.exercicio     = le.exercicio
+                AND p.cod_entidade  = le.cod_entidade
+                AND le.estorno      = false
 
                 --Ligação LANCAMENTO EMPENHO : CONTA_CREDITO
-                AND le.cod_lote = cc.cod_lote
-                AND le.tipo = cc.tipo
-                AND le.exercicio = cc.exercicio
+                AND le.cod_lote     = cc.cod_lote
+                AND le.tipo         = cc.tipo
+                AND le.exercicio    = cc.exercicio
                 AND le.cod_entidade = cc.cod_entidade
-                AND le.sequencia = cc.sequencia
+                AND le.sequencia    = cc.sequencia
 
                 --Ligação CONTA_CREDITO : PLANO ANALITICA
-                AND cc.cod_plano = pa.cod_plano
-                AND cc.exercicio = pa.exercicio';
+                AND cc.cod_plano    = pa.cod_plano
+                AND cc.exercicio    = pa.exercicio';
 
                 if ( inCodPlano is not null and TRIM(inCodPlano)<>'') then
                     stSql := stSql || ' and cc.cod_plano = ' || inCodPlano || ' ';
@@ -108,13 +107,11 @@ BEGIN
                 
                 stSql := stSql || '
                --Ligação PLANO ANALITICA : PLANO CONTA
-                AND pa.cod_conta = pc.cod_conta
-                AND pa.exercicio = pc.exercicio
+                AND pa.cod_conta   = pc.cod_conta
+                AND pa.exercicio   = pc.exercicio
         );
 
-        CREATE INDEX idx_tmp_pago ON tmp_pago (cod_entidade, cod_nota, exercicio_liquidacao, timestamp);
-
-        ';
+        CREATE INDEX idx_tmp_pago ON tmp_pago (cod_entidade, cod_nota, exercicio_liquidacao, timestamp); ';
         EXECUTE stSql;
     end if;
 
@@ -169,46 +166,104 @@ BEGIN
 
         EXECUTE stSql;
     end if;
-
+  
         stSql := '
-            SELECT entidade, descricao_categoria, nom_tipo, empenho, exercicio, cgm, razao_social, cod_nota, stData, ordem, conta, coalesce(nome_conta,''NÃO INFORMADO''), valor, valor_anulado, descricao, recurso, despesa
+            SELECT entidade
+                 , descricao_categoria
+                 , nom_tipo
+                 , empenho
+                 , exercicio
+                 , cgm
+                 , razao_social
+                 , cod_nota
+                 , stData
+                 , ordem
+                 , conta
+                 , coalesce(nome_conta,''NÃO INFORMADO'')
+                 , valor
+                 , valor_anulado
+                 , descricao
+                 , recurso
+                 , despesa
             FROM (
-                    SELECT e.cod_entidade as entidade, categoria_empenho.descricao as descricao_categoria, tipo_empenho.nom_tipo, e.cod_empenho as empenho, e.exercicio as exercicio, pe.cgm_beneficiario as cgm, cgm.nom_cgm as razao_social,cast( pe.descricao as varchar ) as descricao
-                         
-            ';
+                    SELECT e.cod_entidade as entidade
+                         , categoria_empenho.descricao as descricao_categoria
+                         , tipo_empenho.nom_tipo
+                         , e.cod_empenho as empenho
+                         , e.exercicio as exercicio
+                         , pe.cgm_beneficiario as cgm
+                         , cgm.nom_cgm as razao_social
+                         , cast( pe.descricao as varchar ) as descricao ';
 
             if (stSituacao = '1') then            
-                   stSql := stSql || ', 0 as cod_nota, 0 as ordem, 0 as conta, cgm.nom_cgm as nome_conta, to_char(e.dt_empenho,''dd/mm/yyyy'') as stData ,coalesce(sum(e.vl_anulado), 0.00) as valor_anulado, sum(e.vl_total) as valor ';
+                   stSql := stSql ||
+                         ', 0 as cod_nota
+                          , 0 as ordem
+                          , 0 as conta
+                          , cgm.nom_cgm as nome_conta
+                          , to_char(e.dt_empenho,''dd/mm/yyyy'') as stData
+                          , coalesce(sum(e.vl_anulado), 0.00) as valor_anulado
+                          , sum(e.vl_total) as valor ';
             end if;            
 
             if (stSituacao = '2') then
-                    stSql := stSql || ', to_char(nlp.timestamp,''dd/mm/yyyy'') as stData , nlp.cod_nota as cod_nota, sum(nlp.vl_pago) as valor, cast(0.00 as numeric) as valor_anulado, pl.cod_ordem as ordem, tmp.cod_plano as conta, tmp.nom_conta as nome_conta';
+                    stSql := stSql ||
+                          ', to_char(nlp.timestamp,''dd/mm/yyyy'') as stData
+                           , nlp.cod_nota as cod_nota
+                           , sum(nlp.vl_pago) as valor
+                           , cast(0.00 as numeric) as valor_anulado
+                           , pl.cod_ordem as ordem
+                           , tmp.cod_plano as conta
+                           , tmp.nom_conta as nome_conta ';
             end if;
             
             if (stSituacao = '3') then
                     stSql := stSql || '
-                    , to_char(nl.dt_liquidacao,''dd/mm/yyyy'') as stData
-                    , nli.cod_nota as cod_nota
-                    , sum(nli.vl_total) as valor
-                    , coalesce(sum(nlia.vl_anulado), 0.00) as valor_anulado
-                    , 0 as ordem
-                    , 0 as conta
-                    , cgm.nom_cgm  as nome_conta ';
+                           , to_char(nl.dt_liquidacao,''dd/mm/yyyy'') as stData
+                           , nli.cod_nota as cod_nota
+                           , sum(nli.vl_total) as valor
+                           , coalesce(sum(nlia.vl_anulado), 0.00) as valor_anulado
+                           , 0 as ordem
+                           , 0 as conta
+                           , cgm.nom_cgm  as nome_conta ';
             end if;
 
             if (stSituacao = '4') then
-                    stSql := stSql || ', to_char(ea.timestamp,''dd/mm/yyyy'') as stData , 0 as cod_nota, sum(eai.vl_anulado) as valor, cast(0.00 as numeric) as valor_anulado, 0 as ordem, 0 as conta, cgm.nom_cgm as nome_conta';
+                    stSql := stSql ||
+                          ', to_char(ea.timestamp,''dd/mm/yyyy'') as stData
+                           , 0 as cod_nota
+                           , sum(eai.vl_anulado) as valor
+                           , cast(0.00 as numeric) as valor_anulado
+                           , 0 as ordem
+                           , 0 as conta
+                           , cgm.nom_cgm as nome_conta ';
             end if;
 
             if (stSituacao = '5') then
-                    stSql := stSql || ',to_char(nlpa.timestamp_anulada,''dd/mm/yyyy'') as stData, nlpa.cod_nota as cod_nota, sum(nlpa.vl_anulado) as valor, cast(0.00 as numeric) as valor_anulado, pl.cod_ordem as ordem, tmp.cod_plano as conta, tmp.nom_conta as nome_conta';
+                    stSql := stSql ||
+                           ', to_char(nlpa.timestamp_anulada,''dd/mm/yyyy'') as stData
+                            , nlpa.cod_nota as cod_nota
+                            , sum(nlpa.vl_anulado) as valor
+                            , cast(0.00 as numeric) as valor_anulado
+                            , pl.cod_ordem as ordem
+                            , tmp.cod_plano as conta
+                            , tmp.nom_conta as nome_conta ';
             end if;
 
             if (stSituacao = '6') then
-                    stSql := stSql || ', to_char(nlia.timestamp,''dd/mm/yyyy'') as stData , nlia.cod_nota as cod_nota, sum(nlia.vl_anulado) as valor, cast(0.00 as numeric) as valor_anulado, 0 as ordem, 0 as conta, cgm.nom_cgm as nome_conta';
+                    stSql := stSql ||
+                           ', to_char(nlia.timestamp,''dd/mm/yyyy'') as stData
+                            , nlia.cod_nota as cod_nota
+                            , sum(nlia.vl_anulado) as valor
+                            , cast(0.00 as numeric) as valor_anulado
+                            , 0 as ordem
+                            , 0 as conta
+                            , cgm.nom_cgm as nome_conta ';
             end if; 
             
-            stSql := stSql || ', ped_d_cd.nom_recurso as recurso, ped_d_cd.cod_estrutural as despesa ';
+            stSql := stSql ||
+                           ', ped_d_cd.nom_recurso as recurso
+                            , ped_d_cd.cod_estrutural as despesa ';
             
             IF (stSituacao = '1') THEN
             stSql := stSql || '
@@ -268,8 +323,8 @@ BEGIN
             
             stSql := stSql || '
                 JOIN empenho.categoria_empenho 
-                ON (categoria_empenho.cod_categoria = e.cod_categoria)
-               ,empenho.historico   as h ';
+                  ON categoria_empenho.cod_categoria = e.cod_categoria
+                   , empenho.historico   as h ';
                 
                 if (stSituacao = '2') then
                     stSql := stSql || '
@@ -301,17 +356,16 @@ BEGIN
                         INNER JOIN ';
                     END IF;
                     
-                    stSql := stSql || '    empenho.nota_liquidacao_item_anulado nlia
-                                            ON (nli.exercicio = nlia.exercicio
-                                            AND nli.cod_nota = nlia.cod_nota
-                                            AND nli.cod_entidade = nlia.cod_entidade
-                                            AND nli.num_item = nlia.num_item
-                                            AND nli.cod_pre_empenho = nlia.cod_pre_empenho
-                                            AND nli.exercicio_item = nlia.exercicio_item
-                                            AND to_date(to_char(nlia.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') BETWEEN
-                                                 to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')
-                                                 )
-                                            ';
+                    stSql := stSql ||
+                                  ' empenho.nota_liquidacao_item_anulado AS nlia
+                                 ON nli.exercicio       = nlia.exercicio
+                                AND nli.cod_nota        = nlia.cod_nota
+                                AND nli.cod_entidade    = nlia.cod_entidade
+                                AND nli.num_item        = nlia.num_item
+                                AND nli.cod_pre_empenho = nlia.cod_pre_empenho
+                                AND nli.exercicio_item  = nlia.exercicio_item
+                                AND to_date(to_char(nlia.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+                    
                 end if;
 
                 if (stSituacao = '4') then
@@ -361,11 +415,13 @@ BEGIN
                 end if;
 
              stSql := stSql || '
-              , sw_cgm              as cgm
-              , empenho.pre_empenho as pe
+                   , sw_cgm              as cgm
+                   , empenho.pre_empenho as pe
+                   
                 JOIN empenho.tipo_empenho 
-                ON ( tipo_empenho.cod_tipo = pe.cod_tipo)
-                LEFT OUTER JOIN (
+                ON  tipo_empenho.cod_tipo = pe.cod_tipo
+                
+     LEFT OUTER JOIN (
                     SELECT
                         ped.exercicio, 
                         ped.cod_pre_empenho, 
@@ -384,46 +440,54 @@ BEGIN
                     FROM
                         empenho.pre_empenho_despesa as ped, 
                         orcamento.despesa           as d
+                        
                         JOIN orcamento.recurso(''' || stExercicio || ''') as rec
-                          ON ( rec.cod_recurso = d.cod_recurso
-                           AND rec.exercicio = d.exercicio )
+                          ON rec.cod_recurso = d.cod_recurso
+                         AND rec.exercicio = d.exercicio
+                        
                         JOIN orcamento.programa_ppa_programa
                           ON programa_ppa_programa.cod_programa = d.cod_programa
-                         AND programa_ppa_programa.exercicio   = d.exercicio
+                         AND programa_ppa_programa.exercicio    = d.exercicio
+                        
                         JOIN ppa.programa
                           ON ppa.programa.cod_programa = programa_ppa_programa.cod_programa_ppa
+                          
                         JOIN orcamento.pao_ppa_acao
-                          ON pao_ppa_acao.num_pao = d.num_pao
+                          ON pao_ppa_acao.num_pao   = d.num_pao
                          AND pao_ppa_acao.exercicio = d.exercicio
+                         
                         JOIN ppa.acao 
                           ON ppa.acao.cod_acao = pao_ppa_acao.cod_acao
-                           , orcamento.conta_despesa     as cd
-                    WHERE
-                        ped.exercicio      = ''' || stExercicio || '''   AND
-                        ped.cod_despesa    = d.cod_despesa and 
-                        ped.exercicio      = d.exercicio   and ';
+                           
+                           , orcamento.conta_despesa as cd
+                           
+                    WHERE ped.exercicio      = ''' || stExercicio || '''
+                      AND ped.cod_despesa    = d.cod_despesa
+                      AND ped.exercicio      = d.exercicio
+                      AND ';
                     
                     if ( inCodFuncao is not null and TRIM(inCodFuncao)<>'') then
-                        stSql := stSql || ' d.cod_funcao = ' || inCodFuncao || ' and ';
+                        stSql := stSql || ' d.cod_funcao = ' || inCodFuncao || ' AND ';
                     end if;
 
                     if ( inCodSubFuncao is not null and TRIM(inCodSubFuncao)<>'') then
-                        stSql := stSql || ' d.cod_subfuncao = ' || inCodSubFuncao || ' and ';
+                        stSql := stSql || ' d.cod_subfuncao = ' || inCodSubFuncao || ' AND ';
                     end if;
 
                stSql := stSql || '
-                        ped.cod_conta      = cd.cod_conta  and 
-                        ped.exercicio      = cd.exercicio
-                ) as ped_d_cd ON pe.exercicio = ped_d_cd.exercicio AND pe.cod_pre_empenho = ped_d_cd.cod_pre_empenho 
+                        ped.cod_conta      = cd.cod_conta
+                    AND ped.exercicio      = cd.exercicio
+                ) AS ped_d_cd
+               ON pe.exercicio       = ped_d_cd.exercicio
+              AND pe.cod_pre_empenho = ped_d_cd.cod_pre_empenho 
 
-            WHERE
-                    e.exercicio         = ''' || stExercicio || '''
-                AND e.exercicio         = pe.exercicio
-                AND e.cod_pre_empenho   = pe.cod_pre_empenho
-                AND e.cod_entidade      IN (' || stCodEntidades || ')
-                AND pe.cgm_beneficiario = cgm.numcgm 
-                AND h.cod_historico     = pe.cod_historico    
-                AND h.exercicio         = pe.exercicio   ';
+            WHERE e.exercicio         = ''' || stExercicio || '''
+              AND e.exercicio         = pe.exercicio
+              AND e.cod_pre_empenho   = pe.cod_pre_empenho
+              AND e.cod_entidade      IN (' || stCodEntidades || ')
+              AND pe.cgm_beneficiario = cgm.numcgm 
+              AND h.cod_historico     = pe.cod_historico    
+              AND h.exercicio         = pe.exercicio   ';
 
                 if (stCodHistorico is not null and TRIM(stCodHistorico)<>'') then
                     stSql := stSql || ' and h.cod_historico = ' || stCodHistorico || ' ';
@@ -465,22 +529,19 @@ BEGIN
                         AND pl.cod_entidade = plnlp.cod_entidade
                         AND pl.exercicio_liquidacao = plnlp.exercicio_liquidacao
                         AND pl.cod_nota = plnlp.cod_nota
-
-
                     ';
                 end if;
 
                 if (stSituacao = '3') then
                     stSql := stSql || '
-                        --Ligação EMPENHO : NOTA LIQUIDAÇÃO
-                        AND e.exercicio = nl.exercicio_empenho
+                    --Ligação EMPENHO : NOTA LIQUIDAÇÃO
+                        AND e.exercicio    = nl.exercicio_empenho
                         AND e.cod_entidade = nl.cod_entidade
-                        AND e.cod_empenho = nl.cod_empenho
+                        AND e.cod_empenho  = nl.cod_empenho
 
-                        --Ligação NOTA LIQUIDAÇÃO : NOTA LIQUIDAÇÃO ITEM
-                        
-                        AND nl.exercicio = nli.exercicio
-                        AND nl.cod_nota = nli.cod_nota
+                    --Ligação NOTA LIQUIDAÇÃO : NOTA LIQUIDAÇÃO ITEM
+                        AND nl.exercicio    = nli.exercicio
+                        AND nl.cod_nota     = nli.cod_nota
                         AND nl.cod_entidade = nli.cod_entidade
                     ';   
                         
@@ -490,15 +551,13 @@ BEGIN
                         stSql := stSql || ' AND nl.dt_liquidacao NOT BETWEEN ';
                     END IF;
                     
-                    stSql := stSql || ' to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')
- 
-                    ';
+                    stSql := stSql || ' to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'') ';
+                    
                 end if;
 
                 if (stSituacao = '4') then
                     stSql := stSql || '
                         AND to_date( to_char( ea."timestamp", ''dd/mm/yyyy''), ''dd/mm/yyyy'' ) BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')
-
                         AND ea.exercicio = e.exercicio AND ea.exercicio = eai.exercicio
                         AND ea.timestamp = eai.timestamp
                         AND ea.cod_entidade = e.cod_entidade AND ea.cod_entidade = eai.cod_entidade
@@ -517,8 +576,7 @@ BEGIN
                         AND nl.exercicio = nlp.exercicio
                         AND nl.cod_nota = nlp.cod_nota
                         AND nl.cod_entidade = nlp.cod_entidade
-
-                        
+    
                         --Ligação NOTA LIQUIDAÇÃO PAGA : PAGAMENTO LIQUIDACAO NOTA LIQUIDACAO PAGA
                         AND nlp.cod_entidade = plnlp.cod_entidade
                         AND nlp.cod_nota = plnlp.cod_nota
@@ -538,7 +596,6 @@ BEGIN
                         AND nlp.cod_entidade = nlpa.cod_entidade
                         AND nlp.timestamp = nlpa.timestamp
                         AND to_date(to_char(nlpa.timestamp_anulada,''dd/mm/yyyy''),''dd/mm/yyyy'') BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')
-
                     ';
                 end if;
 
@@ -687,10 +744,12 @@ BEGIN
             end if;
 
 
-            stSql := stSql || 'pe.cgm_beneficiario, cgm.nom_cgm ) as tbl
+            stSql := stSql || 'pe.cgm_beneficiario, cgm.nom_cgm
+                            ) as tbl
             
-            WHERE valor <> ''0.00''
+                        WHERE valor <> ''0.00''
             ';
+            
             if (stOrdenacao = 'data' ) then
                 stSql := stSql || ' ORDER BY to_date(stData,''dd/mm/yyyy''), entidade, empenho, exercicio, cgm, razao_social, cod_nota, ordem, conta, nome_conta';
             end if;
@@ -703,20 +762,19 @@ BEGIN
                 stSql := stSql || ' ORDER BY razao_social, to_date(stData,''dd/mm/yyyy''), entidade, empenho, exercicio, cgm, cod_nota, ordem, conta, nome_conta';
             end if;
     
-    
     FOR reRegistro IN EXECUTE stSql
     LOOP
 
         RETURN next reRegistro;
     END LOOP;
 
-    if (stSituacao = '2') then
+    IF (stSituacao = '2') THEN
         DROP TABLE tmp_pago;
-    end if;
-
-    if (stSituacao = '5') then
+    END IF;
+    
+    IF (stSituacao = '5') THEN
         DROP TABLE tmp_estornado;
-    end if;
+    END IF;
           
     RETURN;
 END;

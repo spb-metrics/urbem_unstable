@@ -104,6 +104,8 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
 
 switch ($stAcao) {
     case "anular":
+    SistemaLegado::LiberaFrames(true,False);
+    Sessao::setTrataExcecao(true);
     $obErro = new Erro;
     foreach ($_POST as $stChave => $stValor) {
         if ( strstr( $stChave, "nuValor" ) ) {
@@ -166,33 +168,30 @@ switch ($stAcao) {
         $obErro->setDescricao("A data de anulação deve ser maior ou igual a ". $stMaiorData);
     }
    
-    
     if ( !$obErro->ocorreu() ) {
         if (isset($_REQUEST['inRestos'])) {
             Sessao::write('inRestos', $_REQUEST['inRestos']);
-            
             //Verifica se as contas estão configuradas, se nao estiver nao conclui a anulação
             if ( $_REQUEST['inRestos'] == 0) {
-                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1', '8.2.1.1.2', '8.2.1.1.1');
+                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1');
             }elseif ($_REQUEST['inRestos'] == 1){
-                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1', '8.2.1.1.2', '8.2.1.1.1', '4.6.4.0.1.00' );
+                $arContasLancamentoAnulacao = array('6.3.1.1','6.3.1.9.1', '4.6.4.0.1.00' );
             }elseif ($_REQUEST['inRestos'] == 2){
-                $arContasLancamentoAnulacao = array('4.6.4.0.1.00' , '6.3.2.1', '6.3.2.9.9' , '8.2.1.1.3', '8.2.1.1.1');
+                $arContasLancamentoAnulacao = array('4.6.4.0.1.00' , '6.3.2.1', '6.3.2.9.9' );
             }
-         
             foreach($arContasLancamentoAnulacao AS $arConta ){
                 include_once ( CAM_GF_EMP_MAPEAMENTO     ."FEmpenhoEmpenhoEstornoRestosAPagar.class.php" );
                 $obFEmpenhoEmpenhoEstornoRestosAPagar =  new FEmpenhoEmpenhoEstornoRestosAPagar;
-                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'exercicio'       , Sessao::getExercicio() );
-                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'cod_estrutural'  , $arConta );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'exercicio'        , Sessao::getExercicio() );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'cod_estrutural'   , $arConta );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'exercicio_empenho', $_REQUEST['stDtExercicioEmpenho'] );
+                $obFEmpenhoEmpenhoEstornoRestosAPagar->setDado( 'cod_empenho_resto', $_POST['inCodEmpenho'] );
                 $obFEmpenhoEmpenhoEstornoRestosAPagar->verificaConta($rsRecordset, $boTransacao);
-                
                 if($rsRecordset->getNumLinhas() < 0){
                     $obFEmpenhoEmpenhoEstornoRestosAPagar->buscaContaComMascara($rsRecordset, $boTransacao);
                     $obErro->setDescricao("A conta ".$rsRecordset->getCampo('fn_mascara_completa')." não é analítica ou não está cadastrada!");
                 }
             }
-            
         }
         if ( !$obErro->ocorreu() ) {
             $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtAnulacao( $_POST['stDtAnulacao'] );
@@ -212,6 +211,8 @@ switch ($stAcao) {
         SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
     }
     SistemaLegado::LiberaFrames(true,False);
+    
+    Sessao::encerraExcecao();
     break;
 }
 ?>

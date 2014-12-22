@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 61245 2014-12-19 21:08:54Z arthur $
 
     $Revision: 32880 $
     $Name$
@@ -685,7 +685,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
 
         $obFEmpenhoEmpenhadoPagoLiquidado->setDado("boMostrarAnuladoMesmoPeriodo", false);
         $obErro = $obFEmpenhoEmpenhadoPagoLiquidado->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
-
+        
         $dtAnulacao = "";
         $dtAnulacaoAtual = "";
         $mostra = false;
@@ -720,8 +720,8 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             $inCount++;
             $mostra = false;
             $rsRecordSet->proximo();
-        }
-
+        }     
+                
         if ($inCount > 0) {
 
             //MONTA TOTALIZADOR GERAL
@@ -749,9 +749,20 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             $arRecord[$inCount]['descricao_categoria'] = "";
             $arRecord[$inCount]['nom_tipo']          = "";
             $arRecord[$inCount]['razao_social']      = 'TOTAL DO PERÍODO';
-            $arRecord[$inCount]['valor']             = number_format( ($inTotalGeral + $flValorOutroPeriodo), 2, ',', '.' );
-            $arRecord[$inCount]['valor_anulado']     = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
-            $arRecord[$inCount]['saldo']             = number_format( ($inTotalSaldo + $flSaldoOutroPeriodo), 2, ',', '.' );
+            
+            if($this->getSituacao() != "3"){
+                $arRecord[$inCount]['valor']         = number_format( ($inTotalGeral + $flValorOutroPeriodo), 2, ',', '.' );
+                $arRecord[$inCount]['valor_anulado'] = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
+                $arRecord[$inCount]['saldo']         = number_format( ($inTotalSaldo + $flSaldoOutroPeriodo), 2, ',', '.' );
+            }else{
+                $obFEmpenhoEmpenhadoPagoLiquidado->recuperaLiquidadoTotal( $rsLiquidadoTotal );
+                $obFEmpenhoEmpenhadoPagoLiquidado->recuperaLiquidadoAnuladoTotal( $rsLiquidadoTotalAnulado );
+                
+                $arRecord[$inCount]['valor']         = number_format( $rsLiquidadoTotal->getCampo('vl_total'), 2, ',', '.' );
+                $arRecord[$inCount]['valor_anulado'] = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
+                $arRecord[$inCount]['saldo']         = number_format( $rsLiquidadoTotal->getCampo('vl_total') - $rsLiquidadoTotalAnulado->getCampo('vl_total_anulado'), 2, ',', '.' );
+            }
+            
             $arRecord[$inCount]['data']              = "";
             $arRecord[$inCount]['ordem']             = "";
             $arRecord[$inCount]['conta']             = "";

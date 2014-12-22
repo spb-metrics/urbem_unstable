@@ -500,14 +500,6 @@ stSql :='
         stEntidadesCamara := arEntidades[1];
     END IF;
 
-    --
-    -- Acrescenta o valor da rcl vinculada ao periodo
-    --
-    SELECT stn.fn_calcula_rcl_vinculada(stExercicio,stDtFinal,stEntidadesCamara)
-      INTO flValorRCL;
-
-    nuRCL := nuRCL + flValorRCL;
-
     stSql := 'INSERT INTO tmp_relatorio values(1,''RECEITA CORRENTE LÍQUIDA - RCL'','||nuRCL||','||nuRCL||',''S'',2)';
     EXECUTE stSql;
 

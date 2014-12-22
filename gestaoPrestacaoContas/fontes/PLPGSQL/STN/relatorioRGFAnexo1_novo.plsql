@@ -398,7 +398,6 @@ BEGIN
 	';
 
 	EXECUTE stSql;
-	RAISE NOTICE 'stSql: %', stSql;
     -------------------------------------------------
     -- Adiciona o valor da despesa pessoal vinculada
     -------------------------------------------------
@@ -432,7 +431,6 @@ BEGIN
                 grupo = ' || reReg.grupo || ' AND nivel = 1 ';     
                 
         EXECUTE stSqlAux;
-RAISE NOTICE 'stSqlAux: %', stSqlAux;z
     END LOOP;
 
 	stSql := 'SELECT 

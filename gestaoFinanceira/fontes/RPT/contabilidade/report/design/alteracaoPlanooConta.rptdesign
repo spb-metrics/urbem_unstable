@@ -612,6 +612,7 @@ LEFT JOIN contabilidade.plano_analitica
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">0</property>
             <column id="1415">
                 <property name="width">1.5476190476190477in</property>
             </column>
@@ -700,6 +701,7 @@ LEFT JOIN contabilidade.plano_analitica
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">0</property>
             <column id="6707">
                 <property name="width">1.5476190476190477in</property>
             </column>
@@ -788,6 +790,7 @@ LEFT JOIN contabilidade.plano_analitica
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">0</property>
             <column id="6685">
                 <property name="width">1.5476190476190477in</property>
             </column>
@@ -876,6 +879,7 @@ LEFT JOIN contabilidade.plano_analitica
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">0</property>
             <column id="1446">
                 <property name="width">1.5476190476190477in</property>
             </column>

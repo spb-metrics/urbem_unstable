@@ -33,13 +33,11 @@
 
     $Id:$
 */
-
 /*
     ESTA PL GERA O SOMATORIO REFERENTE A LINHA DE INTRA-ORCAMENTARIAS.
     ELA E BASICAMENTE UMA COPIA DA PL relatorioRREOAnexo2.plsql.
     Prog.: Alexandre Melo
 */
-
 CREATE OR REPLACE FUNCTION stn.fn_anexo2_intra(varchar,varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
@@ -61,116 +59,121 @@ BEGIN
     SELECT
            d.cod_funcao
          , d.cod_subfuncao
-         , f.descricao             as nom_funcao
-         , sf.descricao            as nom_subfuncao
-         , sum(d.vl_original)      as vl_original
-         , (sum(coalesce(d.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))) as vl_suplementacoes
-         , sum(coalesce(empenhado_bimestre.vl_total,0.00)) - sum(coalesce(empenhado_anulado_bimestre.vl_total,0.00)) as vl_empenhado_bimestre
-         , sum(coalesce(empenhado_ate_bimestre.vl_total,0.00))                 as vl_empenhado_ate_bimestre
-         , sum(coalesce(liquidado_bimestre.vl_total,0.00)) - sum(coalesce(liquidado_anulado_bimestre.vl_total,0.00)) as vl_liquidado_bimestre
-         , sum(coalesce(liquidado_ate_bimestre.vl_total,0.00))  as vl_liquidado_ate_bimestre
+         , f.descricao        AS nom_funcao
+         , sf.descricao       AS nom_subfuncao
+         , sum(d.vl_original) AS vl_original
+         , (sum(coalesce(d.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))) AS vl_suplementacoes
+         , sum(coalesce(empenhado_bimestre.vl_total,0.00)) - sum(coalesce(empenhado_anulado_bimestre.vl_total,0.00))                           AS vl_empenhado_bimestre
+         , sum(coalesce(empenhado_ate_bimestre.vl_total,0.00))                                                                                 AS vl_empenhado_ate_bimestre
+         , sum(coalesce(liquidado_bimestre.vl_total,0.00)) - sum(coalesce(liquidado_anulado_bimestre.vl_total,0.00))                           AS vl_liquidado_bimestre
+         , sum(coalesce(liquidado_ate_bimestre.vl_total,0.00))                                                                                 AS vl_liquidado_ate_bimestre
       FROM
-           orcamento.despesa          as d
+           orcamento.despesa  AS d
+           
            -- EMPENHADO BIMESTRE
            LEFT JOIN( SELECT
-                             sum(coalesce(ipe.vl_total, 0.00)) as vl_total
+                             sum(coalesce(ipe.vl_total, 0.00)) AS vl_total
                            , ped.cod_despesa
                         FROM
-                             empenho.pre_empenho_despesa  as ped
-                           , empenho.pre_empenho          as pe
-                           , empenho.item_pre_empenho     as ipe
-                           , empenho.empenho  as e
+                             empenho.pre_empenho_despesa  AS ped
+                           , empenho.pre_empenho          AS pe
+                           , empenho.item_pre_empenho     AS ipe
+                           , empenho.empenho              AS e
                        WHERE
-                             ped.exercicio = pe.exercicio
+                             ped.exercicio       = pe.exercicio
                          AND ped.cod_pre_empenho = pe.cod_pre_empenho
-                         AND pe.cod_pre_empenho = ipe.cod_pre_empenho
+                         AND pe.cod_pre_empenho  = ipe.cod_pre_empenho
 
-                         AND pe.exercicio = ipe.exercicio
-                         AND e.exercicio = pe.exercicio
+                         AND pe.exercicio      = ipe.exercicio
+                         AND e.exercicio       = pe.exercicio
                          AND e.cod_pre_empenho = pe.cod_pre_empenho
-                         AND e.exercicio = ''' || stExercicio || '''
+                         AND e.exercicio       = ''' || stExercicio || '''
                          AND e.cod_entidade IN (' || stCodEntidades || ')
-                         AND e.dt_empenho::date BETWEEN to_date('''||dtInicial||''', ''dd/mm/yyyy'')              -- DATA INCIAL DO BIMESTRE
-                                              AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')              -- DATA FINAL DO BIMESTRE
-                    GROUP BY ped.cod_despesa                                                   ) as empenhado_bimestre
-                  ON( empenhado_bimestre.cod_despesa = d.cod_despesa )
+                         AND e.dt_empenho::date BETWEEN to_date('''||dtInicial||''', ''dd/mm/yyyy'')  -- DATA INCIAL DO BIMESTRE
+                                                    AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')    -- DATA FINAL DO BIMESTRE
+                    GROUP BY ped.cod_despesa
+                   ) AS empenhado_bimestre
+                  ON empenhado_bimestre.cod_despesa = d.cod_despesa 
 
            -- EMPENHADO ANULADO BIMESTRE
            LEFT JOIN( SELECT
-                             sum(coalesce(item_empenho_anulado.vl_anulado,0.00))  as vl_total
+                             sum(coalesce(item_empenho_anulado.vl_anulado,0.00)) AS vl_total
                            , ped.cod_despesa
                         FROM
-                             empenho.pre_empenho_despesa  as ped
-                           , empenho.pre_empenho          as pe
-                           , empenho.item_pre_empenho     as ipe
+                             empenho.pre_empenho_despesa  AS ped
+                           , empenho.pre_empenho          AS pe
+                           , empenho.item_pre_empenho     AS ipe
                              INNER JOIN( SELECT eai.vl_anulado
                                              , eai.exercicio
                                              , eai.cod_pre_empenho
                                              , eai.num_item
                                           FROM empenho.empenho_anulado_item as eai
                                          WHERE eai.timestamp::date BETWEEN to_date( '''||dtInicial||''', ''dd/mm/yyyy'')
-                                                                     AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')  ) as item_empenho_anulado
-                                    ON(     item_empenho_anulado.exercicio       = ipe.exercicio
+                                                                       AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
+                                        ) AS item_empenho_anulado
+                                         ON item_empenho_anulado.exercicio       = ipe.exercicio
                                         AND item_empenho_anulado.cod_pre_empenho = ipe.cod_pre_empenho
-                                        AND item_empenho_anulado.num_item        = ipe.num_item )
-                            , empenho.empenho  as e
+                                        AND item_empenho_anulado.num_item        = ipe.num_item 
+                            , empenho.empenho AS e
                        WHERE
-                             ped.exercicio = pe.exercicio
+                             ped.exercicio       = pe.exercicio
                          AND ped.cod_pre_empenho = pe.cod_pre_empenho
-                         AND pe.cod_pre_empenho = ipe.cod_pre_empenho
-
-                         AND pe.exercicio = ipe.exercicio
-                         AND e.exercicio = pe.exercicio
-                         AND e.cod_pre_empenho = pe.cod_pre_empenho
-                         AND e.exercicio = ''' || stExercicio || '''
-                         AND e.cod_entidade IN (' || stCodEntidades || ')
-                         AND e.dt_empenho::date BETWEEN to_date('''||dtIniExercicio||''', ''dd/mm/yyyy'')              -- DATA INCIAL DO EXERCICIO
-                                              AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')              -- DATA FINAL DO BIMESTRE
-                    GROUP BY ped.cod_despesa                                                   ) as empenhado_anulado_bimestre
-                  ON( empenhado_anulado_bimestre.cod_despesa = d.cod_despesa )
+                         AND pe.cod_pre_empenho  = ipe.cod_pre_empenho
+                         AND pe.exercicio        = ipe.exercicio
+                         AND e.exercicio         = pe.exercicio
+                         AND e.cod_pre_empenho   = pe.cod_pre_empenho
+                         AND e.exercicio         = ''' || stExercicio || '''
+                         AND e.cod_entidade      IN (' || stCodEntidades || ')
+                         AND e.dt_empenho::date BETWEEN to_date('''||dtIniExercicio||''', ''dd/mm/yyyy'')  -- DATA INCIAL DO EXERCICIO
+                                                    AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')         -- DATA FINAL DO BIMESTRE
+                    GROUP BY ped.cod_despesa
+                   ) AS empenhado_anulado_bimestre
+                   ON empenhado_anulado_bimestre.cod_despesa = d.cod_despesa 
 
            -- TOTAL EMPENHADO ATÉ O BIMESTRE
-           LEFT JOIN( SELECT  sum(coalesce(ipe.vl_total, 0.00)) - sum(coalesce(item_empenho_anulado.vl_anulado,0.00))  as vl_total
+           LEFT JOIN( SELECT  sum(coalesce(ipe.vl_total, 0.00)) - sum(coalesce(item_empenho_anulado.vl_anulado,0.00)) AS vl_total
                            , ped.cod_despesa
                         FROM
-                             empenho.pre_empenho_despesa  as ped
-                           , empenho.pre_empenho          as pe
-                           , empenho.item_pre_empenho     as ipe
+                             empenho.pre_empenho_despesa  AS ped
+                           , empenho.pre_empenho          AS pe
+                           , empenho.item_pre_empenho     AS ipe
                              LEFT JOIN( SELECT eai.vl_anulado
                                              , eai.exercicio
                                              , eai.cod_pre_empenho
                                              , eai.num_item
                                           FROM empenho.empenho_anulado_item as eai
                                          WHERE eai.timestamp::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')
-                                                                     AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')  ) as item_empenho_anulado
-                                    ON(     item_empenho_anulado.exercicio       = ipe.exercicio
+                                                                       AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
+                                       ) AS item_empenho_anulado
+                                         ON item_empenho_anulado.exercicio       = ipe.exercicio
                                         AND item_empenho_anulado.cod_pre_empenho = ipe.cod_pre_empenho
-                                        AND item_empenho_anulado.num_item        = ipe.num_item )
-                           , empenho.empenho              as e
+                                        AND item_empenho_anulado.num_item        = ipe.num_item 
+                           , empenho.empenho AS e
                        WHERE
-                             ped.exercicio = pe.exercicio
+                             ped.exercicio       = pe.exercicio
                          AND ped.cod_pre_empenho = pe.cod_pre_empenho
-                         AND pe.cod_pre_empenho = ipe.cod_pre_empenho
-                         AND pe.exercicio = ipe.exercicio
-                         AND e.exercicio = pe.exercicio
-                         AND e.cod_pre_empenho = pe.cod_pre_empenho
-                         AND e.exercicio = ''' || stExercicio || '''
-                         AND e.cod_entidade IN (' || stCodEntidades || ')
-                         AND e.dt_empenho::date BETWEEN to_date('''||dtIniExercicio||''', ''dd/mm/yyyy'')              -- DATA INCIAL DO EXERCICIO
-                                              AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')              -- DATA FINAL DO BIMESTRE
-                    GROUP BY ped.cod_despesa                                                     ) as empenhado_ate_bimestre
-                  ON( empenhado_ate_bimestre.cod_despesa = d.cod_despesa )
+                         AND pe.cod_pre_empenho  = ipe.cod_pre_empenho
+                         AND pe.exercicio        = ipe.exercicio
+                         AND e.exercicio         = pe.exercicio
+                         AND e.cod_pre_empenho   = pe.cod_pre_empenho
+                         AND e.exercicio         = ''' || stExercicio || '''
+                         AND e.cod_entidade      IN (' || stCodEntidades || ')
+                         AND e.dt_empenho::date BETWEEN to_date('''||dtIniExercicio||''', ''dd/mm/yyyy'')  -- DATA INCIAL DO EXERCICIO
+                                                    AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')         -- DATA FINAL DO BIMESTRE
+                    GROUP BY ped.cod_despesa
+                    ) AS empenhado_ate_bimestre
+                  ON empenhado_ate_bimestre.cod_despesa = d.cod_despesa 
 
         -- LIQUIDADO NO BIMESTRE
         LEFT JOIN(  SELECT
                            ped.cod_despesa
-                         , sum(coalesce(nli.vl_total,0.00)) as vl_total
+                         , sum(coalesce(nli.vl_total,0.00)) AS vl_total
                       FROM
-                           empenho.nota_liquidacao as nl
-                         , empenho.nota_liquidacao_item as nli
-                         , empenho.empenho as e
-                         , empenho.pre_empenho as pe
-                         , empenho.pre_empenho_despesa as ped
+                           empenho.nota_liquidacao      AS nl
+                         , empenho.nota_liquidacao_item AS nli
+                         , empenho.empenho              AS e
+                         , empenho.pre_empenho          AS pe
+                         , empenho.pre_empenho_despesa  AS ped
                      WHERE
                            nli.exercicio        = nl.exercicio
                        AND nli.cod_entidade     = nl.cod_entidade
@@ -182,20 +185,21 @@ BEGIN
                        AND e.cod_pre_empenho    = pe.cod_pre_empenho
                        AND pe.exercicio         = ped.exercicio
                        AND pe.cod_pre_empenho   = ped.cod_pre_empenho
-                       AND e.exercicio = ''' || stExercicio || '''
-                       AND e.cod_entidade IN (' || stCodEntidades || ')
+                       AND e.exercicio          = ''' || stExercicio || '''
+                       AND e.cod_entidade       IN (' || stCodEntidades || ')
                        AND nl.dt_liquidacao::date BETWEEN to_date( '''||dtInicial||''', ''dd/mm/yyyy'')
-                                                AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
-                  GROUP BY ped.cod_despesa                                                                     ) as liquidado_bimestre
-                 ON( liquidado_bimestre.cod_despesa = d.cod_despesa )
+                                                      AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
+                  GROUP BY ped.cod_despesa
+                  ) AS liquidado_bimestre
+                 ON liquidado_bimestre.cod_despesa = d.cod_despesa
 
         -- LIQUIDADO ANULADO NO BIMESTRE
         LEFT JOIN(  SELECT
                            ped.cod_despesa
-                         , sum(coalesce(item_anulado.vl_anulado,0.00)) as vl_total
+                         , sum(coalesce(item_anulado.vl_anulado,0.00)) AS vl_total
                       FROM
-                           empenho.nota_liquidacao as nl
-                         , empenho.nota_liquidacao_item as nli
+                           empenho.nota_liquidacao      AS nl
+                         , empenho.nota_liquidacao_item AS nli
                            INNER JOIN( SELECT nlia.exercicio
                                            , nlia.cod_nota
                                            , nlia.num_item
@@ -205,17 +209,18 @@ BEGIN
                                            , nlia.vl_anulado
                                         FROM empenho.nota_liquidacao_item_anulado as nlia
                                        WHERE nlia.timestamp::date BETWEEN to_date( '''||dtInicial||''',  ''dd/mm/yyyy'')
-                                                                 AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')     
-                                                                                                                                    ) as item_anulado
-                                  ON(     item_anulado.exercicio       = nli.exercicio
-                                      AND item_anulado.cod_nota        = nli.cod_nota
-                                      AND item_anulado.num_item        = nli.num_item
-                                      AND item_anulado.exercicio_item  = nli.exercicio_item
-                                      AND item_anulado.cod_pre_empenho = nli.cod_pre_empenho
-                                      AND item_anulado.cod_entidade    = nli.cod_entidade     )
-                         , empenho.empenho as e
-                         , empenho.pre_empenho as pe
-                         , empenho.pre_empenho_despesa as ped
+                                                                      AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')     
+                                                                                                                                    
+                                      ) AS item_anulado
+                                     ON item_anulado.exercicio       = nli.exercicio
+                                    AND item_anulado.cod_nota        = nli.cod_nota
+                                    AND item_anulado.num_item        = nli.num_item
+                                    AND item_anulado.exercicio_item  = nli.exercicio_item
+                                    AND item_anulado.cod_pre_empenho = nli.cod_pre_empenho
+                                    AND item_anulado.cod_entidade    = nli.cod_entidade
+                         , empenho.empenho             AS e
+                         , empenho.pre_empenho         AS pe
+                         , empenho.pre_empenho_despesa AS ped
                      WHERE
                            nli.exercicio        = nl.exercicio
                        AND nli.cod_entidade     = nl.cod_entidade
@@ -227,21 +232,21 @@ BEGIN
                        AND e.cod_pre_empenho    = pe.cod_pre_empenho
                        AND pe.exercicio         = ped.exercicio
                        AND pe.cod_pre_empenho   = ped.cod_pre_empenho
-                       AND e.exercicio = ''' || stExercicio || '''
-                       AND e.cod_entidade IN (' || stCodEntidades || ')
+                       AND e.exercicio          = ''' || stExercicio || '''
+                       AND e.cod_entidade       IN (' || stCodEntidades || ')
                        AND nl.dt_liquidacao::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')
-                                                AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
-                  GROUP BY ped.cod_despesa                                                                     ) as liquidado_anulado_bimestre
-                 ON( liquidado_anulado_bimestre.cod_despesa = d.cod_despesa )
-
+                                                      AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
+                  GROUP BY ped.cod_despesa
+                ) AS liquidado_anulado_bimestre
+                ON liquidado_anulado_bimestre.cod_despesa = d.cod_despesa
 
         -- LIQUIDADO ATE BIMESTRE
         LEFT JOIN(  SELECT
                            ped.cod_despesa
-                         , sum(coalesce(nli.vl_total,0.00)) - sum(coalesce(item_anulado.vl_anulado,0.00)) as vl_total
+                         , sum(coalesce(nli.vl_total,0.00)) - sum(coalesce(item_anulado.vl_anulado,0.00)) AS vl_total
                       FROM
-                           empenho.nota_liquidacao as nl
-                         , empenho.nota_liquidacao_item as nli
+                           empenho.nota_liquidacao      AS nl
+                         , empenho.nota_liquidacao_item AS nli
                            LEFT JOIN( SELECT nlia.exercicio
                                            , nlia.cod_nota
                                            , nlia.num_item
@@ -251,17 +256,18 @@ BEGIN
                                            , nlia.vl_anulado
                                         FROM empenho.nota_liquidacao_item_anulado as nlia
                                        WHERE nlia.timestamp::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')
-                                                                AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')  
-                                                                                                                                      ) as item_anulado
-                                  ON(     item_anulado.exercicio       = nli.exercicio 
-                                      AND item_anulado.cod_nota        = nli.cod_nota
-                                      AND item_anulado.num_item        = nli.num_item
-                                      AND item_anulado.exercicio_item  = nli.exercicio_item
-                                      AND item_anulado.cod_pre_empenho = nli.cod_pre_empenho
-                                      AND item_anulado.cod_entidade    = nli.cod_entidade     )
-                         , empenho.empenho as e
-                         , empenho.pre_empenho as pe
-                         , empenho.pre_empenho_despesa as ped
+                                                                      AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')  
+                                                                                                                                      
+                                    ) AS item_anulado
+                                   ON item_anulado.exercicio       = nli.exercicio 
+                                  AND item_anulado.cod_nota        = nli.cod_nota
+                                  AND item_anulado.num_item        = nli.num_item
+                                  AND item_anulado.exercicio_item  = nli.exercicio_item
+                                  AND item_anulado.cod_pre_empenho = nli.cod_pre_empenho
+                                  AND item_anulado.cod_entidade    = nli.cod_entidade
+                         , empenho.empenho             AS e
+                         , empenho.pre_empenho         AS pe
+                         , empenho.pre_empenho_despesa AS ped
                      WHERE
                            nli.exercicio        = nl.exercicio
                        AND nli.cod_entidade     = nl.cod_entidade
@@ -273,62 +279,70 @@ BEGIN
                        AND e.cod_pre_empenho    = pe.cod_pre_empenho
                        AND pe.exercicio         = ped.exercicio
                        AND pe.cod_pre_empenho   = ped.cod_pre_empenho
-                       AND e.exercicio = ''' || stExercicio || '''
-                       AND e.cod_entidade IN (' || stCodEntidades || ')
+                       AND e.exercicio          = ''' || stExercicio || '''
+                       AND e.cod_entidade       IN (' || stCodEntidades || ')
                        AND nl.dt_liquidacao::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')
-                                                AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
-                  GROUP BY ped.cod_despesa                                                                     ) as liquidado_ate_bimestre
-                 ON( liquidado_ate_bimestre.cod_despesa = d.cod_despesa )
-
-
+                                                      AND to_date( '''||dtFinal||''', ''dd/mm/yyyy'')
+                  GROUP BY ped.cod_despesa
+                  ) AS liquidado_ate_bimestre
+                  ON liquidado_ate_bimestre.cod_despesa = d.cod_despesa
 
            LEFT JOIN ( SELECT ss.exercicio
                             , ss.cod_despesa
-                            , sum(ss.valor)           as vl_suplementado
-                         FROM orcamento.suplementacao                   as s
-                            , orcamento.suplementacao_suplementada      as ss
+                            , sum(ss.valor)                        AS vl_suplementado
+                         FROM orcamento.suplementacao              AS s
+                            , orcamento.suplementacao_suplementada AS ss
                         WHERE s.exercicio         = ss.exercicio
                           AND s.cod_suplementacao = ss.cod_suplementacao
                           AND s.dt_suplementacao::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')   
-                                                     AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')  
+                                                            AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')  
                      GROUP BY ss.exercicio
                             , ss.cod_despesa
-                     ORDER BY ss.cod_despesa ) as suplementado
-                  ON (     suplementado.exercicio   = d.exercicio
-                       AND suplementado.cod_despesa = d.cod_despesa )
+                     ORDER BY ss.cod_despesa
+                     ) AS suplementado
+                  ON suplementado.exercicio   = d.exercicio
+                 AND suplementado.cod_despesa = d.cod_despesa
+           
            LEFT JOIN ( SELECT sr.exercicio
                             , sr.cod_despesa
-                            , sum(sr.valor)           as vl_reduzido
-                         FROM orcamento.suplementacao              as s
-                            , orcamento.suplementacao_reducao      as sr
+                            , sum(sr.valor)                     AS vl_reduzido
+                         FROM orcamento.suplementacao           AS s
+                            , orcamento.suplementacao_reducao   AS sr
                         WHERE s.exercicio         = sr.exercicio
                           AND s.cod_suplementacao = sr.cod_suplementacao
                           AND s.exercicio         = ''' || stExercicio || '''
                           AND s.dt_suplementacao::date BETWEEN to_date( '''||dtIniExercicio||''', ''dd/mm/yyyy'')
-                                                     AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')   
+                                                           AND to_date('''||dtFinal||''', ''dd/mm/yyyy'')   
                      GROUP BY sr.exercicio
                             , sr.cod_despesa
-                     ORDER BY sr.cod_despesa ) as reduzido
-                  ON (     reduzido.exercicio   = d.exercicio
-                       AND reduzido.cod_despesa = d.cod_despesa )
-           LEFT JOIN orcamento.funcao as f
-                  on (    f.exercicio  = d.exercicio
-                      AND f.cod_funcao = d.cod_funcao  )
-           LEFT JOIN orcamento.subfuncao as sf
-                  on (    sf.exercicio = d.exercicio
-                      AND sf.cod_subfuncao = d.cod_subfuncao )
-         , orcamento.conta_despesa     as cd
+                     ORDER BY sr.cod_despesa
+                    ) AS reduzido
+                  ON reduzido.exercicio   = d.exercicio
+                 AND reduzido.cod_despesa = d.cod_despesa
+                 
+           LEFT JOIN orcamento.funcao AS f
+                  ON f.exercicio  = d.exercicio
+                 AND f.cod_funcao = d.cod_funcao
+                 
+           LEFT JOIN orcamento.subfuncao AS sf
+                  ON sf.exercicio     = d.exercicio
+                 AND sf.cod_subfuncao = d.cod_subfuncao 
+         
+         , orcamento.conta_despesa AS cd
+     
      WHERE
-           d.cod_conta   = cd.cod_conta AND d.exercicio   = cd.exercicio
-       AND d.exercicio   =  ''' || stExercicio || '''
+           d.cod_conta    = cd.cod_conta
+       AND d.exercicio    = cd.exercicio
+       AND d.exercicio    =  ''' || stExercicio || '''
        AND d.cod_entidade IN (' || stCodEntidades || ')
        AND substring(cd.cod_estrutural, 5, 3) = ''9.1''
+  
   GROUP BY d.cod_funcao
          , d.cod_subfuncao
          , f.descricao
          , sf.descricao
-  ORDER BY f.descricao;
-    ';
+  
+  ORDER BY f.descricao; ';
 
     EXECUTE stSql;
 
@@ -341,9 +355,7 @@ BEGIN
                    , sum(vl_liquidado_bimestre)               as vl_liquidado_bimestre
                    , sum(vl_liquidado_ate_bimestre)           as vl_liquidado_ate_bimestre
                 FROM
-                     tmp_intra_orcamentarias;
-
-        ';
+                     tmp_intra_orcamentarias; ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -351,8 +363,6 @@ BEGIN
     END LOOP;
 
     RETURN;
-
+    
 END;
-
 $$ language plpgsql;
-

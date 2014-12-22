@@ -562,7 +562,7 @@ extensionProperties.odaPassword = params["db_password"].value;
     dot_atu, 
     liq_tot, 
     resto 
-FROM stn.fn_rreo_anexo11_despesas(?, ?, ?, ?) AS (
+FROM stn.fn_rreo_anexo9_despesas(?, ?, ?, ?) AS (
     grupo INTEGER, 
     nivel INTEGER,
     cod_estrutural VARCHAR, 
@@ -818,7 +818,7 @@ if (params['relatorio_novo'] == 'sim' &amp;&amp; params['exercicio'] < '2015' ) 
 this.queryText += "    atu, ";
 this.queryText += "    ate_bi, ";
 this.queryText += "    saldo ";
-this.queryText += "FROM stn.fn_rreo_anexo11_receitas('"+ params['exercicio'] +"', '"+ params['entidade'] +"', '"+ params['peridiocidade'] +"', "+ params['bimestre'] +") AS ( ";
+this.queryText += "FROM stn.fn_rreo_anexo9_receitas('"+ params['exercicio'] +"', '"+ params['entidade'] +"', '"+ params['peridiocidade'] +"', "+ params['bimestre'] +") AS ( ";
 this.queryText += "    grupo INTEGER , ";
 this.queryText += "    nivel INTEGER , ";
 this.queryText += "    descricao VARCHAR , ";

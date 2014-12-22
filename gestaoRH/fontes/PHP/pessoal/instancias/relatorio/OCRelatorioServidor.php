@@ -139,7 +139,9 @@ switch ($arFiltro["stTipoFiltro"]) {
     break;
 }
 
+
 $obRRelatorioServidor->geraRecordSet( $rsRecordset, $stFiltroContratos, $stOrder );
+
 Sessao::write('rsServidores', $rsRecordset);
 $obRRelatorio->executaFrameOculto( "OCGeraRelatorioServidor.php" );
 ?>

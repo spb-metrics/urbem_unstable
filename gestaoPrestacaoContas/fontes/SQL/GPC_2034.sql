@@ -226,3 +226,55 @@ SELECT 6
            )
      ;
 
+
+----------------
+-- Ticket #22333
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 64
+     , 'RREO - Anexo 6 - Demonstrativo do Resultado Primário'
+     , 'RREOAnexo6_2015.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 64
+           )
+     ;
+
+
+----------------
+-- Ticket #22337
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 65
+     , 'RREO - Anexo 11 - Demonstrativo da Receita de Alienação de Ativos e Aplicação dos Recursos'
+     , 'RREOAnexo11_2015.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 65
+           )
+     ;
+

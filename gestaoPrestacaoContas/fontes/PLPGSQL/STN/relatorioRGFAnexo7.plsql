@@ -182,15 +182,6 @@ BEGIN
         FETCH crCursor INTO nuRCL;
     CLOSE crCursor;
 
-    --
-    -- Acrescenta o valor da rcl vinculada ao periodo
-    --
-    SELECT stn.fn_calcula_rcl_vinculada(stExercicio,stDtFim,stEntidades)
-      INTO flValorRCL;
-
-    nuRCL := nuRCL + flValorRCL;
- 
-
     IF (nuRCL IS NULL) THEN 
         nuRCL := 0.00;
     END IF;

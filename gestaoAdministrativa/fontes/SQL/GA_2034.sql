@@ -425,6 +425,30 @@ BEGIN
 
 
             INSERT
+              INTO empenho.permissao_autorizacao
+                 ( exercicio
+                 , numcgm
+                 , num_unidade
+                 , num_orgao
+                 )
+            SELECT '2015' AS exercicio
+                 , numcgm
+                 , num_unidade
+                 , num_orgao
+              FROM empenho.permissao_autorizacao AS proximo
+             WHERE exercicio = '2014'
+               AND NOT EXISTS (
+                                SELECT 1
+                                  FROM empenho.permissao_autorizacao
+                                 WHERE exercicio   = '2015'
+                                   AND cod_numcgm  = proximo.numcgm
+                                   AND num_unidade = proximo.num_unidade
+                                   AND num_orgao   = proximo.num_orgao
+                              )
+                 ;
+
+
+            INSERT
               INTO contabilidade.posicao_plano
                  ( exercicio
                  , cod_posicao
@@ -634,7 +658,7 @@ BEGIN
                       JOIN orcamento.conta_despesa
                         ON conta_despesa.cod_conta                                         = proximo.cod_conta_despesa
                        AND CAST((CAST(conta_despesa.exercicio AS INTEGER) - 1) AS VARCHAR) = proximo.exercicio
-                     WHERE proximo.exercicio = '2015'
+                     WHERE proximo.exercicio = '2014'
                        AND NOT EXISTS (
                                         SELECT 1
                                           FROM contabilidade.configuracao_lancamento_debito
@@ -664,7 +688,7 @@ BEGIN
                       JOIN orcamento.conta_despesa
                         ON conta_despesa.cod_conta                                         = proximo.cod_conta_despesa
                        AND CAST((CAST(conta_despesa.exercicio AS INTEGER) - 1) AS VARCHAR) = proximo.exercicio
-                     WHERE proximo.exercicio = '2015'
+                     WHERE proximo.exercicio = '2014'
                        AND NOT EXISTS (
                                         SELECT 1
                                           FROM contabilidade.configuracao_lancamento_credito
@@ -690,7 +714,7 @@ BEGIN
                       JOIN orcamento.conta_receita
                         ON conta_receita.cod_conta                                         = proximo.cod_conta_receita
                        AND CAST((CAST(conta_receita.exercicio AS INTEGER) - 1) AS VARCHAR) = proximo.exercicio
-                     WHERE proximo.exercicio = '2015'
+                     WHERE proximo.exercicio = '2014'
                        AND NOT EXISTS (
                                         SELECT 1
                                           FROM contabilidade.configuracao_lancamento_receita
@@ -1984,4 +2008,13 @@ DROP FUNCTION atualiza_gf();
                                 ;
                           ')
          ;
+
+
+----------------
+-- Ticket #22408
+----------------
+
+ALTER TABLE tceto.norma_detalhe ADD COLUMN cod_norma_alteracao INTEGER NOT NULL;
+
+ALTER TABLE normas.norma_detalhe_al ALTER COLUMN descricao_alteracao TYPE VARCHAR(400);
 

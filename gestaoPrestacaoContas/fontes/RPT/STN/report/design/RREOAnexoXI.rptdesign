@@ -373,6 +373,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <property name="distinct">true</property>
+            <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -514,23 +515,25 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
-                    <property name="name">param_4</property>
-                    <property name="paramName">peridiocidade</property>
-                    <property name="dataType">string</property>
+                    <property name="name">param_3_1</property>
+                    <property name="paramName">bimestre</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
                     <property name="position">3</property>
+                    <expression name="defaultValue">2</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">param_3</property>
-                    <property name="paramName">bimestre</property>
+                    <property name="paramName">peridiocidade</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">4</property>
-                    <expression name="defaultValue">2</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -544,7 +547,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     dot_atu, 
     liq_tot, 
     resto 
-FROM stn.fn_rreo_anexo11_despesas(?, ?, ?, ?) AS (
+FROM stn.fn_rreo_anexoXI_despesas(?, ?, ?, ?) AS (
     grupo INTEGER, 
     nivel INTEGER,
     cod_estrutural VARCHAR, 
@@ -619,7 +622,7 @@ FROM stn.fn_rreo_anexo11_despesas(?, ?, ?, ?) AS (
       <design:inputAttributes>
         <design:elementAttributes>
           <design:defaultValues>
-            <design:values>2</design:values>
+            <design:values>JS_EXPR</design:values>
           </design:defaultValues>
           <design:optional>false</design:optional>
           <design:masksValue>false</design:masksValue>
@@ -798,7 +801,7 @@ if (params['relatorio_novo'] == 'sim') {
 this.queryText += "    atu, ";
 this.queryText += "    ate_bi, ";
 this.queryText += "    saldo ";
-this.queryText += "FROM stn.fn_rreo_anexo11_receitas('"+ params['exercicio'] +"', '"+ params['entidade'] +"', '" + params['peridiocidade'] + "', " + params['bimestre'] +") AS ( ";
+this.queryText += "FROM stn.fn_rreo_anexoXI_receitas('"+ params['exercicio'] +"', '"+ params['entidade'] +"', '" + params['peridiocidade'] + "', " + params['bimestre'] +") AS ( ";
 this.queryText += "    grupo INTEGER , ";
 this.queryText += "    nivel INTEGER , ";
 this.queryText += "    descricao VARCHAR , ";

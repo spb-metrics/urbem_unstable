@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.01
 
-    $Id: OCGeraRREOAnexo1.php 61078 2014-12-04 16:51:10Z carlos.silva $
+    $Id: OCGeraRREOAnexo1.php 61194 2014-12-15 12:55:20Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -53,7 +53,7 @@ $obTOrcamentoEntidade = new TOrcamentoEntidade();
 $obTOrcamentoEntidade->setDado( 'exercicio'   , Sessao::getExercicio() );
 $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")" );
 $preview->addParametro( 'exercicio_anterior', (Sessao::getExercicio() - 1) );
-
+$preview->addParametro( 'exercicio_restos', (Sessao::getExercicio() + 1) );
 $preview->addParametro( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 
 $stNomeEntidade = '';
@@ -77,7 +77,8 @@ if ( count($_REQUEST['inCodEntidade']) > 0 ) {
     $preview->addParametro( 'nom_entidade', '' );
 }
 
-$preview->addParametro( 'tipo_periodo', $_REQUEST['stTipoRelatorio'] );
+if($_REQUEST['stTipoRelatorio']!='Mes')
+    $preview->addParametro( 'tipo_periodo', $_REQUEST['stTipoRelatorio'] );
 
 if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($_REQUEST['inCodEntidade']) > 1 ) ) {
     $preview->addParametro( 'poder' , 'Executivo' );
@@ -87,19 +88,24 @@ if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
 
 switch ($_REQUEST['stTipoRelatorio']) {
     case 'Mes':
-        $preview->addParametro( 'titulo_periodo',  utf8_encode(SistemaLegado::mesExtensoBR($_REQUEST['cmbMes']).' de '.Sessao::getExercicio()));
-        $preview->addParametro( 'periodo'  , $_REQUEST['cmbMes'] );
-        $preview->addParametro( 'dt_inicial', '01/'.$_REQUEST['cmbMes'].'/'.Sessao::getExercicio() );
-        $preview->addParametro( 'dt_final', SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'], Sessao::getExercicio()));
+        $preview->addParametro( 'titulo_periodo'    ,  utf8_encode(SistemaLegado::mesExtensoBR($_REQUEST['cmbMes']).' de '.Sessao::getExercicio())  );
+        $preview->addParametro( 'periodo'           , $_REQUEST['cmbMes']                                                                           );
+        $preview->addParametro( 'dt_inicial'        , '01/'.$_REQUEST['cmbMes'].'/'.Sessao::getExercicio()                                          );
+        $preview->addParametro( 'dt_final'          , SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'], Sessao::getExercicio())               );
+        $preview->addParametro( 'dt_final_restos'   , '01/01/'.(Sessao::getExercicio() + 1)                                                         );
+        $preview->addParametro( 'tipo_periodo'      , utf8_encode("Mês") );
+        $preview->addParametro( 'tipo_periodo_Maisc', utf8_encode("MÊS") );
         $stNomeArquivo .= $_REQUEST['cmbMes'] . "mes";
     break;
     case 'Bimestre':
         $preview->addParametro( 'titulo_periodo',  utf8_encode($_REQUEST['cmbBimestre'].'° bimestre de '.Sessao::getExercicio()));
         SistemaLegado::periodoInicialFinalBimestre($stDtInicial, $stDtFinal, $_REQUEST['cmbBimestre'], Sessao::getExercicio());
         
-        $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
-        $preview->addParametro( 'dt_inicial', $stDtInicial);
-        $preview->addParametro( 'dt_final', $stDtFinal);
+        $preview->addParametro( 'periodo'           , $_REQUEST['cmbBimestre']  );
+        $preview->addParametro( 'dt_inicial'        , $stDtInicial              );
+        $preview->addParametro( 'dt_final'          , $stDtFinal                );
+        $preview->addParametro( 'dt_final_restos'   , '01/01/'.(Sessao::getExercicio() + 1) );
+        $preview->addParametro( 'tipo_periodo_Maisc', "BIMESTRE"                );
         $stNomeArquivo .= $_REQUEST['cmbBimestre'] . "bimestre";
     break;
     case 'Quadrimestre':

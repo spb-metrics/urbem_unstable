@@ -27,7 +27,7 @@
     * @author Analista:      Eduardo Paculski Schitz
     * @author Desenvolvedor: Franver Sarmento de Moraes
     
-    $Id: FTCEMGDemonstrativoRCLDespesa.plsql 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FTCEMGDemonstrativoRCLDespesa.plsql 61205 2014-12-16 12:31:49Z evandro $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_demostrativo_rcl_despesa(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -128,46 +128,7 @@ BEGIN
                         And nl.cod_entidade IN ('||stEntidades||')
                  );';
         EXECUTE stSql;
-        /*
-        stSql := '
-            CREATE TEMPORARY TABLE  tmp_valor_despesa AS(
-                SELECT OCD.cod_estrutural
-                     , ENLI.vl_total     as valor
-                     , ENL.dt_liquidacao as data
-                  FROM orcamento.despesa             as OD
-                  JOIN orcamento.recurso('''||inExercicio||''') as oru
-                    ON (oru.cod_recurso = od.cod_recurso
-                   AND oru.exercicio   = od.exercicio )
-                     , orcamento.conta_despesa       as OCD
-                     , empenho.pre_empenho_despesa   as EPED
-                     , empenho.pre_empenho           as EPE
-                     , empenho.empenho               as EE
-                     , empenho.nota_liquidacao_item  as ENLI
-                     , empenho.nota_liquidacao       as ENL
-                 
-                 WHERE OCD.cod_conta               = EPED.cod_conta
-                   And OCD.exercicio               = EPED.exercicio
-                   
-                   And OD.cod_despesa              = EPED.cod_despesa
-                   And OD.exercicio                = EPED.exercicio
-                   
-                   And EPE.cod_pre_empenho         = EE.cod_pre_empenho
-                   And EPE.exercicio               = EE.exercicio
-                   
-                   And EE.exercicio                = ENL.exercicio_empenho
-                   And EE.cod_entidade             = ENL.cod_entidade
-                   And EE.cod_empenho              = ENL.cod_empenho
-                   
-                   And ENL.exercicio               = ENLI.exercicio
-                   And ENL.cod_nota                = ENLI.cod_nota
-                   And ENL.cod_entidade            = ENLI.cod_entidade
-                   
-                   And EPE.exercicio               = EPED.exercicio
-                   And EPE.cod_pre_empenho         = EPED.cod_pre_empenho
-                   
-                   And OD.exercicio IN ('''||inExercicio||''', '''||inExercicio-1||''')
-                   And ENL.cod_entidade IN ('||stEntidades||')
-            ); ';*/
+        
     END IF;
     
   	-- -------------------------------------	
@@ -179,7 +140,7 @@ BEGIN
 
     stSQL := '
     CREATE TEMPORARY TABLE tmp_tcemg_demostrativo_rcl_despesa (
-	 cod_conta      varchar
+	   cod_conta      varchar
        , nom_conta      varchar
        , cod_estrutural varchar
        , mes_1          numeric(14,2)
@@ -194,6 +155,7 @@ BEGIN
        , mes_10         numeric(14,2)
        , mes_11         numeric(14,2)
        , mes_12         numeric(14,2)
+       , total          numeric(14,2)
     );
     ';
 	
@@ -219,7 +181,8 @@ BEGIN
                       , mes_10
                       , mes_11
                       , mes_12
-                   FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1'', 3,'''||stEntidades||''')
+                      , total
+                   FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1'', 3)
                                AS retorno ( cod_conta      VARCHAR
                                           , nom_conta      VARCHAR
                                           , cod_estrutural VARCHAR
@@ -234,7 +197,8 @@ BEGIN
                                           , mes_9          NUMERIC
                                           , mes_10         NUMERIC
                                           , mes_11         NUMERIC
-                                          , mes_12         NUMERIC)
+                                          , mes_12         NUMERIC
+                                          , total          NUMERIC )
         ;';
 
         EXECUTE stSql;
@@ -243,8 +207,8 @@ BEGIN
         stSql := '
                 INSERT INTO tmp_tcemg_demostrativo_rcl_despesa
                 SELECT *
-                  FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1'', 3,'''||stEntidades||''')
-                    AS retorno ( cod_conta      varchar
+                  FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1'', 3)
+                    AS retorno ( cod_conta      VARCHAR
                                , nom_conta      varchar
                                , cod_estrutural varchar
                                , mes_1          numeric
@@ -258,7 +222,9 @@ BEGIN
                                , mes_9          numeric
                                , mes_10         numeric
                                , mes_11         numeric
-                               , mes_12         numeric)
+                               , mes_12         numeric
+                               , total          NUMERIC )
+
         ; ';
 
         EXECUTE stSql;
@@ -269,8 +235,8 @@ BEGIN
         stSql := '
                 INSERT INTO tmp_tcemg_demostrativo_rcl_despesa
                 SELECT *
-                  FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1.9.0.01.01'', 7,'''||stEntidades||''')
-                    AS retorno ( cod_conta      varchar
+                  FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.01.01'', 7)
+                    AS retorno ( cod_conta      VARCHAR
                                , nom_conta      varchar
                                , cod_estrutural varchar
                                , mes_1          numeric
@@ -284,7 +250,8 @@ BEGIN
                                , mes_9          numeric
                                , mes_10         numeric
                                , mes_11         numeric
-                               , mes_12         numeric)
+                               , mes_12         numeric
+                               , total          NUMERIC )
         ; ';
 
         EXECUTE stSql;
@@ -293,7 +260,7 @@ BEGIN
         stSql := '
                 INSERT INTO tmp_tcemg_demostrativo_rcl_despesa
                 SELECT *
-                  FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1.9.0.01.02'', 7,'''||stEntidades||''')
+                  FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.01.02'', 7)
                     AS retorno ( cod_conta      varchar
                                , nom_conta      varchar
                                , cod_estrutural varchar
@@ -308,7 +275,8 @@ BEGIN
                                , mes_9          numeric
                                , mes_10         numeric
                                , mes_11         numeric
-                               , mes_12         numeric)
+                               , mes_12         numeric
+                               , total          NUMERIC )
         ; ';
 
         EXECUTE stSql;
@@ -317,7 +285,7 @@ BEGIN
         stSql := '
                 INSERT INTO tmp_tcemg_demostrativo_rcl_despesa
                 SELECT *
-                  FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1.9.0.03.01'', 7,'''||stEntidades||''')
+                  FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.03.01'', 7)
                     AS retorno ( cod_conta      varchar
                                , nom_conta      varchar
                                , cod_estrutural varchar
@@ -332,7 +300,8 @@ BEGIN
                                , mes_9          numeric
                                , mes_10         numeric
                                , mes_11         numeric
-                               , mes_12         numeric)
+                               , mes_12         numeric
+                               , total          NUMERIC )
         ; ';
 
         EXECUTE stSql;
@@ -341,7 +310,7 @@ BEGIN
         stSql := '
                 INSERT INTO tmp_tcemg_demostrativo_rcl_despesa
                 SELECT *
-                  FROM tcemg.sub_consulta_despesa_rcl_novo('''||stDtFim||''' ,''3.3.1.9.0.03.02'', 7,'''||stEntidades||''')
+                  FROM tcemg.sub_consulta_despesa_rcl_novo('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.03.02'', 7)
                     AS retorno ( cod_conta      varchar
                                , nom_conta      varchar
                                , cod_estrutural varchar
@@ -356,7 +325,8 @@ BEGIN
                                , mes_9          numeric
                                , mes_10         numeric
                                , mes_11         numeric
-                               , mes_12         numeric)
+                               , mes_12         numeric
+                               , total          NUMERIC )
         ; ';
 
         EXECUTE stSql;
@@ -378,6 +348,7 @@ BEGIN
                     , mes_10         
                     , mes_11         
                     , mes_12         
+                    , total
                  FROM tmp_tcemg_demostrativo_rcl_despesa
              ORDER BY cod_estrutural ASC;';
     

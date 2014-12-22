@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioResumoLote.php 60990 2014-11-27 16:23:53Z carolina $
+    * $Id: OCGeraRelatorioResumoLote.php 61230 2014-12-18 17:45:01Z carolina $
 
     * Casos de uso: uc-05.03.23
 */
@@ -671,7 +671,7 @@ while ( !$rsListaOrigem->eof() ) {
 $i++;
 }
 
-    $stFiltroI = str_replace( "lote.", "li.", $stFiltro ). "\n AND EXISTS ( select numeracao FROM arrecadacao.carne WHERE numeracao = li.numeracao ) ";
+    $stFiltroI = str_replace( "lote.", "li.", $stFiltro ). "\n AND NOT EXISTS ( select numeracao FROM arrecadacao.carne WHERE numeracao = li.numeracao AND cod_convenio <> -1) ";
     $obTARRPagamento->recuperaResumoLoteListaInconsistente( $rsInconsistentes, $stFiltroI );
     
     $flOrigemValorInconsistente2OK = 0.00;

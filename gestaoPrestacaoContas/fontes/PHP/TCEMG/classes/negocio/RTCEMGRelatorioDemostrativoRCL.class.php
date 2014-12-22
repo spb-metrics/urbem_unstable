@@ -29,10 +29,10 @@
    * @author Desenvolvedor: Franver Sarmento de Moraes
    *
    * @ignore
-   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 61191 2014-12-12 21:03:55Z jean $
-   * $Date: 2014-12-12 19:03:55 -0200 (Sex, 12 Dez 2014) $
-   * $Author: jean $
-   * $Rev: 61191 $
+   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 61205 2014-12-16 12:31:49Z evandro $
+   * $Date: 2014-12-16 10:31:49 -0200 (Ter, 16 Dez 2014) $
+   * $Author: evandro $
+   * $Rev: 61205 $
    *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -117,13 +117,13 @@ class RTCEMGRelatorioDemostrativoRCL {
         $rsDespesasDeducoes = new RecordSet();
 
         $obTTCEMGRelatorioDemostrativoRCL = new TTCEMGRelatorioDemostrativoRCL();
-        $obTTCEMGRelatorioDemostrativoRCL->setDado( "exercicio"    , $this->getExercicio() );
-        $obTTCEMGRelatorioDemostrativoRCL->setDado( "dt_inicial"   , $this->getDataInicial() );
-        $obTTCEMGRelatorioDemostrativoRCL->setDado( "dt_final"     , $this->getDataFinal() );
-        $obTTCEMGRelatorioDemostrativoRCL->setDado( "cod_entidades", $this->getCodEntidades());
-        $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_despesa" , 1);
-        $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_situacao", $this->getTipoSituacao());
-        $obTTCEMGRelatorioDemostrativoRCL->setDado("exercicio_restos", $this->getExercicioRestos());
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "exercicio"         , $this->getExercicio() );
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "dt_inicial"        , $this->getDataInicial() );
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "dt_final"          , $this->getDataFinal() );
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "cod_entidades"     , $this->getCodEntidades());
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_despesa"      , 1);
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_situacao"     , $this->getTipoSituacao());
+        $obTTCEMGRelatorioDemostrativoRCL->setDado( "exercicio_restos"  , $this->getExercicioRestos());
         $obTTCEMGRelatorioDemostrativoRCL->recuperaReceitasDemonstrativoRCL( $rsReceitas );
                 
         // Inicio da tabela Receitas.
@@ -280,8 +280,7 @@ class RTCEMGRelatorioDemostrativoRCL {
         // Só vai trazer despesas sem as deduções 1.
         $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_despesa", 1);
         $obTTCEMGRelatorioDemostrativoRCL->recuperaDespesasDemonstrativoRCL( $rsDespesas );
-        sistemaLegado::mostravar($rsDespesas);
-        die('Fim');
+        
         $vlTotalDespesasMes1  = 0;
         $vlTotalDespesasMes2  = 0;
         $vlTotalDespesasMes3  = 0;

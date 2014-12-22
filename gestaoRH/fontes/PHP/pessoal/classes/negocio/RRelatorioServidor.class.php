@@ -126,7 +126,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
     //Filtros da sessão
     $arFiltro  = Sessao::read('filtroRelatorio');
     $arContratos = Sessao::read('arContratos');
-    
+
     while ( !$rsRecordSet->eof() ) {        
         //UNSETS para zerar parametros e filtros das classes de regra para cada registro
         unset($this->obRPessoalServidor);
@@ -148,8 +148,15 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
         }
         
         $arDadosTitulo['matricula'] = $rsRecordSet->getCampo('registro') ." - ". $rsRecordSet->getCampo('nom_cgm');
-        $arDadosTitulo['foto'] = CAM_GRH_PES_ANEXOS.$rsRecordSet->getCampo('caminho_foto');
         
+        if (isset($arFiltro['boFoto']) && $arFiltro['boFoto'] == true) { 
+            if (!empty($rsRecordSet->getCampo('caminho_foto'))) {
+                $arDadosTitulo['foto'] = CAM_GRH_PES_ANEXOS.$rsRecordSet->getCampo('caminho_foto');
+            } else {
+                $arDadosTitulo['foto'] = CAM_GRH_PES_ANEXOS."no_foto.jpg";
+            }
+        }
+
         if ( isset($arFiltro['boIdentificacao']) ) {    
             //DADOS DE IDENTIFICACAO
             $arDadosIdentificacao['dt_nascimento'] = $rsRecordSet->getCampo('dt_nascimento');
@@ -433,7 +440,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
                     }
                 break;
             }
-            
+ 
             $obTPessoalFerias->setDado('cod_entidade', Sessao::getEntidade()     );
             $obTPessoalFerias->setDado('exercicio'   , Sessao::getExercicio()    );
             $obTPessoalFerias->setDado('data_limite' , date('d/m/Y')             );
@@ -525,7 +532,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
             $obTPessoalAssentamento->setDado('cod_entidade', Sessao::getEntidade()                  );
             $obTPessoalAssentamento->setDado('exercicio'   , Sessao::getExercicio()                 );                
             $obTPessoalAssentamento->setDado('tipo_filtro' , $arFiltro['stTipoFiltro']              );
-            
+
             switch ($arFiltro['stTipoFiltro']) {
                 case 'lotacao':
                     $obTPessoalAssentamento->setDado('dado_filtro', $rsRecordSet->getCampo('cod_orgao') ); 
@@ -533,6 +540,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
                 case 'contrato':
                 case 'contrato_rescisao':
                 case 'contrato_aposentado':
+                case 'cgm_contrato':
                     $obTPessoalAssentamento->setDado('dado_filtro', $rsRecordSet->getCampo('cod_contrato') );
                 break;
                 case 'local':
@@ -545,7 +553,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
             
             $obTPessoalAssentamento->setDado('cod_contrato', $rsRecordSet->getCampo('cod_contrato') );                
             $obTPessoalAssentamento->recuperaAssentamentoRelatorio($rsAssentamentos, "", "ORDER BY classificacao, periodo_inicial, nom_cgm", $boTransacao);
-            
+
             foreach ($rsAssentamentos->getElementos() as $key => $assentamentos) {
                 $arDadosAssentamentos[$key]['classificacao'] = $assentamentos['classificacao'];
                 $arDadosAssentamentos[$key]['assentamento']  = $assentamentos['assentamento'];

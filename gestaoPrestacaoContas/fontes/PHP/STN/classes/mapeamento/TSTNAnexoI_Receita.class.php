@@ -49,7 +49,7 @@ function TSNT_RREO_AnexoI_Receita()
     $this->setTabela('stn.fn_rreo_anexo1_receitas');
 
     $this->AddCampo('grupo'               ,'integer',false,''    ,false,false);
-    $this->AddCampo('cod_estrutural'      ,'varchar' ,false,''    ,false,false);
+    $this->AddCampo('cod_estrutural'      ,'varchar',false,''    ,false,false);
     $this->AddCampo('nivel'               ,'integer',false,''    ,false,false);
     $this->AddCampo('nom_conta'           ,'varchar',false,''    ,false,false);
     $this->AddCampo('previsao_inicial'    ,'numeric',false,''    ,false,false);
@@ -64,7 +64,7 @@ function TSNT_RREO_AnexoI_Receita()
 
 function montaRecuperaTodos()
 {
-    $stSql  = " select * from stn.fn_rreo_anexo1_receitas('".$this->getDado("exercicio")."', " . $this->getDado("bimestre"). " , '".$this->getDado("entidades")."'  ) as\n";
+    $stSql  = " select * from stn.fn_rreo_anexo1_receitas( '".$this->getDado("exercicio")."', '" . $this->getDado("dt_inicial"). "' , '" . $this->getDado("dt_final"). "', '". $this->getDado('entidades')."'  ) as\n";
     $stSql .= "retorno (grupo integer     ,          \n";
     $stSql .= "         cod_estrutural varchar,      \n";
     $stSql .= "         nivel integer,               \n";

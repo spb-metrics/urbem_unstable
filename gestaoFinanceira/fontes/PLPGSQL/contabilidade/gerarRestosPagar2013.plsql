@@ -79,7 +79,7 @@ BEGIN
                       CASE WHEN tmp_apuracao_saldo.cod_estrutural = ''6.2.2.1.3.03.00.00.00.00'' THEN
                                 (SELECT cod_estrutural FROM contabilidade.plano_conta WHERE exercicio = ' || quote_literal(stExercicio) || ' AND cod_estrutural like ''6.3.2.7%'')
                            ELSE
-                                (SELECT cod_estrutural FROM contabilidade.plano_conta WHERE exercicio = ' || quote_literal(stExercicio) || ' AND cod_estrutural like ''6.3.1.7%'')
+                                (SELECT cod_estrutural FROM contabilidade.plano_conta WHERE exercicio = ' || quote_literal(stExercicio) || ' AND cod_estrutural like ''6.3.1.7.1%'')
                       END AS cod_estrutural_credito,
       
                     CASE WHEN tmp_apuracao_saldo.cod_estrutural = ''6.2.2.1.3.01.00.00.00.00'' THEN

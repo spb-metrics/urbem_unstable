@@ -33,24 +33,21 @@
 
     $Id:$
 */
-
 /*
     ESTA PL SOMA OS VALORES RESULTANTES DE relatorioRREOAnexo2.plsql E relatorioRREOAnexo2Intra.plsql.
     Prog.: Alexandre Melo
 */
-
-CREATE OR REPLACE FUNCTION stn.fn_anexo2_totais()RETURNS SETOF RECORD AS '
+CREATE OR REPLACE FUNCTION stn.fn_anexo2_totais() RETURNS SETOF RECORD AS $$
 DECLARE
     reRegistro      RECORD;
-    stSql           varchar := '''';
-
+    stSql           VARCHAR := '';
 BEGIN
-     
-    
+         
     /*
         ****** SOMA tmp_orcamentaria COM tm_intra_orcamentaria *******
     */
-    stSql := ''
+    
+    stSql := '
     SELECT 
            sum(vl_original)                as vl_original 
          , sum(vl_suplementacoes)          as vl_suplementacoes
@@ -81,8 +78,8 @@ BEGIN
                   , vl_liquidado_bimestre
                   , vl_liquidado_ate_bimestre
                FROM
-                    tmp_intra_orcamentarias ) as tbl
-    '';
+                    tmp_intra_orcamentarias
+            ) AS tbl ';
 
     EXECUTE stSql;  
 
@@ -94,5 +91,5 @@ BEGIN
     RETURN;
 
 END;
- 
-'language plpgsql;
+$$
+language plpgsql;

@@ -577,7 +577,7 @@ class TTCEMGRestosPagar extends Persistente
                      AND configuracao_entidade.cod_modulo = 55
                      AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
 
-                    JOIN (  SELECT pre_empenho.exercicio
+                    LEFT JOIN (  SELECT pre_empenho.exercicio
                                  , pre_empenho.cod_pre_empenho
                                  , CASE WHEN ( pre_empenho.implantado = true )
                                         THEN restos_pre_empenho.num_orgao
@@ -648,8 +648,8 @@ class TTCEMGRestosPagar extends Persistente
                    WHERE empenho.cod_entidade IN (".$this->getDado('entidades').")
                      AND empenho.exercicio <= '".$this->getDado('exercicio')."'
                      AND empenho.exercicio <> '2013'
-					 AND (   (orgao.folha IS false AND (sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
-                          OR (orgao.folha IS true  AND (sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
+					 AND (   ((sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
+                          OR ((sw_cgm_pessoa_fisica.cpf <> '' OR sw_cgm_pessoa_juridica.cnpj <> ''))
                          )
         ";
 

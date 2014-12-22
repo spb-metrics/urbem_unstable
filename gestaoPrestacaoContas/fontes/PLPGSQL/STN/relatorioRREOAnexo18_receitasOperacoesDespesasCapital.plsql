@@ -71,7 +71,7 @@ BEGIN
          , ate_bi
          , saldo 
       INTO reRegistro
-      FROM stn.fn_rreo_anexo11_receitas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
+      FROM stn.fn_rreo_anexo18_receitas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
            (
               grupo INTEGER
             , nivel INTEGER
@@ -92,7 +92,7 @@ BEGIN
     SELECT SUM(dot_atu) AS dot_atu
          , SUM(liq_tot) AS liq_tot
       INTO reRegistro
-      FROM stn.fn_rreo_anexo11_despesas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
+      FROM stn.fn_rreo_anexo18_despesas(stExercicio, stEntidades, stPeridiocidade, inBimestre) AS tbl
          (
             grupo INTEGER 
           , nivel INTEGER
