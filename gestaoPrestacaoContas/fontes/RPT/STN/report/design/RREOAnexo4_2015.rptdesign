@@ -247,10 +247,50 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="entidade_assinatura" id="2759" extends="urbem_231.entidade_assinatura"/>
-        <scalar-parameter name="numcgm_assinatura" id="2760" extends="urbem_231.numcgm_assinatura"/>
-        <scalar-parameter name="timestamp_assinatura" id="2761" extends="urbem_231.timestamp_assinatura"/>
-        <scalar-parameter name="numero_assinatura" id="2762" extends="urbem_231.numero_assinatura"/>
+        <scalar-parameter name="entidade_assinatura" id="2759" extends="urbem_231.entidade_assinatura">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="numcgm_assinatura" id="2760" extends="urbem_231.numcgm_assinatura">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="timestamp_assinatura" id="2761" extends="urbem_231.timestamp_assinatura">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="numero_assinatura" id="2762" extends="urbem_231.numero_assinatura">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
         <scalar-parameter name="unidade_responsavel" id="2792">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -1349,12 +1389,6 @@ total</expression>
                             <property name="fontWeight">normal</property>
                             <property name="textUnderline">underline</property>
                             <property name="textAlign">center</property>
-                            <list-property name="visibility">
-                                <structure>
-                                    <property name="format">all</property>
-                                    <expression name="valueExpr">params['relatorio_novo'] == 'nao'</expression>
-                                </structure>
-                            </list-property>
                             <property name="contentType">auto</property>
                             <text-property name="content"><![CDATA[RECEITAS]]></text-property>
                         </text>
@@ -1893,9 +1927,25 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
             </column>
             <column id="6691">
                 <property name="width">0.625in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr">if( params["bimestre"].value != 6 ){
+true;
+}</expression>
+                    </structure>
+                </list-property>
             </column>
             <column id="6698">
                 <property name="width">0.5625in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr">if( params["bimestre"].value != 6 ){
+true;
+}</expression>
+                    </structure>
+                </list-property>
             </column>
             <header>
                 <row id="1225">
@@ -1921,12 +1971,6 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                             <property name="fontWeight">normal</property>
                             <property name="textUnderline">underline</property>
                             <property name="textAlign">center</property>
-                            <list-property name="visibility">
-                                <structure>
-                                    <property name="format">all</property>
-                                    <expression name="valueExpr">params['relatorio_novo'] == 'nao'</expression>
-                                </structure>
-                            </list-property>
                             <property name="contentType">auto</property>
                             <text-property name="content"><![CDATA[DESPESAS]]></text-property>
                         </text>
@@ -2641,12 +2685,6 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
             <property name="borderBottomStyle">solid</property>
             <property name="borderBottomWidth">1px</property>
             <property name="width">7.989583333333333in</property>
-            <list-property name="visibility">
-                <structure>
-                    <property name="format">all</property>
-                    <expression name="valueExpr" type="javascript">params['relatorio_novo'] == 'nao'</expression>
-                </structure>
-            </list-property>
             <column id="2893">
                 <property name="width">3.21875in</property>
                 <property name="verticalAlign">bottom</property>
@@ -3714,9 +3752,25 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
             </column>
             <column id="6724">
                 <property name="width">0.6145833333333334in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr">if( params["bimestre"].value != 6 ){
+true;
+}</expression>
+                    </structure>
+                </list-property>
             </column>
             <column id="6735">
                 <property name="width">0.5625in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr">if( params["bimestre"].value != 6 ){
+true;
+}</expression>
+                    </structure>
+                </list-property>
             </column>
             <header>
                 <row id="1498">
@@ -4412,39 +4466,39 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
         <grid name="assinaturas1" id="2763" extends="urbem_231.assinaturas">
             <property name="marginTop">50pt</property>
             <overridden-values>
-                <ref-entry baseId="1215" id="2764"/>
-                <ref-entry baseId="1150" id="2765"/>
+                <ref-entry baseId="1215" id="6750"/>
+                <ref-entry baseId="1150" id="6751"/>
                 <ref-entry baseId="1151" id="1151"/>
-                <ref-entry baseId="1152" id="2766"/>
+                <ref-entry baseId="1152" id="6752"/>
                 <ref-entry baseId="1218" id="1218"/>
                 <ref-entry baseId="1179" id="1179"/>
-                <ref-entry baseId="1213" id="2767"/>
+                <ref-entry baseId="1213" id="6753"/>
                 <ref-entry baseId="1180" id="1180"/>
-                <ref-entry baseId="1183" name="NewTable21" id="2768"/>
-                <ref-entry baseId="1186" id="2769"/>
-                <ref-entry baseId="1187" id="2770"/>
-                <ref-entry baseId="1188" name="NewData1221" id="2771"/>
-                <ref-entry baseId="1189" name="NewData1321" id="2772"/>
+                <ref-entry baseId="1183" name="NewTable2" id="6754"/>
+                <ref-entry baseId="1186" id="6755"/>
+                <ref-entry baseId="1187" id="6756"/>
+                <ref-entry baseId="1188" name="NewData122" id="6757"/>
+                <ref-entry baseId="1189" name="NewData132" id="1189"/>
                 <ref-entry baseId="1192" id="1192"/>
-                <ref-entry baseId="1216" id="2773"/>
-                <ref-entry baseId="1153" id="2774"/>
-                <ref-entry baseId="1214" id="2775"/>
-                <ref-entry baseId="1154" id="2776"/>
-                <ref-entry baseId="1157" name="NewTable3" id="2777"/>
-                <ref-entry baseId="1160" id="2778"/>
-                <ref-entry baseId="1161" id="2779"/>
-                <ref-entry baseId="1167" name="NewData123" id="2780"/>
-                <ref-entry baseId="1168" name="NewData133" id="2781"/>
-                <ref-entry baseId="1164" id="2782"/>
-                <ref-entry baseId="1155" id="2783"/>
-                <ref-entry baseId="1156" id="2784"/>
-                <ref-entry baseId="1169" name="NewTable11" id="2785"/>
-                <ref-entry baseId="1172" id="2786"/>
-                <ref-entry baseId="1173" id="2787"/>
-                <ref-entry baseId="1174" name="NewData1211" id="2788"/>
-                <ref-entry baseId="1175" name="NewData1311" id="2789"/>
-                <ref-entry baseId="1178" id="2790"/>
-                <ref-entry baseId="1217" id="2791"/>
+                <ref-entry baseId="1216" id="6758"/>
+                <ref-entry baseId="1153" id="6759"/>
+                <ref-entry baseId="1214" id="1214"/>
+                <ref-entry baseId="1154" id="6760"/>
+                <ref-entry baseId="1157" name="NewTable" id="6761"/>
+                <ref-entry baseId="1160" id="6762"/>
+                <ref-entry baseId="1161" id="6763"/>
+                <ref-entry baseId="1167" name="NewData12" id="6764"/>
+                <ref-entry baseId="1168" name="NewData13" id="6765"/>
+                <ref-entry baseId="1164" id="6766"/>
+                <ref-entry baseId="1155" id="6767"/>
+                <ref-entry baseId="1156" id="6768"/>
+                <ref-entry baseId="1169" name="NewTable1" id="1169"/>
+                <ref-entry baseId="1172" id="6769"/>
+                <ref-entry baseId="1173" id="1173"/>
+                <ref-entry baseId="1174" name="NewData121" id="1174"/>
+                <ref-entry baseId="1175" name="NewData131" id="1175"/>
+                <ref-entry baseId="1178" id="6770"/>
+                <ref-entry baseId="1217" id="1217"/>
             </overridden-values>
         </grid>
     </body>

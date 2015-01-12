@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RContabilidadeLancamentoValor.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RContabilidadeLancamentoValor.class.php 61283 2014-12-29 17:43:35Z michel $
 
     * Casos de uso: uc-02.02.05, uc-02.02.04, uc-02.02.11, uc-02.02.21, uc-02.02.31, uc-02.02.02
 */
@@ -396,6 +396,7 @@ class RContabilidadeLancamentoValor
         include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
         $obTContabilidadeLancamentoValor     = new TContabilidadeValorLancamento;
 
+        $obErro = new Erro;
         $boFlagTransacao = false;
         $stAno = explode( '/',$this->obRContabilidadeLancamento->obRContabilidadeLote->getDtLote() );
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -474,41 +475,43 @@ class RContabilidadeLancamentoValor
             $obErro = $this->excluirConta( 'C', $boTransacao);
             if ( !$obErro->ocorreu() ) {
                 $obErro = $this->excluirConta( 'D', $boTransacao);
-                if ( !$obErro->ocorreu() && $this->nuValor <> 0.00 ) {
-                    $obTContabilidadeLancamentoValor->setDado( "sequencia"    , $this->obRContabilidadeLancamento->getSequencia()    );
-                    $obTContabilidadeLancamentoValor->setDado( "cod_lote"     , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
-                    $obTContabilidadeLancamentoValor->setDado( "tipo"         , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
-                    $obTContabilidadeLancamentoValor->setDado( "exercicio"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
-                    $obTContabilidadeLancamentoValor->setDado( "cod_entidade" , $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
-
-                    if ($this->inContaCredito and $this->nuValor) {
-                        $obTContabilidadeLancamentoValor->setDado( "tipo_valor"   , 'C' );
-                        $obTContabilidadeLancamentoValor->setDado( "vl_lancamento", ($this->nuValor * -1) );
-                        $obErro = $obTContabilidadeLancamentoValor->inclusao( $boTransacao );
-                        if ( !$obErro->ocorreu() ) {
-                            $obTContabilidadeContaCredito->setDado( "sequencia"   , $this->obRContabilidadeLancamento->getSequencia()    );
-                            $obTContabilidadeContaCredito->setDado( "cod_lote"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
-                            $obTContabilidadeContaCredito->setDado( "tipo"        , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
-                            $obTContabilidadeContaCredito->setDado( "exercicio"   , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
-                            $obTContabilidadeContaCredito->setDado( "cod_entidade", $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
-                            $obTContabilidadeContaCredito->setDado( "tipo_valor"  , 'C' );
-                            $obTContabilidadeContaCredito->setDado( "cod_plano"   , $this->inContaCredito );
-                            $obErro = $obTContabilidadeContaCredito->inclusao( $boTransacao );
+                if ( !$obErro->ocorreu() ) {
+                    if ( $this->nuValor <> 0.00 ) {
+                        $obTContabilidadeLancamentoValor->setDado( "sequencia"    , $this->obRContabilidadeLancamento->getSequencia()    );
+                        $obTContabilidadeLancamentoValor->setDado( "cod_lote"     , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
+                        $obTContabilidadeLancamentoValor->setDado( "tipo"         , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
+                        $obTContabilidadeLancamentoValor->setDado( "exercicio"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
+                        $obTContabilidadeLancamentoValor->setDado( "cod_entidade" , $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
+    
+                        if ($this->inContaCredito and $this->nuValor) {
+                            $obTContabilidadeLancamentoValor->setDado( "tipo_valor"   , 'C' );
+                            $obTContabilidadeLancamentoValor->setDado( "vl_lancamento", ($this->nuValor * -1) );
+                            $obErro = $obTContabilidadeLancamentoValor->inclusao( $boTransacao );
+                            if ( !$obErro->ocorreu() ) {
+                                $obTContabilidadeContaCredito->setDado( "sequencia"   , $this->obRContabilidadeLancamento->getSequencia()    );
+                                $obTContabilidadeContaCredito->setDado( "cod_lote"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
+                                $obTContabilidadeContaCredito->setDado( "tipo"        , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
+                                $obTContabilidadeContaCredito->setDado( "exercicio"   , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
+                                $obTContabilidadeContaCredito->setDado( "cod_entidade", $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
+                                $obTContabilidadeContaCredito->setDado( "tipo_valor"  , 'C' );
+                                $obTContabilidadeContaCredito->setDado( "cod_plano"   , $this->inContaCredito );
+                                $obErro = $obTContabilidadeContaCredito->inclusao( $boTransacao );
+                            }
                         }
-                    }
-                    if ( !$obErro->ocorreu() and $this->inContaDebito and $this->nuValor ) {
-                        $obTContabilidadeLancamentoValor->setDado( "tipo_valor"   , 'D' );
-                        $obTContabilidadeLancamentoValor->setDado( "vl_lancamento", $this->nuValor );
-                        $obErro = $obTContabilidadeLancamentoValor->inclusao( $boTransacao );
-                        if ( !$obErro->ocorreu() ) {
-                            $obTContabilidadeContaDebito->setDado( "sequencia"   , $this->obRContabilidadeLancamento->getSequencia()    );
-                            $obTContabilidadeContaDebito->setDado( "cod_lote"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
-                            $obTContabilidadeContaDebito->setDado( "tipo"        , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
-                            $obTContabilidadeContaDebito->setDado( "exercicio"   , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
-                            $obTContabilidadeContaDebito->setDado( "cod_entidade", $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
-                            $obTContabilidadeContaDebito->setDado( "tipo_valor"  , 'D' );
-                            $obTContabilidadeContaDebito->setDado( "cod_plano"   , $this->inContaDebito   );
-                            $obErro = $obTContabilidadeContaDebito->inclusao( $boTransacao );
+                        if ( !$obErro->ocorreu() and $this->inContaDebito and $this->nuValor ) {
+                            $obTContabilidadeLancamentoValor->setDado( "tipo_valor"   , 'D' );
+                            $obTContabilidadeLancamentoValor->setDado( "vl_lancamento", $this->nuValor );
+                            $obErro = $obTContabilidadeLancamentoValor->inclusao( $boTransacao );
+                            if ( !$obErro->ocorreu() ) {
+                                $obTContabilidadeContaDebito->setDado( "sequencia"   , $this->obRContabilidadeLancamento->getSequencia()    );
+                                $obTContabilidadeContaDebito->setDado( "cod_lote"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
+                                $obTContabilidadeContaDebito->setDado( "tipo"        , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo()      );
+                                $obTContabilidadeContaDebito->setDado( "exercicio"   , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
+                                $obTContabilidadeContaDebito->setDado( "cod_entidade", $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
+                                $obTContabilidadeContaDebito->setDado( "tipo_valor"  , 'D' );
+                                $obTContabilidadeContaDebito->setDado( "cod_plano"   , $this->inContaDebito   );
+                                $obErro = $obTContabilidadeContaDebito->inclusao( $boTransacao );
+                            }
                         }
                     }
                 }
@@ -523,7 +526,7 @@ class RContabilidadeLancamentoValor
         * Excluir uma conta da tabela conta_debito ou conta_credito
         * @access Private
         * @param String $stTipoValor
-        * @param Object $obTransacao
+        * @param Object $boTransacao
         * @return Object Objeto Erro
     **/
     public function excluirConta($stTipoValor, $boTransacao = "")
@@ -573,7 +576,7 @@ class RContabilidadeLancamentoValor
     /**
         * Exclui dados do LancamentoValor do banco de dados
         * @access Public
-        * @param  Object $obTransacao Parâmetro Transação
+        * @param  Object $boTransacao Parâmetro Transação
         * @return Object Objeto Erro
     */
     public function excluirImplantado($boTransacao = "")
@@ -581,16 +584,35 @@ class RContabilidadeLancamentoValor
         include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
         $obTContabilidadeLancamentoValor     = new TContabilidadeValorLancamento;
 
+        $obErro = new Erro;
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
         if ( !$obErro->ocorreu() ) {
-           $obErro = $this->excluirConta( 'C', $boTransacao );
-           if ( !$obErro->ocorreu() ) {
-                $obErro = $this->excluirConta( 'D', $boTransacao );
+            $this->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico('1');
+            $obErro = $this->obRContabilidadeLancamento->listar($rsLancamento, "" , $boTransacao);
+
+            while ( !$obErro->ocorreu() && !$rsLancamento->eof() ) {
+                $this->obRContabilidadeLancamento->setSequencia($rsLancamento->getCampo('sequencia'));
+                $this->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio($rsLancamento->getCampo('exercicio'));
+                $this->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($rsLancamento->getCampo('cod_lote'));
+                $this->obRContabilidadeLancamento->obRContabilidadeLote->setTipo($rsLancamento->getCampo('tipo'));
+                $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade($rsLancamento->getCampo('cod_entidade'));
+                
+                $obErro = $this->excluirConta( 'C', $boTransacao );
+                
                 if ( !$obErro->ocorreu() ) {
+                    $obErro = $this->excluirConta( 'D', $boTransacao );
+                    if ( !$obErro->ocorreu() ) {
                         $obErro = $this->obRContabilidadeLancamento->excluirImplantado( $boTransacao );
-               }
-           }
+                    }
+                }
+                
+                if($obErro->ocorreu()){
+                    break;
+                }
+                
+                $rsLancamento->proximo();
+            }
         }
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTContabilidadeLancamentoValor );
 
@@ -600,7 +622,7 @@ class RContabilidadeLancamentoValor
     /**
         * Exclui dados do LancamentoValor do banco de dados
         * @access Public
-        * @param  Object $obTransacao Parâmetro Transação
+        * @param  Object $boTransacao Parâmetro Transação
         * @return Object Objeto Erro
     */
     public function excluir($boTransacao = "")
@@ -627,7 +649,7 @@ class RContabilidadeLancamentoValor
     /**
     * Exclui dados do Lancamento de Abertura de Orcamento Anual
     * @access Public
-    * @param  Object $obTransacao Parâmetro Transação
+    * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
     */
     //mesmo codigo que o outro $this->excluir foi copiado para encapsular funcoes genericas da acao
@@ -660,7 +682,7 @@ class RContabilidadeLancamentoValor
         * @param  Object $boTransacao Parâmetro Transação
         * @return Object Objeto Erro
     */
-    public function listar(&$rsLista, $stOrder = "", $obTransacao = "")
+    public function listar(&$rsLista, $stOrder = "", $boTransacao = "")
     {
         include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
         $obTContabilidadeLancamentoValor     = new TContabilidadeValorLancamento;
@@ -696,11 +718,11 @@ class RContabilidadeLancamentoValor
             }
         }
         $stFiltro = ($stFiltro)? " AND ".substr($stFiltro, 0, strlen($stFiltro)-4) : "";
-        $obErro = $obTContabilidadeLancamentoValor->recuperaRelacionamento( $rsLista, $stFiltro, $stOrder, $obTransacao );
+        $obErro = $obTContabilidadeLancamentoValor->recuperaRelacionamento( $rsLista, $stFiltro, $stOrder, $boTransacao );
 
         return $obErro;
     }
-    public function buscaSistemaContabilCreditoDebito(&$rsSistemaContabil, $stOrder = "", $obTransacao = "")
+    public function buscaSistemaContabilCreditoDebito(&$rsSistemaContabil, $stOrder = "", $boTransacao = "")
     {
         include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
         $obTContabilidadeLancamentoValor     = new TContabilidadeValorLancamento;
@@ -712,7 +734,7 @@ class RContabilidadeLancamentoValor
         $obTContabilidadeLancamentoValor->setDado("cod_plano_credito" , $this->getContaCredito());
         $obTContabilidadeLancamentoValor->setDado("stExercicio"       , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio());
 
-        $obErro = $obTContabilidadeLancamentoValor->recuperaSistemaContabilCreditoDebito( $rsSistemaContabil, $stFiltro, $stOrder, $obTransacao );
+        $obErro = $obTContabilidadeLancamentoValor->recuperaSistemaContabilCreditoDebito( $rsSistemaContabil, $stFiltro, $stOrder, $boTransacao );
 
         return $obErro;
     }
@@ -865,7 +887,7 @@ class RContabilidadeLancamentoValor
         $obTContabilidadePlanoAnalitica = new TContabilidadePlanoAnalitica;
 
         $obTContabilidadePlanoAnalitica->setDado( "exercicio"    , $this->obRContabilidadePlanoContaAnalitica->getExercicio()-1 );
-        $obErro = $obTContabilidadePlanoAnalitica->recuperaSaldoContaAnalitica( $rsRecordSet, $stFiltro, $stOrder, $obTransacao );
+        $obErro = $obTContabilidadePlanoAnalitica->recuperaSaldoContaAnalitica( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
 
         return $obErro;
     }
@@ -931,7 +953,8 @@ class RContabilidadeLancamentoValor
 
     public function gerarSaldosBalanco($boTransacao = "")
     {
-    //  $boFlagTransacao = false;
+        $obErro = new Erro;
+        //$boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
         $this->boLogErros = false ;
         if ( !$obErro->ocorreu() ) {
@@ -941,46 +964,48 @@ class RContabilidadeLancamentoValor
                     $obErro = $this->excluirImplantacaoSaldos($this->obRContabilidadePlanoContaAnalitica->getExercicio(), $boTransacao);
                 }
                 if ( !$obErro->ocorreu() ) {
-                $obErro=$this->listarSaldoContaAnalitica( $rsSaldo,"",$boTransacao);
-                if ( !$obErro->ocorreu() ) {
-                    while ( !$rsSaldo->eof() and !$obErro->ocorreu() ) {
-                        $this->obRContabilidadePlanoContaAnalitica->setCodEstrutural( $rsSaldo->getCampo("cod_estrutural"));
-                        //$this->obRContabilidadePlanoContaAnalitica->setCodPlano ( $rsSaldo->getCampo("cod_plano") );
-                        $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $rsSaldo->getCampo("cod_entidade") );
-                        $obErro=$this->listarLoteImplantacao( $rsContas,"",$boTransacao ) ;
-                        if ( !$obErro->ocorreu() ) {
-                           if (!$rsContas->eof()) {
-                                $arImplantaSaldo = array();
-                                while ( !$rsContas->eof() ) {
-                                    if ( trim($rsSaldo->getCampo("saldo")) != '' ) {
-                                        $obErro = $this->recuperaCodPlanoPorEstrutural($stCodPlano, $rsContas->getCampo("exercicio"),$rsContas->getCampo("cod_estrutural"), $boTransacao);
-                                        if ( !$obErro->ocorreu() ) {
-                                            $arImplantaSaldo[$stCodPlano."-".$rsContas->getCampo( "sequencia" )]= $rsSaldo->getCampo("saldo");
+                    $obErro=$this->listarSaldoContaAnalitica( $rsSaldo,"",$boTransacao);
+                    if ( !$obErro->ocorreu() ) {
+                        while ( !$rsSaldo->eof() and !$obErro->ocorreu() ) {
+                            $this->obRContabilidadePlanoContaAnalitica->setCodEstrutural( $rsSaldo->getCampo("cod_estrutural"));
+                            //$this->obRContabilidadePlanoContaAnalitica->setCodPlano ( $rsSaldo->getCampo("cod_plano") );
+                            $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $rsSaldo->getCampo("cod_entidade") );
+                            $obErro=$this->listarLoteImplantacao( $rsContas,"",$boTransacao ) ;
+
+                            if ( !$obErro->ocorreu() ) {
+                                if ( !$rsContas->eof() ) {
+                                    $arImplantaSaldo = array();
+                                    while ( !$rsContas->eof() ) {
+                                        if ( trim($rsSaldo->getCampo("saldo")) != '' ) {
+                                            $obErro = $this->recuperaCodPlanoPorEstrutural($stCodPlano, $rsContas->getCampo("exercicio"),$rsContas->getCampo("cod_estrutural"), $boTransacao);
+                                            if ( !$obErro->ocorreu() ) {
+                                                $arImplantaSaldo[$stCodPlano."-".$rsContas->getCampo( "sequencia" )]= $rsSaldo->getCampo("saldo");
+                                            }
                                         }
+                                        $rsContas->proximo();
                                     }
-                                    $rsContas->proximo();
+                                    if ( !$obErro->ocorreu() ) {
+                                        $this->setImplantaSaldo($arImplantaSaldo);
+                                        $this->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( $this->obRContabilidadePlanoContaAnalitica->getExercicio() );
+                                        $this->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "01/01/". $this->obRContabilidadePlanoContaAnalitica->getExercicio() );
+                                        $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade($rsSaldo->getCampo("cod_entidade") );
+                                        $this->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
+                                        $this->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Implantação de Saldo Automática');
+                                        $this->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(1);
+                                        $obErro = $this->implantarSaldo($boTransacao);
+                                    }
+                                    if ($obErro->ocorreu()) {
+                                        break;
+                                    }
+                                } else {
+                                    $stLogObs = " ".$rsSaldo->getCampo("cod_estrutural")."\t\t".$rsSaldo->getCampo("cod_entidade")."\t\t".$rsSaldo->getCampo("saldo");
+                                    $this->logLinha( $stLogObs ) ;
                                 }
-                                if ( !$obErro->ocorreu() ) {
-                                    $this->setImplantaSaldo($arImplantaSaldo);
-                                    $this->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( $this->obRContabilidadePlanoContaAnalitica->getExercicio() );
-                                    $this->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "01/01/". $this->obRContabilidadePlanoContaAnalitica->getExercicio() );
-                                    $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade($rsSaldo->getCampo("cod_entidade") );
-                                    $this->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
-                                    $this->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Implantação de Saldo Automática');
-                                    $this->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(1);
-                                    $obErro = $this->implantarSaldo($boTransacao);
-                                }
-                                if ($obErro->ocorreu()) {
-                                    break;
-                                }
-                            } else {
-                                $stLogObs = " ".$rsSaldo->getCampo("cod_estrutural")."\t\t".$rsSaldo->getCampo("cod_entidade")."\t\t".$rsSaldo->getCampo("saldo");
-                                $this->logLinha( $stLogObs ) ;
+                                $rsSaldo->proximo();
                             }
-                            $rsSaldo->proximo();
                         }
                     }
-                }}
+                }
             }
         }
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTContabilidadeLancamentoValor );

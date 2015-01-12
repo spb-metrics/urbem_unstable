@@ -36,7 +36,7 @@
     * Casos de uso: uc-03.05.25
                     uc-03.05.26
 
-    $Id: TComprasCotacaoFornecedorItem.class.php 60947 2014-11-25 20:05:13Z arthur $
+    $Id: TComprasCotacaoFornecedorItem.class.php 61266 2014-12-23 12:34:26Z arthur $
 
 */
 
@@ -490,6 +490,79 @@ function montaRecuperaItensCotacaoJulgados()
                    AND  mapa_solicitacao.cod_solicitacao       = mapa_item.cod_solicitacao
                    AND  mapa_solicitacao.cod_mapa              = mapa_item.cod_mapa
                    AND  mapa_solicitacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+             ";
+
+    return $stSql;
+}
+
+function recuperaItensCotacaoJulgadosCompraDireta(&$rsRecordSet,$stFiltro='',$stOrder='',$boTransacao='')
+{
+        $stOrder = " GROUP BY catalogo_item.descricao_resumida
+                            , catalogo_item.descricao
+                            , cotacao_item.cod_item
+                            , cotacao_item.quantidade
+                            , cotacao_item.lote
+                            , cotacao_item.cod_cotacao
+                            , mapa_cotacao.cod_mapa
+                            , mapa_cotacao.exercicio_mapa
+                            , cotacao_fornecedor_item.vl_cotacao
+                    
+                     ORDER BY cotacao_item.cod_item ";
+
+        return $this->executaRecupera("montaRecuperaItensCotacaoJulgadosCompraDireta",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+}
+
+function montaRecuperaItensCotacaoJulgadosCompraDireta()
+{
+    $stSql = "
+                 SELECT catalogo_item.descricao_resumida
+                      , catalogo_item.descricao as descricao_completa
+                      , cotacao_item.cod_item
+                      , cotacao_item.quantidade
+                      , cotacao_item.lote
+                      , cotacao_item.cod_cotacao
+                      , mapa_cotacao.cod_mapa
+                      , mapa_cotacao.exercicio_mapa as exercicio
+                      , cotacao_fornecedor_item.vl_cotacao
+
+                   FROM compras.cotacao_item
+                  
+             INNER JOIN almoxarifado.catalogo_item
+                     ON cotacao_item.cod_item = catalogo_item.cod_item
+                  
+             INNER JOIN compras.cotacao_fornecedor_item
+                     ON cotacao_fornecedor_item.exercicio   = cotacao_item.exercicio
+                    AND cotacao_fornecedor_item.cod_cotacao = cotacao_item.cod_cotacao
+                    AND cotacao_fornecedor_item.cod_item    = cotacao_item.cod_item
+                    AND cotacao_fornecedor_item.lote        = cotacao_item.lote
+                  
+             INNER JOIN compras.mapa_cotacao
+                     ON cotacao_item.cod_cotacao = mapa_cotacao.cod_cotacao
+                    AND cotacao_item.exercicio   = mapa_cotacao .exercicio_cotacao
+                  
+             INNER JOIN compras.julgamento_item
+                     ON cotacao_fornecedor_item.exercicio      = julgamento_item.exercicio
+                    AND cotacao_fornecedor_item.cod_cotacao    = julgamento_item.cod_cotacao
+                    AND cotacao_fornecedor_item.cod_item       = julgamento_item.cod_item
+                    AND cotacao_fornecedor_item.cgm_fornecedor = julgamento_item.cgm_fornecedor
+                    AND cotacao_fornecedor_item.lote           = julgamento_item.lote
+                  
+             INNER JOIN compras.mapa
+                     ON mapa_cotacao.cod_mapa       = mapa.cod_mapa
+                    AND mapa_cotacao.exercicio_mapa = mapa.exercicio
+                  
+             INNER JOIN compras.mapa_item
+                     ON mapa_item.exercicio = mapa.exercicio
+                    AND mapa_item.cod_mapa  = mapa.cod_mapa
+                    AND mapa_item.cod_item  = cotacao_fornecedor_item.cod_item
+                    AND mapa_item.lote      = cotacao_fornecedor_item.lote
+                  
+             INNER JOIN compras.mapa_solicitacao
+                     ON mapa_solicitacao.exercicio             = mapa_item.exercicio
+                    AND mapa_solicitacao.cod_entidade          = mapa_item.cod_entidade
+                    AND mapa_solicitacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                    AND mapa_solicitacao.cod_mapa              = mapa_item.cod_mapa
+                    AND mapa_solicitacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
              ";
 
     return $stSql;

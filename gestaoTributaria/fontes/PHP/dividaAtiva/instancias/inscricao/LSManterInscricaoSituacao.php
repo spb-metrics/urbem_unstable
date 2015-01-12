@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Desenvolvedor: Fernando Cercato
 
-    $Id: LSManterInscricaoSituacao.php 60436 2014-10-21 16:38:49Z michel $
+    $Id: LSManterInscricaoSituacao.php 61352 2015-01-09 18:14:18Z evandro $
 
     Caso de uso: uc-05.04.02
 */
@@ -103,5 +103,5 @@ $obFormulario->show();
 
 sistemaLegado::executaFrameOculto("buscaValor('atualizarInscricao');");
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+//include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 ?>

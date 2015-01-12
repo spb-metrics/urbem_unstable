@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Formulario de Inclusao/Alteracao de Conta Contabil
     * Data de Criação   : 01/11/2004
 
@@ -32,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMManterPlanoConta.php 60455 2014-10-22 19:34:46Z carlos.silva $
+    * $Id: FMManterPlanoConta.php 61326 2015-01-07 11:02:55Z carolina $
 
     * Casos de uso: uc-02.02.02
 */
@@ -688,6 +685,24 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTran
     $obCmbTipoConta->setDisabled( $boDisabled                   );
 }
 
+//Conta Corrente - TCE-MG
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+    
+    include_once(CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGTipoContaCorrente.class.php');
+    $obTTCEMGTipoContaCorrente = new TTCEMGTipoContaCorrente();
+    $obTTCEMGTipoContaCorrente->recuperaTodos($rsListaTipoConta);
+
+    $obCmbTipoContaCorrenteTCEMG = new Select();
+    $obCmbTipoContaCorrenteTCEMG->setRotulo	  ( "Conta Corrente TCE-MG"         );
+    $obCmbTipoContaCorrenteTCEMG->setName      ( "inTipoContaCorrenteTCEMG"            );
+    $obCmbTipoContaCorrenteTCEMG->setId        ( "inTipoContaCorrenteTCEMG"            );
+    $obCmbTipoContaCorrenteTCEMG->addOption    ( "", "Selecione"                       );
+    $obCmbTipoContaCorrenteTCEMG->setCampoId   ( "cod_tipo"                            );
+    $obCmbTipoContaCorrenteTCEMG->setCampoDesc ( "[cod_tipo] - [descricao]"            );
+    $obCmbTipoContaCorrenteTCEMG->preencheCombo( $rsListaTipoConta                     );
+    $obCmbTipoContaCorrenteTCEMG->setValue     ( $_REQUEST['inTipoContaCorrenteTCEMG'] );
+    $obCmbTipoContaCorrenteTCEMG->setObrigatorio (true);
+}
 SistemaLegado::executaFramePrincipal($js);
 
 $obTContabilidadePlanoContaEncerrada = new TContabilidadePlanoContaEncerrada();
@@ -910,6 +925,10 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
         $obFormulario->addComponenteComposto( $obTxtRecurso, $obCmbRecurso );
     }
     
+    //Tipo Conta Bancária - TCEMG
+    if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+        $obFormulario->addComponente( $obCmbTipoContaCorrenteTCEMG );
+    }
         //Tipo Conta Bancária - TCEPE
     if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
         $obFormulario->addComponente( $obCmbTipoContaCorrente );

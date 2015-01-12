@@ -95,10 +95,10 @@ define( "CAM_FW_MASCARA",            CAM_FW_COMPONENTES."mascara/"          );
 define( "CAM_FW_EXCECAO",            CAM_FRAMEWORK."excecao/"               );
 define( "CAM_FW_EXPORTACAO",         CAM_FRAMEWORK."exportacao/"            );
 define( "CAM_FW_IMPORTACAO",         CAM_FRAMEWORK."importacao/"            );
-define( "CAM_FW_XML",         CAM_FRAMEWORK."xml/"            );
+define( "CAM_FW_XML",                CAM_FRAMEWORK."xml/"                   );
 define( "CAM_FW_OBJETO",             CAM_FRAMEWORK."objeto/"                );
 define( "CAM_FW_PACOTES",            CAM_FRAMEWORK."pacotes/"               );
-define( "CAM_FW_URBEM",            CAM_FRAMEWORK."URBEM/"               );
+define( "CAM_FW_URBEM",              CAM_FRAMEWORK."URBEM/"                 );
 define( "CAM_FW_TEMAS",              CAM_FRAMEWORK."temas/padrao/"          );
 define( "CAM_FW_CSS",                CAM_FW_TEMAS."CSS/"                    );
 define( "CAM_FW_IMAGENS",            CAM_FW_TEMAS."imagens/"                );
@@ -109,7 +109,8 @@ define( "CAM_FW_INSTANCIAS",         CAM_FRAMEWORK."instancias/"            );
 define( "CAM_FW_LEGADO",             CAM_FRAMEWORK."legado/"                );
 define( "CAM_FW_APPLETS",            CAM_FRAMEWORK."applets/"               );
 define( "CAM_FW_BIRT",    	         CAM_FRAMEWORK."birt/"                  );
-define( "CAM_FW_MPDF",               CAM_FRAMEWORK."mpdf/"          );
+define( "CAM_FW_MPDF",               CAM_FRAMEWORK."mpdf/"                  );
+define( "CAM_FW_TMP",                CAM_FRAMEWORK."tmp/"                   );
 
 //NORMAS
 define( "CAM_GA_NORMAS_CLASSES",        CAM_NORMAS."classes/"               );

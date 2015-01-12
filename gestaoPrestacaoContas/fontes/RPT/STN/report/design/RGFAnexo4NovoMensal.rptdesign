@@ -1500,7 +1500,7 @@ true
                                 </structure>
                             </list-property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[              ]]></text-property>
+                            <text-property name="content"><![CDATA[               ]]></text-property>
                         </text>
                     </cell>
                 </row>

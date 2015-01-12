@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
- /**
+
     * Classe de Regra de Plano Conta
     * Data de Criação   : 03/11/2004
 
@@ -132,6 +129,11 @@ var $stFuncao;
     *@var String
 */
 var $inTipoContaCorrenteTCEPE;
+/**
+    *@access Private
+    *@var Integer
+*/
+var $inTipoContaCorrenteTCEMG;
 
 /**
     * @access Public
@@ -211,7 +213,11 @@ function setFuncao($valor) { $this->stFuncao      = $valor;        }
     * @param Integer $Valor
 */
 function setTipoContaCorrenteTCEPE($valor) { $this->inTipoContaCorrenteTCEPE  = $valor; }
-
+/**
+    * @access Public
+    * @param Integer $Valor
+*/
+function setTipoContaCorrenteTCEMG($valor) { $this->inTipoContaCorrenteTCEMG  = $valor; }
 
 /**
     * @access Public
@@ -290,7 +296,11 @@ function getFuncao() { return $this->stFuncao; }
     * @return Integer
 */
 function getTipoContaCorrenteTCEPE() { return $this->inTipoContaCorrenteTCEPE; }
-
+/**
+    * @access Public
+    * @return Integer
+*/
+function getTipoContaCorrenteTCEMG() { return $this->inTipoContaCorrenteTCEMG; }
 /**
      * Método construtor
      * @access Public
@@ -365,7 +375,8 @@ function consultar($boTransacao = "")
             $this->stFuncao = trim($rsRecordSet->getCampo( "funcao" ));
             $this->stNaturezaSaldo = trim($rsRecordSet->getCampo( "natureza_saldo" ));
             $this->inTipoContaCorrenteTCEPE = $rsRecordSet->getCampo( "atributo_tcepe" );
-        }
+            $this->inTipoContaCorrenteTCEMG = $rsRecordSet->getCampo( "atributo_tcemg" );
+        }       
         $this->obRContabilidadeClassificacaoContabil->setCodClassificacao( $rsRecordSet->getCampo( "cod_classificacao" ) );
         $this->obRContabilidadeSistemaContabil->setCodSistema( $rsRecordSet->getCampo( "cod_sistema" ) );
         $this->obRContabilidadeSistemaContabil->setExercicio ( $this->stExercicio );
@@ -709,11 +720,13 @@ function salvar($boTransacao = "")
             $obTContabilidadePlanoConta->setDado( "indicador_superavit"    , $this->stIndicadorSuperavit );
             $obTContabilidadePlanoConta->setDado( "funcao"    , $this->stFuncao );
         }
-        
+ 
         if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
             $obTContabilidadePlanoConta->setDado( "atributo_tcepe" , $this->inTipoContaCorrenteTCEPE );
         }
-        
+        if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+            $obTContabilidadePlanoConta->setDado( "atributo_tcemg" , $this->inTipoContaCorrenteTCEMG );
+        }
         $obErro = $this->validarCodigoEstruturalPai( $boTransacao );
         if ( !$obErro->ocorreu() ) {
             
@@ -724,15 +737,14 @@ function salvar($boTransacao = "")
                 if ( !$obErro->ocorreu() ) {
                     
                     if ($this->inCodConta) {
-                        
                         $boFlagNovaClassificacao = false;
                         $obTContabilidadePlanoConta->setDado( "cod_conta", $this->inCodConta );
                         $obErro = $obTContabilidadePlanoConta->alteracao( $boTransacao );
                     } else {
-                        
+
                         $obErro = $this->validarCodigoEstrutural( $boTransacao );
                         if ( !$obErro->ocorreu() ) {
-                            
+
                             $obTContabilidadePlanoConta->proximoCod( $inCodConta, $boTransacao );
                             $this->setCodConta( $inCodConta );
                             $obTContabilidadePlanoConta->setDado( "cod_conta" , $this->inCodConta );
@@ -762,7 +774,7 @@ function salvar($boTransacao = "")
             }
         }
     }
-    
+       
     $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro );
 
     return $obErro;
@@ -800,7 +812,9 @@ function salvarEscolhaPlanoConta($boTransacao = "")
             $obTContabilidadePlanoConta->setDado( "indicador_superavit"    , $this->stIndicadorSuperavit );
             $obTContabilidadePlanoConta->setDado( "funcao"    , $this->stFuncao );
         }
-
+        if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+            $obTContabilidadePlanoConta->setDado( "atributo_tcemg" , $this->inTipoContaCorrenteTCEMG );
+        }
         if ($this->inCodConta) {
             $obTContabilidadePlanoConta->setDado( "cod_conta", $this->inCodConta );
             $obErro = $obTContabilidadePlanoConta->alteracao( $boTransacao );
@@ -811,7 +825,7 @@ function salvarEscolhaPlanoConta($boTransacao = "")
             $obErro = $obTContabilidadePlanoConta->inclusao( $boTransacao  );
         }
     }
-
+    
     $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro );
 
     return $obErro;

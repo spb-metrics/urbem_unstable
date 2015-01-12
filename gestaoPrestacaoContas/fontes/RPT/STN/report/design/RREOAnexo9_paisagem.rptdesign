@@ -2112,7 +2112,6 @@ dataSetRow["saldo"]</expression>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
                             <text-property name="content"><![CDATA[RECEITAS REALIZADAS
-Até o Bimestre
 (b)]]></text-property>
                         </text>
                     </cell>

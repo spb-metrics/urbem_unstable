@@ -663,8 +663,8 @@ BEGIN
          vl_pago_total	        numeric ,       
          percentual              numeric ,                                                            
          saldo_liquidar          numeric ) 
-         WHERE cod_estrutural LIKE ''4%''
- ) AS tab1
+         WHERE cod_estrutural LIKE ''4%'' 
+) AS tab1
     
     UNION ALL
     

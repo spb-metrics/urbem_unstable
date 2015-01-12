@@ -51,10 +51,19 @@ $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, " and e.cod_entidade in (
 
 $obErro = new Erro();
 
-$preview = new PreviewBirt(6,36,9);
-$preview->setTitulo('Demonstrativo dos Restos a Pagar');
-$preview->setVersaoBirt( '2.5.0' );
-$preview->setExportaExcel ( true );
+if (Sessao::getExercicio() < '2015') {
+    $preview = new PreviewBirt(6,36,9);
+    $preview->setTitulo('Demonstrativo dos Restos a Pagar');
+    $preview->setVersaoBirt( '2.5.0' );
+    $preview->setExportaExcel ( true );
+} else {
+    # Alterar para códigos do novo relatório
+    die();
+    //$preview = new PreviewBirt(6,36,9); 
+    //$preview->setTitulo('Dem Disponibilidades de Caixa');
+    //$preview->setVersaoBirt( '2.5.0' );
+    //$preview->setExportaExcel( true );
+}
 
 $stDataInicial = "01/01/".$_REQUEST['stExercicio'];
 

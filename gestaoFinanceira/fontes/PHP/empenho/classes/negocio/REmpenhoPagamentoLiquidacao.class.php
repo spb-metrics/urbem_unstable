@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPagamentoLiquidacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: REmpenhoPagamentoLiquidacao.class.php 61267 2014-12-23 17:06:46Z diogo.zarpelon $
 
     $Revision: 30805 $
     $Name:  $
@@ -876,11 +876,11 @@ function incluirNotaLiquidacaoAuditoria($obRNotaLiquidacao, $boTransacao = "")
 */
 function pagarOP($boTransacao = "")
 {
-    include_once ( CAM_GF_CONT_NEGOCIO.      "RContabilidadePlanoBanco.class.php"              );
-    include_once ( CAM_GF_CONT_MAPEAMENTO.   "TContabilidadeLancamentoEmpenho.class.php"                );
-    include_once ( CAM_GF_CONT_MAPEAMENTO.   "TContabilidadePagamento.class.php"                        );
-    include_once ( CAM_GF_EMP_MAPEAMENTO.   "FEmpenhoEmpenhoPagamento.class.php"                       );
-    include_once ( CAM_GF_EMP_MAPEAMENTO.   "FEmpenhoEmpenhoPagamentoRestosAPagar.class.php"           );
+    include_once CAM_GF_CONT_NEGOCIO.      "RContabilidadePlanoBanco.class.php";
+    include_once CAM_GF_CONT_MAPEAMENTO.   "TContabilidadeLancamentoEmpenho.class.php";
+    include_once CAM_GF_CONT_MAPEAMENTO.   "TContabilidadePagamento.class.php";
+    include_once CAM_GF_EMP_MAPEAMENTO.   "FEmpenhoEmpenhoPagamento.class.php";
+    include_once CAM_GF_EMP_MAPEAMENTO.   "FEmpenhoEmpenhoPagamentoRestosAPagar.class.php";
     include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoConfiguracao.class.php";
     include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecursoDestinacao.class.php";
     include_once CAM_GF_TES_MAPEAMENTO . 'TTesourariaChequeEmissaoOrdemPagamento.class.php';
@@ -901,6 +901,7 @@ function pagarOP($boTransacao = "")
         $obErro = $this->obREmpenhoOrdemPagamento->consultarValorAPagar( $boTransacao );
 
         if ( !$obErro->ocorreu() ) {
+        
         if ($this->obREmpenhoOrdemPagamento->getValorAPagar() > 0) {
             //VERIFICAÇÃO DA ENTIDADE DA OP e ENTIDADE DA CONTA BANCO - NÃO PODEM SER DIFERENTES
             $obRContabilidadePlanoBanco->setCodPlano ( $this->obRContabilidadePlanoContaAnalitica->getCodPlano()  );

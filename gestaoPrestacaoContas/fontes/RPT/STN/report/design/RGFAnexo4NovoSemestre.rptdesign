@@ -1396,8 +1396,36 @@ true
                             <property name="pageBreakInside">auto</property>
                             <property name="showIfBlank">false</property>
                             <property name="canShrink">false</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">if( row["item"]=='RECEITA CORRENTE LÍQUIDA - RCL' ){
+	true
+}else{
+	false
+}</expression>
+                                </structure>
+                            </list-property>
                             <property name="resultSetColumn">valor_ate_semestre</property>
                         </data>
+                        <text id="6671">
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="textLineThrough">line-through</property>
+                            <property name="textAlign">center</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">if( row["item"]=='RECEITA CORRENTE LÍQUIDA - RCL'  ){
+	false
+}else{
+	true
+}</expression>
+                                </structure>
+                            </list-property>
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[               ]]></text-property>
+                        </text>
                     </cell>
                 </row>
             </detail>

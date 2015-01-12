@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 61211 2014-12-16 19:14:50Z carlos.silva $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 61282 2014-12-29 17:39:42Z carlos.silva $
     *
     * $Name: $
     * $Date: $
@@ -184,6 +184,8 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                      AND empenho_anulado_item.exercicio    = empenho.exercicio
                                      AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                                      AND empenho_anulado_item.num_item = item_pre_empenho.num_item
+                                     
+                                WHERE to_date(to_char(empenho.dt_empenho, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
                                 
                                 GROUP BY  empenho.cod_entidade
                                         , empenho.cod_empenho
@@ -206,7 +208,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                          INNER JOIN sw_cgm
                                  ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
                                
-                            INNER JOIN ( SELECT nota_liquidacao.cod_entidade,
+                         LEFT JOIN ( SELECT nota_liquidacao.cod_entidade,
                                         nota_liquidacao.cod_empenho,
                                         nota_liquidacao.exercicio,
                                         nota_liquidacao.exercicio_empenho,
@@ -223,7 +225,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                     AND nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade
                                     AND nota_liquidacao_paga.cod_nota     = nota_liquidacao.cod_nota
                                            
-                                      LEFT JOIN empenho.nota_liquidacao_paga_anulada 
+                                LEFT JOIN empenho.nota_liquidacao_paga_anulada 
                                          ON nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio 
                                     AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade
                                     AND nota_liquidacao_paga_anulada.cod_nota     = nota_liquidacao_paga.cod_nota
@@ -262,28 +264,28 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                 AND pago.cod_entidade      = empenho.cod_entidade
                                 AND pago.cod_empenho 	   = empenho.cod_empenho	
                                
-                        INNER JOIN contabilidade.plano_analitica
+                        LEFT JOIN contabilidade.plano_analitica
                                 ON plano_analitica.exercicio = pago.exercicio
                                AND plano_analitica.cod_plano = pago.cod_plano
                 
-                        INNER JOIN contabilidade.plano_recurso
+                        LEFT JOIN contabilidade.plano_recurso
                                 ON plano_recurso.exercicio = plano_analitica.exercicio
                                AND plano_recurso.cod_plano = plano_analitica.cod_plano
                                
-                        INNER JOIN contabilidade.plano_banco
+                        LEFT JOIN contabilidade.plano_banco
                                 ON plano_banco.exercicio = plano_analitica.exercicio
                                AND plano_banco.cod_plano = plano_analitica.cod_plano
                 
-                          INNER JOIN monetario.conta_corrente
+                        LEFT JOIN monetario.conta_corrente
                                 ON conta_corrente.cod_banco          = plano_banco.cod_banco
                                AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
                                AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                 
-                        INNER JOIN monetario.agencia
+                        LEFT JOIN monetario.agencia
                                 ON agencia.cod_banco   = conta_corrente.cod_banco
                                AND agencia.cod_agencia = conta_corrente.cod_agencia
                 
-                        INNER JOIN monetario.banco
+                        LEFT JOIN monetario.banco
                                 ON banco.cod_banco = conta_corrente.cod_banco
                 
                         LEFT JOIN (
@@ -414,7 +416,6 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                           dt_empenho, 
                           dt_pagamento ;
         ";
-                          
                           
         //SistemaLegado::mostravar($stSql);
         //die;                 

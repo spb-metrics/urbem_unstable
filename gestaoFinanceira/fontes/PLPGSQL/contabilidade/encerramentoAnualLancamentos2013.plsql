@@ -767,6 +767,7 @@ BEGIN
                                                             , RecLancamento.cod_plano);
                     END IF;
                 END IF;
+             ELSE 
             END CASE;
 
          END IF;

@@ -44,7 +44,7 @@ BEGIN
     stSql := '
     SELECT *
 	    FROM (
-            SELECT programa.num_programa AS cod_programa
+            SELECT programa.cod_programa AS cod_programa
                  , programa_dados.identificacao AS nome_programa
                  , programa_dados.objetivo AS objetivo
                  , REPLACE(SUM(total_recursos.ano1)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_1
@@ -109,7 +109,7 @@ BEGIN
     END IF;
                 
     stSql := stSql || '
-             GROUP BY programa.num_programa
+             GROUP BY programa.cod_programa
                     , programa_dados.identificacao
                     , programa_dados.objetivo
              ORDER BY programa.num_programa
@@ -121,6 +121,7 @@ BEGIN
              
         ORDER BY tmp.cod_programa;
     ';
+
     FOR rsProgramas IN EXECUTE stSql
     LOOP
         SELECT count(*) INTO var FROM tcemg.registros_arquivo_programa WHERE exercicio = stExercicio AND cod_programa = rsProgramas.cod_programa;

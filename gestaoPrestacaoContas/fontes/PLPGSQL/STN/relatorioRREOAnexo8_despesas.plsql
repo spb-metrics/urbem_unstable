@@ -49,7 +49,7 @@ BEGIN
     stDtIniExercicio := '01/01/' || stExercicio;
 
     --Validando restos de acordo com o bimestre
-    IF ( stDtIni = '01/11/2014' AND stDtFim = '31/12/2014') THEN
+    IF ( stDtIni = '01/11/'||stExercicio||'' AND stDtFim = '31/12/'||stExercicio||'') THEN
         stSQLRestos := ' COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(cdd.cod_estrutural)
                                                                                 , '|| quote_literal(stExercicio)      ||'
                                                                                 , '|| quote_literal(stEntidades)      ||'

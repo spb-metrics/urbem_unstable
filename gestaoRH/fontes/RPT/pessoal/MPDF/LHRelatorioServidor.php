@@ -162,8 +162,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_documentacao'])) {  ?>
     <div id="dados_documentacao">
@@ -216,8 +216,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_contratuais'])) {  ?>
     <div id="dados_contratuais">
@@ -312,8 +312,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_salariais'])) {  ?>
     <div id="dados_salariais">
@@ -363,11 +363,12 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
+ <!--
     <div style="page-break-after: always"></div>
-    
+    -->
     <?php if (!empty($servidor['dados_bancarios'])) {  ?>
     <div id="dados_bancarios">
         <table class='border'>
@@ -401,8 +402,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_lotacao'])) {  ?>
     <div id="dados_lotacao">
@@ -448,8 +449,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_ferias'])) {  ?>
     <div id="dados_ferias">
@@ -490,8 +491,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_atributos'])) {  ?>
     <div id="dados_atributos">
@@ -568,8 +569,8 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
-    <?php } ?>
     <br/>
+    <?php } ?>
     
     <?php if (!empty($servidor['dados_assentamento'])) {  ?>
     <div id="dados_assentamento">
@@ -629,11 +630,13 @@ if (count($servidores ) > 0) {
             </tbody>
         </table>
     </div>
+
     <?php
         //quebra de pagina se houver mais servidores
-        if (array_key_exists(($key+1), $servidores)) {
-            echo "<div style=\"page-break-after: always\"></div>";        
-        }
+        #if (array_key_exists(($key+1), $servidores)) {
+        #    echo 'BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB';
+        #    echo "<div style=\"page-break-after: always\"></div>";        
+        #}
     }//IF ASSENTAMENTOS 
     ?>
     <br/>

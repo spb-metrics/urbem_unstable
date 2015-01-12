@@ -430,12 +430,13 @@ function excluirImplantado($boTransacao = "")
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLote.class.php" );
     $obTContabilidadeLote = new TContabilidadeLote;
 
+    $obErro = new Erro;
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
     if ( !$obErro->ocorreu() ) {
         $obTContabilidadeLote->setCampoCod('');
-        $obTContabilidadeLote->setComplementoChave('exercicio,tipo,cod_entidade');
+        $obTContabilidadeLote->setComplementoChave('exercicio,tipo,cod_entidade,cod_lote');
         $obTContabilidadeLote->setDado("cod_lote"  , $this->inCodLote   );
         $obTContabilidadeLote->setDado("exercicio" , $this->stExercicio );
         $obTContabilidadeLote->setDado("tipo"      , $this->stTipo      );

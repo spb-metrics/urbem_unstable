@@ -45,6 +45,7 @@ DECLARE
     dtInicial  		varchar := '';
     dtFinal    		varchar := '';
     dtIniExercicio 	VARCHAR := '';
+    stExercicioAnterior VARCHAR := '';
 
     reRegistro 		record ;
     stSql 			varchar := '';
@@ -55,6 +56,7 @@ BEGIN
     dtFinal   := stDataFinal;
     
     dtIniExercicio := '01/01/'||stExercicio;
+    stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));
 
     -- --------------------
 	-- TABELAS TEMPORARIAS
@@ -72,7 +74,8 @@ BEGIN
         despesa_empenhada NUMERIC(14,2) DEFAULT 0.00,
         porcentagem_empenhada NUMERIC(14,2) DEFAULT 0.00,
         despesa_liquidada NUMERIC(14,2) DEFAULT 0.00,
-        porcentagem NUMERIC(14,2) DEFAULT 0.00
+        porcentagem NUMERIC(14,2) DEFAULT 0.00,
+        restos_nao_processados NUMERIC(14,2) DEFAULT 0.00
     );        
 	
     --
@@ -218,6 +221,152 @@ BEGIN
 
     EXECUTE stSql;
     
+    -- cria a tabela temporaria para o valor nao processado no exercicio anterior
+    stSql := '
+      CREATE TEMPORARY TABLE tmp_nao_processados_exercicio_anterior AS
+  
+        SELECT empenhado.cod_empenho
+             , empenhado.cod_entidade
+             , (SUM(empenhado.vl_empenhado) - SUM(liquidado.vl_liquidado)) AS vl_total
+             , despesa.cod_subfuncao
+          FROM (  SELECT (  SUM(COALESCE(item_pre_empenho.vl_total,0.00))
+                            -
+                            SUM(COALESCE(empenho_anulado_item.vl_anulado,0.00)) ) AS vl_empenhado
+                       , pre_empenho.exercicio
+                       , pre_empenho.cod_pre_empenho
+                       , empenho.cod_entidade
+                       , empenho.cod_empenho
+              
+                    FROM empenho.empenho
+              
+              INNER JOIN empenho.pre_empenho
+                      ON pre_empenho.exercicio = empenho.exercicio
+                     AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+              
+              INNER JOIN empenho.item_pre_empenho
+                      ON item_pre_empenho.exercicio = pre_empenho.exercicio
+                     AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+              
+               LEFT JOIN (  SELECT empenho_anulado_item.exercicio
+                                 , empenho_anulado_item.cod_pre_empenho
+                                 , empenho_anulado_item.num_item
+                                 , SUM(empenho_anulado_item.vl_anulado) AS vl_anulado
+                              FROM empenho.empenho_anulado_item
+                             WHERE empenho_anulado_item.timestamp::date BETWEEN TO_DATE(''01/01/'||stExercicioAnterior||''',''dd/mm/yyyy'') AND TO_DATE(''31/12/'|| stExercicioAnterior||''',''dd/mm/yyyy'')
+                          GROUP BY empenho_anulado_item.exercicio
+                                 , empenho_anulado_item.cod_pre_empenho
+                                 , empenho_anulado_item.num_item
+                         ) AS empenho_anulado_item
+                      ON empenho_anulado_item.exercicio = item_pre_empenho.exercicio
+                     AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                     AND empenho_anulado_item.num_item = item_pre_empenho.num_item
+              
+                   WHERE empenho.exercicio = '''|| stExercicioAnterior ||'''
+                     AND empenho.dt_empenho BETWEEN TO_DATE(''01/01/'|| stExercicioAnterior||''',''dd/mm/yyyy'') AND TO_DATE(''31/12/'|| stExercicioAnterior||''',''dd/mm/yyyy'')
+                     AND empenho.cod_entidade IN ('|| stCodEntidades ||')
+                GROUP BY pre_empenho.exercicio
+                       , pre_empenho.cod_pre_empenho
+                       , empenho.cod_entidade
+                       , empenho.cod_empenho
+               ) AS empenhado 
+  
+       LEFT JOIN (  SELECT ( SUM(liquidado.vl_total) ) AS vl_liquidado
+                         , pre_empenho.exercicio
+                         , pre_empenho.cod_pre_empenho
+                         , empenho.cod_entidade
+                         , empenho.cod_empenho
+                
+                      FROM empenho.nota_liquidacao
+                
+                INNER JOIN empenho.empenho
+                        ON empenho.exercicio = nota_liquidacao.exercicio_empenho
+                       AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                       AND empenho.cod_empenho = nota_liquidacao.cod_empenho
+                
+                INNER JOIN empenho.pre_empenho
+                        ON pre_empenho.exercicio = empenho.exercicio
+                       AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                
+                 LEFT JOIN (  SELECT nota_liquidacao_item.exercicio
+                                   , nota_liquidacao_item.cod_entidade
+                                   , nota_liquidacao_item.cod_nota
+                                   , ( SUM(COALESCE(nota_liquidacao_item.vl_total,0.00)) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado,0.00)) ) AS vl_total
+                                FROM empenho.nota_liquidacao_item
+                           LEFT JOIN (  SELECT exercicio
+                                             , cod_nota
+                                             , num_item
+                                             , exercicio_item
+                                             , cod_pre_empenho
+                                             , cod_entidade
+                                             , SUM(COALESCE(vl_anulado,0.00)) AS vl_anulado
+                                          FROM empenho.nota_liquidacao_item_anulado
+                                         WHERE timestamp::date BETWEEN TO_DATE(''01/01/'||stExercicioAnterior||''',''dd/mm/yyyy'') AND TO_DATE(''31/12/'||stExercicioAnterior||''',''dd/mm/yyyy'')
+                                      GROUP BY exercicio
+                                             , cod_nota
+                                             , num_item
+                                             , exercicio_item
+                                             , cod_pre_empenho
+                                             , cod_entidade
+                                     ) AS nota_liquidacao_item_anulado
+                                  ON nota_liquidacao_item_anulado.exercicio = nota_liquidacao_item.exercicio
+                                 AND nota_liquidacao_item_anulado.cod_nota = nota_liquidacao_item.cod_nota
+                                 AND nota_liquidacao_item_anulado.num_item = nota_liquidacao_item.num_item
+                                 AND nota_liquidacao_item_anulado.exercicio_item = nota_liquidacao_item.exercicio_item
+                                 AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                                 AND nota_liquidacao_item_anulado.cod_entidade = nota_liquidacao_item.cod_entidade
+                            GROUP BY nota_liquidacao_item.exercicio
+                                   , nota_liquidacao_item.cod_entidade
+                                   , nota_liquidacao_item.cod_nota
+                
+                         ) AS liquidado
+                        ON liquidado.exercicio = nota_liquidacao.exercicio
+                       AND liquidado.cod_entidade = nota_liquidacao.cod_entidade
+                       AND liquidado.cod_nota = nota_liquidacao.cod_nota
+                     WHERE empenho.exercicio = '''||stExercicioAnterior||'''
+                       AND empenho.dt_empenho BETWEEN TO_DATE(''01/01/'||stExercicioAnterior||''',''dd/mm/yyyy'') AND TO_DATE(''31/12/'||stExercicioAnterior||''',''dd/mm/yyyy'')
+                       AND nota_liquidacao.dt_liquidacao BETWEEN TO_DATE(''01/01/'||stExercicioAnterior||''',''dd/mm/yyyy'') AND TO_DATE(''31/12/'||stExercicioAnterior||''',''dd/mm/yyyy'')
+                       AND empenho.cod_entidade IN ('||stCodEntidades||')
+                  GROUP BY pre_empenho.exercicio
+                         , pre_empenho.cod_pre_empenho
+                         , empenho.cod_entidade
+                         , empenho.cod_empenho
+  
+                 ) AS liquidado 
+              ON liquidado.exercicio = empenhado.exercicio
+             AND liquidado.cod_pre_empenho = empenhado.cod_pre_empenho
+             AND liquidado.cod_entidade = empenhado.cod_entidade
+  
+  --left para achar o cod_estrutural
+       LEFT JOIN empenho.pre_empenho_despesa
+              ON pre_empenho_despesa.exercicio = empenhado.exercicio
+             AND pre_empenho_despesa.cod_pre_empenho = empenhado.cod_pre_empenho
+        
+       LEFT JOIN orcamento.despesa
+              ON despesa.exercicio = pre_empenho_despesa.exercicio
+             AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+             
+      LEFT JOIN empenho.restos_pre_empenho
+              ON restos_pre_empenho.exercicio = empenhado.exercicio
+             AND restos_pre_empenho.cod_pre_empenho = empenhado.cod_pre_empenho
+
+       WHERE restos_pre_empenho.cod_estrutural LIKE ''31%''
+              OR restos_pre_empenho.cod_estrutural LIKE ''32%''
+              OR restos_pre_empenho.cod_estrutural LIKE ''33%''
+              OR restos_pre_empenho.cod_estrutural LIKE ''44%''
+              OR restos_pre_empenho.cod_estrutural LIKE ''45%''
+              OR restos_pre_empenho.cod_estrutural LIKE ''46%''
+  
+       GROUP BY empenhado.cod_empenho
+              , empenhado.cod_entidade
+              , despesa.num_orgao                
+              , restos_pre_empenho.num_orgao
+              ,despesa.cod_subfuncao
+          HAVING (SUM(COALESCE(empenhado.vl_empenhado,0.00)) - SUM(COALESCE(liquidado.vl_liquidado,0.00)) ) > 0
+             AND ( despesa.num_orgao = 08 OR restos_pre_empenho.num_orgao = 10 ) 
+    ';
+    
+    EXECUTE stSql;
+    
     -- --------------------------------------
     -- Povoa a tabela temporaria tmp_retorno
     -- --------------------------------------
@@ -229,7 +378,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao = 301 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 301 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM(COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 301) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   2
@@ -240,7 +390,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao = 302 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 302 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM(COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 302) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   3
@@ -251,7 +402,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao = 303 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 303 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM (COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 303) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   4
@@ -262,7 +414,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao = 304 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 304 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM (COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 304) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   5
@@ -273,7 +426,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE  cod_subfuncao = 305 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 305 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM (COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 305) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   6
@@ -284,7 +438,8 @@ BEGIN
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao = 306 )
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao = 306 )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM (COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao = 306) IS NULL THEN 0.00 END 
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (   7
@@ -292,14 +447,15 @@ BEGIN
                                      , 'Outras Subfunções'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_subfuncao NOT IN (301,302,303,304,305,306) )
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_subfuncao NOT IN (301,302,303,304,305,306) )
-                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao NOT IN (301,302,303,304,305,306 ))
+                                     , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE cod_subfuncao NOT IN (301,302,303,304,305,306 ))
                                      , 0
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_subfuncao NOT IN (301,302,303,304,305,306) )
-                                    , 0
+                                     , 0
+                                     , CASE WHEN (SELECT SUM (COALESCE(vl_total,0)) FROM tmp_nao_processados_exercicio_anterior WHERE cod_subfuncao NOT IN (301,302,303,304,305,306)) IS NULL THEN 0.00 END 
                                    ) ;
                                 
-    UPDATE tmp_retorno SET porcentagem = ROUND((despesa_liquidada/( SELECT SUM(despesa_liquidada) FROM tmp_retorno ))*100,2);
-    UPDATE tmp_retorno SET  porcentagem_empenhada = ROUND((despesa_empenhada/( SELECT SUM(despesa_empenhada) FROM tmp_retorno ))*100,2);
+    UPDATE tmp_retorno SET porcentagem = CASE WHEN despesa_liquidada > 0 THEN ROUND((despesa_liquidada/( SELECT SUM(despesa_liquidada) FROM tmp_retorno ))*100,2) ELSE 0.00 END;
+    UPDATE tmp_retorno SET porcentagem_empenhada = CASE WHEN despesa_empenhada > 0 THEN ROUND((despesa_empenhada/( SELECT SUM(despesa_empenhada) FROM tmp_retorno ))*100,2) ELSE 0.00 END;
 
     stSql := '
         SELECT grupo
@@ -311,6 +467,7 @@ BEGIN
              , COALESCE(porcentagem_empenhada,0) AS porcentagem_empenhada
              , COALESCE(despesa_liquidada,0) AS despesa_liquidada
              , COALESCE(porcentagem,0) AS porcentagem
+             , restos_nao_processados
           FROM tmp_retorno
       ORDER BY grupo, subgrupo
     ';
@@ -326,6 +483,7 @@ BEGIN
     DROP TABLE tmp_retorno;
     DROP TABLE tmp_despesa;
     DROP TABLE tmp_despesa_liquidada;
+    DROP TABLE tmp_nao_processados_exercicio_anterior;
 
     RETURN;
  

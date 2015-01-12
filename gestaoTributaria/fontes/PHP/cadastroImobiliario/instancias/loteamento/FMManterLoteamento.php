@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: FMManterLoteamento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterLoteamento.php 61287 2014-12-30 12:03:13Z evandro $
 
     * Casos de uso: uc-05.01.15
 */
@@ -170,16 +170,18 @@ $obRdoNao->setLabel   ( "Não" );
 $obRdoNao->setChecked ( true     );
 
 $obDtAprovacao = new Data;
-$obDtAprovacao->setRotulo  ( "Data de Aprovação" );
-$obDtAprovacao->setName    ( "dtAprovacao"       );
-$obDtAprovacao->setValue   ( $dtAprovacao        );
+$obDtAprovacao->setRotulo  ( "Data de Aprovação"        );
+$obDtAprovacao->setName    ( "dtAprovacao"              );
+$obDtAprovacao->setNull    ( false );
+$obDtAprovacao->setValue   ( $_REQUEST["dtAprovacao"]   );
 
 $obDtLiberacao = new Data;
-$obDtLiberacao->setRotulo  ( "Data de Liberação" );
-$obDtLiberacao->setName    ( "dtLiberacao"       );
-$obDtLiberacao->setValue   ( $dtLiberacao        );
+$obDtLiberacao->setRotulo  ( "Data de Liberação"        );
+$obDtLiberacao->setName    ( "dtLiberacao"              );
+$obDtLiberacao->setNull    ( false );
+$obDtLiberacao->setValue   ( $_REQUEST["dtLiberacao"]   );
 
-$inAreaComunitaria = str_replace( '.', ',', $_REQUEST['inAreaComunitaria'] );
+$inAreaComunitaria = number_format($_REQUEST['inAreaComunitaria'],2,",",".");
 $obTxtAreaComunitaria = new TextBox;
 $obTxtAreaComunitaria->setRotulo       ( "Área Comunitária"            );
 $obTxtAreaComunitaria->setTitle        ( "Área destinada ao uso comum" );
@@ -190,7 +192,7 @@ $obTxtAreaComunitaria->setMaxLength    ( 12 );
 $obTxtAreaComunitaria->setNull         ( false );
 $obTxtAreaComunitaria->setFloat        ( true  );
 
-$inAreaLogradouro = str_replace( '.', ',', $_REQUEST['inAreaLogradouro'] );
+$inAreaLogradouro = number_format($_REQUEST['inAreaLogradouro'],2,",",".");
 $obTxtAreaLogradouro = new TextBox;
 $obTxtAreaLogradouro->setRotulo       ( "Área de Logradouros"             );
 $obTxtAreaLogradouro->setTitle        ( "Área destinada para logradouros" );

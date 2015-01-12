@@ -31,7 +31,7 @@
     * $Author: eduardoschitz $
     * $Date: 2008-05-20 16:15:54 -0300 (Ter, 20 Mai 2008) $
     *
-    * $Id: relatorioRREOAnexo6_receitas.plsql 61228 2014-12-18 16:22:18Z evandro $
+    * $Id: relatorioRREOAnexo6_receitas.plsql 61311 2015-01-05 17:06:49Z lisiane $
     *
     * Casos de uso:
     * 
@@ -195,7 +195,7 @@ BEGIN
             AND lote.exercicio      = lancamento.exercicio
             AND lote.tipo           = lancamento.tipo )
     ';
-    
+  
     EXECUTE stSql;
 
     stSql := '
@@ -245,15 +245,15 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
-            ) as ate_bimestre_exercicio_anterior
+             orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                      ,''' || dtInicioExercicioAnterior || '''
+                                                      ,''' || dtFinalAnterior || '''
+             ) as ate_bimestre_exercicio_anterior
+            --orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+            --                                             ,''' || dtInicioExercicioAnterior || '''
+            --                                             ,''' || dtFinalAnterior || '''
+            --                                             ,''' || stExercicioAnterior || '''
+            --) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita     
@@ -316,15 +316,15 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+            --orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+            --                                             ,''' || dtInicioExercicioAnterior || '''
+            --                                             ,''' || dtFinalAnterior || '''
+            --                                             ,''' || stExercicioAnterior || '''
+            --) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   as plano_conta,
             orcamento.conta_receita     
@@ -374,15 +374,15 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+            --orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+            --                                             ,''' || dtInicioExercicioAnterior || '''
+            --                                             ,''' || dtFinalAnterior || '''
+            --                                             ,''' || stExercicioAnterior || '''
+            --) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita   
@@ -448,15 +448,15 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
@@ -508,16 +508,16 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-        FROM
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
+        FROM 
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
         WHERE
@@ -581,15 +581,15 @@ BEGIN
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
@@ -650,15 +650,15 @@ BEGIN
                                                          ,''' || dtInicioExercicio || '''
                                                          ,''' || dtFim || '''
                 ) as ate_bimestre,
-                -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                --                                          ,''' || dtInicioExercicioAnterior || '''
-                --                                          ,''' || dtFinalAnterior || '''
-                -- ) as ate_bimestre_exercicio_anterior
-                orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+                orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                          ,''' || dtInicioExercicioAnterior || '''
                                                          ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
                 ) as ate_bimestre_exercicio_anterior
+               -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+               --                                          ,''' || dtInicioExercicioAnterior || '''
+               --                                          ,''' || dtFinalAnterior || '''
+               --                                          ,''' || stExercicioAnterior || '''
+               -- ) as ate_bimestre_exercicio_anterior
             FROM
 --                contabilidade.plano_conta   ,
                 orcamento.conta_receita  
@@ -703,7 +703,7 @@ BEGIN
             FROM
                 --contabilidade.plano_conta, 
                 orcamento.conta_receita 
-            WHERE conta_receita.cod_estrutural   like ''9.1%'' 
+            WHERE conta_receita.cod_estrutural   like ''1.7.2%'' 
               --
               --AND plano_conta.exercicio = conta_receita.exercicio 
               AND publico.fn_nivel(conta_receita.cod_estrutural) = 2 
@@ -734,7 +734,7 @@ BEGIN
             AND plano_conta.exercicio = '' || stExercicio || ''*/
             
             
-              conta_receita.cod_estrutural   like ''9.1%'' 
+              conta_receita.cod_estrutural   like ''1.7.2%'' 
           
           AND publico.fn_nivel(conta_receita.cod_estrutural) = 2 
           AND conta_receita.exercicio = ''' || stExercicio || '''
@@ -811,15 +811,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
@@ -867,15 +867,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
@@ -900,6 +900,62 @@ UNION
 
     SELECT
         18 as ordem,
+        1 as grupo,
+        9 as subgrupo,
+        1 as item,
+        cast (''1.6.0.0.00.00.00.00.00'' as varchar) as cod_estrutural,
+        2 as nivel,
+        cast(''Receitas de Serviços'' as varchar) as nom_conta,
+        cast(sum(coalesce(previsao_inicial,0.00)) as numeric(14,2)) as previsao_atualizada,
+        cast(sum(coalesce(no_bimestre,0.00))*-1 as numeric(14,2)) as no_bimestre,
+        cast(sum(coalesce(ate_bimestre,0.00))*-1 as numeric(14,2)) as ate_bimestre,
+        cast(sum(coalesce(ate_bimestre_exercicio_anterior,0.00))*-1 as numeric(14,2)) as ate_bimestre_exercicio_anterior
+    FROM(
+        SELECT
+            publico.fn_nivel(conta_receita.cod_estrutural) as nivel,
+            conta_receita.cod_estrutural,
+            conta_receita.descricao,
+            orcamento.fn_receita_valor_previsto( ''' || stExercicio || '''
+                                                ,publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                ,''' || stCodEntidades || '''
+            ) as previsao_inicial,
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicio || '''
+                                                     ,''' || dtFim || '''
+            ) as no_bimestre,
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicio || '''
+                                                     ,''' || dtFim || '''
+            ) as ate_bimestre,
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
+            ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
+        FROM
+            --contabilidade.plano_conta   ,
+            orcamento.conta_receita  
+        WHERE
+            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
+            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
+            --plano_conta.exercicio        = conta_receita.exercicio             
+            -- Filtros
+                conta_receita.cod_estrutural   like ''1.6%'' 
+            AND publico.fn_nivel(conta_receita.cod_estrutural) = 2
+            AND conta_receita.exercicio = ''' || stExercicio || '''
+    
+        ORDER BY
+            conta_receita.cod_estrutural
+    )  as tbl
+    
+UNION
+
+    SELECT
+        19 as ordem,
         2 as grupo,
         0 as subgrupo,
         0 as item,
@@ -914,7 +970,7 @@ UNION
 UNION
 
     SELECT
-        19 as ordem,
+        20 as ordem,
         2 as grupo,
         1 as subgrupo,
         0 as item,
@@ -942,15 +998,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita     
@@ -971,7 +1027,7 @@ UNION
 UNION
 
     SELECT
-        20 as ordem,
+        21 as ordem,
         2 as grupo,
         2 as subgrupo,
         0 as item,
@@ -999,15 +1055,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita   
@@ -1029,7 +1085,7 @@ UNION
 UNION
 
     SELECT
-        21 as ordem,
+        22 as ordem,
         2 as grupo,
         3 as subgrupo,
         0 as item,
@@ -1057,15 +1113,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   as plano_conta,
             orcamento.conta_receita     
@@ -1087,7 +1143,7 @@ UNION
 UNION
 
     SELECT
-        22 as ordem,
+        23 as ordem,
         2 as grupo,
         4 as subgrupo,
         0 as item,
@@ -1102,7 +1158,7 @@ UNION
 UNION
 
     SELECT
-        23 as ordem,
+        24 as ordem,
         2 as grupo,
         4 as subgrupo,
         1 as item,
@@ -1130,10 +1186,10 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+           --                                          ,''' || dtInicioExercicioAnterior || '''
+           --                                          ,''' || dtFinalAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
             orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
                                                          ,''' || dtInicioExercicioAnterior || '''
                                                          ,''' || dtFinalAnterior || '''
@@ -1158,7 +1214,7 @@ UNION
     UNION 
 
     SELECT
-        24 as ordem,
+        25 as ordem,
         2 as grupo,
         4 as subgrupo,
         2 as item,
@@ -1186,15 +1242,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta, 
             orcamento.conta_receita  
@@ -1219,7 +1275,7 @@ UNION
     UNION
 
     SELECT
-        25 as ordem,
+        26 as ordem,
         2 as grupo,
         5 as subgrupo,
         0 as item,
@@ -1247,15 +1303,15 @@ UNION
                                                      ,''' || dtInicioExercicio || '''
                                                      ,''' || dtFim || '''
             ) as ate_bimestre,
-            -- orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-            --                                          ,''' || dtInicioExercicioAnterior || '''
-            --                                          ,''' || dtFinalAnterior || '''
-            -- ) as ate_bimestre_exercicio_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioExercicioAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
+            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
+                                                     ,''' || dtInicioExercicioAnterior || '''
+                                                     ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
+           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
+           --                                              ,''' || dtInicioExercicioAnterior || '''
+           --                                              ,''' || dtFinalAnterior || '''
+           --                                              ,''' || stExercicioAnterior || '''
+           -- ) as ate_bimestre_exercicio_anterior
         FROM
             --contabilidade.plano_conta   ,
             orcamento.conta_receita  
@@ -1277,7 +1333,7 @@ UNION
     UNION
 
     SELECT
-        26 as ordem,
+        27 as ordem,
         3 as grupo,
         0 as subgrupo,
         0 as item,
@@ -1291,7 +1347,6 @@ UNION
 
     )
     ';
-
 
     -- Criação da Tabela Temporaria tmp_valores_birt
     

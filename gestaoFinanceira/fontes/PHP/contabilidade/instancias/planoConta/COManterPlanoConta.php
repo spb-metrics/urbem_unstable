@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Consulta de Conta Contabil
     * Data de Criação   : 22/11/2004
 
@@ -32,7 +29,7 @@
 
     * @ignore
 
-    $Id: COManterPlanoConta.php 60435 2014-10-21 16:30:12Z carlos.silva $
+    $Id: COManterPlanoConta.php 61326 2015-01-07 11:02:55Z carolina $
 
     * Casos de uso: uc-02.02.02
                     uc-02.02.19
@@ -42,6 +39,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoBanco.class.php" );
+include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoConta.class.php" );
 include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaEncerrada.class.php" );
 include_once (CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php");
 
@@ -275,7 +273,22 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 16) 
     $obLblTipoContaCorrente->setValue ( $rsTipoContaCorrenteTCEPE->getCampo('cod_tipo').' - '.$rsTipoContaCorrenteTCEPE->getCampo('descricao'));
     $obLblTipoContaCorrente->setRotulo( "Tipo Conta Corrente TCE-PE" );  
 }
+//Tipo Conta Bancária - TCEMG
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) {
+    $obRContabilidadePlanoConta = new RContabilidadePlanoConta();
+    $obRContabilidadePlanoConta->setExercicio( Sessao::getExercicio() );
+    $obRContabilidadePlanoConta->setCodConta( $inCodConta );
+    $obRContabilidadePlanoConta->consultar();
+    include_once(CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGTipoContaCorrente.class.php');
+    $obTTCEMGTipoContaCorrente = new TTCEMGTipoContaCorrente;
+    $obTTCEMGTipoContaCorrente->setDado('cod_tipo', $obRContabilidadePlanoConta->getTipoContaCorrenteTCEMG());
+    $obTTCEMGTipoContaCorrente->recuperaPorChave($rsTipoContaCorrenteTCEMG);
 
+    $inTipoContaCorrenteTCEMG = $obRContabilidadePlanoBanco->getTipoContaCorrenteTCEMG();
+    $obLblTipoContaCorrente = new Label;
+    $obLblTipoContaCorrente->setValue ( $rsTipoContaCorrenteTCEMG->getCampo('cod_tipo').' - '.$rsTipoContaCorrenteTCEMG->getCampo('descricao'));
+    $obLblTipoContaCorrente->setRotulo( "Conta Corrente TCE-MG" );  
+}
 //****************************************//
 // Monta FORMULARIO
 //****************************************//
@@ -305,7 +318,9 @@ if($rsContaEncerrada->getNumLinhas() > 0 ){
     $obFormulario->addComponente( $obLblDataEncerramento   );
     $obFormulario->addComponente( $obLblMotivoEncerramento );
 }
-
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) {
+    $obFormulario->addComponente( $obLblTipoContaCorrente );
+}
 $obFormulario->addTitulo("Saldos da conta contábil");
 $obFormulario->addSpan( $obSpan );
 
@@ -320,6 +335,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 16) 
     $obFormulario->addComponente( $obLblTipoContaBanco );
     $obFormulario->addComponente( $obLblTipoContaCorrente );
 }
+
 
 $obOk = new OK;
 $obOk->obEvento->setOnClick( "Cancelar('".$pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro."','telaPrincipal');" );

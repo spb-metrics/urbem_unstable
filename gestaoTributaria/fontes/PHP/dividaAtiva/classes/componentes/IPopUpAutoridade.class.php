@@ -33,7 +33,7 @@
 * @package URBEM
 * @subpackage
 
-    * $Id: IPopUpAutoridade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: IPopUpAutoridade.class.php 61270 2014-12-26 17:32:48Z evandro $
 
 * Casos de uso: uc-05.04.08
 */
@@ -100,7 +100,6 @@ class  IPopUpAutoridade extends BuscaInner
 
     public function geraFormulario(&$obFormulario)
     {
-        ;
 
         if ( $this->getCodAutoridade() ) {
 

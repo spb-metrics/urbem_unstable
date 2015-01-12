@@ -269,7 +269,7 @@ function montaBoletim($inCodEntidade, $inCodBoletim = '')
         $obISelectBoletim = new ISelectBoletim;
         $obISelectBoletim->obBoletim->obROrcamentoEntidade->setCodigoEntidade( $inCodEntidade  );
         $obISelectBoletim->obBoletim->setExercicio( Sessao::getExercicio() );
-        $obISelectBoletim->obEvento->setOnChange ( "buscaDado('alteraBoletim');");
+        $obISelectBoletim->obEvento->setOnChange ( "montaParametrosGET('alteraBoletim');");
         $obISelectBoletim->setNull ( false );
 
         $obFormulario = new Formulario;
@@ -310,7 +310,7 @@ function montaSpanContas($obCmbEntidades)
     $obBscContaDebito->obCampoCod->setId              ( "inCodPlanoDebito" );
     $obBscContaDebito->obImagem->setId                ( "imgPlanoDebito"   );
     $obBscContaDebito->setTipoBusca                   ( "tes_pagamento_extra_despesa" );
-    $obBscContaDebito->obCampoCod->obEvento->setOnBlur( " montaParametrosGET( 'verificaContas','inCodPlanoCredito,inCodPlanoDebito');");
+    $obBscContaDebito->obCampoCod->obEvento->setOnBlur( " montaParametrosGET( 'verificaContas','inCodPlanoCredito,inCodPlanoDebito,stDtBoletim');");
 
     // Define Objeto BuscaInner da conta para caixa/banco
     $obBscContaCredito = new IPopUpContaAnalitica( $obCmbEntidades->obSelect );
@@ -322,7 +322,7 @@ function montaSpanContas($obCmbEntidades)
     $obBscContaCredito->obCampoCod->setId              ( "inCodPlanoCredito" );
     $obBscContaCredito->obImagem->setId                ( "imgPlanoCredito"   );
     $obBscContaCredito->setTipoBusca                   ( "tes_pagamento_extra_caixa_banco"    );
-    $obBscContaCredito->obCampoCod->obEvento->setOnBlur( " montaParametrosGET( 'verificaContas','inCodPlanoCredito,inCodPlanoDebito');");
+    $obBscContaCredito->obCampoCod->obEvento->setOnBlur( " montaParametrosGET( 'verificaContas','inCodPlanoCredito,inCodPlanoDebito,stDtBoletim');");
 
     $obFormulario = new Formulario;
     $obFormulario->addComponente ( $obBscContaDebito       );
@@ -346,14 +346,15 @@ function montaSpanContas($obCmbEntidades)
     return $stJs;
 }
 
-function verificaContas($inCodPlanoCredito, $inCodPlanoDebito)
+function verificaContas($inCodPlanoCredito, $inCodPlanoDebito, $stDtBoletim)
 {
-    
+
     if ( ($inCodPlanoCredito) && ($inCodPlanoCredito != $inCodPlanoDebito) ) {
         include_once( CAM_GF_TES_MAPEAMENTO."TTesourariaTransferencia.class.php" );
         $obTTesourariaTransferencia = new TTesourariaTransferencia();
         $obTTesourariaTransferencia->setDado("stExercicio",Sessao::getExercicio() );
         $obTTesourariaTransferencia->setDado("inCodPlano",$inCodPlanoCredito);
+        $obTTesourariaTransferencia->setDado("stDtBoletim",$stDtBoletim);
         $obTTesourariaTransferencia->verificaSaldoContaAnalitica($nuVlSaldoContaAnalitica);
         
         $stJs .= "d.getElementById('nuSaldoContaAnalitica').value   = '".$nuVlSaldoContaAnalitica."'; \n";
@@ -477,14 +478,15 @@ case 'alteraBoletim':
 
     if ( !$obErro->ocorreu() && $rsBoletimAberto->getNumLinhas() == 1 ) {
         $stJs  = "f.inCodBoletim.value = '" . $rsBoletimAberto->getCampo( 'cod_boletim' ) . "';\r\n";
-        $stJs .= "f.stDtBoletim.value = '" . $rsBoletimAberto->getCampo( 'dt_boletim' ) . "';\r\n";
-        SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
+        $stJs .= "jQuery('#stDtBoletim').val('" . $rsBoletimAberto->getCampo( 'dt_boletim' ) . "');\r\n";
+        //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     } else {
         $stJs  = "f.inCodBoletim.value = '';\r\n";
-        $stJs .= "f.stDtBoletim.value = '';\r\n";
-        SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
+        $stJs .= "jQuery('#stDtBoletim').val('');\r\n";
+        //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     }
-    exit;
+    //exit;
+  
     break;
 case 'buscaBoletim':
     if ($_REQUEST['inCodEntidade']) {
@@ -500,7 +502,7 @@ case 'montaSpanContas':
     $stJs  = montaSpanContas($obCmbEntidades);
     break;
 case 'verificaContas':
-    $stJs  = verificaContas($_GET['inCodPlanoCredito'],$_GET['inCodPlanoDebito']);
+    $stJs  = verificaContas($_GET['inCodPlanoCredito'],$_GET['inCodPlanoDebito'], $_GET['stDtBoletim']);
     break;
 case 'verificaCodBarras':
     $stJs = verificaCodBarras( $_REQUEST['inCodBarras'] );

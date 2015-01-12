@@ -292,15 +292,19 @@ class RTCEMGExportacaoArquivosPlanejamento
         }
 
         if (in_array("REC.csv",$this->getArquivos())) {
-            $this->obTOrcamentoReceita->setDado('entidades', $this->getCodEntidades());
-
+            $this->obTOrcamentoReceita->setDado('entidades' , $this->getCodEntidades());
+            $stDataInicial = "01/".$this->getMes()."/".Sessao::getExercicio();
+            $stDataFinal   = SistemaLegado::retornaUltimoDiaMes($this->getMes(), Sessao::getExercicio());
+            $this->obTOrcamentoReceita->setDado('dt_inicial', $stDataInicial );
+            $this->obTOrcamentoReceita->setDado('dt_final'  , $stDataFinal   );
+            
             //Tipo Registro 10
-            $this->obTOrcamentoReceita->recuperaReceitaExportacao10($rsRecordSet);
+            $this->obTOrcamentoReceita->recuperaReceitaExportacaoPlanejamento10($rsRecordSet, $boTransacao);
 
             $arRecordSetArquivos["REC10"] = $rsRecordSet;
 
             //Tipo Registro 11
-            $this->obTOrcamentoReceita->recuperaReceitaExportacao11($rsRecordSet);
+            $this->obTOrcamentoReceita->recuperaReceitaExportacaoPlanejamento11($rsRecordSet, $boTransacao);
 
             $arRecordSetArquivos["REC11"] = $rsRecordSet;
 

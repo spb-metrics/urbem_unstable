@@ -241,29 +241,40 @@ function montaRecuperaRelacionamentoRelatorio()
                         , contrato_servidor_local.cod_local
                         , contrato_servidor_nomeacao_posse.dt_posse
                         , local.descricao AS filtro_local
+                        , contrato_servidor_situacao.situacao
                 FROM sw_cgm 
-                JOIN sw_cgm_pessoa_fisica 
-                     ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
-                JOIN sw_municipio
-                     ON sw_municipio.cod_municipio  = sw_cgm.cod_municipio
-                    AND sw_municipio.cod_uf         = sw_cgm.cod_uf                
-                JOIN sw_uf
-                    ON sw_uf.cod_uf = sw_municipio.cod_uf
-                JOIN sw_pais
-                    ON sw_pais.cod_pais = sw_uf.cod_pais
-                JOIN pessoal.servidor
-                    ON servidor.numcgm = sw_cgm_pessoa_fisica.numcgm
-                JOIN pessoal.servidor_contrato_servidor
-                    ON servidor_contrato_servidor.cod_servidor = servidor.cod_servidor
-                JOIN pessoal.contrato_servidor
-                    ON contrato_servidor.cod_contrato = servidor_contrato_servidor.cod_contrato
-                JOIN pessoal.contrato
-                    ON contrato.cod_contrato = contrato_servidor.cod_contrato
-                LEFT JOIN sw_escolaridade
-                    ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
-                LEFT JOIN ( SELECT  servidor_pis_pasep.dt_pis_pasep                                                              
-                                    ,servidor_pis_pasep.cod_servidor                                                              
-                            FROM pessoal.servidor_pis_pasep                                                                   
+
+          INNER JOIN sw_cgm_pessoa_fisica 
+                  ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+          INNER JOIN sw_municipio
+                  ON sw_municipio.cod_municipio  = sw_cgm.cod_municipio
+                 AND sw_municipio.cod_uf         = sw_cgm.cod_uf                
+
+          INNER JOIN sw_uf
+                 ON sw_uf.cod_uf = sw_municipio.cod_uf
+          
+          INNER JOIN sw_pais
+                  ON sw_pais.cod_pais = sw_uf.cod_pais
+          
+          INNER JOIN pessoal.servidor
+                  ON servidor.numcgm = sw_cgm_pessoa_fisica.numcgm
+          
+          INNER JOIN pessoal.servidor_contrato_servidor
+                  ON servidor_contrato_servidor.cod_servidor = servidor.cod_servidor
+          
+          INNER JOIN pessoal.contrato_servidor
+                  ON contrato_servidor.cod_contrato = servidor_contrato_servidor.cod_contrato
+          
+          INNER JOIN pessoal.contrato
+                  ON contrato.cod_contrato = contrato_servidor.cod_contrato
+          
+           LEFT JOIN sw_escolaridade
+                  ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
+          
+           LEFT JOIN ( SELECT  servidor_pis_pasep.dt_pis_pasep                                                              
+                            , servidor_pis_pasep.cod_servidor                                                              
+                         FROM pessoal.servidor_pis_pasep                                                                   
                             , ( SELECT cod_servidor                                                                      
                                         , max(timestamp) as timestamp                                                           
                                 FROM pessoal.servidor_pis_pasep                                                        
@@ -272,10 +283,12 @@ function montaRecuperaRelacionamentoRelatorio()
                             WHERE servidor_pis_pasep.cod_servidor = max_servidor_pis_pasep.cod_servidor                        
                             AND servidor_pis_pasep.timestamp    = max_servidor_pis_pasep.timestamp
                 ) as servidor_pis_pasep    
-                    ON servidor_pis_pasep.cod_servidor = servidor.cod_servidor                                               
-                LEFT JOIN pessoal.servidor_reservista                                                                           
-                    ON servidor_reservista.cod_servidor = servidor.cod_servidor                                              
-                LEFT JOIN ( SELECT  servidor_conjuge.cod_servidor                                                                
+                  ON servidor_pis_pasep.cod_servidor = servidor.cod_servidor                                               
+           
+           LEFT JOIN pessoal.servidor_reservista                                                                           
+                  ON servidor_reservista.cod_servidor = servidor.cod_servidor                                              
+           
+           LEFT JOIN ( SELECT  servidor_conjuge.cod_servidor                                                                
                                     ,sw_cgm.numcgm  as numcgm_conjuge                                                             
                                     ,sw_cgm.nom_cgm as nome_conjuge                                                               
                             FROM pessoal.servidor_conjuge                                                                     
@@ -289,8 +302,9 @@ function montaRecuperaRelacionamentoRelatorio()
                             AND servidor_conjuge.timestamp = max_servidor_conjuge.timestamp                                  
                             AND servidor_conjuge.numcgm = sw_cgm.numcgm
                 ) as pessoal_servidor_conjuge                         
-                    ON pessoal_servidor_conjuge.cod_servidor = servidor.cod_servidor                                         
-                LEFT JOIN ( SELECT  pessoal.servidor_cid.cod_servidor                                                            
+                  ON pessoal_servidor_conjuge.cod_servidor = servidor.cod_servidor                                         
+           
+           LEFT JOIN ( SELECT  pessoal.servidor_cid.cod_servidor                                                            
                                     ,pessoal.cid.sigla                                                                            
                                     ,pessoal.cid.descricao                                                                        
                             FROM pessoal.servidor_cid
@@ -304,44 +318,64 @@ function montaRecuperaRelacionamentoRelatorio()
                             AND servidor_cid.timestamp = max_servidor_cid.timestamp                                          
                             AND servidor_cid.cod_cid = cid.cod_cid
                 ) as pessoal_cid                                           
-                    ON pessoal_cid.cod_servidor = servidor.cod_servidor
-                LEFT JOIN pessoal.contrato_servidor_conselho
-                    ON contrato_servidor_conselho.cod_contrato = contrato_servidor.cod_contrato
-                LEFT JOIN pessoal.conselho
-                    ON conselho.cod_conselho = contrato_servidor_conselho.cod_conselho
-                JOIN pessoal.contrato_servidor_orgao as pcso
-                    ON contrato_servidor.cod_contrato = pcso.cod_contrato
-                    AND pcso.timestamp = (  select timestamp
+                  ON pessoal_cid.cod_servidor = servidor.cod_servidor
+           
+           LEFT JOIN pessoal.contrato_servidor_conselho
+                  ON contrato_servidor_conselho.cod_contrato = contrato_servidor.cod_contrato
+           
+           LEFT JOIN pessoal.conselho
+                  ON conselho.cod_conselho = contrato_servidor_conselho.cod_conselho
+           
+          INNER JOIN pessoal.contrato_servidor_orgao as pcso
+                  ON contrato_servidor.cod_contrato = pcso.cod_contrato
+                 AND pcso.timestamp = (  select timestamp
                                             from pessoal.contrato_servidor_orgao
                                             where cod_contrato = contrato_servidor.cod_contrato
                                             order by timestamp desc
                                             limit 1)
-                JOIN organograma.orgao
-                    ON pcso.cod_orgao = orgao.cod_orgao
-                JOIN organograma.vw_orgao_nivel
-                    ON orgao.cod_orgao             = vw_orgao_nivel.cod_orgao
-                LEFT JOIN pessoal.contrato_servidor_local
-                    ON contrato_servidor_local.cod_contrato = contrato_servidor.cod_contrato
-                LEFT JOIN organograma.local as local
-                        ON contrato_servidor_local.cod_local = local.cod_local
-                LEFT JOIN pessoal.atributo_contrato_servidor_valor
-                    ON atributo_contrato_servidor_valor.cod_contrato = contrato_servidor.cod_contrato
-                LEFT JOIN administracao.atributo_dinamico
-                    ON atributo_dinamico.cod_modulo         = atributo_contrato_servidor_valor.cod_modulo
-                    AND atributo_dinamico.cod_cadastro      = atributo_contrato_servidor_valor.cod_cadastro
-                    AND atributo_dinamico.cod_atributo      = atributo_contrato_servidor_valor.cod_atributo
-                JOIN pessoal.contrato_servidor_padrao
-                    ON contrato_servidor.cod_contrato = contrato_servidor_padrao.cod_contrato
-                    AND contrato_servidor_padrao.timestamp = ( select timestamp
+          INNER JOIN organograma.orgao
+                  ON pcso.cod_orgao = orgao.cod_orgao
+               
+          INNER JOIN organograma.vw_orgao_nivel
+                  ON orgao.cod_orgao = vw_orgao_nivel.cod_orgao
+          
+           LEFT JOIN pessoal.contrato_servidor_local
+                  ON contrato_servidor_local.cod_contrato = contrato_servidor.cod_contrato
+          
+           LEFT JOIN organograma.local as local
+                  ON contrato_servidor_local.cod_local = local.cod_local
+          
+           LEFT JOIN pessoal.atributo_contrato_servidor_valor
+                  ON atributo_contrato_servidor_valor.cod_contrato = contrato_servidor.cod_contrato
+          
+           LEFT JOIN administracao.atributo_dinamico
+                  ON atributo_dinamico.cod_modulo         = atributo_contrato_servidor_valor.cod_modulo
+                 AND atributo_dinamico.cod_cadastro      = atributo_contrato_servidor_valor.cod_cadastro
+                 AND atributo_dinamico.cod_atributo      = atributo_contrato_servidor_valor.cod_atributo
+          
+          INNER JOIN pessoal.contrato_servidor_padrao
+                  ON contrato_servidor.cod_contrato = contrato_servidor_padrao.cod_contrato
+                 AND contrato_servidor_padrao.timestamp = ( select timestamp
                                                                from pessoal.contrato_servidor_padrao
                                                                where cod_contrato = contrato_servidor.cod_contrato
                                                                order by timestamp desc
                                                                limit 1)
-                JOIN pessoal.contrato_servidor_forma_pagamento
-                    ON contrato_servidor_forma_pagamento.cod_contrato = contrato_servidor.cod_contrato
-                JOIN pessoal.contrato_servidor_nomeacao_posse
+          
+          INNER JOIN pessoal.contrato_servidor_situacao
+                  ON contrato_servidor.cod_contrato = contrato_servidor_situacao.cod_contrato
+                 AND contrato_servidor_situacao.timestamp = ( select timestamp
+                                                               from pessoal.contrato_servidor_situacao
+                                                               where cod_contrato = contrato_servidor.cod_contrato
+                                                               order by timestamp desc
+                                                               limit 1)
+
+          INNER JOIN pessoal.contrato_servidor_forma_pagamento
+                  ON contrato_servidor_forma_pagamento.cod_contrato = contrato_servidor.cod_contrato
+          
+          INNER JOIN pessoal.contrato_servidor_nomeacao_posse
                   ON contrato_servidor_nomeacao_posse.cod_contrato = contrato_servidor.cod_contrato
-                JOIN sw_categoria_habilitacao
+          
+          INNER JOIN sw_categoria_habilitacao
                   ON sw_categoria_habilitacao.cod_categoria = sw_cgm_pessoa_fisica.cod_categoria_cnh
     ";
     

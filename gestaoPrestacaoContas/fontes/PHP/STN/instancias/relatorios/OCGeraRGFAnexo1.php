@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRGFAnexo1.php 59936 2014-09-22 19:42:55Z arthur $
+ * $Id: OCGeraRGFAnexo1.php 61307 2015-01-05 15:58:11Z carolina $
 
  * Casos de uso : uc-06.01.20
  */
@@ -61,8 +61,10 @@ if ((count($_POST['inCodEntidade']) == 1) && (in_array($stEntidade, $_POST['inCo
     $preview = new PreviewBirt(6,36,50);
     $preview->setTitulo('Demonstrativo da Despesa com Pessoal Consórcio');
 } else {
-    if ($stAno > 2012) {
+    if ($stAno > 2012 && $stAno < 2015) {
         $preview = new PreviewBirt(6,36,53);
+    } else if($stAno > 2014){
+        $preview = new PreviewBirt(6,36,67);
     } else {
         $preview = new PreviewBirt(6,36,1);
     }

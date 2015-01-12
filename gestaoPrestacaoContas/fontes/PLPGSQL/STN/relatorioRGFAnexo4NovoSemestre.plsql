@@ -500,7 +500,7 @@ stSql :='
         stEntidadesCamara := arEntidades[1];
     END IF;
 
-    stSql := 'INSERT INTO tmp_relatorio values(1,''RECEITA CORRENTE LÍQUIDA - RCL'','||nuRCL||','||nuRCL||',''S'',2)';
+    stSql := 'INSERT INTO tmp_relatorio values(1,''RECEITA CORRENTE LÍQUIDA - RCL'','||nuRCL||',NULL,''S'',2)';
     EXECUTE stSql;
 
     nuPercent := round((nu_I_no_semestre*100)/nuRCL,2);

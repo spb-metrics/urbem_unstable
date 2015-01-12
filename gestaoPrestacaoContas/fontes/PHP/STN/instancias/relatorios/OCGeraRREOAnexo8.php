@@ -30,8 +30,14 @@ include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoUsuario.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
 
+$obErro = new Erro();
+
+if (!$_REQUEST['cmbMes'] && !$_REQUEST['cmbBimestre']) {
+    $obErro->setDescricao('É preciso selecionar ao menos um '.$_REQUEST['stTipoRelatorio'].'.');
+}
+
 if ( Sessao::getExercicio() >= '2015') {
-    $preview = new PreviewBirt(6,36,63);    
+    $preview = new PreviewBirt(6,36,63);
 }else{
     $preview = new PreviewBirt(6,36,54);
     $preview->addParametro( 'relatorio_novo', 'sim' );
@@ -92,11 +98,28 @@ if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
 $stDtInicio = $stDtFinal = '';
 
 switch ($_REQUEST['stTipoRelatorio']) {
+    
+    case 'Mes':
+        $preview->addParametro( 'periodo'      , $_REQUEST['cmbMes'] );
+        $preview->addParametro( 'nome_periodo' , SistemaLegado::mesExtensoBR($_REQUEST['cmbMes'])." de ".Sessao::getExercicio() );
+        $preview->addParametro( 'tipo_periodo', "Mês" );
+        $preview->addParametro( 'bo_ultimo_bimestre', "false" );
+
+        $stDtInicio = "01/".$request->get('cmbMes')."/".Sessao::getExercicio();
+        $stDtFinal  = SistemaLegado::retornaUltimoDiaMes($request->get('cmbMes'),Sessao::getExercicio());
+    break;
+    
     case 'Bimestre':
-        $preview->addParametro( 'bimestre'     , $_REQUEST['cmbBimestre'] );
+        $preview->addParametro( 'bimestre'     , $_REQUEST['cmbBimestre'] );        
         $preview->addParametro( 'periodo'      , $_REQUEST['cmbBimestre'] ); 
-        $preview->addParametro( 'nome_periodo' , $_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio() );
-        $preview->addParametro( 'tipo_periodo' , "Bimestre" ); 
+        $preview->addParametro( 'nome_periodo' , utf8_encode($_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio()) );
+        $preview->addParametro( 'tipo_periodo' , "Bimestre" );
+        
+        if ( $_REQUEST['cmbBimestre'] == "6" ) {
+            $preview->addParametro( 'bo_ultimo_bimestre', "true" );
+        } else {
+            $preview->addParametro( 'bo_ultimo_bimestre', "false" );
+        }
 
         $stDtInicio = Bimestre::getDataInicial( $_REQUEST['cmbBimestre'], Sessao::getExercicio() );
         $stDtFinal  = Bimestre::getDataFinal( $_REQUEST['cmbBimestre'], Sessao::getExercicio() );
@@ -121,4 +144,10 @@ $preview->addParametro( 'dt_inicio' , $stDtInicio );
 $preview->addParametro( 'dt_final'  , $stDtFinal );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 
-$preview->preview();
+if (!$obErro->ocorreu()) {
+    $preview->preview();
+} else {
+    SistemaLegado::alertaAviso("FLModelosRREO.php?'.Sessao::getId().&stAcao=".$_REQUEST['stAcao']."", $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}
+
+?>

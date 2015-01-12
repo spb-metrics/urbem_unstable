@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TEmpenhoEmpenho.class.php 60868 2014-11-19 18:18:01Z evandro $
+    * $Id: TEmpenhoEmpenho.class.php 61279 2014-12-29 15:31:48Z evandro $
 
     * Casos de uso: uc-02.01.23
                     uc-02.03.03
@@ -713,11 +713,21 @@ function montaRecuperaRelacionamentoReemitirAnulados()
         eai.timestamp,                                      
         sum(eai.vl_anulado) as vl_anulado                   
     FROM                                                    
-        empenho.empenho              as e,               
-        empenho.empenho_anulado      as ea,              
-        empenho.empenho_anulado_item as eai,             
-        sw_cgm                          as  c,           
-        empenho.pre_empenho          as pe
+        empenho.empenho              as e
+        JOIN empenho.empenho_anulado as ea
+             ON e.exercicio         = ea.exercicio               
+            AND e.cod_entidade      = ea.cod_entidade            
+            AND e.cod_empenho       = ea.cod_empenho              
+        JOIN empenho.empenho_anulado_item as eai
+             ON ea.exercicio        = eai.exercicio              
+            AND ea.timestamp        = eai.timestamp              
+            AND ea.cod_entidade     = eai.cod_entidade           
+            AND ea.cod_empenho      = eai.cod_empenho              
+        JOIN empenho.pre_empenho as pe
+             ON e.exercicio         = pe.exercicio               
+            AND e.cod_pre_empenho   = pe.cod_pre_empenho         
+        JOIN sw_cgm as  c
+            ON pe.cgm_beneficiario = c.numcgm           
         
         LEFT OUTER JOIN empenho.autorizacao_empenho  as ae
                      ON pe.exercicio        = ae.exercicio              
@@ -728,8 +738,9 @@ function montaRecuperaRelacionamentoReemitirAnulados()
                     AND  pe.cod_pre_empenho  = ped.cod_pre_empenho )
                     
               LEFT JOIN empenho.item_pre_empenho
-                     ON item_pre_empenho.cod_pre_empenho = pe.cod_pre_empenho
-                    AND item_pre_empenho.exercicio       = pe.exercicio
+                     ON item_pre_empenho.exercicio        = eai.exercicio
+                    AND item_pre_empenho.cod_pre_empenho  = eai.cod_pre_empenho
+                    AND item_pre_empenho.num_item        = eai.num_item
                     
               LEFT JOIN empenho.item_pre_empenho_julgamento
                      ON item_pre_empenho_julgamento.cod_pre_empenho  = item_pre_empenho.cod_pre_empenho   
@@ -771,17 +782,9 @@ function montaRecuperaRelacionamentoReemitirAnulados()
                     AND adjudicacao.lote              = cotacao_item.lote
                     AND adjudicacao.cod_item          = cotacao_item.cod_item
                     
-    WHERE                                                    
-            e.exercicio         = ea.exercicio               
-        AND e.cod_entidade      = ea.cod_entidade            
-        AND e.cod_empenho       = ea.cod_empenho             
-        AND ea.exercicio        = eai.exercicio              
-        AND ea.timestamp        = eai.timestamp              
-        AND ea.cod_entidade     = eai.cod_entidade           
-        AND ea.cod_empenho      = eai.cod_empenho            
-        AND e.exercicio         = pe.exercicio               
-        AND e.cod_pre_empenho   = pe.cod_pre_empenho         
-        AND pe.cgm_beneficiario = c.numcgm";
+    WHERE 1=1                                                    
+        
+         ";
 
     return $stSql;
 }

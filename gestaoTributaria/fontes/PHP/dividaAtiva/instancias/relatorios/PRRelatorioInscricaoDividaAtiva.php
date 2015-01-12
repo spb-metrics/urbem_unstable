@@ -27,7 +27,7 @@
     * @author Desenvolvedor: Evandro Melos
     * @package URBEM    
 
-    * $Id: PRRelatorioInscricaoDividaAtiva.php 60555 2014-10-28 17:11:27Z carolina $
+    * $Id: PRRelatorioInscricaoDividaAtiva.php 61352 2015-01-09 18:14:18Z evandro $
 */
 
 include_once '../../../../../../config.php';
@@ -49,6 +49,8 @@ $pgJs            = "JS".$stPrograma.".js";
 
 include_once $pgJs;
 
+$boTransacao = new Transacao();
+
 $obTRelatorioInscricaoDividaAtiva = new TRelatorioInscricaoDividaAtiva();
 
 $obTOrcamentoEntidade = new TOrcamentoEntidade();
@@ -65,7 +67,7 @@ $inCodEntidades = implode(",", $arCodEntidades);
 $stFiltro = "\n WHERE 1=1  \n";
 
 if (isset($_REQUEST["stDataInicial"])&&isset($_REQUEST["stDataFinal"])) {
-    $stFiltro .= " AND divida_ativa.dt_inscricao BETWEEN TO_DATE('".$_REQUEST['stDataInicial']."','DD/MM/YYYY') AND TO_DATE('".$_REQUEST['stDataFinal']."','DD/MM/YYYY') \n";
+    $stFiltro .= " AND divida_ativa.dt_inscricao BETWEEN TO_DATE('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') AND TO_DATE('".$_REQUEST['stDataFinal']."','dd/mm/yyyy') \n";
 }
 
 if (isset($_REQUEST["stDataInscricao"])) {
@@ -93,7 +95,13 @@ if ( $_REQUEST['inCodCredito'] ) {
 }
 
 if ( $_REQUEST['inCGM'] ) {
-    $stFiltro .= " AND divida_cgm.numcgm IN (".$_REQUEST['inCGM'].") \n";
+    //Validacao para nao chegar no limite da URL que passa todos os CGM
+    if ($_REQUEST['inCGM'] == "muitos" ) {
+        $inCgm = Sessao::read('inCGM');
+        $stFiltro .= " AND divida_cgm.numcgm IN (".$inCgm.") \n";
+    }else{
+        $stFiltro .= " AND divida_cgm.numcgm IN (".$_REQUEST['inCGM'].") \n";        
+    }
 }
 
 if ( $_REQUEST['inCodImovelInicial'] ) {
@@ -101,7 +109,7 @@ if ( $_REQUEST['inCodImovelInicial'] ) {
 }
 
 if ($_REQUEST['inCodImovelFinal']) {
-    $stFiltro .= " AND divida_imovel.inscricao_municipal <= ".$_REQUEST['inCodImovelInicial']." \n";
+    $stFiltro .= " AND divida_imovel.inscricao_municipal <= ".$_REQUEST['inCodImovelFinal']." \n";
 }
 
 if ( $_REQUEST['inNumInscricaoEconomicaInicial'] ) {
@@ -109,7 +117,7 @@ if ( $_REQUEST['inNumInscricaoEconomicaInicial'] ) {
 }
 
 if ( $_REQUEST['inNumInscricaoEconomicaFinal'] ) {
-    $stFiltro .= " AND divida_empresa.inscricao_economica >= ".$_REQUEST['inNumInscricaoEconomicaFinal']." \n";   
+    $stFiltro .= " AND divida_empresa.inscricao_economica <= ".$_REQUEST['inNumInscricaoEconomicaFinal']." \n";   
 }
 
 if($request->get('inCodGrupo')){
@@ -128,22 +136,48 @@ $stOrdem = "
 
 ORDER BY inscricao_origem, ida";
 
+//Validacao para mostrar o campo de cgm na coluna do relatorio INSCRICAO ORIGEM se o usuario nao selecionar inscricao municipal ou economica
+if ( $_REQUEST['inCodImovelInicial'] || $_REQUEST['inCodImovelFinal'] || $_REQUEST['inNumInscricaoEconomicaInicial'] || $_REQUEST['inNumInscricaoEconomicaFinal'] ) {
+    $obTRelatorioInscricaoDividaAtiva->setDado( 'mostrar_cgm' ,false );
+}else{
+    $obTRelatorioInscricaoDividaAtiva->setDado( 'mostrar_cgm' ,true );
+}
+
+if($_REQUEST['stAcao'] == 'emitir'){
+    $stFiltro .= " AND parcelamento.timestamp BETWEEN TO_TIMESTAMP('".$_REQUEST['stPrimeiroTimestamp']."','YYYY-MM-DD HH24:MI:SS')::TIMESTAMP WITHOUT TIME ZONE 
+                                                 AND  TO_TIMESTAMP('".$_REQUEST['stUltimoTimestamp']."','YYYY-MM-DD HH24:MI:SS')::TIMESTAMP WITHOUT TIME ZONE";    
+}
+
 $obTRelatorioInscricaoDividaAtiva->recuperaRelatorioInscricaoDividaAtiva($rsInscricoes, $stFiltro, $stOrdem, $boTransacao );
 
 $arDados['arDados'] = $rsInscricoes->getElementos();
 
-Sessao::write('arDados', $arDados );
-Sessao::write('inCodEntidades', $inCodEntidades );
+SistemaLegado::BloqueiaFrames('true','false');
+//Gerando o relatorio
+set_time_limit(0);
+ini_set('memory_limit', '2G');
+$obMPDF = new FrameWorkMPDF(5,33,7);
+$obMPDF->setCodEntidades ($inCodEntidades);
+$obMPDF->setNomeRelatorio("Relatorio de Inscricoes da Divida Ativa");
+$obMPDF->setFormatoFolha ("A4");
+//Forcar o dowload do arquivo devido ao tamanho do relatorio
+$obMPDF->setTipoSaida("F");
 
-if($_REQUEST["stAcao"] === "emitir"){
+$obMPDF->setConteudo($arDados);
+
+$obMPDF->gerarRelatorio();
+
+if($_REQUEST['stAcao'] == 'emitir'){
+    //quando vier da ACAO de inscricao da divida ativa
+    $stCaminho = CAM_GT_DAT_INSTANCIAS."inscricao/FLManterInscricao.php?".Sessao::getId()."&stAcao=incluir";
+    SistemaLegado::alertaAviso( $stCaminho,"Inscricao de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");    
+}else{
+    //quando vier do RELATORIO da inscricao da divida ativa
     $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/FLRelatorioInscricaoDividaAtiva.php?".Sessao::getId()."&stAcao=incluir";
-}
-else{
-    $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/FLRelatorioInscricaoDividaAtiva.php?".Sessao::getId()."&stAcao=incluir";
+    SistemaLegado::alertaAviso( $stCaminho,"Relatório de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");    
 }
 
-SistemaLegado::alertaAviso( $stCaminho,"Relatório de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
+echo "<script>window.location.href = '".CAM_FW_TMP.$obMPDF->getDownloadNomeRelatorio()."';</script>";
 
-SistemaLegado::mudaFrameOculto(CAM_GT_DAT_INSTANCIAS."relatorios/OCGeraRelatorioInscricaoDividaAtiva.php?stAcao=".$_REQUEST["stAcao"]);
-
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 ?>

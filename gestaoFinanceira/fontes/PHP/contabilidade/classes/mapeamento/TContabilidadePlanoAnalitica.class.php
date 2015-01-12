@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Classe de mapeamento da tabela CONTABILIDADE.PLANO_ANALITICA
     * Data de Criação: 01/11/2004
 
@@ -33,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TContabilidadePlanoAnalitica.class.php 60421 2014-10-20 19:36:09Z carlos.silva $
+    $Id: TContabilidadePlanoAnalitica.class.php 61326 2015-01-07 11:02:55Z carolina $
 
     * Casos de uso: uc-02.02.02, uc-02.04.03, uc-02.02.31,uc-02.04.09, uc-02.03.23
 */
@@ -206,6 +203,7 @@ function montaRecuperaRelacionamentoContaEntidade()
                         , ma.num_agencia
                         , pa.natureza_saldo
                         , pc.atributo_tcepe
+                        , pc.atributo_tcemg
                         , CASE WHEN publico.fn_nivel(cod_estrutural) > 4 THEN
                                     5                                                                     
                             ELSE                                                                     

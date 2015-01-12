@@ -406,11 +406,12 @@ function excluirImplantado($boTransacao = "")
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamento.class.php" );
     $obTContabilidadeLancamento      = new TContabilidadeLancamento;
 
+    $obErro = new Erro;
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     if ( !$obErro->ocorreu() ) {
         $obTContabilidadeLancamento->setCampoCod('');
-        $obTContabilidadeLancamento->setComplementoChave('cod_lote,tipo,exercicio,cod_entidade');
+        $obTContabilidadeLancamento->setComplementoChave('cod_lote,tipo,exercicio,cod_entidade,sequencia');
 
         $obTContabilidadeLancamento->setDado("sequencia"   , $this->inSequencia );
         $obTContabilidadeLancamento->setDado("exercicio"   , $this->obRContabilidadeLote->getExercicio()   );

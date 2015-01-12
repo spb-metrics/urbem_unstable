@@ -343,7 +343,7 @@ BEGIN
                                      , 'Recursos de Transferências do Sistema Único de Saúde - SUS'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_vinculo = 7 ) 
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_vinculo = 7 )
-                                     , (SELECT  SUM(inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 7 ) 
+                                     , ( SELECT SUM(inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 7 ) 
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_vinculo = 7 ) 
                                     , 0
                                    ) ;                               
@@ -353,7 +353,7 @@ BEGIN
                                      , 'Recursos de Operações de Crédito'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_vinculo = 8 ) 
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_vinculo = 8 ) 
-                                     , (SELECT  SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 7 )
+                                     , ( SELECT SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 8 )
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_vinculo = 8 ) 
                                     , 0
                                    ) ;                                   
@@ -363,7 +363,7 @@ BEGIN
                                      , 'Outros Recursos'
                                      , ( SELECT SUM(COALESCE(vl_original,0)) FROM tmp_despesa WHERE cod_vinculo = 9 ) 
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE cod_vinculo = 9 ) 
-                                     , (SELECT  SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 7 ) 
+                                     , ( SELECT SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE  cod_vinculo = 9 ) 
                                      , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE cod_vinculo = 9 ) 
                                     , 0
                                    ) ;                                   

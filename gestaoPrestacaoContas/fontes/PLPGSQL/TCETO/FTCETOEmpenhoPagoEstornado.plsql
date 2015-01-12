@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-    $Id: FTCETOEmpenhoPagoEstornado.plsql 60923 2014-11-25 13:38:10Z carlos.silva $
+    $Id: FTCETOEmpenhoPagoEstornado.plsql 61292 2014-12-30 16:03:12Z michel $
 
 * $Revision: $
 * $Name: $
@@ -235,7 +235,7 @@ BEGIN
                  , categoria_empenho.descricao as descricao_categoria
                  , tipo_empenho.nom_tipo
                  
-                 , CASE WHEN tmp_estornado.timestamp_anulada IS NULL THEN
+                 , CASE WHEN tmp_estornado.timestamp_anulada IS NOT NULL THEN
                         to_char(tmp_estornado.timestamp_anulada,''dd/mm/yyyy'')
                    ELSE
                         to_char(nlp.timestamp,''dd/mm/yyyy'') 

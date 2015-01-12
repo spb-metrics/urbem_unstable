@@ -54,6 +54,7 @@ function TTCETONormaDetalhe()
     $this->setComplementoChave('');
     $this->AddCampo('cod_norma'                   ,'integer'     ,true,'',true,true);
     $this->AddCampo('cod_lei_alteracao'           ,'integer'     ,true,'',false,true);
+    $this->AddCampo('cod_norma_alteracao'         ,'integer'     ,true,'',false,true);
     $this->AddCampo('percentual_credito_adicional','numeric(3,0)',true,'',false,false);
 
 }

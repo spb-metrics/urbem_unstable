@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TDATDividaAtiva.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TDATDividaAtiva.class.php 61352 2015-01-09 18:14:18Z evandro $
 
 * Casos de uso: uc-05.04.02
 */
@@ -87,21 +87,22 @@ class TDATDividaAtiva extends Persistente
         $this->AddCampo('dt_vencimento_origem' , 'date'   , true, '' , false, false );
         $this->AddCampo('exercicio_livro'      , 'varchar', true, '' , false, false );
 
-        $this->inExercicio    = '0';
-        $this->inCodGrupo     = '0';
-        $this->inCodCredito   = '0';
-        $this->inCodEspecie   = '0';
-        $this->inCodGenero    = '0';
-        $this->inCodNatureza  = '0';
-        $this->inNumCgm       = '0';
-        $this->inCodIIInicial = '0';
-        $this->inCodIIFinal   = '0';
-        $this->inCodIEInicial = '0';
-        $this->inCodIEFinal   = '0';
-        $this->dtDataInicial  = null;
-        $this->dtDataFinal    = null;
-        $this->flValorInicial = null;
-        $this->flValorFinal   = null;
+        $this->inExercicio     = '0';
+        $this->inCodGrupo      = '0';
+        $this->inCodCredito    = '0';
+        $this->inCodEspecie    = '0';
+        $this->inCodGenero     = '0';
+        $this->inCodNatureza   = '0';
+        $this->inNumCgmInicial = '0';
+        $this->inNumCgmFinal   = '0';
+        $this->inCodIIInicial  = '0';
+        $this->inCodIIFinal    = '0';
+        $this->inCodIEInicial  = '0';
+        $this->inCodIEFinal    = '0';
+        $this->dtDataInicial   = null;
+        $this->dtDataFinal     = null;
+        $this->flValorInicial  = null;
+        $this->flValorFinal    = null;
 
         $this->inCodModalidade  = null;
         $this->inCodAutoridade  = null;
@@ -126,37 +127,42 @@ class TDATDividaAtiva extends Persistente
 
     public function montaRecuperaListaDivida()
     {
-        $stSql  = "   SELECT                                                                      \r\n";
-        $stSql .= "       *                                                                       \r\n";
-        $stSql .= "   FROM divida.fn_lista_divida_arrecadacao (                                   \r\n";
-
-        $stSql .=         $this->inExercicio.",".$this->inCodGrupo.",".$this->inCodCredito.",     \r\n";
-        $stSql .=         $this->inCodEspecie.",".$this->inCodGenero.",                           \r\n";
-        $stSql .=         $this->inCodNatureza.",".$this->inNumCgm.",".$this->inCodIIInicial.",   \r\n";
-        $stSql .=         $this->inCodIIFinal.",".$this->inCodIEInicial.",                        \r\n";
-        $stSql .=         $this->inCodIEFinal.",'". $this->dtDataInicial."',                      \r\n";
-        $stSql .=         "'".$this->dtDataFinal."',".$this->flValorInicial.",                    \r\n";
-        $stSql .=         $this->flValorFinal.",                                                  \r\n";
-        $stSql .=         "'".$this->stExercicio."'                                               \r\n";
-        $stSql .= "   )                                                                           \r\n";
-
-        $stSql .= "   as lista_dividas (                                                          \r\n";
-        $stSql .= "       valor_aberto numeric,                                                   \r\n";
-        $stSql .= "       valor_lancamento numeric,                                               \r\n";
-        $stSql .= "       cod_lancamento int,                                                     \r\n";
-        $stSql .= "       numcgm int,                                                             \r\n";
-        $stSql .= "       nom_cgm varchar,                                                        \r\n";
-        $stSql .= "       vinculo varchar,                                                        \r\n";
-        $stSql .= "       id_vinculo varchar,                                                     \r\n";
-        $stSql .= "       inscricao int,                                                          \r\n";
-        $stSql .= "       tipo_inscricao varchar,                                                 \r\n";
-        $stSql .= "       vencimento_base date,                                                   \r\n";
-        $stSql .= "       vencimento_base_br varchar,                                             \r\n";
-        $stSql .= "       timestamp_venal timestamp,                                              \r\n";
-        $stSql .= "       nro_parcelas int,                                                       \r\n";
-        $stSql .= "       situacao_lancamento varchar                                             \r\n";
-        $stSql .= "   )                                                                           \r\n";
-
+        $stSql  = "   SELECT                                                                      
+                                *                                                                       
+                            FROM divida.fn_lista_divida_arrecadacao (".$this->inExercicio."
+                                                                    ,".$this->inCodGrupo."
+                                                                    ,".$this->inCodCredito."
+                                                                    ,".$this->inCodEspecie."
+                                                                    ,".$this->inCodGenero."
+                                                                    ,".$this->inCodNatureza."
+                                                                    ,".$this->inNumCgmInicial."
+                                                                    ,".$this->inNumCgmFinal."
+                                                                    ,".$this->inCodIIInicial."
+                                                                    ,".$this->inCodIIFinal."
+                                                                    ,".$this->inCodIEInicial."
+                                                                    ,".$this->inCodIEFinal."
+                                                                    ,'".$this->dtDataInicial."'
+                                                                    ,'".$this->dtDataFinal."'
+                                                                    ,".$this->flValorInicial."
+                                                                    ,".$this->flValorFinal."
+                                                                    ,'".$this->stExercicio."'
+                            ) as lista_dividas (                                                          
+                                            valor_aberto numeric,                                                   
+                                            valor_lancamento numeric,                                               
+                                            cod_lancamento int,                                                     
+                                            numcgm int,                                                             
+                                            nom_cgm varchar,                                                        
+                                            vinculo varchar,                                                        
+                                            id_vinculo varchar,                                                     
+                                            inscricao int,                                                          
+                                            tipo_inscricao varchar,                                                 
+                                            vencimento_base date,                                                   
+                                            vencimento_base_br varchar,                                             
+                                            timestamp_venal timestamp,                                              
+                                            nro_parcelas int,                                                       
+                                            situacao_lancamento varchar                                             
+                            )                                                                                       
+            ";
         return $stSql;
 
     }
@@ -378,6 +384,8 @@ class TDATDividaAtiva extends Persistente
         $stSql .= "       exercicio int,                                              \r\n";
         $stSql .= "       cod_parcela int,                                            \r\n";
         $stSql .= "       cod_calculo int,                                            \r\n";
+        $stSql .= "       cod_lancamento int,                                         \r\n";
+        $stSql .= "       nr_parcela int,                                             \r\n";
         $stSql .= "       cod_credito int,                                            \r\n";
         $stSql .= "       descricao_credito varchar,                                  \r\n";
         $stSql .= "       cod_natureza int,                                           \r\n";
@@ -9252,6 +9260,139 @@ ON
 
         return $stSql;
     }
+
+    public function criaTabelaTodasParcelas($boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaCriaTabelaTodasParcelas();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaCriaTabelaTodasParcelas()
+    {
+        $stSql  = " DROP TABLE IF EXISTS tmp_todas_parcelas;
+                    CREATE TABLE tmp_todas_parcelas AS (
+                        SELECT
+                                max(carne.numeracao)::varchar as numeracao
+                                , carne.cod_convenio
+                                , carne.exercicio::int
+                                , ap.cod_parcela
+                                , alc.cod_calculo
+                                , alc.cod_lancamento
+                                , nr_parcela
+                                , calc.cod_credito
+                                , mon.descricao_credito
+                                , mon.cod_natureza
+                                , mon.cod_genero
+                                , mon.cod_especie
+                                , (alc.valor * arrecadacao.calculaProporcaoParcela(ap.cod_parcela))::numeric(14,2) as valor
+                                , (alc.valor * arrecadacao.calculaProporcaoParcela(ap.cod_parcela)) as valor_exato
+                        FROM
+                            arrecadacao.parcela as ap
+                        JOIN arrecadacao.carne
+                            ON carne.cod_parcela = ap.cod_parcela
+                        JOIN arrecadacao.lancamento_calculo as alc
+                            ON alc.cod_lancamento = ap.cod_lancamento
+                        JOIN arrecadacao.calculo as calc
+                            ON calc.cod_calculo = alc.cod_calculo
+                        JOIN monetario.credito as mon
+                            ON mon.cod_credito = calc.cod_credito
+                            AND mon.cod_natureza = calc.cod_natureza
+                            AND mon.cod_especie = calc.cod_especie
+                            AND mon.cod_genero = calc.cod_genero
+                        
+                        LEFT JOIN ( SELECT carne.cod_parcela
+                                    FROM arrecadacao.carne
+                                    JOIN arrecadacao.pagamento
+                                      ON pagamento.numeracao    = carne.numeracao
+                                     AND pagamento.cod_convenio = carne.cod_convenio
+                        ) AS apag
+                            ON apag.cod_parcela = carne.cod_parcela
+                        
+                        LEFT JOIN   arrecadacao.carne_devolucao as carned
+                            ON carned.numeracao = carne.numeracao and carned.cod_convenio = carne.cod_convenio
+                        WHERE
+            
+                        case when carned.numeracao is not null then
+                            case when 1 < (select count(*) from arrecadacao.carne_devolucao acd where acd.numeracao = carne.numeracao
+                                                                                             and acd.cod_convenio = carne.cod_convenio) then
+                                false
+                            else
+                                carned.cod_motivo = 10
+                            end
+                        else
+                            true 
+                        end
+            
+                        AND apag.cod_parcela IS NULL
+                        AND ap.cod_lancamento IN (".$this->getDado('stCodLancamentos').")
+                    GROUP BY
+                        carne.exercicio
+                        , carne.cod_convenio
+                        , ap.cod_parcela
+                        , alc.cod_calculo
+                        , alc.cod_lancamento
+                        , nr_parcela
+                        , alc.valor
+                        , calc.cod_credito
+                        , mon.descricao_credito
+                        , mon.cod_natureza
+                        , mon.cod_genero
+                        , mon.cod_especie
+                    ORDER BY
+                    ap.cod_parcela, alc.cod_calculo
+            );
+        ";
+        return $stSql;
+    }
+
+    public function deletaTabelaParcelas($boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaDeletaTabelaParcelas();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaDeletaTabelaParcelas()
+    {
+        $stSql  = "DROP TABLE IF EXISTS tmp_todas_parcelas;";
+
+        return $stSql;
+    }
+
+    public function recuperaTimestampInsert(&$rsRecordSet, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaRecuperaTimestampInsert();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaTimestampInsert()
+    {
+        $stSql  = " SELECT now()::TIMESTAMP WITHOUT TIME ZONE as timestamp_insert;";
+        return $stSql;
+    }
+
+
+
 }// end of class
 
 ?>

@@ -37,12 +37,12 @@ $Date: 2008-03-05 14:52:21 -0300 (Qua, 05 Mar 2008) $
 
 Casos de uso: uc-01.04.02
 */
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GA_NORMAS_NEGOCIO."RNorma.class.php");
+include_once (CAM_GA_NORMAS_NEGOCIO."RNorma.class.php");
 include_once ( CAM_GA_NORMAS_MAPEAMENTO."TNorma.class.php"  );
-include_once(CAM_GA_NORMAS_COMPONENTES."IBuscaInnerNorma.class.php");
-
+include_once (CAM_GA_NORMAS_COMPONENTES."IBuscaInnerNorma.class.php");
 
 $stPrograma = "ManterNorma";
 $pgFilt = "FL".$stPrograma.".php";
@@ -53,45 +53,56 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 $rsNorma = $rsTipoNorma = $rsAtributos = new RecordSet;
-$obRegra = new RNorma;
+$obRNorma = new RNorma;
 
 $stExercicio = Sessao::getExercicio();
 
 $stAcao = $request->get('stAcao');
 
-$inCodNorma = $_REQUEST["inCodNorma"];
+$inCodNorma = $request->get('inCodNorma');
 
 if ( (empty($stAcao)) || ($stAcao == "incluir")) {
     Sessao::write('stNormaAcao','incluir');
 
     $js.= "limpaCampos ();";
 
-    $obRegra->obRTipoNorma->listar( $rsTipoNorma );
+    $obRNorma->obRTipoNorma->listar( $rsTipoNorma );
+    
+    $stNomeNorma      = "";
+    $inNumNorma       = "";
+    $stExercicio      = "";
+    $stNomeTipoNorma  = "";
+    $inCodTipoNorma   = "";
+    $stDescricao      = "";
+    $stDataPublicacao = "";
+    $stDataAssinatura = "";
+    $stDataTermino    = "";
+    $stLink           = "";
 
-} elseif ($stAcao) {
+} elseif (isset($stAcao)) {
     Sessao::write('stNormaAcao','incluir');
     Sessao::write('inCodNorma',$inCodNorma);
+        
+    $obRNorma->setCodNorma( $request->get('inCodNorma') );
+    $obRNorma->consultar( $rsNorma );
     
-    $obRegra->setCodNorma( $_REQUEST['inCodNorma'] );
-    $obRegra->consultar( $rsNorma );
-    
-    $stNomeNorma     = $obRegra->getNomeNorma();
-    $inNumNorma      = $obRegra->getNumNorma();
-    $stExercicio     = $obRegra->getExercicio();
-    $stNomeTipoNorma = $obRegra->obRTipoNorma->getNomeTipoNorma();
-    $inCodTipoNorma  = $obRegra->obRTipoNorma->getCodTipoNorma();
+    $stNomeNorma     = $obRNorma->getNomeNorma();
+    $inNumNorma      = $obRNorma->getNumNorma();
+    $stExercicio     = $obRNorma->getExercicio();
+    $stNomeTipoNorma = $obRNorma->obRTipoNorma->getNomeTipoNorma();
+    $inCodTipoNorma  = $obRNorma->obRTipoNorma->getCodTipoNorma();
 
-    $stDescricao     = $obRegra->getDescricaoNorma();
-    $stDataPublicacao= $obRegra->getDataPublicacao();
-    $stDataAssinatura= $obRegra->getDataAssinatura();
-    $stDataTermino   = $obRegra->getDataTermino();
-    $stLink          = $obRegra->getUrl();
+    $stDescricao     = $obRNorma->getDescricaoNorma();
+    $stDataPublicacao= $obRNorma->getDataPublicacao();
+    $stDataAssinatura= $obRNorma->getDataAssinatura();
+    $stDataTermino   = $obRNorma->getDataTermino();
+    $stLink          = $obRNorma->getUrl();
 
     Sessao::write('stNormaLink',$stLink);
 
-    $obRegra->obRTipoNorma->setCodTipoNorma( $inCodTipoNorma );
-    $obRegra->obRTipoNorma->obRCadastroDinamico->setChavePersistenteValores( array("cod_tipo_norma"=>$inCodTipoNorma, "cod_norma"=>$obRegra->getCodNorma()) );
-    $obRegra->obRTipoNorma->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
+    $obRNorma->obRTipoNorma->setCodTipoNorma( $inCodTipoNorma );
+    $obRNorma->obRTipoNorma->obRCadastroDinamico->setChavePersistenteValores( array("cod_tipo_norma"=>$inCodTipoNorma, "cod_norma"=>$obRNorma->getCodNorma()) );
+    $obRNorma->obRTipoNorma->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 }
 
 $obLblLink = new Label;
@@ -175,6 +186,12 @@ $obHdnCodNorma->setName ( "inCodNorma" );
 $obHdnCodNorma->setId   ( "inCodNorma" );
 $obHdnCodNorma->setValue( $inCodNorma  );
 
+$obHdnNormaAlteracao = new Hidden;
+$obHdnNormaAlteracao->setName ( "hdnstNormaAlteracao" );
+
+$obHdnTipoLeiAlteracaoOrcamentaria = new Hidden;
+$obHdnTipoLeiAlteracaoOrcamentaria->setName ( "hdnTipoLeiAlteracaoOrcamentaria" );
+
 $obHdnCodTipoNorma = new Hidden;
 $obHdnCodTipoNorma->setName ( "inCodTipoNorma" );
 $obHdnCodTipoNorma->setId   ( "inCodTipoNorma" );
@@ -234,7 +251,7 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         if( $rsNormaDetalhe->getNumLinhas() > 0 ){
             $codLeiAlteracao = $rsNormaDetalhe->getCampo('cod_lei_alteracao');
             
-            $obTNorma->setDado('cod_norma' , $rsNormaDetalhe->getCampo('cod_norma'));
+            $obTNorma->setDado('cod_norma' , $rsNormaDetalhe->getCampo('cod_norma_alteracao'));
             $obTNorma->recuperaPorChave($rsNormaAlteracao);
             
             $stNumNorma                = $rsNormaAlteracao->getCampo('num_norma');
@@ -267,9 +284,9 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         $obCmbTipoAlteracao->obEvento->setOnChange("buscaValor('MontaBuscaNorma' );");
         
         if ( $codLeiAlteracao ){
-            $obHdnCodNorma->setName ( "hdnstNormaAlteracao" );
-            $obHdnCodNorma->setId   ( "hdnstNormaAlteracao" );
-            $obHdnCodNorma->setValue( $stNumNorma."-".$stExercicioNormaAlteracao."-".$stNomeNormaAlteracao."-".$inCodTipoNormaAlteracao  );
+            $obHdnNormaAlteracao->setName ( "hdnstNormaAlteracao" );
+            $obHdnNormaAlteracao->setId   ( "hdnstNormaAlteracao" );
+            $obHdnNormaAlteracao->setValue( $stNumNorma."-".$stExercicioNormaAlteracao."-".$stNomeNormaAlteracao."-".$inCodTipoNormaAlteracao  );
             
             $obHdnCodLeiAlteracao->setName ( "hdnInLeiAlteracao" );
             $obHdnCodLeiAlteracao->setValue( $codLeiAlteracao );
@@ -284,11 +301,11 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         
         $obTTCETONormaDetalhe->setDado( 'cod_norma' , $_REQUEST['inCodNorma'] );
         $obTTCETONormaDetalhe->recuperaPorChave($rsNormaDetalhe);
-                
+                        
         if( $rsNormaDetalhe->getNumLinhas() > 0 ){
             $codLeiAlteracao = $rsNormaDetalhe->getCampo('cod_lei_alteracao');
                         
-            $obTNorma->setDado('cod_norma' , $rsNormaDetalhe->getCampo('cod_norma'));
+            $obTNorma->setDado('cod_norma' , $rsNormaDetalhe->getCampo('cod_norma_alteracao'));
             $obTNorma->recuperaPorChave($rsNormaAlteracao);
             
             $stNumNorma                    = $rsNormaAlteracao->getCampo('num_norma');
@@ -321,15 +338,48 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         
         $obCmbTipoAlteracao->setTitle             ( "Selecione o Tipo de Lei"      );
         $obCmbTipoAlteracao->obEvento->setOnChange("buscaValor('MontaBuscaNorma' );");
-         
+        
         if ( $codLeiAlteracao ){
-            $obHdnCodNorma->setName ( "hdnstNormaAlteracao" );
-            $obHdnCodNorma->setId   ( "hdnstNormaAlteracao" );
-            $obHdnCodNorma->setValue( $stNumNorma."-".$stExercicioNormaAlteracao."-".$stNomeNormaAlteracao."-".$inCodTipoNormaAlteracao  );
+            $obHdnNormaAlteracao->setName ( "hdnstNormaAlteracao" );
+            $obHdnNormaAlteracao->setId   ( "hdnstNormaAlteracao" );
+            $obHdnNormaAlteracao->setValue( $stNumNorma."-".$stExercicioNormaAlteracao."-".$stNomeNormaAlteracao."-".$inCodTipoNormaAlteracao  );
             
             $obHdnCodLeiAlteracao->setName ( "hdnInLeiAlteracao" );
             $obHdnCodLeiAlteracao->setValue( $codLeiAlteracao );
         }
+    break;
+    case 11:
+        include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php"           );
+        include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTipoLeiOrigemDecreto.class.php"  );
+        
+        $obTTCEMGTipoLeiOrigemDecreto = new TTCEMGTipoLeiOrigemDecreto;
+        $obTTCEMGTipoLeiOrigemDecreto->recuperaTodos($rsTipoLeiOrigemDecreto);
+        
+        $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
+        $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $_REQUEST['inCodNorma'] );
+        $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe);
+        
+        $obCmbTipoLeiOrigemDecreto = new Select;
+        $obCmbTipoLeiOrigemDecreto->setRotulo       ( 'Tipo de Lei que Originou Decreto');
+        $obCmbTipoLeiOrigemDecreto->setName         ( 'stTipoLeiOrigemDecreto'          );
+        $obCmbTipoLeiOrigemDecreto->setId           ( 'stTipoLeiOrigemDecreto'          );
+        $obCmbTipoLeiOrigemDecreto->setCampoId      ( 'cod_tipo_lei'                    );
+        $obCmbTipoLeiOrigemDecreto->setCampoDesc    ( 'descricao'                       );
+        $obCmbTipoLeiOrigemDecreto->addOption       ( "", "Selecione"                   );
+        $obCmbTipoLeiOrigemDecreto->preencheCombo   ( $rsTipoLeiOrigemDecreto           );
+        $obCmbTipoLeiOrigemDecreto->setTitle        ( "Selecione o Tipo de Lei que Originou Decreto"      );
+        $obCmbTipoLeiOrigemDecreto->obEvento->setOnChange("buscaValor('montaLeiOrcamentaria');");
+        if ( $stAcao == "alterar" ) {
+            if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')){
+               $obCmbTipoLeiOrigemDecreto->setValue         ( $rsNormaDetalhe->getCampo('tipo_lei_origem_decreto') );
+               if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3 ){
+                  $obHdnTipoLeiAlteracaoOrcamentaria->setValue($rsNormaDetalhe->getCampo('tipo_lei_alteracao_orcamentaria'));
+               }
+            }
+        }
+        $obSpanTipoLeiAlteracaoOrcamentaria = new Span;
+        $obSpanTipoLeiAlteracaoOrcamentaria->setId('spanTipoLeiAlteracaoOrcamentaria');
+        
     break;
 }
     
@@ -366,7 +416,8 @@ $obFormulario->addTitulo            ( "Dados da Norma" );
 if ($stAcao=='incluir') {
     $obFormulario->addComponenteComposto( $obTxtTipoNorma , $obCmbTipoNorma );
 } else {
-    $obFormulario->addHidden        ( $obHdnCodNorma        ); 
+    $obFormulario->addHidden        ( $obHdnCodNorma        );
+    $obFormulario->addHidden        ( $obHdnNormaAlteracao  );
     $obFormulario->addHidden        ( $obHdnCodLeiAlteracao ); 
     $obFormulario->addHidden        ( $obHdnCodTipoNorma    );
     $obFormulario->addComponente    ( $obLblTipoNorma       );
@@ -376,6 +427,14 @@ $obFormulario->addComponente        ( $obTxtNorma         );
 $obFormulario->addComponente        ( $obTxtExercicio     );
 $obFormulario->addComponente        ( $obTxtNome          );
 $obFormulario->addComponente        ( $obTxtDescricao     );
+
+if(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11){
+    $obFormulario->addHidden        ( $obHdnTipoLeiAlteracaoOrcamentaria  );
+    $obFormulario->addComponente    ( $obCmbTipoLeiOrigemDecreto          );
+    $obFormulario->addSpan          ( $obSpanTipoLeiAlteracaoOrcamentaria );
+
+}
+
 $obFormulario->addComponente        ( $obTxtData          );
 $obFormulario->addComponente        ( $obTxtDataAssinatura);
 $obFormulario->addComponente        ( $obTxtDataTermino   );
@@ -413,7 +472,13 @@ else
 if ( $stAcao == "alterar" and $codLeiAlteracao > 0 ) {
     $js .= "buscaValor('MontaBuscaNorma');";
 }
+
+if ( $stAcao == "alterar" and ($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3) ) {
+    $js .= "buscaValor('montaLeiOrcamentaria');";
+}
+
 sistemaLegado::executaFrameOculto($js);
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

@@ -34,7 +34,7 @@ $Revision: 15580 $
 $Name$
 $Author: cassiano $
 $Date: 2006-09-18 08:26:31 -0300 (Seg, 18 Set 2006) $
-$Id: LSManterNorma.php 60663 2014-11-06 18:22:19Z evandro $
+$Id: LSManterNorma.php 61281 2014-12-29 17:00:31Z arthur $
 
 Casos de uso: uc-01.04.02
 */
@@ -85,18 +85,18 @@ if ( is_array(Sessao::read('link')) ) {
     Sessao::write('link',$arLink);
 }
 
-$obRegra = new RNorma;
-
 $rsLista = new RecordSet;
-$obRegra->obRTipoNorma->setCodTipoNorma ( $_REQUEST['inCodTipoNorma'] );
-$obRegra->setExercicio                  ( $_REQUEST['stExercicio']    );
-$obRegra->setDescricaoNorma             ( $_REQUEST['stDescricao']    );
-$obRegra->setNumNorma                   ( $_REQUEST['inNumNorma']     );
-$obRegra->setNomeNorma                  ( $_REQUEST['stNomeNorma']    );
-$obRegra->setTipoBusca                  ( $_REQUEST['stTipoBusca']    );
-$obRegra->listar( $rsLista );
-$obLista = new Lista;
+$obRNorma = new RNorma;
 
+$obRNorma->obRTipoNorma->setCodTipoNorma ( $_REQUEST['inCodTipoNorma'] );
+$obRNorma->setExercicio                  ( $_REQUEST['stExercicio']    );
+$obRNorma->setDescricaoNorma             ( $_REQUEST['stDescricao']    );
+$obRNorma->setNumNorma                   ( $_REQUEST['inNumNorma']     );
+$obRNorma->setNomeNorma                  ( $_REQUEST['stNomeNorma']    );
+$obRNorma->setTipoBusca                  ( $_REQUEST['stTipoBusca']    );
+$obRNorma->listar( $rsLista );
+
+$obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
 
 $obLista->setRecordSet( $rsLista );
@@ -157,4 +157,5 @@ $obLista->show();
 $obFormulario = new Formulario;
 $obFormulario->setAjuda( "UC-01.04.02" );
 $obFormulario->show();
+
 ?>

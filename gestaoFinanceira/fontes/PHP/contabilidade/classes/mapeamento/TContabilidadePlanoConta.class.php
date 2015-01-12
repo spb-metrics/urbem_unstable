@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Classe de mapeamento da tabela CONTABILIDADE.PLANO_CONTA
     * Data de Criação: 01/11/2004
 
@@ -34,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 60421 2014-10-20 19:36:09Z carlos.silva $
+    $Id: TContabilidadePlanoConta.class.php 61326 2015-01-07 11:02:55Z carolina $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -61,6 +58,7 @@ function TContabilidadePlanoConta()
     $this->AddCampo('cod_sistema','integer',true,'',false,true);
     $this->AddCampo('cod_estrutural','varchar',false,'150',false,false);
     $this->AddCampo('atributo_tcepe','integer',false,'',false,false);
+    $this->AddCampo('atributo_tcemg','integer',false,'',false,false);
 }
 
 function montaRecuperaGrupos()

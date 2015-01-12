@@ -488,6 +488,7 @@ class TTCEMGOPS extends Persistente
                                                 pagamento_tipo_documento.num_documento 
                              END AS nrodocumento
                              , conta_bancaria.cod_ctb_anterior AS codctb
+                             , tipo_documento.descricao as desc_tipo_documento_op
                              , plano_recurso.cod_recurso AS codfontectb
                              , TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'ddmmyyyy') AS dtemissao
                              , nota_liquidacao_paga.vl_pago AS vldocumento
@@ -511,7 +512,10 @@ class TTCEMGOPS extends Persistente
                                       AND pagamento_tipo_documento.exercicio    = nota_liquidacao_paga.exercicio
                                       AND pagamento_tipo_documento.timestamp    = nota_liquidacao_paga.timestamp
                                       AND pagamento_tipo_documento.cod_entidade = nota_liquidacao_paga.cod_entidade
-                                                          
+                            
+                            LEFT JOIN tcemg.tipo_documento
+                                        ON tipo_documento.cod_tipo = pagamento_tipo_documento.cod_tipo_documento
+
                              INNER JOIN empenho.nota_liquidacao_conta_pagadora
                                      ON nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
                                     AND nota_liquidacao_conta_pagadora.cod_entidade         = nota_liquidacao_paga.cod_entidade
@@ -628,6 +632,7 @@ class TTCEMGOPS extends Persistente
                                         , codreduzidoop
                                         , nrodocumento
                                         , codctb
+                                        , desc_tipo_documento_op
                                         , codfontectb
                                         , dtemissao
                                         , vldocumento

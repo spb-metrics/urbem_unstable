@@ -95,7 +95,8 @@ BEGIN
                 despesa_empenhada numeric,
                 porcentagem_empenhada numeric,
                 despesa_liquidada numeric,
-                porcentagem numeric
+                porcentagem numeric,
+                restos_nao_processados numeric
                )
          WHERE subgrupo = 1;
     ELSE
@@ -149,7 +150,8 @@ BEGIN
             despesa_empenhada numeric,
             porcentagem_empenhada numeric,
             despesa_liquidada numeric,
-            porcentagem numeric
+            porcentagem numeric,
+            restos_nao_processados numeric
            ) 
      WHERE subgrupo = 1;
     ELSE

@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Listagem de Itens
     * Data de Criação   : 04/11/2004
 
@@ -32,7 +29,7 @@
 
     * @ignore
 
-    $Id: LSManterPlanoConta.php 60421 2014-10-20 19:36:09Z carlos.silva $
+    $Id: LSManterPlanoConta.php 61326 2015-01-07 11:02:55Z carolina $
 
     * Casos de uso: uc-02.02.02
 */
@@ -174,6 +171,7 @@ $obLista->ultimaAcao->addCampo( "stContaCorrente", "conta_corrente" );
 $obLista->ultimaAcao->addCampo( "inContaCorrente", "cod_conta_corrente" );
 $obLista->ultimaAcao->addCampo( "inCodRecurso", "cod_recurso" );
 $obLista->ultimaAcao->addCampo( "inTipoContaCorrenteTCEPE", "atributo_tcepe" );
+$obLista->ultimaAcao->addCampo( "inTipoContaCorrenteTCEMG", "atributo_tcemg" );
 
 if ($stAcao == "excluir") {
     $obLista->ultimaAcao->addCampo("&stDescQuestao", "nom_conta");

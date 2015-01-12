@@ -173,10 +173,9 @@ $arMes = array(
 );
 
 if (Sessao::getExercicio() == date('Y')) {
-    for ($i=1; $i < date('m'); $i++) {
+    for ($i=1; $i <= date('m'); $i++) {
         $arMes2[$i] = $arMes[$i];
     }
-
     $arMes = $arMes2;
 }
 

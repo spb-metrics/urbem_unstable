@@ -218,7 +218,49 @@ switch ($stCtrl) {
          
         sistemaLegado::executaFrameOculto($stJs);
         
-    break;    
+    break;
+
+    case "montaLeiOrcamentaria":
+        if($_REQUEST['stTipoLeiOrigemDecreto'] == 3){
+          include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTipoLeiAlteracaoOrcamentaria.class.php"  );
+          $obTTCEMGTipoLeiAlteracaoOrcamentaria= new TTCEMGTipoLeiAlteracaoOrcamentaria;
+          $obTTCEMGTipoLeiAlteracaoOrcamentaria->recuperaTodos($rsTipoLeiAlteracaoOrcamentaria    );
+
+          $obCmbTipoLeiAlteracaoOrcamentaria = new Select;
+          $obCmbTipoLeiAlteracaoOrcamentaria->setRotulo       ( 'Tipo de Lei de Alteração Orçamentária'             );
+          $obCmbTipoLeiAlteracaoOrcamentaria->setName         ( 'stTipoLeiAlteracaoOrcamentaria'                    );
+          $obCmbTipoLeiAlteracaoOrcamentaria->setId           ( 'stTipoLeiAlteracaoOrcamentaria'                    );
+          $obCmbTipoLeiAlteracaoOrcamentaria->setCampoId      ( 'cod_tipo_lei'                                      );
+          $obCmbTipoLeiAlteracaoOrcamentaria->setCampoDesc    ( 'descricao'                                         );
+          $obCmbTipoLeiAlteracaoOrcamentaria->addOption       ( "", "Selecione"                                     );
+          $obCmbTipoLeiAlteracaoOrcamentaria->preencheCombo   ( $rsTipoLeiAlteracaoOrcamentaria                     );
+          $obCmbTipoLeiAlteracaoOrcamentaria->setTitle        ( "Selecione o Tipo de Lei de Aleteração Orçamentária");
+          
+          if($_REQUEST['stAcao'] == 'alterar' and $_REQUEST['hdnTipoLeiAlteracaoOrcamentaria'] ){
+            $obTTCEMGTipoLeiAlteracaoOrcamentaria->setDado  ('cod_tipo_lei' ,$_REQUEST['hdnTipoLeiAlteracaoOrcamentaria'] );
+            $obTTCEMGTipoLeiAlteracaoOrcamentaria->recuperaPorChave($rsLeiAlteracaoOrcamentaria, $boTransacao);
+            
+            $inTipoLeiAlteracaoOrcamentaria = $rsLeiAlteracaoOrcamentaria->getCampo('cod_tipo_lei');
+            $stDescLeiAlteracaoOrcamentaria = $rsLeiAlteracaoOrcamentaria->getCampo('descricao');
+          }
+          
+          $obFormulario = new Formulario();
+          $obFormulario->addComponente( $obCmbTipoLeiAlteracaoOrcamentaria );
+          $obFormulario->montaInnerHTML();
+          $stHtml = $obFormulario->getHTML();
+          $stJs .= "jq_('#spanTipoLeiAlteracaoOrcamentaria').html('".$stHtml."');";
+          if($inTipoLeiAlteracaoOrcamentaria){
+              $stJs .= "d.getElementById('stTipoLeiAlteracaoOrcamentaria').value ='".$inTipoLeiAlteracaoOrcamentaria."';\n";
+          }else{
+              $stJs .= "d.getElementById('stTipoLeiAlteracaoOrcamentaria').value ='';\n";
+              $stJs .= "d.getElementById('stTipoLeiAlteracaoOrcamentaria').value ='';\n";
+          }
+          sistemaLegado::executaFrameOculto($stJs);
+        }else{
+            $stJs .= "jq_('#spanTipoLeiAlteracaoOrcamentaria').html('');";
+            sistemaLegado::executaFrameOculto($stJs);
+        }
+    break;
 }
 
 ?>

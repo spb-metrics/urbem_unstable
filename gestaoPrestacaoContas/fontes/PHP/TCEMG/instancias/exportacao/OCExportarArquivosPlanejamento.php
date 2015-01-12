@@ -1331,7 +1331,7 @@ if ($arFiltro['stTipoExport'] == 'compactados') {
         die;
     }
 
-    $obExportador->setNomeArquivoZip('AIP_'.$inCodMunicipio.'_'.Sessao::getExercicio().'.zip');
+    $obExportador->setNomeArquivoZip('IP_'.$inCodMunicipio.'_'.Sessao::getExercicio().'.zip');
 }
 
 $obExportador->show();

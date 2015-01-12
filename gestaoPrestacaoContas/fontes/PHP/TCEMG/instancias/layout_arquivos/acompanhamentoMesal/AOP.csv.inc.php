@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: AOP.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: AOP.csv.inc.php 61329 2015-01-07 13:48:23Z evandro $
+  * $Date: 2015-01-07 11:48:23 -0200 (Qua, 07 Jan 2015) $
+  * $Author: evandro $
+  * $Rev: 61329 $
   *
 */
 /**
@@ -202,16 +202,19 @@ if (count($rsRecordSetAOP10->getElementos()) > 0) {
                             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);     
                             
-                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codorgao");
-                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(2);
-                            
-                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codunidadesub");
-                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(5);
-    
+                            //Registro 11
+                            //Os campos codOrgaoEmpOP e codUnidadeEmpOP não devem mais ser demonstrados apartir do exercício de 2015.
+                            if ( Sessao::getExercicio() < '2015') {
+                                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codorgao");
+                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                                $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(2);
+                                
+                                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codunidadesub");
+                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                                $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(5);
+                            }
                         }
                     }
                 } 

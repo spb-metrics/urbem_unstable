@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLoteamento.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMLoteamento.class.php 61291 2014-12-30 15:55:05Z evandro $
 
      * Casos de uso: uc-05.01.15
 */
@@ -62,6 +62,11 @@ class RCIMLoteamento
     * @var Integer
 */
 var $inCodigoLoteamento;
+/**
+    * @access Private
+    * @var Integer
+*/
+var $inCodLote;
 /**
     * @access Private
     * @var String
@@ -329,7 +334,8 @@ function RCIMLoteamento()
 */
 function addLote($arChaveLote)
 {
-    $this->obRCIMLote->setCodigoLote( $arChaveLote['inCodLote'] );
+    $this->obRCIMLote = new RCIMLote;
+    $this->obRCIMLote->setCodigoLote( $arChaveLote['inCodLote'] );    
     $this->obRCIMLote->setNumeroLote( $arChaveLote['inNumLote'] );
     $this->obRCIMLote->obRCIMLocalizacao->setValorComposto( $arChaveLote['stLocalizacaoLoteamento'] );
     if ($arChaveLote['boCaucionado'] == "Sim") {
@@ -338,11 +344,7 @@ function addLote($arChaveLote)
         $this->obRCIMLote->setCaucionado( false );
     }
 
-    $obErro = $this->obRCIMLote->consultarLote( $rsRecordSet );
-
-    if ( !$obErro->ocorreu() ) {
-        $this->arLote[] = $this->obRCIMLote;
-    }
+    $this->arLote[] = $this->obRCIMLote;
 
     return $obErro;
 }
@@ -388,6 +390,7 @@ function incluirLoteamento($boTransacao = "")
                             $obErro->setDescricao("A Data de Liberação deve ser igual ou posterior à Data de Aprovação!");
                         }
                     }
+                    
                     if ( !$obErro->ocorreu() ) {
                         foreach ($this->arLote as $obRCIMLote) {
                             $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $obRCIMLote->getCodigoLote() );
@@ -468,59 +471,50 @@ function atualizarLoteamentoLote($boTransacao = "")
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     if ( !$obErro->ocorreu() ) {
-        $inTmpCodigoLoteamento = $this->getCodigoLoteamento();
-        $obErro = $this->listarLotesLoteamento( $rsRecordSet ,$boTransacao );
-        if ( !$obErro->ocorreu() ) {
-            $arLoteLoteamento = array();
-            while ( !$rsRecordSet->eof() ) {
-                $stChave =  $rsRecordSet->getCampo("cod_lote");
-                $arLoteLoteamento[$stChave] = true;
-                $rsRecordSet->proximo();
-            }
-            $this->setCodigoLoteamento( $inTmpCodigoLoteamento );
-            if ( !$obErro->ocorreu() ) {
-                $stChaveTabela  =  $this->obTCIMLoteLoteamento->getComplementoChave();
-                $stCampoCod     =  $this->obTCIMLoteLoteamento->getCampoCod();
-                $this->obTCIMLoteLoteamento->setCampoCod("");
-                $this->obTCIMLoteLoteamento->setComplementoChave("cod_loteamento");
+        //Verificar se precisa incluir, alterar ou excluir
+        $this->inCodigoLoteamento = $this->getCodigoLoteamento();
+        $this->listarLotesLoteamento( $rsRecordSet ,$boTransacao );
+        $inRegistrosAnteriores = $rsRecordSet->getNumLinhas();
+        $inRegistrosNovos = count(Sessao::read('lotes'));
 
-                $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $this->inCodigoLoteamento    );
-                $obErro = $this->obTCIMLoteLoteamento->exclusao( $boTransacao );
-   /*             foreach ($arLoteLoteamento as $stChave => $boValor) {
-                    $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $stChave                     );
-                    $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $this->inCodigoLoteamento    );
-                    $this->obTCIMLoteLoteamento->setDado( "caucionado"    , $this->obRCIMLote->getCaucionado() );
-                    $obErro = $this->obTCIMLoteLoteamento->exclusao( $boTransacao );
-                    if ( $obErro->ocorreu() ) {
-                         break;
-                    }
-                }*/
-//                $this->obTCIMLoteLoteamento->setComplementoChave($stChaveTabela);
-  //              $this->obTCIMLoteLoteamento->setCampoCod($stCampoCod);
-            }
+        //INCLUIR OU ATUALIZAR
+        if ( $inRegistrosNovos >= $inRegistrosAnteriores ) {
             foreach ($this->arLote as $obRCIMLote) {
                 $stChaveLote = $obRCIMLote->getCodigoLote();
-
-                $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $obRCIMLote->getCodigoLote() );
-                $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $this->inCodigoLoteamento    );
-                $this->obTCIMLoteLoteamento->setDado( "caucionado"    , $obRCIMLote->getCaucionado() );
-                $obErro = $this->obTCIMLoteLoteamento->inclusao( $boTransacao );
-                if ( $obErro->ocorreu() ) {
-                    break;
-                }
-/*                if ( !isset( $arLoteLoteamento[$stChaveLote] ) ) {
-                    $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $obRCIMLote->getCodigoLote() );
+                
+                $this->inCodLote = $obRCIMLote->getCodigoLote();
+                $this->inCodigoLoteamento = $this->getCodigoLoteamento();
+                $this->listarLotesLoteamento( $rsRecordSet ,$boTransacao );            
+                
+                if ( $rsRecordSet->getNumLinhas() > 0 ) {
+                    $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $stChaveLote );
                     $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $this->inCodigoLoteamento    );
                     $this->obTCIMLoteLoteamento->setDado( "caucionado"    , $obRCIMLote->getCaucionado() );
-                    $obErro = $this->obTCIMLoteLoteamento->inclusao( $boTransacao );
-                    if ( $obErro->ocorreu() ) {
-                        break;
-                    }
-                } else {
-                    unset( $arLoteLoteamento[$stChaveLote] );
-                }                */
+                    $obErro = $this->obTCIMLoteLoteamento->alteracao( $boTransacao );
+                }else{
+                    $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $stChaveLote );
+                    $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $this->inCodigoLoteamento    );
+                    $this->obTCIMLoteLoteamento->setDado( "caucionado"    , $obRCIMLote->getCaucionado() );
+                    $obErro = $this->obTCIMLoteLoteamento->inclusao( $boTransacao );   
+                }
+            }
+        }else{
+            //EXCLUIR
+            $arRegistroAnteriores = $rsRecordSet->getElementos();
+            $arRegistrosNovos = Sessao::read('lotes');
+            $arExcluir = array_diff_assoc($arRegistroAnteriores, $arRegistrosNovos);
+            foreach ($arExcluir as $lotesExcluir) {
+                $this->obTCIMLoteLoteamento->setDado( "cod_lote"      , $lotesExcluir["cod_lote"] );
+                $this->obTCIMLoteLoteamento->setDado( "cod_loteamento", $lotesExcluir["cod_loteamento"]);
+                $this->obTCIMLoteLoteamento->setDado( "caucionado"    , $lotesExcluir["caucionado"]);
+                $obErro = $this->obTCIMLoteLoteamento->exclusao( $boTransacao );
             }
         }
+
+        if ( $obErro->ocorreu() ) {
+            break;
+        }
+        
     }
     $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTCIMLoteLoteamento );
 
@@ -669,6 +663,9 @@ function listarLotesLoteamento(&$rsRecordSet, $boTransacao = "")
     $stFiltro = "";
     if ($this->inCodigoLoteamento) {
         $stFiltro = " l.cod_loteamento = ".  $this->inCodigoLoteamento." and ";
+    }
+    if ($this->inCodLote) {
+        $stFiltro = " l.cod_lote = ".  $this->inCodLote." and ";
     }
     if ($stFiltro) {
         $stFiltro = " WHERE ".substr( $stFiltro, 0, strlen( $stFiltro ) - 4 );

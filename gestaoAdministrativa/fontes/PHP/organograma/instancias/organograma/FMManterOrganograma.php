@@ -32,7 +32,7 @@
 
   Casos de uso: uc-01.05.01
 
-  $Id: FMManterOrganograma.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: FMManterOrganograma.php 61288 2014-12-30 12:29:30Z evandro $
 
   */
 
@@ -197,6 +197,7 @@ $obCmbNorma->preencheCombo ( $rsNorma );
 # Permissão Hierarquica
 $obRdoPermissaoSim = new Radio;
 $obRdoPermissaoSim->setName    ( 'boPermissaoHierarquica' );
+$obRdoPermissaoSim->setId      ( 'boPermissaoHierarquica' );
 $obRdoPermissaoSim->setTitle   ( 'Define se haverá permissão para visualizar registros na hierarquia do Organograma'  );
 $obRdoPermissaoSim->setRotulo  ( 'Permissão Hierárquica'  );
 $obRdoPermissaoSim->setLabel   ( 'Sim'  );
@@ -209,12 +210,13 @@ if ($boPermissaoHierarquica == 'Sim') {
 
 $obRdoPermissaoNao = new Radio;
 $obRdoPermissaoNao->setName    ( 'boPermissaoHierarquica' );
+$obRdoPermissaoNao->setId      ( 'boPermissaoHierarquica' );
 $obRdoPermissaoNao->setRotulo  ( 'Permissão Hierárquica'  );
 $obRdoPermissaoNao->setLabel   ( 'Não' );
 $obRdoPermissaoNao->setValue   ( 'false' );
 $obRdoPermissaoNao->setNull    ( false   );
 
-if ($boPermissaoHierarquica == 'Não') {
+if ($boPermissaoHierarquica == 'Não' || empty($boPermissaoHierarquica) ) {
     $obRdoPermissaoNao->setChecked ( true );
 }
 

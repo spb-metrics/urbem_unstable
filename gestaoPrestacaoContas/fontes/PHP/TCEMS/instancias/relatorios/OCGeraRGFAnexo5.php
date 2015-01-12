@@ -86,11 +86,13 @@ if ($_REQUEST['stTipoRelatorio'] == 'UltimoQuadrimestre') {
 }
 $stDataFinal = "$stDataFinal/".$_REQUEST['stExercicio'];
 
-$preview->addParametro( 'data_inicio', $stDataInicial           );
-$preview->addParametro( 'data_fim'   , $stDataFinal             );
-$preview->addParametro( 'exercicio'  , $_REQUEST['stExercicio'] );
-$preview->addParametro( 'periodo'  , $nuPeriodo  );
-$preview->addParametro( 'poder' , 'Legislativo' );
+
+$preview->addParametro( 'cod_entidade' , $_REQUEST['inCodEntidade'] );
+$preview->addParametro( 'data_inicio'  , $stDataInicial             );
+$preview->addParametro( 'data_fim'     , $stDataFinal               );
+$preview->addParametro( 'exercicio'    , $_REQUEST['stExercicio']   );
+$preview->addParametro( 'periodo'      , $nuPeriodo                 );
+$preview->addParametro( 'poder'        , 'Legislativo'              );
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 if( !$obErro->ocorreu() )

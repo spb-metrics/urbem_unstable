@@ -1658,12 +1658,12 @@ var y = Total.sum( row.restos_pagar, row.descricao == "Despesas Correntes Dos Re
                 </structure>
                 <structure>
                     <property name="name">empenhadas</property>
-                    <expression name="expression">row["liquidado_ate_bimestre"]+row["restos"]</expression>
+                    <expression name="expression">dataSetRow["despesas_empenhadas"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhada</property>
-                    <expression name="expression">row["total_liquidadas"]+row["total_restos"]</expression>
+                    <expression name="expression">Total.sum( row.empenhadas);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>

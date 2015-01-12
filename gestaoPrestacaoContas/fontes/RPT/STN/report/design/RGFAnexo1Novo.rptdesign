@@ -3830,66 +3830,6 @@ params["total_restos_mensal"] = ( y - x );
             </list-property>
             <property name="resultSetColumn">data_extenso</property>
         </data>
-        <data id="6667">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">exercicio</property>
-                    <expression name="expression">params["exercicio"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">exercicio</property>
-        </data>
-        <data id="6668">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">data_ini</property>
-                    <expression name="expression">params["data_ini"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">data_ini</property>
-        </data>
-        <data id="6669">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">data_fim</property>
-                    <expression name="expression">params["data_fim"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">data_fim</property>
-        </data>
-        <data id="6670">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">cod_entidade</property>
-                    <expression name="expression">params["cod_entidade"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">cod_entidade</property>
-        </data>
-        <data id="6671">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">exercicio_restos</property>
-                    <expression name="expression">params["exercicio_restos"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">exercicio_restos</property>
-        </data>
-        <data id="6673">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">query</property>
-                    <expression name="expression">params["query"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">query</property>
-        </data>
         <grid name="assinaturas" id="2862" extends="urbem_231.assinaturas">
             <property name="marginTop">50pt</property>
             <overridden-values>

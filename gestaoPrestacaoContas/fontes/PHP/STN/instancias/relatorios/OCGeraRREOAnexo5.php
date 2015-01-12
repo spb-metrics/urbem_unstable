@@ -144,7 +144,7 @@ switch ($request->get('stTipoRelatorio')) {
                 $stMesAnteriorDescricao = "FEVEREIRO";
             break;
             case '04':
-                $preview->addParametro( 'periodo_referencia', "ABRL DE ".Sessao::getExercicio());
+                $preview->addParametro( 'periodo_referencia', "ABRIL DE ".Sessao::getExercicio());
                 $stMesAnteriorDescricao = "MARÇO";
             break;
             case '05':

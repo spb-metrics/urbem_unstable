@@ -46,6 +46,9 @@ DECLARE
     dtFinal    		varchar := '''';
     dtIniExercicio 	VARCHAR := '''';
     
+    stExercicioAnterior         VARCHAR := '';
+    stDtFinalExercicioAnterior  VARCHAR := '';
+    
     arDatas 		varchar[] ;
     reRegistro 		record ;
     stSql 			varchar := '''';
@@ -55,6 +58,9 @@ BEGIN
     dtFinal   := stDtFinal;
     
     dtIniExercicio := '01/01/' || stExercicio;
+    
+    stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));
+    stDtFinalExercicioAnterior := '31/12/'||stExercicioAnterior ;
 
     -- --------------------
 	-- TABELAS TEMPORARIAS
@@ -72,7 +78,8 @@ BEGIN
         despesa_empenhada NUMERIC(14,2) DEFAULT 0.00,
         porcentagem_empenhada NUMERIC(14,2) DEFAULT 0.00,
         despesa_liquidada NUMERIC(14,2) DEFAULT 0.00,
-        porcentagem NUMERIC(14,2) DEFAULT 0.00
+        porcentagem NUMERIC(14,2) DEFAULT 0.00,
+        restos_nao_processados NUMERIC(14,2) DEFAULT 0.00
     );        
 	
     --
@@ -340,6 +347,81 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                       AND vinculo_recurso.cod_recurso = retorno.cod_recurso
 )';
         EXECUTE stSql;
+        
+        -- cria a tabela temporaria para o valor nao processado no exercicio anterior
+        stSql := '
+      CREATE TEMPORARY TABLE tmp_nao_processados_exercicio_anterior AS
+  
+      
+            SELECT exercicio
+                      , cod_estrutural
+                      , inscritos
+                      , cod_vinculo
+             FROM (
+                SELECT ped_d_cd.cod_estrutural
+                          , e.exercicio as exercicio
+                   -- Valor Inscritos
+                          , empenho.fn_empenho_empenhado( e.exercicio ,e.cod_empenho, e.cod_entidade,''' || dtIniExercicio || ''' ,''' || dtFinal || ''') 
+                         -  empenho.fn_empenho_anulado( e.exercicio ,e.cod_empenho , e.cod_entidade,''' || dtIniExercicio || ''',''' ||stDtFinalExercicioAnterior || ''')
+                         - (empenho.fn_empenho_liquidado( e.exercicio ,e.cod_empenho , e.cod_entidade ,''' || dtIniExercicio || ''' ,''' || stDtFinalExercicioAnterior || ''') - empenho.fn_empenho_estorno_liquidacao( e.exercicio ,e.cod_empenho ,e.cod_entidade ,'''  || dtIniExercicio ||''' ,'''  || stDtFinalExercicioAnterior ||'''  )) as inscritos
+                         , vinculo_recurso.cod_vinculo
+                  FROM empenho.empenho as e
+                         , sw_cgm              as cgm
+                         , empenho.pre_empenho as pe
+                        
+ LEFT OUTER JOIN empenho.restos_pre_empenho as rpe 
+                      ON pe.exercicio        = rpe.exercicio 
+                    AND pe.cod_pre_empenho  = rpe.cod_pre_empenho
+ 
+ LEFT OUTER JOIN (
+                            SELECT ped.exercicio
+                                      , ped.cod_pre_empenho
+                                      , d.num_orgao
+                                      , d.num_unidade
+                                      , d.cod_recurso
+                                      , d.cod_programa
+                                      , d.num_pao
+                                      , cd.cod_estrutural
+                                      , d.cod_funcao
+                                      , d.cod_subfuncao
+                                      , rec.masc_recurso_red  
+                                      , rec.cod_detalhamento
+                                    
+                              FROM empenho.pre_empenho_despesa as ped
+                                      , orcamento.despesa  as d
+
+                                 JOIN orcamento.recurso(''' || stExercicio ||''') as rec
+                                   ON ( rec.exercicio = d.exercicio
+                                 AND rec.cod_recurso = d.cod_recurso )
+                                      , orcamento.conta_despesa     as cd
+                      
+                            WHERE ped.cod_despesa = d.cod_despesa 
+                                AND ped.exercicio   = d.exercicio 
+                                AND ped.cod_conta     = cd.cod_conta 
+                                AND ped.exercicio     = cd.exercicio
+                    
+                            ) as ped_d_cd 
+                       ON  pe.exercicio       = ped_d_cd.exercicio 
+                     AND  pe.cod_pre_empenho = ped_d_cd.cod_pre_empenho
+             LEFT JOIN stn.vinculo_recurso
+                       ON vinculo_recurso.exercicio = ped_d_cd.exercicio        
+                     AND vinculo_recurso.num_orgao = ped_d_cd.num_orgao
+                     AND vinculo_recurso.num_unidade = ped_d_cd.num_unidade
+                     AND vinculo_recurso.cod_recurso = ped_d_cd.cod_recurso
+                WHERE e.exercicio =cast(''' || stExercicio ||''' as varchar)  
+                     AND e.exercicio         = pe.exercicio 
+                     AND e.exercicio         = pe.exercicio 
+                     AND e.cod_pre_empenho   = pe.cod_pre_empenho 
+                     AND e.cod_entidade      IN ('|| stCodEntidades || ') 
+                     AND pe.cgm_beneficiario = cgm.numcgm
+                     AND CASE WHEN pe.implantado = true
+                            THEN rpe.cod_funcao      = '|| 10 ||'
+                            ELSE ped_d_cd.cod_funcao ='|| 10 ||'
+                            END
+                    ) as tbl 
+            ';
+
+    EXECUTE stSql;
 
 
     -- --------------------------------------
@@ -363,13 +445,15 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                      , ( SELECT SUM(COALESCE(vl_original,0)) + SUM(COALESCE(vl_suplementacoes,0)) FROM tmp_despesa WHERE  ( cod_estrutural LIKE '3.3.9.0.01%' OR cod_estrutural LIKE '3.3.9.0.03%' ) )
                                      , ( SELECT SUM(COALESCE(despesa_empenhada,0)) FROM tmp_despesa WHERE (cod_estrutural LIKE '3.3.9.0.01%' OR cod_estrutural LIKE '3.3.9.0.03%' ) )
                                      , 0
-                                     , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE  ( cod_estrutural LIKE '3.3.9.0.01%' OR cod_estrutural LIKE '3.3.9.0.03%' ) )
-                                    , 0
+                                     , ( SELECT SUM(COALESCE(vl_total,0)) FROM tmp_despesa_liquidada WHERE ( cod_estrutural LIKE '3.3.9.0.01%' OR cod_estrutural LIKE '3.3.9.0.03%' ) )
+                                     , 0
+                                     , ( SELECT SUM(inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE ( REPLACE(cod_estrutural, '.', '') LIKE '339001%' OR REPLACE(cod_estrutural, '.', '') LIKE '339003%'))
                                    ) ;
 
     INSERT INTO tmp_retorno VALUES (  2
                                     , 1
                                     , 'DESPESA COM ASSISTÊNCIA À SAÚDE QUE NÃO ATENDE AO PRINCÍPIO DE ACESSO UNIVERSAL'
+                                    , 0
                                     , 0
                                     , 0
                                     , 0
@@ -386,7 +470,8 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                      , ( SELECT sum(COALESCE(empenhado_per,0)) FROM (SELECT cod_despesa, empenhado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=7 GROUP BY cod_despesa, empenhado_per, cod_recurso) AS tabela)
                                      , 0
                                      , ( SELECT sum(COALESCE(liquidado_per,0)) FROM (SELECT cod_despesa, liquidado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=7 GROUP BY cod_despesa, liquidado_per, cod_recurso) AS tabela)
-                                    , 0
+                                     , 0
+                                     , ( SELECT SUM(inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE cod_vinculo = 7 )
                                    ) ;                               
  
     INSERT INTO tmp_retorno VALUES (   3
@@ -397,7 +482,8 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                      , ( SELECT sum(COALESCE(empenhado_per,0)) FROM (SELECT cod_despesa, empenhado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=8 GROUP BY cod_despesa, empenhado_per, cod_recurso) AS tabela)
                                      , 0
                                      , ( SELECT sum(COALESCE(liquidado_per,0)) FROM (SELECT cod_despesa, liquidado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=8 GROUP BY cod_despesa, liquidado_per, cod_recurso) AS tabela)
-                                    , 0
+                                     , 0
+                                     , ( SELECT SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE cod_vinculo = 8 )
                                    ) ;                                   
 
     INSERT INTO tmp_retorno VALUES (   3
@@ -408,7 +494,8 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                      , ( SELECT sum(COALESCE(empenhado_per,0)) FROM (SELECT cod_despesa, empenhado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=9 GROUP BY cod_despesa, empenhado_per, cod_recurso) AS tabela)
                                      , 0
                                      , ( SELECT sum(COALESCE(liquidado_per,0)) FROM (SELECT cod_despesa, liquidado_per, cod_recurso FROM tmp_balancete_despesa WHERE cod_vinculo=9 GROUP BY cod_despesa, liquidado_per, cod_recurso) AS tabela)
-                                    , 0
+                                     , 0
+                                     , ( SELECT SUM( inscritos) FROM tmp_nao_processados_exercicio_anterior WHERE cod_vinculo = 9 ) 
                                    ) ;                                   
 
    
@@ -422,12 +509,14 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                  , 0
                                  , SUM(COALESCE(despesa_liquidada,0))
                                  , 0
+                                 , SUM(COALESCE(restos_nao_processados,0.00)) 
                               FROM tmp_retorno
                              WHERE grupo = 3;
 
     INSERT INTO tmp_retorno VALUES (  4
                                     , 1
                                     , 'OUTRAS AÇÕES E SERVIÇOS NÃO COMPUTADOS'
+                                    , 0
                                     , 0
                                     , 0
                                     , 0
@@ -445,6 +534,7 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                     , 0
                                     , 0
                                     , 0
+                                    , 0
                                    );
 
     INSERT INTO tmp_retorno VALUES (  6
@@ -456,11 +546,13 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
                                     , 0
                                     , 0
                                     , 0
+                                    , 0
                                    );
      
   INSERT INTO tmp_retorno VALUES (  7
                                     , 1
                                     , 'DESPESAS CUSTEADAS COM RECURSOS VINCULADOS À PARCELA DO PERCENTUAL MÍNIMO QUE NÃO FOI APLICADA EM AÇÕES E SERVIÇOS DE SAÚDE EM EXERCÍCIOS ANTERIORES³'
+                                    , 0
                                     , 0
                                     , 0
                                     , 0
@@ -485,6 +577,7 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
              , COALESCE(porcentagem_empenhada,0) AS porcentagem_empenhada
              , COALESCE(despesa_liquidada,0) AS despesa_liquidada
              , COALESCE(porcentagem,0) AS porcentagem
+             , COALESCE(restos_nao_processados,0) AS restos_nao_processados 
           FROM tmp_retorno
       ORDER BY grupo, subgrupo
     ';
@@ -501,6 +594,7 @@ stSql := 'CREATE TEMPORARY TABLE tmp_balancete_despesa AS (
     DROP TABLE tmp_despesa;
     DROP TABLE tmp_despesa_liquidada;
     DROP TABLE tmp_balancete_despesa;
+    DROP TABLE tmp_nao_processados_exercicio_anterior;
 
     RETURN;
  

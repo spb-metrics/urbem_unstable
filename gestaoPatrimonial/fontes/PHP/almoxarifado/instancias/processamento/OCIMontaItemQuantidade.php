@@ -903,17 +903,25 @@ switch ($_REQUEST['stCtrl']) {
                 $stFiltro .= " and alm.cod_almoxarifado = ".$_REQUEST[$stNomeAlmoxarifado];
             }
             $obTAlxamoxarifadoEstoqueMaterial->recuperaSaldoEstoque( $rsSaldo, $stFiltro );
-            if ( $rsSaldo->getCampo('saldo_estoque') ) {
-                $inSaldo = number_format($rsSaldo->getCampo('saldo_estoque'),4,',','.');
-                $stJs .= "jQuery('#".$stNomeSaldo."').html('".$inSaldo."');";
-                $stJs .= "f.".$obIMontaItemQuantidade->obHdnSaldo->getName().".value = '".$inSaldo."';";
-                $stJs .= "f.".$obIMontaItemQuantidade->obHdnCentroCusto->getName().".value = f.".$stNomeCentroCusto.".options[f.".$stNomeCentroCusto.".selectedIndex].text;";
+            
+            $boMostraSaldo = strtolower(sistemalegado::pegaConfiguracao('demonstrar_saldo_estoque' , 29));
 
-                //Se o item possuir atributos de entrada deve ser mostrado o span dos atributos
-                if ($_REQUEST['boFlag']) {
-                    $stJs .= mostraAtributos(false);
+            if ( $rsSaldo->getCampo('saldo_estoque')) {
+                if ($boMostraSaldo == 'true') {
+                    $inSaldo = number_format($rsSaldo->getCampo('saldo_estoque'),4,',','.');
+                    $stJs .= "jQuery('#".$stNomeSaldo."').html('".$inSaldo."');";
+                    $stJs .= "f.".$obIMontaItemQuantidade->obHdnSaldo->getName().".value = '".$inSaldo."';";
+                    $stJs .= "f.".$obIMontaItemQuantidade->obHdnCentroCusto->getName().".value = f.".$stNomeCentroCusto.".options[f.".$stNomeCentroCusto.".selectedIndex].text;";
+
+                    //Se o item possuir atributos de entrada deve ser mostrado o span dos atributos
+                    if ($_REQUEST['boFlag']) {
+                        $stJs .= mostraAtributos(false);
+                    } else {
+                        $stJs .= mostraAtributos();
+                    }
                 } else {
-                    $stJs .= mostraAtributos();
+                    $stJs .= "d.getElementById('".$stNomeSaldo."').innerHTML = 'Configuração não permite a exibição do saldo de estoque.';";
+                    $stJs .= limpaSpanAtributos();
                 }
             } else {
                 $stJs .= "d.getElementById('".$stNomeSaldo."').innerHTML = '&nbsp;';";

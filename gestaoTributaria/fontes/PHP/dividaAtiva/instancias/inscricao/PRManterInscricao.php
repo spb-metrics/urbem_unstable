@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Diego Bueno Coelho
 
-    * $Id: PRManterInscricao.php 60436 2014-10-21 16:38:49Z michel $
+    * $Id: PRManterInscricao.php 61352 2015-01-09 18:14:18Z evandro $
 
   Caso de uso: uc-05.04.02
 **/
@@ -42,6 +42,7 @@ include_once ( CAM_GT_DAT_MAPEAMENTO."TDATModalidade.class.php"             );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATModalidadeParcela.class.php"      );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATModalidadeAcrescimo.class.php"    );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaAtiva.class.php"            );
+include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaAtivaAuditoria.class.php"   );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaCGM.class.php"              );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaParcelaOrigem.class.php"    );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaImovel.class.php"           );
@@ -89,6 +90,9 @@ $arModalidadeSessao = Sessao::read('modalidade');
 sistemaLegado::LiberaFrames();
 
 if ( Sessao::read('inscricaoDA') == -1 ) {
+    $obErro = new Erro;
+    Sessao::setTrataExcecao(true);    
+
     $obTDATPosicaoLivro = new TDATPosicaoLivro;
     $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro );
     if ( $rsListaLivro->Eof() ) {
@@ -161,13 +165,28 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
         }
     }
 
+    foreach ($arListagemDividas as $key => $value) {
+        $stCodLancamento .= $value["cod_lancamento"].",";
+    }
+    $stCodLancamento = substr($stCodLancamento, 0,strlen($stCodLancamento)-1);
+    //CRIA TABELA COM TODAS AS PARCELAS DE TODOS OS REGISTROS
+    $obTDATDividaAtiva = new TDATDividaAtiva;
+    $obTDATDividaAtiva->setDado("stCodLancamentos", $stCodLancamento);
+    $obErro = $obTDATDividaAtiva->criaTabelaTodasParcelas($boTransacao);
+
     Sessao::write('lista_dividas_parcelas'  , $arListagemDividas            );
     Sessao::write('inscricaoDA'             , 0                             );
     Sessao::write('total_inscricaoDA'       , count( $arListagemDividas )   );
-
-    sistemaLegado::mudaFramePrincipal( "LSManterInscricaoSituacao.php?inCodGrupo=".$_REQUEST['inCodGrupo'].Sessao::getId()."&stAcao=incluir" );
+    
+    Sessao::encerraExcecao();
+    SistemaLegado::mudaFramePrincipal( "LSManterInscricaoSituacao.php?inCodGrupo=".$_REQUEST['inCodGrupo'].Sessao::getId()."&stAcao=incluir" );
+    
 } else {
     $obErro = new Erro;
+    Sessao::setTrataExcecao(true);    
+    
+    $time_start = microtime(true); 
+    
     $obTDATDividaAtiva = new TDATDividaAtiva;
     $arListagemDividas = Sessao::read( 'lista_dividas_parcelas' );
 
@@ -176,21 +195,28 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
     $arProcesso = explode ( '/', Sessao::read( "inProcesso" ) );
     $inCodProcesso = $arProcesso[0];
     $inExercicioProcesso = $arProcesso[1];
-
-    if(Sessao::read('inscricaoDA') < Sessao::read('total_inscricaoDA')){
+    //calcular de 20 em 20 registro depois atualizar a pagina
+    $i = 1;        
+    while( (Sessao::read('inscricaoDA') < Sessao::read('total_inscricaoDA')) ){
         $inX = Sessao::read('inscricaoDA');
         Sessao::write( 'inscricaoDA', $inX+1 );
+        
+        //Salva o timestamp para mostrar os dados inseridos no momento, no relatorio de inscricao
+        if ( Sessao::read('inscricaoDA') == 1) {
+            $obTDATDividaAtiva->recuperaTimestampInsert($rsTimestamp , $boTransacao);            
+            Sessao::write('primeiro_timestamp', $rsTimestamp->getCampo('timestamp_insert'));
+        }
 
         $obTARRLancamentoCalculo = new TARRLancamentoCalculo;
         $stFiltro = " WHERE cod_lancamento = ".$arListagemDividas[$inX]["cod_lancamento"];
-        $obTARRLancamentoCalculo->recuperaTodos( $rsListaCalculos, $stFiltro );
+        $obTARRLancamentoCalculo->recuperaTodos( $rsListaCalculos, $stFiltro, "", $boTransacao);
 
         $obTARRCalculo = new TARRCalculo;
         $stFiltro = " WHERE cod_calculo = ".$rsListaCalculos->getCampo("cod_calculo");
-        $obTARRCalculo->recuperaTodos( $rsListaCalculo, $stFiltro );
+        $obTARRCalculo->recuperaTodos( $rsListaCalculo, $stFiltro ,"", $boTransacao);
 
         $stParametros = $arListagemDividas[$inX]["cod_lancamento"];
-        $obTDATDividaAtiva->recuperaListaParcelasDivida( $rsParcelasDivida, $stParametros );
+        $obTDATDividaAtiva->recuperaListaParcelasDivida( $rsParcelasDivida, $stParametros ,$boTransacao);
 
         /***** INÍCIO DO BLOCO QUE EXECUTA O ARREDONDAMENTO DAS PARCELAS DA DÍVIDA *****/
         $inCountCalculos = count($rsListaCalculos->arElementos);
@@ -238,26 +264,26 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
         $stDataAtual = date ("d/m/Y");
         $arNumeracoes = array();
         $inTotalNumeracoes = 0;
-        $obTDATDividaAtiva->recuperaListaCarnesParaCancelar( $rsListaCarnesCancelar, $rsParcelasDivida->getCampo("cod_parcela") );
+        $obTDATDividaAtiva->recuperaListaCarnesParaCancelar( $rsListaCarnesCancelar, $rsParcelasDivida->getCampo("cod_parcela") ,$boTransacao);
 
         while ( !$rsListaCarnesCancelar->Eof() && !$obErro->ocorreu() ) {
             $obTARRCarneDevolucao->setDado( "cod_motivo"    , 11                                                );
             $obTARRCarneDevolucao->setDado( "numeracao"     , $rsListaCarnesCancelar->getCampo("numeracao")     );
             $obTARRCarneDevolucao->setDado( "cod_convenio"  , $rsListaCarnesCancelar->getCampo("cod_convenio")  );
             $obTARRCarneDevolucao->setDado( "dt_devolucao"  , $stDataAtual                                      );
-            $obErro = $obTARRCarneDevolucao->inclusao();
+            $obErro = $obTARRCarneDevolucao->inclusao($boTransacao);
             $rsListaCarnesCancelar->proximo();
         }
 
         if ($arModalidadeSessao[0]["cod_forma_inscricao"] == 4 && !$obErro->ocorreu()) { //Parcelas Individuais por Crédito
             $arParcelasDivida = $rsParcelasDivida->getElementos();
             for ( $inW=0; $inW<count($arParcelasDivida); $inW++ ) {
-                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao );
+                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao, $boTransacao );
 
                 $inCodInscricao = $rsListaPosicao->getCampo( "max_inscricao" )>0?$rsListaPosicao->getCampo( "max_inscricao" )+1:1;
                 unset( $obTDATPosicaoLivro );
                 $obTDATPosicaoLivro = new TDATPosicaoLivro;
-                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro );
+                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro , $boTransacao);
 
                 $arLivros = explode( "-", $rsListaLivro->getCampo("valor") );
 
@@ -272,7 +298,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaAtiva->setDado( "dt_vencimento_origem" , $arListagemDividas[$inX]["vencimento_base_br"]);
                     $obTDATDividaAtiva->setDado( "exercicio_original"   , $rsListaCalculo->getCampo("exercicio")        );
                     $obTDATDividaAtiva->setDado( "exercicio_livro"      , $arLivros[3]                                  );
-                    $obErro = $obTDATDividaAtiva->inclusao();
+                    $obErro = $obTDATDividaAtiva->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
@@ -281,25 +307,25 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaCGM->setDado( "exercicio"     , Sessao::getExercicio()             );
                     $obTDATDividaCGM->setDado( "cod_inscricao" , $inCodInscricao                    );
                     $obTDATDividaCGM->setDado( "numcgm"        , $arListagemDividas[$inX]["numcgm"] );
-                    $obErro = $obTDATDividaCGM->inclusao();
+                    $obErro = $obTDATDividaCGM->inclusao($boTransacao);
                 }
 
-                if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
+                if (!$obErro->ocorreu() && $arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
                     $obTDATDividaImovel = new TDATDividaImovel;
                     $obTDATDividaImovel->setDado( "exercicio"           , Sessao::getExercicio()                );
                     $obTDATDividaImovel->setDado( "cod_inscricao"       , $inCodInscricao                       );
                     $obTDATDividaImovel->setDado( "inscricao_municipal" , $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaImovel->inclusao();
-                }else if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
+                    $obErro = $obTDATDividaImovel->inclusao($boTransacao);
+                }else if (!$obErro->ocorreu() && $arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
                     $obTDATDividaEmpresa = new TDATDividaEmpresa;
                     $obTDATDividaEmpresa->setDado( "exercicio"          , Sessao::getExercicio()                );
                     $obTDATDividaEmpresa->setDado( "cod_inscricao"      , $inCodInscricao                       );
                     $obTDATDividaEmpresa->setDado( "inscricao_economica", $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaEmpresa->inclusao();
+                    $obErro = $obTDATDividaEmpresa->inclusao($boTransacao);
                 }
 
                 $obTDATParcelamento = new TDATParcelamento;
-                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento );
+                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento , $boTransacao);
                 $inNumeroParcelamento = $rsNumeroParcelamento->getCampo("valor");
 
                 if (!$obErro->ocorreu()) {
@@ -308,8 +334,8 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATParcelamento->setDado( "cod_modalidade"      , $arModalidadeSessao[0]["cod_modalidade"]  );
                     $obTDATParcelamento->setDado( "timestamp_modalidade", $arModalidadeSessao[0]["timestamp"]       );
                     $obTDATParcelamento->setDado( "numero_parcelamento" , -1                                        );
-                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );
-                    $obErro = $obTDATParcelamento->inclusao();
+                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );                    
+                    $obErro = $obTDATParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
@@ -317,7 +343,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaParcelamento->setDado( "num_parcelamento"  , $inNumeroParcelamento );
                     $obTDATDividaParcelamento->setDado( "exercicio"         , Sessao::getExercicio());
                     $obTDATDividaParcelamento->setDado( "cod_inscricao"     , $inCodInscricao       );
-                    $obErro = $obTDATDividaParcelamento->inclusao();
+                    $obErro = $obTDATDividaParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
@@ -327,7 +353,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                             $obTDATDividaDocumento->setDado( "num_parcelamento"  , $inNumeroParcelamento                            );
                             $obTDATDividaDocumento->setDado( "cod_documento"     , $arModalidadeSessao[$inY]["cod_documento"]       );
                             $obTDATDividaDocumento->setDado( "cod_tipo_documento", $arModalidadeSessao[$inY]["cod_tipo_documento"]  );
-                            $obErro = $obTDATDividaDocumento->inclusao();
+                            $obErro = $obTDATDividaDocumento->inclusao($boTransacao);
                         }
                     }
                 }
@@ -338,7 +364,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaProcesso->setDado  ( "exercicio"       , Sessao::getExercicio() );
                     $obTDATDividaProcesso->setDado  ( "cod_processo"    , $inCodProcesso         );
                     $obTDATDividaProcesso->setDado  ( "ano_exercicio"   , $inExercicioProcesso   );
-                    $obErro = $obTDATDividaProcesso->inclusao();
+                    $obErro = $obTDATDividaProcesso->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
@@ -350,15 +376,15 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaParcelaOrigem->setDado( "cod_credito"      , $arParcelasDivida[$inW]["cod_credito"]  );
                     $obTDATDividaParcelaOrigem->setDado( "num_parcelamento" , $inNumeroParcelamento                   );
                     $obTDATDividaParcelaOrigem->setDado( "valor"            , $arParcelasDivida[$inW]["valor"]        );
-                    $obErro = $obTDATDividaParcelaOrigem->inclusao();
+                    $obErro = $obTDATDividaParcelaOrigem->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
                     $obTDATDividaAcrescimo = new TDATDividaAcrescimo;
-                    $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao );
+                    $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao, $boTransacao );
                 }
             }
-        }else if (!$obErro->ocorreu()&&$arModalidadeSessao[0]["cod_forma_inscricao"] == 3) { //Parcelas Individuais
+        }else if (!$obErro->ocorreu() && $arModalidadeSessao[0]["cod_forma_inscricao"] == 3) { //Parcelas Individuais
             $arParcelasDivida = $rsParcelasDivida->getElementos();
             $arTMP = array();
             $inTotalDeParcelas = 0;
@@ -387,12 +413,12 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
 
             $arListaCreditoPorParcela = $arTMP;
             for ($inW=0; $inW<$inTotalDeParcelas; $inW++) { //uma inscricao por parcelas
-                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao );
+                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao , $boTransacao);
 
                 $inCodInscricao = $rsListaPosicao->getCampo( "max_inscricao" )>0?$rsListaPosicao->getCampo( "max_inscricao" )+1:1;
 
                 $obTDATPosicaoLivro = new TDATPosicaoLivro;
-                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro );
+                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro ,$boTransacao);
 
                 $arLivros = explode( "-", $rsListaLivro->getCampo("valor") );
 
@@ -407,7 +433,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaAtiva->setDado( "dt_vencimento_origem" , $arListagemDividas[$inX]["vencimento_base_br"]);
                     $obTDATDividaAtiva->setDado( "exercicio_original"   , $rsListaCalculo->getCampo("exercicio")        );
                     $obTDATDividaAtiva->setDado( "exercicio_livro"      , $arLivros[3]                                  );
-                    $obErro = $obTDATDividaAtiva->inclusao();
+                    $obErro = $obTDATDividaAtiva->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()) {
@@ -415,7 +441,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaCGM->setDado( "exercicio"      , Sessao::getExercicio()            );
                     $obTDATDividaCGM->setDado( "cod_inscricao"  , $inCodInscricao                   );
                     $obTDATDividaCGM->setDado( "numcgm"         , $arListagemDividas[$inX]["numcgm"]);
-                    $obErro = $obTDATDividaCGM->inclusao();
+                    $obErro = $obTDATDividaCGM->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
@@ -423,17 +449,17 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaImovel->setDado( "exercicio"           , Sessao::getExercicio()                );
                     $obTDATDividaImovel->setDado( "cod_inscricao"       , $inCodInscricao                       );
                     $obTDATDividaImovel->setDado( "inscricao_municipal" , $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaImovel->inclusao();
-                }else if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
+                    $obErro = $obTDATDividaImovel->inclusao($boTransacao);
+                }else if (!$obErro->ocorreu() && $arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
                     $obTDATDividaEmpresa = new TDATDividaEmpresa;
                     $obTDATDividaEmpresa->setDado( "exercicio"          , Sessao::getExercicio()                );
                     $obTDATDividaEmpresa->setDado( "cod_inscricao"      , $inCodInscricao                       );
                     $obTDATDividaEmpresa->setDado( "inscricao_economica", $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaEmpresa->inclusao();
+                    $obErro = $obTDATDividaEmpresa->inclusao($boTransacao);
                 }
 
                 $obTDATParcelamento = new TDATParcelamento;
-                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento );
+                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento , $boTransacao);
                 $inNumeroParcelamento = $rsNumeroParcelamento->getCampo("valor");
 
                 if (!$obErro->ocorreu()){
@@ -442,8 +468,8 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATParcelamento->setDado( "cod_modalidade"      , $arModalidadeSessao[0]["cod_modalidade"]  );
                     $obTDATParcelamento->setDado( "timestamp_modalidade", $arModalidadeSessao[0]["timestamp"]       );
                     $obTDATParcelamento->setDado( "numero_parcelamento" , -1                                        );
-                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );
-                    $obErro = $obTDATParcelamento->inclusao();
+                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );                    
+                    $obErro = $obTDATParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -451,7 +477,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaParcelamento->setDado( "num_parcelamento", $inNumeroParcelamento   );
                     $obTDATDividaParcelamento->setDado( "exercicio"       , Sessao::getExercicio()  );
                     $obTDATDividaParcelamento->setDado( "cod_inscricao"   , $inCodInscricao         );
-                    $obErro = $obTDATDividaParcelamento->inclusao();
+                    $obErro = $obTDATDividaParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -461,7 +487,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                             $obTDATDividaDocumento->setDado( "num_parcelamento"  , $inNumeroParcelamento                            );
                             $obTDATDividaDocumento->setDado( "cod_documento"     , $arModalidadeSessao[$inY]["cod_documento"]       );
                             $obTDATDividaDocumento->setDado( "cod_tipo_documento", $arModalidadeSessao[$inY]["cod_tipo_documento"]  );
-                            $obErro = $obTDATDividaDocumento->inclusao();
+                            $obErro = $obTDATDividaDocumento->inclusao($boTransacao);
                         }
                     }
                 }
@@ -472,7 +498,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaProcesso->setDado  ( "exercicio"     , Sessao::getExercicio() );
                     $obTDATDividaProcesso->setDado  ( "cod_processo"  , $inCodProcesso         );
                     $obTDATDividaProcesso->setDado  ( "ano_exercicio" , $inExercicioProcesso   );
-                    $obErro = $obTDATDividaProcesso->inclusao ();
+                    $obErro = $obTDATDividaProcesso->inclusao ($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -486,17 +512,17 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                             $obTDATDividaParcelaOrigem->setDado( "cod_credito"      , $arListaCreditoPorParcela[$inW]["credito"][$inY]["cod_credito" ]);
                             $obTDATDividaParcelaOrigem->setDado( "num_parcelamento" , $inNumeroParcelamento                                           );
                             $obTDATDividaParcelaOrigem->setDado( "valor"            , $arListaCreditoPorParcela[$inW]["credito"][$inY]["valor"       ]);
-                            $obErro = $obTDATDividaParcelaOrigem->inclusao();
+                            $obErro = $obTDATDividaParcelaOrigem->inclusao($boTransacao);
                         }
                     }
                 }
 
                 if (!$obErro->ocorreu()){
                     $obTDATDividaAcrescimo = new TDATDividaAcrescimo;
-                    $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao );
+                    $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao , $boTransacao);
                 }
             }
-        }else if (!$obErro->ocorreu()&&$arModalidadeSessao[0]["cod_forma_inscricao"] == 2) { //Valor Total Por Crédito
+        }else if (!$obErro->ocorreu() && $arModalidadeSessao[0]["cod_forma_inscricao"] == 2) { //Valor Total Por Crédito
             $arParcelasDivida = $rsParcelasDivida->getElementos();
             $arTMP = array();
             $inTotalDeCreditos = 0;
@@ -532,12 +558,12 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
 
             $arListaParcelasPorCredito = $arTMP;
             for ($inW=0; $inW<$inTotalDeCreditos; $inW++) { //uma inscricao por credito
-                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao );
+                $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao , $boTransacao);
 
                 $inCodInscricao = $rsListaPosicao->getCampo( "max_inscricao" )>0?$rsListaPosicao->getCampo( "max_inscricao" )+1:1;
 
                 $obTDATPosicaoLivro = new TDATPosicaoLivro;
-                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro );
+                $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro, $boTransacao);
 
                 $arLivros = explode( "-", $rsListaLivro->getCampo("valor") );
 
@@ -552,7 +578,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaAtiva->setDado( "dt_vencimento_origem" , $arListagemDividas[$inX]["vencimento_base_br"]);
                     $obTDATDividaAtiva->setDado( "exercicio_original"   , $rsListaCalculo->getCampo("exercicio")        );
                     $obTDATDividaAtiva->setDado( "exercicio_livro"      , $arLivros[3]                                  );
-                    $obErro = $obTDATDividaAtiva->inclusao();
+                    $obErro = $obTDATDividaAtiva->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -560,25 +586,25 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaCGM->setDado( "exercicio"      , Sessao::getExercicio()            );
                     $obTDATDividaCGM->setDado( "cod_inscricao"  , $inCodInscricao                   );
                     $obTDATDividaCGM->setDado( "numcgm"         , $arListagemDividas[$inX]["numcgm"]);
-                    $obErro = $obTDATDividaCGM->inclusao();
+                    $obErro = $obTDATDividaCGM->inclusao($boTransacao);
                 }
 
-                if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
+                if (!$obErro->ocorreu() && $arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
                     $obTDATDividaImovel = new TDATDividaImovel;
                     $obTDATDividaImovel->setDado( "exercicio"           , Sessao::getExercicio()                );
                     $obTDATDividaImovel->setDado( "cod_inscricao"       , $inCodInscricao                       );
                     $obTDATDividaImovel->setDado( "inscricao_municipal" , $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaImovel->inclusao();
-                }else if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
+                    $obErro = $obTDATDividaImovel->inclusao($boTransacao);
+                }else if (!$obErro->ocorreu() && $arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
                     $obTDATDividaEmpresa = new TDATDividaEmpresa;
                     $obTDATDividaEmpresa->setDado( "exercicio"          , Sessao::getExercicio()                );
                     $obTDATDividaEmpresa->setDado( "cod_inscricao"      , $inCodInscricao                       );
                     $obTDATDividaEmpresa->setDado( "inscricao_economica", $arListagemDividas[$inX]["inscricao"] );
-                    $obErro = $obTDATDividaEmpresa->inclusao();
+                    $obErro = $obTDATDividaEmpresa->inclusao($boTransacao);
                 }
 
                 $obTDATParcelamento = new TDATParcelamento;
-                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento );
+                $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento ,$boTransacao);
                 $inNumeroParcelamento = $rsNumeroParcelamento->getCampo("valor");
 
                 if (!$obErro->ocorreu()){
@@ -587,8 +613,8 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATParcelamento->setDado( "cod_modalidade"      , $arModalidadeSessao[0]["cod_modalidade"]  );
                     $obTDATParcelamento->setDado( "timestamp_modalidade", $arModalidadeSessao[0]["timestamp"]       );
                     $obTDATParcelamento->setDado( "numero_parcelamento" , -1                                        );
-                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );
-                    $obErro = $obTDATParcelamento->inclusao();
+                    $obTDATParcelamento->setDado( "exercicio"           , -1                                        );                    
+                    $obErro = $obTDATParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -596,7 +622,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaParcelamento->setDado( "num_parcelamento"  , $inNumeroParcelamento );
                     $obTDATDividaParcelamento->setDado( "exercicio"         , Sessao::getExercicio());
                     $obTDATDividaParcelamento->setDado( "cod_inscricao"     , $inCodInscricao       );
-                    $obErro = $obTDATDividaParcelamento->inclusao();
+                    $obErro = $obTDATDividaParcelamento->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -606,7 +632,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                             $obTDATDividaDocumento->setDado( "num_parcelamento"     , $inNumeroParcelamento                             );
                             $obTDATDividaDocumento->setDado( "cod_documento"        , $arModalidadeSessao[$inY]["cod_documento"]        );
                             $obTDATDividaDocumento->setDado( "cod_tipo_documento"   , $arModalidadeSessao[$inY]["cod_tipo_documento"]   );
-                            $obErro = $obTDATDividaDocumento->inclusao();
+                            $obErro = $obTDATDividaDocumento->inclusao($boTransacao);
                         }
                     }
                 }
@@ -617,7 +643,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                     $obTDATDividaProcesso->setDado  ( "exercicio"       , Sessao::getExercicio());
                     $obTDATDividaProcesso->setDado  ( "cod_processo"    , $inCodProcesso        );
                     $obTDATDividaProcesso->setDado  ( "ano_exercicio"   , $inExercicioProcesso  );
-                    $obErro = $obTDATDividaProcesso->inclusao();
+                    $obErro = $obTDATDividaProcesso->inclusao($boTransacao);
                 }
 
                 if (!$obErro->ocorreu()){
@@ -631,7 +657,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                         $stCodParcela .= $arListaParcelasPorCredito[$inW]["cod_natureza"]."_";
                         $stCodParcela .= $arListaParcelasPorCredito[$inW]["cod_credito"]."_";
                         $stCodParcela .= $inNumeroParcelamento;
-                        if (!$obErro->ocorreu()&&$stCodParcela != $stCodParcelaTmp) {
+                        if (!$obErro->ocorreu() && $stCodParcela != $stCodParcelaTmp) {
                             $obTDATDividaParcelaOrigem->setDado( "cod_parcela"      , $arListaParcelasPorCredito[$inW]["credito"][$inY]["cod_parcela"]  );
                             $obTDATDividaParcelaOrigem->setDado( "cod_especie"      , $arListaParcelasPorCredito[$inW]["cod_especie"]                   );
                             $obTDATDividaParcelaOrigem->setDado( "cod_genero"       , $arListaParcelasPorCredito[$inW]["cod_genero"]                    );
@@ -639,24 +665,24 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                             $obTDATDividaParcelaOrigem->setDado( "cod_credito"      , $arListaParcelasPorCredito[$inW]["cod_credito"]                   );
                             $obTDATDividaParcelaOrigem->setDado( "num_parcelamento" , $inNumeroParcelamento                                             );
                             $obTDATDividaParcelaOrigem->setDado( "valor"            , $arListaParcelasPorCredito[$inW]["credito"][$inY]["valor"]        );
-                            $obErro = $obTDATDividaParcelaOrigem->inclusao();
+                            $obErro = $obTDATDividaParcelaOrigem->inclusao($boTransacao);
                             $stCodParcelaTmp = $stCodParcela;
                         }
                     }
                     
                     if (!$obErro->ocorreu()){
                         $obTDATDividaAcrescimo = new TDATDividaAcrescimo;
-                        $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao );
+                        $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao ,$boTransacao);
                     }
                 }
 
             }
-        }else if (!$obErro->ocorreu()&&$arModalidadeSessao[0]["cod_forma_inscricao"] == 1) { //Valor Total
-            $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao );
+        }else if (!$obErro->ocorreu() && $arModalidadeSessao[0]["cod_forma_inscricao"] == 1) { //Valor Total
+            $obTDATDividaAtiva->recuperaCodigoInscricaoComponente( $rsListaPosicao, $boTransacao);
             $inCodInscricao = $rsListaPosicao->getCampo( "max_inscricao" )>0?$rsListaPosicao->getCampo( "max_inscricao" )+1:1;
 
             $obTDATPosicaoLivro = new TDATPosicaoLivro;
-            $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro );
+            $obTDATPosicaoLivro->recuperaPosicaoLivro( $rsListaLivro, $boTransacao);
 
             $arLivros = explode( "-", $rsListaLivro->getCampo("valor") );
 
@@ -671,7 +697,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATDividaAtiva->setDado( "dt_vencimento_origem" , $arListagemDividas[$inX]["vencimento_base_br"]);
                 $obTDATDividaAtiva->setDado( "exercicio_original"   , $rsListaCalculo->getCampo("exercicio")        );
                 $obTDATDividaAtiva->setDado( "exercicio_livro"      , $arLivros[3]                                  );
-                $obErro = $obTDATDividaAtiva->inclusao();
+                $obErro = $obTDATDividaAtiva->inclusao($boTransacao);
             }
 
             if (!$obErro->ocorreu()){
@@ -679,7 +705,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATDividaCGM->setDado( "exercicio"      , Sessao::getExercicio()            );
                 $obTDATDividaCGM->setDado( "cod_inscricao"  , $inCodInscricao                   );
                 $obTDATDividaCGM->setDado( "numcgm"         , $arListagemDividas[$inX]["numcgm"]);
-                $obErro = $obTDATDividaCGM->inclusao();
+                $obErro = $obTDATDividaCGM->inclusao($boTransacao);
             }
 
             if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IM") {
@@ -687,17 +713,17 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATDividaImovel->setDado( "exercicio"           , Sessao::getExercicio()                );
                 $obTDATDividaImovel->setDado( "cod_inscricao"       , $inCodInscricao                       );
                 $obTDATDividaImovel->setDado( "inscricao_municipal" , $arListagemDividas[$inX]["inscricao"] );
-                $obErro = $obTDATDividaImovel->inclusao();
+                $obErro = $obTDATDividaImovel->inclusao($boTransacao);
             }else if (!$obErro->ocorreu()&&$arListagemDividas[$inX]["tipo_inscricao"] == "IE") {
                 $obTDATDividaEmpresa = new TDATDividaEmpresa;
                 $obTDATDividaEmpresa->setDado( "exercicio"          , Sessao::getExercicio()                );
                 $obTDATDividaEmpresa->setDado( "cod_inscricao"      , $inCodInscricao                       );
                 $obTDATDividaEmpresa->setDado( "inscricao_economica", $arListagemDividas[$inX]["inscricao"] );
-                $obErro = $obTDATDividaEmpresa->inclusao();
+                $obErro = $obTDATDividaEmpresa->inclusao($boTransacao);
             }
 
             $obTDATParcelamento = new TDATParcelamento;
-            $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento );
+            $obTDATParcelamento->recuperaNumeroParcelamento( $rsNumeroParcelamento, $boTransacao );
             $inNumeroParcelamento = $rsNumeroParcelamento->getCampo("valor");
 
             if (!$obErro->ocorreu()){
@@ -706,8 +732,8 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATParcelamento->setDado( "cod_modalidade"          , $arModalidadeSessao[0]["cod_modalidade"]  );
                 $obTDATParcelamento->setDado( "timestamp_modalidade"    , $arModalidadeSessao[0]["timestamp"]       );
                 $obTDATParcelamento->setDado( "numero_parcelamento"     , -1                                        );
-                $obTDATParcelamento->setDado( "exercicio"               , -1                                        );
-                $obErro = $obTDATParcelamento->inclusao();
+                $obTDATParcelamento->setDado( "exercicio"               , -1                                        );                
+                $obErro = $obTDATParcelamento->inclusao($boTransacao);
             }
 
             if (!$obErro->ocorreu()){
@@ -715,7 +741,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATDividaParcelamento->setDado( "num_parcelamento", $inNumeroParcelamento   );
                 $obTDATDividaParcelamento->setDado( "exercicio"       , Sessao::getExercicio()  );
                 $obTDATDividaParcelamento->setDado( "cod_inscricao"   , $inCodInscricao         );
-                $obErro = $obTDATDividaParcelamento->inclusao();
+                $obErro = $obTDATDividaParcelamento->inclusao($boTransacao);
             }
 
             if (!$obErro->ocorreu()){
@@ -725,7 +751,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                         $obTDATDividaDocumento->setDado( "num_parcelamento"  , $inNumeroParcelamento                            );
                         $obTDATDividaDocumento->setDado( "cod_documento"     , $arModalidadeSessao[$inY]["cod_documento"]       );
                         $obTDATDividaDocumento->setDado( "cod_tipo_documento", $arModalidadeSessao[$inY]["cod_tipo_documento"]  );
-                        $obErro = $obTDATDividaDocumento->inclusao();
+                        $obErro = $obTDATDividaDocumento->inclusao($boTransacao);
                     }
                 }
             }
@@ -736,12 +762,12 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                 $obTDATDividaProcesso->setDado  ( "exercicio"       , Sessao::getExercicio());
                 $obTDATDividaProcesso->setDado  ( "cod_processo"    , $inCodProcesso        );
                 $obTDATDividaProcesso->setDado  ( "ano_exercicio"   , $inExercicioProcesso  );
-                $obErro = $obTDATDividaProcesso->inclusao();
+                $obErro = $obTDATDividaProcesso->inclusao($boTransacao);
             }
 
             if (!$obErro->ocorreu()){
                 $obTDATDividaParcelaOrigem = new TDATDividaParcelaOrigem;
-                while ( !$obErro->ocorreu()&&!$rsParcelasDivida->Eof() ) {
+                while ( !$obErro->ocorreu() && !$rsParcelasDivida->Eof() ) {
                     if ( $rsParcelasDivida->getCampo("valor") > 0.00 ) {
                         $obTDATDividaParcelaOrigem->setDado( "cod_parcela"      , $rsParcelasDivida->getCampo("cod_parcela" )   );
                         $obTDATDividaParcelaOrigem->setDado( "cod_especie"      , $rsParcelasDivida->getCampo("cod_especie" )   );
@@ -750,7 +776,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
                         $obTDATDividaParcelaOrigem->setDado( "cod_credito"      , $rsParcelasDivida->getCampo("cod_credito" )   );
                         $obTDATDividaParcelaOrigem->setDado( "num_parcelamento" , $inNumeroParcelamento                         );
                         $obTDATDividaParcelaOrigem->setDado( "valor"            , $rsParcelasDivida->getCampo("valor")          );
-                        $obErro = $obTDATDividaParcelaOrigem->inclusao();
+                        $obErro = $obTDATDividaParcelaOrigem->inclusao($boTransacao);
                     }
                     $rsParcelasDivida->proximo();
                 }
@@ -758,16 +784,57 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
 
             if (!$obErro->ocorreu()){
                 $obTDATDividaAcrescimo = new TDATDividaAcrescimo;
-                $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao );
+                $obErro = $obTDATDividaAcrescimo->lancarAcrescimos( Sessao::getExercicio(), $inCodInscricao , $boTransacao);
             }
         } 
-        sistemaLegado::mudaFramePrincipal( "LSManterInscricaoSituacao.php?inCodGrupo=".$_REQUEST['inCodGrupo'].Sessao::getId()."&stAcao=incluir");
-        exit;
+        
+        
+        if( $i == 100 ){
+            Sessao::encerraExcecao();
+            SistemaLegado::mudaFramePrincipal( "LSManterInscricaoSituacao.php?inCodGrupo=".$_REQUEST['inCodGrupo'].Sessao::getId()."&stAcao=incluir");            
+            exit;
+        }elseif( Sessao::read('total_inscricaoDA') < 100 ){
+            Sessao::encerraExcecao();
+            SistemaLegado::mudaFramePrincipal( "LSManterInscricaoSituacao.php?inCodGrupo=".$_REQUEST['inCodGrupo'].Sessao::getId()."&stAcao=incluir"); 
+            exit;
+        }    
+        
+        $i++;    
     }
 
-    if (!$obErro->ocorreu()){
+    if (Sessao::read('inscricaoDA') == Sessao::read('total_inscricaoDA')) {
+        //Abre uma transacao para salvar na auditoria os dados da inscricao
+        $boFlagTransacao = false;
+        $obErro = new Erro();
+        $obTransacao = new Transacao();
+        Sessao::setTrataExcecao(true);
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );    
+        
+        //DELETA a tabela temporaria com todas as parcelas        
+        $obTDATDividaAtiva = new TDATDividaAtiva;
+        $obErro = $obTDATDividaAtiva->deletaTabelaParcelas($boTransacao);
+
+        if (!$obErro->ocorreu()) {
+            $arCodModalidade = Sessao::read("modalidade");
+            $arCodModalidade = $arCodModalidade[0]["cod_modalidade"];
+            $obTDATDividaAtivaAuditoria = new TDATDividaAtivaAuditoria();
+            $obTDATDividaAtivaAuditoria->setDado("cod_grupo", $_REQUEST["inCodGrupo"]);
+            $obTDATDividaAtivaAuditoria->setDado("cod_modalidade", $arCodModalidade);
+            $obTDATDividaAtivaAuditoria->setDado("exercicio", Sessao::getExercicio());
+            $obTDATDividaAtivaAuditoria->setDado("total_inscritos", Sessao::read("total_inscricaoDA"));
+            //Salva na auditoria
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTDATDividaAtivaAuditoria );
+            Sessao::encerraExcecao(); 
+        }else{
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_erro","erro",Sessao::getId(), "../");   
+        }
+    }   
+
+    if (Sessao::read('inscricaoDA') == Sessao::read('total_inscricaoDA')) {
+        $obErro = new Erro;
+        $obTransacao = new Transacao();
         //Varre todos os dados que foram inscritos e incluidos no banco        
-        $arDadosAux = Sessao::read('lista_dividas_parcelas');                        
+        $arDadosAux = Sessao::read('lista_dividas_parcelas');
 
         foreach ($arDadosAux as $dados) {            
             $arNumCgm[] = $dados['numcgm'];
@@ -793,22 +860,28 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
             $stParametros .= "&inCGM=".$inNumCgm;
             $stParametros .= "&inNumModalidade=".$inNumModalidade;
             $stParametros .= "&stDataInscricao=".Sessao::read( "dtInscricao" );
-    
-            SistemaLegado::alertaAviso( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
+            
+            SistemaLegado::mudaFramePrincipal( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
             //Emitir Relatório de Inscrição em Dívida Ativa quando for mais de um inscricao
         } else if( Sessao::read( "boRelatorioLancamentos" ) ) {        
             $stParametros  = "&stExercicio=".Sessao::getExercicio();        
             $stParametros .= "&stDataInscricao=".Sessao::read( "dtInscricao" );
             $stParametros .= "&inNumModalidade=".$inNumModalidade;
             $stParametros .= "&inCodGrupo=".$_REQUEST['inCodGrupo'];
-            $stParametros .= "&inCGM=".$inNumCgm;
-    
+            $stParametros .= "&inCGM=muitos";
+            Sessao::write('inCGM',$inNumCgm);
+            
+            //Pega o ultimo e o primeiro timestamp para passar para o relatorio
+            //Recuperando o ultimo timestamp
+            $obTDATDividaAtiva = new TDATDividaAtiva();
+            $obTDATDividaAtiva->recuperaTimestampInsert($rsTimestamp , $boTransacao);
+            $stParametros .= "&stPrimeiroTimestamp=".Sessao::read('primeiro_timestamp');
+            $stParametros .= "&stUltimoTimestamp=".$rsTimestamp->getCampo('timestamp_insert');
+
             $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/PRRelatorioInscricaoDividaAtiva.php";
-            SistemaLegado::mudaFrameOculto( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir");        
+            SistemaLegado::mudaFrameOculto( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=emitir");        
         } else {
-            sistemaLegado::alertaAviso( $pgFilt."?".Sessao::getId()."&stAcao=inscrever","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso( $pgFilt."?".Sessao::getId()."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
         }// fim boEmissaoDocumento
-    }else{
-        SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_erro","erro",Sessao::getId(), "../");
     }
 }

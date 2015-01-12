@@ -441,7 +441,7 @@ BEGIN
                                 SELECT 1
                                   FROM empenho.permissao_autorizacao
                                  WHERE exercicio   = '2015'
-                                   AND cod_numcgm  = proximo.numcgm
+                                   AND numcgm      = proximo.numcgm
                                    AND num_unidade = proximo.num_unidade
                                    AND num_orgao   = proximo.num_orgao
                               )
@@ -2015,6 +2015,8 @@ DROP FUNCTION atualiza_gf();
 ----------------
 
 ALTER TABLE tceto.norma_detalhe ADD COLUMN cod_norma_alteracao INTEGER NOT NULL;
+ALTER TABLE tceto.norma_detalhe ADD CONSTRAINT fk_norma_detalhe_3 FOREIGN KEY (cod_norma_alteracao)
+                                                                  REFERENCES normas.norma(cod_norma);
 
 ALTER TABLE normas.norma_detalhe_al ALTER COLUMN descricao_alteracao TYPE VARCHAR(400);
 

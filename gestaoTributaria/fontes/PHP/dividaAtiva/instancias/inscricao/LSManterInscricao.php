@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Diego Bueno Coelho
 
-    * $Id: LSManterInscricao.php 59983 2014-09-24 17:41:52Z carlos.silva $
+    * $Id: LSManterInscricao.php 61352 2015-01-09 18:14:18Z evandro $
 
   Caso de uso: uc-05.04.02
 **/
@@ -94,8 +94,15 @@ if ($_REQUEST['inCodCredito']) {
     $obTDATDividaAtiva->inCodNatureza	= $arCredito[3];
 }
 
-if ($_REQUEST['inCGM']) {
-    $obTDATDividaAtiva->inNumCgm = $_REQUEST['inCGM'];
+if ($_REQUEST['inCGMInicial'] || $_REQUEST['inCGMFinal']) {
+    if ($_REQUEST['inCGMInicial'] != "" && $_REQUEST['inCGMFinal'] != "") {
+        $obTDATDividaAtiva->inNumCgmInicial = $_REQUEST['inCGMInicial'];
+        $obTDATDividaAtiva->inNumCgmFinal   = $_REQUEST['inCGMFinal'];
+    }else if($_REQUEST['inCGMInicial'] != "" && $_REQUEST['inCGMFinal'] == ""){
+        $obTDATDividaAtiva->inNumCgmInicial = $_REQUEST['inCGMInicial'];
+    }else{
+        $obTDATDividaAtiva->inNumCgmInicial = $_REQUEST['inCGMFinal'];
+    }
 }
 
 if ($_REQUEST['inCodImovelInicial']) {
@@ -208,7 +215,7 @@ while ( !$rsListaDividas->eof() ) {
         $arListagemDividas[] = array (
             "contribuinte" 	   => $rsListaDividas->getCampo('numcgm'). " - ". $rsListaDividas->getCampo('nom_cgm'),
             "cod_lancamento"   => $rsListaDividas->getCampo('cod_lancamento'),
-            "origem"		   => $rsListaDividas->getCampo('vinculo'),
+            "imposto"		   => $rsListaDividas->getCampo('vinculo'),
             "parcelas"		   => $rsListaDividas->getCampo('nro_parcelas'),
             "valor_original"   => $rsListaDividas->getCampo('valor_aberto'),
             "valor_aberto"     => $rsListaDividas->getCampo('valor_aberto'),
@@ -238,9 +245,13 @@ Sessao::write('modalidade'            , $rsModalidade->getElementos() );
 Sessao::write('lista_dividas_parcelas', $arListagemDividas);
 
 $obIPopUpAutoridade = new IPopUpAutoridade;
-$obIPopUpAutoridade->setRotulo ( "Autoridade" );
-$obIPopUpAutoridade->setTitle ( "Informe o código da Autoridade" );
-$obIPopUpAutoridade->setNull ( false );
+$obIPopUpAutoridade->setRotulo           ( "Autoridade" );
+$obIPopUpAutoridade->setId               ( 'stNomAutoridade'  );
+$obIPopUpAutoridade->setName             ( 'stNomAutoridade'  );
+$obIPopUpAutoridade->obCampoCod->setName ( "inCodAutoridade"  );
+$obIPopUpAutoridade->obCampoCod->setID   ( "inCodAutoridade"  );
+$obIPopUpAutoridade->setTitle            ( "Informe o código da Autoridade" );
+$obIPopUpAutoridade->setNull             ( false );
 
 $obCBoxEmitir = new CheckBox;
 $obCBoxEmitir->setName   ( "boEmissaoDocumento" );
@@ -272,18 +283,22 @@ if ( count( $arListagemDividas ) <= 5000 ) {
     $obChkIncluir->setValue                       ( "[cod_lancamento]" );
     $obChkIncluir->obEvento->setOnChange          ( "verificaMarcados();" );
 
+    $rsListagemDividas->addFormatacao('valor_original','NUMERIC_BR');
+
     $obLista = new Table();
     $obLista->setRecordset( $rsListagemDividas );
     $obLista->setSummary('Lista de Lançamentos');
     //$obLista->setConditional( true , "#efefef" ); // lista zebrada
     $obLista->Head->addCabecalho( 'Contribuinte', 30  );
-    $obLista->Head->addCabecalho( 'Origem', 15  );
+    $obLista->Head->addCabecalho( 'Inscrição Origem', 10  );
+    $obLista->Head->addCabecalho( 'Imposto', 15  );
     $obLista->Head->addCabecalho( 'Parcelas', 10  );
     $obLista->Head->addCabecalho( 'Valor Original', 10  );
     $obLista->Head->addCabecalho( "", 3  );
 
-    $obLista->Body->addCampo( 'contribuinte', 'C' );
-    $obLista->Body->addCampo( 'origem' );
+    $obLista->Body->addCampo( 'contribuinte', 'E' );
+    $obLista->Body->addCampo( 'inscricao', 'C' );
+    $obLista->Body->addCampo( 'imposto' );
     $obLista->Body->addCampo( 'parcelas', 'C' );
     $obLista->Body->addCampo( 'valor_original', 'D' );
 
@@ -425,7 +440,7 @@ $obBscProcesso->setFuncaoBusca ( "abrePopUp('".CAM_GA_PROT_POPUPS."processo/FLBu
 
 $obBtnOK = new OK;
 $obBtnOK->setName              ( "btnOk" );
-$obBtnOK->obEvento->setOnClick ( "validarListar();BloqueiaFrames(true, false);" );
+$obBtnOK->obEvento->setOnClick ( "validarListar();" );
 
 $obBtnLimpar = new Limpar;
 //$obBtnLimpar->obEvento->setOnClick( "Limpar();" );
@@ -472,3 +487,4 @@ $obFormulario->addComponente ( $obCBoxEmitir        );
 $obFormulario->defineBarra   ( $botoesSpanBotoes, 'left', '' );
 
 $obFormulario->show();
+?>

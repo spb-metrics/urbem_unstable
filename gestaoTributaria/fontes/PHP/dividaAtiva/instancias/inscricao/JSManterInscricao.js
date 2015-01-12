@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSManterInscricao.js 60506 2014-10-24 17:17:18Z michel $
+    * $Id: JSManterInscricao.js 61352 2015-01-09 18:14:18Z evandro $
 
 * Casos de uso: uc-05.04.02
 */
@@ -68,7 +68,7 @@ function verificaMarcados() {
 
     while(cont < document.frm.elements.length){
         var namee = document.frm.elements[cont].name;
-        if( (document.frm.elements[cont].type == 'checkbox') && ( document.frm.elements[cont].name != 'boTodos') && ( namee.match('boIncluir')) ){
+        if( (document.frm.elements[cont].type == 'checkbox') && ( document.frm.elements[cont].name != 'boTodos') && ( namee.match('boIncluir_')) ){
             if ( document.frm.elements[cont].checked ) {
                 marcados++;
             }
@@ -94,7 +94,7 @@ function selecionarTodos(){
 
     while(cont < document.frm.elements.length){
         var namee = document.frm.elements[cont].name;
-        if( (document.frm.elements[cont].type == 'checkbox') && ( document.frm.elements[cont].name != 'boTodos') && ( namee.match('boIncluir')) ){
+        if( (document.frm.elements[cont].type == 'checkbox') && ( document.frm.elements[cont].name != 'boTodos') && ( namee.match('boIncluir_')) ){
             document.frm.elements[cont].checked = !document.frm.elements[cont].checked;
             if ( document.frm.elements[cont].checked ) {
                 marcados++;
@@ -137,7 +137,8 @@ function submeteFiltro(){
 		inCodGrupo = document.frm.inCodGrupo.value;
 		inCodCredito = document.frm.inCodCredito.value;
 
-		inCGM = document.frm.inCGM.value;
+		inCGMInicial = document.frm.inCGMInicial.value;
+        inCGMFinal = document.frm.inCGMFinal.value;
 
 		inNumInscInicial = document.frm.inNumInscricaoEconomicaInicial.value;
 		inNumInscFinal = document.frm.inNumInscricaoEconomicaFinal.value;
@@ -151,13 +152,13 @@ function submeteFiltro(){
 		if ( ( !inCodGrupo && !inCodCredito ) ) {
 			mensagem = "Campos 'Grupo de Crédito' ou 'Crédito' não foram preenchidos!";
 			alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
-		} else if ( !inCGM && !inNumInscInicial && !inNumInscMunicipalInicial ) {
-			mensagem = "Campos 'CGM', 'Inscrição Municipal' ou 'Inscrição Econômica' não foram preenchidos!";
+		} else if ( !inCGMInicial && !inCGMFinal && !inNumInscInicial && !inNumInscMunicipalInicial ) {
+			mensagem = "Campos 'Contribuinte', 'Inscrição Municipal' ou 'Inscrição Econômica' não foram preenchidos!";
 			alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
 		} else if( validaData( dtDataPreenchida, dtDataHoje ) ) {
 			mensagem = "Campos 'Data de Inscrição' deve ser igual ou anterior à da ta de hoje!";
 			alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
-		} else {
+        } else {
 			document.frm.submit();
 		}
     }
@@ -235,9 +236,11 @@ function validarListar(){
     }
 
     if ( !selecionado && ( document.frm.inTotalRegistros.value <= 5000 ) ) {
+        LiberaFrames(true,true);
         alertaAviso("Erro! Nenhum registro de parcela foi selecionado!",'form','erro','<?=Sessao::getId();?>', '../');
     }else {
         if( Valida() ){
+            BloqueiaFrames(true,false);
             document.frm.stCtrl.value = "PRManterInscricao.php";
             document.frm.action = '<?=$pgProc.'?'.Sessao::getId().$stLink;?>';
             document.frm.submit();

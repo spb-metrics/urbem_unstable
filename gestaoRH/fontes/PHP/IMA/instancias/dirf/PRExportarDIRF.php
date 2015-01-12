@@ -31,7 +31,7 @@
 2
     * Casos de uso: uc-04.08.15
 
-    $Id: PRExportarDIRF.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarDIRF.php 61346 2015-01-08 19:47:19Z dagiane $
 
 */
 
@@ -517,7 +517,7 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
 
     /* TO DO: adicionar na configuração um campo o ano-referência */
     $file = fopen('../../../../../../gestaoAdministrativa/fontes/PHP/framework/tmp/DIRF.TXT', 'w');
-    $linha = 'Dirf|2013|'.$rsTipo1->getCampo('ano_calendario').'|'.$boRetificadora.'|'.$rsTipo1->getCampo('numero_recibo').'|7C2DE7J|'."\n";
+    $linha = 'Dirf|2015|'.$rsTipo1->getCampo('ano_calendario').'|'.$boRetificadora.'|'.$rsTipo1->getCampo('numero_recibo').'|M1LB5V2|'."\n";
     fputs($file, $linha);
 
     $linha = 'RESPO|'.str_pad($rsTipo1->getCampo('cpf_responsavel'),11,0,STR_PAD_LEFT).'|'.$rsTipo1->getCampo('nome_responsavel').'|'.

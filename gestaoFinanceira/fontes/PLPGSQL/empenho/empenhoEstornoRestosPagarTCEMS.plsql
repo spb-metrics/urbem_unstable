@@ -121,7 +121,6 @@ BEGIN
                                            AND empenho.exercicio = ''' || EXERCRP || '''
                                            ');
     
-    
         IF RESTOS = '0' THEN 
         -- não processado
 
@@ -142,80 +141,6 @@ BEGIN
                AND empenho.exercicio   = nota_liquidacao.exercicio_empenho 
              WHERE empenho.cod_pre_empenho = CODPREEMPENHO
                AND empenho.exercicio = EXERCRP::VARCHAR;
-
-            IF inCodNota IS NOT NULL THEN
-            SQLCONTAFIXA := '
-                SELECT REPLACE(plano_analitica_debito.cod_plano::VARCHAR, ''.'', '''')::integer AS plano_debito
-                     , (SELECT plano_analitica.cod_plano 
-                          FROM contabilidade.plano_conta 
-                          JOIN contabilidade.plano_analitica
-                            ON plano_analitica.cod_conta = plano_conta.cod_conta
-                           AND plano_analitica.exercicio = plano_conta.exercicio
-                         WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
-                           ) AS plano_credito
-                     , configuracao_lancamento_debito.cod_conta_despesa
-                     , REPLACE(plano_conta_debito.cod_estrutural, ''.'', '''') as estrutural_debito
-                     , (SELECT plano_conta.cod_estrutural
-                          FROM contabilidade.plano_conta 
-                          JOIN contabilidade.plano_analitica
-                            ON plano_analitica.cod_conta = plano_conta.cod_conta
-                           AND plano_analitica.exercicio = plano_conta.exercicio
-                         WHERE plano_conta.exercicio = '''||STEXERCICIO||''' 
-                           AND REPLACE(plano_conta.cod_estrutural, ''.'', '''') LIKE ''4640100%''
-                           ) AS estrutural_credito
-                  FROM empenho.nota_liquidacao
-            INNER JOIN empenho.empenho
-                    ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
-                   AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
-                   AND empenho.cod_entidade = nota_liquidacao.cod_entidade
-            INNER JOIN empenho.pre_empenho
-                    ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                   AND pre_empenho.exercicio       = empenho.exercicio
-            INNER JOIN empenho.pre_empenho_despesa
-                    ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                   AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-            INNER JOIN orcamento.conta_despesa
-                    ON conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
-                   AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
-            INNER JOIN contabilidade.configuracao_lancamento_credito
-                    ON configuracao_lancamento_credito.cod_conta_despesa = conta_despesa.cod_conta
-                   AND configuracao_lancamento_credito.exercicio         = '''||STEXERCICIO||'''
-            INNER JOIN contabilidade.configuracao_lancamento_debito
-                    ON configuracao_lancamento_credito.exercicio = configuracao_lancamento_debito.exercicio
-                   AND configuracao_lancamento_credito.cod_conta_despesa = configuracao_lancamento_debito.cod_conta_despesa
-                   AND configuracao_lancamento_credito.tipo = configuracao_lancamento_debito.tipo
-                   AND configuracao_lancamento_credito.estorno = configuracao_lancamento_debito.estorno
-            INNER JOIN contabilidade.plano_conta plano_conta_credito
-                    ON plano_conta_credito.cod_conta = configuracao_lancamento_credito.cod_conta
-                   AND plano_conta_credito.exercicio = configuracao_lancamento_credito.exercicio
-            INNER JOIN contabilidade.plano_analitica plano_analitica_credito
-                    ON plano_conta_credito.cod_conta = plano_analitica_credito.cod_conta
-                   AND plano_conta_credito.exercicio = plano_analitica_credito.exercicio
-            INNER JOIN contabilidade.plano_conta plano_conta_debito
-                    ON plano_conta_debito.cod_conta = configuracao_lancamento_debito.cod_conta
-                   AND plano_conta_debito.exercicio = configuracao_lancamento_debito.exercicio
-            INNER JOIN contabilidade.plano_analitica plano_analitica_debito
-                    ON plano_conta_debito.cod_conta = plano_analitica_debito.cod_conta
-                   AND plano_conta_debito.exercicio = plano_analitica_debito.exercicio
-                 WHERE configuracao_lancamento_credito.estorno = ''true''
-                   AND configuracao_lancamento_credito.exercicio = '''||STEXERCICIO||'''
-                   AND configuracao_lancamento_credito.tipo = ''liquidacao''
-                   AND nota_liquidacao.cod_nota = ' || inCodNota || '
-                   AND nota_liquidacao.exercicio = '''||stExercicioLiquidacao||'''
-        ';
-
-                FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
-                LOOP
-                        SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
-                        INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
-                END LOOP;
-                
-                IF ( INCONTCONFIGURACAO = 0 ) THEN
-                    RAISE EXCEPTION 'Configuração dos lançamentos de despesa não configurados para esta despesa.';
-                END IF;
-        
-            END IF;
 
             SQLCONTAFIXA := '
                 SELECT debito.cod_estrutural AS estrutural_debito
@@ -365,7 +290,7 @@ BEGIN
             END LOOP;
             
          IF ( INCONTCONFIGURACAO = 0 ) THEN
-            RAISE EXCEPTION 'Contas do recurso não cadastradas!.';
+            RAISE EXCEPTION 'Contas do recurso não cadastradas!';
          END IF;
          
       ELSE
@@ -409,6 +334,9 @@ BEGIN
             INNER JOIN empenho.pre_empenho_despesa
                     ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
                    AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+            INNER JOIN orcamento.despesa
+                    ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                   AND despesa.exercicio = '''||EXERCRP||'''
             INNER JOIN orcamento.conta_despesa
                     ON conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
                    AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
@@ -436,7 +364,8 @@ BEGIN
                    AND configuracao_lancamento_credito.exercicio = '''||STEXERCICIO||'''
                    AND configuracao_lancamento_credito.tipo = ''liquidacao''
                    AND despesa.cod_despesa = '||inCodDespesa||'
-                   AND despesa.exercicio = '''||STEXERCICIO||'''
+                   AND pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
+                   
         ';
             
       ELSE
@@ -501,17 +430,19 @@ BEGIN
                           AND configuracao_lancamento_credito.exercicio = '''||STEXERCICIO||'''
                 ';
             END IF;
-                  
+
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
-                    SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
-                    INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
+                SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
+                INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
             END LOOP;
-   
+
             IF ( INCONTCONFIGURACAO = 0 ) THEN
               RAISE EXCEPTION 'Configuração dos lançamentos de despesa não configurados para esta despesa.';
             END IF;
   
+            INCONTCONFIGURACAO = 0 ;
+            
             SQLCONTAFIXA := '
                 SELECT debito.cod_estrutural AS estrutural_debito
                      , credito.cod_estrutural AS estrutural_credito
@@ -579,7 +510,6 @@ BEGIN
                             AND plano_conta.exercicio = '''||STEXERCICIO||'''
                      ) AS tabela_debito
                     ON tabela_debito.cod_recurso = recurso.cod_recurso
-                   AND tabela_debito.exercicio   = recurso.exercicio
                   JOIN ( SELECT plano_recurso.cod_recurso
                               , plano_recurso.exercicio
                               , plano_analitica.cod_plano AS plano_credito
@@ -595,7 +525,6 @@ BEGIN
                             AND plano_conta.exercicio = '''||STEXERCICIO||'''
                      ) AS tabela_credito
                     ON tabela_credito.cod_recurso = recurso.cod_recurso
-                   AND tabela_credito.exercicio   = recurso.exercicio
                  WHERE pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
                    AND pre_empenho.exercicio = '''||EXERCRP||'''
             ';
@@ -652,11 +581,17 @@ BEGIN
                  WHERE pre_empenho.cod_pre_empenho = '||CODPREEMPENHO||'
                    AND pre_empenho.exercicio = '''||EXERCRP||'''
             ';
-            END IF ; 
+            END IF ;
+
             FOR REREGISTROSCONTAFIXA IN EXECUTE SQLCONTAFIXA
             LOOP
                 SEQUENCIA := FAZERLANCAMENTO(  REREGISTROSCONTAFIXA.estrutural_debito , REREGISTROSCONTAFIXA.estrutural_credito , 918 , STEXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , REREGISTROSCONTAFIXA.plano_debito, REREGISTROSCONTAFIXA.plano_credito );
+                INCONTCONFIGURACAO := INCONTCONFIGURACAO + 1;
             END LOOP;
+ 
+         IF ( INCONTCONFIGURACAO = 0 ) THEN
+            RAISE EXCEPTION 'Contas do recurso não cadastradas!.';
+         END IF;
         END IF;
     END IF;
     

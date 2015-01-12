@@ -60,7 +60,7 @@ switch ($arFiltro["stTipoFiltro"]) {
     case "cgm_contrato_todos":
     case "cgm_contrato_rescisao":
     case "cgm_contrato_aposentado":
-        $stFiltroContratos = " WHERE contrato.cod_contrato IN (";
+        $stFiltroContratos = " AND contrato.cod_contrato IN (";
         foreach (Sessao::read("arContratos") as $arContrato) {
             $stFiltroContratos .= $arContrato["cod_contrato"].",";
         }
@@ -68,7 +68,7 @@ switch ($arFiltro["stTipoFiltro"]) {
     break;
     case "contrato_pensionista":
     case "cgm_contrato_pensionista":
-        $stFiltroContratos = " WHERE contrato.cod_contrato IN (";
+        $stFiltroContratos = " AND contrato.cod_contrato IN (";
         foreach (Sessao::read("arPensionistas") as $arContrato) {
             $stFiltroContratos .= $arContrato["cod_contrato"].",";
         }
@@ -87,7 +87,7 @@ switch ($arFiltro["stTipoFiltro"]) {
         } else {
             $stOrdem .= $virgula."orgao,registro";
         }
-        $stFiltroContratos = " WHERE vw_orgao_nivel.cod_orgao IN (";
+        $stFiltroContratos = " AND vw_orgao_nivel.cod_orgao IN (";
         foreach ($arFiltro['inCodLotacaoSelecionados'] as $inCodOrgao) {
             $stFiltroContratos .= $inCodOrgao.",";
         }
@@ -107,7 +107,7 @@ switch ($arFiltro["stTipoFiltro"]) {
         } else {
             $stOrdem .= $virgula."cod_local,registro";
         }
-        $stFiltroContratos = " WHERE contrato_servidor_local.cod_local IN (";
+        $stFiltroContratos = " AND contrato_servidor_local.cod_local IN (";
         foreach ($arFiltro['inCodLocalSelecionados'] as $inCodLocal) {
             $stFiltroContratos .= $inCodLocal.",";
         }
@@ -116,7 +116,7 @@ switch ($arFiltro["stTipoFiltro"]) {
     case "atributo_servidor":
         $inCodAtributo = $arFiltro["inCodAtributo"];
         $inCodCadastro = $arFiltro["inCodCadastro"];
-        $stFiltroContratos = " WHERE atributo_dinamico.cod_atributo IN (";
+        $stFiltroContratos = " AND atributo_dinamico.cod_atributo IN (";
         if ( is_array($inCodAtributo) ) {
             foreach ( $inCodAtributo as $cod_atributo) {
                 $stFiltroContratos .= $cod_atributo.",";
@@ -135,10 +135,29 @@ switch ($arFiltro["stTipoFiltro"]) {
             $stFiltroContratos .= $inCodCadastro.")";
         }
         $valorAtributo = $arFiltro["Atributo_".$inCodAtributo."_".$inCodCadastro.""];
-        $stFiltroContratos .=" AND atributo_contrato_servidor_valor.valor ilike '%".$valorAtributo."%' ";
+        #$stFiltroContratos .=" AND atributo_contrato_servidor_valor.valor ilike '%".$valorAtributo."%' ";
+   break;
+}
+
+switch ($arFiltro['stSituacao']){
+    case 'ativos':
+        $stFiltroContratos .=" AND situacao = 'A' ";
+    break;
+    
+    case 'rescindidos':
+        $stFiltroContratos .=" AND situacao = 'R' ";
+    break;
+
+    case 'aposentados':
+        $stFiltroContratos .=" AND situacao = 'P' ";
+    break;
+
+    case 'pensionistas':
+        $stFiltroContratos .=" AND situacao = 'E' ";
     break;
 }
 
+$stFiltroContratos = " WHERE 1=1 ".$stFiltroContratos;
 
 $obRRelatorioServidor->geraRecordSet( $rsRecordset, $stFiltroContratos, $stOrder );
 

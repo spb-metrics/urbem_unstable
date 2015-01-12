@@ -27,7 +27,7 @@
     * Classe de mapeamento do Relatorio Inscricao da Divida Ativa
     * Data de Criação: 12/09/2014
     * @author Desenvolvedor: Evandro Melos
-    $Id: TRelatorioInscricaoDividaAtiva.class.php 60447 2014-10-22 12:02:34Z carolina $
+    $Id: TRelatorioInscricaoDividaAtiva.class.php 61352 2015-01-09 18:14:18Z evandro $
 */
 
 include_once ( CLA_PERSISTENTE );
@@ -64,12 +64,18 @@ class TRelatorioInscricaoDividaAtiva extends Persistente
 
     function montaRecuperaRelatorioInscricaoDividaAtiva()
     {
-        $stSql = " SELECT DISTINCT
-                   CASE WHEN divida_imovel.inscricao_municipal > 0 THEN 
+        if ( $this->getDado('mostrar_cgm') ) {
+            $stSelect = "divida_cgm.numcgm ";
+        }else{
+            $stSelect = "CASE WHEN divida_imovel.inscricao_municipal > 0 THEN 
                             divida_imovel.inscricao_municipal
                         ELSE
                             divida_empresa.inscricao_economica
-                        END AS inscricao_origem
+                        END ";
+        }
+
+        $stSql = " SELECT DISTINCT
+                    ".$stSelect." AS inscricao_origem
                     , divida_ativa.exercicio
                     , credito.descricao_credito || ' / ' || COALESCE(grupo_credito.descricao, '') AS imposto
                     , divida_ativa.num_livro    AS livro
@@ -117,7 +123,7 @@ class TRelatorioInscricaoDividaAtiva extends Persistente
                INNER JOIN arrecadacao.calculo
                        ON calculo.cod_calculo  = lancamento_calculo.cod_calculo
 
-	       INNER JOIN arrecadacao.calculo_grupo_credito
+	       LEFT JOIN arrecadacao.calculo_grupo_credito
                        ON calculo.cod_calculo = calculo_grupo_credito.cod_calculo
 
 	        LEFT JOIN arrecadacao.grupo_credito

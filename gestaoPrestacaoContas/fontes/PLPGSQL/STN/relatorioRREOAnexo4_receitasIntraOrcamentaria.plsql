@@ -35,7 +35,7 @@
 
     * Casos de uso : uc-06.01.04
 
-    $Id: relatorioRREOAnexo4_receitasIntraOrcamentaria.plsql 61129 2014-12-10 17:04:54Z evandro $
+    $Id: relatorioRREOAnexo4_receitasIntraOrcamentaria.plsql 61310 2015-01-05 16:38:45Z evandro $
 */
 
 
@@ -119,7 +119,6 @@ EXECUTE stSql;
 
 
 INSERT INTO tmp_receitas_intra_orcamentarias VALUES (6, 'militar1', 4, 'Pessoal Militar');
-INSERT INTO tmp_receitas_intra_orcamentarias VALUES (1, 'deducoes', 1, 'DEDUÇÕES DA RECEITA(X)', 0.00, 0.00, 0.00, 0.00, 0.00);
 INSERT INTO tmp_receitas_intra_orcamentarias VALUES (6, 'militar2', 5, 'Ativo');
 INSERT INTO tmp_receitas_intra_orcamentarias VALUES (6, 'militar3', 5, 'Inativo');
 INSERT INTO tmp_receitas_intra_orcamentarias VALUES (6, 'militar4', 5, 'Pensionista');

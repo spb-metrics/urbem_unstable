@@ -321,6 +321,7 @@ DECLARE
     reRegistro                      RECORD;
     rePeriodos                      RECORD;
     reEventos                       RECORD;
+    reCodTipo                       RECORD;
     inSequencia                     INTEGER:=2;
     inIndex                         INTEGER:=1;
     inCodEventoIRRFDesconto         INTEGER;
@@ -337,6 +338,8 @@ DECLARE
     inCodEventoColuna1              INTEGER;
     inCodEventoColuna2              INTEGER;
     inCodEventoColuna3              INTEGER;
+    inCodTipo                       INTEGER;
+    stCGMAnterior                   INTEGER;
     nuSomaBaseIRRF                  NUMERIC:=0;
     nuColuna1                       NUMERIC:=0;
     nuSomaColuna2                   NUMERIC:=0;
@@ -353,8 +356,8 @@ DECLARE
     arValores2                      VARCHAR[];
     arValores3                      VARCHAR[];
     rwDirf                          colunasDirf%ROWTYPE;
-    stCPFAnterior                       VARCHAR;
-    boSomaInformativoDeducaoDependente  BOOLEAN;
+    stCPFAnterior                   VARCHAR;
+    boSomaDeducaoDecimo             BOOLEAN;
 BEGIN
 
     --O parametro inSequenciaEventos identifica qual sequencia de eventos será buscada 
@@ -472,7 +475,7 @@ BEGIN
                                          WHERE contrato_pensionista.cod_contrato = cadastro.cod_contrato
                                            AND contrato_pensionista.dt_encerramento IS NULL)';
                                   
-    stSelect := stSelect  ||' ORDER BY cod_contrato';
+    stSelect := stSelect  ||' ORDER BY numcgm , cod_contrato ';
 
 -- o select acima traz os servidores com cod_contrato, registro, etc...
     
@@ -494,17 +497,15 @@ BEGIN
         nuValorRendimentosDecimo := 0;
         nuValorDeducoesDecimo    := 0; 
         nuValorRetidoDecimo      := 0; 
+
+        -- flag para controlar o pagto de decimo entre mais de um contrato
+         IF  reRegistro.numcgm != stCGMAnterior THEN
+	     boSomaDeducaoDecimo := TRUE;
+	 END IF;
+	      
         
-        -- flag para controlar e informar os informativos de dependente do servidor somente para a primeira matricula do mesmo
-        boSomaInformativoDeducaoDependente := false;
+        -- Estrutura do arquivo 
         
-        IF (reRegistro.cpf IS NOT NULL) THEN
-            stCPFAnterior := selectIntoVarchar(' SELECT cpf FROM tmp_cpf_controle_dependentes WHERE cpf = '|| quote_literal(reRegistro.cpf) ||' AND sequencia_evento = '|| inSequenciaEventos);
-        ELSE
-            INSERT INTO tmp_cpf_controle_dependentes VALUES (reRegistro.cpf, inSequenciaEventos);
-            boSomaInformativoDeducaoDependente := true;
-        END IF;
-            
             --inSequenciaEventos 1
             --  arValores1: Rendimento Tributável
             --  arValores2: Deduções
@@ -517,7 +518,7 @@ BEGIN
             --  arValores1: Previdencia Privada
             --  arValores2: FAPI
             --inIndex identifica o período de movimentação|        
-        
+            
         FOR rePeriodos IN EXECUTE stSelect LOOP
             nuColuna1 := 0;            
             --###########Início Base de IRRF   
@@ -713,92 +714,167 @@ BEGIN
                           
             
             --Início dependentes
-            nuValor := 0;
+            --apresenta informativos de deducao de dependente somente de uma das matriculas do servidor
+            --Se o cod_contrato teve deducao de dependente na competencia na tabela deducao_dependente e deducao_depedente_complementar utiliza-se esse para a dirf
             
-            -- apresenta informativos de deducao de dependente somente para a primeira matricula do servidor
-            IF boSomaInformativoDeducaoDependente IS TRUE THEN
-                IF inSequenciaEventos = 2 THEN
-                    --Salário         
-                    stSelect := 'SELECT evento_calculado.valor as valor
-                                   FROM folhapagamento'|| stEntidade ||'.registro_evento_periodo
-                                       , folhapagamento'|| stEntidade ||'.evento_calculado
-                                       , folhapagamento'|| stEntidade ||'.periodo_movimentacao
-                                   WHERE registro_evento_periodo.cod_registro = evento_calculado.cod_registro
-                                   AND registro_evento_periodo.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
-                                   AND registro_evento_periodo.cod_contrato = '|| reRegistro.cod_contrato ||'
-                                   AND registro_evento_periodo.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
-                                   AND evento_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
-                                 LIMIT 1';
-                    nuTemp := selectIntoNumeric(stSelect);
-                    IF nuTemp IS NOT NULL AND nuValor = 0 THEN
-                        nuValor := nuValor + nuTemp;
-                    END IF;                           
-                              
-                    --Complementar         
-                    nuTemp := recupera_evento_calculado_dirf(0,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);                       
-                    IF nuTemp IS NOT NULL AND nuValor = 0 THEN
-                        nuValor := nuValor + nuTemp;
-                    END IF;                          
-                    
-                    --Ferias
-                    nuTemp := recupera_evento_calculado_dirf(2,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);                       
-                    IF nuTemp IS NOT NULL AND nuValor = 0 THEN
-                        nuValor := nuValor + nuTemp;
-                    END IF; 
-                                                             
-                    stSelect := 'SELECT evento_rescisao_calculado.valor as valor
-                                FROM folhapagamento'|| stEntidade ||'.registro_evento_rescisao
-                                , folhapagamento'|| stEntidade ||'.evento_rescisao_calculado
-                                , folhapagamento'|| stEntidade ||'.periodo_movimentacao
-                            WHERE registro_evento_rescisao.cod_registro = evento_rescisao_calculado.cod_registro
-                                AND registro_evento_rescisao.cod_evento = evento_rescisao_calculado.cod_evento
-                                AND registro_evento_rescisao.desdobramento = evento_rescisao_calculado.desdobramento
-                                AND registro_evento_rescisao.timestamp = evento_rescisao_calculado.timestamp_registro
-                                AND registro_evento_rescisao.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
-                                AND registro_evento_rescisao.cod_contrato = '|| reRegistro.cod_contrato ||'
-                                AND registro_evento_rescisao.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
-                                AND evento_rescisao_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
-                                AND evento_rescisao_calculado.desdobramento != ''D''
-                              LIMIT 1';
-                    nuTemp := selectIntoNumeric(stSelect);
-                    IF nuTemp IS NOT NULL AND nuValor = 0 THEN           
-                        nuValor := nuValor + nuTemp;                                 
-                    END IF;                                                         
-                              
-                    --###########Início Décimo
-                    stSelect := 'SELECT sum(evento_rescisao_calculado.valor) as valor
-                                FROM folhapagamento'|| stEntidade ||'.registro_evento_rescisao
-                                , folhapagamento'|| stEntidade ||'.evento_rescisao_calculado
-                                , folhapagamento'|| stEntidade ||'.periodo_movimentacao
-                            WHERE registro_evento_rescisao.cod_registro = evento_rescisao_calculado.cod_registro
-                                AND registro_evento_rescisao.cod_evento = evento_rescisao_calculado.cod_evento
-                                AND registro_evento_rescisao.desdobramento = evento_rescisao_calculado.desdobramento
-                                AND registro_evento_rescisao.timestamp = evento_rescisao_calculado.timestamp_registro
-                                AND registro_evento_rescisao.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
-                                AND registro_evento_rescisao.cod_contrato = '|| reRegistro.cod_contrato ||'
-                                AND registro_evento_rescisao.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
-                                AND evento_rescisao_calculado.desdobramento = ''D''
-                                AND evento_rescisao_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente;
-                    nuTemp := selectIntoNumeric(stSelect);                
-                    IF nuTemp IS NOT NULL THEN
-                        nuValorDeducoesDecimo := nuValorDeducoesDecimo + nuTemp;
+            nuValor := 0;           
+                                               
+                stSelect := 'SELECT COALESCE(cod_tipo) as cod_tipo
+                             FROM ( SELECT cod_tipo FROM folhapagamento'|| stEntidade ||'.deducao_dependente 
+                                     WHERE cod_periodo_movimentacao =  '|| rePeriodos.cod_periodo_movimentacao ||' 
+                                       AND cod_contrato = '|| reRegistro.cod_contrato ||'
+                                    UNION 
+                                    SELECT cod_tipo FROM folhapagamento'|| stEntidade ||'.deducao_dependente_complementar
+                                     WHERE cod_periodo_movimentacao =  '|| rePeriodos.cod_periodo_movimentacao ||' 
+                                       AND numcgm = '|| reRegistro.numcgm ||'
+                                  ) as deducao_dependente                                                              
+                            ';
+                --inCodTipo := selectIntoInteger(stSelect); 
+                FOR reCodTipo IN EXECUTE stSelect LOOP   
+                --IF inCodTipo > 0 THEN          
+                    IF inSequenciaEventos = 2 THEN
+                        IF reCodTipo.cod_tipo = 2 THEN
+                            --Salário         
+                            stSelect := 'SELECT evento_calculado.valor as valor
+                                            FROM folhapagamento'|| stEntidade ||'.registro_evento_periodo
+                                            , folhapagamento'|| stEntidade ||'.evento_calculado
+                                            , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                            WHERE registro_evento_periodo.cod_registro = evento_calculado.cod_registro
+                                            AND registro_evento_periodo.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                            AND registro_evento_periodo.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                            AND registro_evento_periodo.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                            AND evento_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                            LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);
+                            IF nuTemp IS NOT NULL AND nuValor = 0 THEN
+                               nuValor := nuValor + nuTemp;
+                            END IF;                           
+                        END IF;                    
+                        -- verifica se nao possuir nuVAlor quer dizer que nao houve deducao de dependente na folha salario
+                        IF reCodTipo.cod_tipo = 3 AND nuValor = 0 THEN                                  
+                            --Complementar         
+                            --nuTemp := recupera_evento_calculado_dirf(0,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);                       
+                            stSelect := 'SELECT evento_complementar_calculado.valor as valor
+                                        FROM folhapagamento'|| stEntidade ||'.registro_evento_complementar
+                                        , folhapagamento'|| stEntidade ||'.evento_complementar_calculado
+                                        , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                    WHERE registro_evento_complementar.cod_registro = evento_complementar_calculado.cod_registro
+                                        AND registro_evento_complementar.cod_evento = evento_complementar_calculado.cod_evento
+                                        AND registro_evento_complementar.timestamp = evento_complementar_calculado.timestamp_registro
+                                        AND registro_evento_complementar.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                        AND registro_evento_complementar.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                        AND registro_evento_complementar.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                        AND evento_complementar_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                        AND evento_complementar_calculado.cod_configuracao = 1
+                                      LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);
+                            IF nuTemp IS NOT NULL THEN
+                                nuValor := nuValor + nuTemp;
+                            END IF;                          
+                        END IF;                    
+                        
+                        IF reCodTipo.cod_tipo = 1 THEN
+                            --Ferias
+                            --nuTemp := recupera_evento_calculado_dirf(2,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);                       
+                            stSelect := 'SELECT evento_ferias_calculado.valor as valor
+                                        FROM folhapagamento'|| stEntidade ||'.registro_evento_ferias
+                                        , folhapagamento'|| stEntidade ||'.evento_ferias_calculado
+                                        , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                    WHERE registro_evento_ferias.cod_registro = evento_ferias_calculado.cod_registro
+                                        AND registro_evento_ferias.cod_evento = evento_ferias_calculado.cod_evento
+                                        AND registro_evento_ferias.desdobramento = evento_ferias_calculado.desdobramento
+                                        AND registro_evento_ferias.timestamp = evento_ferias_calculado.timestamp_registro
+                                        AND registro_evento_ferias.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                        AND registro_evento_ferias.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                        AND registro_evento_ferias.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                        AND evento_ferias_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                        AND evento_ferias_calculado.desdobramento = ''F''
+                                      LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);
+                            IF nuTemp IS NOT NULL AND nuValor = 0 THEN
+                                nuValor := nuValor + nuTemp;
+                            END IF; 
+                        END IF;                    
+                        
+                        IF reCodTipo.cod_tipo = 5 THEN
+                            -- rescisao    
+                            stSelect := 'SELECT evento_rescisao_calculado.valor as valor
+                                        FROM folhapagamento'|| stEntidade ||'.registro_evento_rescisao
+                                        , folhapagamento'|| stEntidade ||'.evento_rescisao_calculado
+                                        , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                    WHERE registro_evento_rescisao.cod_registro = evento_rescisao_calculado.cod_registro
+                                        AND registro_evento_rescisao.cod_evento = evento_rescisao_calculado.cod_evento
+                                        AND registro_evento_rescisao.desdobramento = evento_rescisao_calculado.desdobramento
+                                        AND registro_evento_rescisao.timestamp = evento_rescisao_calculado.timestamp_registro
+                                        AND registro_evento_rescisao.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                        AND registro_evento_rescisao.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                        AND registro_evento_rescisao.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                        AND evento_rescisao_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                        AND evento_rescisao_calculado.desdobramento != ''D''
+                                      LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);
+                            IF nuTemp IS NOT NULL AND nuValor = 0 THEN           
+                                nuValor := nuValor + nuTemp;                                 
+                            END IF;                                                         
+                        END IF;                    
+                        
+                        IF reCodTipo.cod_tipo = 5 THEN
+                            -- Décimo na rescisao
+                            stSelect := 'SELECT evento_rescisao_calculado.valor as valor
+                                        FROM folhapagamento'|| stEntidade ||'.registro_evento_rescisao
+                                        , folhapagamento'|| stEntidade ||'.evento_rescisao_calculado
+                                        , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                    WHERE registro_evento_rescisao.cod_registro = evento_rescisao_calculado.cod_registro
+                                        AND registro_evento_rescisao.cod_evento = evento_rescisao_calculado.cod_evento
+                                        AND registro_evento_rescisao.desdobramento = evento_rescisao_calculado.desdobramento
+                                        AND registro_evento_rescisao.timestamp = evento_rescisao_calculado.timestamp_registro
+                                        AND registro_evento_rescisao.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                        AND registro_evento_rescisao.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                        AND registro_evento_rescisao.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                        AND evento_rescisao_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                        AND evento_rescisao_calculado.desdobramento = ''D''
+                                      LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);                
+                            IF nuTemp IS NOT NULL THEN				                              
+                                IF  reRegistro.numcgm = stCGMAnterior THEN
+                                    IF boSomaDeducaoDecimo IS TRUE THEN                                
+					nuValorDeducoesDecimo := nuValorDeducoesDecimo + nuTemp;
+					boSomaDeducaoDecimo := FALSE;
+				    END IF;
+				ELSE
+				    nuValorDeducoesDecimo := nuValorDeducoesDecimo + nuTemp;
+				    boSomaDeducaoDecimo := FALSE;
+                                END IF;
+                            END IF;
+                        END IF;                    
+                        
+                        IF reCodTipo.cod_tipo = 4 THEN                                                          
+                            --Décimo
+                            --nuTemp := recupera_evento_calculado_dirf(3,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);
+                            stSelect := 'SELECT evento_decimo_calculado.valor as valor
+                                            FROM folhapagamento'|| stEntidade ||'.registro_evento_decimo
+                                            , folhapagamento'|| stEntidade ||'.evento_decimo_calculado
+                                            , folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                            WHERE registro_evento_decimo.cod_registro = evento_decimo_calculado.cod_registro
+                                            AND registro_evento_decimo.cod_evento = evento_decimo_calculado.cod_evento
+                                            AND registro_evento_decimo.desdobramento = evento_decimo_calculado.desdobramento
+                                            AND registro_evento_decimo.timestamp = evento_decimo_calculado.timestamp_registro
+                                            AND registro_evento_decimo.cod_periodo_movimentacao = periodo_movimentacao.cod_periodo_movimentacao
+                                            AND registro_evento_decimo.cod_contrato = '|| reRegistro.cod_contrato ||'
+                                            AND registro_evento_decimo.cod_periodo_movimentacao = '|| rePeriodos.cod_periodo_movimentacao ||'
+                                            AND evento_decimo_calculado.cod_evento = '|| inCodEventoInfDeducaoDependente ||'
+                                            AND evento_decimo_calculado.desdobramento = ''D''
+                                          LIMIT 1';
+                            nuTemp := selectIntoNumeric(stSelect);
+                            IF nuTemp IS NOT NULL THEN
+                                nuValorDeducoesDecimo := nuValorDeducoesDecimo + nuTemp;
+                                boSomaDeducaoDecimo := FALSE;
+			    END IF;
+                        END IF;                          
                     END IF;
-                                                  
-                    --Décimo
-                    nuTemp := recupera_evento_calculado_dirf(3,rePeriodos.cod_periodo_movimentacao,reRegistro.cod_contrato,inCodEventoInfDeducaoDependente,stEntidade);
-                    IF nuTemp IS NOT NULL THEN
-                        nuValorDeducoesDecimo := nuValorDeducoesDecimo + nuTemp;
-                    END IF;
-                    --###########Fim Décimo        
-                END IF;  
-                
-                -- caso o LOOP de periodos ja tenha sido completado para os 12 meses, seta apresenta informativos dependente falso para o servidor corrente
-                IF inIndex >= 12 THEN
-                    boSomaInformativoDeducaoDependente := false;
-                END IF;
-            END IF;  
+                END LOOP;                                         
             --Fim dependentes     
-                   
+            stCGMAnterior   := reRegistro.numcgm;        
             arValores2[inIndex] := nuValor;       
                    
             --###########Imposto retido

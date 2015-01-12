@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.03.10
 
-    $Id: IMontaItemQuantidade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IMontaItemQuantidade.class.php 61357 2015-01-09 19:54:12Z diogo.zarpelon $
 */
 
 $pgOc = CAM_GP_ALM_PROCESSAMENTO.'OCIMontaItemQuantidade.php?'.Sessao::getId();
@@ -163,10 +163,7 @@ class IMontaItemQuantidade extends Objeto
         $obFormulario->addComponente( $this->obCmbMarca );
         $obFormulario->addComponente( $this->obCmbCentroCusto );
         $obFormulario->addTitulo    ( "Quantidade" );
-
-        if (strtolower(sistemalegado::pegaConfiguracao( 'demonstrar_saldo_estoque',29 ))=='true') {
-            $obFormulario->addComponente( $this->obLblSaldo );
-        }
+        $obFormulario->addComponente( $this->obLblSaldo );
 
         $obFormulario->addSpan( $this->obSpnAtributos);
         $obFormulario->addSpan( $this->obSpnListaLotes);

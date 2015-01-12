@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OPS.csv.inc.php 61155 2014-12-11 19:31:56Z evandro $
-  * $Date: 2014-12-11 17:31:56 -0200 (Qui, 11 Dez 2014) $
+  * $Id: OPS.csv.inc.php 61331 2015-01-07 16:03:07Z evandro $
+  * $Date: 2015-01-07 14:03:07 -0200 (Qua, 07 Jan 2015) $
   * $Author: evandro $
-  * $Rev: 61155 $
+  * $Rev: 61331 $
   *  
 */
 /**
@@ -283,6 +283,16 @@ if (count($rsRecordSetOPS10->getElementos()) > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(3);
+
+                    //Registro 12
+                    //Inclusão do campo descTipoDocumentoOP, este campo deve ficar entre os campos codFonteCTB e dtEmissao
+                    //Este campo só será informado quando o o tipo de documento for 99 – Outros.
+                    if ( (Sessao::getExercicio() >= '2015') && ($arOPS12['tipodocumentoop'] == '99') ) {
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desc_tipo_documento_op");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(50);
+                    }
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dtemissao");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");

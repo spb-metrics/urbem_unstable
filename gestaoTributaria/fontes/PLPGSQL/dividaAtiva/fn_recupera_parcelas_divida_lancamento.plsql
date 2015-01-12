@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_recupera_parcelas_divida_lancamento.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_recupera_parcelas_divida_lancamento.plsql 61284 2014-12-30 10:58:38Z evandro $
 *
 * Caso de uso: uc-05.04.02
 */
@@ -36,14 +36,14 @@ $Log:
 
 
 CREATE OR REPLACE FUNCTION divida.fn_recupera_parcelas_divida_lancamento( INTEGER )
-RETURNS SETOF RECORD AS '
+RETURNS SETOF RECORD AS $$
 
 DECLARE
     
     inCodLancamento ALIAS FOR $1;
     
     cod_parcela_unica 	integer;
-	retorno 			varchar := '''';
+	retorno 			varchar := '';
     reRecord            RECORD;
     stSql               VARCHAR;
     
@@ -70,134 +70,28 @@ WHERE
 	);
  
 /* SE O LANCAMENTO SÓ CONTER ESSA PARCELA ÚNICA, UTILIZA O VALOR DELA */
+	stSql := ' SELECT 
+                         numeracao
+                        , cod_convenio
+                        , exercicio
+                        , cod_parcela
+                        , cod_calculo
+                        , cod_lancamento
+                        , nr_parcela
+                        , cod_credito
+                        , descricao_credito
+                        , cod_natureza
+                        , cod_genero
+                        , cod_especie
+                        , valor
+                        , valor_exato
+                FROM tmp_todas_parcelas
+                WHERE cod_lancamento = '||inCodLancamento||' ';
 
-IF	cod_parcela_unica is not null THEN
-	stSql := ''
-			select
-			carne.numeracao
-            , carne.cod_convenio
-			, carne.exercicio::int
-			, ap.cod_parcela
-			, alc.cod_calculo
-			, calc.cod_credito
-			, mon.descricao_credito
-			, mon.cod_natureza
-			, mon.cod_genero
-			, mon.cod_especie
-			, (alc.valor * arrecadacao.calculaProporcaoParcela(ap.cod_parcela))::numeric(14,2) as valor
-			from arrecadacao.parcela as ap
-			INNER JOIN arrecadacao.carne
-			ON carne.cod_parcela = ap.cod_parcela
-			INNER JOIN arrecadacao.lancamento_calculo as alc
-			ON alc.cod_lancamento = ap.cod_lancamento
-			INNER JOIN arrecadacao.calculo as calc
-			ON calc.cod_calculo = alc.cod_calculo
-			INNER JOIN monetario.credito as mon
-			ON mon.cod_credito = calc.cod_credito
-                AND mon.cod_natureza = calc.cod_natureza
-                AND mon.cod_especie = calc.cod_especie
-                AND mon.cod_genero = calc.cod_genero
-                
-                LEFT JOIN ( SELECT carne.cod_parcela
-                      FROM arrecadacao.carne
-                      JOIN arrecadacao.pagamento
-                        ON pagamento.numeracao    = carne.numeracao
-                       AND pagamento.cod_convenio = carne.cod_convenio
-                ) AS apag
-                ON apag.cod_parcela = carne.cod_parcela
-            
-            LEFT JOIN   arrecadacao.carne_devolucao as carned
-            ON carned.numeracao = carne.numeracao and carned.cod_convenio = carne.cod_convenio
-			where alc.cod_lancamento = ''||inCodLancamento||''
-			and nr_parcela = 0
-            --and carned.numeracao is null
-            and case when carned.numeracao is not null then
-                        case when 1 < (select count(*) from arrecadacao.carne_devolucao acd where acd.numeracao = carne.numeracao
-                                                                                         and acd.cod_convenio = carne.cod_convenio) then
-                            false
-                        else
-                            carned.cod_motivo = 10
-                        end
-                else
-                        true
-                end
-            AND apag.cod_parcela IS NULL
-
-			order by ap.cod_parcela, alc.cod_calculo
-			'';
-ELSE 
-	stSql :=''
-		SELECT
-			max(carne.numeracao)::varchar as numeracao
-                        , carne.cod_convenio
-			, carne.exercicio::int
-			, ap.cod_parcela
-			, alc.cod_calculo
-			, calc.cod_credito
-			, mon.descricao_credito
-			, mon.cod_natureza
-			, mon.cod_genero
-			, mon.cod_especie
-			, (alc.valor * arrecadacao.calculaProporcaoParcela(ap.cod_parcela))::numeric(14,2) as valor
-                        , (alc.valor * arrecadacao.calculaProporcaoParcela(ap.cod_parcela)) as valor_exato
-		FROM
-            arrecadacao.parcela as ap
-			INNER JOIN arrecadacao.carne
-			ON carne.cod_parcela = ap.cod_parcela
-			INNER JOIN arrecadacao.lancamento_calculo as alc
-			ON alc.cod_lancamento = ap.cod_lancamento
-			INNER JOIN arrecadacao.calculo as calc
-			ON calc.cod_calculo = alc.cod_calculo
-			INNER JOIN monetario.credito as mon
-			ON mon.cod_credito = calc.cod_credito
-                AND mon.cod_natureza = calc.cod_natureza
-                AND mon.cod_especie = calc.cod_especie
-                AND mon.cod_genero = calc.cod_genero
-                        
-                        LEFT JOIN ( SELECT carne.cod_parcela
-			      FROM arrecadacao.carne
-			      JOIN arrecadacao.pagamento
-			        ON pagamento.numeracao    = carne.numeracao
-			       AND pagamento.cod_convenio = carne.cod_convenio
-                        ) AS apag
-                        ON apag.cod_parcela = carne.cod_parcela
-                        
-			LEFT JOIN 	arrecadacao.carne_devolucao as carned
-			ON carned.numeracao = carne.numeracao and carned.cod_convenio = carne.cod_convenio
-			
-		WHERE
-			--carned.numeracao is null
-            case when carned.numeracao is not null then
-                case when 1 < (select count(*) from arrecadacao.carne_devolucao acd where acd.numeracao = carne.numeracao
-                                                                                 and acd.cod_convenio = carne.cod_convenio) then
-                    false
-                else
-                    carned.cod_motivo = 10
-                end
-            else
-                true 
-            end
-			--and apag.numeracao is null
-                        AND apag.cod_parcela IS NULL
-			and ap.nr_parcela > 0
-			and	ap.cod_lancamento = ''||inCodLancamento||''
-
-
-        GROUP BY
-
-            carne.exercicio
-            , carne.cod_convenio
-            , ap.cod_parcela
-            , alc.cod_calculo
-            , alc.valor
-            , calc.cod_credito
-            , mon.descricao_credito
-            , mon.cod_natureza
-            , mon.cod_genero
-            , mon.cod_especie
-		ORDER BY
-            ap.cod_parcela, alc.cod_calculo '';
-
+IF  cod_parcela_unica is not null THEN
+    stSql := stSql || 'AND nr_parcela = 0';
+ELSE
+    stSql := stSql || 'AND nr_parcela > 0';
 END IF;
 
     FOR reRecord IN EXECUTE stSql LOOP
@@ -206,4 +100,4 @@ END IF;
 	return;
 
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

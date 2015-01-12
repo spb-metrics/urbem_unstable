@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ORGAO.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: ORGAO.csv.inc.php 61325 2015-01-06 19:40:31Z lisiane $
+  * $Date: 2015-01-06 17:40:31 -0200 (Ter, 06 Jan 2015) $
+  * $Author: lisiane $
+  * $Rev: 61325 $
   *
 */
 /**
@@ -43,11 +43,17 @@
 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoOrgao.class.php";
 $rsRecordSetORGAO10 = new RecordSet();
 $rsRecordSetORGAO11 = new RecordSet();
+$stVersao = 'Versão: '.Sessao::getVersao();
 
 $obTTCEMGConfiguracaoOrgao               = new TTCEMGConfiguracaoOrgao;
 $obTTCEMGConfiguracaoOrgao->setDado('exercicio',Sessao::getExercicio());
 $obTTCEMGConfiguracaoOrgao->setDado('entidade',$stEntidades);
-$obTTCEMGConfiguracaoOrgao->recuperaOrgao($rsRecordSetORGAO10);
+if(Sessao::getExercicio() >= 2015){
+    $obTTCEMGConfiguracaoOrgao->setDado('versao',$stVersao);
+    $obTTCEMGConfiguracaoOrgao->recuperaOrgao2015($rsRecordSetORGAO10);
+}else {
+    $obTTCEMGConfiguracaoOrgao->recuperaOrgao($rsRecordSetORGAO10);
+}
 
 $obTTCEMGConfiguracaoOrgao->setDado('exercicio',Sessao::getExercicio());
 $obTTCEMGConfiguracaoOrgao->setDado('entidade',$stEntidades);
@@ -97,6 +103,23 @@ if (count($rsRecordSetORGAO10->getElementos()) > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+        
+        if( Sessao::getExercicio() >= 2015 ) {
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_documento");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_documento");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("versao");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
+        }
  
         if (count($rsRecordSetORGAO11->getElementos()) > 0) {
             foreach ($rsRecordSetORGAO11->getElementos() as $arORGAO11) {

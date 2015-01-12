@@ -31,7 +31,7 @@
 
  * @ignore
 
- $Id: OCManterAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCManterAutorizacao.php 61266 2014-12-23 12:34:26Z arthur $
 
  * Casos de uso: uc-03.04.32
 
@@ -268,8 +268,8 @@ switch ($_REQUEST['stCtrl']) {
                                                AND  cotacao_anulada.exercicio   = cotacao_item.exercicio
                                          ) ";
 
-                $obTComprasCotacaoFornecedorItem->recuperaItensCotacaoJulgados ( $rsMapaItens, $stFiltro );
-
+                $obTComprasCotacaoFornecedorItem->recuperaItensCotacaoJulgadosCompraDireta ( $rsMapaItens, $stFiltro );
+                
                 // somar total do mapa
                 $nuTotal = 0.00;
                 while (!$rsMapaItens->eof()) {

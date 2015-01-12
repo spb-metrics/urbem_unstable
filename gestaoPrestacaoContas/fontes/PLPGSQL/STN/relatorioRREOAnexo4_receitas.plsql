@@ -35,7 +35,7 @@
 
     * Casos de uso : uc-06.01.04
 
-    $Id: relatorioRREOAnexo4_receitas.plsql 61129 2014-12-10 17:04:54Z evandro $
+    $Id: relatorioRREOAnexo4_receitas.plsql 61310 2015-01-05 16:38:45Z evandro $
 */
 
 CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo4_receitas(varchar, varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
@@ -334,58 +334,7 @@ ELSE
                 )
              AND conta_receita.exercicio = ''' || stExercicio || '''
         ) as tbl
-        
-    UNION ALL 
-    
-    SELECT
-            cast(1 as integer) as grupo,
-            cod_estrutural,
-            cast(1 as integer) as nivel,
-            ''(-) DEDUÇÕES DA RECEITA'' AS nom_conta,
-            coalesce(previsao_inicial, 0.00) as previsao_inicial,
-            coalesce(previsao_inicial, 0.00) as previsao_atualizada,
-            coalesce(no_bimestre,0.00)*-1 as no_bimestre,
-            coalesce(ate_bimestre,0.00)*-1 as ate_bimestre,
-            coalesce(ate_bimestre_anterior,0.00)*-1 as ate_bimestre_anterior
-    FROM(
-        SELECT
-            conta_receita.cod_estrutural,
-            conta_receita.descricao AS nom_conta,
-            orcamento.fn_receita_valor_previsto( ''' || stExercicio || '''
-                                    ,publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                    , ''' || stCodEntidades || '''
-            ) as previsao_inicial,
-            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicial || '''
-                                                     ,''' || dtFinal || '''
-            ) as no_bimestre,
-            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
-                                                     ,''' || dtInicioAno || '''
-                                                     ,''' || dtFinal || '''
-            ) as ate_bimestre,
---            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
---                                                     ,''' || dtInicioAnoAnterior || '''
---                                                     ,''' || dtFinalAnterior || '''
---            ) as ate_bimestre_anterior
-            orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-                                                         ,''' || dtInicioAnoAnterior || '''
-                                                         ,''' || dtFinalAnterior || '''
-                                                         ,''' || stExercicioAnterior || '''
-            ) as ate_bimestre_anterior
-        FROM
-            --contabilidade.plano_conta,
-            orcamento.conta_receita
             
-        WHERE
---                plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  
-                conta_receita.cod_estrutural   like ''9%'' 
-          
---          AND plano_conta.exercicio = conta_receita.exercicio 
-          AND publico.fn_nivel(conta_receita.cod_estrutural) = 1 
-          AND conta_receita.exercicio = ''' || stExercicio || '''
-        
-        ) as tbl
-        
         ORDER BY cod_estrutural
     )
     ';
@@ -727,25 +676,7 @@ ELSE
         WHERE   cod_estrutural ILIKE ''2.1%''
           OR    cod_estrutural ILIKE ''2.4%''
           OR    cod_estrutural ILIKE ''2.5%''
-    
-    UNION ALL
-    
-        SELECT
-            CAST(14 as integer) as grupo,
-            CAST('''' as varchar) AS cod_estrutural,
-            CAST(2 as integer) as nivel,
-            CAST(''(-) DEDUÇÕES DA RECEITA'' as varchar) AS nom_conta,
-            SUM(COALESCE(previsao_inicial, 0.00)) as previsao_inicial,
-            SUM(COALESCE(previsao_inicial, 0.00)) as previsao_atualizada,
-            SUM(COALESCE(no_bimestre,0.00)) as no_bimestre,
-            SUM(COALESCE(ate_bimestre,0.00)) as ate_bimestre,
-            SUM(COALESCE(ate_bimestre_anterior,0.00)) as ate_bimestre_anterior
-        FROM  tmp_receitas
-        
---        WHERE   cod_estrutural ILIKE ''4.9%''
---          OR    cod_estrutural ILIKE ''9.%''
-        WHERE cod_estrutural ILIKE ''9.%''
-          
+
     UNION ALL
     
         SELECT

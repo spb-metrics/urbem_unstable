@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FrameWorkMPDF.class.php 60858 2014-11-19 15:24:57Z michel $
-  * $Date: 2014-11-19 13:24:57 -0200 (Qua, 19 Nov 2014) $
-  * $Author: michel $
-  * $Rev: 60858 $
+  * $Id: FrameWorkMPDF.class.php 61319 2015-01-06 18:07:28Z evandro $
+  * $Date: 2015-01-06 16:07:28 -0200 (Ter, 06 Jan 2015) $
+  * $Author: evandro $
+  * $Rev: 61319 $
   *
 */
 
@@ -390,7 +390,10 @@ class FrameWorkMPDF
         $this->setRodapeHTML($obRodape->loadTemplate("LHRodape.php", $arRodape, false));
     }
 
-    
+    public function getDownloadNomeRelatorio() {
+        return preg_replace("/[^a-zA-Z0-9]/","", ucwords( $this->getNomeRelatorio() ) )."_".date("Y-m-d",time())."_".date("Hi",time()).".pdf";
+    }
+
     /**
     * 
     * @method gerarRelatorio
@@ -425,10 +428,14 @@ class FrameWorkMPDF
         $this->obMPDF->useSubstitutions = false; 
         $this->obMPDF->simpleTables = true;
 
-        $stNomeArquivoPDF = preg_replace("/[^a-zA-Z0-9]/","", ucwords( $this->getNomeRelatorio() ) )."_".date("Y-m-d",time())."_".date("His",time()).".pdf";
-        
-        
-        $this->obMPDF->Output( $stNomeArquivoPDF, $this->getTipoSaida());
+        //Se for do tipo salvar o arquivo = , deve salvar na pasta tmp do urbem
+        if ($this->getTipoSaida() == "F") {
+            $stCaminhoArquivo = CAM_FW_TMP.$this->getDownloadNomeRelatorio();
+        } else {
+            $stCaminhoArquivo = $this->getDownloadNomeRelatorio();
+        }
+
+        $this->obMPDF->Output( $stCaminhoArquivo , $this->getTipoSaida());
     }
 }
 

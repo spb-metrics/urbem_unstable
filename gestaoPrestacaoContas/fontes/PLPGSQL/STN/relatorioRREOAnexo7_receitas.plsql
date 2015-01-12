@@ -83,7 +83,7 @@ BEGIN
     dtInicioExercicioAnterior := '01/01/'||cast(cast(stExercicio as int)-1 as varchar);
     
     dtInicioAnterior := SUBSTRING(dtInicio,0,6) || stExercicioAnterior;
-    dtFimAnterior := SUBSTRING(dtFinal,0,6) || stExercicioAnterior;
+    dtFimAnterior := SUBSTRING(dtFim,0,6) || stExercicioAnterior;
 
     stSql := '
     CREATE TEMPORARY TABLE tmp_valor AS (

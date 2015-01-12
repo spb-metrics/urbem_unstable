@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLExportarInclusaoProgramas.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: FLExportarInclusaoProgramas.php 61317 2015-01-06 12:47:58Z lisiane $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -162,7 +162,7 @@ $arMes = array(
 );
 
 if (Sessao::getExercicio() == date('Y')) {
-    for ($i=1; $i < date('m'); $i++) {
+    for ($i=1; $i <= date('m'); $i++) {
         $arMes2[$i] = $arMes[$i];
     }
 

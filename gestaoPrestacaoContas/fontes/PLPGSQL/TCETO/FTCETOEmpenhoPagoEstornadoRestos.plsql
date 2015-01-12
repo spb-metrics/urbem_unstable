@@ -29,7 +29,7 @@
 
     * Casos de uso: uc-02.03.09 
 
-    $Id: FTCETOEmpenhoPagoEstornadoRestos.plsql 60856 2014-11-19 13:26:44Z evandro $
+    $Id: FTCETOEmpenhoPagoEstornadoRestos.plsql 61292 2014-12-30 16:03:12Z michel $
 
 */
 CREATE OR REPLACE FUNCTION tceto.empenho_pago_estornado_restos(varchar,varchar,varchar,varchar)
@@ -243,7 +243,7 @@ BEGIN
                               , e.cod_empenho as empenho
                               , e.exercicio as exercicio
                               , sw_cgm.nom_cgm as credor, 
-                        CASE WHEN (ped_d_cd.cod_estrutural is not null) THEN ped_d_cd.cod_estrutural
+                        CASE WHEN (pe.implantado = FALSE) THEN ped_d_cd.cod_estrutural
                         ELSE rpe.cod_estrutural END as cod_estrutural';
 
    if (stSituacao = '1') then
@@ -281,7 +281,9 @@ BEGIN
             stSql := stSql || '
                               , nl.exercicio AS exercicio_liquidacao
                               , nl.dt_liquidacao AS dt_liquidacao
-                              , ped_d_cd.cod_recurso as recurso_vinculado
+                              , CASE WHEN (pe.implantado = FALSE) THEN ped_d_cd.cod_recurso
+                                ELSE rpe.recurso
+                                END AS recurso_vinculado
                  
                            FROM empenho.empenho  as e
                               , empenho.pagamento_liquidacao_nota_liquidacao_paga plnlp
@@ -430,6 +432,13 @@ BEGIN
                         AND pl.cod_entidade = plnlp.cod_entidade
                         AND pl.exercicio_liquidacao = plnlp.exercicio_liquidacao
                         AND pl.cod_nota = plnlp.cod_nota
+                        
+                        --SEPARAR SÓ RESTOS
+                        AND (
+                                rpe.cod_pre_empenho IS NOT NULL
+                              OR
+                                e.exercicio < '|| quote_literal(stExercicioAtual) ||'
+                            )
                 ';
 
             stSql := stSql || ' ORDER BY ';

@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TTCEMGConfiguracaoOrgao.class.php 59719 2014-09-08 15:00:53Z franver $
+  $Id: TTCEMGConfiguracaoOrgao.class.php 61325 2015-01-06 19:40:31Z lisiane $
   $Date: $
   $Author: $
   $Rev: $
@@ -120,24 +120,27 @@ class TTCEMGConfiguracaoOrgao extends Persistente
                            ,( SELECT valor
                                 FROM administracao.configuracao_entidade
                                WHERE configuracao_entidade.cod_entidade = ent.cod_entidade
-                                 AND    configuracao_entidade.parametro = 'tcemg_codigo_tipo_balancete'
-                           ) as tipo_balancete         
+                                 AND configuracao_entidade.parametro    = 'tcemg_codigo_tipo_balancete'
+				 AND configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
+                           ) AS tipo_balancete         
                           ,( SELECT CASE WHEN LENGTH(valor) >= 11 
                                          THEN SUBSTR(valor, 1, LENGTH(valor)-11)
                                          ELSE valor
                                           END AS valor
                                 FROM administracao.configuracao_entidade
                                WHERE configuracao_entidade.cod_entidade = ent.cod_entidade
-                                 AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
-                            ) as orgao_unidade          
+                                 AND configuracao_entidade.parametro    = 'tcemg_tipo_orgao_entidade_sicom'
+				 AND configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
+                            ) AS orgao_unidade          
                            ,( SELECT CASE WHEN LENGTH(valor) >= 11 
                                           THEN SUBSTR(valor, 1, LENGTH(valor)-11)
                                           ELSE valor
                                            END AS valor
                                 FROM administracao.configuracao_entidade
                                WHERE configuracao_entidade.cod_entidade = ent.cod_entidade
-                                 AND configuracao_entidade.parametro = 'tcemg_cgm_responsavel'
-                            ) as num_cgm          
+                                 AND configuracao_entidade.parametro    = 'tcemg_cgm_responsavel'
+				 AND configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
+                            ) AS num_cgm          
                            ,(SELECT nom_cgm 
                                FROM sw_cgm 
                               WHERE numcgm = ( SELECT CASE WHEN LENGTH(valor) >= 11 
@@ -146,19 +149,24 @@ class TTCEMGConfiguracaoOrgao extends Persistente
                                                            END AS valor
                                                  FROM administracao.configuracao_entidade
                                                 WHERE configuracao_entidade.cod_entidade = ent.cod_entidade
-                                                  AND configuracao_entidade.parametro = 'tcemg_cgm_responsavel'
+                                                  AND configuracao_entidade.parametro    = 'tcemg_cgm_responsavel'
+						  AND configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
                                              )::integer
-                            ) as nom_cgm_responsavel 
-                      FROM sw_cgm AS cgm     
+                            ) AS nom_cgm_responsavel
+                      FROM sw_cgm AS cgm
+		      
                 INNER JOIN orcamento.entidade AS ent     
-                        ON cgm.numcgm = ent.numcgm  
+                        ON cgm.numcgm = ent.numcgm
+			
                  LEFT JOIN administracao.configuracao_entidade AS ce      
                         ON ent.exercicio    = ce.exercicio           
                        AND ent.cod_entidade = ce.cod_entidade        
-                       AND ce.parametro     = 'tcemg_codigo_orgao_entidade_sicom'              
+                       AND ce.parametro     = 'tcemg_codigo_orgao_entidade_sicom'
+		       
                      WHERE ent.exercicio    = '".$this->getDado('exercicio')."'                  
                        AND ce.exercicio     = '".$this->getDado('exercicio')."'                              
                        AND ce.cod_modulo    = ".$this->getDado('cod_modulo')." \n";
+		       
         return $stSql;
     }
 
@@ -189,7 +197,62 @@ class TTCEMGConfiguracaoOrgao extends Persistente
                      AND ACE.parametro = 'tcemg_tipo_orgao_entidade_sicom' ";
         return $stSql;
     }
+    
+    public function recuperaOrgao2015(&$rsRecordSet,$stFiltro = "",$stOrder = "",$boTransacao = "")
+    {
+        return $this->executaRecupera("montaRecuperaOrgao2015",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
 
+    public function montaRecuperaOrgao2015()
+    {
+        $stSql  = "SELECT 10 AS tipoRegistro,
+                          (SELECT valor::INTEGER
+                             FROM administracao.configuracao_entidade
+                            WHERE exercicio = ACE.exercicio
+                              AND parametro = 'tcemg_codigo_orgao_entidade_sicom'
+                              AND cod_entidade = ACE.cod_entidade) AS codOrgao,
+                          ACE.valor::INTEGER AS tipoOrgao,
+                          CGM_PJ.cnpj::TEXT AS cnpjOrgao,
+			  ACE.cod_entidade||''||ACE.exercicio AS chave,
+			  CGM_fornecedor_sw.tipo_documento,
+                          CGM_fornecedor_sw.numero_documento,
+			  '".$this->getDado('versao')."'::text AS versao
+                    FROM administracao.configuracao_entidade AS ACE
+              INNER JOIN orcamento.entidade AS OE
+                      ON OE.cod_entidade = ACE.cod_entidade
+                     AND OE.exercicio = ACE.exercicio
+               LEFT JOIN sw_cgm_pessoa_juridica AS CGM_PJ
+                      ON CGM_PJ.numcgm = OE.numcgm
+	      INNER JOIN ( SELECT valor 
+			        , configuracao.exercicio
+			        , CGM.tipo_documento
+			        , CGM.numero_documento
+		             FROM administracao.configuracao
+                             JOIN ( SELECT sw_cgm.numcgm
+					 , CASE WHEN sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm THEN 1
+                                                WHEN sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm THEN 2
+						ELSE 3
+                                           END AS tipo_documento
+			                 , CASE WHEN sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm THEN sw_cgm_pessoa_fisica.cpf
+                                                WHEN sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm THEN sw_cgm_pessoa_juridica.cnpj
+                                           END AS numero_documento
+                                      FROM sw_cgm
+                                 LEFT JOIN sw_cgm_pessoa_fisica
+                                        ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                                 LEFT JOIN sw_cgm_pessoa_juridica
+                                        ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+                                  ) AS CGM
+                                  ON CGM.numcgm::text = configuracao.valor
+                               WHERE configuracao.parametro= 'fornecedor_software'
+                                 AND configuracao.exercicio= '2015'
+			) AS CGM_fornecedor_sw
+		      ON CGM_fornecedor_sw.exercicio = '".$this->getDado('exercicio')."'      
+                   WHERE ACE.exercicio = '".$this->getDado('exercicio')."'
+                     AND ACE.cod_entidade IN (".$this->getDado('entidade').")
+                     AND ACE.parametro = 'tcemg_tipo_orgao_entidade_sicom' ";
+        return $stSql;
+    }
+    
     public function recuperaOrgaoResponsavel(&$rsRecordSet,$stFiltro = "",$stOrder = "",$boTransacao = "")
     {
         return $this->executaRecupera("montaRecuperaOrgaoResponsavel",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);

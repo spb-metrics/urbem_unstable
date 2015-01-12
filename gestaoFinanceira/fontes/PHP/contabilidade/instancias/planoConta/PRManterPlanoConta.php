@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Processamento de Plano de Contas
     * Data de Criação   : 04/11/2004
 
@@ -32,7 +29,7 @@
 
     * @ignore
 
-    * $Id: PRManterPlanoConta.php 60466 2014-10-23 13:30:45Z carlos.silva $
+    * $Id: PRManterPlanoConta.php 61349 2015-01-09 13:03:20Z lisiane $
 
     * Casos de uso: uc-02.02.02
 */
@@ -113,6 +110,9 @@ switch ($stAcao) {
             
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEPE($_POST['inTipoContaCorrenteTCEPE']);
+            }
+            if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+                $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_REQUEST['inTipoContaCorrenteTCEMG']);
             }
             
             if ( SistemaLegado::is_tcems($boTransacao) ) {
@@ -269,6 +269,9 @@ switch ($stAcao) {
                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                     $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['stTipoContaTCEPE']);
                 }
+                if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+                    $obRContabilidadePlanoBanco->setTipoContaTCEMG($_POST['stTipoContaTCEMG']);
+                }
             }
             
             if( !$obErro->ocorreu() ) {
@@ -315,7 +318,7 @@ switch ($stAcao) {
             exit;
         }
 
-        if ($_REQUEST['inCodSistemaContabil']) {
+        if ($_REQUEST['inCodSistemaContabil']) { 
             $obRContabilidadePlanoBanco->setCodConta( $_POST['inCodConta'] );
             $obRContabilidadePlanoBanco->setCodPlano( $_POST['inCodPlano'] );
             $obRContabilidadePlanoBanco->setNatSaldo( $stNatSaldo          );
@@ -328,7 +331,9 @@ switch ($stAcao) {
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEPE($_POST['inTipoContaCorrenteTCEPE']);
             }
-            
+            if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+                $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_POST['inTipoContaCorrenteTCEMG']);
+            }
             if ( SistemaLegado::is_tcems($boTransacao) ) {
                 $stNaturezaSaldo = '';
                 switch ($_REQUEST['stNatSaldo']) {
@@ -633,7 +638,11 @@ switch ($stAcao) {
                 $obRContabilidadePlanoBanco->setCodContaCorrente( $_POST['inContaCorrente'] );
                 
                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
-                    $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['stTipoContaTCEPE']);
+                    $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['inTipoContaCorrenteTCEMG']);
+                }###
+###
+                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+                    $obRContabilidadePlanoBanco->setTipoContaTCEMG($_POST['stTipoContaTCEMG']);
                 }
             }
 

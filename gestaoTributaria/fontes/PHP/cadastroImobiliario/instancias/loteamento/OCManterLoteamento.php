@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: OCManterLoteamento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterLoteamento.php 61291 2014-12-30 15:55:05Z evandro $
 
     * Casos de uso: uc-05.01.15
 */
@@ -138,8 +138,9 @@ function montaListaLote($arListaLotes)
         $stHTML = "&nbsp;";
     }
     $inNumCaucionado = 0;
+    $rsListaLotes->setPrimeiroElemento();
     while ( !$rsListaLotes->eof() ) {
-        if ( $rsListaLotes->getCampo( "boCaucionado" ) == "Sim" ) {
+        if ( $rsListaLotes->getCampo("boCaucionado") == "Sim" ) {            
             $inNumCaucionado++;
         }
         $rsListaLotes->proximo();

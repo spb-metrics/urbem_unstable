@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.02
 
-    $Id: OCGeraRREOAnexo2.php 61079 2014-12-04 16:57:59Z carlos.silva $
+    $Id: OCGeraRREOAnexo2.php 61299 2014-12-30 19:21:12Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -41,7 +41,12 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                      );
 
-$preview = new PreviewBirt(6,36,21);
+if (Sessao::getExercicio() >= '2015') {
+    $preview = new PreviewBirt(6,36,66);
+}else{
+    $preview = new PreviewBirt(6,36,21);
+}
+
 $preview->setTitulo('Demonstrativo da Execução das Despesas por Função/Subfunção');
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel( true );

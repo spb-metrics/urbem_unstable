@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FLManterInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLManterInscricao.php 61352 2015-01-09 18:14:18Z evandro $
 
     *Casos de uso: uc-05.04.02
 
@@ -93,19 +93,18 @@ $obIPopUpGrupoCredito->setTitulo ( "Informe o código do grupo de crédito." );
 
 $obIPopUpCredito = new IPopUpCredito;
 $obIPopUpCredito->setRotulo ( "Crédito" );
-$obIPopUpCredito->setTitle ( "Informe o código de crédito." );
-$obIPopUpCredito->setNull ( true );
+$obIPopUpCredito->setTitle  ( "Informe o código de crédito." );
+$obIPopUpCredito->setNull   ( true );
 
 $obTxtExercicio = new TextBox ;
-$obTxtExercicio->setName       ( "stExercicio"     );
-$obTxtExercicio->setId             ( "stExercicio"     );
-$obTxtExercicio->setInteiro       ( true          );
+$obTxtExercicio->setName      ( "stExercicio" );
+$obTxtExercicio->setId        ( "stExercicio" );
+$obTxtExercicio->setInteiro   ( true          );
 $obTxtExercicio->setMaxLength ( 4             );
-$obTxtExercicio->setSize           ( 4             );
-$obTxtExercicio->setRotulo      ( "Exercício"       );
-$obTxtExercicio->setTitle         ( "Exercício"       );
-$obTxtExercicio->setNull          ( true              );
-//$obTxtExercicio->setValue       ( Sessao::getExercicio());
+$obTxtExercicio->setSize      ( 4             );
+$obTxtExercicio->setRotulo    ( "Exercício"   );
+$obTxtExercicio->setTitle     ( "Exercício"   );
+$obTxtExercicio->setNull      ( true          );
 
 $obIPopUpEmpresa = new IPopUpEmpresaIntervalo;
 $obIPopUpEmpresa->obInnerEmpresaIntervalo->setTitle( "Informe o código da Inscrição Econômica." );
@@ -118,7 +117,7 @@ $obIPopUpImovel->setVerificaInscricao(false);
 $obIPopUpModalidade = new IPopUpModalidade;
 $obIPopUpModalidade->setTipoModalidade(1); //inscricao
 $obIPopUpModalidade->obInnerModalidade->setTitle ( "Informe o código para a Modalidade" );
-$obIPopUpModalidade->obInnerModalidade->setNull ( false );
+$obIPopUpModalidade->obInnerModalidade->setNull  ( false );
 
 $dtDiaHoje = date ("d/m/Y");
 
@@ -127,12 +126,12 @@ $obHdnDataHoje->setName ( "dtHoje" );
 $obHdnDataHoje->setValue( $dtDiaHoje );
 
 $obDtInscricao = new Data;
-$obDtInscricao->setName ( "dtInscricao" );
-$obDtInscricao->setId ( "dtInscricao" );
-$obDtInscricao->setTitle ( "Informe a data de inscrição em dívida ativa" );
-$obDtInscricao->setRotulo ( "Data de Inscrição" );
-$obDtInscricao->setValue ( $dtDiaHoje );
-$obDtInscricao->setNull ( false );
+$obDtInscricao->setName               ( "dtInscricao" );
+$obDtInscricao->setId                 ( "dtInscricao" );
+$obDtInscricao->setTitle              ( "Informe a data de inscrição em dívida ativa" );
+$obDtInscricao->setRotulo             ( "Data de Inscrição" );
+$obDtInscricao->setValue              ( $dtDiaHoje );
+$obDtInscricao->setNull               ( false );
 $obDtInscricao->obEvento->setOnChange ( "validaData( this.value, '".$dtDiaHoje."' )" );
 
 //DEFINICAO DOS COMPONENTES
@@ -147,24 +146,32 @@ $obHdnCtrl->setValue  ( $_REQUEST['stCtrl']  );
 //DEFINICAO DO PERIODO
 $obPeriodo = new Periodo;
 $obPeriodo->setRotulo ("Período");
-$obPeriodo->setTitle ("Informe o período a ser inscrito em dívida ativa DD/MM/AAAA.");
+$obPeriodo->setTitle  ("Informe o período a ser inscrito em dívida ativa DD/MM/AAAA.");
 
 $obTxtValorInicial = new Moeda;
-$obTxtValorInicial->setName	(	'flValorInicial'	);
-$obTxtValorInicial->setTitle ( 'Informe o intervalo de valores a ser inscrito em dívida ativa.' );
-$obTxtValorInicial->setNull	(	true	);
-$obTxtValorInicial->setRotulo     ( "Valor"     );
+$obTxtValorInicial->setName   ( 'flValorInicial' );
+$obTxtValorInicial->setTitle  ( 'Informe o intervalo de valores a ser inscrito em dívida ativa.' );
+$obTxtValorInicial->setNull   ( true );
+$obTxtValorInicial->setRotulo ( "Valor" );
 
 $obLblValor = new Label;
 $obLblValor->setValue("até");
 
 $obTxtValorFinal = new Moeda;
-$obTxtValorFinal->setName	(	'flValorFinal'	);
-$obTxtValorFinal->setTitle ( 'Informe o intervalo de valores a ser iscrito em dívida ativa.' );
+$obTxtValorFinal->setName   (	'flValorFinal'	);
+$obTxtValorFinal->setTitle  ( 'Informe o intervalo de valores a ser iscrito em dívida ativa.' );
 $obTxtValorFinal->setNull	(	true	);
-$obTxtValorFinal->setRotulo     ( "Valor"     );
+$obTxtValorFinal->setRotulo ( "Valor"     );
 
 $arValores = array ($obTxtValorInicial, $obLblValor, $obTxtValorFinal);
+
+$obBscContribuinte = new BuscaInnerIntervalo;
+$obBscContribuinte->setRotulo                   ( "Contribuinte"    );
+$obBscContribuinte->obLabelIntervalo->setValue  ( "até"          );
+$obBscContribuinte->obCampoCod->setName         ("inCGMInicial"  );
+$obBscContribuinte->setFuncaoBusca( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCGMInicial','stNaoExiste','','".Sessao::getId()."','800','450');" ));
+$obBscContribuinte->obCampoCod2->setName        ("inCGMFinal"  );
+$obBscContribuinte->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCGMFinal','stNaoExiste','','".Sessao::getId()."','800','450');" ));
 
 //DEFINICAO DO FORM
 $obForm = new Form;
@@ -173,34 +180,25 @@ $obForm->setTarget ( "telaPrincipal" );
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addForm       ( $obForm );
-$obFormulario->setAjuda      ( "UC-05.04.02" );
-$obFormulario->addHidden     ( $obHdnAcao );
-$obFormulario->addHidden     ( $obHdnCtrl );
-$obFormulario->addHidden	 ( $obHdnDataHoje );
+$obFormulario->addForm   ( $obForm );
+$obFormulario->setAjuda  ( "UC-05.04.02" );
+$obFormulario->addHidden ( $obHdnAcao );
+$obFormulario->addHidden ( $obHdnCtrl );
+$obFormulario->addHidden ( $obHdnDataHoje );
 $obFormulario->addTitulo ("Dados para Filtro");
 
-$obIPopUpGrupoCredito->geraFormulario ( $obFormulario, true, true );
-$obIPopUpCredito->geraFormulario ( $obFormulario );
-$obFormulario->addComponente( $obTxtExercicio          );
+$obIPopUpGrupoCredito->geraFormulario( $obFormulario, true, true );
+$obIPopUpCredito->geraFormulario     ( $obFormulario             );
+$obFormulario->addComponente         ( $obTxtExercicio           );
+$obFormulario->addComponente         ( $obBscContribuinte        );
+$obIPopUpEmpresa->geraFormulario     ( $obFormulario             );
+$obIPopUpImovel->geraFormulario      ( $obFormulario             );
+$obFormulario->addComponente         ( $obPeriodo                );
+$obFormulario->agrupaComponentes     ( $arValores                );
+$obFormulario->addTitulo             ( "Dados para Inscrição"    );
+$obIPopUpModalidade->geraFormulario  ( $obFormulario             );
+$obFormulario->addComponente         ( $obDtInscricao            );
 
-$obPopUpCGM = new IPopUpCGM( $obForm );
-$obPopUpCGM->setNull ( true );
-$obPopUpCGM->setRotulo ( "CGM" );
-$obPopUpCGM->setTitle ( "Informe o número do CGM." );
-$obFormulario->addComponente( $obPopUpCGM				);
-
-$obIPopUpEmpresa->geraFormulario ( $obFormulario );
-$obIPopUpImovel->geraFormulario ( $obFormulario );
-$obFormulario->addComponente ( $obPeriodo );
-$obFormulario->agrupaComponentes ( $arValores );
-
-$obFormulario->addTitulo ("Dados para Inscrição");
-$obIPopUpModalidade->geraFormulario ( $obFormulario );
-
-$obFormulario->addComponente ( $obDtInscricao );
-
-//$obFormulario->addComponente ( $obCBoxEmitir );
 $obBtnOK = new Ok;
 $obBtnOK->obEvento->setOnClick( "submeteFiltro()" );
 
@@ -208,3 +206,6 @@ $onBtnLimpar = new Limpar;
 
 $obFormulario->defineBarra( array( $obBtnOK , $onBtnLimpar ) );
 $obFormulario->show();
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+?>

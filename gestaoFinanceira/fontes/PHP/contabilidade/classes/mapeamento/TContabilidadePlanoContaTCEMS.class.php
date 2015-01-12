@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Classe de mapeamento da tabela CONTABILIDADE.PLANO_CONTA para o tribunal do estado do mato grosso do sul
     * Data de Criação: 01/11/2004
 
@@ -64,6 +61,7 @@ function TContabilidadePlanoContaTCEMS()
     $this->AddCampo('indicador_superavit','char',false,'12',false,false);
     $this->AddCampo('funcao','text',false,'',false,false);
     $this->AddCampo('atributo_tcepe','integer',false,'',false,false);
+    $this->AddCampo('atributo_tcemg','integer',false,'',false,false);
 
 }
 

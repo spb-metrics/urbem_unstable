@@ -142,14 +142,16 @@ class TTCEMGAMP extends Persistente
                           , acao.cod_acao
                           , acao.num_acao AS id_acao
                           , '' AS id_sub_acao
-                          , REPLACE(SUM(total_metas.ano1)::VARCHAR, '.',',') AS metas_ano_1
-                          , REPLACE(SUM(total_metas.ano2)::VARCHAR, '.',',') AS metas_ano_2
-                          , REPLACE(SUM(total_metas.ano3)::VARCHAR, '.',',') AS metas_ano_3
-                          , REPLACE(SUM(total_metas.ano4)::VARCHAR, '.',',') AS metas_ano_4
-                          , REPLACE(SUM(total_recursos.ano1)::VARCHAR, '.',',') AS recursos_ano_1
-                          , REPLACE(SUM(total_recursos.ano2)::VARCHAR, '.',',') AS recursos_ano_2
-                          , REPLACE(SUM(total_recursos.ano3)::VARCHAR, '.',',') AS recursos_ano_3
-                          , REPLACE(SUM(total_recursos.ano4)::VARCHAR, '.',',') AS recursos_ano_4
+                          
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'1',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_1
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'2',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_2
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'3',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_3
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'4',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_4
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'1',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_1
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'2',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_2
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'3',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_3
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'4',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_4
+                          
                        FROM ppa.acao
                        JOIN ppa.acao_dados
                          ON acao_dados.cod_acao             = acao.cod_acao
@@ -159,61 +161,7 @@ class TTCEMGAMP extends Persistente
                         AND acao_unidade_executora.timestamp_acao_dados = acao.ultimo_timestamp_acao_dados
                        JOIN ppa.programa
                          ON programa.cod_programa = acao.cod_programa
-                       JOIN (
-                             SELECT ano1.cod_acao
-                                  , ano1.timestamp_acao_dados
-                                  , ano1.exercicio_recurso
-                                  , COALESCE(ano1.valor, 0.00) AS ano1
-                                  , COALESCE(ano2.valor, 0.00) AS ano2
-                                  , COALESCE(ano3.valor, 0.00) AS ano3
-                                  , COALESCE(ano4.valor, 0.00) AS ano4
-                               FROM ppa.acao_recurso AS ano1
-                         INNER JOIN orcamento.recurso('".Sessao::getExercicio()."') AS recurso
-                                 ON ano1.cod_recurso   = recurso.cod_recurso
-                          LEFT JOIN ppa.acao_recurso AS ano2
-                                 ON ano2.ano = '2'
-                                AND ano1.cod_acao             = ano2.cod_acao
-                                AND ano1.timestamp_acao_dados = ano2.timestamp_acao_dados
-                                AND ano1.cod_recurso          = ano2.cod_recurso
-                          LEFT JOIN ppa.acao_recurso AS ano3
-                                 ON ano3.ano = '3'
-                                AND ano1.cod_acao             = ano3.cod_acao
-                                AND ano1.timestamp_acao_dados = ano3.timestamp_acao_dados
-                                AND ano1.cod_recurso          = ano3.cod_recurso
-                          LEFT JOIN ppa.acao_recurso AS ano4
-                                 ON ano4.ano = '4'
-                                AND ano1.cod_acao             = ano4.cod_acao
-                                AND ano1.timestamp_acao_dados = ano4.timestamp_acao_dados
-                                AND ano1.cod_recurso          = ano4.cod_recurso
-                              WHERE ano1.ano = '1'
-                          ) AS total_recursos
-                         ON total_recursos.cod_acao = acao.cod_acao
-                       JOIN (
-                             SELECT ano1.cod_acao
-                                  , ano1.timestamp_acao_dados
-                                  , COALESCE(ano1.valor, 0.00) AS ano1
-                                  , COALESCE(ano2.valor, 0.00) AS ano2
-                                  , COALESCE(ano3.valor, 0.00) AS ano3
-                                  , COALESCE(ano4.valor, 0.00) AS ano4
-                               FROM ppa.acao_quantidade as ano1
-                               LEFT JOIN ppa.acao_quantidade as ano2
-                                      ON ano2.ano = '2'
-                                     AND ano1.cod_acao             = ano2.cod_acao
-                                     AND ano1.timestamp_acao_dados = ano2.timestamp_acao_dados
-                                     AND ano1.cod_recurso          = ano2.cod_recurso
-                               LEFT JOIN ppa.acao_quantidade as ano3
-                                      ON ano3.ano = '3'
-                                     AND ano1.cod_acao             = ano3.cod_acao
-                                     AND ano1.timestamp_acao_dados = ano3.timestamp_acao_dados
-                                     AND ano1.cod_recurso          = ano3.cod_recurso
-                               LEFT JOIN ppa.acao_quantidade as ano4
-                                      ON ano4.ano = '4'
-                                     AND ano1.cod_acao             = ano4.cod_acao
-                                     AND ano1.timestamp_acao_dados = ano4.timestamp_acao_dados
-                                     AND ano1.cod_recurso          = ano4.cod_recurso
-                                   WHERE ano1.ano = '1'
-                           ) AS total_metas
-                          ON total_metas.cod_acao = acao.cod_acao
+                       
                     GROUP BY acao.num_acao
                            , acao.cod_acao
                            , programa.num_programa

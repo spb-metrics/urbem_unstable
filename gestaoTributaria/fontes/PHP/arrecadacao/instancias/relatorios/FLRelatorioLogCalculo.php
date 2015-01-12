@@ -76,7 +76,7 @@ if (isset($stCtrl)) {
 }
 
 $obBtnOK = new OK;
-$obBtnOK->obEvento->setOnClick( "submeteFiltro()" );
+$obBtnOK->obEvento->setOnClick( "BloqueiaFrames(true,false); submeteFiltro();" );
 
 $onBtnLimpar = new Limpar;
 

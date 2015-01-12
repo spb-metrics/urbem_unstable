@@ -138,7 +138,7 @@ switch ($_REQUEST['cmbBimestre']) {
         $stDtFinal = '31/10/' . Sessao::getExercicio();
     break;
     case '6':
-        $stDtInicio = '01/10/' . Sessao::getExercicio();
+        $stDtInicio = '01/11/' . Sessao::getExercicio();
         $stDtFinal = '31/12/' . Sessao::getExercicio();
     break;
 }

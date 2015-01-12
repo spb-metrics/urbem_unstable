@@ -58,6 +58,11 @@ if (Sessao::getExercicio() < '2013') {
     $preview->setTitulo('Dem Disponibilidades de Caixa');
     $preview->setVersaoBirt( '2.5.0' );
     $preview->setExportaExcel( true );
+} elseif(Sessao::getExercicio() > '2014') { 
+    $preview = new PreviewBirt(6,36,68);
+    $preview->setTitulo('Demonstrativo da Disponibilidade de Caixa e dos Restos a Pagar');
+    $preview->setVersaoBirt( '2.5.0' );
+    $preview->setExportaExcel( true );
 } else {
     $preview = new PreviewBirt(6,36,52);
     $preview->setTitulo('Dem Disponibilidades de Caixa');

@@ -32,7 +32,7 @@
 
   Casos de uso: uc-01.05.02
 
-  $Id: ROrganogramaOrganograma.class.php 59997 2014-09-24 19:54:15Z evandro $
+  $Id: ROrganogramaOrganograma.class.php 61288 2014-12-30 12:29:30Z evandro $
 
 */
 
@@ -567,9 +567,11 @@ function consultar($boTransacao = "")
 function salvarNiveis($boTransacao = "")
 {
     $boFlagTransacao = false;
-    $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+    $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );    
     if ( !$obErro->ocorreu() ) {
-        $obErro = $this->excluirNiveis( $boTransacao );
+        //Se nao for Acao de Alteracao
+        if (!$this->getCodOrganograma())
+            $obErro = $this->excluirNiveis( $boTransacao );        
         if ( !$obErro->ocorreu() ) {
             $arNiveis = $this->getNivel();
             foreach ($arNiveis as $obNivel) {

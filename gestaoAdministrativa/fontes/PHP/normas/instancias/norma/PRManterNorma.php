@@ -65,7 +65,7 @@ $obAtributos->recuperaVetor( $arChave );
 
 switch ($stAcao) {
     case "incluir":
-
+        
         foreach ($arChave as $key=>$value) {
             $arChaves = preg_split( "/[^a-zA-Z0-9]/", $key );
             $inCodAtributo = $arChaves[0];
@@ -76,7 +76,7 @@ switch ($stAcao) {
             $obRNorma->obRTipoNorma->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
         }
     
-        $obRNorma->setNumNorma       ( $_POST['inNumNorma']       ); // Ver onde ele está sendo salva
+        $obRNorma->setNumNorma       ( $_POST['inNumNorma']       );
         $obRNorma->setExercicio      ( $_POST['stExercicio']      );
         $obRNorma->setDataPublicacao ( $_POST['stDataPublicacao'] );
         $obRNorma->setDataAssinatura ( $_POST['stDataAssinatura'] );
@@ -93,7 +93,7 @@ switch ($stAcao) {
                
         if (!$obErro->ocorreu()) {
            
-            switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
+            switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao)) {
                 case 02: //TCEAL
                     
                     if( !empty($_POST['stTipoLeiAlteracao']) ){
@@ -102,13 +102,13 @@ switch ($stAcao) {
                             $obErro->setDescricao('Necessário informar a Lei Alterada!');
                         }
                         
-                        if ( !$obErro->ocorreu() ){
+                        if ( !$obErro->ocorreu() ) {
                             $obNorma = new TNorma;
                             $obNorma->setDado('cod_norma' ,  $_POST['hdnCodNorma']);
-                            $obErro = $obNorma->recuperaPorChave($rsNormaAlterada);
+                            $obErro = $obNorma->recuperaPorChave($rsNormaAlterada, $boTransacao);
                             $stDescricao = $rsNormaAlterada->getCampo('descricao');
                             
-                            if ( !$obErro->ocorreu() ){
+                            if ( !$obErro->ocorreu() ) {
                                 $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
                                 $obRNorma->setCodNormaAlteracao( $_POST['hdnCodNorma'] );
                                 $obRNorma->setDescricaoNormaAlteracao( empty($stDescricao) ? $_REQUEST['stDescricao'] : $rsNormaAlterada->getCampo('descricao') );
@@ -130,14 +130,22 @@ switch ($stAcao) {
                         if (!$obErro->ocorreu()) {
                             $obNorma = new TNorma;
                             $obNorma->setDado('cod_norma', $_POST['hdnCodNorma']);
-                            $obErro = $obNorma->recuperaPorChave($rsNormaAlterada);
+                            $obErro = $obNorma->recuperaPorChave($rsNormaAlterada, $boTransacao);
                             
                             if ( !$obErro->ocorreu() ){
-                                $obRNorma->setCodNorma($_POST['hdnCodNorma']);
                                 $obRNorma->setCodNormaAlteracao( $_POST['hdnCodNorma'] );
                                 $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
                                 $obRNorma->setPercentualCreditoAdicional( $_POST['numPercentualCreditoAdicional'] );
                             }
+                        }
+                    }
+                break;
+                
+                case 11: //TCEMG
+                    if ( !empty($_REQUEST['stTipoLeiOrigemDecreto']) ){
+                        $obRNorma->setTipoLeiOrigemDecreto ($_REQUEST['stTipoLeiOrigemDecreto']);
+                        if($_REQUEST['stTipoLeiOrigemDecreto']==3 and !(empty($_REQUEST['stTipoLeiAlteracaoOrcamentaria']))){
+                            $obRNorma->setTipoLeiAlteracaoOrcamentaria ($_REQUEST['stTipoLeiAlteracaoOrcamentaria']);
                         }
                     }
                 break;
@@ -146,7 +154,7 @@ switch ($stAcao) {
         
         if ( !$obErro->ocorreu() ){
             $obTransacao = new Transacao;
-            $obErro = $obRNorma->salvar($obTransacao);
+            $obErro = $obRNorma->salvar($boTransacao);
         }
         
         if ( !$obErro->ocorreu() )
@@ -194,7 +202,7 @@ switch ($stAcao) {
         if (!$obErro->ocorreu()) {
             switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
                 case 02: //TCEAL
-
+                
                     if( $_POST['stTipoLeiAlteracao'] ){
                         if( empty( $_POST['stCodNorma'] ) ){
                             $obErro->setDescricao('Necessário informar a Lei Alterada!');
@@ -216,6 +224,7 @@ switch ($stAcao) {
                                 }else{
                                     $obErro->setDescricao("Número de Lei Alterada inválida!");
                                 }
+                                
                             }else{
                                 $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
                                 $obRNorma->setCodNormaAlteracao(  $inCodNormaAlteracao );
@@ -228,6 +237,7 @@ switch ($stAcao) {
                         $obNormaDetalheAl->exclusao();
                     }
                 break;
+            
                 case 27: //TCETO
                     if(!empty($_POST['stTipoLeiAlteracao'])){
                         
@@ -254,6 +264,7 @@ switch ($stAcao) {
                                 }else{
                                     $obErro->setDescricao("Número de Lei Alterada inválida!");
                                 }
+                                
                             }else{
                                 $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
                                 $obRNorma->setCodNormaAlteracao(  $inCodNormaAlteracao );
@@ -263,8 +274,17 @@ switch ($stAcao) {
                     } else {
                         include_once ( CAM_GPC_TCETO_MAPEAMENTO."TTCETONormaDetalhe.class.php");
                         $obTTCETONormaDetalhe = new TTCETONormaDetalhe;
-                        $obTTCETONormaDetalhe->setDado( 'cod_norma', $_POST['inNumNorma'] );
+                        $obTTCETONormaDetalhe->setDado( 'cod_norma', Sessao::read('inCodNorma') );
                         $obTTCETONormaDetalhe->exclusao();
+                    }
+                break;
+            
+              case 11: //TCEMG
+                    if ( !empty($_REQUEST['stTipoLeiOrigemDecreto']) ){
+                        $obRNorma->setTipoLeiOrigemDecreto ($_REQUEST['stTipoLeiOrigemDecreto'] );
+                        if( $_REQUEST['stTipoLeiOrigemDecreto']==3 and !(empty($_REQUEST['stTipoLeiAlteracaoOrcamentaria']))){
+                            $obRNorma->setTipoLeiAlteracaoOrcamentaria ($_REQUEST['stTipoLeiAlteracaoOrcamentaria']);
+                        }
                     }
                 break;
             }
@@ -272,7 +292,7 @@ switch ($stAcao) {
         
         if (!$obErro->ocorreu()){
             $obTransacao = new Transacao;
-            $obErro = $obRNorma->salvar($obTransacao);
+            $obErro = $obRNorma->salvar($boTransacao);
         }
         
         if (!$obErro->ocorreu()) {

@@ -145,6 +145,18 @@ function geraRecordSet(&$rsRecordSet , &$rsRecordSet2, $stOrder = "")
                 $arResumoCapital[$inCountResumoCapital]["valor"]      = $inValor;
                 $inSomaCapital = $inSomaCapital + $rsRecordSet->getCampo('valor');
                 $inCountResumoCapital++;
+            } elseif (($stGrupo == 7) && (trim($rsRecordSet->getCampo("nivel") == 2))) {
+                $arResumoCorrente[$inCountResumoCorrente]["indentacao"] = 1;
+                $arResumoCorrente[$inCountResumoCorrente]["descricao"]  = $rsRecordSet->getCampo("descricao");
+                $arResumoCorrente[$inCountResumoCorrente]["valor"]      = $inValor;
+                $inSomaCorrentes = $inSomaCorrentes + $rsRecordSet->getCampo('valor');
+                $inCountResumoCorrente++;
+            } elseif (($stGrupo == 8) && (trim($rsRecordSet->getCampo("nivel") == 2))) {
+                $arResumoCorrente[$inCountResumoCorrente]["indentacao"] = 1;
+                $arResumoCorrente[$inCountResumoCorrente]["descricao"]  = $rsRecordSet->getCampo("descricao");
+                $arResumoCorrente[$inCountResumoCorrente]["valor"]      = $inValor;
+                $inSomaCorrentes = $inSomaCorrentes + $rsRecordSet->getCampo('valor');
+                $inCountResumoCorrente++;
             }
 
             $arOrcamento[$inCount]['valor_d']       = '';

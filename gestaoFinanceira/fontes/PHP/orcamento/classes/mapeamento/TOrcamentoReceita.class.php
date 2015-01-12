@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 61151 2014-12-11 16:59:38Z michel $
+    $Id: TOrcamentoReceita.class.php 61338 2015-01-08 16:56:57Z evandro $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -1300,6 +1300,310 @@ function montaRecuperaReceitaExportacao11()
              , receita.cod_recurso
              , conta_receita.cod_estrutural
              , detalhamento_receitas.arrecadado_periodo
+         ORDER BY tipo_registro, cod_receita, cod_font_recursos
+    ";
+
+    return $stSql;
+}
+
+function recuperaReceitaExportacaoPlanejamento10(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaReceitaExportacaoPlanejamento10();
+    $this->setDebug( $stSql);    
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaReceitaExportacaoPlanejamento10()
+{
+    $stSql = "
+        SELECT tipo_registro
+             , cod_receita_final AS cod_receita
+             , cod_orgao
+             , deducao_receita
+             , identificador_deducao
+             , CASE WHEN SUBSTR(natureza_receita::text, 1, 1) = '9'
+                    THEN SUBSTR(natureza_receita::text, 2, 8)::integer
+                    ELSE natureza_receita
+                END AS natureza_receita
+             , remove_acentos(especificacao) as especificacao
+             , CASE WHEN SUBSTR(cod_receita_final::VARCHAR, 1, 1) = '9'
+                    THEN REPLACE(REPLACE(sum(tabela.vl_previsto)::VARCHAR,'.',','),'-','')
+                    ELSE REPLACE(sum(tabela.vl_previsto)::VARCHAR,'.',',')
+                END AS vl_previsto
+          FROM (
+               SELECT 10::integer AS tipo_registro
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                     THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                                 END
+                       END AS cod_receita_final
+                    , configuracao_entidade.valor AS cod_orgao
+                    , rec.masc_recurso_red AS recurso
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN 1
+                           ELSE 2
+                       END AS deducao_receita
+                    , valores_identificadores.cod_identificador::integer AS identificador_deducao
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                     THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                                 END
+                       END AS natureza_receita
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN (SELECT TRIM(o_cr.descricao)
+                                   FROM orcamento.conta_receita AS o_cr
+                                  WHERE o_cr.exercicio ='".Sessao::getExercicio()."'
+                                    AND RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9),15,'0') = REPLACE(o_cr.cod_estrutural,'.',''))
+                           ELSE (SELECT TRIM(descricao)
+                                   FROM orcamento.conta_receita AS o_cr
+                                  WHERE o_cr.exercicio ='".Sessao::getExercicio()."'
+                                    AND RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8),14,'0') = REPLACE(o_cr.cod_estrutural,'.',''))
+                       END AS especificacao
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN detalhamento_receitas.valor_previsto
+                           ELSE ABS(detalhamento_receitas.valor_previsto)
+                       END AS vl_previsto
+                 FROM orcamento.receita
+
+            LEFT JOIN orcamento.recurso('".Sessao::getExercicio()."') as rec 
+                   ON rec.cod_recurso = receita.cod_recurso
+                  AND rec.exercicio   = receita.exercicio                 
+                 
+                 JOIN orcamento.conta_receita
+                   ON conta_receita.cod_conta = receita.cod_conta
+                  AND conta_receita.exercicio = receita.exercicio
+
+                 JOIN administracao.configuracao_entidade
+                   ON configuracao_entidade.cod_entidade = receita.cod_entidade
+                  AND configuracao_entidade.exercicio = receita.exercicio
+                  
+                JOIN tcemg.fn_detalhamento_receitas('".Sessao::getExercicio()."','','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."','".$this->getDado('entidades')."','','','','','','','') 
+                  AS detalhamento_receitas (                      
+                    cod_estrutural      varchar,                                           
+                    receita             integer,                                           
+                    recurso             varchar,                                           
+                    descricao           varchar,                                           
+                    valor_previsto      numeric,                                           
+                    arrecadado_periodo  numeric,                                           
+                    arrecadado_ano      numeric,                                           
+                    diferenca           numeric                                           
+                ) ON detalhamento_receitas.cod_estrutural = conta_receita.cod_estrutural
+                 AND SUBSTR(detalhamento_receitas.cod_estrutural, 1, 1) != '9'
+
+            LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
+                   ON receita_indentificadores_peculiar_receita.exercicio = receita.exercicio
+                  AND receita_indentificadores_peculiar_receita.cod_receita = receita.cod_receita
+
+            LEFT JOIN tcemg.valores_identificadores
+                   ON valores_identificadores.cod_identificador = receita_indentificadores_peculiar_receita.cod_identificador
+
+                 WHERE receita.exercicio = '".Sessao::getExercicio()."'
+                   AND receita.cod_entidade IN (".$this->getDado('entidades').")
+                   AND configuracao_entidade.cod_modulo = 55
+                   AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+                   AND receita.vl_original <> 0.00
+             GROUP BY  cod_receita_final
+                     , conta_receita.cod_estrutural
+                     , conta_receita.descricao
+                     , cod_orgao
+                     , identificador_deducao
+                     , detalhamento_receitas.valor_previsto
+                     , rec.masc_recurso_red
+             UNION
+
+               SELECT
+                    10::integer AS tipo_registro
+                    , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer AS cod_receita_final
+                    , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
+                    , rec.masc_recurso_red AS recurso
+                    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                           THEN 1
+                           ELSE 2
+                    END AS deducao_receita
+                    , valores_identificadores.cod_identificador AS indentificador_deducao
+                    , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer AS natureza_receita
+                    , TRIM(conta_receita.descricao) AS especificacao
+                    , SUM(arrecadacao_receita_dedutora.vl_deducao) AS vl_previsto
+    
+                 FROM orcamento.receita
+                 
+            LEFT JOIN orcamento.recurso('".Sessao::getExercicio()."') as rec 
+                   ON rec.cod_recurso = receita.cod_recurso
+                  AND rec.exercicio   = receita.exercicio
+    
+                 JOIN tesouraria.arrecadacao_receita_dedutora
+                   ON arrecadacao_receita_dedutora.cod_receita_dedutora=receita.cod_receita
+                  AND arrecadacao_receita_dedutora.exercicio=receita.exercicio
+                  AND arrecadacao_receita_dedutora.timestamp_arrecadacao::date BETWEEN TO_DATE( '".$this->getDado('dt_inicial')."', 'dd/mm/yyyy' ) AND TO_DATE( '".$this->getDado('dt_final')."', 'dd/mm/yyyy' )
+    
+                 JOIN administracao.configuracao_entidade
+                   ON configuracao_entidade.cod_entidade = receita.cod_entidade
+                  AND configuracao_entidade.exercicio = receita.exercicio
+    
+                 JOIN orcamento.conta_receita
+                   ON conta_receita.cod_conta = receita.cod_conta
+                  AND conta_receita.exercicio = receita.exercicio        
+    
+            LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
+                   ON receita_indentificadores_peculiar_receita.exercicio = receita.exercicio
+                  AND receita_indentificadores_peculiar_receita.cod_receita = receita.cod_receita
+    
+            LEFT JOIN tcemg.valores_identificadores
+                   ON valores_identificadores.cod_identificador = receita_indentificadores_peculiar_receita.cod_identificador
+    
+                 WHERE receita.exercicio = '".Sessao::getExercicio()."'
+                   AND receita.cod_entidade IN (".$this->getDado('entidades').")
+                   AND configuracao_entidade.cod_modulo = 55
+                   AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
+
+             GROUP BY receita.cod_receita
+                     , receita.exercicio
+                     , cod_orgao
+                     , conta_receita.cod_estrutural
+                     , conta_receita.descricao
+                     , indentificador_deducao
+                     , natureza_receita
+                     , especificacao
+                     , rec.masc_recurso_red
+               ) AS tabela
+             WHERE tabela.vl_previsto<>0.00
+              GROUP BY tipo_registro, cod_orgao, deducao_receita, identificador_deducao, natureza_receita, cod_receita, especificacao
+              ORDER BY tabela.natureza_receita
+    ";
+
+    return $stSql;
+}
+
+function recuperaReceitaExportacaoPlanejamento11(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaReceitaExportacaoPlanejamento11();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaReceitaExportacaoPlanejamento11()
+{
+    $stSql = "
+        SELECT 11 AS tipo_registro
+             , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+                    THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                     THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                                 END
+                END AS cod_receita
+             , receita.cod_recurso::integer AS cod_font_recursos
+             , REPLACE(REPLACE(detalhamento_receitas.valor_previsto::VARCHAR,'.',','),'-','') AS vl_arrecadado_fonte
+          FROM orcamento.receita
+          JOIN orcamento.conta_receita
+            ON conta_receita.cod_conta = receita.cod_conta
+           AND conta_receita.exercicio = receita.exercicio
+           
+          JOIN (SELECT cod_estrutural
+                     , receita
+                     , recurso
+                     , descricao
+                     , sum(detalhamento.valor_previsto) as valor_previsto
+                    
+                 FROM
+                    (
+                          SELECT * FROM tcemg.fn_detalhamento_receitas('".Sessao::getExercicio()."','','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."','".$this->getDado('entidades')."','','','','','','','')
+                              AS detalhamento_receitas
+                               (                      
+                                 cod_estrutural      varchar,                                           
+                                 receita             integer,                                           
+                                 recurso             varchar,                                           
+                                 descricao           varchar,                                           
+                                 valor_previsto      numeric,                                           
+                                 arrecadado_periodo  numeric,                                           
+                                 arrecadado_ano      numeric,                                           
+                                 diferenca           numeric                                           
+                               )
+                           WHERE SUBSTR(cod_estrutural, 1, 1) != '9'
+        
+                           UNION 
+                        
+                          SELECT conta_receita.cod_estrutural::varchar AS cod_estrutural
+                               , receita.cod_receita AS receita
+                               , rec.masc_recurso_red AS recurso
+                               , TRIM(conta_receita.descricao)::varchar AS descricao
+                               , 0.00::numeric AS valor_previsto
+                               , SUM(arrecadacao_receita_dedutora.vl_deducao)::numeric AS valor_previsto
+                               , 0.00::numeric AS arrecadado_ano
+                               , 0.00::numeric AS diferenca
+
+                            FROM orcamento.receita
+        
+                       LEFT JOIN orcamento.recurso('".Sessao::getExercicio()."') as rec 
+                              ON rec.cod_recurso = receita.cod_recurso
+                             AND rec.exercicio   = receita.exercicio
+                        
+                            JOIN tesouraria.arrecadacao_receita_dedutora
+                              ON arrecadacao_receita_dedutora.cod_receita_dedutora=receita.cod_receita
+                             AND arrecadacao_receita_dedutora.exercicio=receita.exercicio
+                             AND arrecadacao_receita_dedutora.timestamp_arrecadacao::date BETWEEN TO_DATE( '".$this->getDado('dt_inicial')."', 'dd/mm/yyyy' ) AND TO_DATE( '".$this->getDado('dt_final')."', 'dd/mm/yyyy' )
+            
+                            JOIN administracao.configuracao_entidade
+                              ON configuracao_entidade.cod_entidade = receita.cod_entidade
+                             AND configuracao_entidade.exercicio = receita.exercicio
+            
+                            JOIN orcamento.conta_receita
+                              ON conta_receita.cod_conta = receita.cod_conta
+                             AND conta_receita.exercicio = receita.exercicio
+              
+            
+                       LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
+                              ON receita_indentificadores_peculiar_receita.exercicio = receita.exercicio
+                             AND receita_indentificadores_peculiar_receita.cod_receita = receita.cod_receita
+            
+                       LEFT JOIN tcemg.valores_identificadores
+                              ON valores_identificadores.cod_identificador = receita_indentificadores_peculiar_receita.cod_identificador
+            
+                           WHERE receita.exercicio = '".Sessao::getExercicio()."'
+                             AND receita.cod_entidade IN (".$this->getDado('entidades').")
+                             AND configuracao_entidade.cod_modulo = 55
+                             AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
+        
+                        GROUP BY receita.cod_receita
+                               , receita.exercicio
+                               , cod_estrutural
+                               , conta_receita.descricao
+                               , rec.masc_recurso_red
+                    )
+                   AS detalhamento 
+             GROUP BY cod_estrutural
+                    , receita
+                    , recurso
+                    , descricao
+               )
+            AS detalhamento_receitas
+            ON detalhamento_receitas.cod_estrutural = conta_receita.cod_estrutural
+               
+         WHERE receita.exercicio = '".Sessao::getExercicio()."'
+           AND receita.cod_entidade IN (".$this->getDado('entidades').")
+           AND receita.vl_original <> 0.00
+           AND detalhamento_receitas.valor_previsto<>0.00
+         GROUP BY receita.cod_receita
+             , receita.cod_recurso
+             , conta_receita.cod_estrutural
+             , detalhamento_receitas.valor_previsto
          ORDER BY tipo_registro, cod_receita, cod_font_recursos
     ";
 

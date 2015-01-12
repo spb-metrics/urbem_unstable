@@ -65,7 +65,7 @@ BEGIN
 
     dtIniExercicio := '01/01/'||stExercicio;
     dtInicialExercicioAnterior := '01/01/' || stExercicioAnterior;
-    dtFinalExercicioAnterior :=  SUBSTRING(dtFinal,0,6) || stExercicioAnterior;
+    dtFinalExercicioAnterior :=  SUBSTRING(dtFinal,0,6) || '/'||stExercicioAnterior;
 
     -- TABELAS TEMPORARIAS
     
@@ -199,7 +199,7 @@ BEGIN
             de.cod_conta, 
             de.exercicio 
     ';
-    
+ 
     EXECUTE stSql;
     
     --- FIM DAS TEMPORARIAS
@@ -255,8 +255,8 @@ BEGIN
             ocd.exercicio = '|| quote_literal(stExercicio) ||'
             
             -- Exceto intra
-        AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
-            AND substring(tmp.cod_estrutural, 5, 3) <> ''9.1''
+            AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
+        --    AND substring(tmp.cod_estrutural, 5, 3) <> ''9.1''
             
         GROUP BY
             ocd.descricao,
@@ -299,7 +299,6 @@ BEGIN
             -- Exceto intra
                 ocd.exercicio = '|| quote_literal(stExercicio) ||'
             AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
-            AND substring(tmp.cod_estrutural, 5, 3) <> ''9.1'' 
             
         GROUP BY
             ocd.descricao,
@@ -720,7 +719,7 @@ BEGIN
 
     ) 
     ';
-    
+  
     EXECUTE stSql;
 
     -- Calcular totais do nivel pai

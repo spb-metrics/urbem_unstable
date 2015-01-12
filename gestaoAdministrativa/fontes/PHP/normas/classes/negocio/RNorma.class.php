@@ -34,7 +34,7 @@ $Revision: 27553 $
 $Name$
 $Author: melo $
 $Date: 2008-01-15 17:12:04 -0200 (Ter, 15 Jan 2008) $
-$Id: RNorma.class.php 61162 2014-12-12 11:38:09Z lisiane $
+$Id: RNorma.class.php 61340 2015-01-08 17:51:31Z lisiane $
 
 Casos de uso: uc-01.04.02
 */
@@ -157,6 +157,17 @@ var $stTipoBusca;
     * @param Numeric $Valor
 */
 var $numPercentualCreditoAdicional;
+/**
+    * @access Public
+    * @param Numeric $Valor
+*/
+var $inCodTipoLeiOrigemDecreto;
+/**
+    * @access Public
+    * @param Numeric $Valor
+*/
+var $inCodTipoLeiAlteracaoOrcamentaria;
+
 /**
     * @access Private
     * @var String
@@ -290,6 +301,16 @@ function setCodNormaAlteracao($valor) { $this->inCodNormaAlteracao         = $va
 function setPercentualCreditoAdicional($valor) { $this->numPercentualCreditoAdicional = $valor; }
 /**
     * @access Public
+     * @param Numeric $Valor
+*/
+function setTipoLeiOrigemDecreto($valor) { $this->inCodTipoLeiOrigemDecreto= $valor; }
+/**
+    * @access Public
+     * @param Numeric $Valor
+*/
+function setTipoLeiAlteracaoOrcamentaria($valor) { $this->inCodTipoLeiAlteracaoOrcamentaria = $valor; }
+/**
+    * @access Public
     * @return String
 */
 function getCodNorma() { return $this->inCodNorma; }
@@ -421,9 +442,21 @@ function getCodNormaAlteracao() { return $this->inCodNormaAlteracao   ; }
 */
 function getPercentualCreditoAdicional() { return $this->numPercentualCreditoAdicional   ; }
 /**
+    * @access Public
+    * @return Numeric 
+*/
+function getTipoLeiOrigemDecreto() { return $this->inCodTipoLeiOrigemDecreto ; }
+/**
+    * @access Public
+    * @return Numeric 
+*/
+function getTipoLeiAlteracaoOrcamentaria() { return $this->inCodTipoLeiAlteracaoOrcamentaria ; }
+
+/**
      * Método construtor
      * @access Private
 */
+
 function RNorma()
 {
     $this->setTNorma       ( new TNorma       );
@@ -448,9 +481,7 @@ function salvar($boTransacao = "")
     }
 
     $boFlagTransacao = false;
-    
-    
-    $boFlagTransacao = false;
+        
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
         
     if ( !$obErro->ocorreu() ) {
@@ -465,8 +496,9 @@ function salvar($boTransacao = "")
         $this->obTNorma->setDado("cod_tipo_norma", $this->obRTipoNorma->getCodTipoNorma() );
         
         $inCodNorma = $this->getCodNorma();
-       
+               
         if (isset($inCodNorma)) {
+           
             $obErro = $this->validarNumeroNorma( $this->getCodNorma(), $boTransacao );
             if ( !$obErro->ocorreu() ) {
                 $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
@@ -484,7 +516,9 @@ function salvar($boTransacao = "")
                     }
                 }
             }
+            
         } else {
+            
             $obErro = $this->validarNumeroNorma( $this->getCodNorma(), $boTransacao );
             if ( !$obErro->ocorreu() ) {
                 $this->obTNorma->proximoCod( $inCodNorma , $boTransacao );
@@ -501,7 +535,8 @@ function salvar($boTransacao = "")
                         $obErro = $this->obTNormaDataTermino->inclusao( $boTransacao );
                     }
                 }
-            }   
+            }
+            
         }
         
         //-O codigo abaixo foi colocado para inserir uma figura no diretorio anexos com o código da norma.
@@ -520,19 +555,24 @@ function salvar($boTransacao = "")
                 }
             }
         }
+        
         if ( !$obErro->ocorreu() ) {
                 $this->obRTipoNorma->obRCadastroDinamico->setChavePersistenteValores( array( "cod_tipo_norma" => $this->obRTipoNorma->getCodTipoNorma(), "cod_norma" => $this->getCodNorma() ) );
                 $obErro = $this->obRTipoNorma->obRCadastroDinamico->salvarValores( $boTransacao );
         }
+        
     }
 
     if ( !$obErro->ocorreu()) {
-        switch (SistemaLegado::pegaConfiguracao( 'cod_uf', 2, Sessao::getExercicio() )) {
+        switch (SistemaLegado::pegaConfiguracao( 'cod_uf', 2, Sessao::getExercicio(), $boTransacao )) {
             case 02: //TCEAL
             case 27: //TCETO
                 if ($_REQUEST['stTipoLeiAlteracao']) {
                     $obErro = $this->salvarNormaAlterada($boTransacao);
                 }
+            break;
+            case 11: //TCEMG
+                $obErro = $this->salvarNormaAlterada($boTransacao);
             break;
         }
     }
@@ -544,12 +584,12 @@ function salvar($boTransacao = "")
 
 function salvarNormaAlterada($boTransacao)
 {
-    switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
+    switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) ) {
         case 02: //TCEAL
             include_once CAM_GA_NORMAS_MAPEAMENTO."TNormaDetalheAl.class.php";
             $obNormaDetalheAl = new TNormaDetalheAl;
             $obNormaDetalheAl->setDado( 'cod_norma', $this->getCodNorma() );
-            $obNormaDetalheAl->recuperaPorChave($rsNormaDetalhe);
+            $obNormaDetalheAl->recuperaPorChave($rsNormaDetalhe, $boTransacao);
             
             if ($rsNormaDetalhe->getNumLinhas() > 0){
                 $obNormaDetalheAl->setDado( 'cod_lei_alteracao'  , $this->getCodLeiAlteracao()       );
@@ -568,19 +608,45 @@ function salvarNormaAlterada($boTransacao)
             include_once ( CAM_GPC_TCETO_MAPEAMENTO."TTCETONormaDetalhe.class.php"  );
             $obTTCETONormaDetalhe = new TTCETONormaDetalhe;
             $obTTCETONormaDetalhe->setDado( 'cod_norma', $this->getCodNorma() );
-            $obTTCETONormaDetalhe->recuperaPorChave($rsNormaDetalhe);
+            
+            $obTTCETONormaDetalhe->recuperaPorChave($rsNormaDetalhe, $boTransacao);
             
             if ($rsNormaDetalhe->getNumLinhas() > 0){
                 $obTTCETONormaDetalhe->setDado( 'cod_lei_alteracao'           , $this->getCodLeiAlteracao()            );
-                $obTTCETONormaDetalhe->setDado( 'cod_norma'                   , $this->getCodNormaAlteracao()          );
+                $obTTCETONormaDetalhe->setDado( 'cod_norma_alteracao'         , $this->getCodNormaAlteracao()          );
                 $obTTCETONormaDetalhe->setDado( 'percentual_credito_adicional', $this->getPercentualCreditoAdicional() );
                 $obErro = $obTTCETONormaDetalhe->alteracao($boTransacao);
             } else {
                 $obTTCETONormaDetalhe->setDado( 'cod_lei_alteracao'           , $this->getCodLeiAlteracao()            );
-                $obTTCETONormaDetalhe->setDado( 'cod_norma'                   , $this->getCodNormaAlteracao()          );
+                $obTTCETONormaDetalhe->setDado( 'cod_norma_alteracao'         , $this->getCodNormaAlteracao()          );
                 $obTTCETONormaDetalhe->setDado( 'percentual_credito_adicional', $this->getPercentualCreditoAdicional() );
-                $obErro = $obTTCETONormaDetalhe->inclusao($boTransacao);                
+                $obErro = $obTTCETONormaDetalhe->inclusao($boTransacao);
             }
+        break;
+    
+        case 11://TCEMG
+            include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php"  );
+            $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
+            $obTTCEMGNormaDetalhe->setDado( 'cod_norma', $this->getCodNorma() );
+            $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe, $boTransacao);
+          
+            if ($rsNormaDetalhe->getNumLinhas() > 0){
+                $obTTCEMGNormaDetalhe->setDado( 'tipo_lei_origem_decreto'             , $this->getTipoLeiOrigemDecreto()         );
+                if($_REQUEST['stTipoLeiAlteracaoOrcamentaria']){
+                    $obTTCEMGNormaDetalhe->setDado( 'tipo_lei_alteracao_orcamentaria' , $this->getTipoLeiAlteracaoOrcamentaria() );
+                }
+                $obErro = $obTTCEMGNormaDetalhe->exclusao($boTransacao);
+                if( $this->getTipoLeiOrigemDecreto() ){
+                    $obErro = $obTTCEMGNormaDetalhe->inclusao($boTransacao);
+                }
+            } else {
+                $obTTCEMGNormaDetalhe->setDado( 'tipo_lei_origem_decreto'             , $this->getTipoLeiOrigemDecreto()         );
+                if($_REQUEST['stTipoLeiAlteracaoOrcamentaria']){
+                    $obTTCEMGNormaDetalhe->setDado( 'tipo_lei_alteracao_orcamentaria' , $this->getTipoLeiAlteracaoOrcamentaria() );
+                }
+                $obErro = $obTTCEMGNormaDetalhe->inclusao($boTransacao);
+            }
+            
         break;
     }
     
@@ -635,16 +701,25 @@ function excluir($boTransacao = "")
             if ( !$obErro->ocorreu() ) {
                 $this->obTNormaDataTermino->setDado("cod_norma", $this->getCodNorma() );
                 $obErro = $this->obTNormaDataTermino->exclusao( $boTransacao );
+                if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())==11) { 
+                    include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php" );
+                    $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
+                    $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $this->getCodNorma() );
+                    $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe, $boTransacao);
+                    if($rsNormaDetalhe->getNumLinhas()>0){
+                      $obTTCEMGNormaDetalhe->exclusao($boTransacao);  
+                    }
+                }   
                 if ( !$obErro->ocorreu() ) {
-                     $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
-                     $obErro = $this->obTNorma->exclusao( $boTransacao );
-                     if ( !$obErro->ocorreu() ) {
+                    $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
+                    $obErro = $this->obTNorma->exclusao( $boTransacao );
+                    if ( !$obErro->ocorreu() ) {
                         $stNomeArquivo  = $this->getNomeArquivo();
                         $stDestinoAnexo = CAM_NORMAS.'anexos/';
                         if ($stNomeArquivo != '') {
                             unlink( $stDestinoAnexo.$stNomeArquivo );
                         }
-                     }
+                    }
                 }
             }
         }

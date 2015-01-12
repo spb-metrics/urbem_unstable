@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoOrdemPagamento.class.php 61064 2014-12-03 18:30:58Z franver $
+    $Id: REmpenhoOrdemPagamento.class.php 61275 2014-12-29 12:51:47Z evandro $
 
     * Casos de uso: uc-02.03.03,uc-02.03.05,uc-02.03.20,uc-02.03.23,uc-02.04.05,uc-02.03.28
 */
@@ -1108,7 +1108,7 @@ function listarReemitir(&$rsRecordSet, $boTransacao = "")
     }
     if ( $this->obROrcamentoEntidade->getCodigoEntidade() ) {
         $stFiltro .= " AND op.cod_entidade in (".$this->obROrcamentoEntidade->getCodigoEntidade().") 
-                       AND oa.exercicio = '".Sessao::getExercicio()."'
+                       AND TO_CHAR(oa.timestamp,'yyyy') = '".Sessao::getExercicio()."'
                     ";
     }
     if ($this->dtDataVencimento) {

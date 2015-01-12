@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 60844 2014-11-18 16:54:14Z franver $
+    * $Id: PRManterPagamento.php 61267 2014-12-23 17:06:46Z diogo.zarpelon $
 
     * Casos de uso: uc-02.04.05
 */
@@ -45,6 +45,9 @@ require_once CAM_GF_TES_MAPEAMENTO."TTesourariaPagamento.class.php";
 require_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+
+$obTransacao = new Transacao();
+$obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterPagamento";
@@ -89,7 +92,8 @@ $obRTesourariaConfiguracao = new RTesourariaConfiguracao();
 $obRTesourariaConfiguracao->setExercicio( Sessao::getExercicio() );
 $obRTesourariaConfiguracao->consultarTesouraria();
 
-$boTransacao = isset($boTransacao) ? $boTransacao : "";
+#$boTransacao = isset($boTransacao) ? $boTransacao : "";
+
 switch ($stAcao) {
     case 'incluir':
 
@@ -181,8 +185,9 @@ switch ($stAcao) {
         $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setNotaLiquidacao( $arNotaLiquidacao );
         $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setValoresPagos( $arNotaPaga );
     }
+
     if (!$obErro->ocorreu()) {
-       $obErro = $obRTesourariaBoletim->roUltimoPagamento->pagar();
+       $obErro = $obRTesourariaBoletim->roUltimoPagamento->pagar($boTransacao);
     }
 
     $boRetencao = $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getRetencao();

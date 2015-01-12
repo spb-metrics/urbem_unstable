@@ -127,7 +127,7 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
     $arFiltro  = Sessao::read('filtroRelatorio');
     $arContratos = Sessao::read('arContratos');
 
-    while ( !$rsRecordSet->eof() ) {        
+    while ( !$rsRecordSet->eof() ) {
         //UNSETS para zerar parametros e filtros das classes de regra para cada registro
         unset($this->obRPessoalServidor);
         unset($this->obRPessoalContratoServidor);
@@ -150,7 +150,8 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
         $arDadosTitulo['matricula'] = $rsRecordSet->getCampo('registro') ." - ". $rsRecordSet->getCampo('nom_cgm');
         
         if (isset($arFiltro['boFoto']) && $arFiltro['boFoto'] == true) { 
-            if (!empty($rsRecordSet->getCampo('caminho_foto'))) {
+            $stPathImg = $rsRecordSet->getCampo('caminho_foto');
+            if (!empty($stPathImg)) {
                 $arDadosTitulo['foto'] = CAM_GRH_PES_ANEXOS.$rsRecordSet->getCampo('caminho_foto');
             } else {
                 $arDadosTitulo['foto'] = CAM_GRH_PES_ANEXOS."no_foto.jpg";
@@ -402,7 +403,15 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
             $arDadosPrevidencia['regime_previdencia'] = $this->obRFolhaPagamentoPrevidencia->getDescricao();
         }
         
-        if ( isset($arFiltro['boFerias']) ) {   
+
+        if ( isset($arFiltro['boFerias']) ) {
+
+            $stTipoFiltro = $arFiltro['stTipoFiltro'];
+
+            if ($arFiltro['stTipoFiltro'] == 'lotacao' || $arFiltro['stTipoFiltro'] == 'lotacao_grupo') {
+                $stTipoFiltro = 'contrato';
+            }
+            
             include_once CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php";
             $obTPessoalFerias = new TPessoalFerias();
             switch ($arFiltro['stTipoFiltro']) {
@@ -416,11 +425,9 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
                 case "cgm_contrato_rescisao":
                 case "cgm_contrato_aposentado":
                 case "cgm_contrato_pensionista":        
-                    $stValoresFiltro = $rsRecordSet->getCampo('cod_contrato');
-                break;
                 case "lotacao":
                 case "lotacao_grupo":
-                    $stValoresFiltro = $rsRecordSet->getCampo('cod_orgao');
+                    $stValoresFiltro = $rsRecordSet->getCampo('cod_contrato');
                 break;
                 case "local_grupo":
                 case "local":
@@ -444,10 +451,11 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
             $obTPessoalFerias->setDado('cod_entidade', Sessao::getEntidade()     );
             $obTPessoalFerias->setDado('exercicio'   , Sessao::getExercicio()    );
             $obTPessoalFerias->setDado('data_limite' , date('d/m/Y')             );
-            $obTPessoalFerias->setDado('tipo_filtro' , $arFiltro['stTipoFiltro'] );
+            # Busca sempre por contrato, pois as férias estão ligadas a um.
+            $obTPessoalFerias->setDado('tipo_filtro' , $stTipoFiltro );
             $obTPessoalFerias->setDado('valor_filtro', $stValoresFiltro          );
             $obTPessoalFerias->recuperaHistoricoFeriasRelatorio($rsHistoricoFerias, "", "", $boTransacao);
-            
+
             foreach ($rsHistoricoFerias->getElementos() as $key => $ferias) {
                 if ($ferias['dt_inicial_gozo'] != '' && $ferias['dt_final_gozo'] != '') {
                     $arDadosFerias[$key]['nro']                = $key + 1; 
@@ -465,16 +473,18 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
 
         //Gera Recordset com as informações dos atributos dinâmicos
         if ( isset($arFiltro['boAtributos']) ) {
+
             $rsAtributos = new Recordset;
             $this->obRPessoalContratoServidor->obRCadastroDinamico->setChavePersistenteValores( array("cod_contrato"=>$rsRecordSet->getCampo('cod_contrato')) );
             $this->obRPessoalContratoServidor->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
             
             foreach ($rsAtributos->getElementos() as $key => $atributo) {
-                if (($atributo['cod_atributo'] == $arFiltro['inCodAtributo']) && ($atributo['cod_cadastro'] == $arFiltro['inCodCadastro'])) {
+                #if (($atributo['cod_atributo'] == $arFiltro['inCodAtributo']) && ($atributo['cod_cadastro'] == $arFiltro['inCodCadastro'])) {
                     $arDadosAtributos[$key]['atributo'] = $atributo['nom_atributo'].": ".$atributo['valor'];
                     $arAtributoAssentamento = $atributo['cod_cadastro']."#".$atributo['cod_atributo']."#".$atributo['valor']."";
-                }
+                #}
             }
+        
         }
         
         //Geração do Recordset com dados dos dependentes do servidor
@@ -527,16 +537,21 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
         }
         
         if ( isset($arFiltro['boAssentamentos']) ) {
+
+            $stTipoFiltro = $arFiltro['stTipoFiltro'];
+
+            if ($arFiltro['stTipoFiltro'] == 'lotacao') {
+                $stTipoFiltro = 'contrato';
+            }
+
             include_once CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamento.class.php";
             $obTPessoalAssentamento = new TPessoalAssentamento();
             $obTPessoalAssentamento->setDado('cod_entidade', Sessao::getEntidade()                  );
             $obTPessoalAssentamento->setDado('exercicio'   , Sessao::getExercicio()                 );                
-            $obTPessoalAssentamento->setDado('tipo_filtro' , $arFiltro['stTipoFiltro']              );
+            $obTPessoalAssentamento->setDado('tipo_filtro' , $stTipoFiltro );
 
             switch ($arFiltro['stTipoFiltro']) {
                 case 'lotacao':
-                    $obTPessoalAssentamento->setDado('dado_filtro', $rsRecordSet->getCampo('cod_orgao') ); 
-                break;
                 case 'contrato':
                 case 'contrato_rescisao':
                 case 'contrato_aposentado':
@@ -615,7 +630,6 @@ function geraRecordSet(&$rsRecordset , $stFiltro , $stOrder)
     }
     
     $rsRecordset = new RecordSet();
-    
     $rsRecordset->preenche( $arDadosRelatorio );
     
     return $obErro;

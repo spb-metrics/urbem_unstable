@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: listaDividasArrecadacao.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: listaDividasArrecadacao.plsql 61352 2015-01-09 18:14:18Z evandro $
 *
 * Caso de uso: uc-05.04.02
 */
@@ -62,22 +62,23 @@ Revision 1.1  2006/09/29 11:14:56  dibueno
 */
 
 CREATE OR REPLACE FUNCTION divida.fn_lista_divida_arrecadacao ( inExercicio     INTEGER
-                                                                                                        , inCodGrupo      INTEGER
-                                                                                                        , inCodCredito    INTEGER
-                                                                                                        , inCodEspecie    INTEGER
-                                                                                                        , inCodGenero     INTEGER
-                                                                                                        , inCodNatureza   INTEGER
-                                                                                                        , inNumCgm        INTEGER
-                                                                                                        , inCodIIInicial  INTEGER
-                                                                                                        , inCodIIFinal    INTEGER
-                                                                                                        , inCodIEInicial  INTEGER
-                                                                                                        , inCodIEFinal    INTEGER
-                                                                                                        , dtDataInicial   VARCHAR
-                                                                                                        , dtDataFinal     VARCHAR
-                                                                                                        , flValorInicial  NUMERIC
-                                                                                                        , flValorFinal    NUMERIC
-                                                                                                        , stExercicio     VARCHAR
-                                                                                                        ) RETURNS         SETOF RECORD AS $$
+                                                                , inCodGrupo      INTEGER
+                                                                , inCodCredito    INTEGER
+                                                                , inCodEspecie    INTEGER
+                                                                , inCodGenero     INTEGER
+                                                                , inCodNatureza   INTEGER
+                                                                , inNumCgmInicial INTEGER
+                                                                , inNumCgmFinal   BIGINT
+                                                                , inCodIIInicial  INTEGER
+                                                                , inCodIIFinal    INTEGER
+                                                                , inCodIEInicial  INTEGER
+                                                                , inCodIEFinal    INTEGER
+                                                                , dtDataInicial   VARCHAR
+                                                                , dtDataFinal     VARCHAR
+                                                                , flValorInicial  NUMERIC
+                                                                , flValorFinal    NUMERIC
+                                                                , stExercicio     VARCHAR
+                                                                ) RETURNS         SETOF RECORD AS $$
 DECLARE
     stNumeracaoAnt  varchar;
     inRetorno       integer;
@@ -124,7 +125,7 @@ IF ( inCodCredito > 0 ) THEN
 END IF;
 
 /* CGM */
-IF ( inNumCgm > 0 ) THEN
+IF ( inNumCgmInicial > 0 ) THEN
     stFrom := '
                                                     FROM arrecadacao.calculo_cgm
                                               INNER JOIN arrecadacao.calculo
@@ -139,10 +140,17 @@ IF ( inNumCgm > 0 ) THEN
                                                      AND lancamento.divida         = FALSE
                                                      AND lancamento.ativo          = TRUE
               ';
-
-    stFiltro := stFiltro ||'
-                                                     AND calculo_cgm.numcgm = '|| inNumCgm::varchar ||'
+    --Validacoes para os campos de CGM
+    IF ( inNumCgmFinal > 0) THEN
+        stFiltro := stFiltro ||'
+                                                     AND calculo_cgm.numcgm BETWEEN '|| inNumCgmInicial::varchar ||' AND '|| inNumCgmFinal::varchar ||'
                            ';
+    ELSE
+        stFiltro := stFiltro ||'
+                                                     AND calculo_cgm.numcgm = '|| inNumCgmInicial::varchar ||'
+                           ';
+    END IF; 
+    
 
 END IF;
 

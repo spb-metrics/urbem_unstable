@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: FMManterConfiguracaoDirf.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterConfiguracaoDirf.php 61330 2015-01-07 15:57:46Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -201,6 +201,7 @@ $obIPopUpCGMCNPJ->setNull(false);
 $obIPopUpCGMCNPJ->setTipo('fisica');
 $obIPopUpCGMCNPJ->setId("stNomCGMCNPJ");
 $obIPopUpCGMCNPJ->obCampoCod->setName("inCGMCNPJ");
+$obIPopUpCGMCNPJ->obCampoCod->setId("inCGMCNPJ");
 $obIPopUpCGMCNPJ->setValue($stCGMCNPJ);
 $obIPopUpCGMCNPJ->obCampoCod->setValue($inCGMCNPJ);
 
