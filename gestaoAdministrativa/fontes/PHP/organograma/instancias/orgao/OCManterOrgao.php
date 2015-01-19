@@ -30,7 +30,7 @@
  * @author Analista: Cassiano
  * @author Desenvolvedor: Cassiano
 
- $Id: OCManterOrgao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCManterOrgao.php 61435 2015-01-16 12:54:36Z lisiane $
 
  Casos de uso: uc-01.05.02
 
@@ -159,7 +159,6 @@ function MontaOrgaoSuperior($stSelecionado = "")
 function MontaNorma($stSelecionado = "")
 {
     $obRegra = new ROrganogramaOrgao;
-
     $stCombo  = "inCodNorma";
     $stFiltro = "inCodTipoNorma";
     $stJs .= "limpaSelect(f.$stCombo,0); \n";
@@ -186,7 +185,7 @@ function MontaNorma($stSelecionado = "")
         while (!$rsCombo->eof()) {
             $inCount++;
             $inId   = $rsCombo->getCampo("cod_norma");
-            $stDesc = $rsCombo->getCampo("nom_norma");
+            $stDesc = addslashes($rsCombo->getCampo("nom_norma"));
 
             if ($stSelecionado == $inId && ($inCodTipoNormaAux == $inCodTipoNorma)) {
                 $stSelected = 'selected';
@@ -198,7 +197,6 @@ function MontaNorma($stSelecionado = "")
             $rsCombo->proximo();
         }
     }
-
     return $stJs;
 }
 

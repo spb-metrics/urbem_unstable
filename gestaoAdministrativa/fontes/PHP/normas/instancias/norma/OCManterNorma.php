@@ -110,7 +110,7 @@ switch ($stCtrl) {
 
     //monta HTML com os ATRIBUTOS relativos ao TIPO DE NORMA selecionado
     case "MontaAtributos":
-
+        
         if ($_POST["inCodTipoNorma"] != "") {
             $inCodTipoNorma = $_POST["inCodTipoNorma"];
             $inCodNorma = $_POST[$inCodNorma];
@@ -138,13 +138,25 @@ switch ($stCtrl) {
             $obFormulario->obJavaScript->montaJavaScript();
             $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
             $stEval = str_replace("\n","",$stEval);
+            
+            if (($_REQUEST["inCodTipoNorma"] == 1 || $_REQUEST["inCodTipoNorma"] == 2) && (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) && Sessao::getExercicio() >= "2015" ){
+                $js .= TipoLeiDecretoTCEMG($_REQUEST["stAcao"]);
+            }else{
+                $js .= "jq_('#spanTipoLeiDecreto').html('');";
+                $js .= "jq_('#spanTipoLeiAlteracaoOrcamentaria').html('');";  
+            }
+            
         } else {
             $stHTML = " ";
             $stEval = " ";
+            $js .= "jq_('#spanTipoLeiDecreto').html('');";
+            $js .= "jq_('#spanTipoLeiAlteracaoOrcamentaria').html('');";  
         }
+        
         $js .= "f.stEval.value = '$stEval'; \n";
         $js .= "d.getElementById('spanAtributos').innerHTML = '".$stHTML."';";
         sistemaLegado::executaFrameOculto($js);
+        
     break;
 
     case "Anexos":
@@ -261,6 +273,52 @@ switch ($stCtrl) {
             sistemaLegado::executaFrameOculto($stJs);
         }
     break;
+}
+
+function TipoLeiDecretoTCEMG($stAcao){
+    
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php"           );
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTipoLeiOrigemDecreto.class.php"  );
+    
+    $obHdnTipoLeiAlteracaoOrcamentaria = new Hidden;
+    $obHdnTipoLeiAlteracaoOrcamentaria->setName ( "hdnTipoLeiAlteracaoOrcamentaria" );
+            
+    $obTTCEMGTipoLeiOrigemDecreto = new TTCEMGTipoLeiOrigemDecreto;
+    $obTTCEMGTipoLeiOrigemDecreto->recuperaTodos($rsTipoLeiOrigemDecreto);
+    
+    $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
+    $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $_REQUEST['inCodNorma'] );
+    $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe);
+    
+    $obCmbTipoLeiOrigemDecreto = new Select;
+    $obCmbTipoLeiOrigemDecreto->setRotulo       ( 'Tipo de Lei que Originou Decreto');
+    $obCmbTipoLeiOrigemDecreto->setName         ( 'stTipoLeiOrigemDecreto'          );
+    $obCmbTipoLeiOrigemDecreto->setId           ( 'stTipoLeiOrigemDecreto'          );
+    $obCmbTipoLeiOrigemDecreto->setCampoId      ( 'cod_tipo_lei'                    );
+    $obCmbTipoLeiOrigemDecreto->setCampoDesc    ( 'descricao'                       );
+    $obCmbTipoLeiOrigemDecreto->addOption       ( "", "Selecione"                   );
+    $obCmbTipoLeiOrigemDecreto->preencheCombo   ( $rsTipoLeiOrigemDecreto           );
+    $obCmbTipoLeiOrigemDecreto->setTitle        ( "Selecione o Tipo de Lei que Originou Decreto"      );
+    $obCmbTipoLeiOrigemDecreto->obEvento->setOnChange("buscaValor('montaLeiOrcamentaria');");
+    
+    if ( $stAcao == "alterar" ) {
+        if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')){
+           $obCmbTipoLeiOrigemDecreto->setValue         ( $rsNormaDetalhe->getCampo('tipo_lei_origem_decreto') );
+           if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3 ){
+              $obHdnTipoLeiAlteracaoOrcamentaria->setValue($rsNormaDetalhe->getCampo('tipo_lei_alteracao_orcamentaria'));
+           }
+        }
+    }
+    
+    $obFormulario = new Formulario();
+    $obFormulario->addHidden        ( $obHdnTipoLeiAlteracaoOrcamentaria  );
+    $obFormulario->addComponente    ( $obCmbTipoLeiOrigemDecreto          );
+    $obFormulario->montaInnerHTML();
+    
+    $stHtml = $obFormulario->getHTML();
+    $stJs .= "jq_('#spanTipoLeiDecreto').html('".$stHtml."');";
+    
+    return $stJs;
 }
 
 ?>

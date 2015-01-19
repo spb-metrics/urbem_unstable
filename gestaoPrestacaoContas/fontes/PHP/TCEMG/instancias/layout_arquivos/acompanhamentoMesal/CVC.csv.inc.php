@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CVC.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: CVC.csv.inc.php 61369 2015-01-12 13:53:38Z arthur $
+  * $Date: 2015-01-12 11:53:38 -0200 (Seg, 12 Jan 2015) $
+  * $Author: arthur $
+  * $Rev: 61369 $
   *
 */
 /**
@@ -170,7 +170,19 @@ if ( count($rsRecuperaVeiculosCVC10->getElementos()) > 0 ) {
             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-        
+            
+            if ($obTTCEMGArquivoMensalCVC->getDado('exercicio') >= "2015") {
+               $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_documento");
+               $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+               $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+               $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+               
+               $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_documento");
+               $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+               $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+               $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+            }
+            
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_deslocamento");
             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

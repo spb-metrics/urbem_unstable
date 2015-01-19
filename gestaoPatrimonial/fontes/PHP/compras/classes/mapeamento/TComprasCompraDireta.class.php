@@ -33,7 +33,7 @@
     * Casos de uso: uc-03.04.33
                     uc-03.04.32
 
-    $Id: TComprasCompraDireta.class.php 60384 2014-10-16 19:00:04Z carolina $
+    $Id: TComprasCompraDireta.class.php 61437 2015-01-16 16:29:21Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1001,7 +1001,7 @@ class TComprasCompraDireta extends Persistente
                 ON homologacao.cod_compra_direta = compra_direta.cod_compra_direta
                AND homologacao.cod_entidade      = compra_direta.cod_entidade
                AND homologacao.cod_modalidade    = compra_direta.cod_modalidade
-               AND homologacao.exercicio         = '2014'
+               AND homologacao.exercicio         = '".$this->getDado('exercicio')."'
              
          WHERE  EXISTS  ( SELECT *
                            FROM compras.julgamento_item

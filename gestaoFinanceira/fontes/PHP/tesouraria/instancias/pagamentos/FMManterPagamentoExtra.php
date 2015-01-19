@@ -32,7 +32,7 @@
     *
     * @ignore
     *
-    * $Id: FMManterPagamentoExtra.php 61289 2014-12-30 13:36:29Z carolina $
+    * $Id: FMManterPagamentoExtra.php 61422 2015-01-15 18:58:18Z evandro $
     *
     * Casos de uso: uc-02.04.27
 */
@@ -234,6 +234,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obHdnDtBoletim = new Hidden;
     $obHdnDtBoletim->setName  ( 'stDtBoletim');
     $obHdnDtBoletim->setId    ( 'stDtBoletim');
+    $obHdnDtBoletim->setValue ( $_REQUEST['stDtBoletim'] );
     
     // Define objeto BuscaInner para cgm
     $obICredor = new IPopUpCredor($obForm);

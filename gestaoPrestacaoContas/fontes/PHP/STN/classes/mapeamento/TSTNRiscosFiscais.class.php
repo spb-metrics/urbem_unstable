@@ -96,6 +96,39 @@ class TSTNRiscosFiscais extends Persistente
 
         return $this->executaRecuperaSql($stSql,$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
     }
+    
+    /**
+     * Método que retorna risco fiscal - Returna um único resultado
+     *
+     * @author      Analista        Ane Caroline   
+     * @author      Desenvolvedor   Carlos Adriano 
+     * @param object  $rsRecordSet
+     * @param string  $stFiltro    Filtros alternativos que podem ser passados
+     * @param string  $stOrder     Ordenacao do SQL
+     * @param boolean $boTransacao Usar transacao
+     *
+     * @return object $rsRecordSet
+     */
+    public function buscaRiscoFiscal(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        $stSql = "
+            SELECT riscos_fiscais.cod_risco
+                 , riscos_fiscais.cod_entidade
+                 , riscos_fiscais.exercicio
+                 , riscos_fiscais.descricao
+                 , riscos_fiscais.valor
+                 , riscos_fiscais.cod_identificador
+                 , sw_cgm.nom_cgm
+              FROM stn.riscos_fiscais
+              JOIN orcamento.entidade
+                ON entidade.cod_entidade = riscos_fiscais.cod_entidade
+               AND entidade.exercicio    = riscos_fiscais.exercicio
+              JOIN sw_cgm
+                ON sw_cgm.numcgm = entidade.numcgm
+        ";
+
+        return $this->executaRecuperaSql($stSql,$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
 
     /**
      * Método que retorna os riscos fiscais para exportação do TCEMG
@@ -154,6 +187,7 @@ class TSTNRiscosFiscais extends Persistente
                         ) AS codigo_unidade_gestora
                        ON codigo_unidade_gestora.cod_entidade = riscos_fiscais.cod_entidade
                       AND riscos_fiscais.cod_entidade IN (".$this->getDado('entidades').")
+                WHERE stn.riscos_fiscais.exercicio = '".Sessao::getExercicio()."'
         ";
 
         return $this->executaRecuperaSql($stSql,$rsRecordSet,$stFiltro,$stOrder,$boTransacao);

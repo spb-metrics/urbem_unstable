@@ -308,7 +308,7 @@ switch ($stAcao) {
 
         if (!$obErro->ocorreu()) {
             $obTransacao->commitAndClose();
-            sistemaLegado::alertaAviso($pgFilt,"Registro: ".$obRPessoalServidor->roUltimoContratoServidor->getRegistro()." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$obRPessoalServidor->roUltimoContratoServidor->getRegistro()." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
         } else {
             $obTransacao->rollbackAndClose();
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
@@ -318,6 +318,7 @@ switch ($stAcao) {
 
     case "alterar":
     case "alterar_servidor":
+        
         $obErro = new Erro;
         if (Sessao::read('FOTO_NAME') and Sessao::read('FOTO_NAME') != "no_foto.jpeg") {
             //NOME DO ARQUIVO DA MINIATURA
@@ -577,15 +578,16 @@ switch ($stAcao) {
 
             $obErro = $obRPessoalServidor->alterarServidor();
         }
+        
         if ( !$obErro->ocorreu() )
             if ($_POST['actVoltar']) {
                 // a variavel actVoltar contém o nome do programa que chamou a tela de servidor,
                 // pra onde o sistema deve retornar se ela estiver vazia o sistema retorno para
                 // a listagem de servidores
-                sistemaLegado::alertaAviso($_POST['actVoltar'] . '?inNumCGM='.$_POST['inNumCGM'].'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Registro: ".$obRPessoalServidor->roUltimoContratoServidor->getRegistro()." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
+                sistemaLegado::alertaAviso($_POST['actVoltar'] . '?inNumCGM='.$_POST['inNumCGM'].'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$_REQUEST['inContratoAlterar']." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
 
             } else {
-                sistemaLegado::alertaAviso($pgList .'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Registro: ".$obRPessoalServidor->roUltimoContratoServidor->getRegistro()." - ".$rsCGM->getCampo("nom_cgm"),"alterar","aviso", Sessao::getId(), "../");
+                sistemaLegado::alertaAviso($pgList .'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$_REQUEST['inContratoAlterar']." - ".$rsCGM->getCampo("nom_cgm"),"alterar","aviso", Sessao::getId(), "../");
             } else
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
 

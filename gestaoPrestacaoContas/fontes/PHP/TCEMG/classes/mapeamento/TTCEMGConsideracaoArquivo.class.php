@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCEMGConsideracaoArquivo.class.php 59719 2014-09-08 15:00:53Z franver $
+    $Id: TTCEMGConsideracaoArquivo.class.php 61428 2015-01-15 20:06:35Z arthur $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -89,15 +89,25 @@ class TTCEMGConsideracaoArquivo extends Persistente
     public function montaRecuperaConsid()
     {
         $stSql  = "
-            SELECT 10 as tipo_registro
-                 , consideracao_arquivo.cod_arquivo
+            SELECT 10 as tipo_registro \n";
+        
+        if ( $this->getDado('exercicio') >= "2015" )
+            $stSql  .= " , consideracao_arquivo.nom_arquivo \n";
+        else
+            $stSql  .= " , consideracao_arquivo.cod_arquivo \n";
+        
+        $stSql  .= "         
                  , CAD.descricao as consideracoes
               FROM tcemg.consideracao_arquivo
+              
               JOIN tcemg.consideracao_arquivo_descricao as CAD
                 ON CAD.cod_arquivo = consideracao_arquivo.cod_arquivo
                AND CAD.descricao != ''
-             WHERE CAD.periodo = '".$this->getDado('mes')."' and CAD.cod_entidade IN(".$this->getDado('entidade').")
-          ORDER BY cod_arquivo";
+             
+             WHERE CAD.periodo      = '".$this->getDado('mes')."'
+               AND CAD.cod_entidade IN(".$this->getDado('entidade').")
+          
+          ORDER BY consideracao_arquivo.cod_arquivo";
         return $stSql;
     }
 

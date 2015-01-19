@@ -135,6 +135,7 @@ switch ($_REQUEST["stCtrl"]) {
     
     default:
         $stValoresFiltro = "";
+        $obErro = new Erro;
         
         switch ($_REQUEST['stTipoFiltro']) {
             case "contrato_todos":
@@ -143,7 +144,6 @@ switch ($_REQUEST["stCtrl"]) {
                 $arContratos = Sessao::read("arContratos");
                 
                 if(!is_array($arContratos)) {
-                    $obErro = new Erro;
                     $obErro->setDescricao('É necessário adicionar ao menos um registro na lista de filtros');
                     break;
                 }
@@ -156,7 +156,6 @@ switch ($_REQUEST["stCtrl"]) {
             
             case "funcao":
                 if(!is_array($_REQUEST["inCodFuncaoSelecionados"])) {
-                    $obErro = new Erro;
                     $obErro->setDescricao('É necessário adicionar ao menos um registro na lista de filtros');
                     break;
                 }
@@ -166,7 +165,6 @@ switch ($_REQUEST["stCtrl"]) {
             
             case "lotacao":
                 if(!is_array($_REQUEST["inCodLotacaoSelecionados"])) {
-                    $obErro = new Erro;
                     $obErro->setDescricao('É necessário adicionar ao menos um registro na lista de filtros');
                     break;
                 }
@@ -176,7 +174,6 @@ switch ($_REQUEST["stCtrl"]) {
             
             case "local":
                 if(!is_array($_REQUEST["inCodLocalSelecionados"])) {
-                    $obErro = new Erro;
                     $obErro->setDescricao('É necessário adicionar ao menos um registro na lista de filtros');
                     break;
                 }
@@ -186,7 +183,6 @@ switch ($_REQUEST["stCtrl"]) {
             
             case "sub_divisao":
                 if(!is_array($_REQUEST["inCodSubDivisaoSelecionados"])) {
-                    $obErro = new Erro;
                     $obErro->setDescricao('É necessário adicionar ao menos um registro na lista de filtros');
                     break;
                 }

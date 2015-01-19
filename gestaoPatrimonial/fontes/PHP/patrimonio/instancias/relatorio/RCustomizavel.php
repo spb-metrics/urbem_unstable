@@ -200,7 +200,7 @@ switch ($ctrl) {
             $obChkDataBaixa->setName           ( "boDataBaixa"  );
             $obChkDataBaixa->setChecked        ( ($boDataBaixa == true) );
             $obChkDataBaixa->setTabIndex       (0);
-            $obChkDataBaixa->obEvento->setOnChange( "preencheColunas(this.name);");
+            $obChkDataBaixa->obEvento->setOnClick( "preencheColunas(this.name);");
             $obChkDataBaixa->setValue(1);
             $obChkDataBaixa->show();
            ?>
@@ -532,11 +532,11 @@ switch ($ctrl) {
                 $obTxtTitulo->setMaxLength          ( 50         );
                 $obTxtTitulo->setSize               ( 50         );
                 $obTxtTitulo->setTabIndex           ( 0          );
-        $obTxtTitulo->show();
+                $obTxtTitulo->show();
                 ?>
             </td>
           </tr>
-           <tr>
+        <tr>
         <td class="label" title="Selecione se voce deseja que campos com grande quantidade de texto seja expandido em mais linhas" >Expandir Campos no Relatório</td>
                 <td class="field">
                 <?php
@@ -547,6 +547,38 @@ switch ($ctrl) {
                 ?>
                 </td>
           </tr>
+          
+          <tr>
+            <td class="label" title='Demonstrar Bens Baixados:'>*Demonstrar Bens Baixados:</td>
+            <td class="field">
+                <?php
+                $obRadioBemBaixadoSim = new Radio;
+                $obRadioBemBaixadoSim->setName        ( "stRBemBaixado" );
+                $obRadioBemBaixadoSim->setId          ( "stRBemBaixado" );
+                $obRadioBemBaixadoSim->setValue       ( "sim" );
+                $obRadioBemBaixadoSim->setLabel       ( "Sim" );
+                $obRadioBemBaixadoSim->setChecked     (  false );                
+                $obRadioBemBaixadoSim->show();
+
+                $obRadioBemBaixadoNao = new Radio;
+                $obRadioBemBaixadoNao->setName        ( "stRBemBaixado" );
+                $obRadioBemBaixadoNao->setId          ( "stRBemBaixado" );
+                $obRadioBemBaixadoNao->setValue       ( "nao" );
+                $obRadioBemBaixadoNao->setLabel       ( "Não" );
+                $obRadioBemBaixadoNao->setChecked     (  false );                
+                $obRadioBemBaixadoNao->show();
+
+                $obRadioBemBaixadoTodos = new Radio;
+                $obRadioBemBaixadoTodos->setName        ( "stRBemBaixado" );
+                $obRadioBemBaixadoTodos->setId          ( "stRBemBaixado" );
+                $obRadioBemBaixadoTodos->setValue       ( "todos" );
+                $obRadioBemBaixadoTodos->setLabel       ( "Todos" );
+                $obRadioBemBaixadoTodos->setChecked     (  true );                
+                $obRadioBemBaixadoTodos->show();               
+                ?>
+            </td>
+          </tr>
+
        <tr>
        <td class="field" colspan="2"><?php geraBotaoOk2(1,1); ?>
        </td>
@@ -722,24 +754,39 @@ switch ($ctrl) {
         {
             var boErro = false;
 
-            for ( i=0; i< $('filtro').length;i++) {
-            if ( $('filtro').options[i].value == stElemento ) {
-                $('filtro').options[i].remove(i);
-                boErro = true;
+            //bloquiar a opção 'Não' do campo '*Demonstrar Bens Baixados' quando a Data da Baixa for exibida no relatorio
+            if ( jQuery("input:checkbox[name='boDataBaixa']").is(":checked") ) {
+                jQuery("input:radio[name='stRBemBaixado']").each(function(){
+                    if ( jQuery(this).val() == "nao" ){
+                        jQuery(this).prop('disabled',true);
+                    }                                        
+                });    
+            }else{                    
+                jQuery("input:radio[name='stRBemBaixado']").each(function(){
+                    if ( jQuery(this).val() == "nao" ){
+                        jQuery(this).prop('disabled',false);
+                    }                                        
+                });    
             }
+
+            for ( i=0; i< $('filtro').length;i++) {
+                if ( $('filtro').options[i].value == stElemento ) {
+                    $('filtro').options[i].remove(i);
+                    boErro = true;
+                }
             }
 
             for ( i=0; i< $('ordenacao').length;i++) {
-            if ( $('ordenacao').options[i].value == stElemento ) {
-                $('ordenacao').options[i].remove(i);
-                boErro = true;
-            }
+                if ( $('ordenacao').options[i].value == stElemento ) {
+                    $('ordenacao').options[i].remove(i);
+                    boErro = true;
+                }
             }
 
             if (boErro == true) {
-            return false;
+                return false;
             }
-
+            
             switch (stElemento) {
             case 'boValor' :
                 $('filtro').options[$('filtro').length] = new Option( 'Valor','boValor' );

@@ -48,38 +48,49 @@ class TTCEPEClasseNivelFaixa extends Persistente
 
     function montaRecuperaTodos()
     {
-        $stSql = " SELECT 0 AS reservado_tce,
-                          cargo_padrao.cod_cargo,
-                          cargo_padrao.cod_padrao AS cod_classe,
-                          padrao.descricao AS nomenclatura,
-                          padrao_padrao.valor AS vencimento_base
-                        
+        $stSql = " SELECT
+                            0 AS reservado_tce,
+                            subselect.cod_cargo,
+                            subselect.timestamp,
+                            cargo_padrao.cod_padrao AS cod_classe,
+                            padrao.descricao AS nomenclatura,
+                            padrao_padrao.valor AS vencimento_base
+                            
                     FROM pessoal".$this->getDado('cod_entidade').".cargo_padrao
                     
+                    JOIN (
+                            SELECT 
+                                    cargo_padrao.cod_cargo,
+                                    MAX(cargo_padrao.timestamp) AS timestamp
+                                    
+                            FROM pessoal".$this->getDado('cod_entidade').".cargo_padrao
+                            
+                            WHERE  cargo_padrao.timestamp <= (
+                                                                SELECT ultimoTimestampPeriodoMovimentacao(cod_periodo_movimentacao,'".$this->getDado('cod_entidade')."')
+                                                                  FROM folhapagamento".$this->getDado('cod_entidade').".periodo_movimentacao
+                                                                 WHERE TO_CHAR(periodo_movimentacao.dt_inicial,'dd/mm/yyyy') = '".$this->getDado('dt_inicial')."'
+                                                                   AND TO_CHAR(periodo_movimentacao.dt_final,'dd/mm/yyyy') = '".$this->getDado('dt_final')."'
+                                                            )::timestamp
+                                                            
+                            GROUP BY cod_cargo
+                            ORDER BY cod_cargo
+                        ) AS subselect
+                      ON subselect.cod_cargo = cargo_padrao.cod_cargo
+                     AND subselect.timestamp = cargo_padrao.timestamp
+                     
                     JOIN folhapagamento".$this->getDado('cod_entidade').".padrao
                       ON padrao.cod_padrao = cargo_padrao.cod_padrao
                       
                     JOIN folhapagamento".$this->getDado('cod_entidade').".padrao_padrao
                       ON padrao_padrao.cod_padrao = padrao.cod_padrao
-                     AND padrao_padrao.timestamp = (SELECT MAX(FPP.timestamp) FROM folhapagamento.padrao_padrao AS FPP
-                                                                             WHERE FPP.cod_padrao = padrao_padrao.cod_padrao) 
-                   WHERE padrao_padrao.timestamp <= (
-                                                    
-                        SELECT MAX(padrao_padrao.timestamp) AS timestamp
-                          FROM folhapagamento".$this->getDado('cod_entidade').".padrao_padrao
-                         WHERE padrao_padrao.timestamp::date <= (
-                                                                    SELECT ultimoTimestampPeriodoMovimentacao(cod_periodo_movimentacao,'".$this->getDado('cod_entidade')."')
-                                                                      FROM folhapagamento".$this->getDado('cod_entidade').".periodo_movimentacao
-                                                                     WHERE TO_CHAR(periodo_movimentacao.dt_inicial,'dd/mm/yyyy') = '".$this->getDado('dt_inicial')."'
-                                                                       AND TO_CHAR(periodo_movimentacao.dt_final,'dd/mm/yyyy') = '".$this->getDado('dt_final')."'
-                                                                )::date
-                        )
-                        
-                GROUP BY cod_cargo,cod_classe,nomenclatura,vencimento_base
-                ORDER BY cod_cargo, cod_classe
-                        
-        ";
-        
+                    AND padrao_padrao.timestamp = (
+                                                    SELECT MAX(FPP.timestamp)
+                                                      FROM folhapagamento.padrao_padrao AS FPP
+                                                     WHERE FPP.cod_padrao = padrao_padrao.cod_padrao
+                                                )
+                                                
+                    ORDER BY cod_cargo, cod_classe, timestamp";
+                    
         return $stSql;
     }
 }

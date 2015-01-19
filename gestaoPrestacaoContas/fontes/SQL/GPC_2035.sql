@@ -46,7 +46,7 @@ INSERT
      , ativo
      )
      VALUES
-     ( 3026
+     ( 3028
      , 451
      , 'FMManterFornecedorSoftware.php'
      , 'manter'
@@ -140,4 +140,88 @@ CREATE TABLE tcemg.norma_detalhe(
                                                 REFERENCES tcemg.tipo_lei_alteracao_orcamentaria  (cod_tipo_lei)
 );
 GRANT ALL ON tcemg.norma_detalhe TO urbem;
+
+
+----------------
+-- Ticket #22544
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+VALUES
+     ( 3029
+     , 484
+     , 'FLRelatorioDespesaTotalPessoal.php'
+     , 'consultar'
+     , 55
+     , ''
+     , 'Despesa Total com Pessoal'
+     , TRUE
+     );
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+VALUES
+     ( 6
+     , 55
+     , 15
+     , 'Despesa Total com Pessoal'
+     , 'LHTCEMGRelatorioDespesaTotalPessoal.php'
+     );
+ 
+
+
+----------------
+-- Ticket #22562
+----------------
+
+ALTER TABLE tcemg.consideracao_arquivo_descricao DROP CONSTRAINT fk_consideracao_arquivo_descricao_1;
+
+UPDATE tcemg.consideracao_arquivo           SET cod_arquivo = 41 WHERE cod_arquivo = 40;
+UPDATE tcemg.consideracao_arquivo_descricao SET cod_arquivo = 41 WHERE cod_arquivo = 40;
+INSERT INTO tcemg.consideracao_arquivo VALUES (40, 'SUPDEF');
+
+ALTER TABLE tcemg.consideracao_arquivo_descricao ADD  CONSTRAINT fk_consideracao_arquivo_descricao_1
+                                                      FOREIGN KEY (cod_arquivo)
+                                                      REFERENCES tcemg.consideracao_arquivo(cod_arquivo);
+
+
+----------------
+-- Ticket #22340
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 6
+     , 36
+     , 67
+     , 'RGF - Anexo 1 - Demonstrativo da Despesa com Pessoal'
+     , 'RGFAnexo1_2015.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 6
+                AND cod_modulo    = 36
+                AND cod_relatorio = 67
+           )
+     ;
 

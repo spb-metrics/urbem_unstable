@@ -5,6 +5,16 @@
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">1249</property>
+        </structure>
+        <structure>
+            <property name="name">queryTimeOut</property>
+            <property name="id">1249</property>
+        </structure>
+    </list-property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -107,8 +117,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
             <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
             <property name="distinct">true</property>
+            <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -157,6 +169,39 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="cod_local" id="6667">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_organograma" id="6670">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cod_orgao" id="6671">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
@@ -169,9 +214,9 @@ extensionProperties.odaPassword = params["db_password"].value;
  extensionProperties.charSet = "utf8";
 }]]></method>
             <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.3:5432/gf_mariana_2501_1995_testing</property>
-            <property name="odaUser">sw.suporte</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">c3Vwb3J0ZQ==</encrypted-property>
+            <property name="odaURL">jdbc:postgresql://172.16.30.34:2345/mariana_1212_2034_stable_8</property>
+            <property name="odaUser">urbem</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">VXJCM20=</encrypted-property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -370,47 +415,94 @@ extensionProperties.odaPassword = params["db_password"].value;
     this.queryText += " AND bem.cod_bem in ("+params['lista_bens']+")";
 }
 
-this.queryText += " ORDER BY local_destino,local_origem,bem.descricao";
+if (params['cod_local'] != ""){
+    this.queryText += " AND local.cod_local = "+params['cod_local'];
+}
+
+if (params['cod_orgao'] != ''){
+    this.queryText += " AND vw_orgao_nivel.orgao_reduzido ILIKE '"+params['cod_orgao']+"'" ;
+}
+
+if (params['cod_organograma'] != ''){
+    this.queryText += " AND vw_orgao_nivel.cod_organograma = "+params['cod_organograma'];
+}
+
+this.queryText += " ORDER BY local_destino, local_origem, bem.descricao";
 
 params["query"] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[SELECT  bem.*
-       ,bem_responsavel.*
-       ,(SELECT nom_cgm 
-          FROM sw_cgm 
-         WHERE numcgm = bem_responsavel.numcgm) AS responsavel
-       , (CASE WHEN (SELECT COALESCE(COUNT(cod_bem),1)=1 
-                     FROM patrimonio.historico_bem
-                    WHERE historico_bem.cod_bem = bem.cod_bem)
-              THEN
-                  'SETOR PATRIMONIO'
-              ELSE 
-                  COALESCE((SELECT ol.descricao FROM organograma.local ol
-                  INNER JOIN patrimonio.historico_bem phb
-                          ON ol.cod_local = phb.cod_local
-                       WHERE phb.cod_bem = bem.cod_bem
-                         AND phb.timestamp = (SELECT timestamp FROM patrimonio.historico_bem phb2
-                                               WHERE phb2.cod_bem = bem.cod_bem 
-                                            ORDER BY timestamp DESC LIMIT 1 OFFSET 1)),'SETOR DE PATRIMONIO')
-               END) AS local_origem
-       ,COALESCE((SELECT ol.descricao FROM organograma.local ol
-     INNER JOIN patrimonio.historico_bem phb
-             ON ol.cod_local = phb.cod_local
-          WHERE phb.cod_bem = bem.cod_bem
-            AND phb.timestamp = (SELECT timestamp FROM patrimonio.historico_bem phb2
-                                  WHERE phb2.cod_bem = bem.cod_bem 
-                                        ORDER BY timestamp DESC LIMIT 1 OFFSET 0)),'SETOR DE PATRIMONIO') AS local_destino
-         FROM  patrimonio.bem
-   INNER JOIN  patrimonio.bem_responsavel
-           ON  bem_responsavel.cod_bem = bem.cod_bem
+            <xml-property name="queryText"><![CDATA[  SELECT bem.*
+       , bem_responsavel.*
+       , (SELECT nom_cgm FROM sw_cgm WHERE numcgm = bem_responsavel.numcgm) AS responsavel
+       , (CASE WHEN ( SELECT COALESCE(COUNT(cod_bem),1)=1 
+                        FROM patrimonio.historico_bem
+                       WHERE historico_bem.cod_bem = bem.cod_bem
+                     )
+               THEN 'SETOR PATRIMONIO'
+               ELSE  COALESCE(( SELECT ol.descricao
+                                  FROM organograma.local ol
+                            
+                            INNER JOIN patrimonio.historico_bem phb
+                                    ON ol.cod_local = phb.cod_local
+                       
+                                 WHERE phb.cod_bem = bem.cod_bem
+                                   AND phb.timestamp = ( 
+                                   						 SELECT timestamp
+                                   						   FROM patrimonio.historico_bem phb2
+                                                          WHERE phb2.cod_bem = bem.cod_bem 
+                                                       ORDER BY timestamp DESC LIMIT 1 OFFSET 1
+                                                        )
+         ),'SETOR DE PATRIMONIO') END) AS local_origem
+ 
+       , COALESCE(( SELECT ol.descricao 
+                      FROM organograma.local ol
+                
+                INNER JOIN patrimonio.historico_bem phb
+                        ON ol.cod_local = phb.cod_local
+                     
+                     WHERE phb.cod_bem = bem.cod_bem
+                       AND phb.timestamp = ( SELECT timestamp 
+                                               FROM patrimonio.historico_bem phb2
+                                              WHERE phb2.cod_bem = bem.cod_bem 
+                                           ORDER BY timestamp DESC LIMIT 1 OFFSET 0)
+                                            )
+             ,  'SETOR DE PATRIMONIO') AS local_destino
+             ,  vw_orgao_nivel.orgao as orgao             
+         
+          FROM  patrimonio.bem
+    
+    INNER JOIN  patrimonio.bem_responsavel
+            ON  bem_responsavel.cod_bem = bem.cod_bem
+ 
+     LEFT JOIN ( SELECT h.*
+                   FROM patrimonio.historico_bem as h
+                      , patrimonio.historico_bem as uhb
+                  WHERE h.cod_bem = uhb.cod_bem
+               GROUP BY h.cod_bem
+                      , h.cod_situacao
+                      , h.cod_local
+                      , h.cod_orgao
+                      , h.timestamp
+                      , h.descricao HAVING h.timestamp = max(uhb.timestamp)) as hb
+            ON hb.cod_bem = bem.cod_bem  
+
+    INNER JOIN organograma.local
+            ON local.cod_local = hb.cod_local   
+    
+    INNER JOIN organograma.orgao
+            ON orgao.cod_orgao = hb.cod_orgao   
+
+    INNER JOIN organograma.vw_orgao_nivel
+            ON orgao.cod_orgao = vw_orgao_nivel.cod_orgao   
+         
          WHERE  bem_responsavel.numcgm  = ?
            AND  bem_responsavel.dt_fim IS NULL
-AND NOT EXISTS
-    (
-        SELECT  1
-          FROM  patrimonio.bem_baixado
-         WHERE  bem_baixado.cod_bem = bem.cod_bem
-    )
+
+AND NOT EXISTS (
+                 SELECT  1
+          		   FROM  patrimonio.bem_baixado
+         		  WHERE  bem_baixado.cod_bem = bem.cod_bem 
+         	   )
 ]]></xml-property>
         </oda-data-set>
     </data-sets>
@@ -669,6 +761,12 @@ AND NOT EXISTS
                     <expression name="expression">dataSetRow["responsavel"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">orgao</property>
+                    <property name="displayName">orgao</property>
+                    <expression name="expression">'Classificação: '+dataSetRow["orgao"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <property name="pageBreakInterval">0</property>
             <column id="1176">
@@ -749,6 +847,42 @@ AND NOT EXISTS
                     </cell>
                 </row>
             </header>
+            <group id="6672">
+                <property name="groupName">orgao</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["orgao"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">row["orgao"]</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">auto</property>
+                <header>
+                    <row id="6673">
+                        <cell id="6674">
+                            <property name="colSpan">5</property>
+                            <property name="rowSpan">1</property>
+                            <data id="6685">
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="resultSetColumn">orgao</property>
+                            </data>
+                        </cell>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6679">
+                        <cell id="6680"/>
+                        <cell id="6681"/>
+                        <cell id="6682"/>
+                        <cell id="6683"/>
+                        <cell id="6684"/>
+                    </row>
+                </footer>
+            </group>
             <group id="1543">
                 <property name="groupName">localDestinoGroup</property>
                 <property name="interval">none</property>

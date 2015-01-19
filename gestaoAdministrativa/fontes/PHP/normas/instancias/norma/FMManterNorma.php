@@ -189,9 +189,6 @@ $obHdnCodNorma->setValue( $inCodNorma  );
 $obHdnNormaAlteracao = new Hidden;
 $obHdnNormaAlteracao->setName ( "hdnstNormaAlteracao" );
 
-$obHdnTipoLeiAlteracaoOrcamentaria = new Hidden;
-$obHdnTipoLeiAlteracaoOrcamentaria->setName ( "hdnTipoLeiAlteracaoOrcamentaria" );
-
 $obHdnCodTipoNorma = new Hidden;
 $obHdnCodTipoNorma->setName ( "inCodTipoNorma" );
 $obHdnCodTipoNorma->setId   ( "inCodTipoNorma" );
@@ -348,38 +345,50 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
             $obHdnCodLeiAlteracao->setValue( $codLeiAlteracao );
         }
     break;
-    case 11:
-        include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php"           );
-        include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTipoLeiOrigemDecreto.class.php"  );
+    case 11: //TCEMG
         
-        $obTTCEMGTipoLeiOrigemDecreto = new TTCEMGTipoLeiOrigemDecreto;
-        $obTTCEMGTipoLeiOrigemDecreto->recuperaTodos($rsTipoLeiOrigemDecreto);
-        
-        $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
-        $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $_REQUEST['inCodNorma'] );
-        $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe);
-        
-        $obCmbTipoLeiOrigemDecreto = new Select;
-        $obCmbTipoLeiOrigemDecreto->setRotulo       ( 'Tipo de Lei que Originou Decreto');
-        $obCmbTipoLeiOrigemDecreto->setName         ( 'stTipoLeiOrigemDecreto'          );
-        $obCmbTipoLeiOrigemDecreto->setId           ( 'stTipoLeiOrigemDecreto'          );
-        $obCmbTipoLeiOrigemDecreto->setCampoId      ( 'cod_tipo_lei'                    );
-        $obCmbTipoLeiOrigemDecreto->setCampoDesc    ( 'descricao'                       );
-        $obCmbTipoLeiOrigemDecreto->addOption       ( "", "Selecione"                   );
-        $obCmbTipoLeiOrigemDecreto->preencheCombo   ( $rsTipoLeiOrigemDecreto           );
-        $obCmbTipoLeiOrigemDecreto->setTitle        ( "Selecione o Tipo de Lei que Originou Decreto"      );
-        $obCmbTipoLeiOrigemDecreto->obEvento->setOnChange("buscaValor('montaLeiOrcamentaria');");
-        if ( $stAcao == "alterar" ) {
+        if ($stAcao == "alterar") {
+            //Será dentro do OC
+            include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php"           );
+            include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTipoLeiOrigemDecreto.class.php"  );
+            
+            $obHdnTipoLeiAlteracaoOrcamentaria = new Hidden;
+            $obHdnTipoLeiAlteracaoOrcamentaria->setName ( "hdnTipoLeiAlteracaoOrcamentaria" );
+                    
+            $obTTCEMGTipoLeiOrigemDecreto = new TTCEMGTipoLeiOrigemDecreto;
+            $obTTCEMGTipoLeiOrigemDecreto->recuperaTodos($rsTipoLeiOrigemDecreto);
+            
+            $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
+            $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $_REQUEST['inCodNorma'] );
+            $obTTCEMGNormaDetalhe->recuperaPorChave($rsNormaDetalhe);
+            
+            $obCmbTipoLeiOrigemDecreto = new Select;
+            $obCmbTipoLeiOrigemDecreto->setRotulo       ( 'Tipo de Lei que Originou Decreto');
+            $obCmbTipoLeiOrigemDecreto->setName         ( 'stTipoLeiOrigemDecreto'          );
+            $obCmbTipoLeiOrigemDecreto->setId           ( 'stTipoLeiOrigemDecreto'          );
+            $obCmbTipoLeiOrigemDecreto->setCampoId      ( 'cod_tipo_lei'                    );
+            $obCmbTipoLeiOrigemDecreto->setCampoDesc    ( 'descricao'                       );
+            $obCmbTipoLeiOrigemDecreto->addOption       ( "", "Selecione"                   );
+            $obCmbTipoLeiOrigemDecreto->preencheCombo   ( $rsTipoLeiOrigemDecreto           );
+            $obCmbTipoLeiOrigemDecreto->setTitle        ( "Selecione o Tipo de Lei que Originou Decreto"      );
+            $obCmbTipoLeiOrigemDecreto->obEvento->setOnChange("buscaValor('montaLeiOrcamentaria');");
+            
             if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')){
-               $obCmbTipoLeiOrigemDecreto->setValue         ( $rsNormaDetalhe->getCampo('tipo_lei_origem_decreto') );
-               if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3 ){
-                  $obHdnTipoLeiAlteracaoOrcamentaria->setValue($rsNormaDetalhe->getCampo('tipo_lei_alteracao_orcamentaria'));
-               }
+                $obCmbTipoLeiOrigemDecreto->setValue         ( $rsNormaDetalhe->getCampo('tipo_lei_origem_decreto') );
+                if($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3 ){
+                      $obHdnTipoLeiAlteracaoOrcamentaria->setValue($rsNormaDetalhe->getCampo('tipo_lei_alteracao_orcamentaria'));
+                }
             }
+            
         }
-        $obSpanTipoLeiAlteracaoOrcamentaria = new Span;
-        $obSpanTipoLeiAlteracaoOrcamentaria->setId('spanTipoLeiAlteracaoOrcamentaria');
         
+        // Somente ocorre para lei e decreto
+        $obSpanTipoLeiDecreto = new Span;
+        $obSpanTipoLeiDecreto->setId  ('spanTipoLeiDecreto');
+                        
+        $obSpanTipoLeiAlteracaoOrcamentaria = new Span;
+        $obSpanTipoLeiAlteracaoOrcamentaria->setId  ('spanTipoLeiAlteracaoOrcamentaria');
+                
     break;
 }
     
@@ -428,9 +437,13 @@ $obFormulario->addComponente        ( $obTxtExercicio     );
 $obFormulario->addComponente        ( $obTxtNome          );
 $obFormulario->addComponente        ( $obTxtDescricao     );
 
-if(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11){
-    $obFormulario->addHidden        ( $obHdnTipoLeiAlteracaoOrcamentaria  );
-    $obFormulario->addComponente    ( $obCmbTipoLeiOrigemDecreto          );
+if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11) && Sessao::getExercicio() >= "2015"){
+    if ($stAcao == "alterar") {
+        $obFormulario->addHidden        ( $obHdnTipoLeiAlteracaoOrcamentaria  );
+        $obFormulario->addComponente    ( $obCmbTipoLeiOrigemDecreto          );
+    }
+    
+    $obFormulario->addSpan          ( $obSpanTipoLeiDecreto );
     $obFormulario->addSpan          ( $obSpanTipoLeiAlteracaoOrcamentaria );
 
 }
@@ -473,8 +486,9 @@ if ( $stAcao == "alterar" and $codLeiAlteracao > 0 ) {
     $js .= "buscaValor('MontaBuscaNorma');";
 }
 
-if ( $stAcao == "alterar" and ($rsNormaDetalhe->getCampo('tipo_lei_origem_decreto')==3) ) {
-    $js .= "buscaValor('montaLeiOrcamentaria');";
+if ( $stAcao == "alterar" && (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 11)) {
+    if( $rsNormaDetalhe->getCampo('tipo_lei_origem_decreto') == 3 )
+        $js .= "buscaValor('montaLeiOrcamentaria');";
 }
 
 sistemaLegado::executaFrameOculto($js);

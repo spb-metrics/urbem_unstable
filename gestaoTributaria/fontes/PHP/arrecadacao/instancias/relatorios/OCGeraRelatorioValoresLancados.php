@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioValoresLancados.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioValoresLancados.php 61362 2015-01-12 11:22:07Z carolina $
 
     * Casos de uso: uc-05.01.13
 */

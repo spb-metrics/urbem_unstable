@@ -29,7 +29,7 @@
     *
     * @author Analista: Silvia Martins Silva
     * @author Desenvolvedor: Evandro Melos
-    * $Id: TTCETOAlteracaoLeiPPA.class.php 60778 2014-11-14 17:55:19Z evandro $
+    * $Id: TTCETOAlteracaoLeiPPA.class.php 61442 2015-01-16 16:55:25Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -71,10 +71,19 @@ class TTCETOAlteracaoLeiPPA extends Persistente
 
     public function montaRecuperaAlteracaoLeisPPA()
     {
-        $stSql = "  SELECT * 
+        $stSql = "  SELECT alteracao_lei_ppa.cod_norma
+                        , alteracao_lei_ppa.data_alteracao
+                        , tipo_norma.nom_tipo_norma||' '||norma.num_norma||'/'||norma.exercicio||' - '||norma.nom_norma  AS nom_norma
+                        , norma.descricao
+                        , norma.exercicio
+                        , norma.num_norma
+                        , norma.cod_tipo_norma
+                        , tipo_norma.nom_tipo_norma
                     FROM tceto.alteracao_lei_ppa 
                     JOIN normas.norma
                         ON norma.cod_norma = alteracao_lei_ppa.cod_norma
+                    JOIN normas.tipo_norma
+                      ON tipo_norma.cod_tipo_norma = norma.cod_tipo_norma
                     WHERE alteracao_lei_ppa.timestamp = (SELECT MAX(timestamp) 
                                                          FROM tceto.alteracao_lei_ppa)
                 ";

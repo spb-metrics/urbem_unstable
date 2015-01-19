@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLManterPlanoConta.php 60235 2014-10-07 20:38:22Z arthur $
+    * $Id: FLManterPlanoConta.php 61444 2015-01-16 17:32:17Z franver $
 
     * Casos de uso: uc-02.02.02
 */
@@ -216,6 +216,28 @@ $obCmbContaCorrente->setDisabled  ( $boDisabled );
 $obCmbContaCorrente->setNull(true);
 $obCmbContaCorrente->obEvento->setOnChange  ( " montaParametrosGET('BuscaContaCorrente'); ");
 
+// Define Objeto TextBox para Codigo do Recurso
+$obTxtRecurso = new TextBox;
+$obTxtRecurso->setName    ( "inCodRecurso"                     );
+$obTxtRecurso->setId      ( "inCodRecurso"                     );
+$obTxtRecurso->setValue   ( $inCodRecurso                      );
+$obTxtRecurso->setRotulo  ( "Recurso"                          );
+$obTxtRecurso->setTitle   ( "Selecione o recurso orçamentário" );
+$obTxtRecurso->setDisabled( $boDesabilitaRecurso               );
+$obTxtRecurso->setMascara ( $stMascaraRecurso                  );
+$obTxtRecurso->setPreencheComZeros ( 'E'                       );
+
+// Define Objeto Select para o Recurso
+$obCmbRecurso = new Select;
+$obCmbRecurso->setName      ( "stNomeRecurso"    );
+$obCmbRecurso->setId        ( "stNomeRecurso"    );
+$obCmbRecurso->setValue     ( $inCodRecurso      );
+$obCmbRecurso->addOption    ( "", "Selecione"    );
+$obCmbRecurso->setCampoId   ( "[cod_fonte]"    );
+$obCmbRecurso->setCampoDesc ( "[nom_recurso]"  );
+$obCmbRecurso->preencheCombo( $rsRecurso         );
+$obCmbRecurso->setDisabled  ( $boDesabilitaRecurso );
+
 
 //****************************************//
 //Monta FORMULARIO
@@ -237,6 +259,7 @@ $obFormulario->addComponente( $obDataSaldo           );
 $obFormulario->addComponenteComposto( $obTxtBanco  , $obCmbBanco   );
 $obFormulario->addComponenteComposto( $obTxtAgencia, $obCmbAgencia );
 $obFormulario->addComponente( $obCmbContaCorrente );
+$obFormulario->addComponenteComposto( $obTxtRecurso, $obCmbRecurso );
 
 $obFormulario->OK();
 $obFormulario->show();

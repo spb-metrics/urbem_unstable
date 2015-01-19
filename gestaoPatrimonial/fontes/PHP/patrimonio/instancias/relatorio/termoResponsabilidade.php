@@ -28,13 +28,16 @@
   * Página de Filtro para emissão do relatório Termo de Responsabilidade
   * Data de criação : 12/08/2008
 
-  $Id: termoResponsabilidade.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: termoResponsabilidade.php 61409 2015-01-14 18:21:07Z diogo.zarpelon $
 
   */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once CAM_GA_ORGAN_MAPEAMENTO."TOrganogramaOrganograma.class.php";
 include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
+include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
+include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganogramaLocal.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "termoResponsabilidade";
@@ -51,6 +54,17 @@ include($pgJS);
 //cria um novo formulario
 $obForm = new Form;
 $obForm->setAction ($pgOcul);
+
+# Recupera o Organograma Ativo no sistema.
+$obTOrganogramaOrganograma = new TOrganogramaOrganograma;
+$obTOrganogramaOrganograma->setDado('ativo', true);
+$obTOrganogramaOrganograma->recuperaOrganogramasAtivo($rsOrganogramaAtivo);
+
+$inCodOrganogramaAtivo = $rsOrganogramaAtivo->getCampo('cod_organograma');
+
+$obHdnOrganogramaAtivo = new Hidden;
+$obHdnOrganogramaAtivo->setName ("inCodOrganogramaAtivo" );
+$obHdnOrganogramaAtivo->setValue($inCodOrganogramaAtivo);
 
 //instancia o componente IPopUpCGMVinculado para o responsavel
 $obIPopUpCGMVinculadoResponsavel = new IPopUpCGMVinculado( $obForm );
@@ -84,12 +98,24 @@ if ($cnpjCNM == '00703157000183') {
     $obChkValor->setValue   (1);
 }
 
+# Filtros de Organograma / Localização
+$obIMontaOrganograma = new IMontaOrganograma(false);
+$obIMontaOrganograma->setStyle('width:250px');
+
+$obIMontaOrganogramaLocal = new IMontaOrganogramaLocal;
+$obIMontaOrganogramaLocal->setValue($codLocal);
+
 // Define o formulário
 $obFormulario = new Formulario;
 $obFormulario->addForm       ( $obForm          );
 $obFormulario->addTitulo     ( "Dados para o Filtro");
 $obFormulario->addComponente ( $obIPopUpCGMVinculadoResponsavel );
 $obFormulario->addComponente ( $obChkValor );
+$obFormulario->addHidden    ( $obHdnOrganogramaAtivo );
+
+$obFormulario->addTitulo    ( "Localização"   );
+$obIMontaOrganograma->geraFormulario( $obFormulario );
+$obIMontaOrganogramaLocal->geraFormulario( $obFormulario );
 
 $obFormulario->OK();
 $obFormulario->show();

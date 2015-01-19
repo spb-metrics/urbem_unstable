@@ -559,7 +559,21 @@ this.queryText += " 		) \n";
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="rreo_anexo4_despesas" id="1325">
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[this.queryText = " select *  \n";
+            <method name="beforeOpen"><![CDATA[this.queryText = " select  \n";
+this.queryText += "          grupo,   \n";
+this.queryText +="          nivel,    \n";
+this.queryText +="          cod_estrutural,    \n";
+this.queryText +="          nom_funcao,    \n";
+this.queryText +="          COALESCE(vl_original,0.00) as vl_original ,    \n";
+this.queryText +="          COALESCE(vl_suplementacoes,0.00) as   vl_suplementacoes              	 ,    \n";
+this.queryText +="          COALESCE(vl_empenhado_bimestre,0.00) as vl_empenhado_bimestre            	 ,    \n";
+this.queryText +="          COALESCE(vl_empenhado_ate_bimestre,0.00) as  vl_empenhado_ate_bimestre       	 ,    \n";
+this.queryText +="          COALESCE(vl_empenhado_ate_bimestre_anterior,0.00) as vl_empenhado_ate_bimestre_anterior ,    \n";
+this.queryText +="          COALESCE(vl_liquidado_bimestre,0.00) as vl_liquidado_bimestre ,    \n";
+this.queryText +="          COALESCE(vl_liquidado_ate_bimestre,0.00) as vl_liquidado_ate_bimestre ,	\n";
+this.queryText +="          COALESCE(vl_liquidado_ate_bimestre_anterior,0.00) as vl_liquidado_ate_bimestre_anterior ,    \n";
+this.queryText +=" 			COALESCE(vl_nao_processados_exercicio_anterior,0.00) as vl_nao_processados_exercicio_anterior, 	\n";
+this.queryText +=" 			COALESCE(vl_nao_processados_exercicio,0.00) as vl_nao_processados_exercicio  	\n";
 this.queryText +=" from stn.fn_rreo_anexo4_despesas( '"+params['exercicio']+"', '"+params['entidade']+"', '"+params['dt_inicial']+"', '"+params['dt_final']+"' ) as \n";
 this.queryText +=" retorno ( grupo                             integer ,   \n";
 this.queryText +="          nivel                              	integer ,    \n";
@@ -1805,13 +1819,13 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 <structure>
                     <property name="name">total_vl_original</property>
                     <property name="displayName">total_vl_original</property>
-                    <expression name="expression">Total.sum(row["vl_original"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_original"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_suplementacoes</property>
                     <property name="displayName">total_vl_suplementacoes</property>
-                    <expression name="expression">Total.sum(row["vl_suplementacoes"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_suplementacoes"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -1823,13 +1837,13 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 <structure>
                     <property name="name">total_vl_empenhado_ate_bimestre</property>
                     <property name="displayName">total_vl_empenhado_ate_bimestre</property>
-                    <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_empenhado_ate_bimestre_anterior</property>
                     <property name="displayName">total_vl_empenhado_ate_bimestre_anterior</property>
-                    <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre_anterior"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre_anterior"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -1884,22 +1898,32 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 </structure>
                 <structure>
                     <property name="name">total_vl_liquidado_ate_bimestre</property>
-                    <expression name="expression">Total.sum(row["vl_liquidado_ate_bimestre"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_liquidado_ate_bimestre"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_liquidado_ate_bimestre_anterior</property>
-                    <expression name="expression">Total.sum(row["vl_liquidado_ate_bimestre_anterior"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_liquidado_ate_bimestre_anterior"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_nao_processado_exercicio</property>
-                    <expression name="expression">Total.sum(row["vl_nao_processado_exercicio"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_nao_processado_exercicio"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_nao_processado_exercicio_anterior</property>
-                    <expression name="expression">Total.sum(row["vl_nao_processado_exercicio_anterior"], row.nivel == 2)</expression>
+                    <expression name="expression">Total.sum(row["vl_nao_processado_exercicio_anterior"], row.nivel == 2);</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">resultado_vl_despesa_liquidada</property>
+                    <expression name="expression">params["total_ate_bimestre"] - row["total_vl_liquidado_ate_bimestre"];</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">resultado_vl_despesa_liquidada_anterior</property>
+                    <expression name="expression">params["total_ate_bimestre_anterior"] - row["total_vl_liquidado_ate_bimestre_anterior"];</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
@@ -2490,6 +2514,9 @@ true;
                         </data>
                     </cell>
                     <cell id="2730">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <data id="6712">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -2501,6 +2528,9 @@ true;
                         </data>
                     </cell>
                     <cell id="6688">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <data id="6713">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -2515,6 +2545,9 @@ true;
                         </data>
                     </cell>
                     <cell id="6695">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <data id="6714">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -2631,6 +2664,15 @@ true;
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
                         <property name="borderRightWidth">thin</property>
+                        <data id="6772">
+                            <property name="fontSize">4pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">resultado_vl_despesa_liquidada</property>
+                        </data>
                     </cell>
                     <cell id="2746">
                         <property name="borderBottomColor">#000000</property>
@@ -2645,6 +2687,15 @@ true;
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
+                        <data id="6773">
+                            <property name="fontSize">4pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">resultado_vl_despesa_liquidada_anterior</property>
+                        </data>
                     </cell>
                     <cell id="6690">
                         <property name="borderBottomColor">#000000</property>
@@ -4035,6 +4086,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">1px</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">1px</property>
@@ -4179,6 +4233,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
                         <data id="6743">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -4193,6 +4250,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <data id="6746">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -4210,6 +4270,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <data id="6747">
                             <property name="fontSize">4pt</property>
                             <structure name="numberFormat">
@@ -4372,6 +4435,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">1px</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">1px</property>
@@ -4392,6 +4458,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">1px</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">1px</property>
@@ -4415,6 +4484,9 @@ true;
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
                         <property name="borderLeftWidth">1px</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">1px</property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">1px</property>
@@ -4462,6 +4534,16 @@ true;
                 </structure>
             </list-property>
             <property name="resultSetColumn">data_extenso</property>
+        </data>
+        <data id="6771">
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">query</property>
+                    <expression name="expression">params["query"].value</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <property name="resultSetColumn">query</property>
         </data>
         <grid name="assinaturas1" id="2763" extends="urbem_231.assinaturas">
             <property name="marginTop">50pt</property>

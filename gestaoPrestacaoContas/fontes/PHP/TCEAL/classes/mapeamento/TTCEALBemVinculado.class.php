@@ -27,7 +27,7 @@
     *
     * @author: Carlos Adriano Vernieri da Silva
     *
-    * $Id: TTCEALBemVinculado.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTCEALBemVinculado.class.php 61420 2015-01-15 16:24:25Z jean $
     *
     * @ignore
     *
@@ -81,21 +81,21 @@ class TTCEALBemVinculado extends Persistente
                         , bem.cod_bem AS num_bem
                         , bem.num_placa AS num_tombamento
                         , CASE WHEN bem_comprado.cod_empenho::VARCHAR  <> '' THEN
-                            TO_CHAR(dt_empenho,'yyyymm')||bem_comprado.cod_empenho::VARCHAR
+                            TO_CHAR(dt_empenho,'yyyymm')||LPAD(bem_comprado.cod_empenho::VARCHAR,7,'0')
                           ELSE 
-                            ''::VARCHAR
+                            '9999010000001'::VARCHAR
                           END AS num_empenho
                        
                     FROM patrimonio.bem
-              INNER JOIN patrimonio.bem_comprado
+               LEFT JOIN patrimonio.bem_comprado
                       ON bem_comprado.cod_bem      = bem.cod_bem
+                     AND bem_comprado.exercicio    = '".$this->getDado('exercicio')."'
+                     AND bem_comprado.cod_entidade = ".$this->getDado('inCodEntidade')."
                LEFT JOIN empenho.empenho
                       ON bem_comprado.cod_empenho = empenho.cod_empenho
                      AND bem_comprado.cod_entidade = empenho.cod_entidade
                      AND bem_comprado.exercicio = empenho.exercicio
-                   WHERE bem_comprado.exercicio    = '".$this->getDado('exercicio')."'
-                     AND bem_comprado.cod_entidade = ".$this->getDado('inCodEntidade')."
-                     AND bem.dt_aquisicao < to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                   WHERE bem.dt_aquisicao < to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
                     ) AS tabela
                 ORDER BY num_bem";
                 

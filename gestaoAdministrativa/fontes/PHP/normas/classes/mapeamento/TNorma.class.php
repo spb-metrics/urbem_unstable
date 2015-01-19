@@ -318,6 +318,12 @@ function montaRecuperaDadosExportacaoLPP()
                             ON norma.cod_norma = configuracao_leis_ppa.cod_norma
                          WHERE configuracao_leis_ppa.tipo_configuracao = 'alteracao'
                            AND configuracao_leis_ppa.status <> 'f'
+                           AND (SELECT MAX(norma.dt_publicacao)
+                                FROM tcemg.configuracao_leis_ppa
+                                JOIN normas.norma
+                                  ON norma.cod_norma = configuracao_leis_ppa.cod_norma
+                                WHERE configuracao_leis_ppa.tipo_configuracao = 'alteracao'
+                                  AND configuracao_leis_ppa.status <> 'f') = norma.dt_publicacao
                     ) as ppa_alteracao
                    ON ppa_anterior.exercicio = configuracao_leis_ppa.exercicio
                 WHERE configuracao_leis_ppa.exercicio = '".$this->getDado('exercicio')."'

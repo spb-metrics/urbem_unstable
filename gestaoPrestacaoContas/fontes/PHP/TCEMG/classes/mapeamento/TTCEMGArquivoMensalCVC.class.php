@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalCVC.class.php 61030 2014-12-01 17:27:56Z lisiane $
+    $Id: TTCEMGArquivoMensalCVC.class.php 61408 2015-01-14 17:26:31Z lisiane $
 
 */
 
@@ -81,8 +81,14 @@ class TTCEMGArquivoMensalCVC extends Persistente
                         END as numero_renavam                        
                         , numero_serie
                         , situacao_veiculo
-                        , tipo_deslocamento
-                FROM (
+                        , tipo_deslocamento \n";
+                        
+        if ( $this->getDado('exercicio') >= "2015" ) {
+            $stSql .=   " , tipo_documento
+                          , nro_documento \n";
+        }
+        
+        $stSql .= "    FROM (
                                 SELECT 10 AS tipo_registro
                                             , CASE WHEN (veiculo_propriedade.proprio = true) THEN
                                                     orgao_bem.cod_orgao
@@ -130,23 +136,31 @@ class TTCEMGArquivoMensalCVC extends Persistente
                                                 veiculo_uniorcam.num_unidade 
                                              END as uniorcam_cod_unidade
                                             , orgao_sicom.cod_entidade as cod_unidade_sub
-                                            , orgao_sicom.valor as cod_orgao
-                                    FROM frota.veiculo
-                                       JOIN frota.modelo
-                                        ON modelo.cod_modelo = veiculo.cod_modelo
+                                            , orgao_sicom.valor as cod_orgao ";
+                                            
+            if ( $this->getDado('exercicio') >= "2015" ) {
+                            $stSql .=   "   , tmp_tipo_documento.tipo_documento
+                                            , tmp_nro_documento.nro_documento \n ";
+            }
+                                            
+            $stSql .=  "             FROM frota.veiculo
+                                        
+                                     JOIN frota.modelo
+                                       ON modelo.cod_modelo = veiculo.cod_modelo
                                       AND modelo.cod_marca = veiculo.cod_marca
                                       
-                                LEFT JOIN patrimonio.veiculo_uniorcam
-                                         ON veiculo_uniorcam.cod_veiculo = veiculo.cod_veiculo
+                              LEFT JOIN patrimonio.veiculo_uniorcam
+                                     ON veiculo_uniorcam.cod_veiculo = veiculo.cod_veiculo
                                         
                               LEFT JOIN frota.marca
-                                        ON marca.cod_marca = modelo.cod_marca
-                                      JOIN frota.veiculo_propriedade
-                                       ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-                                     AND veiculo_propriedade.\"timestamp\" = ( SELECT MAX(vp.\"timestamp\")
-                                                         FROM frota.veiculo_propriedade as vp
-                                                        WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
-                                                     )
+                                     ON marca.cod_marca = modelo.cod_marca
+                                    
+                                   JOIN frota.veiculo_propriedade
+                                     ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+                                    AND veiculo_propriedade.\"timestamp\" = ( SELECT MAX(vp.\"timestamp\")
+                                                                                FROM frota.veiculo_propriedade as vp
+                                                                               WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo )
+                                                                            
                               LEFT JOIN ( SELECT bem.descricao
                                                          , bem.cod_bem
                                                          , bem_comprado.num_orgao
@@ -154,26 +168,33 @@ class TTCEMGArquivoMensalCVC extends Persistente
                                                          , veiculo_propriedade.cod_veiculo
                                                          , MAX(veiculo_propriedade.\"timestamp\")
                                                          , bem_comprado.cod_entidade
-                                                 FROM frota.veiculo
-                                                   JOIN frota.veiculo_propriedade
-                                                     ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-                                                   AND veiculo_propriedade.proprio = true
-                                                   JOIN frota.proprio
-                                                    ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-                                                  AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
-                                          LEFT JOIN frota.terceiros
-                                                   ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
-                                                 AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
-                                                 JOIN patrimonio.bem
-                                                   ON bem.cod_bem = proprio.cod_bem
-                                                 JOIN patrimonio.bem_comprado
-                                                  ON bem_comprado.cod_bem = bem.cod_bem                      
-                                       GROUP BY bem.descricao
-                                                     , veiculo_propriedade.cod_veiculo
-                                                     , bem.cod_bem
-                                                     , bem_comprado.cod_entidade
-                                                     , bem_comprado.num_orgao
-                                                     , bem_comprado.num_unidade
+                                                      
+                                                      FROM frota.veiculo
+                                                   
+                                                      JOIN frota.veiculo_propriedade
+                                                        ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+                                                       AND veiculo_propriedade.proprio = true
+                                                      
+                                                      JOIN frota.proprio
+                                                        ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                                       AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
+                                          
+                                                 LEFT JOIN frota.terceiros
+                                                        ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                                       AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
+                                                 
+                                                      JOIN patrimonio.bem
+                                                        ON bem.cod_bem = proprio.cod_bem
+                                                
+                                                      JOIN patrimonio.bem_comprado
+                                                        ON bem_comprado.cod_bem = bem.cod_bem
+                                                
+                                                  GROUP BY bem.descricao
+                                                         , veiculo_propriedade.cod_veiculo
+                                                         , bem.cod_bem
+                                                         , bem_comprado.cod_entidade
+                                                         , bem_comprado.num_orgao
+                                                         , bem_comprado.num_unidade
                                                 ) AS descricao_veiculo
                                             ON descricao_veiculo.cod_veiculo = veiculo.cod_veiculo
                                             
@@ -192,15 +213,15 @@ class TTCEMGArquivoMensalCVC extends Persistente
                                            ON orgao_bem.cod_bem = descricao_veiculo.cod_bem
                                            
                                   LEFT JOIN tcemg.tipo_veiculo_vinculo
-                                            ON tipo_veiculo_vinculo.cod_tipo = veiculo.cod_tipo_veiculo
+                                         ON tipo_veiculo_vinculo.cod_tipo = veiculo.cod_tipo_veiculo
                                           
                                   LEFT JOIN frota.proprio
-                                           ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-                                          AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
+                                         ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                        AND proprio.\"timestamp\" = veiculo_propriedade.\"timestamp\"
                                           
                                   LEFT JOIN frota.terceiros
-                                           ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
-                                          AND terceiros.\"timestamp\" = veiculo_propriedade.\"timestamp\"
+                                         ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                        AND terceiros.\"timestamp\" = veiculo_propriedade.\"timestamp\"
                                           
                                   LEFT JOIN ( SELECT * FROM(
                                                      SELECT terceiros_historico.cod_veiculo
@@ -224,10 +245,92 @@ class TTCEMGArquivoMensalCVC extends Persistente
                                                                WHERE configuracao_entidade.cod_entidade IN(".$this->getDado('entidades').") AND parametro = 'tcemg_codigo_orgao_entidade_sicom'
                                                )  AS orgao_sicom
                                            ON orgao_sicom.exercicio= '".Sessao::getExercicio()."'
-                                         AND orgao_sicom.cod_entidade = orgao_terceiro.cod_entidade
-                                           OR orgao_sicom.cod_entidade = descricao_veiculo.cod_entidade
+                                          AND orgao_sicom.cod_entidade = orgao_terceiro.cod_entidade
+                                           OR orgao_sicom.cod_entidade = descricao_veiculo.cod_entidade \n";
+                                           
+            if ( $this->getDado('exercicio') >= "2015" ) {
+                        $stSql .= " LEFT JOIN(
+                                            SELECT veiculo.cod_veiculo
+                                                 , CASE WHEN (terceiros.cod_veiculo is NOT NULL) OR (proprio.cod_veiculo is NULL) AND veiculo_propriedade.proprio = false
+                                                        THEN
+                                                            CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1
+                                                                 WHEN sw_cgm_pessoa_juridica.numcgm IS NOT NULL THEN 2
+                                                                 WHEN sw_cgm_pessoa_fisica.numcgm IS NULL OR sw_cgm_pessoa_juridica.numcgm IS NULL THEN 3
+                                                            END
+                                                    END AS tipo_documento
+                                            
+                                                   FROM frota.veiculo
+                                    
+                                                   JOIN frota.veiculo_propriedade
+                                                     ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+                                                    AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+                                                                                            FROM frota.veiculo_propriedade as vp
+                                                                                           WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo )
+                                    
+                                               LEFT JOIN frota.proprio
+                                                      ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                                     AND proprio.timestamp   = veiculo_propriedade.timestamp
+                                               
+                                               LEFT JOIN frota.terceiros
+                                                      ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                                     AND terceiros.timestamp   = veiculo_propriedade.timestamp
+                                               
+                                               LEFT JOIN sw_cgm
+                                                      ON sw_cgm.numcgm = terceiros.cod_proprietario
+                                                      
+                                               LEFT JOIN sw_cgm_pessoa_fisica
+                                                      ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                                                 
+                                               LEFT JOIN sw_cgm_pessoa_juridica
+                                                      ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+                                           
+                                    ) AS tmp_tipo_documento
+                                      ON tmp_tipo_documento.cod_veiculo = veiculo.cod_veiculo
+
+                            LEFT JOIN(
+                                             SELECT veiculo.cod_veiculo
+                                                  , CASE WHEN (terceiros.cod_veiculo is NOT NULL) OR (proprio.cod_veiculo is NULL) AND veiculo_propriedade.proprio = false
+                                                         THEN cgm.num_documento::varchar
+                                                         ELSE ''::varchar
+                                                    END AS nro_documento
+                                    
+                                               FROM frota.veiculo
+                            
+                                               JOIN frota.veiculo_propriedade
+                                                 ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+                                                AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+                                                                                        FROM frota.veiculo_propriedade as vp
+                                                                                       WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo )
+                            
+                                         LEFT JOIN frota.proprio
+                                                ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                               AND proprio.timestamp   = veiculo_propriedade.timestamp
+                                         
+                                         LEFT JOIN frota.terceiros
+                                                ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                               AND terceiros.timestamp   = veiculo_propriedade.timestamp
+                                         
+                                         LEFT JOIN sw_cgm
+                                                ON sw_cgm.numcgm = terceiros.cod_proprietario
+                                         
+                                        INNER JOIN (
+							SELECT sw_cgm.numcgm
+						             , CASE WHEN sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm THEN sw_cgm_pessoa_fisica.cpf
+								    WHEN sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm THEN sw_cgm_pessoa_juridica.cnpj
+                                                                END AS num_documento
+                                                          FROM sw_cgm
+                                                     LEFT JOIN sw_cgm_pessoa_fisica
+                                                            ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                                                     LEFT JOIN sw_cgm_pessoa_juridica
+                                                            ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+
+                                                     ) AS cgm
+                                                ON cgm.numcgm = sw_cgm.numcgm
+                            ) AS tmp_nro_documento
+                              ON tmp_nro_documento.cod_veiculo = veiculo.cod_veiculo ";
+            }                               
                 
-                               ORDER BY veiculo.cod_veiculo
+        $stSql .= "  \n  ORDER BY veiculo.cod_veiculo
                      ) AS veiculos ";
         return $stSql;
     }

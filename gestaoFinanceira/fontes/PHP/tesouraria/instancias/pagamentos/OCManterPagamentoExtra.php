@@ -350,15 +350,16 @@ function verificaContas($inCodPlanoCredito, $inCodPlanoDebito, $stDtBoletim)
 {
 
     if ( ($inCodPlanoCredito) && ($inCodPlanoCredito != $inCodPlanoDebito) ) {
-        include_once( CAM_GF_TES_MAPEAMENTO."TTesourariaTransferencia.class.php" );
+        include_once( CAM_GF_TES_MAPEAMENTO."TTesourariaTransferencia.class.php" );                
         $obTTesourariaTransferencia = new TTesourariaTransferencia();
-        $obTTesourariaTransferencia->setDado("stExercicio",Sessao::getExercicio() );
-        $obTTesourariaTransferencia->setDado("inCodPlano",$inCodPlanoCredito);
-        $obTTesourariaTransferencia->setDado("stDtBoletim",$stDtBoletim);
+        $obTTesourariaTransferencia->setDado("stExercicio" , Sessao::getExercicio() );
+        $obTTesourariaTransferencia->setDado("inCodPlano"  , $inCodPlanoCredito);
+        $obTTesourariaTransferencia->setDado("stDtBoletim" , $stDtBoletim);
         $obTTesourariaTransferencia->verificaSaldoContaAnalitica($nuVlSaldoContaAnalitica);
         
-        $stJs .= "d.getElementById('nuSaldoContaAnalitica').value   = '".$nuVlSaldoContaAnalitica."'; \n";
-        $stJs .= "d.getElementById('nuSaldoContaAnaliticaBR').value = '".number_format($nuVlSaldoContaAnalitica,"2",",",".")."'; \n";
+        $stJs .= "jQuery('#nuSaldoContaAnalitica').val('".$nuVlSaldoContaAnalitica."'); \n";
+        $stJs .= "jQuery('#nuSaldoContaAnaliticaBR').val('".$nuVlSaldoContaAnalitica."'); \n";
+        $stJs .= "jQuery('#stDtBoletim').val('".$stDtBoletim."');";
     }
 
     if ( ($inCodPlanoCredito) && ( $inCodPlanoCredito == $inCodPlanoDebito) ) {
@@ -383,14 +384,14 @@ function verificaContas($inCodPlanoCredito, $inCodPlanoDebito, $stDtBoletim)
             $obTOrcamentoEntidade->recuperaRelacionamento($rsEntidadesBeneficio, " AND E.cod_entidade <> ".Sessao::read('cod_entidade_form')." AND E.exercicio = '".Sessao::getExercicio()."'");
             
             $obCmbEntidadeBeneficio = new Select;
-            $obCmbEntidadeBeneficio->setRotulo     ( "Entidade Beneficiada" );
+            $obCmbEntidadeBeneficio->setRotulo     ( "Entidade Beneficiada"   );
             $obCmbEntidadeBeneficio->setId         ( "inCodEntidadeBeneficio" );
             $obCmbEntidadeBeneficio->setName       ( "inCodEntidadeBeneficio" );
             $obCmbEntidadeBeneficio->setTitle      ( "Selecione o tipo de entidade a ser beneficiada" );
-            $obCmbEntidadeBeneficio->setCampoID    ( "cod_entidade" );
-            $obCmbEntidadeBeneficio->setCampoDesc  ( "nom_cgm" );
+            $obCmbEntidadeBeneficio->setCampoID    ( "cod_entidade"  );
+            $obCmbEntidadeBeneficio->setCampoDesc  ( "nom_cgm"       );
             $obCmbEntidadeBeneficio->addOption     ( "", "Selecione" );
-            $obCmbEntidadeBeneficio->setNull       ( false );
+            $obCmbEntidadeBeneficio->setNull       ( false           );
             $obCmbEntidadeBeneficio->preencheCombo ( $rsEntidadesBeneficio );
             
             $obTTCEPETipoTransferencia = new TTCEPETipoTransferencia;
@@ -477,11 +478,11 @@ case 'alteraBoletim':
     $obErro = $obRTesourariaBoletim->listarBoletimAberto ( $rsBoletimAberto );
 
     if ( !$obErro->ocorreu() && $rsBoletimAberto->getNumLinhas() == 1 ) {
-        $stJs  = "f.inCodBoletim.value = '" . $rsBoletimAberto->getCampo( 'cod_boletim' ) . "';\r\n";
+        $stJs .= "f.inCodBoletim.value = '" . $rsBoletimAberto->getCampo( 'cod_boletim' ) . "';\r\n";
         $stJs .= "jQuery('#stDtBoletim').val('" . $rsBoletimAberto->getCampo( 'dt_boletim' ) . "');\r\n";
         //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     } else {
-        $stJs  = "f.inCodBoletim.value = '';\r\n";
+        $stJs .= "f.inCodBoletim.value = '';\r\n";
         $stJs .= "jQuery('#stDtBoletim').val('');\r\n";
         //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     }
@@ -502,7 +503,7 @@ case 'montaSpanContas':
     $stJs  = montaSpanContas($obCmbEntidades);
     break;
 case 'verificaContas':
-    $stJs  = verificaContas($_GET['inCodPlanoCredito'],$_GET['inCodPlanoDebito'], $_GET['stDtBoletim']);
+    $stJs  = verificaContas($_REQUEST['inCodPlanoCredito'],$_REQUEST['inCodPlanoDebito'], $_REQUEST['stDtBoletim']);
     break;
 case 'verificaCodBarras':
     $stJs = verificaCodBarras( $_REQUEST['inCodBarras'] );

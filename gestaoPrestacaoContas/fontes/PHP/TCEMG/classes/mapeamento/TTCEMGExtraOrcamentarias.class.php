@@ -215,29 +215,50 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao20()
     {
-        $stSql = "
-            SELECT tipo_registro
-                 , cod_orgao
-                 , cod_ext
-                 , cod_recurso AS cod_font_recurso
-                 , vl_saldo_anterior::varchar AS vl_saldo_ant
-                 , CASE WHEN (substr(cod_estrutural,1,1) = '2') THEN
-			    (vl_saldo_atual * -1)::varchar
-			ELSE
-			    vl_saldo_atual::varchar
-		    END AS vl_saldo_atual
-              FROM tcemg.fn_arquivo_ext_registro20('".$this->getDado('exercicio')."','cod_entidade IN (".$this->getDado('entidades').")','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."','A'::CHAR)
-                AS retorno( cod_estrutural    VARCHAR
-                          , tipo_registro     INTEGER
-                          , cod_orgao         VARCHAR
-                          , cod_ext           INTEGER
-                          , cod_recurso       INTEGER
-                          , vl_saldo_anterior NUMERIC
-                          , vl_saldo_debitos  NUMERIC
-                          , vl_saldo_creditos NUMERIC
-                          , vl_saldo_atual    NUMERIC
-                          );
-        ";
+        $stSql = "  SELECT tipo_registro
+                        , cod_orgao
+                        , cod_ext
+                        , cod_font_recurso
+                        , vl_saldo_ant
+                        , CASE SIGN(vl_saldo_ant)
+                                WHEN -1 THEN 'D'
+                                WHEN 1  THEN 'C'
+                                WHEN 0  THEN ''
+                         END AS natsaldoanteriorfonte                
+                        , vl_saldo_atual
+                        , CASE SIGN(vl_saldo_atual)
+                                WHEN -1 THEN 'D'
+                                WHEN 1  THEN 'C'
+                                WHEN 0  THEN ''
+                         END AS natsaldoatualfonte
+                    FROM (
+                            SELECT  tipo_registro
+                                    , cod_orgao
+                                    , cod_ext
+                                    , cod_recurso AS cod_font_recurso
+                                    , vl_saldo_anterior AS vl_saldo_ant
+                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2') THEN
+			                                 (vl_saldo_atual * -1)
+			                            ELSE
+			                                 vl_saldo_atual
+		                             END AS vl_saldo_atual
+                            FROM tcemg.fn_arquivo_ext_registro20('".$this->getDado('exercicio')."'
+                                                                ,'cod_entidade IN (".$this->getDado('entidades').")'
+                                                                ,'".$this->getDado('dt_inicial')."'
+                                                                ,'".$this->getDado('dt_final')."'
+                                                                ,'A'::CHAR)
+                            AS retorno( cod_estrutural    VARCHAR
+                                        , tipo_registro     INTEGER
+                                        , cod_orgao         VARCHAR
+                                        , cod_ext           INTEGER
+                                        , cod_recurso       INTEGER
+                                        , vl_saldo_anterior NUMERIC
+                                        , vl_saldo_debitos  NUMERIC
+                                        , vl_saldo_creditos NUMERIC
+                                        , vl_saldo_atual    NUMERIC
+                            )
+                    ) as registro20
+        ";        
         return $stSql;
     }
 
@@ -579,124 +600,158 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao23()
     {
-        $stSql = "
-                 SELECT
-                    23 AS tipo_registro
-		    , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar AS cod_reduzido_op
-                    , '99' AS tipo_documento_op
-                    , ' ' AS num_documento
-                    , cod_ctb_transferencia.cod_ctb_anterior as cod_ctb
-                    , plano_recurso.cod_recurso AS cod_fonte_ctb
-                    , TO_CHAR(transferencia.dt_autenticacao, 'ddmmyyyy') AS dt_emissao
-                    , COALESCE(lote.vl_lancamento, 0.00) AS vl_documento
+        $stSql = "  SELECT
+                            23 AS tipo_registro
+                            , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar AS cod_reduzido_op
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN
+                                                '99'
+                                        ELSE
+                                                pagamento_tipo_documento.cod_tipo_documento
+                              END AS tipo_documento_op                            
+                            , pagamento_tipo_documento.num_documento AS num_documento
+                            , cod_ctb_transferencia.cod_ctb_anterior as cod_ctb
+                            , plano_recurso.cod_recurso AS cod_fonte_ctb
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 OR pagamento_tipo_documento.cod_tipo_documento IS NULL THEN
+                                                tipo_documento.descricao
+                                        ELSE
+                                                ''
+                              END AS desctipodocumentoop
+                            , TO_CHAR(transferencia.dt_autenticacao, 'ddmmyyyy') AS dt_emissao
+                            , COALESCE(lote.vl_lancamento, 0.00) AS vl_documento
                     
-            FROM tesouraria.transferencia
+                    FROM tesouraria.transferencia
             
-            JOIN contabilidade.plano_analitica
-              ON plano_analitica.cod_plano = transferencia.cod_plano_debito
-             AND plano_analitica.exercicio = transferencia.exercicio
-             
-            JOIN(
-                    SELECT lote.cod_lote
-                         , lote.dt_lote
-                         , lote.exercicio
-                         , conta_debito.cod_plano
-                         , lote.tipo
-                         , lote.cod_entidade
-                         , valor_lancamento.vl_lancamento
-                         
-                    FROM  contabilidade.lote
+                    JOIN contabilidade.plano_analitica
+                        ON plano_analitica.cod_plano = transferencia.cod_plano_debito
+                        AND plano_analitica.exercicio = transferencia.exercicio
                     
-                    JOIN contabilidade.valor_lancamento
-                      ON valor_lancamento.exercicio = lote.exercicio
-                     AND valor_lancamento.cod_entidade = lote.cod_entidade
-                     AND valor_lancamento.tipo = lote.tipo
-                     AND valor_lancamento.cod_lote = lote.cod_lote
-                     AND valor_lancamento.tipo_valor = 'D'
+                    JOIN(   SELECT  lote.cod_lote
+                                    , lote.dt_lote
+                                    , lote.exercicio
+                                    , conta_debito.cod_plano
+                                    , lote.tipo
+                                    , lote.cod_entidade
+                                    , valor_lancamento.vl_lancamento
+                         
+                            FROM  contabilidade.lote
+                    
+                            JOIN contabilidade.valor_lancamento
+                              ON valor_lancamento.exercicio = lote.exercicio
+                             AND valor_lancamento.cod_entidade = lote.cod_entidade
+                             AND valor_lancamento.tipo = lote.tipo
+                             AND valor_lancamento.cod_lote = lote.cod_lote
+                             AND valor_lancamento.tipo_valor = 'D'
                      
-                    JOIN contabilidade.conta_debito
-                      ON conta_debito.exercicio = valor_lancamento.exercicio
-                     AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
-                     AND conta_debito.tipo = valor_lancamento.tipo
-                     AND conta_debito.cod_lote = valor_lancamento.cod_lote
-                     AND conta_debito.sequencia = valor_lancamento.sequencia
-                     AND valor_lancamento.tipo = 'T'
+                            JOIN contabilidade.conta_debito
+                              ON conta_debito.exercicio = valor_lancamento.exercicio
+                             AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                             AND conta_debito.tipo = valor_lancamento.tipo
+                             AND conta_debito.cod_lote = valor_lancamento.cod_lote
+                             AND conta_debito.sequencia = valor_lancamento.sequencia
+                             AND valor_lancamento.tipo = 'T'
                      
-                    WHERE lote.exercicio = '2014' AND lote.tipo = 'T'
-                      AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
-                    GROUP BY 1,2,3,4,5,6,7
-                    ORDER BY lote.cod_lote
-		) AS lote
-              ON lote.exercicio = plano_analitica.exercicio
-             AND lote.cod_plano = plano_analitica.cod_plano
-             AND lote.tipo = transferencia.tipo
-             AND lote.cod_entidade =  transferencia.cod_entidade 
-             AND lote.cod_lote = transferencia.cod_lote
+                            WHERE lote.exercicio = '".$this->getDado('exercicio')."' 
+                            AND lote.tipo = 'T'
+                            AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                            GROUP BY 1,2,3,4,5,6,7
+                            ORDER BY lote.cod_lote
+		            ) AS lote
+                        ON lote.exercicio = plano_analitica.exercicio
+                        AND lote.cod_plano = plano_analitica.cod_plano
+                        AND lote.tipo = transferencia.tipo
+                        AND lote.cod_entidade =  transferencia.cod_entidade 
+                        AND lote.cod_lote = transferencia.cod_lote
              
-            JOIN tcemg.balancete_extmmaa
-              ON balancete_extmmaa.cod_plano = plano_analitica.cod_plano
-             AND balancete_extmmaa.exercicio = plano_analitica.exercicio
-             
-            JOIN contabilidade.plano_conta
-              ON plano_analitica.exercicio = plano_conta.exercicio
-             AND plano_analitica.cod_conta = plano_conta.cod_conta
-             
-            JOIN contabilidade.conta_debito
-              ON plano_analitica.exercicio = conta_debito.exercicio
-             AND plano_analitica.cod_plano = conta_debito.cod_plano
+                    JOIN tcemg.balancete_extmmaa
+                        ON balancete_extmmaa.cod_plano = plano_analitica.cod_plano
+                        AND balancete_extmmaa.exercicio = plano_analitica.exercicio
+                        
+                    LEFT JOIN tesouraria.pagamento
+                        ON pagamento.cod_plano        = plano_analitica.cod_plano
+                        AND pagamento.exercicio_plano = plano_analitica.exercicio
 
-	    JOIN contabilidade.plano_recurso
-                    ON plano_recurso.exercicio = balancete_extmmaa.exercicio
-                   AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
-       LEFT JOIN (
-                    SELECT conta_debito.cod_lote
-			 , conta_debito.tipo
-			 , conta_debito.exercicio
-			 , conta_debito.cod_entidade
-			 , conta_bancaria.cod_ctb_anterior
-			 , transferencia.cod_plano_credito
-			 , transferencia.cod_plano_debito
-			 , conta_debito.sequencia
-                      FROM contabilidade.conta_debito
-                INNER JOIN contabilidade.lote AS lo
-			ON conta_debito.cod_lote     = lo.cod_lote
-		       AND conta_debito.tipo         = lo.tipo
-		       AND conta_debito.exercicio    = lo.exercicio
-		       AND conta_debito.cod_entidade = lo.cod_entidade
-                INNER JOIN tesouraria.transferencia
-			ON transferencia.cod_plano_debito = conta_debito.cod_plano
-		       AND lo.cod_lote = transferencia.cod_lote
-		       AND transferencia.cod_entidade = lo.cod_entidade
-		       AND transferencia.tipo = 'T'
-		       AND transferencia.cod_tipo = 1
-                INNER JOIN contabilidade.plano_analitica
-                        ON plano_analitica.cod_plano = transferencia.cod_plano_credito
-                       AND plano_analitica.natureza_saldo = 'D'
-                       AND plano_analitica.exercicio = conta_debito.exercicio
-                 LEFT JOIN tcemg.conta_bancaria
-			ON conta_bancaria.cod_conta = plano_analitica.cod_conta
-		       AND conta_bancaria.exercicio = plano_analitica.exercicio
-                     WHERE conta_debito.exercicio = '2014'
-                       AND conta_debito.cod_entidade IN (2)
-                       AND  lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
-                       AND  lo.exercicio = '".$this->getDado('exercicio')."'
-		       AND conta_debito.tipo = 'T'
-                ) AS cod_ctb_transferencia
-              ON cod_ctb_transferencia.exercicio = conta_debito.exercicio                             
-             AND cod_ctb_transferencia.sequencia = conta_debito.sequencia
-             AND cod_ctb_transferencia.cod_lote = transferencia.cod_lote
-             AND cod_ctb_transferencia.tipo =conta_debito.tipo
-             AND cod_ctb_transferencia.cod_plano_debito = conta_debito.cod_plano
-	     
-           WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
-             AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
-             AND transferencia.cod_tipo = 1
+                    LEFT JOIN tcemg.pagamento_tipo_documento
+                        ON pagamento_tipo_documento.cod_entidade = pagamento.cod_entidade
+                        AND pagamento_tipo_documento.exercicio   = pagamento.exercicio
+                        AND pagamento_tipo_documento.timestamp   = pagamento.timestamp
+                        AND pagamento_tipo_documento.cod_nota    = pagamento.cod_nota
              
-        GROUP BY tipo_registro, tipo_documento_op, num_documento, cod_reduzido_op, cod_ctb, cod_fonte_ctb, dt_emissao, vl_documento
+                    LEFT JOIN tcemg.tipo_documento
+                        ON tipo_documento.cod_tipo = pagamento_tipo_documento.cod_tipo_documento
+
+                    JOIN contabilidade.plano_conta
+                        ON plano_analitica.exercicio = plano_conta.exercicio
+                        AND plano_analitica.cod_conta = plano_conta.cod_conta
+             
+                    JOIN contabilidade.conta_debito
+                        ON plano_analitica.exercicio = conta_debito.exercicio
+                        AND plano_analitica.cod_plano = conta_debito.cod_plano
+
+	               JOIN contabilidade.plano_recurso
+                        ON plano_recurso.exercicio = balancete_extmmaa.exercicio
+                        AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
+                
+                    LEFT JOIN (
+                                SELECT conta_debito.cod_lote
+			                         , conta_debito.tipo
+			                         , conta_debito.exercicio
+			                         , conta_debito.cod_entidade
+			                         , conta_bancaria.cod_ctb_anterior
+			                         , transferencia.cod_plano_credito
+			                         , transferencia.cod_plano_debito
+			                         , conta_debito.sequencia
+                                FROM contabilidade.conta_debito
+                                
+                                INNER JOIN contabilidade.lote AS lo 
+                                    ON conta_debito.cod_lote     = lo.cod_lote
+		                            AND conta_debito.tipo         = lo.tipo
+		                            AND conta_debito.exercicio    = lo.exercicio
+		                            AND conta_debito.cod_entidade = lo.cod_entidade
+                                
+                                INNER JOIN tesouraria.transferencia
+			                        ON transferencia.cod_plano_debito = conta_debito.cod_plano
+		                            AND lo.cod_lote = transferencia.cod_lote
+		                            AND transferencia.cod_entidade = lo.cod_entidade
+		                            AND transferencia.tipo = 'T'
+		                            AND transferencia.cod_tipo = 1
+                
+                                INNER JOIN contabilidade.plano_analitica
+                                    ON plano_analitica.cod_plano = transferencia.cod_plano_credito
+                                    AND plano_analitica.natureza_saldo = 'D'
+                                    AND plano_analitica.exercicio = conta_debito.exercicio
+                                
+                                LEFT JOIN tcemg.conta_bancaria
+			                        ON conta_bancaria.cod_conta = plano_analitica.cod_conta
+		                            AND conta_bancaria.exercicio = plano_analitica.exercicio
+                     
+                                WHERE conta_debito.exercicio = '".$this->getDado('exercicio')."'
+                                AND conta_debito.cod_entidade IN (2)
+                                AND  lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                                AND  lo.exercicio = '".$this->getDado('exercicio')."'
+		                        AND conta_debito.tipo = 'T'
+                    ) AS cod_ctb_transferencia
+                        ON cod_ctb_transferencia.exercicio = conta_debito.exercicio                             
+                        AND cod_ctb_transferencia.sequencia = conta_debito.sequencia
+                        AND cod_ctb_transferencia.cod_lote = transferencia.cod_lote
+                        AND cod_ctb_transferencia.tipo =conta_debito.tipo
+                        AND cod_ctb_transferencia.cod_plano_debito = conta_debito.cod_plano
+	     
+                    WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+                    AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
+                    AND transferencia.cod_tipo = 1
+                
+                    GROUP BY tipo_registro
+                            , tipo_documento_op
+                            , num_documento
+                            , cod_reduzido_op
+                            , cod_ctb
+                            , cod_fonte_ctb
+                            , desctipodocumentoop
+                            , dt_emissao
+                            , vl_documento
         
-        ORDER BY cod_reduzido_op
-        ";
-        
+                    ORDER BY cod_reduzido_op
+        ";        
         return $stSql;
     }
     

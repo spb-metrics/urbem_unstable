@@ -78,7 +78,27 @@ case 'montaEstornos':
     echo $obTable->getHTML();
 
     break;
+
+    case 'preencheDataEmissao':
+        include_once CAM_GF_TES_MAPEAMENTO.'TTesourariaReciboExtra.class.php';
+        $obTReciboExtra = new TTesourariaReciboExtra;
+        /////pegando a data do ultimo recibo de Receita
+        $obTReciboExtra->setDado ('tipo_recibo','D');
+        $obTReciboExtra->setDado ('exercicio',Sessao::getExercicio());
+        $obTReciboExtra->setDado ('cod_entidade',$_REQUEST['inCodEntidade']);
+        $obTReciboExtra->recuperaUltimaDataRecibo( $rsDataRecibo );
+
+        if ( $rsDataRecibo->getCampo( 'data' ) ) {
+           $stUltimaData = substr($rsDataRecibo->getCampo( 'data' ), 0, 10 );
+           $stUltimaData = explode (  '-', $stUltimaData );
+           $stUltimaData = $stUltimaData[2].'/'.$stUltimaData[1].'/'.$stUltimaData[0];
+           $stJs .= "d.getElementById('dtDataEmissao').value = '".$stUltimaData."';\n"; 
+        }else {
+            $stJs .= "d.getElementById('dtDataEmissao').value = '';\n"; 
+        }
+        
+       SistemaLegado::executaFrameOculto($stJs);
+    break;
 }
 
-echo $stJs;
 ?>

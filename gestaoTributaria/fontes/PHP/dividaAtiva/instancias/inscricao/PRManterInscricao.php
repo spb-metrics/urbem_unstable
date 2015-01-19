@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Diego Bueno Coelho
 
-    * $Id: PRManterInscricao.php 61352 2015-01-09 18:14:18Z evandro $
+    * $Id: PRManterInscricao.php 61417 2015-01-15 13:29:03Z evandro $
 
   Caso de uso: uc-05.04.02
 **/
@@ -209,14 +209,14 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
 
         $obTARRLancamentoCalculo = new TARRLancamentoCalculo;
         $stFiltro = " WHERE cod_lancamento = ".$arListagemDividas[$inX]["cod_lancamento"];
-        $obTARRLancamentoCalculo->recuperaTodos( $rsListaCalculos, $stFiltro, "", $boTransacao);
+        $obErro   = $obTARRLancamentoCalculo->recuperaTodos( $rsListaCalculos, $stFiltro, "", $boTransacao);
 
         $obTARRCalculo = new TARRCalculo;
         $stFiltro = " WHERE cod_calculo = ".$rsListaCalculos->getCampo("cod_calculo");
-        $obTARRCalculo->recuperaTodos( $rsListaCalculo, $stFiltro ,"", $boTransacao);
+        $obErro   = $obTARRCalculo->recuperaTodos( $rsListaCalculo, $stFiltro ,"", $boTransacao);
 
         $stParametros = $arListagemDividas[$inX]["cod_lancamento"];
-        $obTDATDividaAtiva->recuperaListaParcelasDivida( $rsParcelasDivida, $stParametros ,$boTransacao);
+        $obErro       = $obTDATDividaAtiva->recuperaListaParcelasDivida( $rsParcelasDivida, $stParametros ,$boTransacao);
 
         /***** INÍCIO DO BLOCO QUE EXECUTA O ARREDONDAMENTO DAS PARCELAS DA DÍVIDA *****/
         $inCountCalculos = count($rsListaCalculos->arElementos);
@@ -833,6 +833,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
     if (Sessao::read('inscricaoDA') == Sessao::read('total_inscricaoDA')) {
         $obErro = new Erro;
         $obTransacao = new Transacao();
+        Sessao::setTrataExcecao(true);
         //Varre todos os dados que foram inscritos e incluidos no banco        
         $arDadosAux = Sessao::read('lista_dividas_parcelas');
 
@@ -861,6 +862,7 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
             $stParametros .= "&inNumModalidade=".$inNumModalidade;
             $stParametros .= "&stDataInscricao=".Sessao::read( "dtInscricao" );
             
+            Sessao::encerraExcecao();
             SistemaLegado::mudaFramePrincipal( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
             //Emitir Relatório de Inscrição em Dívida Ativa quando for mais de um inscricao
         } else if( Sessao::read( "boRelatorioLancamentos" ) ) {        
@@ -878,9 +880,11 @@ if ( Sessao::read('inscricaoDA') == -1 ) {
             $stParametros .= "&stPrimeiroTimestamp=".Sessao::read('primeiro_timestamp');
             $stParametros .= "&stUltimoTimestamp=".$rsTimestamp->getCampo('timestamp_insert');
 
+            Sessao::encerraExcecao();
             $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/PRRelatorioInscricaoDividaAtiva.php";
-            SistemaLegado::mudaFrameOculto( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=emitir");        
+            SistemaLegado::alertaAviso( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
         } else {
+            Sessao::encerraExcecao();
             sistemaLegado::alertaAviso( $pgFilt."?".Sessao::getId()."&stAcao=incluir","Inscrição de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");
         }// fim boEmissaoDocumento
     }

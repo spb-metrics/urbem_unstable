@@ -28,7 +28,7 @@
     * Data de Criação   : 30/09/2014
     * @author Analista: Silvia
     * @author Desenvolvedor: Evandro Melos
-    * $Id: FLEncerrarConta.php 60107 2014-09-30 17:56:47Z evandro $
+    * $Id: FLEncerrarConta.php 61444 2015-01-16 17:32:17Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -210,6 +210,28 @@ $obCmbContaCorrente->setDisabled  ( $boDisabled );
 $obCmbContaCorrente->setNull(true);
 $obCmbContaCorrente->obEvento->setOnChange  ( " montaParametrosGET('BuscaContaCorrente'); ");
 
+// Define Objeto TextBox para Codigo do Recurso
+$obTxtRecurso = new TextBox;
+$obTxtRecurso->setName    ( "inCodRecurso"                     );
+$obTxtRecurso->setId      ( "inCodRecurso"                     );
+$obTxtRecurso->setValue   ( $inCodRecurso                      );
+$obTxtRecurso->setRotulo  ( "Recurso"                          );
+$obTxtRecurso->setTitle   ( "Selecione o recurso orçamentário" );
+$obTxtRecurso->setDisabled( $boDesabilitaRecurso               );
+$obTxtRecurso->setMascara ( $stMascaraRecurso                  );
+$obTxtRecurso->setPreencheComZeros ( 'E'                       );
+
+// Define Objeto Select para o Recurso
+$obCmbRecurso = new Select;
+$obCmbRecurso->setName      ( "stNomeRecurso"    );
+$obCmbRecurso->setId        ( "stNomeRecurso"    );
+$obCmbRecurso->setValue     ( $inCodRecurso      );
+$obCmbRecurso->addOption    ( "", "Selecione"    );
+$obCmbRecurso->setCampoId   ( "[cod_fonte]"    );
+$obCmbRecurso->setCampoDesc ( "[nom_recurso]"  );
+$obCmbRecurso->preencheCombo( $rsRecurso         );
+$obCmbRecurso->setDisabled  ( $boDesabilitaRecurso );
+
 //****************************************//
 //Monta FORMULARIO
 //****************************************//
@@ -229,6 +251,7 @@ $obFormulario->addComponente( $obDataSaldo           );
 $obFormulario->addComponenteComposto( $obTxtBanco  , $obCmbBanco   );
 $obFormulario->addComponenteComposto( $obTxtAgencia, $obCmbAgencia );
 $obFormulario->addComponente( $obCmbContaCorrente );
+$obFormulario->addComponenteComposto( $obTxtRecurso, $obCmbRecurso );
 
 $obFormulario->OK();
 $obFormulario->show();

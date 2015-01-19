@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalIDE.class.php 59719 2014-09-08 15:00:53Z franver $
+    $Id: TTCEMGArquivoMensalIDE.class.php 61367 2015-01-12 13:14:11Z lisiane $
 
 */
 
@@ -66,7 +66,7 @@ class TTCEMGArquivoMensalIDE extends Persistente
                     AND entidade.exercicio = configuracao.exercicio
                   WHERE sw_cgm_pessoa_juridica.numcgm=entidade.numcgm
              ) AS cnpj_municipio
-             , ( SELECT cod_municipio
+             , ( SELECT DISTINCT cod_municipio
                    FROM tcemg.configurar_ide
              ) AS cod_municipio
              , LPAD((SELECT valor

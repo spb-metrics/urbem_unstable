@@ -222,8 +222,7 @@ function listar(&$rsRecordSet, $stOrder = "" , $obTransacao = "")
 
     $stFiltro .= " centro_custo_permissao.responsavel = TRUE AND ";
 
-    $stFiltro = ($stFiltro) ? " AND  " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
-//  $stOrder = ($stOrder) ? $stOrder : " Order by centro_custo_permissao.cod_centro desc";
+    $stFiltro = ($stFiltro) ? " AND  " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";    
     $obErro = $obTAlmoxarifadoCentroCusto->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
 
     return $obErro;
@@ -270,7 +269,11 @@ function listarDotacoes(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
    if ($this->roUltimaEntidade->getCodigoEntidade()) {
       $stFiltro .= ' and cod_entidade = '. $this->roUltimaEntidade->getCodigoEntidade();
    }
-   $obTAlmoxarifadoCentroCustoDotacao->recuperaRelacionamento($rsRecordSet, $stFiltro, $stOrder, $boTransacao);
+
+   $stFiltro .= " AND accd.exercicio = '".Sessao::getExercicio()."' ";
+
+   $obTAlmoxarifadoCentroCustoDotacao->recuperaRelacionamento($rsRecordSet, $stFiltro, $stOrder, $boTransacao);   
+   
 }
 
 /**
@@ -428,11 +431,13 @@ function alterar($boTransacao = "")
 
             if ( !$obErro->ocorreu() ) {
                 $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_centro" , $this->getCodigo() );
+                $obTAlmoxarifadoCentroCustoDotacao->setDado( "exercicio"  , Sessao::getExercicio() );                
                 $obErro = $obTAlmoxarifadoCentroCustoDotacao->exclusao( $boTransacao );
             }
 
            if ( !$obErro->ocorreu() ) {
                 $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_centro" , $this->getCodigo() );
+                $obTAlmoxarifadoCentroCustoEntidade->setDado( "exercicio"  , Sessao::getExercicio() );
                 $obErro = $obTAlmoxarifadoCentroCustoEntidade->exclusao( $boTransacao );
             }
 

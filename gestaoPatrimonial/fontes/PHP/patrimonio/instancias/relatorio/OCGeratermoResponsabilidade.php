@@ -28,7 +28,7 @@
   * Página que abre o preview do relatório desenvolvido no Birt.
   * Data de criação : 12/08/2008
 
-  $Id: OCGeratermoResponsabilidade.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: OCGeratermoResponsabilidade.php 61409 2015-01-14 18:21:07Z diogo.zarpelon $
 
   */
 
@@ -89,6 +89,34 @@ if ($rsBemResponsavel->getNumLinhas() > 0) {
     $preview->addParametro( 'nomecgm', $filtroRelatorio['stNomResponsavel'] );
     $preview->addParametro( 'hidden_valor', $filtroRelatorio['demo_valor']);
     $preview->addParametro( 'lista_bens', $filtroRelatorio['lista_bens']);
+
+    # Organograma
+    if ($_REQUEST['inCodOrganogramaAtivo'] != '') {
+        if ($_REQUEST['inCodOrganogramaClassificacao'] != '') {
+
+            $boPermissaoHierarquica = SistemaLegado::pegaDado('permissao_hierarquica', 'organograma.organograma', ' WHERE cod_organograma = '.$_REQUEST['inCodOrganogramaAtivo']);
+            
+            if ($boPermissaoHierarquica == 't'){
+                $preview->addParametro( 'cod_orgao', $_REQUEST['hdninCodOrganograma'].'%' );
+            } else {
+                $preview->addParametro( 'cod_orgao', $_REQUEST['hdninCodOrganograma'] );
+            }
+        } else {
+
+        }
+
+        $preview->addParametro( 'cod_organograma', $_REQUEST['inCodOrganogramaAtivo'] );
+    } else {
+        $preview->addParametro( 'cod_organograma', '' );
+    }
+
+    # Local
+    if ($_REQUEST['inCodLocal'] != '' ) {
+        $preview->addParametro( 'cod_local', $_REQUEST['inCodLocal'] );
+    } else {
+        $preview->addParametro( 'cod_local', '' );
+    }
+
 
     $preview->preview();
 

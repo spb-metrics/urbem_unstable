@@ -34,7 +34,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: MontaAtributos.class.php 60424 2014-10-21 11:25:40Z evandro $
+$Id: MontaAtributos.class.php 61431 2015-01-16 12:31:02Z jean $
 
 Casos de uso: uc-01.01.00
 
@@ -181,11 +181,6 @@ function geraFormulario(&$obFormulario)
         return false;
 
     $obFormulario->addTitulo( $this->getTitulo() );
-
-    if (!$this->rsRecordSet->eof()) {
-        $this->rsRecordSet->ordena('nom_atributo');
-        $this->rsRecordSet->ordena('cod_tipo');
-    }
 
     while (!$this->rsRecordSet->eof()) {
         if( $this->rsRecordSet->getCampo('cod_tipo') && !$this->rsRecordSet->getCampo('cod_cadastro') )

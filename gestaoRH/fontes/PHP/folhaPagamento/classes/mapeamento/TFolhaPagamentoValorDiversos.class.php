@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-04.00.00
 
-    $Id: TFolhaPagamentoValorDiversos.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TFolhaPagamentoValorDiversos.class.php 61416 2015-01-15 13:21:21Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -69,7 +69,7 @@ function TFolhaPagamentoValorDiversos()
     $this->AddCampo('cod_valor','integer'      ,true  ,''    ,true,false);
     $this->AddCampo('timestamp','timestamp_now',true  ,''    ,true,false);
     $this->AddCampo('descricao','varchar'      ,true  ,'60'  ,false,false);
-    $this->AddCampo('valor'    ,'numeric'      ,true  ,'14,2',false,false);
+    $this->AddCampo('valor'    ,'numeric'      ,true  ,'16,4',false,false);
     $this->AddCampo('ativo'    ,'boolean'      ,true  ,''    ,false,false);
     $this->AddCampo('data_vigencia','date'     ,true  ,''    ,true,false);
 }
@@ -78,7 +78,7 @@ function montaRecuperaRelacionamento()
 {
     $stSql.= "SELECT valor_diversos.cod_valor                                             \n";
     $stSql.= "     , valor_diversos.descricao                                             \n";
-    $stSql.= "     , to_real(valor_diversos.valor) as valor                               \n";
+    $stSql.= "     , REPLACE((valor_diversos.valor::varchar),'.',',') as valor            \n";
     $stSql.= "     , TO_CHAR(valor_diversos.data_vigencia, 'dd/mm/yyyy') as data_vigencia \n";
     $stSql.= "  FROM folhapagamento.valor_diversos                                        \n";
     $stSql.= "     , (  SELECT cod_valor                                                  \n";

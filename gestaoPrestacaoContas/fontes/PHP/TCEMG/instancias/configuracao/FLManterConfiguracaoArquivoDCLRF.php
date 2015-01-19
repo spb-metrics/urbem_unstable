@@ -32,11 +32,11 @@
   
   * @ignore
   *
-  * $Id: FLManterConfiguracaoArquivoDCLRF.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: FLManterConfiguracaoArquivoDCLRF.php 61386 2015-01-13 15:47:45Z lisiane $
   * 
-  * $Revision: 59612 $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Revision: 61386 $
+  * $Author: lisiane $
+  * $Date: 2015-01-13 13:47:45 -0200 (Ter, 13 Jan 2015) $
   
 */
 
@@ -92,7 +92,7 @@ $arMes = array(
 );
 
 if(Sessao::getExercicio() == date('Y')) {
-    for($i=1; $i < date('m'); $i++) {
+    for($i=1; $i <= date('m'); $i++) {
         $arMes2[$i] = $arMes[$i];
     }
     

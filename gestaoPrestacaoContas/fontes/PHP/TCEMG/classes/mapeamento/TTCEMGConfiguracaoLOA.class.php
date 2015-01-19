@@ -82,6 +82,7 @@ class TTCEMGConfiguracaoLOA extends Persistente
           FROM  tcemg.configuracao_loa
     INNER JOIN  normas.norma
             ON  norma.cod_norma = configuracao_loa.cod_norma
+         WHERE  configuracao_loa.exercicio = '".$this->getDado('exercicio')."'
         ";
 
         return $stSql;
@@ -112,6 +113,7 @@ class TTCEMGConfiguracaoLOA extends Persistente
           FROM  tcemg.configuracao_loa
     INNER JOIN  normas.norma
             ON  norma.cod_norma = configuracao_loa.cod_norma
+         WHERE  configuracao_loa.exercicio = '".$this->getDado('exercicio')."'
         ";
 
         return $stSql;

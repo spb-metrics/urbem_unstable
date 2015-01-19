@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.22
 
-    $Id: FMManterValoresDiversos.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterValoresDiversos.php 61416 2015-01-15 13:21:21Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -97,6 +97,7 @@ $obNumValor->setRotulo("Valor");
 $obNumValor->setTitle("Informe o valor do código do diverso.");
 $obNumValor->setName("nuValor");
 $obNumValor->setNull(false);
+$obNumValor->setDecimais(4);
 $obNumValor->setValue($_GET["nuValor"]);
 
 $obTxtVigencia = new Data;

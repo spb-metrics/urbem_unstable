@@ -83,7 +83,7 @@
             <td class="text_align_right" ><?php echo $arDespesaExlcusao["total"];?></td>
         </tr>
         <?php } ?>
-    </tbody>
+    </tbody>    
     <tfoot>
         <?php foreach($arDespesasExclusoesTotal AS $arDespesaExlcusaoTotal) { ?>
         <tr class="border">
@@ -104,6 +104,29 @@
         </tr>
         <?php } ?>
     </tfoot>
+     <?php  
+      if($arExercicio == 2014) {  ?>
+    <tfoot>
+     
+        <tr class="border">
+            <td class="text_align_left border_right" ><?php echo $arDespesaPessoal2013["nom_conta"];?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_1"] != '') ? $arDespesaPessoal2013["mes_1"] : "0,00" ;?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_2"] != '') ? $arDespesaPessoal2013["mes_2"] : "0,00" ;?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_3"] != '') ? $arDespesaPessoal2013["mes_3"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_4"] != '') ? $arDespesaPessoal2013["mes_4"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_5"] != '') ? $arDespesaPessoal2013["mes_5"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_6"] != '') ? $arDespesaPessoal2013["mes_6"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_7"] != '') ? $arDespesaPessoal2013["mes_7"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_8"] != '') ? $arDespesaPessoal2013["mes_8"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_9"] != '') ? $arDespesaPessoal2013["mes_9"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_10"] != '') ? $arDespesaPessoal2013["mes_10"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_11"] != '') ? $arDespesaPessoal2013["mes_11"] : "0,00";?></td>
+            <td class="text_align_right border_right" ><?php echo ($arDespesaPessoal2013["mes_12"] != '') ? $arDespesaPessoal2013["mes_12"] : "0,00"; ?></td>
+            <td class="text_align_right" ><?php echo $arDespesaPessoal2013["total"];?></td>
+        </tr>
+  
+    </tfoot>
+    <?php } ?>
     <tfoot>
         <?php foreach($arValorTotalDespesaPessoal AS $arrValorTotalDespesaPessoal) { ?>
         <tr class="border">

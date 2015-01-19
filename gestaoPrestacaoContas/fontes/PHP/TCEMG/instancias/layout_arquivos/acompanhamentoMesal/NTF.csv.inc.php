@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: NTF.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: NTF.csv.inc.php 61365 2015-01-12 11:41:35Z evandro $
+  * $Date: 2015-01-12 09:41:35 -0200 (Seg, 12 Jan 2015) $
+  * $Author: evandro $
+  * $Rev: 61365 $
   *
 */
 /**
@@ -54,26 +54,26 @@ $aux=0;
 $arRecordSetNTF10 = $rsRecordSetNTF10->getElementos();
 for ($i=0; $i<count($arRecordSetNTF10);$i++) {
     if ($i==0)
-        $rsRecordSetNTF12 = new RecordSet();
+        $rsRecordSetNTF20 = new RecordSet();
 
-    $obTTCEMGNotaFiscal->setDado('codnotafiscal'  ,$arRecordSetNTF10[$i]['codnotafiscal']);
-    $obTTCEMGNotaFiscal->setDado('cod_nota'       ,$arRecordSetNTF10[$i]['cod_nota'     ]);
-    $obTTCEMGNotaFiscal->setDado('exercicio'      ,$arRecordSetNTF10[$i]['exercicio'    ]);
-    $obTTCEMGNotaFiscal->setDado('cod_entidade'   ,$arRecordSetNTF10[$i]['cod_entidade' ]);
-    $obTTCEMGNotaFiscal->setDado('mes', $stMes);
+    $obTTCEMGNotaFiscal->setDado('codnotafiscal'  , $arRecordSetNTF10[$i]['codnotafiscal']);
+    $obTTCEMGNotaFiscal->setDado('cod_nota'       , $arRecordSetNTF10[$i]['cod_nota'     ]);
+    $obTTCEMGNotaFiscal->setDado('exercicio'      , $arRecordSetNTF10[$i]['exercicio'    ]);
+    $obTTCEMGNotaFiscal->setDado('cod_entidade'   , $arRecordSetNTF10[$i]['cod_entidade' ]);
+    $obTTCEMGNotaFiscal->setDado('mes'            , $stMes );
 
-    $obTTCEMGNotaFiscal->recuperaNTF12($rsRecordSet);
+    $obTTCEMGNotaFiscal->recuperaNTF20($rsRecordSet);
 
     for ($count=0; $count<count($rsRecordSet->arElementos); $count++) {
         if ($aux==0)
-           $rsRecordSetNTF12->inNumLinhas=0;
-        $rsRecordSetNTF12->arElementos[$aux]=$rsRecordSet->arElementos[$count];
-        $aux++;
+            $rsRecordSetNTF20->inNumLinhas = 0;
+            $rsRecordSetNTF20->arElementos[$aux] = $rsRecordSet->arElementos[$count];
+            $aux++;
     }
-    $rsRecordSetNTF12->inNumLinhas=$rsRecordSetNTF12->inNumLinhas+$rsRecordSet->inNumLinhas;
-    $rsRecordSetNTF12->inNumColunas=$rsRecordSet->inNumColunas;
-    $rsRecordSetNTF12->inCorrente=$rsRecordSet->inCorrente;
-    $rsRecordSetNTF12->boInicio=$rsRecordSet->boInicio;
+    $rsRecordSetNTF20->inNumLinhas  = $rsRecordSetNTF20->inNumLinhas + $rsRecordSet->inNumLinhas;
+    $rsRecordSetNTF20->inNumColunas = $rsRecordSet->inNumColunas;
+    $rsRecordSetNTF20->inCorrente   = $rsRecordSet->inCorrente;
+    $rsRecordSetNTF20->boInicio     = $rsRecordSet->boInicio;
 }
 
 //Tipo Registro 99
@@ -85,7 +85,6 @@ $arRecordSetNTF99 = array(
 
 $rsRecuperaNTF99 = new RecordSet();
 $rsRecuperaNTF99->preenche($arRecordSetNTF99);
-
 
 if (count($rsRecordSetNTF10->getElementos()) > 0) {
     $inCount=0;
@@ -212,15 +211,15 @@ if (count($rsRecordSetNTF10->getElementos()) > 0) {
          *E O NTF11 É FACULTATIVO
         */
 
-        if (count($rsRecordSetNTF12->getElementos()) > 0) {
-            foreach ($rsRecordSetNTF12->getElementos() as $arNTF12) {
-              $stChave1 = $arNTF12['codnotafiscal'];
+        if (count($rsRecordSetNTF20->getElementos()) > 0) {
+            foreach ($rsRecordSetNTF20->getElementos() as $arNTF20) {
+              $stChave1 = $arNTF20['codnotafiscal'];
 
                 if ($stChave === $stChave1) {
                     $rsBloco = 'rsBloco_'.$inCount;
                     unset($$rsBloco);
                     $$rsBloco = new RecordSet();
-                    $$rsBloco->preenche(array($arNTF12));
+                    $$rsBloco->preenche(array($arNTF20));
 
                     $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
                     $obExportador->roUltimoArquivo->addBloco($$rsBloco);
@@ -230,10 +229,42 @@ if (count($rsRecordSetNTF10->getElementos()) > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codnotafiscal");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);
+                    if ( Sessao::getExercicio() >= '2015' ) {
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nfnumero");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
+
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nfserie");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(8);
+
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipodocumento");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nrodocumento");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("chaveacesso");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(44);
+
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dtemissaonf");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+                    }else{
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codnotafiscal");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);    
+                    }
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codunidadesub");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
@@ -271,9 +302,9 @@ if (count($rsRecordSetNTF10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 }
 
-$rsRecordSetNTF10 = null;
-$rsRecordSetNTF12 = null;
+$rsRecordSetNTF10   = null;
+$rsRecordSetNTF20   = null;
 $obTTCEMGNotaFiscal = null;
-$rsRecuperaNTF99 = null;
+$rsRecuperaNTF99    = null;
 
 ?>

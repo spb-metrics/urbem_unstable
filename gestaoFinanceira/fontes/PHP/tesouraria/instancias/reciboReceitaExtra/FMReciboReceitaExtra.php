@@ -77,7 +77,7 @@ $pgOcul       = "OC".$stPrograma.".php";
 $pgJS         = "JS".$stPrograma.".js";
 
 $stAcao = $_GET['stAcao'] ? $_GET['stAcao'] : $_POST['stAcao'];
-
+include_once($pgJS);
 $obForm = new Form;
 $obForm->setAction( $pgProc  );
 $obForm->setTarget( "oculto" );
@@ -86,6 +86,8 @@ $obForm->setTarget( "oculto" );
 $obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario;
 $obEntidadeUsuario->obTextBox->obEvento->setOnChange( 'getIMontaAssinaturas()' );
 $obEntidadeUsuario->obSelect->obEvento->setOnChange( 'getIMontaAssinaturas()' );
+$obEntidadeUsuario->obSelect->obEvento->setOnChange( "buscaValor('preencheDataEmissao')"  );
+$obEntidadeUsuario->obTextBox->obEvento->setOnChange( "buscaValor('preencheDataEmissao')" );
 
 ///Data Emissão
 $obTextData = new Data;

@@ -171,6 +171,8 @@ $arDados = array( "arDespesas"                    => $rsRecordSet["arDespesas"],
                   "arDespesasExclusoes"           => $rsRecordSet["arDespesasExclusoes"],
                   "arDespesasExclusoesTotal"      => $rsRecordSet["arDespesasExclusoesTotal"],
                   "arValorTotalDespesaPessoal"    => $rsRecordSet["arValorTotalDespesaPessoal"],
+                  "arDespesaPessoal2013"    => $rsRecordSet["arDespesas2013"],
+                  "arExercicio" => $stExercicio,
                   "arCabecalhoMes"                => $arCabecalhoMeses
                   );
 

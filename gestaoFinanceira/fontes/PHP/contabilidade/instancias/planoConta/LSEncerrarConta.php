@@ -27,7 +27,7 @@
     * Página de Listagem de Itens
     * Data de Criação   : 30/09/2014
     * @author Desenvolvedor: Evandro Melos
-    $Id: LSEncerrarConta.php 60235 2014-10-07 20:38:22Z arthur $
+    $Id: LSEncerrarConta.php 61444 2015-01-16 17:32:17Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -86,6 +86,7 @@ $obRContabilidadePlanoBanco->setCodigoEntidade        ( $stCodEntidade          
 $obRContabilidadePlanoBanco->setNumAgencia            ( $_REQUEST['inNumAgencia']  );
 $obRContabilidadePlanoBanco->setNumBanco              ( $_REQUEST['inNumBanco']    );
 $obRContabilidadePlanoBanco->setContaCorrente         ( $_REQUEST['stContaCorrente'] );
+$obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($_REQUEST['inCodRecurso']);
 
 if ($stAcao == "encerrar"){
     $obRContabilidadePlanoBanco->setFiltroEncerrado   ( "encerrar"                 );

@@ -36,7 +36,7 @@
 
     * @ignore
 
-    $Id: TTCEMGNotaFiscal.class.php 59719 2014-09-08 15:00:53Z franver $
+    $Id: TTCEMGNotaFiscal.class.php 61365 2015-01-12 11:41:35Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -134,20 +134,31 @@ function recuperaNTF10(&$rsRecordSet, $stFiltro="", $stOrdem="", $boTransacao=""
 
 function montaRecuperaNTF10()
 {
-    $stSql  = " SELECT DISTINCT ON (NF.cod_nota, NF.exercicio)  10 AS tiporegistro
+    $stSql  = " SELECT DISTINCT ON (NF.cod_nota, NF.exercicio)  
+            10 AS tiporegistro
             , RPAD((NF.cod_nota||''||NF.cod_entidade||''||to_char(data_emissao, 'ddmmyyyy')), 15, '0') AS codnotafiscal
             , (SELECT valor::INTEGER
                     FROM administracao.configuracao_entidade
                     WHERE exercicio=NF.exercicio
                     AND parametro='tcemg_codigo_orgao_entidade_sicom'
                     AND cod_entidade=NF.cod_entidade)
-              AS codorgao
-            , CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN 
-                    NF.nro_nota 
-                ELSE        
-                    ' '
-              END AS nfnumero
-            , CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN
+              AS codorgao ";
+
+    //Alteração para 2015
+    //Registro 10
+    //Para exercicios anteriores a 2015 existe uma verificação no campo nfNumero : Não informar este campo caso a nota fiscal seja eletrônica e siga o padrão ajuste SINIEF 07/05.
+    //Retirar essa verificação, deve demonstrar esse campo para todas as notas fiscais
+    if ( Sessao::getExercicio() >= '2015' ) {
+        $stSql .= "\n,NF.nro_nota AS nfnumero ";
+    }else{
+        $stSql .= "\n, CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN 
+                                NF.nro_nota 
+                            ELSE        
+                                ' '
+                       END AS nfnumero ";
+    }
+
+    $stSql .="\n, CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN
                     NF.nro_serie 
                 ELSE
                     ' '
@@ -260,56 +271,94 @@ function montaRecuperaNTF10()
     return $stSql;
 }
 
-function recuperaNTF12(&$rsRecordSet, $stFiltro="", $stOrdem="", $boTransacao="")
+function recuperaNTF20(&$rsRecordSet, $stFiltro="", $stOrdem="", $boTransacao="")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
 
-    $stSql = $this->montaRecuperaNTF12().$stFiltro.$stOrdem;
+    $stSql = $this->montaRecuperaNTF20().$stFiltro.$stOrdem;
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql );
 
     return $obErro;
 }
 
-function montaRecuperaNTF12()
+function montaRecuperaNTF20()
 {
-    $stSql  = " SELECT 12 AS tiporegistro
+    $stSql  = " SELECT 20 AS tiporegistro
                 , '".$this->getDado('codnotafiscal')."'::TEXT AS codnotafiscal
+                , nota_fiscal.nro_nota AS nfnumero
+                , CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN
+                                nota_fiscal.nro_serie 
+                        ELSE
+                                ' '
+                  END AS nfserie
+                , CASE WHEN sw_cgm_pessoa_juridica.cnpj !='' THEN
+                                2
+                        ELSE
+                        CASE WHEN sw_cgm_pessoa_fisica.cpf !='' THEN
+                                1
+                        ELSE
+                                3
+                        END
+                 END AS tipodocumento
+                , CASE WHEN sw_cgm_pessoa_juridica.cnpj !='' THEN
+                                sw_cgm_pessoa_juridica.cnpj
+                        ELSE
+                        CASE WHEN sw_cgm_pessoa_fisica.cpf !='' THEN
+                                sw_cgm_pessoa_fisica.cpf
+                        ELSE
+                                ''
+                        END
+                 END AS nrodocumento
+                , nota_fiscal.chave_acesso AS chaveacesso
+                , to_char(data_emissao, 'ddmmyyyy') as dtemissaonf
+                , LPAD((LPAD(''||OD.num_orgao,2, '0')||LPAD(''||OD.num_unidade,2, '0')), 5, '0') AS codunidadesub
                 , to_char(EE.dt_empenho, 'ddmmyyyy') AS dtempenho
                 , NFEL.cod_empenho AS nroempenho
-                , to_char(ENL.dt_liquidacao, 'ddmmyyyy') AS dtliquidacao
-                
-                -- , NFEL.cod_nota_liquidacao AS nroliquidacao
-                , TCEMG.numero_nota_liquidacao('".$this->getDado('exercicio')."',
+                , to_char(ENL.dt_liquidacao, 'ddmmyyyy') AS dtliquidacao                                
+                , TCEMG.numero_nota_liquidacao('2014',
                                                                  EE.cod_entidade,
                                                                  ENL.cod_nota,
                                                                  ENL.exercicio_empenho,
                                                                  EE.cod_empenho
                                                                 ) AS nroliquidacao
-                
-                , LPAD((LPAD(''||OD.num_orgao,2, '0')||LPAD(''||OD.num_unidade,2, '0')), 5, '0') AS codunidadesub
+                                
                 FROM tcemg.nota_fiscal_empenho_liquidacao AS NFEL
+                LEFT JOIN tcemg.nota_fiscal
+                     ON nota_fiscal.cod_nota        = NFEL.cod_nota
+                    AND nota_fiscal.exercicio       = NFEL.exercicio
+                    AND nota_fiscal.cod_entidade    = NFEL.cod_entidade                
+                LEFT JOIN tcemg.tipo_nota_fiscal
+                     ON tipo_nota_fiscal.cod_tipo = nota_fiscal.cod_tipo
+                LEFT JOIN orcamento.entidade
+                     ON  entidade.cod_entidade = nota_fiscal.cod_entidade
+                    AND entidade.exercicio    = nota_fiscal.exercicio
+                LEFT JOIN sw_cgm_pessoa_juridica
+                     ON  sw_cgm_pessoa_juridica.numcgm = entidade.numcgm
+                LEFT JOIN sw_cgm_pessoa_fisica
+                     ON  sw_cgm_pessoa_fisica.numcgm = entidade.numcgm
                 LEFT JOIN empenho.empenho AS EE
-                    ON  EE.cod_empenho  = NFEL.cod_empenho
+                     ON  EE.cod_empenho = NFEL.cod_empenho
                     AND EE.exercicio    = NFEL.exercicio_empenho
                     AND EE.cod_entidade = NFEL.cod_entidade
                 LEFT JOIN empenho.nota_liquidacao AS ENL
-                    ON  ENL.cod_nota     = NFEL.cod_nota_liquidacao
+                     ON  ENL.cod_nota    = NFEL.cod_nota_liquidacao
                     AND ENL.exercicio    = NFEL.exercicio_liquidacao
                     AND ENL.cod_entidade = NFEL.cod_entidade
                 LEFT JOIN empenho.pre_empenho_despesa AS EPED
-                    ON  EPED.cod_pre_empenho = EE.cod_pre_empenho
-                    AND EPED.exercicio       = EE.exercicio
+                     ON  EPED.cod_pre_empenho = EE.cod_pre_empenho
+                    AND EPED.exercicio        = EE.exercicio
                 LEFT JOIN orcamento.despesa AS OD
-                    ON  OD.exercicio     = EPED.exercicio
+                     ON  OD.exercicio    = EPED.exercicio
                     AND OD.cod_despesa   = EPED.cod_despesa
 
                 WHERE NFEL.exercicio    ='".$this->getDado('exercicio')."'
                 AND NFEL.cod_nota       =".$this->getDado('cod_nota')."
                 AND NFEL.cod_entidade   =".$this->getDado('cod_entidade')."
-                AND ENL.dt_liquidacao BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
+                AND ENL.dt_liquidacao   BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) 
+                                        AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
                 ";
 
     return $stSql;

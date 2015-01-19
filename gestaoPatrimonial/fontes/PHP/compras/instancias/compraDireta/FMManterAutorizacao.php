@@ -34,7 +34,7 @@
 
  * Casos de uso : uc-03.04.32
 
- $Id: FMManterAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterAutorizacao.php 61445 2015-01-16 17:57:12Z franver $
 
  */
 
@@ -57,6 +57,7 @@ Sessao::write('arAutorizacao', array());
 Sessao::write('assinaturas', array());
 
 $obTCompraDireta = new TComprasCompraDireta();
+$obTCompraDireta->setDado( 'exercicio'          , Sessao::getExercicio() );
 $obTCompraDireta->setDado( 'cod_compra_direta'  , $_REQUEST['inCodCompraDireta']   );
 $obTCompraDireta->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']       );
 $obTCompraDireta->setDado( 'cod_modalidade'     , $_REQUEST['inCodModalidade']     );

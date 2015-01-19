@@ -119,12 +119,22 @@ class TTCEMGLeiAlteracaoOrcamentaria extends Persistente
         $stSql = "
                     SELECT
                             11 AS tipo_registro
-                          , norma.num_norma AS nro_lei_alteracao
-                          , CASE WHEN tipo_transferencia.cod_tipo IN (1,2,3,4,5) THEN 1
-                                 WHEN tipo_transferencia.cod_tipo IN (6,7,8,9,10,11) THEN 2
+                          , norma.num_norma AS nro_lei_alteracao \n ";
+        
+        if($this->getDado('exercicio') < 2015) {
+          $stSql .= "  , CASE WHEN tipo_transferencia.cod_tipo IN (1,2,3,4,5) THEN 1
+                                WHEN tipo_transferencia.cod_tipo IN (6,7,8,9,10,11) THEN 2
                                  WHEN tipo_transferencia.cod_tipo IN (12,13,14) THEN 3
                                  WHEN tipo_transferencia.cod_tipo IN (15,16) THEN 4
-                          END AS tipo_lei_alteracao
+                          END AS tipo_lei_alteracao ";
+            
+        
+        } else {
+             $stSql .= " , tipo_lei_alteracao_orcamentaria.cod_tipo_lei AS tipo_lei_alteracao ";
+            
+        }
+            
+            $stSql .= "            
                          --, norma_artigo.num_artigo::varchar AS artigo_lei_alteracao
                          --, norma_artigo.descricao::varchar AS descricao_artigo
                          , CASE WHEN tipo_transferencia.cod_tipo = 15 THEN LPAD('0,00', 14, '0')
@@ -222,7 +232,14 @@ class TTCEMGLeiAlteracaoOrcamentaria extends Persistente
                   ON suplementacao.cod_tipo          = transferencia_despesa.cod_tipo                           
                  AND suplementacao.exercicio         = transferencia_despesa.exercicio                          
                  AND suplementacao.cod_suplementacao = transferencia_despesa.cod_suplementacao
-                 
+          
+        -- Alterecao para a partir de exercicio de 2015
+           LEFT JOIN tcemg.norma_detalhe
+                    ON norma_detalhe.cod_norma = norma.cod_norma
+                    
+           LEFT JOIN tcemg.tipo_lei_alteracao_orcamentaria
+                    ON tipo_lei_alteracao_orcamentaria.cod_tipo_lei = norma_detalhe.tipo_lei_alteracao_orcamentaria
+                    
                WHERE suplementacao.exercicio = '".$this->getDado('exercicio')."'
                  AND (suplementacao_suplementada.cod_entidade IN (".$this->getDado('entidades').") OR suplementacao_reducao.cod_entidade IN (".$this->getDado('entidades')."))
                  AND suplementacao.dt_suplementacao BETWEEN TO_DATE('01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy')
@@ -246,6 +263,7 @@ class TTCEMGLeiAlteracaoOrcamentaria extends Persistente
                         nro_lei_alteracao
                       , tipo_lei_alteracao
         ";
+
         return $stSql;
     }
 

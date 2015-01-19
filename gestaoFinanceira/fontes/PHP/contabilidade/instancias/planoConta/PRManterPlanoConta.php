@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: PRManterPlanoConta.php 61349 2015-01-09 13:03:20Z lisiane $
+    * $Id: PRManterPlanoConta.php 61374 2015-01-12 17:48:14Z arthur $
 
     * Casos de uso: uc-02.02.02
 */
@@ -111,6 +111,7 @@ switch ($stAcao) {
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEPE($_POST['inTipoContaCorrenteTCEPE']);
             }
+            
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_REQUEST['inTipoContaCorrenteTCEMG']);
             }
@@ -269,9 +270,11 @@ switch ($stAcao) {
                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                     $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['stTipoContaTCEPE']);
                 }
+                /*
                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
                     $obRContabilidadePlanoBanco->setTipoContaTCEMG($_POST['stTipoContaTCEMG']);
                 }
+                */
             }
             
             if( !$obErro->ocorreu() ) {
@@ -331,6 +334,7 @@ switch ($stAcao) {
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEPE($_POST['inTipoContaCorrenteTCEPE']);
             }
+            
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_POST['inTipoContaCorrenteTCEMG']);
             }
@@ -638,12 +642,13 @@ switch ($stAcao) {
                 $obRContabilidadePlanoBanco->setCodContaCorrente( $_POST['inContaCorrente'] );
                 
                 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 16) {
-                    $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['inTipoContaCorrenteTCEMG']);
-                }###
-###
+                    $obRContabilidadePlanoBanco->setTipoContaTCEPE($_POST['stTipoContaTCEPE']);
+                }
+                /*
                  if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
                     $obRContabilidadePlanoBanco->setTipoContaTCEMG($_POST['stTipoContaTCEMG']);
                 }
+                */
             }
 
             $stFiltro = "&pos=".Sessao::read('pos');

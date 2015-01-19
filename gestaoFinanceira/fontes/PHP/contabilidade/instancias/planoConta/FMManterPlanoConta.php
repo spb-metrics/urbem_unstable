@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMManterPlanoConta.php 61326 2015-01-07 11:02:55Z carolina $
+    * $Id: FMManterPlanoConta.php 61379 2015-01-12 20:10:17Z arthur $
 
     * Casos de uso: uc-02.02.02
 */
@@ -686,7 +686,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTran
 }
 
 //Conta Corrente - TCE-MG
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11 && (Sessao::getExercicio() >= "2015")) {
     
     include_once(CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGTipoContaCorrente.class.php');
     $obTTCEMGTipoContaCorrente = new TTCEMGTipoContaCorrente();
@@ -926,7 +926,7 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
     }
     
     //Tipo Conta Bancária - TCEMG
-    if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
+    if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11 && (Sessao::getExercicio() >= "2015")) {
         $obFormulario->addComponente( $obCmbTipoContaCorrenteTCEMG );
     }
         //Tipo Conta Bancária - TCEPE

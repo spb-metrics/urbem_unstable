@@ -161,7 +161,7 @@ BEGIN
                         And EPE.cod_pre_empenho      = EE.cod_pre_empenho
             
                         And EE.exercicio             = '|| quote_literal(stExercicio) ||'
-                        And EE.cod_entidade          IN ('||stCodEntidades||')
+                        And EE.cod_entidade          IN ('||stEntidades||')
             
                         And EE.cod_empenho           = ENL.cod_empenho
                         And EE.exercicio             = ENL.exercicio_empenho

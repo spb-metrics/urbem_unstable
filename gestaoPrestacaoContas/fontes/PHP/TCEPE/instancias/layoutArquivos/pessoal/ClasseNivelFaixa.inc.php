@@ -31,10 +31,10 @@
   * @author Desenvolvedor:
   *
   * @ignore
-  * $Id: ClasseNivelFaixa.inc.php 60568 2014-10-30 13:58:28Z jean $
-  * $Date: 2014-10-30 11:58:28 -0200 (Qui, 30 Out 2014) $
+  * $Id: ClasseNivelFaixa.inc.php 61426 2015-01-15 19:32:48Z jean $
+  * $Date: 2015-01-15 17:32:48 -0200 (Qui, 15 Jan 2015) $
   * $Author: jean $
-  * $Rev: 60568 $
+  * $Rev: 61426 $
   *
 */
 
@@ -55,7 +55,6 @@ $obTTCEPEClasseNivelFaixa->setDado('dt_inicial'           , $stDataInicial      
 $obTTCEPEClasseNivelFaixa->setDado('dt_final'             , $stDataFinal           );
 
 $obTTCEPEClasseNivelFaixa->recuperaTodos($rsRecordSet, "" ,"" , $boTransacao );
-    
 $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tce");
@@ -75,7 +74,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARA
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(200);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vencimento_base");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tce");

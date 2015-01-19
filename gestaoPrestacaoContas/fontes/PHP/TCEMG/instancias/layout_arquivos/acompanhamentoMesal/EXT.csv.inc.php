@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EXT.csv.inc.php 60158 2014-10-02 20:11:24Z lisiane $
-  * $Date: 2014-10-02 17:11:24 -0300 (Qui, 02 Out 2014) $
-  * $Author: lisiane $
-  * $Rev: 60158 $
+  * $Id: EXT.csv.inc.php 61383 2015-01-13 12:55:37Z evandro $
+  * $Date: 2015-01-13 10:55:37 -0200 (Ter, 13 Jan 2015) $
+  * $Author: evandro $
+  * $Rev: 61383 $
   *
 */
 /**
@@ -180,10 +180,24 @@ if (count($rsRecordSetEXT10->getElementos()) > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
 
+                    if ( Sessao::getExercicio() >= '2015' ) {
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natsaldoanteriorfonte");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+                    }
+
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_atual");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+                    if ( Sessao::getExercicio() >= '2015' ) {
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natsaldoatualfonte");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+                    }
 
                     if (count($rsRecordSetEXT21->getElementos()) > 0) {
                         foreach ($rsRecordSetEXT21->getElementos() as $arEXT21) {
@@ -344,6 +358,13 @@ if (count($rsRecordSetEXT10->getElementos()) > 0) {
                                                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                                                         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                                                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+
+                                                        if ( Sessao::getExercicio() >= '2015' ) {
+                                                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desctipodocumentoop");
+                                                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                                                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                                                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(50);
+                                                        }
 
                                                         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_emissao");
                                                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");

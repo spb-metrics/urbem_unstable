@@ -31,6 +31,7 @@
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRelatorioDespesaTotalPessoal.class.php");
+include_once (CAM_GPC_STN_MAPEAMENTO . 'TSTNDespesaPessoal.class.php');
 
 class RTCEMGRelatorioDespesaTotalPessoal{
     /**
@@ -107,6 +108,95 @@ class RTCEMGRelatorioDespesaTotalPessoal{
     {
         $rsDespesas = new RecordSet();
         $rsDespesasExclusoes = new RecordSet();
+        $rsDespesas2013 = new RecordSet();
+        
+        list( $dia, $mes, $ano ) = explode( "/", $this->getDataInicial() );
+        if($this->getExercicio() == '2014' ){
+            $obTSTNDespesaPessoal = new  TSTNDespesaPessoal();
+            $obTSTNDespesaPessoal->setDado( "exercicio"         , $this->getExercicio() );
+            $obTSTNDespesaPessoal->setDado( "cod_entidades"     , $this->getCodEntidades());
+            $obTSTNDespesaPessoal->setDado( "mes"     , (int)$mes);
+            $obTSTNDespesaPessoal->listValorEntidade( $rsDespesas2013);     
+
+            $inCountDespesas2013 = 1;
+            $arDemostrativoDespesa2013 = array();
+
+            foreach( $rsDespesas2013->getElementos() as $arDespesas2013 )
+            {
+ 
+               $arDemostrativoDespesa2013["nom_conta"]     = 'DESPESAS TOTAL COM PESSOAL EM 2013';
+               $arDemostrativoDespesa2013["entidade"]     = $arDespesas2013["cod_entidade"];
+               $vlTotalDespesas2013Total = $vlTotalDespesas2013Total+ $arDespesas2013["valor"];
+               $inMes = $arDespesas2013["mes"] -1;
+               $idMes = 'mes_'.$inMes;
+               switch ($arDespesas2013["mes"]) {
+                   case 1:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');  
+                       $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 2:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 3:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 4:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break;  
+                    case 5:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 6:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 7:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 8:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"]  , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 9:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"]  , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 10:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"]  , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+                    case 11:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"]  , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                     case 12:
+                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"]  , 2, ',','.');
+                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
+                    break; 
+               }
+               $arDemostrativoDespesa2013["total"] = number_format($vlTotalDespesas2013Total  , 2, ',','.');
+             
+               $rsDespesas2013->proximo();
+            }
+            
+            $inCountDespesas2013 = 0;            
+        }
+        $vlTotalDespesas2013Mes1  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_1"] != "" ) ? $arDespesa2013["mes_1"]:0;
+        $vlTotalDespesas2013Mes2  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_2"] != "" ) ? $arDespesa2013["mes_2"]:0;
+        $vlTotalDespesas2013Mes3  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_3"] != "" ) ? $arDespesa2013["mes_3"]:0;
+        $vlTotalDespesas2013Mes4  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_4"] != "" ) ? $arDespesa2013["mes_4"]:0;
+        $vlTotalDespesas2013Mes5  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_5"] != "" ) ? $arDespesa2013["mes_5"]:0;
+        $vlTotalDespesas2013Mes6  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_6"] != "" ) ? $arDespesa2013["mes_6"]:0;
+        $vlTotalDespesas2013Mes7  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_7"] != "" ) ? $arDespesa2013["mes_7"]:0;
+        $vlTotalDespesas2013Mes8  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_8"] != "" ) ? $arDespesa2013["mes_8"]:0;
+        $vlTotalDespesas2013Mes9  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_9"] != "" ) ? $arDespesa2013["mes_9"]:0;
+        $vlTotalDespesas2013Mes10 = ($this->getExercicio() == 2014 && $arDespesa2013["mes_10"] != "" ) ? $arDespesa2013["mes_10"]:0;
+        $vlTotalDespesas2013Mes11 = ($this->getExercicio() == 2014 && $arDespesa2013["mes_11"] != "" ) ? $arDespesa2013["mes_11"]:0;
+        $vlTotalDespesas2013Mes12 = ($this->getExercicio() == 2014 && $arDespesa2013["mes_12"] != "" ) ? $arDespesa2013["mes_12"]:0;        
 
         $obTTCEMGRelatorioDespesaTotalPessoal = new TTCEMGRelatorioDespesaTotalPessoal();
                 
@@ -274,20 +364,20 @@ class RTCEMGRelatorioDespesaTotalPessoal{
         $arDemostrativoDespesaExclusoesTotal[$inCountDespesasExclusoes]["mes_11"] = number_format($vlTotalDespesasExclusoesMes11, 2, ',','.');
         $arDemostrativoDespesaExclusoesTotal[$inCountDespesasExclusoes]["mes_12"] = number_format($vlTotalDespesasExclusoesMes12, 2, ',','.');
         $arDemostrativoDespesaExclusoesTotal[$inCountDespesasExclusoes]["total"]  = number_format($vlTotalDespesasExclusoesTotal, 2, ',','.');
-        
-        $vlTotaisDespesaMes1  = $vlTotalDespesasMes1  - $vlTotalDespesasExclusoesMes1;
-        $vlTotaisDespesaMes2  = $vlTotalDespesasMes2  - $vlTotalDespesasExclusoesMes2;
-        $vlTotaisDespesaMes3  = $vlTotalDespesasMes3  - $vlTotalDespesasExclusoesMes3;
-        $vlTotaisDespesaMes4  = $vlTotalDespesasMes4  - $vlTotalDespesasExclusoesMes4;
-        $vlTotaisDespesaMes5  = $vlTotalDespesasMes5  - $vlTotalDespesasExclusoesMes5;
-        $vlTotaisDespesaMes6  = $vlTotalDespesasMes6  - $vlTotalDespesasExclusoesMes6;
-        $vlTotaisDespesaMes7  = $vlTotalDespesasMes7  - $vlTotalDespesasExclusoesMes7;
-        $vlTotaisDespesaMes8  = $vlTotalDespesasMes8  - $vlTotalDespesasExclusoesMes8;
-        $vlTotaisDespesaMes9  = $vlTotalDespesasMes9  - $vlTotalDespesasExclusoesMes9;
-        $vlTotaisDespesaMes10 = $vlTotalDespesasMes10 - $vlTotalDespesasExclusoesMes10;
-        $vlTotaisDespesaMes11 = $vlTotalDespesasMes11 - $vlTotalDespesasExclusoesMes11;
-        $vlTotaisDespesaMes12 = $vlTotalDespesasMes12 - $vlTotalDespesasExclusoesMes12;
-        $vlTotaisDespesaTotal = $vlTotalDespesasTotal - $vlTotalDespesasExclusoesTotal;
+
+        $vlTotaisDespesaMes1  = ($vlTotalDespesasMes1  - $vlTotalDespesasExclusoesMes1)+$vlTotalDespesas2013Mes1;
+        $vlTotaisDespesaMes2  = ($vlTotalDespesasMes2  - $vlTotalDespesasExclusoesMes2)+$vlTotalDespesas2013Mes2;
+        $vlTotaisDespesaMes3  = ($vlTotalDespesasMes3  - $vlTotalDespesasExclusoesMes3)+$vlTotalDespesas2013Mes3;
+        $vlTotaisDespesaMes4  = ($vlTotalDespesasMes4  - $vlTotalDespesasExclusoesMes4)+$vlTotalDespesas2013Mes4;
+        $vlTotaisDespesaMes5  = ($vlTotalDespesasMes5  - $vlTotalDespesasExclusoesMes5)+$vlTotalDespesas2013Mes5;
+        $vlTotaisDespesaMes6  = ($vlTotalDespesasMes6  - $vlTotalDespesasExclusoesMes6)+$vlTotalDespesas2013Mes6;
+        $vlTotaisDespesaMes7  = ($vlTotalDespesasMes7  - $vlTotalDespesasExclusoesMes7)+$vlTotalDespesas2013Mes7;
+        $vlTotaisDespesaMes8  = ($vlTotalDespesasMes8  - $vlTotalDespesasExclusoesMes8)+$vlTotalDespesas2013Mes8;
+        $vlTotaisDespesaMes9  = ($vlTotalDespesasMes9  - $vlTotalDespesasExclusoesMes9)+$vlTotalDespesas2013Mes9;
+        $vlTotaisDespesaMes10 = ($vlTotalDespesasMes10 - $vlTotalDespesasExclusoesMes10)+$vlTotalDespesas2013Mes10;
+        $vlTotaisDespesaMes11 = ($vlTotalDespesasMes11 - $vlTotalDespesasExclusoesMes11)+$vlTotalDespesas2013Mes11;
+        $vlTotaisDespesaMes12 = ($vlTotalDespesasMes12 - $vlTotalDespesasExclusoesMes12)+$vlTotalDespesas2013Mes12;
+        $vlTotaisDespesaTotal = ($vlTotalDespesasTotal - $vlTotalDespesasExclusoesTotal) + $vlTotalDespesas2013Total;
               
         $arValorTotalDespesaPessoal[0]["nom_conta"]      = "DESPESAS TOTAL COM PESSOAL";
         $arValorTotalDespesaPessoal[0]["cod_estrutural"] = "";
@@ -309,7 +399,9 @@ class RTCEMGRelatorioDespesaTotalPessoal{
         $rsRecordSet["arDespesasTotal"]            = $arDemostrativoDespesaTotal;
         $rsRecordSet["arDespesasExclusoes"]        = $arDemostrativoDespesaExclusoes;
         $rsRecordSet["arDespesasExclusoesTotal"]   = $arDemostrativoDespesaExclusoesTotal;
-        $rsRecordSet["arValorTotalDespesaPessoal"] = $arValorTotalDespesaPessoal;
+        $rsRecordSet["arValorTotalDespesaPessoal"] = $arValorTotalDespesaPessoal;      
+        $rsRecordSet["arDespesas2013"]   = $arDemostrativoDespesa2013;
+        
     }
 }
 ?>

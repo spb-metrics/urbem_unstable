@@ -177,6 +177,61 @@ BEGIN
         
     END IF;
     
+       IF ( stTipoSituacao = 'pago' ) THEN
+    
+        stSql := '
+            CREATE TEMPORARY TABLE tmp_despesa_pessoal_mensal AS (
+    
+            SELECT
+                cast ( conta_despesa.cod_conta  as varchar ) as cod_conta,
+                cast ( coalesce(  stn.tituloRCL( publico.fn_mascarareduzida(conta_despesa.cod_estrutural)) , conta_despesa.descricao ) as varchar ) as descricao,
+                cast ( conta_despesa.cod_estrutural as varchar ) as cod_estrutural,
+                ';
+            
+            i := 1;
+            inMes := 12;
+            WHILE i <= 12 LOOP
+                dtInicioMes := arDatas[inMes];
+                dtFimMes    := to_char(to_date(''||arDatas[inMes]||'', 'dd/mm/yyyy') + interval '1 month' - interval '1 day','dd/mm/yyyy');      
+                
+                
+                stSql := stSql||'
+                    COALESCE((select * from tcemg.fn_despesa_total_pessoal_paga('||quote_literal(dtInicial)||'
+                                                                                           , '|| quote_literal(dtFinal)||'
+                                                                                           , '|| quote_literal(stEntidades) ||'
+                                                                                           , '|| quote_literal(stExercicio) ||'
+                                                                                           , '|| quote_literal( substr( cod_estrutural, 3,16))|| '
+                                                                                           , false
+                    )), 0.00) as mes'||i||',  ';
+                
+                i := i + 1;
+                inMes  := inMes - 1;
+            
+            END LOOP;      
+    
+            stSql := stSql||'
+                            COALESCE((select * from tcemg.fn_despesa_total_pessoal_paga('||quote_literal(dtInicial)||'
+                                                                                           , '|| quote_literal(dtFinal)||'
+                                                                                           , '|| quote_literal(stEntidades) ||'
+                                                                                           , '|| quote_literal(stExercicio) ||'
+                                                                                           , '|| quote_literal( substr( cod_estrutural, 3,16))|| ' 
+                                                                                           , false
+                            )), 0.00) as valor_total_periodo
+                     
+                    FROM orcamento.conta_despesa
+              LEFT JOIN orcamento.despesa
+                        ON despesa.exercicio = conta_despesa.exercicio
+                      AND despesa.cod_conta = conta_despesa.cod_conta
+                   WHERE conta_despesa.cod_estrutural LIKE ''' ||substr( cod_estrutural, 3,16)||'%'' 
+                     AND publico.fn_nivel(conta_despesa.cod_estrutural) = ''' || inNivel-1 || ''' 
+                     AND conta_despesa.exercicio                        = '''|| stExercicio ||'''
+                )';
+    
+        EXECUTE stSql;
+        
+    END IF;
+
+
     stSql := 'SELECT cod_conta,
                      descricao,
                      cod_estrutural,

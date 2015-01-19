@@ -39,9 +39,12 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_COMPONENTES."IMontaClassificacao.class.php");
-include_once( CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php" );
-include_once( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
+include_once CAM_GA_ORGAN_MAPEAMENTO."TOrganogramaOrganograma.class.php";
+include_once CAM_GP_PAT_COMPONENTES."IMontaClassificacao.class.php";
+include_once CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php" ;
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" ;
+include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
+include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganogramaLocal.class.php";
 
 $stPrograma = "RelatorioBemEntidade";
 $pgFilt   = "relatorioBemEntidade.php";
@@ -61,6 +64,17 @@ $obHdnAcao->setValue($stAcao);
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ("stCtrl" );
 $obHdnCtrl->setValue("");
+
+# Recupera o Organograma Ativo no sistema.
+$obTOrganogramaOrganograma = new TOrganogramaOrganograma;
+$obTOrganogramaOrganograma->setDado('ativo', true);
+$obTOrganogramaOrganograma->recuperaOrganogramasAtivo($rsOrganogramaAtivo);
+
+$inCodOrganogramaAtivo = $rsOrganogramaAtivo->getCampo('cod_organograma');
+
+$obHdnOrganogramaAtivo = new Hidden;
+$obHdnOrganogramaAtivo->setName ("inCodOrganogramaAtivo" );
+$obHdnOrganogramaAtivo->setValue($inCodOrganogramaAtivo);
 
 //instancia o componente IMontaClassificacao
 $obIMontaClassificacao = new IMontaClassificacao( $obForm );
@@ -93,10 +107,50 @@ $obSelectOrdenacao = new Select();
 $obSelectOrdenacao->setRotulo( 'Ordenação' );
 $obSelectOrdenacao->setTitle( 'Selecione a ordenação.' );
 $obSelectOrdenacao->setName( 'stOrdenacao' );
-$obSelectOrdenacao->addOption( '', 'Selecione' );
-$obSelectOrdenacao->addOption( 'cod_bem', 'Código do Bem' );
-$obSelectOrdenacao->addOption( 'descricao', 'Descrição do Bem' );
-$obSelectOrdenacao->addOption( 'classificacao', 'Classificação' );
+$obSelectOrdenacao->addOption( ''              , 'Selecione' );
+$obSelectOrdenacao->addOption( 'cod_bem'       , 'Código do Bem' );
+$obSelectOrdenacao->addOption( 'descricao'     , 'Descrição do Bem' );
+$obSelectOrdenacao->addOption( 'classificacao' , 'Classificação' );
+$obSelectOrdenacao->addOption( 'local'         , 'Local' );
+$obSelectOrdenacao->addOption( 'organograma'   , 'Organograma' );
+
+# Filtros de Organograma / Localização
+$obIMontaOrganograma = new IMontaOrganograma(false);
+$obIMontaOrganograma->setStyle('width:250px');
+
+$obIMontaOrganogramaLocal = new IMontaOrganogramaLocal;
+$obIMontaOrganogramaLocal->setValue($codLocal);
+
+$obRdbAgruparClassificacao = new Radio;
+$obRdbAgruparClassificacao->setRotulo ( "Agrupar por" );
+$obRdbAgruparClassificacao->setTitle  ( "Selecione a quebra de página." );
+$obRdbAgruparClassificacao->setName   ( "boAgrupar" );
+$obRdbAgruparClassificacao->setValue  ( 'classificacao' );
+$obRdbAgruparClassificacao->setLabel  ( "Classificação" );
+
+$obRdbAgruparLocal = new Radio;
+$obRdbAgruparLocal->setName   ( "boAgrupar" );
+$obRdbAgruparLocal->setValue  ( 'local' );
+$obRdbAgruparLocal->setLabel  ( "Local" );
+
+$obRdbAgruparOrganograma = new Radio;
+$obRdbAgruparOrganograma->setName   ( "boAgrupar" );
+$obRdbAgruparOrganograma->setValue  ( 'organograma' );
+$obRdbAgruparOrganograma->setLabel  ( "Organograma" );
+
+# Filtro de Bem Baixado 
+$obRdbBemBaixadoSim = new Radio;
+$obRdbBemBaixadoSim->setRotulo ( "Demonstrar Bens Baixados" );
+$obRdbBemBaixadoSim->setTitle  ( "Selecione se o relatório deve exibir os bens baixados." );
+$obRdbBemBaixadoSim->setName   ( "boBemBaixado" );
+$obRdbBemBaixadoSim->setValue  ( 'sim' );
+$obRdbBemBaixadoSim->setLabel  ( "Sim" );
+
+$obRdbBemBaixadoNao = new Radio;
+$obRdbBemBaixadoNao->setName   ( "boBemBaixado" );
+$obRdbBemBaixadoNao->setValue  ( 'nao' );
+$obRdbBemBaixadoNao->setLabel  ( "Não" );
+$obRdbBemBaixadoNao->setChecked(true);
 
 //monta o formulário
 $obFormulario = new Formulario;
@@ -104,12 +158,21 @@ $obFormulario->setAjuda("UC-03.01.20");
 $obFormulario->addForm      ( $obForm );
 $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
+$obFormulario->addHidden    ( $obHdnOrganogramaAtivo );
 
 $obFormulario->addTitulo    ( 'Relatório de Bens por Entidade' );
 $obIMontaClassificacao->geraFormulario( $obFormulario );
 $obFormulario->addComponente	( $obTipoBuscaDescricaoBem);
 $obFormulario->addComponente( $obITextBoxSelectEntidadeGeral );
 $obFormulario->addComponente( $obPeriodicidade );
+$obFormulario->agrupaComponentes( array( $obRdbBemBaixadoSim, $obRdbBemBaixadoNao));
+
+$obFormulario->addTitulo    ( "Localização"   );
+$obIMontaOrganograma->geraFormulario( $obFormulario );
+$obIMontaOrganogramaLocal->geraFormulario( $obFormulario );
+$obFormulario->agrupaComponentes( array( $obRdbAgruparClassificacao, $obRdbAgruparLocal, $obRdbAgruparOrganograma));
+
+$obFormulario->addTitulo    ( "Ordernação"   );
 $obFormulario->addComponente( $obSelectOrdenacao );
 
 $obFormulario->Ok();

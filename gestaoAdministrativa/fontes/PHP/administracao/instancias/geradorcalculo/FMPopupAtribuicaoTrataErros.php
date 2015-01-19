@@ -54,23 +54,29 @@ $obRegra                    = new RFuncao;
 $arVariaveis                = array();
 
 $variaveisTipo = Sessao::read('VariaveisTipo');
+
 //Indentifica a tipagem da variável inicialmente informada.
 foreach ($variaveisTipo as $campo => $valor) {
     if ( $variaveisTipo[$campo]['stNomeVariavel'] == str_replace("-","",$_REQUEST['stVariavelInicial']) ) {
         $stTipoVariavel = $variaveisTipo[$campo]['stTipoVariavel'];
     }
 }
+
 //Recupera as funções de mesmo tipo da variável informada
 $obRegra->obRTipoPrimitivo->setNomeTipo( $stTipoVariavel );
 $obRegra->listar( $rsFuncao );
 
 //Armazena as funções presentes na atribuição, pois estavam dando problema na verificação
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
+
 if ( empty($stAcao)||$stAcao=="incluir" ) {
+    
     $stAcao = "incluir";
     $stTipoAtribuicao = $_REQUEST['stTipoAtribuicao'];
     Sessao::remove('arParametros');
+    
 } elseif ($stAcao) {
+    
     $arPosicao  = explode("-",$_REQUEST['stPosicao']); //Primeira posição: Indice numérico - Segunda posição: Nível
     $arFuncao = Sessao::read('Funcao');
     $stConteudo = $arFuncao['Corpo'][ $arPosicao[0] ]['Conteudo'];
@@ -98,33 +104,42 @@ if ( empty($stAcao)||$stAcao=="incluir" ) {
         $stParametros = str_replace(',"DATA"','', $stParametros);
 
     } else {
+        
         $stTipoAtribuicao = 'Funcao';
         $stFuncao = substr($stConteudo, strpos($stConteudo, '-')+2, strlen($stConteudo));
         $stFuncao = substr($stFuncao, 0, strpos($stFuncao, '('));
         $stParametros = substr($stConteudo, strpos($stConteudo, '(')+1, strlen($stConteudo) );
         $stParametros = substr($stParametros, 0, strpos($stParametros, ')')-1);
+        
     }
+    
     $stTemp = '';
+    
     for ( $x=0; $x<strlen($stParametros);$x++ ) {
          if( $stParametros[$x] != ' ')
-         if ($stParametros[$x] == '"') {
-             $x++;
-             while ($stParametros[$x] != '"') {
-                 $stTemp = $stTemp . $stParametros[$x];
-                 $x++;
-             }
-                 $arPar[] = $stTemp;
-                 $stTemp = '';
-
-         } else {
-             if ($stParametros[$x] == ',') {
-                 if( $stTemp != '' )
-                     $arPar[] = $stTemp;
-                 $stTemp = '';
-             } else {
-                 $stTemp = $stTemp .$stParametros[$x];
-             }
-         }
+            if ($stParametros[$x] == '"') {
+                $x++;
+                
+                while ($stParametros[$x] != '"') {
+                    $stTemp = $stTemp . $stParametros[$x];
+                    $x--;
+                    
+                    if ($stParametros[$x] == '"')
+                        $stTemp = '';
+                }
+                
+                    $arPar[] = $stTemp;
+                    $stTemp = '';
+   
+            } else {
+                if ($stParametros[$x] == ',') {
+                    if( $stTemp != '' )
+                        $arPar[] = $stTemp;
+                    $stTemp = '';
+                } else {
+                    $stTemp = $stTemp .$stParametros[$x];
+                }
+            }
     }
         $arPar[] = $stTemp;
 

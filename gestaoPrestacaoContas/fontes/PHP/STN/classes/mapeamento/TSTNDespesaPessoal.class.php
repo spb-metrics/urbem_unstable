@@ -85,5 +85,45 @@ class TSTNDespesaPessoal extends Persistente
 
         return $this->executaRecuperaSql($stSql,$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
     }
+    /**
+     * Método que retorna os valores dos periodos
+     *
+     * @author      Analista        Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
+     * @author      Desenvolvedor   Henrique Boaventura <henrique.boaventura@cnm.org.br>
+     * @param object  $rsRecordSet
+     * @param string  $stFiltro    Filtros alternativos que podem ser passados
+     * @param string  $stOrder     Ordenacao do SQL
+     * @param boolean $boTransacao Usar transacao
+     *
+     * @return object $rsRecordSet
+     */
+    public function listValorEntidade(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        $stSql = "
+            SELECT despesa_pessoal.exercicio
+                 , despesa_pessoal.cod_entidade
+                 , despesa_pessoal.mes
+                 , despesa_pessoal.ano
+                 , despesa_pessoal.valor
+                 , despesa_total.total as total
+              FROM stn.despesa_pessoal
+      INNER JOIN ( SELECT SUM(valor) AS total
+                                   , exercicio
+                                   , cod_entidade                 
+                            FROM stn.despesa_pessoal
+                          WHERE despesa_pessoal.mes >   ".$this->getDado('mes')."                    
+                         GROUP BY exercicio
+                                       , cod_entidade    
+                        ) AS despesa_total
+                 ON despesa_total.exercicio = despesa_pessoal.exercicio
+               AND despesa_total.cod_entidade = despesa_pessoal.cod_entidade
+          WHERE despesa_pessoal.cod_entidade IN (".$this->getDado('cod_entidades').")
+                 AND  despesa_pessoal.exercicio = '".$this->getDado('exercicio')."'
+                 AND  despesa_pessoal.mes >   '".$this->getDado('mes')."'
+             ORDER BY despesa_pessoal.cod_entidade,  despesa_pessoal.mes
+        ";
+
+        return $this->executaRecuperaSql($stSql,$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
 
 }

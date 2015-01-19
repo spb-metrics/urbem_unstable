@@ -903,12 +903,12 @@ switch ($_REQUEST['stCtrl']) {
                 $stFiltro .= " and alm.cod_almoxarifado = ".$_REQUEST[$stNomeAlmoxarifado];
             }
             $obTAlxamoxarifadoEstoqueMaterial->recuperaSaldoEstoque( $rsSaldo, $stFiltro );
-            
+
             $boMostraSaldo = strtolower(sistemalegado::pegaConfiguracao('demonstrar_saldo_estoque' , 29));
 
             if ( $rsSaldo->getCampo('saldo_estoque')) {
-                if ($boMostraSaldo == 'true') {
-                    $inSaldo = number_format($rsSaldo->getCampo('saldo_estoque'),4,',','.');
+                $inSaldo = number_format($rsSaldo->getCampo('saldo_estoque'),4,',','.');
+                if ($boMostraSaldo == 'true') {                   
                     $stJs .= "jQuery('#".$stNomeSaldo."').html('".$inSaldo."');";
                     $stJs .= "f.".$obIMontaItemQuantidade->obHdnSaldo->getName().".value = '".$inSaldo."';";
                     $stJs .= "f.".$obIMontaItemQuantidade->obHdnCentroCusto->getName().".value = f.".$stNomeCentroCusto.".options[f.".$stNomeCentroCusto.".selectedIndex].text;";
@@ -921,7 +921,8 @@ switch ($_REQUEST['stCtrl']) {
                     }
                 } else {
                     $stJs .= "d.getElementById('".$stNomeSaldo."').innerHTML = 'Configuração não permite a exibição do saldo de estoque.';";
-                    $stJs .= limpaSpanAtributos();
+                    $stJs .= "f.".$obIMontaItemQuantidade->obHdnSaldo->getName().".value = '".$inSaldo."';";
+                    //$stJs .= limpaSpanAtributos();
                 }
             } else {
                 $stJs .= "d.getElementById('".$stNomeSaldo."').innerHTML = '&nbsp;';";

@@ -96,8 +96,11 @@ $obRTesourariaConfiguracao->consultarTesouraria();
 $obRTesourariaBoletim->roUltimaTransferencia->setNomContaDebito     ( $_POST['stNomContaDebito']   );
 $obRTesourariaBoletim->roUltimaTransferencia->setNomContaCredito    ( $_POST['stNomContaCredito']  );
 
-$stFiltros  = "?stAcao=".$stAcao."&inCodEntidade=".$_REQUEST['inCodEntidade']."&stNomEntidade=".$_REQUEST['stNomEntidade']."&inCodBoletim=".$_REQUEST['inCodBoletim']."&inCodHistorico=".$_REQUEST['inCodHistorico'];
-$stFiltros .= "&stNomHistorico=".$_REQUEST['stNomHistorico']."&inCodPlanoCredito=".$_REQUEST['inCodPlanoCredito']."&stNomContaCredito=".$_REQUEST['stNomContaCredito'];
+//pegando a data do boletim para enviar de volta ao formulario
+$stFiltros  = "?stAcao=".$stAcao."&inCodEntidade=".$_REQUEST['inCodEntidade']."&stNomEntidade=".$_REQUEST['stNomEntidade']
+            ."&inCodBoletim=".$_REQUEST['inCodBoletim']."&stDtBoletim=".$stDtBoletim."&inCodHistorico=".$_REQUEST['inCodHistorico']
+            ."&stNomHistorico=".$_REQUEST['stNomHistorico']."&inCodPlanoCredito=".$_REQUEST['inCodPlanoCredito']."&stNomContaCredito=".$_REQUEST['stNomContaCredito'];
+
 //Implementacao do pagamento extra via cheque
 $arCheques = Sessao::read('arCheques');
 if (is_array($arCheques)) {

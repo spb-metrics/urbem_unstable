@@ -34,7 +34,7 @@ $Revision: 27553 $
 $Name$
 $Author: melo $
 $Date: 2008-01-15 17:12:04 -0200 (Ter, 15 Jan 2008) $
-$Id: RNorma.class.php 61340 2015-01-08 17:51:31Z lisiane $
+$Id: RNorma.class.php 61405 2015-01-14 13:55:15Z lisiane $
 
 Casos de uso: uc-01.04.02
 */
@@ -782,10 +782,10 @@ function listar(&$rsRecordSet, $boTransacao = "")
     if( $this->stExercicio )
         $stFiltro .= " AND exercicio = '".$this->stExercicio."' ";
     if( $this->getNumNorma() )
-        $stFiltro .= " AND num_norma = '".$this->getNumNorma()."'";
+        $stFiltro .= " AND num_norma = LTRIM('".$this->getNumNorma()."'".","."'0')";
     $stOrder = " ORDER BY N.num_norma,N.exercicio ";
     $obErro = $this->obTNorma->recuperaNormas( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-   
+
     return $obErro;
 }
 

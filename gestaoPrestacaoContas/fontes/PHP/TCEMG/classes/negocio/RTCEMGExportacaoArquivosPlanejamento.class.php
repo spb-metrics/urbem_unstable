@@ -209,6 +209,7 @@ class RTCEMGExportacaoArquivosPlanejamento
 
         if (in_array("LOA.csv",$this->getArquivos())) {
             //Tipo Registro 10
+            $this->obTTCEMGConfiguracaoLOA->setDado('exercicio',$this->getExercicio());
             $this->obTTCEMGConfiguracaoLOA->recuperaRegistro10( $rsRecordSet );
             $arRecordSetArquivos["LOA10"] = $rsRecordSet;
 
@@ -220,7 +221,9 @@ class RTCEMGExportacaoArquivosPlanejamento
 
             while ($inIndex < 3) {
                 $this->obTTCEMGConfiguracaoLOA->setDado('tipo', $inIndex+1);
+                $this->obTTCEMGConfiguracaoLOA->setDado('exercicio', Sessao::getExercicio());
                 $this->obTTCEMGConfiguracaoLOA->recuperaRegistro11( $rsRecordSet11 );
+                
                 $arRecordSet11[] = $rsRecordSet11->arElementos[0];
                 $inIndex++;
             }

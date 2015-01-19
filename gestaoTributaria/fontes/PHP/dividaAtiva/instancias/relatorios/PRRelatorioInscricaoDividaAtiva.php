@@ -27,7 +27,7 @@
     * @author Desenvolvedor: Evandro Melos
     * @package URBEM    
 
-    * $Id: PRRelatorioInscricaoDividaAtiva.php 61352 2015-01-09 18:14:18Z evandro $
+    * $Id: PRRelatorioInscricaoDividaAtiva.php 61417 2015-01-15 13:29:03Z evandro $
 */
 
 include_once '../../../../../../config.php';
@@ -143,7 +143,7 @@ if ( $_REQUEST['inCodImovelInicial'] || $_REQUEST['inCodImovelFinal'] || $_REQUE
     $obTRelatorioInscricaoDividaAtiva->setDado( 'mostrar_cgm' ,true );
 }
 
-if($_REQUEST['stAcao'] == 'emitir'){
+if($_REQUEST['stAcao'] == 'incluir'){
     $stFiltro .= " AND parcelamento.timestamp BETWEEN TO_TIMESTAMP('".$_REQUEST['stPrimeiroTimestamp']."','YYYY-MM-DD HH24:MI:SS')::TIMESTAMP WITHOUT TIME ZONE 
                                                  AND  TO_TIMESTAMP('".$_REQUEST['stUltimoTimestamp']."','YYYY-MM-DD HH24:MI:SS')::TIMESTAMP WITHOUT TIME ZONE";    
 }
@@ -167,17 +167,20 @@ $obMPDF->setConteudo($arDados);
 
 $obMPDF->gerarRelatorio();
 
-if($_REQUEST['stAcao'] == 'emitir'){
+//echo "<script>window.location.href = '".CAM_FW_TMP.$obMPDF->getDownloadNomeRelatorio()."';</script>";
+echo "<script>
+        window.open('".CAM_FW_TMP.$obMPDF->getDownloadNomeRelatorio()."','_parent');        
+    </script>";
+
+if($_REQUEST['stAcao'] == 'incluir'){
     //quando vier da ACAO de inscricao da divida ativa
     $stCaminho = CAM_GT_DAT_INSTANCIAS."inscricao/FLManterInscricao.php?".Sessao::getId()."&stAcao=incluir";
     SistemaLegado::alertaAviso( $stCaminho,"Inscricao de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");    
 }else{
     //quando vier do RELATORIO da inscricao da divida ativa
-    $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/FLRelatorioInscricaoDividaAtiva.php?".Sessao::getId()."&stAcao=incluir";
+    $stCaminho = CAM_GT_DAT_INSTANCIAS."relatorios/FLRelatorioInscricaoDividaAtiva.php?".Sessao::getId()."&stAcao=emitir";
     SistemaLegado::alertaAviso( $stCaminho,"Relatório de Dívida Ativa", "incluir","aviso", Sessao::getId(), "../");    
 }
-
-echo "<script>window.location.href = '".CAM_FW_TMP.$obMPDF->getDownloadNomeRelatorio()."';</script>";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 ?>

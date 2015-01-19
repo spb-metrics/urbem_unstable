@@ -226,14 +226,14 @@ class TTCEPERemuneracaoAgentesEletivos extends Persistente
                                     JOIN folhapagamento".$this->getDado('cod_entidade').".periodo_movimentacao
                                       ON periodo_movimentacao.cod_periodo_movimentacao = contrato_servidor_periodo.cod_periodo_movimentacao
                                     
-                                    JOIN normas.norma
-                                      ON norma.cod_norma = contrato_servidor.cod_norma
-                                    
                                     JOIN tcepe.agente_eletivo
-                                      ON agente_eletivo.cod_norma = norma.cod_norma
+                                      ON agente_eletivo.cod_cargo = contrato_servidor.cod_cargo
+
+                                    JOIN normas.norma
+                                      ON norma.cod_norma = agente_eletivo.cod_norma
                                       
-                                   WHERE periodo_movimentacao.dt_inicial >= TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
-                                     AND periodo_movimentacao.dt_final <= TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                                    WHERE periodo_movimentacao.dt_inicial >= TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                    AND periodo_movimentacao.dt_final <= TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
                                 ) AS contratos
                               ON contratos.cod_contrato = eventos.cod_contrato
                              AND contratos.cod_periodo_movimentacao = eventos.cod_periodo_movimentacao

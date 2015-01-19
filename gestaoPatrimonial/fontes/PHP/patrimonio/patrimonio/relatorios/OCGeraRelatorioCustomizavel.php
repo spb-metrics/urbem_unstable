@@ -72,19 +72,18 @@ $obPDF        = new ListaPDF("L");
 
 $arFiltro = Sessao::read('filtroRelatorio');
 
-$obRRelatorio->setExercicio  ( Sessao::getExercicio() );
+$obRRelatorio->setExercicio     ( Sessao::getExercicio() );
 $obRRelatorio->recuperaCabecalho( $arConfiguracao );
-$obPDF->setModulo            ( "Patrimonio" );
-$obPDF->setSubTitulo         ( strtoupper($arFiltro['stTitulo']));
-$obPDF->setTitulo            ( "Relatório customizavel Exercício: ".Sessao::getExercicio() );
-$obPDF->setUsuario           ( Sessao::getUsername() );
-$obPDF->setEnderecoPrefeitura( $arConfiguracao );
-$obPDF->addRecordSet	     ( Sessao::read('recordset') );
-$obPDF->addIndentacao        ( "nivel", "descricao", "  ");
-$obPDF->addQuebraLinha       ( "nivel", 1 );
+$obPDF->setModulo               ( "Patrimonio" );
+$obPDF->setSubTitulo            ( strtoupper($arFiltro['stTitulo']));
+$obPDF->setTitulo               ( "Relatório customizavel Exercício: ".Sessao::getExercicio() );
+$obPDF->setUsuario              ( Sessao::getUsername() );
+$obPDF->setEnderecoPrefeitura   ( $arConfiguracao );
+$obPDF->addRecordSet	          ( Sessao::read('recordset') );
+$obPDF->addIndentacao           ( "nivel", "descricao", "  ");
+$obPDF->addQuebraLinha          ( "nivel", 1 );
 
 $inTotalColunas = 41;
-
 for ($icount=0;$icount <= $arFiltro['cont'];$icount++) {
     if ($arFiltro['boAtributoDinamico'.$icount]) {
         $inTotalColunas -= 7;

@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.03.07
 
-    $Id: PRManterCentroCusto.php 60951 2014-11-26 11:56:53Z arthur $
+    $Id: PRManterCentroCusto.php 61395 2015-01-13 18:48:04Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -80,12 +80,12 @@ switch ($stAcao) {
 
     case "alterar":
 
-        $obRegra->setCodigo ( $_POST['inCodigo']  );
-        $obRegra->setDescricao      ( $_POST['stDescricao']  );
+        $obRegra->setCodigo                           ( $_POST['inCodigo']  );
+        $obRegra->setDescricao                        ( $_POST['stDescricao']  );
         $obRegra->roUltimaEntidade->setCodigoEntidade ( $_POST['inCodEntidade'] );
-        $obRegra->roUltimaEntidade->setExercicio ( Sessao::getExercicio() );
-        $obRegra->obRCGMResponsavel->setNumCGM ( $_POST['inCGMResponsavel'] );
-        $obRegra->setVigencia      ( $_POST['dtDataVigencia']  );
+        $obRegra->roUltimaEntidade->setExercicio      ( Sessao::getExercicio() );
+        $obRegra->obRCGMResponsavel->setNumCGM        ( $_POST['inCGMResponsavel'] );
+        $obRegra->setVigencia                         ( $_POST['dtDataVigencia']  );
 
         if (count(Sessao::read('arDotacoes')) > 0) {
             foreach ( Sessao::read('arDotacoes') as $arTemp ) {

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 59719 2014-09-08 15:00:53Z franver $
+    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 61375 2015-01-12 18:30:45Z arthur $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -139,6 +139,7 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
 		INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (38,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '' );
 		INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (39,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '' );
 		INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (40,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '' );
+                INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '' );
         ";
 
         return $stSql;

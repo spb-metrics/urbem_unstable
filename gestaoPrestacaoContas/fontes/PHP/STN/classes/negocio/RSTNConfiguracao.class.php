@@ -635,9 +635,44 @@ class RSTNConfiguracao
 
         return $obErro;
     }
+    
+    /**
+     * Metodo que recupera risco fiscal - Retorna um registo unico
+     *
+     * @author      Analista        Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
+     * @author      Desenvolvedor   Eduardo Schitz      <eduardo.schitz@cnm.org.br>
+     * @param object $rsRecordSet
+     *
+     * @return object $obErro
+     */
+    public function buscaRiscoFiscal(&$rsRiscoFiscal)
+    {
+        //Aplica os filtros
+        if ($this->stExercicio != '') {
+            $stFiltro .= " AND riscos_fiscais.exercicio = '".$this->stExercicio."' ";
+        }
+        if ($this->inCodEntidade != '') {
+            $stFiltro .= " AND riscos_fiscais.cod_entidade = ".$this->inCodEntidade." ";
+        }
+        if ($this->inCodRisco != '') {
+            $stFiltro .= " AND riscos_fiscais.cod_risco = ".$this->inCodRisco." ";
+        }
+
+        if ($stFiltro) {
+            $stFiltro = ' WHERE ' . substr($stFiltro,4);
+        }
+
+        $stOrder = ' ORDER BY riscos_fiscais.cod_risco, riscos_fiscais.cod_entidade, riscos_fiscais.exercicio ';
+
+        //Faz a consulta usando o filtro
+        $obErro = $this->obTSTNRiscosFiscais->buscaRiscoFiscal($rsRiscoFiscal, $stFiltro, $stOrder);
+
+        return $obErro;
+    }
+    
 
     /**
-     * Metodo que recupera as provid?ncias dos riscos fiscais
+     * Metodo que recupera as providências dos riscos fiscais
      *
      * @author      Analista        Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
      * @author      Desenvolvedor   Eduardo Schitz      <eduardo.schitz@cnm.org.br>

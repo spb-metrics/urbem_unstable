@@ -66,12 +66,13 @@ $stDescricaoRisco = '';
 $flValor = '';
 $flValorProvidencia = '';
 $inCodIdentificador = '';
+
 if ($stAcao == 'alterarDemonstrativo') {
     $obController->obModel->stExercicio        = $_REQUEST['stExercicio'];
     $obController->obModel->inCodEntidade      = $_REQUEST['inCodEntidade'];
     $obController->obModel->inCodRisco         = $_REQUEST['inCodRisco'];
     $obController->obModel->inCodIdentificador = $_REQUEST['inCodIdentificador'];
-    $obController->obModel->listRiscosFiscais($rsRiscosFiscais);
+    $obController->obModel->buscaRiscoFiscal($rsRiscosFiscais);
     $rsRiscosFiscais->addFormatacao('valor', 'NUMERIC_BR');
 
     $stDescricaoRisco = $rsRiscosFiscais->getCampo('descricao');

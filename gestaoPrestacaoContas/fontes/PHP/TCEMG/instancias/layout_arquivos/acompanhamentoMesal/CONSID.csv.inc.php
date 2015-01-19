@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CONSID.csv.inc.php 59719 2014-09-08 15:00:53Z franver $
-  * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-  * $Author: franver $
-  * $Rev: 59719 $
+  * $Id: CONSID.csv.inc.php 61428 2015-01-15 20:06:35Z arthur $
+  * $Date: 2015-01-15 18:06:35 -0200 (Qui, 15 Jan 2015) $
+  * $Author: arthur $
+  * $Rev: 61428 $
   *
 */
 /**
@@ -71,11 +71,18 @@ if (count($rsRecuperaConsid10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_arquivo");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-
+    if ( Sessao::getExercicio() >= "2015" ) {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_arquivo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
+    } else {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_arquivo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    }
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("consideracoes");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");

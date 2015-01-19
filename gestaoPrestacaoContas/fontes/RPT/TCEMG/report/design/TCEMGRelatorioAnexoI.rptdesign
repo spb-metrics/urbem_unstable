@@ -504,7 +504,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 </structure>
                 <structure>
                     <property name="name">percentual_usado</property>
-                    <expression name="expression">(dataSetRow["total_anexo_ii"]*100)/dataSetRow["total_receitas"];</expression>
+                    <expression name="expression">if(dataSetRow["total_anexo_ii"] != 0 ){
+(dataSetRow["total_anexo_ii"]*100)/dataSetRow["total_receitas"];
+} else {
+0.00}</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>

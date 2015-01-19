@@ -29,7 +29,7 @@
 
     * @ignore
 
-    $Id: LSManterPlanoConta.php 61326 2015-01-07 11:02:55Z carolina $
+    $Id: LSManterPlanoConta.php 61444 2015-01-16 17:32:17Z franver $
 
     * Casos de uso: uc-02.02.02
 */
@@ -98,6 +98,7 @@ $obRContabilidadePlanoBanco->setCodigoEntidade       ( $stCodEntidade           
 $obRContabilidadePlanoBanco->setNumAgencia           ( $_REQUEST['inNumAgencia']    );
 $obRContabilidadePlanoBanco->setNumBanco             ( $_REQUEST['inNumBanco']      );
 $obRContabilidadePlanoBanco->setContaCorrente        ( $_REQUEST['stContaCorrente'] );
+$obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($_REQUEST['inCodRecurso']);
 $obRContabilidadePlanoBanco->listarPlanoContaEntidade( $rsLista , 'cod_estrutural'  );
 
 $stLink .= "&stAcao=".$stAcao;

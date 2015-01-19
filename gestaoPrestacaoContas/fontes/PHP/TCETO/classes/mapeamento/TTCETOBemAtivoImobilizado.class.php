@@ -217,8 +217,7 @@ class TTCETOBemAtivoImobilizado extends Persistente
                           ON bem_baixado.cod_bem = bem.cod_bem
                          AND bem_baixado.dt_baixa BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
                          
-                       WHERE bem_comprado.exercicio    = '".$this->getDado('exercicio')."'
-                         AND bem_comprado.cod_entidade = 2
+                       WHERE bem_comprado.cod_entidade = 2
                          AND bem.dt_aquisicao < to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
                 ) AS tabela
               

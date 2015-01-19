@@ -91,4 +91,57 @@ if ($_REQUEST['stOrdenacao'] != '') {
     $preview->addParametro( 'ordenacao', '' );
 }
 
+# Local
+if ($_REQUEST['inCodLocal'] != '' ) {
+    $preview->addParametro( 'cod_local', $_REQUEST['inCodLocal'] );
+} else {
+    $preview->addParametro( 'cod_local', '' );
+}
+
+# Bem Baixado
+if ($_REQUEST['boBemBaixado'] != '' ) {
+    $preview->addParametro( 'bem_baixado', $_REQUEST['boBemBaixado'] );
+} else {
+    $preview->addParametro( 'bem_baixado', '' );
+}
+
+# Organograma
+if ($_REQUEST['inCodOrganogramaAtivo'] != '') {
+    if ($_REQUEST['inCodOrganogramaClassificacao'] != '') {
+
+        $boPermissaoHierarquica = SistemaLegado::pegaDado('permissao_hierarquica', 'organograma.organograma', ' WHERE cod_organograma = '.$_REQUEST['inCodOrganogramaAtivo']);
+        
+        $stOrgaoReduzido = SistemaLegado::pegaDado('orgao_reduzido', 'organograma.vw_orgao_nivel', ' WHERE cod_orgao = '.$_REQUEST['hdnUltimoOrgaoSelecionado']);
+        
+        if ($boPermissaoHierarquica == 't'){
+            $preview->addParametro( 'cod_orgao', $stOrgaoReduzido.'%' );
+        } else {
+            $preview->addParametro( 'cod_orgao', $stOrgaoReduzido );
+        }
+    } else {
+
+    }
+
+    $preview->addParametro( 'cod_organograma', $_REQUEST['inCodOrganogramaAtivo'] );
+} else {
+    $preview->addParametro( 'cod_organograma', '' );
+}
+
+switch ($_REQUEST['boAgrupar']) {
+    case 'classificacao':
+        $preview->addParametro( 'agrupar' , 'classificacao' );
+    break;
+
+    case 'local':
+        $preview->addParametro( 'agrupar'   , 'local' );
+    break;
+
+    case 'organograma':
+        $preview->addParametro( 'agrupar'   , 'organograma' );
+    break;
+}
+
+$preview->addParametro( 'cod_organograma', '' );
+$preview->addParametro( 'cod_orgao', '');
+
 $preview->preview();

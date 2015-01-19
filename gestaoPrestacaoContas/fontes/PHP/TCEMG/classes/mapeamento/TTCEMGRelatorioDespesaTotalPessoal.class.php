@@ -48,7 +48,7 @@ class TTCEMGRelatorioDespesaTotalPessoal extends Persistente
 	    $obConexao   = new Conexao;
 	    $rsRecordSet = new RecordSet;
 	    $stSql = $this->montaRecuperaDespesaTotalPessoal().$stFiltro.$stOrdem;
-	    $this->stDebug = $stSql;        
+	    $this->stDebug = $stSql;    
 	    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
     }
     

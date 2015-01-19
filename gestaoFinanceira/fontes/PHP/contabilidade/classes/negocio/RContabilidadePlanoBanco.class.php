@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RContabilidadePlanoBanco.class.php 60455 2014-10-22 19:34:46Z carlos.silva $
+    $Id: RContabilidadePlanoBanco.class.php 61444 2015-01-16 17:32:17Z franver $
 
     $Revision: 30668 $
     $Name$
@@ -470,6 +470,10 @@ function listarPlanoContaEntidade(&$rsRecordSet, $stOrder = "" , $boTransacao = 
         $stFiltro .= " pc.exercicio = '" . $this->stExercicio . "' AND ";
         $obTContabilidadePlanoAnalitica->setDado('exercicio', $this->stExercicio );
     }
+    if ($this->obROrcamentoRecurso->getCodRecurso())
+    {
+        $stFiltro .= " pr.cod_recurso = " . (int)$this->obROrcamentoRecurso->getCodRecurso() . " AND ";
+    }
     
     // Quando ação de encerrar não traz na lista os já encerrados
     if ($this->filtroEncerrado == "encerrar"){
@@ -493,7 +497,7 @@ function listarPlanoContaEntidade(&$rsRecordSet, $stOrder = "" , $boTransacao = 
     
     $stOrder = ( $stOrder ) ?  $stOrder : 'cod_estrutural';
     $obErro = $obTContabilidadePlanoAnalitica->recuperaRelacionamentoContaEntidade( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-    
+
     return $obErro;
 }
 

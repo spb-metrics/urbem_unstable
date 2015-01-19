@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Bruce Cruz de Sena</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">mm</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederacao Nacional de Municipios>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">mm</property>
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
         <structure>
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -27,10 +27,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -149,9 +149,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -160,9 +160,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -175,9 +175,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -186,9 +186,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,9 +197,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,9 +208,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -219,10 +219,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -231,9 +231,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -242,9 +242,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -352,63 +352,97 @@ extensionProperties.odaPassword = params["db_password"].value;
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsRecursos" id="4163">
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">data_inicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_3</property>
-                    <property name="paramName">data_fim</property>
-                    <property name="dataType">string</property>
-                    <property name="position">3</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_4</property>
-                    <property name="paramName">cod_entidade</property>
-                    <property name="dataType">string</property>
-                    <property name="position">4</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <list-property name="columnHints"/>
             <structure name="cachedMetaData"/>
             <method name="afterClose"><![CDATA[params["qry"] = this.queryText;]]></method>
             <property name="dataSource">Data Source</property>
-            <xml-property name="queryText"><![CDATA[SELECT *
-FROM stn.pl_recurso_descricao(?,?,?,' ',?,'false')
-AS
-(
-		 tipo_recurso					char(1)
-		,cod_recurso 					integer
-		, exercicio						varchar
-		, nom_recurso					varchar
-		, positivo						numeric
-		, negativo						numeric
-		, saldo							numeric
-		, a_pagar_exercicio				numeric
-		, a_pagar_exercicio_anteriores	numeric
-		, valor_consignacao_positivo	numeric
-		, valor_consignacao_negativo	numeric
-		, consignacoes 					numeric
-		, caixa							numeric
-   
-)
-ORDER BY tipo_recurso DESC]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[SELECT    q.tipo AS nom_recurso
+		, q.tipo_rd AS tipo_recurso
+		, q.disponibilidade_caixa_bruta
+		, q.obrigacoes_financeiras
+		, (q.disponibilidade_caixa_bruta - q.obrigacoes_financeiras) AS disponibilidade_liquida
+
+FROM (	SELECT lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
+         , tb.tipo
+         , rd.tipo AS tipo_rd
+         
+         /* Disponibilidade Caixa_Bruta */
+         , sum(tb.caixa_liquida) + 
+           sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) + 
+           sum(tb.liquidados_nao_pagos) + 
+           sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) + 
+           sum(tb.empenhados_nao_liquidados) AS disponibilidade_caixa_bruta 
+         
+		/* Obrigações financeiras */
+		, sum(tb.total_processados_exercicios_anteriores) + 
+		  sum(tb.total_processados_exercicio_anterior) + 
+		  sum(tb.total_nao_processados_exercicios_anteriores) + 
+		  sum(tb.total_nao_processados_exercicio_anterior) +
+		  sum(tb2.consignacoes) AS obrigacoes_financeiras
+
+	FROM ( SELECT 
+		      cod_recurso
+		    , entidade
+		    , tipo
+		    , SUM(total_processados_exercicios_anteriores) AS total_processados_exercicios_anteriores
+		    , SUM(total_processados_exercicio_anterior) AS total_processados_exercicio_anterior
+		    , SUM(total_nao_processados_exercicios_anteriores) AS total_nao_processados_exercicios_anteriores
+		    , SUM(total_nao_processados_exercicio_anterior) AS total_nao_processados_exercicio_anterior
+		    , SUM(liquidados_nao_pagos) AS liquidados_nao_pagos
+		    , SUM(empenhados_nao_liquidados) AS empenhados_nao_liquidados
+		    , SUM(empenhados_nao_liquidados_cancelados) AS empenhados_nao_liquidados_cancelados
+		    , SUM(caixa_liquida) AS caixa_liquida
+		FROM stn.fn_rgf_anexo6novo_recurso('2014','2','30/06/2014') AS stn_fn
+		   (  cod_recurso 			      	  integer
+		    , tipo 				      	  varchar
+		    , entidade 				      	  integer
+		    , total_processados_exercicios_anteriores 	  numeric
+		    , total_processados_exercicio_anterior    	  numeric
+		    , total_nao_processados_exercicios_anteriores numeric
+		    , total_nao_processados_exercicio_anterior 	  numeric
+		    , liquidados_nao_pagos 			  numeric
+		    , empenhados_nao_liquidados 		  numeric
+		    , empenhados_nao_liquidados_cancelados 	  numeric
+		    , caixa_liquida 				  numeric )
+	     GROUP BY cod_recurso
+		    , entidade
+		    , tipo
+	  ) AS tb
+
+ INNER JOIN stn.pl_recurso_descricao('2014','01/01/2014','30/06/2014',' ','2','false') AS tb2
+            (  tipo_recurso				 char(1)
+	      , cod_recurso 				 integer
+	      , exercicio				 varchar
+              , nom_recurso				 varchar
+	      , positivo				 numeric
+	      , negativo				 numeric
+	      , saldo					 numeric
+	      , a_pagar_exercicio			 numeric
+	      , a_pagar_exercicio_anteriores 		 numeric
+	      , valor_consignacao_positivo	 	 numeric
+	      , valor_consignacao_negativo	 	 numeric
+	      , consignacoes 				 numeric
+	      , caixa	  	 	  		 numeric )
+
+       ON tb2.cod_recurso = tb.cod_recurso
+      AND tb2.exercicio   = '2014'
+
+  INNER JOIN orcamento.recurso_direto AS rd
+        ON rd.cod_recurso = tb.cod_recurso
+       AND rd.exercicio = '2014' 
+
+     WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = '2014'))
+
+  GROUP BY tb.cod_recurso
+         , tb.tipo
+	 , tb2.cod_recurso
+	 , tb2.tipo_recurso
+	 , tipo_rd
+	  
+  ORDER BY tb.cod_recurso
+         , tb.tipo
+) AS q]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsRecursosRPPS" id="4575">
             <list-property name="parameters">
@@ -545,6 +579,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                     </text-data>
                 </cell>
                 <cell id="178">
+                    <property name="verticalAlign">bottom</property>
                     <text id="180">
                         <property name="fontFamily">sans-serif</property>
                         <property name="fontSize">7pt</property>
@@ -571,8 +606,9 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                             </structure>
                             <structure>
                                 <property name="name">saldo_bruto_vinculados</property>
-                                <expression name="expression">dataSetRow["caixa"]</expression>
+                                <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_bruta"]</expression>
                                 <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_vinculado</property>
@@ -595,13 +631,15 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                             </structure>
                             <structure>
                                 <property name="name">obrigacoes</property>
-                                <expression name="expression">(dataSetRow["a_pagar_exercicio"] + dataSetRow["a_pagar_exercicio_anteriores"] + dataSetRow["consignacoes"])*(-1);</expression>
+                                <expression name="expression" type="javascript">dataSetRow["obrigacoes_financeiras"]</expression>
                                 <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">caixa_liquida</property>
-                                <expression name="expression">row["saldo_bruto_vinculados"] - row["obrigacoes"]</expression>
+                                <expression name="expression" type="javascript">dataSetRow["disponibilidade_liquida"]</expression>
                                 <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_caixa_liquida</property>
@@ -649,16 +687,6 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                 <expression name="expression">row["total_III"] - row["total_obrigacoes_III"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
-                            <structure>
-                                <property name="name">consignacoes</property>
-                                <expression name="expression">dataSetRow["consignacoes"]</expression>
-                                <property name="dataType">decimal</property>
-                            </structure>
-                            <structure>
-                                <property name="name">teste</property>
-                                <expression name="expression">Total.sum(row["obrigacoes"]) + Total.sum(dataSetRow["consignacoes"])</expression>
-                                <property name="dataType">decimal</property>
-                            </structure>
                         </list-property>
                         <column id="4247">
                             <property name="width">73.55416666666667mm</property>
@@ -674,7 +702,6 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                         </column>
                         <header>
                             <row id="4251">
-                                <property name="height">12.170833333333333mm</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">1px</property>
@@ -682,6 +709,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                 <property name="borderTopStyle">solid</property>
                                 <property name="borderTopWidth">1px</property>
                                 <property name="verticalAlign">middle</property>
+                                <property name="height">12.170833333333333mm</property>
                                 <cell id="4252">
                                     <text id="4257">
                                         <property name="fontSize">7pt</property>
@@ -827,7 +855,6 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                         </group>
                         <detail>
                             <row id="4238">
-                                <property name="height">3.96875mm</property>
                                 <method name="onRender"><![CDATA[//var x = this.getRowData().getColumnValue('tipo_recurso');
 
 //if (x != 'V'){
@@ -835,6 +862,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
 //}
 
 ]]></method>
+                                <property name="height">3.96875mm</property>
                                 <cell id="4239">
                                     <property name="borderRightColor">#000000</property>
                                     <property name="borderRightStyle">solid</property>
@@ -904,10 +932,10 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                         </detail>
                         <footer>
                             <row id="4586">
-                                <property name="height">3.7041666666666666mm</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">1px</property>
+                                <property name="height">3.7041666666666666mm</property>
                                 <cell id="4587">
                                     <label id="4591">
                                         <property name="fontSize">7pt</property>
@@ -1098,7 +1126,7 @@ DOS SERVIDORES¹</text-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

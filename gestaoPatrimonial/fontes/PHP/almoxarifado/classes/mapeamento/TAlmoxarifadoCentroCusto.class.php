@@ -88,26 +88,27 @@ function TAlmoxarifadoCentroCusto()
 
   public function montaRecuperaRelacionamento()
   {
-      $stSql  =" SELECT centro_custo.cod_centro                                        ,                                            \n";
-      $stSql .="        centro_custo.descricao                                         ,                                            \n";
-      $stSql .="        TO_CHAR(centro_custo.dt_vigencia, 'dd/mm/yyyy') as dt_vigencia ,                                            \n";
-      $stSql .="        centro_custo_permissao.numcgm                                  ,                                            \n";
-      $stSql .="        centro_custo_entidade.cod_entidade                             ,                                            \n";
-      $stSql .="        cgm_entidade.nom_cgm AS desc_entidade                                ,                                            \n";
-      $stSql .="        sw_cgm.nom_cgm                                                                                              \n";
-      $stSql .="   FROM almoxarifado.centro_custo                                                                                   \n";
-      $stSql .="   LEFT JOIN almoxarifado.centro_custo_permissao ON (centro_custo_permissao.cod_centro = centro_custo.cod_centro )   \n";
-      $stSql .="   LEFT JOIN almoxarifado.centro_custo_entidade  ON (centro_custo_entidade.cod_centro  = centro_custo.cod_centro) , \n";
-      $stSql .="        orcamento.entidade                                                                                        , \n";
-      $stSql .="        sw_cgm                                                                                                    ,  \n";
-      $stSql .="        sw_cgm as cgm_entidade                                                                                                     \n";
-      $stSql .="  WHERE centro_custo_entidade.cod_entidade = entidade.cod_entidade                                                  \n";
-      $stSql .="    AND centro_custo_entidade.exercicio    = entidade.exercicio                                                     \n";
-      $stSql .="    AND cgm_entidade.numcgm    = entidade.numcgm \n";
-      $stSql .="    AND centro_custo_permissao.numcgm      = sw_cgm.numcgm                                                          \n";
-      // A linha abaixo não pode ser utilizada, pois se um almoxarife criar um centro de custo
-      // onde não é o responsável, somente será possível modificar este centro de custo pelo banco de dados.
-      //$stSql .="    AND centro_custo_permissao.responsavel = true \n";
+        $stSql="SELECT DISTINCT 
+                        centro_custo.cod_centro                                        
+                        ,centro_custo.descricao                                         
+                        ,TO_CHAR(centro_custo.dt_vigencia, 'dd/mm/yyyy') as dt_vigencia 
+                        ,centro_custo_permissao.numcgm     
+                        ,centro_custo_entidade.cod_entidade
+                        ,cgm_entidade.nom_cgm AS desc_entidade
+                        ,sw_cgm.nom_cgm        
+                FROM almoxarifado.centro_custo
+                LEFT JOIN almoxarifado.centro_custo_permissao 
+                    ON centro_custo_permissao.cod_centro = centro_custo.cod_centro 
+                LEFT JOIN almoxarifado.centro_custo_entidade 
+                    ON centro_custo_entidade.cod_centro  = centro_custo.cod_centro
+                ,orcamento.entidade                                                                                        
+                ,sw_cgm                                                                                                    
+                ,sw_cgm as cgm_entidade
+                WHERE centro_custo_entidade.cod_entidade = entidade.cod_entidade
+                AND centro_custo_entidade.exercicio = entidade.exercicio
+                AND cgm_entidade.numcgm = entidade.numcgm
+                AND centro_custo_permissao.numcgm = sw_cgm.numcgm
+        ";
     return $stSql;
  }
 

@@ -160,7 +160,8 @@ function RecuperaRelatorio(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTran
     $rsRecordSet = new RecordSet;
 
     $stSql = $this->montaRecuperaRelatorio($stFiltro);
-    $this->setDebug($stSql);
+    $this->setDebug($stSql);    
+    //SistemaLegado::mostravar($stSql); exit();
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
@@ -240,7 +241,7 @@ function montaRecuperaRelatorio($filtro)
             $ordenacao.= ", dt_aquisicao";
         }
         if ($filtro['ordenacao'] == 'boDataBaixa') {
-            $ordenacao.= ", dt_baixa";
+            $ordenacao.= ", MAX(dt_baixa) ";
         }
         if ($filtro['ordenacao'] == 'boNotaFiscal') {
             $ordenacao.= ", nota_fiscal";
@@ -256,105 +257,105 @@ function montaRecuperaRelatorio($filtro)
           $stJoin = 'LEFT';
       }
 
-      $stSql.="   select dinamico.cod_bem                                                                             \n ";
-      $stSql.="         ,dinamico.descricao                                                                           \n ";
-      $stSql.="         ,dinamico.vl_bem                                  as valor_empenho                            \n ";
-      $stSql.="         ,max(bc.cod_empenho)                              as cod_empenho                              \n ";
-      $stSql.="         ,max(dinamico.num_placa)                          as numero_placa                             \n ";
-      $stSql.="         ,max(dinamico.classificacao)                      as classificacao                            \n ";
-      $stSql.="         ,max(bc.nota_fiscal)                      		  as nota_fiscal                           	  \n ";
-      $stSql.="         ,sw_cgm.nom_cgm 							      as entidade	                         	  \n ";
-      $stSql.="         ,max(to_char(dinamico.dt_aquisicao,'dd-mm-YYYY')) as dt_aquisicao                             \n ";
-      $stSql.="         ,".$max."                                                                                     \n ";
-      $stSql.="         max(to_char(bb.dt_baixa,'dd-mm-YYYY'))           as dt_baixa                                  \n ";
-      $stSql.="         , recuperaDescricaoOrgao(orgao.cod_orgao, to_date('".$filtro['dtFinal']."','dd/mm/yyyy')) as nom_orgao                                 \n ";
-      $stSql.="    from ( select bem.cod_bem                                                                          \n ";
-      $stSql.="                 ,bem.descricao                                                                        \n ";
-      $stSql.="                 ,bem.dt_aquisicao                                                                     \n ";
-      $stSql.="                 ,bem.num_placa                                                                        \n ";
-      $stSql.="                 ,bem.vl_bem                                                                           \n ";
-      $stSql.="                 ,bem.cod_natureza|| '.' ||bem.cod_grupo|| '.' ||bem.cod_especie as classificacao      \n ";
-      if ( strlen($Campo) > 0 ) {
-        $stSql.="                 ,".$Campo."                                                                           \n ";
+      if ( $filtro['stRBemBaixado'] == 'todos' ) {
+          $stSelectBemBaixado = "max(to_char(bb.dt_baixa,'dd-mm-YYYY'))           as dt_baixa, ";
+          $stJoinBemBaixado   = "LEFT OUTER JOIN patrimonio.bem_baixado bb
+                                        on dinamico.cod_bem = bb.cod_bem ";
+      }elseif ( $filtro['stRBemBaixado'] == 'sim' ) {
+          $stSelectBemBaixado = "max(to_char(bb.dt_baixa,'dd-mm-YYYY'))           as dt_baixa, ";
+          $stJoinBemBaixado   = "JOIN patrimonio.bem_baixado bb
+                                       on dinamico.cod_bem = bb.cod_bem ";
+      }elseif ( $filtro['stRBemBaixado'] == 'nao' ) {
+          $stSelectBemBaixado  = " ''::varchar as dt_baixa, ";
+          $stJoinBemBaixado    = " ";
+          $boNotExistsBaixados = true ;          
       }
-      $stSql.="           from patrimonio.bem bem                                               \n ";
-      $stSql.="           left join patrimonio.bem_atributo_especie bae                                                           \n ";
-      $stSql.="           on bae.cod_bem = bem.cod_bem                                                                \n ";
-      $stSql.="           where  \n";
-//( cod_atributo in ".$in."                                                             \n ";
-//      $stSql.="            )and                                                                                       \n ";
-      $stSql.="           bem.dt_aquisicao between to_date('".$filtro['dtInicial']."','dd/mm/yyyy')                   \n ";
-      $stSql.="                                  and to_date('".$filtro['dtFinal']."','dd/mm/yyyy')                   \n ";
-      $stSql.="           ".$Compara."                                                                                \n ";
-      $stSql.="    ) as dinamico                                                                                      \n ";
-      $stSql.="    left outer join patrimonio.bem_baixado bb                                                      \n ";
-      $stSql.="    on dinamico.cod_bem = bb.cod_bem                                                                   \n ";
-      $stSql.="  ".$stJoin." join patrimonio.bem_comprado bc on bc.cod_bem = dinamico.cod_bem                     \n ";
 
-        ///SOLICITACAO DO DIA 22/03/2007 FILTRO USANDO ENTIDADE\\\\\
+        $stSql.="   select  dinamico.cod_bem
+                            ,dinamico.descricao
+                            ,dinamico.vl_bem                                  as valor_empenho
+                            ,max(bc.cod_empenho)                              as cod_empenho
+                            ,max(dinamico.num_placa)                          as numero_placa
+                            ,max(dinamico.classificacao)                      as classificacao
+                            ,max(bc.nota_fiscal)                      		  as nota_fiscal
+                            ,sw_cgm.nom_cgm 							      as entidade
+                            ,max(to_char(dinamico.dt_aquisicao,'dd-mm-YYYY')) as dt_aquisicao,
+                            ".$max."
+                            ".$stSelectBemBaixado."
+                            recuperaDescricaoOrgao(orgao.cod_orgao, to_date('".$filtro['dtFinal']."','dd/mm/yyyy')) as nom_orgao
+                    from (  select bem.cod_bem
+                                ,bem.descricao
+                                ,bem.dt_aquisicao
+                                ,bem.num_placa
+                                ,bem.vl_bem
+                                ,bem.cod_natureza|| '.' ||bem.cod_grupo|| '.' ||bem.cod_especie as classificacao
+        ";
+        if ( strlen($Campo) > 0 ) {
+            $stSql.="                 ,".$Campo." \n ";
+        }
+        
+        $stSql.="           from patrimonio.bem bem
+                            left join patrimonio.bem_atributo_especie bae
+                                on bae.cod_bem = bem.cod_bem
+                            where
+                            bem.dt_aquisicao between to_date('".$filtro['dtInicial']."','dd/mm/yyyy')
+                                            and to_date('".$filtro['dtFinal']."','dd/mm/yyyy')
+                            ".$Compara."
+                            ) as dinamico
+                            
+                            ".$stJoinBemBaixado."
 
-      $stSql.=" inner join orcamento.entidade on entidade.cod_entidade = bc.cod_entidade \n";
-      $stSql.="                              and entidade.exercicio    = bc.exercicio \n";
-      $stSql.=" inner join sw_cgm on entidade.numcgm = sw_cgm.numcgm \n";
+                            ".$stJoin." join patrimonio.bem_comprado bc
+                                on bc.cod_bem = dinamico.cod_bem
+                            inner join orcamento.entidade 
+                                on entidade.cod_entidade = bc.cod_entidade
+                                and entidade.exercicio    = bc.exercicio
+                            inner join sw_cgm 
+                                on entidade.numcgm = sw_cgm.numcgm \n";
 
         if ( ( $filtro['codEntidade'] >= 0 ) && ( $filtro['codEntidade'] != 'xxx' ) ) {
-            $stSql.=" and sw_cgm.numcgm = ".$filtro['codEntidade']." ";
+            $stSql.="       and sw_cgm.numcgm = ".$filtro['codEntidade']." ";
         }
-
-        // if (( $filtro[codOrgao] >= 0) && ($filtro[codOrgao] != 'xxx') ) {
-        //     $arOrgao = explode("-",$filtro[codOrgao]);
-        //     $stSql.="
-        //             left join ( select  cod_orgao
-        //                              --,  ano_exercicio
-        //                              ,  cod_bem
-        //                              ,  max(timestamp) as timestamp
-        //                           from  patrimonio.historico_bem
-        //                       group by cod_orgao
-        //                              --, ano_exercicio
-        //                              , cod_bem
-        //                       ) as historico_bem
-        //                 on historico_bem.cod_orgao = ".$arOrgao[0]."
-        //                --and historico_bem.ano_exercicio = ".$arOrgao[1]."
-        //              left join organograma.orgao
-        //                     on orgao.cod_orgao = ";
-
-        // } else {
-            $stSql.="
+        
+        $stSql.="
                     left join (
-                          SELECT historico_bem.cod_bem
-                               , historico_bem.cod_orgao
-                               --, historico_bem.ano_exercicio
-                               , historico_bem.timestamp
+                            SELECT  historico_bem.cod_bem
+                                    , historico_bem.cod_orgao
+                                    --, historico_bem.ano_exercicio
+                                    , historico_bem.timestamp
                             FROM patrimonio.historico_bem
-                      INNER JOIN (  SELECT  cod_bem
+                            JOIN (  SELECT  cod_bem
                                          ,  MAX(timestamp) AS timestamp
-                                      FROM  patrimonio.historico_bem
-                                      GROUP BY  cod_bem
+                                    FROM  patrimonio.historico_bem
+                                    GROUP BY  cod_bem
                                  ) AS historico_bem_max
-                              ON historico_bem.cod_bem = historico_bem_max.cod_bem
-                             AND historico_bem.timestamp   = historico_bem_max.timestamp
-                        GROUP BY historico_bem.cod_orgao
-                               , historico_bem.cod_bem
-                               , historico_bem.timestamp
-                             ) as historico_bem
-                       on historico_bem.cod_bem = dinamico.cod_bem
-            ";
-            $stSql.=" left join organograma.orgao on orgao.cod_orgao = historico_bem.cod_orgao \n";
-        // }
-
-        ///FIM\\\
-
-      $stSql.="  left join ( select em.exercicio, em.cod_empenho, ipe.vl_total, eai.vl_anulado from empenho.empenho em             \n ";
-      $stSql.="  ".$stJoin." join empenho.pre_empenho pe                                                          \n ";
-      $stSql.="    on em.cod_pre_empenho = pe.cod_pre_empenho                                                         \n ";
-      $stSql.="  ".$stJoin." join empenho.item_pre_empenho ipe                                                    \n ";
-      $stSql.="    on  pe.cod_pre_empenho = ipe.cod_pre_empenho                                                       \n ";
-      $stSql.="    and pe.exercicio       = ipe.exercicio                                                             \n ";
-      $stSql.="    left outer join empenho.empenho_anulado_item eai                                                \n ";
-      $stSql.="    on ipe.cod_pre_empenho = eai.cod_pre_empenho                                                       \n ";
-      $stSql.="    AND ipe.exercicio      = eai.exercicio                                                             \n ";
-      $stSql.="    AND ipe.num_item       = eai.num_item ) as emp                                                     \n ";
-      $stSql.="    on bc.cod_empenho = emp.cod_empenho  and bc.exercicio = emp.exercicio                                  \n ";
+                                ON historico_bem.cod_bem    = historico_bem_max.cod_bem
+                                AND historico_bem.timestamp = historico_bem_max.timestamp
+                            GROUP BY historico_bem.cod_orgao
+                                    , historico_bem.cod_bem
+                                    , historico_bem.timestamp
+                            ) as historico_bem
+                        ON historico_bem.cod_bem = dinamico.cod_bem      
+                    LEFT JOIN organograma.orgao 
+                        ON orgao.cod_orgao = historico_bem.cod_orgao
+                    LEFT JOIN ( SELECT  em.exercicio
+                                        , em.cod_empenho
+                                        , ipe.vl_total
+                                        , eai.vl_anulado 
+                                FROM empenho.empenho em             
+                                ".$stJoin." JOIN empenho.pre_empenho pe
+                                    ON em.cod_pre_empenho = pe.cod_pre_empenho
+                                ".$stJoin." JOIN empenho.item_pre_empenho ipe
+                                    ON  pe.cod_pre_empenho = ipe.cod_pre_empenho
+                                    AND pe.exercicio       = ipe.exercicio
+                                LEFT OUTER JOIN empenho.empenho_anulado_item eai
+                                    ON ipe.cod_pre_empenho = eai.cod_pre_empenho
+                                    AND ipe.exercicio      = eai.exercicio
+                                    AND ipe.num_item       = eai.num_item 
+                            ) as emp
+                        ON bc.cod_empenho = emp.cod_empenho
+                        AND bc.exercicio = emp.exercicio 
+        ";
 
       if ( strstr($filtro['filtro'],'bo') ) {
             if ($filtro['filtro'] == 'boValor') {
@@ -381,10 +382,14 @@ function montaRecuperaRelatorio($filtro)
           $stFiltro.= " historico_bem.cod_orgao in (select cod_orgao from organograma.vw_orgao_nivel where orgao_reduzido like '".$filtro[hdninCodOrganograma]."%') AND ";
       }
 
+      if ($boNotExistsBaixados) {
+          $stFiltro .= " NOT EXISTS (SELECT * FROM patrimonio.bem_baixado WHERE bem_baixado.cod_bem = dinamico.cod_bem) AND ";
+      }
+
       if ($stFiltro) {
           $stSql.= " WHERE ".substr($stFiltro,0,strlen($stFiltro)-4);
       }
-      $stSql.="    group by orgao.cod_orgao,dinamico.cod_bem,dinamico.descricao,dinamico.vl_bem,dinamico.num_placa,bc.cod_empenho,nom_orgao,sw_cgm.nom_cgm                               \n ";
+      $stSql.="\n    group by orgao.cod_orgao,dinamico.cod_bem,dinamico.descricao,dinamico.vl_bem,dinamico.num_placa,bc.cod_empenho,nom_orgao,sw_cgm.nom_cgm ";
       if ( $filtro['filtro'] != 'xxx' AND !strstr($filtro['filtro'],'bo') ) {
           $stSql.="    HAVING max(upper(dinamico.Atributo_".$filtro['filtro'].")) between upper('".$filtro['valor_filtro1']."')         \n ";
           $stSql.="                                                             and upper('".$filtro['valor_filtro2']."')         \n ";

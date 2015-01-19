@@ -1,4 +1,3 @@
-<?php
 /*
     **********************************************************************************
     *                                                                                *
@@ -21,38 +20,24 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?php
-/**
-    *
-    * Data de Criação: 27/10/2005
-
-    * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
-    * @author Documentor: Cassiano de Vasconcellos Ferreira
-
-    * @package framework
-    * @subpackage componentes
-
-    Casos de uso: uc-01.01.00
-
-    $Id: OCRelatorio.php 61362 2015-01-12 11:22:07Z carolina $
+/*
+*
+* Script de DDL e DML
+*
+* Versao 2.03.5
+*
+* Fabio Bertoldi - 20150112
+*
 */
 
-set_time_limit(0);
+----------------
+-- Ticket #22592
+----------------
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_FW_PDF."RRelatorio.class.php"  );
+UPDATE administracao.relatorio
+   set arquivo= 'relatorioArrecadacaoAnalitico.rptdesign'
+ where cod_gestao    = 5
+   and cod_modulo    = 25
+   and cod_relatorio = 4
+     ;
 
-$recebeRequest = $_REQUEST;
-if (isset($recebeRequest['stTitulo'])) {
-    $recebeRequest['stTitulo']=mb_strtoupper($recebeRequest['stTitulo'], 'UTF-8');
-}
-$acao="";
-if (isset($recebeRequest['acao'])) {
-    $acao = "&acao=".$recebeRequest['acao'];
-}
-Sessao::write('filtroRelatorio',$recebeRequest);
-
-$js = "window.open('frame.php?".Sessao::getId().$acao."','relatorio','width=500,height=300');";
-SistemaLegado::executaFrameOculto($js);
-?>
