@@ -75,7 +75,7 @@ $preview->addParametro('cod_entidade', implode(',', $_REQUEST['inCodEntidade']))
 $boConfirmaFundo = strpos(strtolower($rsEntidade->getCampo('nom_cgm')), 'fundo');
 
 if (count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
     if (preg_match( "/prefeitura/i", $rsEntidade->getCampo('nom_cgm')) || $boConfirmaFundo > 0) {
         $preview->addParametro( 'poder' , 'Executivo' );
     } else {
@@ -84,7 +84,7 @@ if (count($_REQUEST['inCodEntidade']) == 1 ) {
 } else {
     while (!$rsEntidade->eof()) {
         if (preg_match( "/prefeitura/i", $rsEntidade->getCampo('nom_cgm')) ) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
             $preview->addParametro( 'poder' , 'Executivo' );
             break;
         }
@@ -96,7 +96,7 @@ switch ($_REQUEST['stTipoRelatorio']) {
     case 'Mes':
         $preview->addParametro('periodo', intval($_REQUEST['cmbMensal']));
         $numPeriodo   = 'Mes';
-        $stMesExtenso = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMensal']))." de ".$stAno);
+        $stMesExtenso = sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMensal']))." de ".$stAno;
     break;
     case 'Quadrimestre':
         $preview->addParametro('periodo', $_REQUEST['cmbQuadrimestre']);
@@ -192,7 +192,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 $preview->addParametro( 'tipoAnexo', 'anexo5novo');
 #################################################################################################
 

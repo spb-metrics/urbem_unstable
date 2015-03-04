@@ -57,13 +57,13 @@ $preview->setExportaExcel ( true );
 
 if ( count($request->get('inCodEntidade')) == 1 ) {
 
-    $preview->addParametro('nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')));
+    $preview->addParametro('nom_entidade', $rsEntidade->getCampo('nom_cgm'));
     $preview->addParametro('cod_entidade', $_POST['inCodEntidade'][0]  );
 
 } else {
     foreach ($rsEntidade->arElementos as $key => $value) {
         if (preg_match("/prefeitura/i", $value['nom_cgm'])) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($value['nom_cgm']));
+            $preview->addParametro( 'nom_entidade', $value['nom_cgm']);
         }
     }
     $preview->addParametro( 'cod_entidade', implode(',', $request->get('inCodEntidade') ) );
@@ -140,7 +140,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 #################################################################################################
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));

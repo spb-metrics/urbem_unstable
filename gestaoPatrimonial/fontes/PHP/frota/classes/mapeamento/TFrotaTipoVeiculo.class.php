@@ -30,7 +30,7 @@
     * @author Analista:
     * @author Programador: Fernando Zank Correa Evangelista
 
-    $Id: TFrotaTipoVeiculo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TFrotaTipoVeiculo.class.php 61597 2015-02-11 18:46:51Z jean $
 
     Caso de uso: uc-03.02.10
 **/
@@ -148,6 +148,43 @@ function montaRecuperaVinculoTipoVeiculoTCE()
     $stSql .= "    frota.tipo_veiculo                                           \n";
     $stSql .= " LEFT JOIN tcemg.tipo_veiculo_vinculo                            \n";
     $stSql .= "        ON tipo_veiculo_vinculo.cod_tipo = tipo_veiculo.cod_tipo \n";
+
+    if ($this->getDado('inCodTipoVeiculo') ) {
+        $stSql .= "    where tipo_veiculo.cod_tipo = ".$this->getDado('inCodTipoVeiculo')." \n";
+    }
+
+    return $stSql;
+}
+
+function recuperaVinculoTipoVeiculoTCERN(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    if (trim($stOrdem)) {
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    }
+    $stSql = $this->montaRecuperaVinculoTipoVeiculoTCERN().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaVinculoTipoVeiculoTCERN()
+{
+    $stSql  = "SELECT tipo_veiculo.cod_tipo                                     
+                    , tipo_veiculo.nom_tipo                                     
+                    , tipo_veiculo.placa                                        
+                    , tipo_veiculo.prefixo                                      
+                    , tipo_veiculo_vinculo.cod_tipo_tce                
+                    , tipo_veiculo_vinculo.cod_especie_tce                             
+
+                 FROM frota.tipo_veiculo
+
+             LEFT JOIN tcern.tipo_veiculo_vinculo                            
+                    ON tipo_veiculo_vinculo.cod_tipo = tipo_veiculo.cod_tipo
+            ";
 
     if ($this->getDado('inCodTipoVeiculo') ) {
         $stSql .= "    where tipo_veiculo.cod_tipo = ".$this->getDado('inCodTipoVeiculo')." \n";

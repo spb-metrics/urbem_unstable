@@ -37,44 +37,73 @@ $Date: 2006-11-09 13:44:15 -0200 (Qui, 09 Nov 2006) $
 
 Casos de uso: uc-01.06.98
 */
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once(CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php");
-
-//Define o nome dos arquivos PHP
-$stPrograma = "DocumentoProcesso";
-$pgFilt = "FL".$stPrograma.".php";
-$pgList = "LS".$stPrograma.".php";
-$pgForm = "FM".$stPrograma.".php";
-$pgProc = "PR".$stPrograma.".php?".Sessao::getId();
-$pgOcul = "OC".$stPrograma.".php";
-$pgJs   = "JS".$stPrograma.".js";
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-$obTPROCopiaDigital = new TPROCopiaDigital();
-Sessao::write('nom_arquivo',$_FILES['stArquivo']['name']);
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php";
+
+$inCodProcesso  = $request->get('inCodProcesso'); 
+$stAnoProcesso  = $request->get('stAnoProcesso');
+$inCodDocumento = $request->get('inCodDocumento'); 
+
+Sessao::write('nom_arquivo', $_FILES['stArquivo']['name']);
 
 if ($_FILES['stArquivo']['type'] != 'image/jpeg' and $_POST['boImagem'] == 't') {
     SistemaLegado::exibeAviso("O Arquivo precisa ser estar no formato JPG!","","erro");
 } elseif ($_FILES['stArquivo']['size'] > 1000000) {
     SistemaLegado::exibeAviso("O Arquivo não pode ter mais que 1000KB","","erro");
 } else {
-    //MONTA O NOME DO DIRETORIO TEMPORARIO UTILIZANDO O ID DA SESSÃO
-    $inPosInicial = strpos(Sessao::getId(),'=') + 1;
-    $inPosFinal = strpos(Sessao::getId(),'&') - $inPosInicial;
-    $stIdSessao = substr(Sessao::getId(),$inPosInicial,$inPosFinal );
-    $stDiretorioSessao = CAM_PROTOCOLO."tmp/".$stIdSessao;
-    if ( !is_dir($stDiretorioSessao) ) {
-        mkdir($stDiretorioSessao,0755);//CRIA O DIRETORIO
+
+    $stDirUpload = CAM_PROTOCOLO."tmp/";
+    $stDirAnexo  = CAM_PROTOCOLO."anexos/";
+
+    # Cria o diretório caso não exista
+    if ( !is_dir($stDirUpload) ) {
+        mkdir($stDirUpload, 0755);
     }
-    $stDiretorioDocumento = $_POST['inCodigoDocumento'].'_'.(int) Sessao::read('codigo_processo');
-    $stDiretorioDocumento .= "_".Sessao::getExercicio();
-    if ( !is_dir($stDiretorioSessao."/".$stDiretorioDocumento) ) {
-        mkdir($stDiretorioSessao."/".$stDiretorioDocumento,0755);
+
+    # Cria o diretório de Anexo caso não exista
+    if ( !is_dir($stDirAnexo) ) {
+        mkdir($stDirAnexo, 0755);
     }
-    if ( !is_file( $stDiretorioSessao."/".$stDiretorioDocumento."/".$_FILES['stArquivo']['name'] ) ) {
-        $boCopia = copy( $_FILES['stArquivo']['tmp_name'], $stDiretorioSessao."/".$stDiretorioDocumento."/".$_FILES['stArquivo']['name'] );
-        chmod($stDiretorioSessao."/".$stDiretorioDocumento."/".$_FILES['stArquivo']['name'],0777);
+
+    $obTPROCopiaDigital = new TPROCopiaDigital();
+    $obTPROCopiaDigital->setDado('cod_documento' , $inCodDocumento);
+    $obTPROCopiaDigital->setDado('cod_processo'  , $inCodProcesso);
+    $obTPROCopiaDigital->setDado('exercicio'     , $stAnoProcesso);
+    $obTPROCopiaDigital->proximoCod($inCodCopia);
+   
+    # Nome do arquivo formatado para ser único
+    $stNomeArquivo = $inCodCopia.'_'.$inCodDocumento.'_'.$inCodProcesso.'_'.$stAnoProcesso.'_'.$_FILES['stArquivo']['name'];
+
+    if ( !is_file( $stDirUpload."/".$stNomeArquivo ) ) {
+
+        $boCopia = copy( $_FILES['stArquivo']['tmp_name'], $stDirUpload."/".$stNomeArquivo );
+        chmod($stDirUpload."/".$stNomeArquivo,0777);
+        
         if ($boCopia) {
+        
+            # Copia o arquivo para o diretório Anexo
+            $boCopiaAnexo = copy( $_FILES['stArquivo']['tmp_name'], $stDirAnexo."/".$stNomeArquivo );
+            chmod($stDirAnexo."/".$stNomeArquivo,0777);    
+            
+            if ($_FILES['stArquivo']['name'] != "." && $_FILES['stArquivo']['name'] != "..") {
+                $stExtencao = substr($_FILES['stArquivo']['name'] , strrpos($_FILES['stArquivo']['name'],'.') );
+
+                if (strtolower($stExtencao) == '.jpg' || strtolower($stExtencao) == '.jpeg') {
+                    $boImagem = 't';
+                } else {
+                    $boImagem = 'f';
+                }
+
+                $obTPROCopiaDigital->setDado('cod_documento' , $inCodDocumento);
+                $obTPROCopiaDigital->setDado('cod_processo'  , $inCodProcesso);
+                $obTPROCopiaDigital->setDado('exercicio'     , $stAnoProcesso);
+                $obTPROCopiaDigital->setDado('cod_copia'     , $inCodCopia);
+                $obTPROCopiaDigital->setDado('imagem'        , $boImagem);
+                $obTPROCopiaDigital->setDado('anexo'         , $stNomeArquivo);
+                $obTPROCopiaDigital->inclusao();
+            }
+            
             SistemaLegado::exibeAvisoTelaPrincipal("Arquivo enviado com sucesso!","","");
         } else {
             SistemaLegado::exibeAviso("Erro no upload de arquivo!","","erro");

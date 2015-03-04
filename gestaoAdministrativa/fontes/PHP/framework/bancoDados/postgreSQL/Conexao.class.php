@@ -301,12 +301,12 @@ class Conexao extends Objeto
     public function executaDML($stSql, $boTransacao = "")
     {
         $stSql = $this->filtroEntidadeRh($stSql);
-        if (constant('ENV_TYPE') == 'dev') {
-            echo '<pre class="debug">';
-            echo '<h7 class="debug">DebugSQL</h7>';
-            echo $stSql;
-            echo '</pre>';
-        }
+        #if (constant('ENV_TYPE') == 'dev') {
+        #    echo '<pre class="debug">';
+        #    echo '<h7 class="debug">DebugSQL</h7>';
+        #    echo $stSql;
+        #    echo '</pre>';
+        #}
 
         if (Sessao::getTrataExcecao()) {
 

@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: reciboProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: reciboProcesso.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
 */
 
@@ -61,6 +61,6 @@ $preview->addParametro ( 'pCodMunicipio' , $cod_municipio );
 $preview->addParametro ( 'pCodUf' , $codUf );
 
 $stDataHoje = dataExtenso(date("Y-m-d"));
-$preview->addParametro ('pDataHoje', utf8_encode($stDataHoje));
+$preview->addParametro ('pDataHoje', $stDataHoje);
 
 $preview->preview();

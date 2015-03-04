@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Carlos Adriano
 */
@@ -40,6 +37,7 @@ Sessao::getExercicio();
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
 $dadosFiltro = Sessao::read('dadosFiltro',$param);
+
 foreach ($dadosFiltro as $chave =>$valor) {
     $stFiltro.= "&".$chave."=".$valor;
 }

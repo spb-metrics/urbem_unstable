@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Data de Criação: 07/10/2008
 
     * @author Analista: Gelson W. Gonçalves
@@ -179,28 +176,32 @@ $obLista->show();
 
 function montaFiltrosConsulta()
 {
-
-   if ($_REQUEST['inNumContrato']) {
+   if ($_REQUEST['inNumContrato'] != "") {
       $stFiltro .= " contrato.num_contrato = ". $_REQUEST['inNumContrato']." and ";
    }
-   if ($_REQUEST['stExercicioContrato']) {
+   if ($_REQUEST['stExercicioContrato']  != "") {
       $stFiltro .= " contrato.exercicio = '". $_REQUEST['stExercicioContrato']."' and ";
    }
-   if ($_REQUEST['dtContrato']) {
+   if ($_REQUEST['dtContrato']  != "") {
       $stFiltro .= " contrato.dt_assinatura = to_date('". $_REQUEST['dtContrato']."','dd/mm/yyyy') and ";
    }
-   if ($_REQUEST['inCodContratado']) {
+   if ($_REQUEST['inCodContratado']  != "") {
       $stFiltro .= " contrato.cgm_contratado = ".$_REQUEST['inCodContratado']." and ";
    }
-   if ($_REQUEST["inNumCGM"]) {
+
+   if ($_REQUEST["inNumCGM"]  != "" &&  $stAcao == "incluirCD" ) {
+      $stFiltro .= " cgm_entidade.numcgm in (".$_REQUEST["inNumCGM"].") and ";
+   } else if ($_REQUEST["inNumCGM"]  != "" && $_REQUEST["stAcao"] == "anularCD") {
+        $stFiltro .= " cgm_entidade.numcgm in (".$_REQUEST["inNumCGM"].") and ";
+   } else if ($_REQUEST["inNumCGM"]  != "" && $_REQUEST["stAcao"] != "incluirCD" && $_REQUEST["stAcao"] != "anularCD" ) {
       $stFiltro .= " cgm_entidade.numcgm in (".implode(",", $_REQUEST["inNumCGM"]).") and ";
    }
 
    if ($stAcao == "alterar") {
-       if ($_REQUEST["inNumeroAditivo"]) {
+       if ($_REQUEST["inNumeroAditivo"]  != "") {
            $stFiltro .= " contrato_aditivos.num_aditivo = ".$_REQUEST["inNumeroAditivo"]." and ";
        }
-       if ($_REQUEST["stExercioAditivo"]) {
+       if ($_REQUEST["stExercioAditivo"]  != "") {
            $stFiltro .= " contrato_aditivos.exercicio = '".$_REQUEST["stExercioAditivo"]."' and ";
        }
    }
@@ -218,7 +219,6 @@ function montaFiltrosConsulta()
                                AND contrato_anulado.cod_entidade = contrato.cod_entidade
                                AND contrato_anulado.num_contrato = contrato.num_contrato
                             ) and ";
-
    if ($_REQUEST['stAcao'] != "incluirCD") {
        $stFiltro .=  " NOT EXISTS (SELECT 1
                                  FROM licitacao.contrato_aditivos_anulacao
@@ -230,7 +230,7 @@ function montaFiltrosConsulta()
                              ) and ";
    }
 
-   $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
+     $stFiltro = ($stFiltro) ?' WHERE '.substr($stFiltro,0,strlen($stFiltro)-4): '';
 
    return $stFiltro;
 }

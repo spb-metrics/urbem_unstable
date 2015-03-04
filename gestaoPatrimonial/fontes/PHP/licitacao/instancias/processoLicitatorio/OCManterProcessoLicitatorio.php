@@ -31,7 +31,7 @@
 
   * Casos de uso: uc-03.05.15
 
-  $Id: OCManterProcessoLicitatorio.php 60641 2014-11-05 13:14:49Z jean $
+  $Id: OCManterProcessoLicitatorio.php 61490 2015-01-23 18:50:21Z evandro $
 
   */
 
@@ -1423,32 +1423,38 @@ case 'validaDtLicitacao':
 
     case 'recuperaRegimeExecucaoObra' :
         $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf');
-        if ($request->get('inCodTipoObjeto') == 2 && $inCodUF == 11) {
-            include_once CAM_GP_LIC_MAPEAMENTO."TRegimeExecucaoObras.class.php";
-            $obTRegimeExecucaoObras = new TRegimeExecucaoObras;
+        switch ($request->get('inCodTipoObjeto')) {
+            case 2:
+                //TCE-MG ou TCM-GO
+                if ( ($inCodUF == 11) || ($inCodUF == 9) ) {
+                    include_once CAM_GP_LIC_MAPEAMENTO."TRegimeExecucaoObras.class.php";
+                    $obTRegimeExecucaoObras = new TRegimeExecucaoObras;
+                    $obTRegimeExecucaoObras->recuperaTodos($rsRecordSet);
 
-            $obTRegimeExecucaoObras->recuperaTodos($rsRecordSet);
+                    $obSlRegime = new Select();
+                    $obSlRegime->setRotulo    ( "Regime de execução de Obras"                            );
+                    $obSlRegime->setName      ( "inCodRegime"                                            );
+                    $obSlRegime->setTitle     ( "Regime de execução para obras e serviços de engenharia.");
+                    $obSlRegime->setNull      ( false                                   );
+                    $obSlRegime->setValue     ( $_REQUEST['inCodRegime']                );
+                    $obSlRegime->addOption    ( "","Selecione"                          );
+                    $obSlRegime->setCampoID   ( "cod_regime"                            );
+                    $obSlRegime->setCampoDesc ( "descricao"                             );
+                    $obSlRegime->preencheCombo( $rsRecordSet                            );
 
-            $obSlRegime = new Select();
-            $obSlRegime->setRotulo    ("Regime de execução de Obras"                            );
-            $obSlRegime->setName      ("inCodRegime"                                            );
-            $obSlRegime->setTitle     ("Regime de execução para obras e serviços de engenharia.");
-            $obSlRegime->setNull      (false                                   );
-            $obSlRegime->setValue     ($_REQUEST['inCodRegime']                );
-            $obSlRegime->addOption    ("","Selecione"                          );
-            $obSlRegime->setCampoID   ("cod_regime"                            );
-            $obSlRegime->setCampoDesc ("descricao"                             );
-            $obSlRegime->preencheCombo($rsRecordSet                            );
-
-            $obFormulario = new Formulario();
-            $obFormulario->addComponente($obSlRegime);
-            $obFormulario->montaInnerHTML();
-            $stHTML = $obFormulario->getHTML();
-            $stJs .= "d.getElementById('spnRegime').innerHTML = '".$stHTML."';\n";
-        }else{
-            $stJs .= "d.getElementById('spnRegime').innerHTML = '".$stHTML."';\n";
+                    $obFormulario = new Formulario();
+                    $obFormulario->addComponente($obSlRegime);
+                    $obFormulario->montaInnerHTML();
+                    $stHTML = $obFormulario->getHTML();
+                    $stJs .= "d.getElementById('spnRegime').innerHTML = '".$stHTML."';\n";
+                }
+            break;
+            
+            default:
+                $stJs .= "d.getElementById('spnRegime').innerHTML = '".$stHTML."';\n";
+            break;
         }
-
+       
     break;
     
  case 'montaItensAlterar':

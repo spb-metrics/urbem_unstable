@@ -180,6 +180,7 @@ class CTCEMGExportacao
                                             'receitaCapital.txt',
                                             'recursoAlienacaoAtivo.txt',
                                             'variacaoPatrimonial.txt',
+                                            'demonstrativoOpCredito.txt',
                                          ),
                      );
 

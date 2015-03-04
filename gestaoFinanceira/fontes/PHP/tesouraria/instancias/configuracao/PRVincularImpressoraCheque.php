@@ -42,16 +42,14 @@ $stAcao = $request->get('stAcao');
 switch ($stAcao) {
 
 case 'incluir' :
-    sistemaLegado::mostraVar($_REQUEST);
-
+    
     $obRTesourariaImpressoraCheque = new RTesourariaImpressoraCheque();
-    $obRTesourariaImpressoraCheque->obRTesourariaTerminal->inCodTerminal       = $_REQUEST['inCodTerminal'      ];
-    $obRTesourariaImpressoraCheque->obRTesourariaTerminal->stTimestampTerminal = $_REQUEST['stTimestampTerminal'];
-
+    $obRTesourariaImpressoraCheque->recuperaCodigoTimestampTerminal(Sessao::read('numCgm'));
+    
     $obRTesourariaImpressoraCheque->removeImpressoraTerminal();
 
-    $obRTesourariaImpressoraCheque->inCodImpressora                            = $_REQUEST['inCodImpressora'    ];
-
+    $obRTesourariaImpressoraCheque->inCodImpressora = $request->get('inCodImpressora');
+    
     $obErro = $obRTesourariaImpressoraCheque->insertImpressoraTerminal();
 
     if ( !$obErro->ocorreu() ) {

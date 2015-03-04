@@ -34,10 +34,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 61473 $
     $Name$
     $Autor: $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Date: 2015-01-21 11:32:02 -0200 (Qua, 21 Jan 2015) $
 
     * Casos de uso: uc-02.08.01
 */
@@ -54,10 +54,10 @@ Adicionada tag Log aos arquivos
 ?>
 
 <script language="javascript">
-function rd_extra(){ 
+function add_arquivos_extras(exercicio){ 
 /**
-* Function rd_extra 
-* @ Desc    Inclui o arquivo RD_EXTRA.TXT 
+* Function add_arquivos_extras 
+* @ Desc    Inclui o arquivo RD_EXTRA.TXT e BVER_ENC.TXT
 * no select de arquivos disponiveis para exportacao se o periodo selecionado for igual a 6
 */
         var inPer  = document.getElementById("inPeriodo")                                                 
@@ -65,9 +65,15 @@ function rd_extra(){
         
         if (selBim == 6)
         {
-            var o   =new Option("RD_EXTRA.TXT","RD_EXTRA.TXT");
-            var os  =document.getElementById("arCodArqDisponiveis").options;                                               
-            os[os.length]=o;                                                                           
+            var rd_extra = new Option("RD_EXTRA.TXT","RD_EXTRA.TXT");
+            var os       = document.getElementById("arCodArqDisponiveis").options;
+            os[os.length] = rd_extra;
+
+            if (exercicio >= 2015) {
+                var bver_enc = new Option("BVER_ENC.TXT","BVER_ENC.TXT");
+                var os       = document.getElementById("arCodArqDisponiveis").options;
+                os[os.length] = bver_enc;                
+            };                                     
         }                                                                                                         
         if (selBim < 6)
         {

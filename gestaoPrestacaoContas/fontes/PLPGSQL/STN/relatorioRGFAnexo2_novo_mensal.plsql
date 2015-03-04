@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatorioRGFAnexo2_novo_mensal.plsql 61165 2014-12-12 12:32:08Z jean $
+* $Id: relatorioRGFAnexo2_novo_mensal.plsql 61691 2015-02-25 19:48:43Z franver $
 
 * Casos de uso: uc-06.01.02
 */
@@ -127,7 +127,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
   
   IF stContasConfiguracao <> '' THEN

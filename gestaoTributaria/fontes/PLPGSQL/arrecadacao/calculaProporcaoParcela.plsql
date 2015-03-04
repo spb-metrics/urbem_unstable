@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: calculaProporcaoParcela.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: calculaProporcaoParcela.plsql 61622 2015-02-18 15:50:46Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
@@ -38,7 +38,7 @@ adicionado trecho de log do CVS
 
 */
 
-CREATE OR REPLACE FUNCTION arrecadacao.calculaProporcaoParcela(integer) RETURNS numeric as '
+CREATE OR REPLACE FUNCTION arrecadacao.calculaProporcaoParcela(integer) RETURNS numeric as $$
     DECLARE
         inCodParcela        ALIAS FOR $1;
         inCodLancamento     INT;
@@ -76,5 +76,5 @@ CREATE OR REPLACE FUNCTION arrecadacao.calculaProporcaoParcela(integer) RETURNS 
 
         return nuRetorno;  
     END;
-'language 'plpgsql';
+$$ language 'plpgsql';
            

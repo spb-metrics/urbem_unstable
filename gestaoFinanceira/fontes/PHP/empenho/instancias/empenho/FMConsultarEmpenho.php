@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMConsultarEmpenho.php 60997 2014-11-27 18:53:16Z jean $
+    $Id: FMConsultarEmpenho.php 61753 2015-03-02 13:55:48Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -265,6 +265,17 @@ if ( Sessao::read('filtro') ) {
     $arFiltro = Sessao::read('filtro');
     $stFiltro = '';
     foreach ($arFiltro as $stCampo => $stValor) {
+        if (is_array($stValor)) {
+            $stValorAux = '';
+            foreach ($stValor as $index => $value) {
+                if ($stValor[$index+1] != '') {
+                    $stValorAux = $stValorAux.$value.',';
+                } else {
+                    $stValorAux = $stValorAux.$value;
+                }
+            }
+            $stValor = $stValorAux;
+        }
         $stFiltro .= "&".$stCampo."=".@urlencode( $stValor );
     }
     $stFiltro .= '&pg='.Sessao::read('pg').'&pos='.Sessao::read('pos').'&paginando'.Sessao::read('paginando');
@@ -621,6 +632,7 @@ $obSpnLista = new Span;
 $obSpnLista->setId ( "spnLista" );
 
 $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao.$stFiltro;
+
 $obButtonVoltar = new Button;
 $obButtonVoltar->setName  ( "Voltar" );
 $obButtonVoltar->setValue ( "Voltar" );

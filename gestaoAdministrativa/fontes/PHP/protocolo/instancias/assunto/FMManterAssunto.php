@@ -214,6 +214,30 @@ $obLblClassificacao = new Label();
 $obLblClassificacao->setRotulo('Classificação');
 $obLblClassificacao->setValue( $rsClassificacao->getCampo('cod_classificacao').' '.$rsClassificacao->getCampo('nom_classificacao') );
 
+# Busca da configuração do Protocolo se deve gerar o código de classificação automático ou manual.
+$boGeraCodigo = SistemaLegado::pegaConfiguracao("tipo_numeracao_classificacao_assunto", 5);
+
+if (!empty($boGeraCodigo) && $boGeraCodigo == 'manual' && $stAcao == "incluir") {
+    $obCodAssunto = new TextBox;
+    $obCodAssunto->setRotulo    ( "Código do Assunto" );
+    $obCodAssunto->setId        ( "inCodigoAssunto" );
+    $obCodAssunto->setName      ( "inCodigoAssunto" );
+    $obCodAssunto->setValue     ( $inCodigoAssunto );
+    $obCodAssunto->setSize      ( 5 );
+    $obCodAssunto->setMaxLength ( 3 );
+    $obCodAssunto->setInteiro   ( true  );
+    $obCodAssunto->setTitle     ( "Informe o código do assunto" );
+    $obCodAssunto->setNull      ( false );
+} else {
+    $obHdnCodClassificacao = new Hidden;
+    $obHdnCodClassificacao->setName( "inCodClassificacao" );
+    $obHdnCodClassificacao->setValue( $inCodClassificacao );
+
+    $obLabelAssunto = new Label;
+    $obLabelAssunto->setRotulo('Código do Assunto');
+    $obLabelAssunto->setValue($inCodigoAssunto);
+}
+
 $obTxtDescricao = new TextBox();
 $obTxtDescricao->setRotulo		("Descrição");
 $obTxtDescricao->setName		("stDescricao");
@@ -320,6 +344,15 @@ if ($stAcao != 'incluir') {
 } else {
     $obFormulario->addComponenteComposto($obTxtCodigoClassificacao, $obCmbClassificacao);
 }
+
+if (!empty($boGeraCodigo) && $boGeraCodigo == 'manual' && $stAcao == "incluir")  {
+    $obFormulario->addComponente($obCodAssunto);
+}
+
+if ($stAcao == 'alterar') {
+    $obFormulario->addComponente($obLabelAssunto);
+}
+
 $obFormulario->addComponente($obTxtDescricao);
 $obFormulario->agrupaComponentes(array($obRdConfidencialNao,$obRdConfidencialSim));
 

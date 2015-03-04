@@ -32,7 +32,7 @@
  * @author Desenvolvedor: Fernando Piccini Cercato
  * @ignore
 
- * $Id: FMManterEmissao.php 60521 2014-10-27 12:09:18Z carolina $
+ * $Id: FMManterEmissao.php 61643 2015-02-20 10:45:39Z evandro $
 
  * Casos de uso: uc-05.04.03
 
@@ -1066,7 +1066,7 @@ foreach ($arLista as $valor => $arKey) {
             $OOParser->MergeBlock( 'Dat3',   $arDadosTotal );
             $OOParser->MergeBlock( 'Dat4',   $rsDados2->arElementos );
 
-        } elseif ($arKey[0] == "termoInscricao.agt" || $arKey[0] == "certidaoDivida.agt") {
+        } elseif ($arKey[0] == "termoInscricao.agt" || $arKey[0] == "certidaoDivida.agt") {            
             //esta consulta serve para o termo de inscricao da divida
             //esta consulta serva para certidao de divida ativa do municipio
             $arTMP1 = $rsDados->arElementos;
@@ -1084,37 +1084,38 @@ foreach ($arLista as $valor => $arKey) {
             }
 
             for ( $inTMP=0; $inTMP<count($arTMP1); $inTMP++ ) {
-                $arTMP1[$inTMP]["juros"] = number_format( $arTMP1[$inTMP]["juros"], 2, ',', '.' );
-                $arTMP1[$inTMP]["multa"] = number_format( $arTMP1[$inTMP]["multa"], 2, ',', '.' );
-                $arTMP1[$inTMP]["multa_infracao"] = number_format( $arTMP1[$inTMP]["multa_infracao"], 2, ',', '.' );
-                $arTMP1[$inTMP]["correcao"] = number_format( $arTMP1[$inTMP]["correcao"], 2, ',', '.' );
-                $arTMP1[$inTMP]["valor_origem"] = number_format( $arTMP1[$inTMP]["valor_origem"], 2, ',', '.' );
+                $arTMP1[$inTMP]["juros"]            = number_format( $arTMP1[$inTMP]["juros"], 2, ',', '.' );
+                $arTMP1[$inTMP]["multa"]            = number_format( $arTMP1[$inTMP]["multa"], 2, ',', '.' );
+                $arTMP1[$inTMP]["multa_infracao"]   = number_format( $arTMP1[$inTMP]["multa_infracao"], 2, ',', '.' );
+                $arTMP1[$inTMP]["correcao"]         = number_format( $arTMP1[$inTMP]["correcao"], 2, ',', '.' );
+                $arTMP1[$inTMP]["valor_origem"]     = number_format( $arTMP1[$inTMP]["valor_origem"], 2, ',', '.' );
             }
 
             for ( $inTMP=0; $inTMP<count($arDados); $inTMP++ ) {
-                $arDados[$inTMP]["juros"] = number_format( $arDados[$inTMP]["juros"], 2, ',', '.' );
-                $arDados[$inTMP]["multa"] = number_format( $arDados[$inTMP]["multa"], 2, ',', '.' );
-                $arDados[$inTMP]["multa_infracao"] = number_format( $arDados[$inTMP]["multa_infracao"], 2, ',', '.' );
-                $arDados[$inTMP]["correcao"] = number_format( $arDados[$inTMP]["correcao"], 2, ',', '.' );
-                $arDados[$inTMP]["valor_origem"] = number_format( $arDados[$inTMP]["valor_origem"], 2, ',', '.' );
-                $arDados[$inTMP]["valor_total"] = number_format( $arDados[$inTMP]["valor_total"], 2, ',', '.' );
+                $arDados[$inTMP]["juros"]           = number_format( $arDados[$inTMP]["juros"], 2, ',', '.' );
+                $arDados[$inTMP]["multa"]           = number_format( $arDados[$inTMP]["multa"], 2, ',', '.' );
+                $arDados[$inTMP]["multa_infracao"]  = number_format( $arDados[$inTMP]["multa_infracao"], 2, ',', '.' );
+                $arDados[$inTMP]["correcao"]        = number_format( $arDados[$inTMP]["correcao"], 2, ',', '.' );
+                $arDados[$inTMP]["valor_origem"]    = number_format( $arDados[$inTMP]["valor_origem"], 2, ',', '.' );
+                $arDados[$inTMP]["valor_total"]     = number_format( $arDados[$inTMP]["valor_total"], 2, ',', '.' );
             }
 
             for ( $inTMP=0; $inTMP<count($arDadosTotal); $inTMP++ ) {
-                $arDadosTotal[$inTMP]["juros"] = number_format( $arDadosTotal[$inTMP]["juros"], 2, ',', '.' );
-                $arDadosTotal[$inTMP]["multa"] = number_format( $arDadosTotal[$inTMP]["multa"], 2, ',', '.' );
+                $arDadosTotal[$inTMP]["juros"]          = number_format( $arDadosTotal[$inTMP]["juros"], 2, ',', '.' );
+                $arDadosTotal[$inTMP]["multa"]          = number_format( $arDadosTotal[$inTMP]["multa"], 2, ',', '.' );
                 $arDadosTotal[$inTMP]["multa_infracao"] = number_format( $arDadosTotal[$inTMP]["multa_infracao"], 2, ',', '.' );
-                $arDadosTotal[$inTMP]["correcao"] = number_format( $arDadosTotal[$inTMP]["correcao"], 2, ',', '.' );
+                $arDadosTotal[$inTMP]["correcao"]       = number_format( $arDadosTotal[$inTMP]["correcao"], 2, ',', '.' );
                 $arDadosTotal[$inTMP]["valor_original"] = number_format( $arDadosTotal[$inTMP]["valor_original"], 2, ',', '.' );
-                $arDadosTotal[$inTMP]["valor_total"] = number_format( $arDadosTotal[$inTMP]["valor_total"], 2, ',', '.' );
+                $arDadosTotal[$inTMP]["valor_total"]    = number_format( $arDadosTotal[$inTMP]["valor_total"], 2, ',', '.' );
             }
 
-            $OOParser->MergeBlock( 'Dat2',   $arTMP1 );
+            $arTmp2 = $arTMP1;
 
             $arTMP1[0]["num_documento"] = $arDadosSessao[$inArquivo]["num_documento"];
             $arTMP1[0]["exercicio"] = $inExercicio;
 
             $OOParser->MergeBlock( 'Dat',    $arTMP1 );
+            $OOParser->MergeBlock( 'Dat2',   $arTmp2 );
             $OOParser->MergeBlock( 'Dat3',   $arDados );
             $OOParser->MergeBlock( 'Dat4',   $arDadosTotal );
 

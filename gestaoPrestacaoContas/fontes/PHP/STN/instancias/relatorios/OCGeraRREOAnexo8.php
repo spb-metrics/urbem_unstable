@@ -82,7 +82,7 @@ if ($stNomeEntidade == '') {
 }
 
 if ( count($_REQUEST['inCodEntidade']) > 0 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($stNomeEntidade) );
+    $preview->addParametro( 'nom_entidade', $stNomeEntidade );
 } else {
     $preview->addParametro( 'nom_entidade', '' );
 }
@@ -112,7 +112,7 @@ switch ($_REQUEST['stTipoRelatorio']) {
     case 'Bimestre':
         $preview->addParametro( 'bimestre'     , $_REQUEST['cmbBimestre'] );        
         $preview->addParametro( 'periodo'      , $_REQUEST['cmbBimestre'] ); 
-        $preview->addParametro( 'nome_periodo' , utf8_encode($_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio()) );
+        $preview->addParametro( 'nome_periodo' , $_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio() );
         $preview->addParametro( 'tipo_periodo' , "Bimestre" );
         
         if ( $_REQUEST['cmbBimestre'] == "6" ) {
@@ -139,7 +139,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 $preview->addParametro( 'dt_inicio' , $stDtInicio );
 $preview->addParametro( 'dt_final'  , $stDtFinal );
 $preview->addAssinaturas(Sessao::read('assinaturas'));

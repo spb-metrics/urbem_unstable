@@ -40,23 +40,11 @@
     * Casos de uso: uc-03.03.01
 */
 
-/*
-$Log$
-Revision 1.9  2006/10/09 15:02:48  larocca
-Bug #6883#
-
-Revision 1.8  2006/07/06 13:59:55  diego
-Retirada tag de log com erro.
-
-Revision 1.7  2006/07/06 12:09:52  diego
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(CAM_GP_ALM_NEGOCIO. "RAlmoxarifadoAlmoxarifado.class.php");
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterAlmoxarifado";
@@ -68,17 +56,11 @@ $pgOcul = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 
 $obRegra = new RAlmoxarifadoAlmoxarifado;
 
-//if ($stAcao != "incluir") {
-  //  verificaDadosAlmoxarifado();
-//}
-
 switch ($stAcao) {
     case "incluir":
 
         $obRegra->obRCGMAlmoxarifado->setNumCGM ( $_POST['inCGMAlmoxarifado'] );
         $obRegra->obRCGMResponsavel->setNumCGM  ( $_POST['inCGMResponsavel']  );
-        $obRegra->setMascara                    ( $_POST['stLocalizacao']     );
-
         $obRegra->obRCGMAlmoxarifado->consultarCGM($rsCGM);
 
         $obErro = $obRegra->incluir();
@@ -95,8 +77,6 @@ switch ($stAcao) {
 
         $obRegra->obRCGMAlmoxarifado->setNumCGM     ( $_POST['inCGMAlmoxarifado']);
         $obRegra->obRCGMResponsavel->setNumCGM      ( $_POST['inCGMResponsavel'] );
-        $obRegra->setMascara                        ( $_POST['stLocalizacao']    );
-
         $obRegra->obRCGMAlmoxarifado->consultarCGM($rsCGM);
 
         $obErro = $obRegra->alterar();

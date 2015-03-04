@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMManterApcaaaa.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterApcaaaa.php 61679 2015-02-25 13:07:38Z evandro $
 
     * Casos de uso : uc-06.04.00
 */
@@ -82,7 +82,7 @@ $obCmbTipoLancamento->addOption ('1','Dívida Ativa Tributária');
 $obCmbTipoLancamento->addOption ('2','Dívida Ativa Não Tributária');
 $obCmbTipoLancamento->addOption ('3','Valores (Ações, etc..)');
 $obCmbTipoLancamento->addOption ('4','Diversos (Cotas Consórcio, etc...)');
-$obCmbTipoLancamento->obEvento->setOnChange("montaParametrosGET('preencheLista','inTipoLancamento','true');");
+$obCmbTipoLancamento->obEvento->setOnChange("montaParametrosGET('preencheLista','inTipoLancamento');");
 
 $obBscConta = new BuscaInner;
 $obBscConta->setRotulo ( "Conta"         );
@@ -97,12 +97,12 @@ $obBscConta->obCampoCod->setId         ( "inCodConta"      );
 $obBscConta->obCampoCod->setNull       ( true      );
 $obBscConta->obCampoCod->setValue      ( $inCodConta       );
 $obBscConta->obCampoCod->setAlign      ( "left"            );
-$obBscConta->obCampoCod->obEvento->setOnChange("montaParametrosGET('buscaEstrutural','inTipoLancamento,inCodConta','true');");
+$obBscConta->obCampoCod->obEvento->setOnChange("montaParametrosGET('buscaEstrutural','inTipoLancamento,inCodConta');");
 $obBscConta->setFuncaoBusca("abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodConta','stConta','conta_analitica_estrutural','".Sessao::getId()."&inCodIniEstrutural=1&tipoBusca2=Apcaaaa','800','550');");
 
 $obBtnOk = new Button();
 $obBtnOk->setValue('Incluir');
-$obBtnOk->obEvento->setOnClick("montaParametrosGET('incluirConta','inTipoLancamento,inCodConta','true');");
+$obBtnOk->obEvento->setOnClick("montaParametrosGET('incluirConta','inTipoLancamento,inCodConta');");
 
 $obBtnLimpar = new Button();
 $obBtnLimpar->setValue('Limpar');

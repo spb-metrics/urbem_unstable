@@ -32,7 +32,7 @@
 
   * @package URBEM
 
-    * $Id: RCarneDividaMarianaPimentel.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCarneDividaMarianaPimentel.class.php 61651 2015-02-20 18:47:10Z evandro $
 
   Caso de uso: uc-05.03.11
 */
@@ -600,9 +600,10 @@ class RCarneDiversosPetropolis extends RProtocolo
     public $lblObs       = 'OBSERVAÇÃO';
 
     public $lblMulta = '(+) MULTA DE MORA';
-    public $lblMultaI = '(+) MULTA DE INFRAÇÃO';
+    public $lblMultaI = '(+) CORREÇÃO URM';
+    public $lblReducao = '(-) REDUÇÕES';
     public $lblJuros = '(+) JUROS DE MORA';
-    public $lblOutros = '(+) ATUALIZAÇÃO MONETÁRIA';
+    public $lblOutros = '(+) COMISSÃO COBRANÇA';
 
     public $lblValorParcela = 'VALOR PARCELA';
     public $lblReal = '(REAL)';
@@ -642,11 +643,12 @@ class RCarneDiversosPetropolis extends RProtocolo
     public $stObservacaoL3;
     public $stObsVencimento; // = "Não receber após o vencimento.";
     public $stNumeracao;
-    public $flValorMulta  = '0,00';
-    public $flValorJuros  = '0,00';
-    public $flValorOutros = '0,00';
-    public $flValorMultaF = '0,00';
-    public $flValorTotal  = '0,00';
+    public $flValorMulta   = '0,00';
+    public $flValorJuros   = '0,00';
+    public $flValorOutros  = '0,00';
+    public $flValorMultaF  = '0,00';
+    public $flValorTotal   = '0,00';
+    public $flValorReducao = '0,00';
     public $tamY = 0.93;
 
     /* setters */
@@ -681,7 +683,12 @@ class RCarneDiversosPetropolis extends RProtocolo
     public function setObservacaoL3($valor) { $this->stObservacaoL3   = $valor; }
     public function setObsVencimento($valor) { $this->stObsVencimento  = $valor; }
     public function setNumeracao($valor) { $this->stNumeracao      = $valor; }
+    public function setValorMulta($valor) { $this->flValorMulta = $valor; }
+    public function setValorJuros($valor) { $this->flValorJuros = $valor; }
+    public function setValorOutros($valor) { $this->flValorOutros = $valor; }
     public function setValorTotal($valor) { $this->flValorTotal     = $valor; }
+    public function setValorReducao($valor) { $this->flValorReducao   = $valor; }    
+    public function setValorCorrecao($valor) { $this->flValorMultaF   = $valor; }    
 
     /* getters */
     public function getImagemCarne() { return $this->ImagemCarne      ; }
@@ -711,6 +718,8 @@ class RCarneDiversosPetropolis extends RProtocolo
     public function getObservacaoL3() { return $this->stObservacaoL3   ; }
     public function getObsVencimento() { return $this->stObsVencimento  ; }
     public function getNumeracao() { return $this->stNumeracao      ; }
+    public function getValorReducao() { return $this->flValorReducao      ; }
+    public function getValorCorrecao() { return $this->flValorMultaF      ; }    
 
     /* configura carne */
     public function configuraCarne()
@@ -758,30 +767,35 @@ class RCarneDiversosPetropolis extends RProtocolo
         $this->Line( ($x+95-20), ($y+(32*$this->tamY)), ($x+197), ($y+(32*$this->tamY)) );
 
         $this->Line( $x+36, ($y+(39*$this->tamY)), (92-20+$x), ($y+(39*$this->tamY)) );
-        $this->Line( ($x+151-20), ($y+(39*$this->tamY)), ($x+197), ($y+(39*$this->tamY)) );
+        
+        $this->Line( ($x+151), ($y+(39*$this->tamY)), ($x+197), ($y+(39*$this->tamY)) );
 
         $this->Line( $x, ($y+(46*$this->tamY)), (92-20+$x), ($y+(46*$this->tamY)) );
 
-        $this->Line( ($x+151), ($y+(53*$this->tamY)), ($x+197), ($y+(53*$this->tamY)) ); //linha nova do total
+        $this->Line( ($x+151), ($y+(53*$this->tamY)), ($x+197), ($y+(53*$this->tamY)) ); //linha nova da redução
+
         // linhas adicionais no carne no lado esquerdo
-
-        $this->Line( $x, ($y+(68*$this->tamY)), (92-20+$x), ($y+(68*$this->tamY)) ); //nova
-
         $this->Line( $x, ($y+(53*$this->tamY)), (92-20+$x), ($y+(53*$this->tamY)) );
-        $this->Line( $x, ($y+(60*$this->tamY)), (92-20+$x), ($y+(60*$this->tamY)) );
+        $this->Line( $x, ($y+(59*$this->tamY)), (92-20+$x), ($y+(59*$this->tamY)) ); // linha de baixo do valor total
+        
+        $this->Line( $x, ($y+(65.5*$this->tamY)), (92-20+$x), ($y+(65.5*$this->tamY)) ); //nova
+        $this->Line( $x, ($y+(72*$this->tamY)), (92-20+$x), ($y+(72*$this->tamY)) );
+        
 
         $this->Line( ($x+95-20), ($y+(46*$this->tamY)), ($x+197), ($y+(46*$this->tamY)) );
 
         /* linhas verticais */
-        $this->Line( ($x+46), ($y+(11*$this->tamY)), ($x+46), ($y+(46*$this->tamY)) );
         $this->Line( ($x+18), ($y+(18*$this->tamY)), ($x+18), ($y+(25*$this->tamY)) );
         $this->Line( ($x+31), ($y+(11*$this->tamY)), ($x+31), ($y+(18*$this->tamY)) );
         $this->Line( ($x+31), ($y+(18*$this->tamY)), ($x+31), ($y+(25*$this->tamY)) );
+        $this->Line( ($x+46), ($y+(11*$this->tamY)), ($x+46), ($y+(46*$this->tamY)) );
+        $this->Line( ($x+46), ($y+(11*$this->tamY)), ($x+46), ($y+(59*$this->tamY)) );
 
-        $this->Line( ($x+151), ($y+(11*$this->tamY)), ($x+151), ($y+(53*$this->tamY)) );
-        $this->Line( ($x+113), ($y+(11*$this->tamY)), ($x+113), ($y+(18*$this->tamY)) ); //linha parcela
         $this->Line( ($x+100), ($y+(18*$this->tamY)), ($x+100), ($y+(25*$this->tamY)) );
         $this->Line( ($x+127), ($y+(18*$this->tamY)), ($x+127), ($y+(25*$this->tamY)) ); //linha nova acordo
+        $this->Line( ($x+113), ($y+(11*$this->tamY)), ($x+113), ($y+(18*$this->tamY)) ); //linha parcela
+        $this->Line( ($x+151), ($y+(11*$this->tamY)), ($x+151), ($y+(53*$this->tamY)) );
+        $this->Line( ($x+151), ($y+(11*$this->tamY)), ($x+151), ($y+(59*$this->tamY)) ); //linha total
 
         /* brazao */
         if ($this->Imagem) {
@@ -830,56 +844,62 @@ class RCarneDiversosPetropolis extends RProtocolo
 
         /* retangulo para vencimento */
         $this->setFillColor( 240 );
-        $this->Rect   ( ($x), ($y+(39*$this->tamY)), 46, 14*$this->tamY, 'DF' );
+        $this->Rect   ( ($x)      , ($y+(39*$this->tamY)), 46   , 14*$this->tamY, 'DF' );
         $this->Rect   ( ($x+95-20), ($y+(32*$this->tamY)), 56+20, 14*$this->tamY, 'DF' );
         $this->setFillColor( 0 );
 
-        $this->Text   ( ($x+1)  , ($y+(41.5*$this->tamY)), $this->lblVencimento   );
-        $this->Text   ( ($x+96-20) , ($y+(34.5*$this->tamY)), $this->lblVencimento   );
+        $this->Text   ( ($x+1),     ($y+(41.5*$this->tamY)), $this->lblVencimento   );
+        $this->Text   ( ($x+96-20), ($y+(34.5*$this->tamY)), $this->lblVencimento   );
 
-        $this->Text   ( ($x+58-10) , ($y+(13.5*$this->tamY)), $this->lblValorPrincipal   );
-        $this->Text   ( ($x+154), ($y+(13.5*$this->tamY)), $this->lblValorPrincipal   );
-        $this->Text   ( ($x+58-10) , ($y+(20.5*$this->tamY)), $this->lblMulta    );
-        $this->Text   ( ($x+154), ($y+(20.5*$this->tamY)), $this->lblMulta    );
-        $this->Text   ( ($x+58-10) , ($y+(27.5*$this->tamY)), $this->lblJuros    );
-        $this->Text   ( ($x+154), ($y+(27.5*$this->tamY)), $this->lblJuros    );
-        $this->Text   ( ($x+58-10) , ($y+(34.5*$this->tamY)), "(+) AT. MONET."   );
-        $this->Text   ( ($x+154), ($y+(34.5*$this->tamY)), $this->lblOutros   );
+        $this->Text   ( ($x+58-10), ($y+(13.5*$this->tamY)), $this->lblValorPrincipal   );
+        $this->Text   ( ($x+154),   ($y+(13.5*$this->tamY)), $this->lblValorPrincipal   );
+        
+        $this->Text   ( ($x+58-10), ($y+(20.5*$this->tamY)), $this->lblMulta    );
+        $this->Text   ( ($x+154),   ($y+(20.5*$this->tamY)), $this->lblMulta    );
+        
+        $this->Text   ( ($x+58-10), ($y+(27.5*$this->tamY)), $this->lblJuros    );
+        $this->Text   ( ($x+154),   ($y+(27.5*$this->tamY)), $this->lblJuros    );
+        
+        $this->Text   ( ($x+58-10), ($y+(34.5*$this->tamY)), "(+) COMISSÃO"   );
+        $this->Text   ( ($x+154),   ($y+(34.5*$this->tamY)), $this->lblOutros   );
 
-        $this->Text   ( ($x+58-10) , ($y+(41.5*$this->tamY)), "(+) MULTA DE INFRAÇ"  );
-        $this->Text   ( ($x+154) , ($y+(41.5*$this->tamY)), $this->lblMultaI   );
+        $this->Text   ( ($x+58-10), ($y+(41.5*$this->tamY)), "(+) CORREÇÃO URM"  );
+        $this->Text   ( ($x+154),   ($y+(41.5*$this->tamY)), $this->lblMultaI   );
 
-        $this->Text   ( ($x+58-10) , ($y+(48.5*$this->tamY)), $this->lblValorTotal );
-        $this->Text   ( ($x+154), ($y+(48.5*$this->tamY)), $this->lblValorTotal );
+        $this->Text   ( ($x+58-10), ($y+(48.5*$this->tamY)), "(-) REDUÇÔES"  );
+        $this->Text   ( ($x+154),   ($y+(48.5*$this->tamY)), $this->lblReducao   );
+
+        $this->Text   ( ($x+58-10), ($y+(55*$this->tamY)), $this->lblValorTotal );
+        $this->Text   ( ($x+154),   ($y+(55*$this->tamY)), $this->lblValorTotal );
 
         // nao receber apos vencimento
         if ( !$this->getObsVencimento() ) {
             $this->setObsVencimento ( 'Receber até 31/12/2012.' );
         }
 
-        $this->Text   ( ($x+1)  , ($y+(52*$this->tamY)), $this->getObsVencimento() );
-        $this->Text   ( ($x+96-20) , ($y+(45*$this->tamY)), $this->getObsVencimento() );
+        $this->Text   ( ($x+1)      , ($y+(52*$this->tamY)), $this->getObsVencimento() );
+        $this->Text   ( ($x+96-20)  , ($y+(45*$this->tamY)), $this->getObsVencimento() );
 
         // contribuinte
-        $this->Text   ( ($x+1)  , ($y+(55.5*$this->tamY)), $this->lblContribuinte );
-        $this->Text   ( ($x+96-20) , ($y+(48.5*$this->tamY)), $this->lblContribuinte );
+        $this->Text   ( ($x+1)      , ($y+(61*$this->tamY)), $this->lblContribuinte );
+        $this->Text   ( ($x+96-20)  , ($y+(50*$this->tamY)), $this->lblContribuinte );
 
         // endereço do imovel
-        $this->Text   ( ($x+1)  , ($y+(62.5*$this->tamY)), 'ENDEREÇO DO IMÓVEL' );
+        $this->Text   ( ($x+1)  , ($y+(68*$this->tamY)), 'ENDEREÇO DO IMÓVEL' );
 
         // obs
-        $this->Text   ( ($x+1)  , ($y+(71*$this->tamY) ), $this->lblObs          );
+        $this->Text   ( ($x+1)  , ($y+(75*$this->tamY) ), $this->lblObs          );
 
         // vias
         $this->setFont( 'Arial','I',6 );
-        $this->Text   ( ($x+70-20) , ($y+(71*$this->tamY)), 'VIA CONTRIBUINTE');
-        $this->Text   ( ($x+178), ($y+(56.5*$this->tamY)), 'VIA PREFEITURA');
+        $this->Text   ( ($x+70-20),  ($y+(75*$this->tamY)), 'VIA CONTRIBUINTE');
+        $this->Text   ( ($x+178),    ($y+(62*$this->tamY)), 'VIA PREFEITURA');
 
         $this->setFont( 'Arial','', 6 );
         $this->stObservacao .= "LEI MUNICIPAL 483, 19 DE DEZEMBRO DE 2006.";
         $stObs = str_replace("\n\r"," ",$this->stObservacao);
 
-        $this->Text   ( 8     , $y+(74*$this->tamY)  , substr($stObs,0      ,62 ));
+        $this->Text   ( 8     , $y+(79*$this->tamY)  , substr($stObs,0      ,62 ));
         $this->Text   ( 8     , $y+(77*$this->tamY)  , substr($stObs,62     ,60 ));
         $this->Text   ( 8     , $y+(80*$this->tamY)  , substr($stObs,122    ,60 ));
     }
@@ -892,29 +912,34 @@ class RCarneDiversosPetropolis extends RProtocolo
         $this->Text   ( ($x+43) , ($y+(10*$this->tamY))  ,$this->stExercicio ); // ok
         $this->Text   ( ($x+128), ($y+(10*$this->tamY))  ,$this->stExercicio ); // ok
 
-        $this->Text   ( ($x+72-20) , ($y+(17*$this->tamY)), number_format($this->flValor,2,',','.')); // ok
-        $this->Text   ( ($x+166), ($y+(17*$this->tamY)), number_format($this->flValor,2,',','.')); // ok
-        $this->Text   ( ($x+72-20) , ($y+(23*$this->tamY)), number_format($this->flValorMulta,2,',','.')); // ok  multa
-        $this->Text   ( ($x+166), ($y+(23*$this->tamY)), number_format($this->flValorMulta,2,',','.')); // ok  multa
-        $this->Text   ( ($x+72-20) , ($y+(31*$this->tamY)), number_format($this->flValorJuros,2,',','.' )); // ok  juros
-        $this->Text   ( ($x+166), ($y+(31*$this->tamY)), number_format($this->flValorJuros,2,',','.')); // ok  juros
+        $this->Text   ( ($x+72-20) , ($y+(17*$this->tamY))  , number_format($this->flValor,2,',','.')); // ok
+        $this->Text   ( ($x+166)   , ($y+(17*$this->tamY))  , number_format($this->flValor,2,',','.')); // ok
+        
+        $this->Text   ( ($x+72-20) , ($y+(23*$this->tamY))  , number_format($this->flValorMulta,2,',','.')); // ok  multa
+        $this->Text   ( ($x+166)   , ($y+(23*$this->tamY))  , number_format($this->flValorMulta,2,',','.')); // ok  multa
+        
+        $this->Text   ( ($x+72-20) , ($y+(31*$this->tamY))  , number_format($this->flValorJuros,2,',','.' )); // ok  juros
+        $this->Text   ( ($x+166)   , ($y+(31*$this->tamY))  , number_format($this->flValorJuros,2,',','.')); // ok  juros
 
-        $this->Text   ( ($x+72-20) , ($y+(38*$this->tamY)), number_format($this->flValorOutros,2,',','.')); // ok  outros
-        $this->Text   ( ($x+166), ($y+(38*$this->tamY)), number_format($this->flValorOutros,2,',','.')); // ok  outros
+        $this->Text   ( ($x+72-20) , ($y+(38*$this->tamY))  , number_format($this->flValorOutros,2,',','.')); // ok  COMISSAO
+        $this->Text   ( ($x+166)   , ($y+(38*$this->tamY))  , number_format($this->flValorOutros,2,',','.')); // ok  outros
 
-        $this->Text   ( ($x+72-20) , ($y+(45*$this->tamY)), number_format($this->flValorMultaF,2,',','.')); // ok  outros
-        $this->Text   ( ($x+166), ($y+(45*$this->tamY)), number_format($this->flValorMultaF,2,',','.')); // ok  outros
+        $this->Text   ( ($x+72-20) , ($y+(45*$this->tamY))  , number_format($this->flValorMultaF,2,',','.')); // ok  Correcoes URM
+        $this->Text   ( ($x+166)   , ($y+(45*$this->tamY))  , number_format($this->flValorMultaF,2,',','.')); // ok  Correcoes URM
 
-        $this->Text   ( ($x+72-20) , ($y+(52*$this->tamY)), number_format($this->flValorTotal,2,',','.')); // ok  total
-        $this->Text   ( ($x+166), ($y+(52*$this->tamY)), number_format($this->flValorTotal,2,',','.')); // ok  total
+        $this->Text   ( ($x+72-20) , ($y+(52*$this->tamY))  , number_format($this->flValorReducao,2,',','.')); // reduções
+        $this->Text   ( ($x+166)   , ($y+(52*$this->tamY))  , number_format($this->flValorReducao,2,',','.')); // reduções
+
+        $this->Text   ( ($x+72-20) , ($y+(58*$this->tamY))  , number_format($this->flValorTotal,2,',','.')); // ok  total
+        $this->Text   ( ($x+166)   , ($y+(58*$this->tamY))  , number_format($this->flValorTotal,2,',','.')); // ok  total
 
 //57
         if (strlen(trim($this->getNomCgm()))>40) {$this->setFont('Arial', 'B', 7 );} //diminui a fonte caso o nome seja maior que 40
-        $this->Text   ( ($x+2), ($y+(59*$this->tamY)), substr($this->getNomCgm(),0,44) ); // ok  contribuinte
-        $this->Text   ( ($x+97-20),($y+(52*$this->tamY)), substr($this->getNomCgm(),0,48) ); // ok  contribuinte (via prefeitura)
+        $this->Text   ( ($x+2), ($y+(64.5*$this->tamY)), substr($this->getNomCgm(),0,44) ); // ok  contribuinte
+        $this->Text   ( ($x+97-20),($y+(54*$this->tamY)), substr($this->getNomCgm(),0,48) ); // ok  contribuinte (via prefeitura)
         if (strlen(trim($this->getNomCgm()))>40) {$this->setFont('Arial', 'B', 8 );}
 
-        $this->Text   ( ($x+2), ($y+(66*$this->tamY)), substr($this->getRua(), 0, 46) ) ; // end . do imovel
+        $this->Text   ( ($x+2), ($y+(71*$this->tamY)), substr($this->getRua(), 0, 46) ) ; // end . do imovel
 
         $this->Text   ( ($x+1), ($y+(17*$this->tamY))  , $this->stNumeracao ); // ok
         $this->Text   ( ($x+80), ($y+(17*$this->tamY))  , $this->stNumeracao ); // ok
@@ -1182,7 +1207,7 @@ class RCarneDadosCadastraisMarianaPimentel extends RCarneDiversosPetropolis
         $this->stSubTitulo = 'Secretaria de Administração e Finanças';
         $this->lblMulta = '(+) MULTA DE MORA';
         $this->lblJuros = '(+) JUROS DE MORA';
-        $this->lblOutros = '(+) ATUALIZAÇÃO MONETÁRIA';
+        $this->lblOutros = '(+) COMISSÃO COBRANÇA';
 
         /**
          * Seta Configuração do PDF
@@ -1567,6 +1592,7 @@ var $stLocal;
 var $boConsolidacao;
 var $stNumeracaoConsolidacao;
 var $dtVencimentoConsolidacao;
+var $boCobranca;
 
 /* setters */
 function setHorizontal($valor) { $this->inHorizontal = $valor; }
@@ -1578,6 +1604,7 @@ function setPulaPagina($valor) { $this->boPulaPagina = $valor; }
 function setConsolidacao($valor) { $this->boConsolidacao = $valor;            }
 function setVencimentoConsolidacao($valor) { $this->dtVencimentoConsolidacao = $valor;  }
 function setNumeracaoConsolidacao($valor) { $this->stNumeracaoConsolidacao = $valor;   }
+function setCobranca($valor) { $this->boCobranca = $valor;   }
 
 /* getters */
 function getHorizontal() { return $this->inHorizontal;   }
@@ -1589,6 +1616,7 @@ function getPulaPagina() { return $this->boPulaPagina;   }
 function getConsolidacao() { return $this->boConsolidacao;   }
 function getNumeracaoConsolidacao() { return $this->stNumeracaoConsolidacao; }
 function getVencimentoConsolidacao() { return $this->dtVencimentoConsolidacao; }
+function getCobranca() { return $this->boCobranca; }
 
 /*
     * Metodo Construtor
@@ -1600,7 +1628,9 @@ function RCarneDividaMarianaPimentel($arEmissao, $horizontal = 7, $vertical = 95
     $this->arEmissao        = $arEmissao;
     $this->inHorizontal     = $horizontal;
     $this->inVertical       = $vertical;
-    $this->boConsolidacao = false;
+    $this->boConsolidacao   = false;
+    $this->boCobranca       = false;
+    
 }
 
 function imprimirCarne($diffBaixa = FALSE)
@@ -1623,7 +1653,8 @@ function imprimirCarne($diffBaixa = FALSE)
     $this->obRCarnePetropolis->stCamLogo = CAM_FW_TEMAS."imagens/".$stNomeImagem;
     $this->obRCarnePetropolis->lblTitulo1 = "MARIANA PIMENTEL - Sec. de Adm. e Fin.";
 
-    $nuValorTotal = $nuValorNormal = $nuValorJuroNormal = $nuValorMultaNormal = 0.00;
+    $nuValorTotal = $nuValorNormal = $nuValorJuroNormal = $nuValorMultaNormal = $stMultaNormal = $nuValorComissao = $nuValorCorrecao = $nuValorReducao= 0.00;    
+
     foreach ($this->arEmissao as $valor => $chave) {
         /* imprimir duas folhas com dados cadastrais */
         /* buscar informações para dados cadastrais*/
@@ -1817,7 +1848,6 @@ function imprimirCarne($diffBaixa = FALSE)
 
         #echo '<h2>CONSOLIDACAO </h2>'; exit;
 
-
             foreach ($chave as $parcela) {
 
                 $inParcela++;
@@ -1834,10 +1864,6 @@ function imprimirCarne($diffBaixa = FALSE)
                 $obCalculaParcelas = new FARRCalculaParcelasReemissao;
                 // retorna valores de juro e multa que foram aplicados
                 $obCalculaJM = new FARRCalculaJuroOrMultaParcelasReemissao;
-
-
-
-
 
                 $dtVencimento = $this->getVencimentoConsolidacao();
                 $stParametro  = "'".$rsParcela->getCampo('numeracao')."',".$this->obRARRCarne->stExercicio;
@@ -1880,10 +1906,10 @@ function imprimirCarne($diffBaixa = FALSE)
                 $this->obRCarnePetropolis->setObservacaoL1 ( 'Não receber após o vencimento. ' );
                 $this->obRCarnePetropolis->setParcela ( "1/1" );
                 $this->obRCarnePetropolis->setVencimento  ( $this->getVencimentoConsolidacao() );
-                $this->obRCarnePetropolis->flValorJuros = ( number_format(round($nuValorJuroNormal,2),2,',',''));
-                $this->obRCarnePetropolis->flValorMulta = ( number_format(round($nuValorMultaNormal,2),2,',',''));
-                $this->obRCarnePetropolis->setValor       ( number_format(round($nuValorNormal,2),2,',',''));
-                $this->obRCarnePetropolis->setValorTotal(number_format(round($nuValorTotal,2),2,',',''));
+                $this->obRCarnePetropolis->setValorJuros  ( number_format($nuValorJuroNormal,2,',',''));
+                $this->obRCarnePetropolis->setValorMulta  ( number_format($nuValorMultaNormal,2,',',''));
+                $this->obRCarnePetropolis->setValor       ( number_format($nuValorNormal,2,',',''));
+                $this->obRCarnePetropolis->setValorTotal  (number_format($nuValorTotal,2,',',''));
 
                 $this->arCodigoBarra = $this->obBarra->geraFebraban( $this->arBarra );
                 $this->obRCarnePetropolis->setBarCode( $this->arCodigoBarra['codigo_barras'] );
@@ -1923,13 +1949,33 @@ function imprimirCarne($diffBaixa = FALSE)
                 $stParametro1 = $stParametro.$dtVencimento."'";
 
                 // valor atualizado
-                $obErro = $obCalculaParcelas->executaCalculaValoresParcelasReemissao($rsTmp,$stParametro1);
+                //Verifica se vem da cobranca da divida ou da reemissao
+                if ($this->getCobranca()) {
+                    //Cobrança da Divida Ativa                                     
+                    $stParametro1 = $parcela["inscricao"].",".$rsParcela->getCampo("nr_parcela").",".$rsParcela->getCampo("cod_lancamento").",".$parcela["cod_parcela"];
+                    $obErro = $obCalculaParcelas->executaCalculaValoresParcelasCobranca($rsTmp,$stParametro1,$boTransacao);
 
-                $arValorNormal = explode ( "§", $rsTmp->getCampo('valor') );
-                $nuValorTotal = $arValorNormal[0];
-                $nuValorNormal = $arValorNormal[1];
-                $stJuroNormal = $arValorNormal[3];
-                $stMultaNormal = $arValorNormal[2];
+                    $arValorNormal   = explode ( "§", $rsTmp->getCampo('valor') );
+                    //dividindo o valor de origem pelo numero total de parcelas
+                    $nuValorNormal   = ($arValorNormal[0] / count($chave)) ;                    
+                    $stJuroNormal    = $arValorNormal[1];
+                    $stMultaNormal   = $arValorNormal[2];
+                    $nuValorComissao = $arValorNormal[3];
+                    $nuValorCorrecao = $arValorNormal[4];
+                    $nuValorReducao  = $arValorNormal[5];
+                    $nuValorTotal    = $arValorNormal[6];
+                
+                }else{
+                    //Reemissao
+                    $obErro = $obCalculaParcelas->executaCalculaValoresParcelasReemissao($rsTmp,$stParametro1,$boTransacao);
+                    $arValorNormal = explode ( "§", $rsTmp->getCampo('valor') );
+                    $nuValorTotal    = $arValorNormal[0];
+                    $nuValorNormal   = $arValorNormal[1];
+                    $stMultaNormal   = $arValorNormal[2];
+                    $stJuroNormal    = $arValorNormal[3];
+                    $nuValorReducao  = $arValorNormal[4];
+                    $nuValorCorrecao = $arValorNormal[5];                    
+                }
 
                 $this->arBarra['valor_documento'] = $nuValorTotal;
                 $this->arBarra['vencimento'] = (string) $rsParcela->getCampo( 'vencimento' );
@@ -1946,14 +1992,14 @@ function imprimirCarne($diffBaixa = FALSE)
                     $this->obRCarnePetropolis->lblTitulo2        = ' ';
                     $this->obRCarnePetropolis->lblValorCotaUnica = 'VALOR TOTAL';
                     $this->obRCarnePetropolis->setVencimento   ( $rsParcela->getCampo( 'vencimento' ) );
-                    $this->obRCarnePetropolis->setValor        ( number_format($nuValorNormal,2,',','.') );
+                    $this->obRCarnePetropolis->setValor        ( $nuValorNormal );
                     $this->obRCarnePetropolis->setParcela ( $rsParcela->getCampo( 'info' ) );
                 } else {
                     if ( $rsParcela->getCampo( 'nr_parcela' ) == 0 ) {
                         $this->arBarra['tipo_moeda'] = 6;
                         $this->obRCarnePetropolis->setParcelaUnica ( true );
                         $this->obRCarnePetropolis->setVencimento   ( $rsParcela->getCampo( 'vencimento' ) );
-                        $this->obRCarnePetropolis->setValor        ( number_format($nuValorNormal,2,',','.') );
+                        $this->obRCarnePetropolis->setValor        ( $nuValorNormal );
                         // Recuperar Desconto
                         include_once(CAM_GT_ARR_MAPEAMENTO."FARRParcentualDescontoParcela.class.php");
                         $obPercentual = new FARRParcentualDescontoParcela;
@@ -1995,7 +2041,6 @@ function imprimirCarne($diffBaixa = FALSE)
                                 }
                             }
                             // converter vencimentos para formato americano
-
                             $arTmp = explode('/',$arVencimentos[0]);
                             $dtVencimento1 = $arTmp[2].'-'.$arTmp[1].'-'.$arTmp[0];
 
@@ -2012,10 +2057,10 @@ function imprimirCarne($diffBaixa = FALSE)
                             // valor, % de juro, % de multa para valor normal do carne --------------
                             // valor
                             // % de juro
-                            $this->obRCarnePetropolis->flValorJuros = $stJuroNormal;
+                            $this->obRCarnePetropolis->setValorJuros ($stJuroNormal);
 
                             // % de multa
-                            $this->obRCarnePetropolis->flValorMulta = $stMultaNormal;
+                            $this->obRCarnePetropolis->setValorMulta ($stMultaNormal);
                             //-----------------------------------------------------------------------
 
                             // valor, % de juro, % de multa para valor vencimento 1 do carne --------------
@@ -2082,24 +2127,29 @@ function imprimirCarne($diffBaixa = FALSE)
                             //-----------------------------------------------------------------------
 
                             // repassa valores para pdf
-                            $this->obRCarnePetropolis->setValor       (number_format(round($nuValorNormal,2),2,',','.'));
+                            $this->obRCarnePetropolis->setValor       ($nuValorNormal);
                             if ($boVenc1 == true) {
-                                $this->obRCarnePetropolis->setValor1      (number_format(round($nuValor1,2),2,',','.')) ;
+                                $this->obRCarnePetropolis->setValor1      (number_format($nuValor1,2,',','.')) ;
                                 if ($boVenc2 == true) {
-                                    $this->obRCarnePetropolis->setValor2      (number_format(round($nuValor2,2),2,',','.')) ;
+                                    $this->obRCarnePetropolis->setValor2      (number_format($nuValor2,2,',','.')) ;
                                     if ($boVenc3 == true) {
-                                        $this->obRCarnePetropolis->setValor3      (number_format(round($nuValor3,2),2,',','.')) ;
+                                        $this->obRCarnePetropolis->setValor3      (number_format($nuValor3,2,',','.')) ;
                                     }
                                 }
                             }
                         } else {
-                            $this->obRCarnePetropolis->setValor       (number_format(round($nuValorNormal,2),2,',','.'));
+                            $this->obRCarnePetropolis->setValor       ($nuValorNormal);
 
                         }
 
                     }
-                }
-                $this->obRCarnePetropolis->setValorTotal( $nuValorTotal );
+                }                                
+
+                $this->obRCarnePetropolis->setValorTotal    ( $nuValorTotal );
+                $this->obRCarnePetropolis->setValorOutros   ( $nuValorComissao );
+                $this->obRCarnePetropolis->setValorReducao  ( $nuValorReducao );
+                $this->obRCarnePetropolis->setValorCorrecao ( $nuValorCorrecao );
+                
                 $this->arCodigoBarra = $this->obBarra->geraFebraban( $this->arBarra );
                 $this->obRCarnePetropolis->setBarCode( $this->arCodigoBarra['codigo_barras'] );
                 $this->obRCarnePetropolis->setLinhaCode( $this->arCodigoBarra['linha_digitavel'] );

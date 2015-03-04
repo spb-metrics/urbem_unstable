@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: FARRCalculaParcelasReemissao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FARRCalculaParcelasReemissao.class.php 61643 2015-02-20 10:45:39Z evandro $
 
 * Casos de uso: uc-05.03.11
 */
@@ -116,6 +116,28 @@ function montaExecutaCalculaValoresParcelasReemissao($stParametros)
 
     return $stSql;
 }
+
+function executaCalculaValoresParcelasCobranca(&$rsRecordset, $stParametros,$boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+
+    $stSql  = $this->montaExecutaCalculaValoresParcelasCobranca($stParametros);
+    $this->setDebug($stSql);
+    $obErro = $obConexao->executaSQL($rsRecordset,$stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaExecutaCalculaValoresParcelasCobranca($stParametros)
+{
+    $stSql  = " SELECT arrecadacao.calculaValoresParcelasCobranca(".$stParametros.") as valor  \r\n";
+
+    return $stSql;
+}
+
+
+
 
 }
 ?>

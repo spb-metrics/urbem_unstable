@@ -21,8 +21,7 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?php
+
 
 /**
     * Classe de regra de negócio para arrecadacao calculo
@@ -33,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRCalculo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RARRCalculo.class.php 61457 2015-01-19 13:55:53Z carolina $
 
 * Casos de uso: uc-05.03.05
 */
@@ -938,12 +937,6 @@ class RARRCalculo
                                         $rsCalculos->proximo();
                                     }// while dos calculos_correntes
 
-                                    $obTAdministracaoAuditoria->setDado( "numcgm", Sessao::read( "numCgm" ) );
-                                    $obTAdministracaoAuditoria->setDado( "cod_acao", Sessao::read( "acao" ) );
-                                    $obTAdministracaoAuditoria->setDado( "timestamp", $stTimestampAtual );
-                                    $obTAdministracaoAuditoria->setDado( "objeto", $stCalculos );
-                                    $obTAdministracaoAuditoria->setDado( "transacao", false );
-                                    $obTAdministracaoAuditoria->inclusao( $boTransacao );
                                     Sessao::write( "calculos", $stCalculosSessao );
                                 }//if CALCULOS > 0
                             }//FIm SE O RETORNO EH TRUE DO CALCULO TRIBUTARIO

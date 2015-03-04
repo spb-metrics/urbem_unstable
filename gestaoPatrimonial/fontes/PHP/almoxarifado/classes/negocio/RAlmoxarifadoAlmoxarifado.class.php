@@ -42,21 +42,6 @@
                     uc-03.03.14
 */
 
-/*
-$Log$
-Revision 1.13  2006/07/13 17:21:32  leandro.zis
-Bug #6551#, Bug #6550# e alterado para listar os almoxarifados ordenados pelo nome
-
-Revision 1.12  2006/07/11 20:36:25  tonismar
-arrumado método de consulta
-
-Revision 1.11  2006/07/06 14:04:47  diego
-Retirada tag de log com erro.
-
-Revision 1.10  2006/07/06 12:09:31  diego
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_FW_BANCO_DADOS."Transacao.class.php"                       );
 include_once ( CAM_GP_ALM_MAPEAMENTO."TAlmoxarifadoAlmoxarifado.class.php");
@@ -91,11 +76,6 @@ var $obRCGMAlmoxarifado;
     * @var Object
 */
 var $obRCGMResponsavel;
-/**
-    * @access Private
-    * @var Object
-*/
-var $stMascara;
 
 /**
     * @access Public
@@ -108,18 +88,6 @@ function setCodigo($inCodigo) { $this->inCodigo = $inCodigo; }
     * @return Integer
 */
 function getCodigo() { return $this->inCodigo; }
-
-/**
-    * @access Public
-    * @return Integer
-*/
-function setMascara($stMascara) { $this->stMascara = $stMascara; }
-
-/**
-    * @access Public
-    * @return Integer
-*/
-function getMascara() { return $this->stMascara; }
 
 /**
      * Método construtor
@@ -164,10 +132,9 @@ function listar(&$rsRecordSet, $stOrder = "" , $obTransacao = "")
 
 function incluir($boTransacao = "")
 {
-    include_once ( CAM_GP_ALM_MAPEAMENTO."TAlmoxarifadoAlmoxarifadoLocalizacao.class.php");
     $boFlagTransacao            = false;
     $rsRecordSet                = new Recordset();
-    $obTAlmoxarifadoLocalizacao = new TAlmoxarifadoAlmoxarifadoLocalizacao();
+
     $obErro                     = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     if ( !$obErro->ocorreu() ) {
         $stFiltro = " where cgm_almoxarifado  = ". $this->obRCGMAlmoxarifado->getNumCGM();
@@ -187,12 +154,6 @@ function incluir($boTransacao = "")
 
         $obErro = $this->obTAlmoxarifadoAlmoxarifado->inclusao( $boTransacao );
 
-        if (!($obErro->ocorreu())) {
-             $obTAlmoxarifadoLocalizacao->setDado("cod_almoxarifado", $this->inCodigo );
-             $obTAlmoxarifadoLocalizacao->setDado("mascara"         , $this->stMascara);
-             $obErro = $obTAlmoxarifadoLocalizacao->inclusao($boTransacao);
-        }
-
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTAlmoxarifadoAlmoxarifado );
     }
 
@@ -211,7 +172,6 @@ function alterar($boTransacao = "")
     include_once ( CAM_GP_ALM_MAPEAMENTO."TAlmoxarifadoAlmoxarifadoLocalizacao.class.php");
     $boFlagTransacao = false;
     $rsRecordSet                = new Recordset();
-    $obTAlmoxarifadoLocalizacao = new TAlmoxarifadoAlmoxarifadoLocalizacao();
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
     if ( !$obErro->ocorreu() ) {
@@ -228,18 +188,6 @@ function alterar($boTransacao = "")
         $this->obTAlmoxarifadoAlmoxarifado->setDado( "cgm_almoxarifado"  , $this->obRCGMAlmoxarifado->getNumCGM() );
 
         $obErro = $this->obTAlmoxarifadoAlmoxarifado->alteracao( $boTransacao );
-
-        if ($this->verificaDadosAlmoxarifado() == true) {
-            if (!($obErro->ocorreu())) {
-                 $obTAlmoxarifadoLocalizacao->setDado("cod_almoxarifado", $this->inCodigo );
-                 $obErro = $obTAlmoxarifadoLocalizacao->exclusao($boTransacao);
-
-                 $obTAlmoxarifadoLocalizacao->setDado("cod_almoxarifado", $this->inCodigo );
-                 $obTAlmoxarifadoLocalizacao->setDado("mascara"         , $this->stMascara);
-                 $obErro = $obTAlmoxarifadoLocalizacao->inclusao($boTransacao);
-            }
-        }
-
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTAlmoxarifadoAlmoxarifado );
     }
 
@@ -256,12 +204,6 @@ function consultar($boTransacao = "")
  if (!$obErro->ocorreu()) {
     $this->obRCGMAlmoxarifado->setNumCGM($rsRecordSet->getCampo('cgm_almoxarifado'));
     $this->obRCGMAlmoxarifado->consultar(new RecordSet());
-    $obTAlmoxarifadoLocalizacao = new TAlmoxarifadoAlmoxarifadoLocalizacao();
-    $obTAlmoxarifadoLocalizacao->setDado ('cod_almoxarifado', $this->getCodigo() );
-    $obErro = $obTAlmoxarifadoLocalizacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-    if (!$obErro->ocorreu()) {
-        $this->setMascara( $rsRecordSet->getCampo('mascara') );
-    }
  }
 
  return $obErro;
@@ -287,17 +229,10 @@ function consultarLocalizacao(&$rsRecordSet,$obTransacao = "")
 
  function excluir($boTransacao = "")
  {
-    include_once ( CAM_GP_ALM_MAPEAMENTO."TAlmoxarifadoAlmoxarifadoLocalizacao.class.php");
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-    $obTAlmoxarifadoLocalizacao = new TAlmoxarifadoAlmoxarifadoLocalizacao();
 
     if (!$obErro->ocorreu()) {
-
-        $obTAlmoxarifadoLocalizacao->setDado("cod_almoxarifado", $this->inCodigo );
-        $obTAlmoxarifadoLocalizacao->setDado("mascara"         , $this->stMascara);
-
-        $obErro = $obTAlmoxarifadoLocalizacao->exclusao($boTransacao);
 
         if (!($obErro->ocorreu())) {
 

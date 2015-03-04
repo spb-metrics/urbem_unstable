@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Data de Criação: 15/05/2008
 
     * @author Analista: Fabio Bertoldi
@@ -70,7 +67,11 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue ( $stStrl );
 
-$nuPorcentagem  = number_format( (Sessao::read( "lancados" ) * 100 / Sessao::read( "lancados_total" ) ), 2, ',', ' ');
+if(Sessao::read( "lancados_total") != 0 ){
+    $nuPorcentagem  = number_format( (Sessao::read( "lancados" ) * 100 / Sessao::read( "lancados_total" ) ), 2, ',', ' ');
+} else {
+     $nuPorcentagem  = number_format( 0, 2, ',', ' ');;
+}
 
 $stHtml  = "<center>".$nuPorcentagem."% processada até o momento!<br>";
 $stHtml .= "<img id=\"img_carregando\" src=\"".CAM_FW_IMAGENS."loading.gif\"></center>";

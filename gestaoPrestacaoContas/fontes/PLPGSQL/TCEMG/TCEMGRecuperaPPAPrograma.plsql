@@ -44,13 +44,14 @@ BEGIN
     stSql := '
     SELECT *
 	    FROM (
-            SELECT programa.cod_programa AS cod_programa
-                 , programa_dados.identificacao AS nome_programa
-                 , programa_dados.objetivo AS objetivo
-                 , REPLACE(SUM(total_recursos.ano1)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_1
-                 , REPLACE(SUM(total_recursos.ano2)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_2
-                 , REPLACE(SUM(total_recursos.ano3)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_3
-                 , REPLACE(SUM(total_recursos.ano4)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_4
+            SELECT  programa.cod_programa AS cod_programa
+                    , programa.num_programa AS num_programa
+                    , programa_dados.identificacao AS nome_programa
+                    , programa_dados.objetivo AS objetivo
+                    , REPLACE(SUM(total_recursos.ano1)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_1
+                    , REPLACE(SUM(total_recursos.ano2)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_2
+                    , REPLACE(SUM(total_recursos.ano3)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_3
+                    , REPLACE(SUM(total_recursos.ano4)::VARCHAR, ''.'', '','')::VARCHAR AS total_recursos_ano_4
               FROM ppa.programa
               JOIN ppa.programa_dados
                 ON programa_dados.cod_programa = programa.cod_programa
@@ -129,10 +130,10 @@ BEGIN
             INSERT INTO tcemg.registros_arquivo_programa (exercicio, cod_programa) VALUES (stExercicio, rsProgramas.cod_programa);
         END IF;
        
-        IF rsProgramas.cod_programa = 999 THEN
-           rsProgramas.cod_programa := 9999;
+        IF rsProgramas.num_programa = 999 THEN
+           rsProgramas.num_programa := 9999;
         ELSE
-           rsProgramas.cod_programa := rsProgramas.cod_programa;
+           rsProgramas.num_programa := rsProgramas.num_programa;
         END IF;
         
         RETURN next rsProgramas;

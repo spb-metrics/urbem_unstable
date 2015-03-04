@@ -379,6 +379,7 @@ $obDataGrid->addTituloGrid        ( "Registros de metas de execução de despesa
 
 $obDataGrid->montaGrid();
 $obOk   = new Ok;
+$obOk->obEvento->setOnClick("validaRequest(); BloqueiaFrames(true,false); Salvar();");
 
 $obVoltar = new Button;
 $obVoltar->setName  ( "Cancelar" );

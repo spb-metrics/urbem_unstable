@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 59612 $
+    $Revision: 61480 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: carlos.silva $
+    $Date: 2015-01-21 17:21:23 -0200 (Qua, 21 Jan 2015) $
 
     * Casos de uso: uc-02.08.01, uc-02.08.07
 */
@@ -68,30 +68,31 @@ function FExportacaoTCERSExportacaoBalanceteReceita()
 
 function montaRecuperaDadosExportacao()
 {
-    $stSql  = "SELECT                                                               \n";
-    $stSql .= "    replace(tabela.cod_estrutural,'.','') as cod_estrutural,         \n";
-    $stSql .= "    replace(tabela.vl_original::varchar,'.','') as vl_original,               \n";
-    $stSql .= "    replace(tabela.totalizado::varchar,'.','') as totalizado,                 \n";
-    $stSql .= "    tabela.cod_recurso,                                              \n";
-    $stSql .= "    regexp_replace(sem_acentos(tabela.descricao), '[°|º|\/]', ' ', 'g') AS descricao,    \n";
-    $stSql .= "    tabela.tipo,                                                     \n";
-    $stSql .= "    tabela.nivel,                                                    \n";
-    $stSql .= "    tabela.cod_caracteristica                                        \n";
-    $stSql .= "FROM                                                                 \n";
-    $stSql .= " ".$this->getTabela()."('".$this->getDado("stExercicio")     ."',    \n";
-    $stSql .= "                        '".$this->getDado("stCodEntidades")  ."',    \n";
-    $stSql .= "                        '".$this->getDado("dtInicial")       ."',    \n";
-    $stSql .= "                        '".$this->getDado("dtFinal")         ."')    \n";
-    $stSql .= "AS tabela              (   cod_estrutural     varchar,               \n";
-    $stSql .= "                           cod_recurso        varchar(13),               \n";
-    $stSql .= "                           descricao          varchar,               \n";
-    $stSql .= "                           vl_original        numeric,               \n";
-    $stSql .= "                           totalizado         numeric,               \n";
-    $stSql .= "                           tipo               varchar,               \n";
-    $stSql .= "                           nivel              integer,               \n";
-    $stSql .= "                           cod_caracteristica integer)               \n";
-    $stSql .= "WHERE tabela.nivel<>0                                                \n";
-    $stSql .= "ORDER BY tabela.cod_estrutural                                       \n";
+    $stSql  = "SELECT                                                                                \n";
+    $stSql .= "    replace(tabela.cod_estrutural,'.','') as cod_estrutural,                          \n";
+    $stSql .= "    replace(tabela.vl_original::varchar,'.','') as vl_original,                       \n";
+    $stSql .= "    replace(tabela.totalizado::varchar,'.','') as totalizado,                         \n";
+    $stSql .= "    tabela.cod_recurso,                                                               \n";
+    $stSql .= "    regexp_replace(sem_acentos(tabela.descricao), '[°|º|\/]', ' ', 'g') AS descricao, \n";
+    $stSql .= "    tabela.tipo,                                                                      \n";
+    $stSql .= "    tabela.nivel,                                                                     \n";
+    $stSql .= "    tabela.cod_caracteristica,                                                        \n";
+    $stSql .= "    replace(tabela.vl_original::varchar,'.','') as vl_atualizado                      \n";
+    $stSql .= "FROM                                                                                  \n";
+    $stSql .= " ".$this->getTabela()."('".$this->getDado("stExercicio")     ."',                     \n";
+    $stSql .= "                        '".$this->getDado("stCodEntidades")  ."',                     \n";
+    $stSql .= "                        '".$this->getDado("dtInicial")       ."',                     \n";
+    $stSql .= "                        '".$this->getDado("dtFinal")         ."')                     \n";
+    $stSql .= "AS tabela              (   cod_estrutural     varchar,                                \n";
+    $stSql .= "                           cod_recurso        varchar(13),                            \n";
+    $stSql .= "                           descricao          varchar,                                \n";
+    $stSql .= "                           vl_original        numeric,                                \n";
+    $stSql .= "                           totalizado         numeric,                                \n";
+    $stSql .= "                           tipo               varchar,                                \n";
+    $stSql .= "                           nivel              integer,                                \n";
+    $stSql .= "                           cod_caracteristica integer)                                \n";
+    $stSql .= "WHERE tabela.nivel<>0                                                                 \n";
+    $stSql .= "ORDER BY tabela.cod_estrutural                                                        \n";
 
     return $stSql;
 }

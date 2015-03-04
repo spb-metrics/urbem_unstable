@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TTCEMGConfiguracaoOrgao.class.php 61325 2015-01-06 19:40:31Z lisiane $
+  $Id: TTCEMGConfiguracaoOrgao.class.php 61575 2015-02-10 12:53:21Z franver $
   $Date: $
   $Author: $
   $Rev: $
@@ -260,50 +260,116 @@ class TTCEMGConfiguracaoOrgao extends Persistente
 
     public function montaRecuperaOrgaoResponsavel()
     {
-        $stSql = "  SELECT 11 AS tipoRegistro
-                           , configuracao_orgao.tipo_responsavel AS tipoResponsavel
-                           , CGM_PF.rg AS cartIdent
-                           , sw_uf.sigla_uf AS orgEmissorCi
-                           , CGM_PF.cpf
-                           , CASE WHEN configuracao_orgao.tipo_responsavel = 2 THEN
-                                configuracao_orgao.crc_contador
-                             ELSE
-                                ''
-                             END as crcContador
-                           , CASE WHEN configuracao_orgao.tipo_responsavel = 2 THEN
-                                configuracao_orgao.uf_crccontador 
-                             ELSE
-                                ''
-                             END as ufCrcContador
-                           , CASE WHEN configuracao_orgao.tipo_responsavel = 4 THEN
-                                configuracao_orgao.cargo_ordenador_despesa 
-                             ELSE
-                                ''
-                             END as cargoOrdDespDeleg
-                           , CE.exercicio
-                           , CE.cod_entidade
-                           , CE.valor::integer AS CGM
-                           , to_char(configuracao_orgao.dt_inicio, 'ddmmyyyy') AS dtInicio
-                           , to_char(configuracao_orgao.dt_fim, 'ddmmyyyy') AS dtFinal
-                           , CGM.e_mail AS email
-			   , CE.cod_entidade||''||CE.exercicio AS chave
-                      FROM administracao.configuracao_entidade as CE
-                      JOIN tcemg.configuracao_orgao
-                        ON configuracao_orgao.cod_entidade = CE.cod_entidade
-                       AND configuracao_orgao.exercicio    = CE.exercicio
-                 LEFT JOIN sw_cgm_pessoa_fisica as CGM_PF
-                        ON CGM_PF.numcgm = CE.valor::integer
-                 LEFT JOIN sw_cgm as CGM
-                        ON CGM.numcgm = CE.valor::integer
-                      JOIN sw_uf 
-                        ON sw_uf.cod_uf = CGM_PF.cod_uf_orgao_emissor
-                     WHERE CE.exercicio = '".$this->getDado('exercicio')."'
-                       AND CE.cod_entidade IN (".$this->getDado('entidade').")
-                       AND CE.parametro = 'tcemg_cgm_responsavel' ";
+        
+	$stSql = "SELECT 11 AS tipoRegistro
+			, configuracao_orgao.tipo_responsavel AS tipoResponsavel
+			, cgm_pf.rg AS cartIdent
+			, sw_uf.sigla_uf AS orgEmissorCi
+			, cgm_pf.cpf
+			, CASE WHEN configuracao_orgao.tipo_responsavel = 2
+			       THEN configuracao_orgao.crc_contador
+			       ELSE ''
+			  END as crcContador
+			, CASE WHEN configuracao_orgao.tipo_responsavel = 2
+			       THEN configuracao_orgao.uf_crccontador 
+			       ELSE ''
+			  END AS ufCrcContador
+			, CASE WHEN configuracao_orgao.tipo_responsavel = 4
+			       THEN configuracao_orgao.cargo_ordenador_despesa 
+			       ELSE ''
+			  END AS cargoOrdDespDeleg
+			, configuracao_entidade.exercicio
+			, configuracao_entidade.cod_entidade
+			, configuracao_orgao.num_cgm AS cgm
+			, CASE WHEN TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY'), 'yyyymmdd') > TO_CHAR(dt_inicio, 'yyyymmdd')
+                   THEN TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY'), 'ddmmyyyy')
+                   ELSE to_char(configuracao_orgao.dt_inicio, 'ddmmyyyy')
+               END AS dtInicio
+            , CASE WHEN TO_CHAR(TO_DATE('".$this->getDado('dt_final')."','DD/MM/YYYY'), 'yyyymmdd') < TO_CHAR(dt_fim, 'yyyymmdd')
+                   THEN TO_CHAR(TO_DATE('".$this->getDado('dt_final')."','DD/MM/YYYY'), 'ddmmyyyy')
+                   ELSE to_char(configuracao_orgao.dt_inicio, 'ddmmyyyy')
+               END AS dtfinal
+            , configuracao_orgao.email AS email
+			, configuracao_entidade.cod_entidade||''||configuracao_entidade.exercicio AS chave
+		   
+		   FROM administracao.configuracao_entidade
+	   
+	     INNER JOIN tcemg.configuracao_orgao
+		     ON configuracao_orgao.cod_entidade = configuracao_entidade.cod_entidade
+		    AND configuracao_orgao.exercicio    = configuracao_entidade.exercicio
+	    
+	      LEFT JOIN sw_cgm_pessoa_fisica AS cgm_pf
+		     ON cgm_pf.numcgm = configuracao_orgao.num_cgm
+	 
+	      LEFT JOIN sw_cgm AS cgm
+		     ON cgm.numcgm = configuracao_orgao.num_cgm
+	 
+	     INNER JOIN sw_uf 
+		     ON sw_uf.cod_uf = cgm_pf.cod_uf_orgao_emissor
+	 
+		  WHERE configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
+		    AND configuracao_entidade.cod_entidade IN (".$this->getDado('entidade').")
+		    AND configuracao_entidade.parametro    = 'tcemg_cgm_responsavel'
+		    AND (TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY') BETWEEN dt_inicio AND dt_fim
+                OR
+				 TO_DATE('".$this->getDado('dt_final')."','DD/MM/YYYY') BETWEEN dt_inicio AND dt_fim
+				)
+		";
+	
         return $stSql;
     }
+    
+    function recuperaExportacaoOrgaoPlanejamento(&$rsRecordSet, $boTransacao = "")
+    {
+	$obErro      = new Erro;
+	$obConexao   = new Conexao;
+	$rsRecordSet = new RecordSet;
+	$stSql = $this->montaRecuperaExportacaoOrgaoPlanejamento();
+	$this->setDebug( $stSql);
+	$obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+	return $obErro;
+    }
+    
+    function montaRecuperaExportacaoOrgaoPlanejamento()
+    {
+	$stSql = "
+	    SELECT codigo_unidade_gestora.cod_orgao
+		 , tipo_unidade_gestora.tipo_orgao
+		 , responsavel_unidade_gestora.cpf
+		 
+	      FROM ( SELECT valor AS cod_orgao
+			  , cod_entidade
+		       FROM administracao.configuracao_entidade
+		      WHERE parametro = 'tcemg_codigo_orgao_entidade_sicom'
+			AND exercicio = '".Sessao::getExercicio()."'
+		 ) AS codigo_unidade_gestora
 	
-	public function __destruct(){}
+	 LEFT JOIN ( SELECT valor AS tipo_orgao
+			  , cod_entidade
+		       FROM administracao.configuracao_entidade
+		      WHERE parametro = 'tcemg_tipo_orgao_entidade_sicom'
+			AND exercicio = '".Sessao::getExercicio()."'
+		 ) AS tipo_unidade_gestora
+		ON tipo_unidade_gestora.cod_entidade = codigo_unidade_gestora.cod_entidade
+	
+	 LEFT JOIN ( SELECT CGM_PF.cpf
+			  , configuracao_orgao.cod_entidade  
+		     FROM tcemg.configuracao_orgao
+	       INNER JOIN sw_cgm_pessoa_fisica as CGM_PF
+		       ON CGM_PF.numcgm = configuracao_orgao.num_cgm 
+		      AND configuracao_orgao.tipo_responsavel = 1
+		      AND configuracao_orgao.exercicio = '".Sessao::getExercicio()."'
+		      
+		    ) as responsavel_unidade_gestora
+		   ON responsavel_unidade_gestora.cod_entidade = codigo_unidade_gestora.cod_entidade
+	
+		WHERE codigo_unidade_gestora.cod_entidade IN (".$this->getDado('entidade').") ";
+    
+	return $stSql;
+    }
+	
+    public function __destruct(){}
 
 }
 ?>

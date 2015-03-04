@@ -39,17 +39,17 @@ Casos de uso: uc-01.06.94
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TClassificacao extends Persistente
 {
-function TClassificacao()
-{
-    parent::Persistente();
-    $this->setTabela('sw_classificacao');
-    $this->setCampoCod('cod_classificacao');
+    public function TClassificacao()
+    {
+        parent::Persistente();
+        $this->setTabela('sw_classificacao');
+        $this->setCampoCod('cod_classificacao');
 
-    $this->AddCampo('cod_classificacao','integer',true,'',true,false);
-    $this->AddCampo('nom_classificacao','varchar',true,'',false,false);
-}
+        $this->AddCampo('cod_classificacao', 'integer' ,true ,'' ,true  ,false);
+        $this->AddCampo('nom_classificacao', 'varchar' ,true ,'' ,false ,false);
+    }
 }

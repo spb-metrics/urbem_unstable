@@ -79,7 +79,7 @@ class TTCEMGRestosPagar extends Persistente
                             , empenho.exercicio as exercicio_empenho
                             , CASE WHEN restos_pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho THEN
 				    CASE WHEN restos_pre_empenho.exercicio >= '2013' THEN ''
-				          WHEN configuracao_entidade.exercicio = '2014' THEN ''
+				          WHEN pre_empenho.exercicio = '2014' THEN ''
 					ELSE LPAD(restos_pre_empenho.cod_funcao::VARCHAR,2,'0')||LPAD(restos_pre_empenho.cod_subfuncao::VARCHAR,3,'0')||LPAD(restos_pre_empenho.cod_programa::VARCHAR,4,'0')||LPAD(restos_pre_empenho.num_pao::VARCHAR,4,'0')||LPAD(restos_pre_empenho.cod_estrutural,8,'0')
 				     END	
                               END AS dot_orig

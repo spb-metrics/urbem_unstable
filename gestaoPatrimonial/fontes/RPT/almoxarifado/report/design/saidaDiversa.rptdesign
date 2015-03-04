@@ -586,11 +586,6 @@ this.queryText = this.queryText + " AND natureza_lancamento.num_lancamento      
             <property name="width">285mm</property>
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">lote</property>
-                    <expression name="expression">row["num_lancamento"]+" / "+row["exercicio_lancamento"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
                     <property name="name">Requisitante</property>
                     <expression name="expression">params["prRequisitante"].value</expression>
                     <property name="dataType">string</property>

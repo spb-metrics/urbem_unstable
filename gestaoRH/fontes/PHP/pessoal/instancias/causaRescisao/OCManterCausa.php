@@ -43,6 +43,7 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once CAM_GRH_PES_MAPEAMENTO."TPessoalCausaRescisao.class.php";
 
 $stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
 
@@ -76,20 +77,31 @@ function addElementoArray($inId,$inCodCasoCausa="")
 
 function incluirCaso()
 {
+    $obTPessoalCausaRescisao = new TPessoalCausaRescisao();
     $obErro = new Erro();
     $arCasosCausa = Sessao::read('arCasosCausa');
+
+    $stFiltro = " WHERE num_causa = '".$_POST['inNumCausa']."'";
+    $obTPessoalCausaRescisao->recuperaTodos($rsNumeroCausaRescisao, $stFiltro);
+        
+    if ( $rsNumeroCausaRescisao->getNumLinhas() >= 1 ) {
+        $obErro->setDescricao( "Código ".$_POST['inNumCausa']." já cadastrado. Informe um código diferente." );
+    }
+
     foreach ($arCasosCausa as $arCasoCausa) {
         if ($arCasoCausa['stDescricaoCaso'] == $_POST['stDescricaoCaso']) {
             $obErro->setDescricao("A descrição informada já existe na lista de casos de causa de rescisão.");
             break;
         }
     }
+    
     if ( !$obErro->ocorreu() ) {
         $arCasosCausa[] = addElementoArray(count($arCasosCausa));
         Sessao::write('arCasosCausa', $arCasosCausa);
     } else {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     }
+    
     $stJs .= montaListaCasosCausa();
     $stJs .= limpaCamposLista();
 

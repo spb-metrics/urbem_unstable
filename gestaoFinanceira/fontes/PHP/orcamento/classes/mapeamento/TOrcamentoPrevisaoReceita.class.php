@@ -172,6 +172,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 1
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_1
@@ -179,6 +180,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 2
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_2
@@ -186,6 +188,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 3
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_3
@@ -193,6 +196,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 4
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_4
@@ -200,6 +204,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 5
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_5
@@ -207,6 +212,7 @@ function montaRecuperaEstrutural()
                       FROM orcamento.previsao_receita
                       JOIN orcamento.receita
                         ON receita.cod_receita = previsao_receita.cod_receita
+                       AND receita.exercicio = previsao_receita.exercicio
                      WHERE previsao_receita.periodo = 6
                        AND receita.cod_entidade IN (".$this->getDado('entidades').")
                        AND previsao_receita.exercicio = '".Sessao::getExercicio()."')::VARCHAR,'.',',') AS meta_arrec_bim_6

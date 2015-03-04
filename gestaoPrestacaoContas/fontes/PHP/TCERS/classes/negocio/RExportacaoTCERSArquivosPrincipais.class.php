@@ -35,7 +35,7 @@
     * @subpackage Exportador
 
     * Casos de uso: uc-02.08.01
-    $Id: RExportacaoTCERSArquivosPrincipais.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RExportacaoTCERSArquivosPrincipais.class.php 61774 2015-03-03 16:24:44Z michel $
 */
 
 /* Includes */
@@ -94,14 +94,14 @@ class RExportacaoTcersArquivosPrincipais
     public function RExportacaoTcersArquivosPrincipais()
     {
         $this->obFExportacaoTCERSExportacaoBalanceteReceita   =   new FExportacaoTCERSExportacaoBalanceteReceita() ;
-        $this->obFExportacaoTCERSExportacaoReceita           =   new  FExportacaoTCERSExportacaoReceita() ;
-        $this->obTContabilidadeValorLancamento      =   new TContabilidadeValorLancamento() ;
-        $this->obTContabilidadePlanoConta           =   new TContabilidadePlanoConta();
-        $this->obTEmpenhoEmpenho                    =   new TEmpenhoEmpenho;
-        $this->obFExportacaoPagamento               =   new FExportacaoPagamento();
-        $this->obFExportacaoLiquidacao              =   new FExportacaoLiquidacao();
-        $this->obTNorma                             =   new TNorma();
-        $this->obFExportacaoBalanceteDespesa        =   new FExportacaoTCERSBalanceteDespesa();
+        $this->obFExportacaoTCERSExportacaoReceita            =   new  FExportacaoTCERSExportacaoReceita() ;
+        $this->obTContabilidadeValorLancamento                =   new TContabilidadeValorLancamento() ;
+        $this->obTContabilidadePlanoConta                     =   new TContabilidadePlanoConta();
+        $this->obTEmpenhoEmpenho                              =   new TEmpenhoEmpenho;
+        $this->obFExportacaoPagamento                         =   new FExportacaoPagamento();
+        $this->obFExportacaoLiquidacao                        =   new FExportacaoLiquidacao();
+        $this->obTNorma                                       =   new TNorma();
+        $this->obFExportacaoBalanceteDespesa                  =   new FExportacaoTCERSBalanceteDespesa();
 
     }
     // SETANDO
@@ -187,18 +187,22 @@ class RExportacaoTcersArquivosPrincipais
 
             $inCount=0;
             while ( !$rsRecordset->eof()) {
-                $arRecordsetNovo[$inCount]['exercicio'] = $rsRecordset->getCampo('exercicio');
-                $arRecordsetNovo[$inCount]['cod_empenho'] = $rsRecordset->getCampo('cod_empenho');
-                $arRecordsetNovo[$inCount]['cod_entidade'] = $rsRecordset->getCampo('cod_entidade');
-                $arRecordsetNovo[$inCount]['cod_nota'] = $rsRecordset->getCampo('cod_nota');
-                $arRecordsetNovo[$inCount]['data_pagamento'] = $rsRecordset->getCampo('data_pagamento');
-                $arRecordsetNovo[$inCount]['valor_liquidacao'] = $rsRecordset->getCampo('valor_liquidacao');
-                $arRecordsetNovo[$inCount]['sinal_valor'] = $rsRecordset->getCampo('sinal_valor');
-                $arRecordsetNovo[$inCount]['observacao'] = $rsRecordset->getCampo('observacao');
-                $arRecordsetNovo[$inCount]['ordem'] = $rsRecordset->getCampo('ordem');
-                $arRecordsetNovo[$inCount]['codigo_operacao'] =  $rsRecordset->getCampo('codigo_operacao');
-                $arRecordsetNovo[$inCount]['zero'] = "000000000000000000000000000000";
-                $arRecordsetNovo[$inCount]['branco'] = '';
+                $arRecordsetNovo[$inCount]['exercicio']             = $rsRecordset->getCampo('exercicio');
+                $arRecordsetNovo[$inCount]['cod_empenho']           = $rsRecordset->getCampo('cod_empenho');
+                $arRecordsetNovo[$inCount]['cod_entidade']          = $rsRecordset->getCampo('cod_entidade');
+                $arRecordsetNovo[$inCount]['cod_nota']              = $rsRecordset->getCampo('cod_nota');
+                $arRecordsetNovo[$inCount]['data_pagamento']        = $rsRecordset->getCampo('data_pagamento');
+                $arRecordsetNovo[$inCount]['valor_liquidacao']      = $rsRecordset->getCampo('valor_liquidacao');
+                $arRecordsetNovo[$inCount]['sinal_valor']           = $rsRecordset->getCampo('sinal_valor');
+                $arRecordsetNovo[$inCount]['observacao']            = $rsRecordset->getCampo('observacao');
+                $arRecordsetNovo[$inCount]['ordem']                 = $rsRecordset->getCampo('ordem');
+                $arRecordsetNovo[$inCount]['codigo_operacao']       = $rsRecordset->getCampo('codigo_operacao');
+                $arRecordsetNovo[$inCount]['existe_contrato']       = $rsRecordset->getCampo('existe_contrato');
+                $arRecordsetNovo[$inCount]['cod_contrato_tce']      = $rsRecordset->getCampo('cod_contrato_tce');
+                $arRecordsetNovo[$inCount]['cod_contrato']          = $rsRecordset->getCampo('cod_contrato');
+                $arRecordsetNovo[$inCount]['exercicio_contrato']    = $rsRecordset->getCampo('exercicio_contrato');
+                $arRecordsetNovo[$inCount]['zero']                  = "000000000000000000000000000000";
+                $arRecordsetNovo[$inCount]['branco']                = '';
 
                 $rsRecordset->proximo();
                 $inCount++;
@@ -224,6 +228,14 @@ class RExportacaoTcersArquivosPrincipais
             $this->obFExportacaoBalanceteDespesa->setDado('stCodEntidades' , $this->getCodEntidades()     );
             $obErro =   $this->obFExportacaoBalanceteDespesa->recuperaDadosExportacao($rsRecordset        );
             $arRecordset["BAL_DESP.TXT"] = $rsRecordset;
+        }
+        if (in_array("BVER_ENC.TXT",$this->arArquivos)) {
+            $this->obTContabilidadePlanoConta->setDado('stExercicio'        , $this->getExercicio()              );
+            $this->obTContabilidadePlanoConta->setDado('dtInicial'          , "01/01/".Sessao::getExercicio()."" );
+            $this->obTContabilidadePlanoConta->setDado('dtFinal'            , $this->getDataFinal()              );
+            $this->obTContabilidadePlanoConta->setDado('stCodEntidades'     , $this->getCodEntidades()           );
+            $obErro = $this->obTContabilidadePlanoConta->recuperaDadosExportacaoBalVerificacaoEnceramento($rsRecordset,"","",$boTransacao);            
+            $arRecordset["BVER_ENC.TXT"] = $rsRecordset;
         }
 
         return $obErro;

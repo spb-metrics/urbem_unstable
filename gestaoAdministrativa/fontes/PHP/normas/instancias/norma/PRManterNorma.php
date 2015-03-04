@@ -57,8 +57,6 @@ $pgOcul = "OC".$stPrograma.".php";
 $obRNorma = new RNorma;
 $obErro  = new Erro;
 
-$inCodNorma = Sessao::read('inCodNorma');
-
 $obAtributos = new MontaAtributos;
 $obAtributos->setName('Atributo_');
 $obAtributos->recuperaVetor( $arChave );
@@ -82,7 +80,7 @@ switch ($stAcao) {
         $obRNorma->setDataAssinatura ( $_POST['stDataAssinatura'] );
         $obRNorma->setDataTermino    ( $_POST['stDataTermino']    );
         $obRNorma->setNomeNorma      ( $_POST['stNomeNorma']      );
-        $obRNorma->setDescricaoNorma ( $_POST['stDescricao']      );
+        $obRNorma->setDescricaoNorma ( $_POST['stDescricao']      );                
         $obRNorma->setUrl            ( $_FILES['btnIncluirLink']['tmp_name']  );
         $obRNorma->setNomeArquivo    ( $_FILES['btnIncluirLink']['name']      );
         $obRNorma->obRTipoNorma->setCodTipoNorma( $_POST['inCodTipoNorma'] );
@@ -126,18 +124,13 @@ switch ($stAcao) {
                         } elseif (empty($_REQUEST['stCodNorma'])) {
                             $obErro->setDescricao('Necessário informar a Lei Alterada!');
                         }
-                        
-                        if (!$obErro->ocorreu()) {
-                            $obNorma = new TNorma;
-                            $obNorma->setDado('cod_norma', $_POST['hdnCodNorma']);
-                            $obErro = $obNorma->recuperaPorChave($rsNormaAlterada, $boTransacao);
-                            
-                            if ( !$obErro->ocorreu() ){
-                                $obRNorma->setCodNormaAlteracao( $_POST['hdnCodNorma'] );
-                                $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
-                                $obRNorma->setPercentualCreditoAdicional( $_POST['numPercentualCreditoAdicional'] );
-                            }
+                                                   
+                        if ( !$obErro->ocorreu() ){
+                            $obRNorma->setCodNormaAlteracao( $_POST['hdnCodNorma'] );
+                            $obRNorma->setCodLeiAlteracao( $_POST['stTipoLeiAlteracao'] );
+                            $obRNorma->setPercentualCreditoAdicional( $_POST['numPercentualCreditoAdicional'] );
                         }
+                        
                     }
                 break;
                 
@@ -164,7 +157,7 @@ switch ($stAcao) {
 
     break;
     case "alterar":
-        
+        $inCodNorma = Sessao::read('inCodNorma');
         $anexo = $_FILES['btnIncluirLink']['tmp_name'];
         foreach ($arChave as $key=>$value) {
             $arChaves = preg_split( "/[^a-zA-Z0-9]/", $key );

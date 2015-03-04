@@ -213,10 +213,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
 extensionProperties.odaPassword = params["db_password"].value;
  extensionProperties.charSet = "utf8";
 }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.34:2345/mariana_1212_2034_stable_8</property>
-            <property name="odaUser">urbem</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">VXJCM20=</encrypted-property>
+            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
+            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -420,7 +418,7 @@ if (params['cod_local'] != ""){
 }
 
 if (params['cod_orgao'] != ''){
-    this.queryText += " AND vw_orgao_nivel.orgao_reduzido ILIKE '"+params['cod_orgao']+"'" ;
+    this.queryText += " AND vw_orgao_nivel.orgao ILIKE '"+params['cod_orgao']+"'" ;
 }
 
 if (params['cod_organograma'] != ''){
@@ -1141,14 +1139,24 @@ this.queryText += " ORDER BY bem.descricao";]]></method>
                         </data>
                     </cell>
                 </row>
-                <row id="1594">
-                    <property name="height">0.3541666666666667in</property>
+                <row id="6692">
+                    <property name="borderTopColor">#808080</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">1px</property>
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
-                            <expression name="valueExpr">params["hidden_valor"].value==""</expression>
+                            <expression name="valueExpr">params["hidden_valor"].value!=""</expression>
                         </structure>
                     </list-property>
+                    <cell id="6693"/>
+                    <cell id="6694"/>
+                    <cell id="6695"/>
+                    <cell id="6696"/>
+                    <cell id="6697"/>
+                </row>
+                <row id="1594">
+                    <property name="height">0.3541666666666667in</property>
                     <cell id="1595"/>
                     <cell id="1596">
                         <property name="borderBottomColor">#000000</property>
@@ -1160,12 +1168,6 @@ this.queryText += " ORDER BY bem.descricao";]]></method>
                     <cell id="1599"/>
                 </row>
                 <row id="1606">
-                    <list-property name="visibility">
-                        <structure>
-                            <property name="format">all</property>
-                            <expression name="valueExpr">params["hidden_valor"].value==""</expression>
-                        </structure>
-                    </list-property>
                     <cell id="1607"/>
                     <cell id="1608">
                         <data id="1612">

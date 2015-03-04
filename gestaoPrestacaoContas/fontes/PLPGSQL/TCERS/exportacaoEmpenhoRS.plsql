@@ -26,10 +26,10 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 59612 $
+* $Revision: 61556 $
 * $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Author: evandro $
+* $Date: 2015-02-04 16:20:51 -0200 (Qua, 04 Fev 2015) $
 *
 * Casos de uso: uc-02.00.00
 * Casos de uso: uc-02.00.00
@@ -48,24 +48,30 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION tcers.exportacaoEmpenho(varchar,varchar,varchar,varchar) RETURNS SETOF record AS '
+CREATE OR REPLACE FUNCTION tcers.exportacaoEmpenho(varchar,varchar,varchar,varchar) RETURNS SETOF record AS $$
 DECLARE
-    stExercicio     ALIAS FOR $1    ;
-    stDataInicial   ALIAS FOR $2    ;
-    stDataFinal     ALIAS FOR $3    ;
-    stCodEntidade   ALIAS FOR $4    ;
-    stSql           VARCHAR := '''' ;
-    stOut           VARCHAR := '''' ;
-    raRegistro      RECORD          ;
+    stExercicio     ALIAS FOR $1;
+    stDataInicial   ALIAS FOR $2;
+    stDataFinal     ALIAS FOR $3;
+    stCodEntidade   ALIAS FOR $4;
+    stSql           VARCHAR := '';
+    stOut           VARCHAR := '';
+    raRegistro      RECORD;
     arDados         VARCHAR[] := array[0];
 BEGIN
-stSql = ''
+stSql = '
     -- Select para soma do itens  --> data vem de empenho.empenho.dt_empenho
 ------------------------------------------------------------------------------
 
-SELECT tabela.*,0 as caracteristica,0 as modalidade,''''''''::text as nro_licitacao,''''''''::text as outras_modalidades,''''N''''::text as preco
+SELECT tabela.*
+      ,0 as caracteristica
+      ,0 as modalidade
+      ,''''::text as nro_licitacao
+      ,''''::text as outras_modalidades
+      ,''N''::text as preco
+      ,''''::text as modalidade_licitacao
 FROM
-    tcers.fn_exportacao_Empenho_Soma_Dos_Itens(''''''||stExercicio||'''''',''''''||stDataInicial||'''''',''''''||stDataFinal||'''''',''''''||stCodEntidade||'''''')
+    tcers.fn_exportacao_Empenho_Soma_Dos_Itens('''||stExercicio||''','''||stDataInicial||''','''||stDataFinal||''','''||stCodEntidade||''')
 as
     tabela
         (
@@ -92,9 +98,15 @@ as
 ------------------------------------------------------------------------------
 UNION  -- FAZ A UNIAO COM O SEBUNDO BLOCO , ITENS ANULADOS
 ------------------------------------------------------------------------------
-SELECT tabela.*,0 as caracteristica,0 as modalidade,''''''''::text as nro_licitacao,''''''''::text as outras_modalidades,''''N''''::text as preco
+SELECT  tabela.*
+        ,0 as caracteristica
+        ,0 as modalidade
+        ,''''::text as nro_licitacao
+        ,''''::text as outras_modalidades
+        ,''N''::text as preco
+        ,''''::text as modalidade_licitacao
 FROM
-    tcers.fn_exportacao_Empenho_Itens_Anulados(''''''||stExercicio||'''''',''''''||stDataInicial||'''''',''''''||stDataFinal||'''''',''''''||stCodEntidade||'''''')
+    tcers.fn_exportacao_Empenho_Itens_Anulados('''||stExercicio||''','''||stDataInicial||''','''||stDataFinal||''','''||stCodEntidade||''')
 as
     tabela
         (
@@ -124,9 +136,15 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
 -----------------------------------------------------------------------------
 --SELECT (
 
-    SELECT tabela.*,0 as caracteristica,0 as modalidade,''''''''::text as nro_licitacao,''''''''::text as outras_modalidades,''''N''''::text as preco
+    SELECT  tabela.*
+            ,0 as caracteristica
+            ,0 as modalidade
+            ,''''::text as nro_licitacao
+            ,''''::text as outras_modalidades
+            ,''N''::text as preco
+            ,''''::text as modalidade_licitacao
     FROM
-    tcers.fn_exportacao_Empenho_Restos_Pagar(''''''||stExercicio||'''''',''''''||stCodEntidade||'''''')
+    tcers.fn_exportacao_Empenho_Restos_Pagar('''||stExercicio||''','''||stCodEntidade||''')
     as
     tabela
         (
@@ -151,7 +169,7 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
             oid             oid
         )
     where tabela.vl_empenhado > 0
-'';
+';
         -- Encerra conteudo do sql
 
 
@@ -160,14 +178,14 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
     
 
         arDados := tcers.fn_exportacao_dados_empenho(raRegistro.cod_empenho,raRegistro.exercicio,raRegistro.cod_entidade);
-        raRegistro.num_orgao        := to_number(arDados[1], ''9999999999'');
-        raRegistro.num_unidade      := to_number(arDados[2], ''9999999999'');
-        raRegistro.cod_funcao       := to_number(arDados[3], ''9999999999'');
-        raRegistro.cod_subfuncao    := to_number(arDados[4], ''9999999999'');
-        raRegistro.cod_programa     := to_number(arDados[5], ''9999999999'');
-        raRegistro.num_pao          := to_number(arDados[6], ''9999999999'');
+        raRegistro.num_orgao        := to_number(arDados[1], '9999999999');
+        raRegistro.num_unidade      := to_number(arDados[2], '9999999999');
+        raRegistro.cod_funcao       := to_number(arDados[3], '9999999999');
+        raRegistro.cod_subfuncao    := to_number(arDados[4], '9999999999');
+        raRegistro.cod_programa     := to_number(arDados[5], '9999999999');
+        raRegistro.num_pao          := to_number(arDados[6], '9999999999');
         raRegistro.cod_estrutural   := arDados[7];
-        raRegistro.cod_recurso      := to_number(arDados[8], ''9999999999'');
+        raRegistro.cod_recurso      := to_number(arDados[8], '9999999999');
         raRegistro.caracteristica   :=  (
                                         select  case 
                                                      when valor::integer = 1 then 000 
@@ -199,7 +217,7 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
             raRegistro.caracteristica   := 000;
         END IF;
        
-        raRegistro.historico := regexp_replace(raRegistro.historico, E''[\\n\\r]+'', '''', ''g'' );
+        raRegistro.historico := regexp_replace(raRegistro.historico, E'[\\n\\r]+', '', 'g' );
 
         raRegistro.modalidade      :=  (
                                         select  valor as modalidade
@@ -237,21 +255,46 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
                                         );
 
 
-        if raRegistro.modalidade = 1 then raRegistro.outras_modalidades := ''Concurso''; raRegistro.modalidade := 99;       
-            elsif raRegistro.modalidade = 2 then raRegistro.modalidade := 3;     
-            elsif raRegistro.modalidade = 3 then raRegistro.modalidade := 4;
-            elsif raRegistro.modalidade = 4 then raRegistro.modalidade := 5;
-            elsif raRegistro.modalidade = 5 then raRegistro.modalidade := 1;
-            elsif raRegistro.modalidade = 6 then raRegistro.modalidade := 2;
-            elsif raRegistro.modalidade = 7 then raRegistro.modalidade := 0;
-            elsif raRegistro.modalidade = 8 then raRegistro.outras_modalidades := ''Suprimentos''; raRegistro.modalidade := 99;
-            elsif raRegistro.modalidade = 9 then raRegistro.outras_modalidades := ''Integracao''; raRegistro.modalidade := 99;
-            elsif raRegistro.modalidade = 13 then raRegistro.outras_modalidades := ''Chamada Publica''; raRegistro.modalidade := 99;
-            elsif raRegistro.modalidade = 14 then raRegistro.outras_modalidades := ''Registro de Precos'';raRegistro.preco := ''S''; raRegistro.modalidade := 99;
-            elsif raRegistro.modalidade = 11 then raRegistro.modalidade := 6;
-            elsif raRegistro.modalidade = 12 then raRegistro.modalidade := 7;
-            else  raRegistro.outras_modalidades := null;
+    IF stExercicio::INTEGER < 2015 THEN
+    
+            if raRegistro.modalidade = 1 then raRegistro.outras_modalidades := 'Concurso'; raRegistro.modalidade := 99;       
+         elsif raRegistro.modalidade = 2 then raRegistro.modalidade := 3;     
+         elsif raRegistro.modalidade = 3 then raRegistro.modalidade := 4;
+         elsif raRegistro.modalidade = 4 then raRegistro.modalidade := 5;
+         elsif raRegistro.modalidade = 5 then raRegistro.modalidade := 1;
+         elsif raRegistro.modalidade = 6 then raRegistro.modalidade := 2;
+         elsif raRegistro.modalidade = 7 then raRegistro.modalidade := 0;
+         elsif raRegistro.modalidade = 8 then raRegistro.outras_modalidades := 'Suprimentos'; raRegistro.modalidade := 99;
+         elsif raRegistro.modalidade = 9 then raRegistro.outras_modalidades := 'Integracao';  raRegistro.modalidade := 99;
+         elsif raRegistro.modalidade = 13 then raRegistro.outras_modalidades := 'Chamada Publica'; raRegistro.modalidade := 99;
+         elsif raRegistro.modalidade = 14 then raRegistro.outras_modalidades := 'Registro de Precos';raRegistro.preco := 'S'; raRegistro.modalidade := 99;
+         elsif raRegistro.modalidade = 11 then raRegistro.modalidade := 6;
+         elsif raRegistro.modalidade = 12 then raRegistro.modalidade := 7;
+          else raRegistro.outras_modalidades := null;
         end if;
+    
+    ELSE
+    
+            if raRegistro.modalidade = 1 then  raRegistro.modalidade_licitacao := 'CNS';
+         elsif raRegistro.modalidade = 2 then  raRegistro.modalidade_licitacao := 'CNV';     
+         elsif raRegistro.modalidade = 3 then  raRegistro.modalidade_licitacao := 'TMP';
+         elsif raRegistro.modalidade = 4 then  raRegistro.modalidade_licitacao := 'CNC';
+         elsif raRegistro.modalidade = 5 then  raRegistro.modalidade_licitacao := 'PRD';
+         elsif raRegistro.modalidade = 6 then  raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 7 then  raRegistro.modalidade_licitacao := 'NSA';
+         elsif raRegistro.modalidade = 8 then  raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 9 then  raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 10 then raRegistro.modalidade_licitacao := 'PRP';
+         elsif raRegistro.modalidade = 11 then raRegistro.modalidade_licitacao := 'PRP';
+         elsif raRegistro.modalidade = 12 then raRegistro.modalidade_licitacao := 'PRE';
+         elsif raRegistro.modalidade = 13 then raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 14 then raRegistro.modalidade_licitacao := 'RPO';
+         elsif raRegistro.modalidade = 15 then raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 20 then raRegistro.modalidade_licitacao := 'DPV';
+          else raRegistro.outras_modalidades := null;
+        end if;
+    END IF;
+    
 --
      
         
@@ -260,5 +303,4 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
 
     RETURN;
 END;
-' LANGUAGE 'plpgsql';
-
+$$ LANGUAGE 'plpgsql';

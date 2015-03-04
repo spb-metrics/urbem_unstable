@@ -73,6 +73,7 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJS = "JS".$stPrograma.".js";
 
 include_once( $pgJS );
+ini_set('max_input_vars', '10000');
 ?>
  <script language="JavaScript1.2" type="text/javascript">
 
@@ -418,9 +419,15 @@ $obDataGrid->setFuncaoColuna      ( true );
 $obDataGrid->addTituloGrid        ( "Registros de metas de arrecadação de receita" );
 
 $obDataGrid->montaGrid();
-$obDataGrid->OK();
+
+$obOk  = new Ok();
+$obOk->obEvento->setOnClick("validaRequest(); BloqueiaFrames(true,false); Salvar();");
+$obLimpar  = new Limpar;
+
+$obDataGrid->defineBarra( array( $obOk, $obLimpar ) );
 
 $obDataGrid->show();
+
 ?>
         <script>zebra('Array','zb');</script>
 <?php

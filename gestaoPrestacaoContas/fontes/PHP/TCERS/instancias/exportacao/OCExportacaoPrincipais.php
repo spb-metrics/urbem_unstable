@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoPrincipais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportacaoPrincipais.php 61774 2015-03-03 16:24:44Z michel $
 
     * Casos de uso: uc-02.08.01
 */
@@ -207,27 +207,43 @@ if (in_array("EMPENHO.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(165);
     }
-
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("caracteristica");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("modalidade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    if (Sessao::getExercicio() < '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("modalidade");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    } else {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    }
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("preco");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("outras_modalidades");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_licitacao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
-
+    if (Sessao::getExercicio() < '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("outras_modalidades");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_licitacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+    } else {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_licitacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+    }
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_licitacao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
@@ -238,6 +254,11 @@ if (in_array("EMPENHO.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(400);
     }
 
+    if (Sessao::getExercicio() >= '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("modalidade_licitacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+    }
 }
 
 /*********************/
@@ -288,6 +309,12 @@ if (in_array("BAL_REC.TXT",$arFiltro["arArquivosSelecionados"])) {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_caracteristica");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+    
+    if (Sessao::getExercicio() >= '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_atualizado");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+    }
 }
 
 if (in_array("RECEITA.TXT",$arFiltro["arArquivosSelecionados"])) {
@@ -581,6 +608,22 @@ if (in_array("LIQUIDAC.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("observacao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(400);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("existe_contrato");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_contrato_tce");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_contrato");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_contrato");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
     }
 
 }
@@ -720,6 +763,115 @@ if (in_array("BAL_DESP.TXT",$arFiltro["arArquivosSelecionados"])) {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("previsao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+}
+
+if (in_array("BVER_ENC.TXT",$arFiltro["arArquivosSelecionados"])) {    
+    if ($arRecordSet["BVER_ENC.TXT"]->getNumLinhas() >= 1) {
+        $arElementos = $arRecordSet["BVER_ENC.TXT"]->getElementos();
+        $arDadosArquivo = array();
+        $inCount = 0;
+        foreach ($arElementos as $key => $array) {
+              $arDadosArquivo[$inCount]['cod_estrutural']           = $array['cod_estrutural'];
+              $arDadosArquivo[$inCount]['nom_sistema']              = $array['nom_sistema'];
+              $arDadosArquivo[$inCount]['nivel']                    = $array['nivel'];
+              $arDadosArquivo[$inCount]['nom_conta']                = $array['nom_conta'];
+              $arDadosArquivo[$inCount]['saldo_anterior_devedora']  = $array['saldo_anterior_devedora'];
+              $arDadosArquivo[$inCount]['saldo_anterior_credora']   = $array['saldo_anterior_credora'];
+              $arDadosArquivo[$inCount]['vl_saldo_debitos']         = $array['vl_saldo_debitos'];
+              $arDadosArquivo[$inCount]['vl_saldo_creditos']        = $array['vl_saldo_creditos'];
+              $arDadosArquivo[$inCount]['saldo_atual_devedora']     = $array['saldo_atual_devedora'];
+              $arDadosArquivo[$inCount]['saldo_atual_credora']      = $array['saldo_atual_credora'];
+              $arDadosArquivo[$inCount]['tipo_conta']               = $array['tipo_conta'];
+              $arDadosArquivo[$inCount]['branco']                   = '';
+              $arDadosArquivo[$inCount]['escrituracao']             = $array['escrituracao'];
+              $arDadosArquivo[$inCount]['indicador_superavit']      = $array['indicador_superavit'];
+
+              if ($array['cod_entidade'] != '') {
+                switch ($array['cod_entidade']) {
+                    case $inCodPrefeitura   : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOUExecutivo; break;
+                    case $inCodCamara       : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOULegislativo; break;
+                    case $inCodRPPS         : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOURPPS; break;
+                    DEFAULT                 : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOUOutros;
+                }
+            } else {
+                switch ($setorGoverno[0]) {
+                    case $inCodPrefeitura   : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOUExecutivo; break;
+                    case $inCodCamara       : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOULegislativo; break;
+                    case $inCodRPPS         : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOURPPS; break;
+                    DEFAULT                 : $arDadosArquivo[$inCount]['orgao_unidade'] = $inCodOUExecutivo;
+                }
+            }
+              $inCount++;
+        }
+        $arBVER_ENC = new RecordSet;
+        $arBVER_ENC->preenche($arDadosArquivo);
+    }else{
+        $arBVER_ENC = new RecordSet;
+    }
+
+    $obExportador->addArquivo("BVER_ENC.TXT");
+    $obExportador->roUltimoArquivo->setTipoDocumento("TCE_RS");
+    $obExportador->roUltimoArquivo->addBloco($arBVER_ENC);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_estrutural");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("orgao_unidade");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_anterior_devedora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_anterior_credora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_debitos");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_creditos");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_atual_devedora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_atual_credora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(148);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nivel");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_sistema");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escrituracao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("indicador_superavit");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 }
 
 if ($arFiltro['stTipoExport'] == 'compactados') {

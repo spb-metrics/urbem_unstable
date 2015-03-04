@@ -31,11 +31,11 @@
 
     * @ignore
 
-    *$Id: OCManterDividaFundada.php 59612 2014-09-02 12:00:51Z gelson $
+    *$Id: OCManterDividaFundada.php 61530 2015-01-30 13:52:09Z jean $
 
     * Casos de uso : uc-06.04.00
 */
-
+/*
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
@@ -210,3 +210,4 @@ switch ($stCtrl) {
         break;
 }
 echo $stJs;
+*/

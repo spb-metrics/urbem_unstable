@@ -32,10 +32,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 59612 $
+    $Revision: 61774 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: michel $
+    $Date: 2015-03-03 13:24:44 -0300 (Ter, 03 Mar 2015) $
 
     * Casos de uso: uc-02.08.01
 */
@@ -67,34 +67,80 @@ function FExportacaoLiquidacao()
 
 function montaRecuperaDadosExportacao()
 {
-    $stSql  = "SELECT                                                               \n";
-    $stSql .= "    lpad(tabela.exercicio,4,'0') as exercicio,                       \n";
-    $stSql .= "    lpad(tabela.cod_empenho::varchar,7,'0') as cod_empenho,                   \n";
-    $stSql .= "    lpad(tabela.cod_entidade::varchar,2,'0') as cod_entidade,                 \n";
-    $stSql .= "    tabela.cod_nota,                                                 \n";
-    $stSql .= "    to_char(tabela.data_pagamento,'dd/mm/yyyy') as data_pagamento,   \n";
-    $stSql .= "    replace(tabela.valor_liquidacao::varchar,'.','') as valor_liquidacao,     \n";
-    $stSql .= "    tabela.sinal_valor,                                              \n";
-    $stSql .= "    tabela.observacao,                                               \n";
-    $stSql .= "    tabela.ordem,                                                    \n";
-    $stSql .= "    ' ' as codigo_operacao                                           \n";
-    $stSql .= "FROM                                                                 \n";
-    $stSql .= " ".$this->getTabela()."('".$this->getDado("stExercicio")     ."',    \n";
-    $stSql .= "                        '".$this->getDado("dtInicial")       ."',    \n";
-    $stSql .= "                        '".$this->getDado("dtFinal")         ."',    \n";
-    $stSql .= "                        '".$this->getDado("stCodEntidades")  ."',    \n";
-    $stSql .= "                        '".$this->getDado("stFiltro")        ."')    \n";
-    $stSql .= "AS tabela              (   exercicio char(4),                        \n";
-    $stSql .= "                           cod_empenho integer,                      \n";
-    $stSql .= "                           cod_entidade integer,                     \n";
-    $stSql .= "                           cod_nota integer,                         \n";
-    $stSql .= "                           data_pagamento date,                      \n";
-    $stSql .= "                           valor_liquidacao numeric,                 \n";
-    $stSql .= "                           sinal_valor text,                         \n";
-    $stSql .= "                           observacao varchar,                       \n";
-    $stSql .= "                           ordem integer,                            \n";
-    $stSql .= "                           oid oid)                                  \n";
-    //echo $stSql;
+    $stSql  = "
+                SELECT
+
+                *,
+                CASE WHEN resultado.cod_contrato IS NOT NULL THEN 'S'
+                     WHEN resultado.cod_estrutural LIKE ('3190%') THEN 'X'
+                     ELSE 'N'
+                END AS existe_contrato
+
+                FROM (
+
+                SELECT                                                               
+                    lpad(tabela.exercicio,4,'0') as exercicio,                      
+                    lpad(tabela.cod_empenho::varchar,7,'0') as cod_empenho,         
+                    lpad(tabela.cod_entidade::varchar,2,'0') as cod_entidade,       
+                    tabela.cod_nota,                                                
+                    to_char(tabela.data_pagamento,'dd/mm/yyyy') as data_pagamento,  
+                    replace(tabela.valor_liquidacao::varchar,'.','') as valor_liquidacao,
+                    tabela.sinal_valor,                                              
+                    tabela.observacao,                                               
+                    tabela.ordem,                                                    
+                    ' ' as codigo_operacao,
+                    contratos_liquidacao.cod_contrato_tce,
+                    contratos_liquidacao.cod_contrato,
+                    contratos_liquidacao.exercicio AS exercicio_contrato,
+                    despesa.cod_estrutural
+                FROM                                                                 
+                 ".$this->getTabela()."('".$this->getDado("stExercicio")     ."',    
+                                        '".$this->getDado("dtInicial")       ."',    
+                                        '".$this->getDado("dtFinal")         ."',    
+                                        '".$this->getDado("stCodEntidades")  ."',    
+                                        '".$this->getDado("stFiltro")        ."')    
+                AS tabela              (   exercicio char(4),                        
+                                           cod_empenho integer,                      
+                                           cod_entidade integer,                     
+                                           cod_nota integer,                         
+                                           data_pagamento date,                      
+                                           valor_liquidacao numeric,                 
+                                           sinal_valor text,                         
+                                           observacao varchar,                       
+                                           ordem integer,                            
+                                           oid oid)                                  
+               INNER JOIN empenho.empenho
+                       ON empenho.exercicio = tabela.exercicio
+                      AND empenho.cod_entidade = tabela.cod_entidade
+                      AND empenho.cod_empenho = tabela.cod_empenho
+               INNER JOIN empenho.pre_empenho
+                       ON pre_empenho.exercicio = empenho.exercicio
+                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+               INNER JOIN ( SELECT pre_empenho.exercicio
+                                 , pre_empenho.cod_pre_empenho
+                                 , CASE WHEN ( pre_empenho.implantado = true )
+                                        THEN restos_pre_empenho.cod_estrutural
+                                        ELSE replace(conta_despesa.cod_estrutural, '.', '')
+                                   END as cod_estrutural
+                              FROM empenho.pre_empenho
+                         LEFT JOIN empenho.restos_pre_empenho
+                                ON restos_pre_empenho.exercicio = pre_empenho.exercicio
+                               AND restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                         LEFT JOIN empenho.pre_empenho_despesa
+                                ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
+                               AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                         LEFT JOIN orcamento.conta_despesa
+                                ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                               AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+                          ) AS despesa
+                       ON despesa.exercicio = empenho.exercicio
+                      AND despesa.cod_pre_empenho = empenho.cod_pre_empenho
+                LEFT JOIN tcers.contratos_liquidacao
+                       ON contratos_liquidacao.cod_liquidacao = tabela.cod_nota
+                      AND contratos_liquidacao.exercicio = TO_CHAR(tabela.data_pagamento, 'yyyy')
+                ) as resultado
+                ORDER BY resultado.exercicio, resultado.cod_entidade, resultado.cod_empenho, resultado.ordem
+            ";
     return $stSql;
 }
 

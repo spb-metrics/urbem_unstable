@@ -153,6 +153,7 @@ BEGIN
 		re.exercicio        = stExercicio           AND 
         re.cod_despesa      = inCodDespesa          AND
         re.dt_validade_final > to_date(now()::text, 'yyyy-mm-dd') AND
+        EXTRACT( YEAR FROM re.dt_inclusao)::varchar = stExercicio AND
         rsa.cod_reserva     is null;
 --    GROUP BY
 --        re.dt_validade_final;

@@ -41,64 +41,112 @@ class TTGODSI extends Persistente
 
     public function montaRecuperaDetalhamento10()
     {
-        $stSql = "
-            SELECT 10 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
-                 , sw_processo.cod_processo AS num_processo
-                 , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
-                 , TO_CHAR(licitacao.timestamp,'dd/mm/yyyy') AS dt_abertura
-                 , CASE WHEN tipo_objeto.cod_tipo_objeto = 1 THEN 2
-                        WHEN tipo_objeto.cod_tipo_objeto = 2 THEN 1
-                        WHEN tipo_objeto.cod_tipo_objeto = 3 THEN 3
-                        WHEN tipo_objeto.cod_tipo_objeto = 4 THEN 3
-                 END AS natureza_objeto
-                 , objeto.descricao AS objeto
-                 , '' AS justificativa
-                 , '' AS razao
-                 , '' AS dt_publicacao_termo_ratificacao
-                 , veiculo.nom_cgm AS veiculo_publicacao
-                 , 0 AS numero_sequencial
+        $stSql = "  SELECT DISTINCT 
+                                10 AS tipo_registro
+                                , licitacao.num_orgao AS cod_orgao
+                                , licitacao.num_unidade AS cod_unidade
+                                , sw_processo.cod_processo AS num_processo
+                                , sw_processo.ano_exercicio AS ano_exercicio_processo
+                                , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                                       WHEN modalidade.cod_modalidade = 9 THEN 2
+                                 END AS tipo_processo
+                                , TO_CHAR(licitacao.timestamp,'dd/mm/yyyy') AS dt_abertura
+                                , CASE WHEN tipo_objeto.cod_tipo_objeto = 1 THEN 2
+                                       WHEN tipo_objeto.cod_tipo_objeto = 2 THEN 1
+                                       WHEN tipo_objeto.cod_tipo_objeto = 3 THEN 3
+                                       WHEN tipo_objeto.cod_tipo_objeto = 4 THEN 3
+                                 END AS natureza_objeto
+                                , objeto.descricao AS objeto
+                                , justificativa_razao.justificativa AS justificativa
+                                , justificativa_razao.razao AS razao
+                                , TO_CHAR(publicacao_edital.data_publicacao,'dd/mm/yyyy')  AS dt_publicacao_termo_ratificacao
+                                , veiculo.nom_cgm AS veiculo_publicacao
+                                , 0 AS numero_sequencial
                  
-            FROM licitacao.licitacao
-            
-            JOIN compras.objeto
-              ON objeto.cod_objeto = licitacao.cod_objeto
-              
-            JOIN sw_processo
-              ON sw_processo.cod_processo = licitacao.cod_processo
-             AND sw_processo.ano_exercicio = licitacao.exercicio_processo
-             
-            JOIN compras.modalidade
-              ON modalidade.cod_modalidade = licitacao.cod_modalidade
-              
-            JOIN compras.tipo_objeto
-              ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
-              
-            JOIN licitacao.edital
-              ON edital.cod_licitacao = licitacao.cod_licitacao
-             AND edital.cod_modalidade = licitacao.cod_modalidade
-             AND edital.cod_entidade = licitacao.cod_entidade
-             AND edital.exercicio_licitacao = licitacao.exercicio
-             
-            JOIN licitacao.publicacao_edital
-              ON publicacao_edital.num_edital = edital.num_edital
-             AND publicacao_edital.exercicio = edital.exercicio
-             
-            JOIN licitacao.veiculos_publicidade
-              ON veiculos_publicidade.numcgm = publicacao_edital.numcgm
-              
-            JOIN sw_cgm AS veiculo
-              ON veiculo.numcgm = veiculos_publicidade.numcgm
-              
-            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
-              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
-              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
-              AND modalidade.cod_modalidade IN (8,9)
-            ";
+                    FROM licitacao.licitacao
+                    
+                    JOIN compras.objeto
+                      ON objeto.cod_objeto = licitacao.cod_objeto
+                      
+                    JOIN sw_processo
+                      ON sw_processo.cod_processo = licitacao.cod_processo
+                     AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                     
+                    JOIN compras.modalidade
+                      ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                      
+                    JOIN compras.tipo_objeto
+                      ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                      
+                    JOIN licitacao.edital
+                      ON edital.cod_licitacao = licitacao.cod_licitacao
+                     AND edital.cod_modalidade = licitacao.cod_modalidade
+                     AND edital.cod_entidade = licitacao.cod_entidade
+                     AND edital.exercicio_licitacao = licitacao.exercicio
+                     
+                    JOIN licitacao.publicacao_edital
+                      ON publicacao_edital.num_edital = edital.num_edital
+                     AND publicacao_edital.exercicio = edital.exercicio
+                     
+                    JOIN licitacao.veiculos_publicidade
+                      ON veiculos_publicidade.numcgm = publicacao_edital.numcgm
+                      
+                    JOIN sw_cgm AS veiculo
+                      ON veiculo.numcgm = veiculos_publicidade.numcgm
+                      
+                    JOIN compras.mapa
+                        ON mapa.exercicio = licitacao.exercicio_mapa
+                        AND mapa.cod_mapa = licitacao.cod_mapa     
+        
+                    JOIN compras.mapa_cotacao
+                        ON mapa.exercicio = mapa_cotacao.exercicio_mapa
+                        AND mapa.cod_mapa = mapa_cotacao.cod_mapa
+                        
+                    JOIN compras.julgamento
+                        ON julgamento.exercicio = mapa_cotacao.exercicio_cotacao
+                        AND julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
+                        
+                    JOIN compras.julgamento_item
+                        ON  julgamento_item.exercicio = julgamento.exercicio
+                        AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
+                        AND julgamento_item.ordem = 1
+        
+                    JOIN licitacao.homologacao
+                         ON homologacao.cod_licitacao=licitacao.cod_licitacao
+                        AND homologacao.cod_modalidade=licitacao.cod_modalidade
+                        AND homologacao.cod_entidade=licitacao.cod_entidade
+                        AND homologacao.exercicio_licitacao=licitacao.exercicio
+                        AND homologacao.cod_item=julgamento_item.cod_item
+                        AND homologacao.lote=julgamento_item.lote
+                        AND (
+                            SELECT homologacao_anulada.num_homologacao FROM licitacao.homologacao_anulada
+                            WHERE homologacao_anulada.cod_licitacao=licitacao.cod_licitacao
+                            AND homologacao_anulada.cod_modalidade=licitacao.cod_modalidade
+                            AND homologacao_anulada.cod_entidade=licitacao.cod_entidade
+                            AND homologacao_anulada.exercicio_licitacao=licitacao.exercicio
+                            AND homologacao.num_homologacao=homologacao_anulada.num_homologacao
+                            AND homologacao.cod_item=homologacao_anulada.cod_item
+                            AND homologacao.lote=homologacao_anulada.lote
+                        ) IS NULL
+                                     
+                    JOIN compras.cotacao_fornecedor_item
+                         ON julgamento_item.exercicio = cotacao_fornecedor_item.exercicio
+                        AND julgamento_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
+                        AND julgamento_item.cod_item = cotacao_fornecedor_item.cod_item
+                        AND julgamento_item.cgm_fornecedor = cotacao_fornecedor_item.cgm_fornecedor
+                        AND julgamento_item.lote = cotacao_fornecedor_item.lote
+                                    
+                    LEFT JOIN licitacao.justificativa_razao
+                         ON justificativa_razao.cod_entidade = licitacao.cod_entidade
+                        AND justificativa_razao.cod_licitacao = licitacao.cod_licitacao
+                        AND justificativa_razao.exercicio = licitacao.exercicio
+                        AND justificativa_razao.cod_modalidade = licitacao.cod_modalidade
+        
+                    WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+                    AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+                    AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+                    AND modalidade.cod_modalidade IN (8,9)
+                    ";
             
         return $stSql;
     }
@@ -111,85 +159,721 @@ class TTGODSI extends Persistente
     public function montaRecuperaDetalhamento11()
     {
         $stSql = "
-            SELECT 11 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
+            --------------------- 1
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
                  , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
                  END AS tipo_processo
                  , 1 AS tipo_resp
-                 , sw_cgm_pessoa_fisica.cpf AS num_cpf_responsavel
-                 , responsavel.nom_cgm AS nome_responsavel
-                 , responsavel.logradouro AS logradouro
-                 , responsavel.bairro AS setor
-                 , sw_municipio.nom_municipio AS cidade
-                 , responsavel.cep AS cep
-                 , sw_uf.nom_uf AS uf 
-                 , CASE WHEN responsavel.fone_residencial = ''
-                        THEN CASE WHEN responsavel.fone_comercial = ''
-                                  THEN CASE WHEN responsavel.fone_celular = ''
-                                            THEN ''
-                                            ELSE responsavel.fone_celular
-                                       END
-                                  ELSE responsavel.fone_comercial
-                             END
-                        ELSE responsavel.fone_residencial
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
                  END AS telefone
-                 , CASE WHEN responsavel.e_mail = ''
-                        THEN CASE WHEN responsavel.e_mail_adcional = ''
-                                  THEN ''
-                                  ELSE responsavel.e_mail_adcional
-                             END
-                        ELSE responsavel.e_mail
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
                  END AS email
                  , '' AS brancos
                  , 0 AS numero_sequencial
                  
-            FROM licitacao.licitacao
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
             
-            JOIN compras.objeto
-              ON objeto.cod_objeto = licitacao.cod_objeto
-              
-            JOIN sw_processo
-              ON sw_processo.cod_processo = licitacao.cod_processo
-             AND sw_processo.ano_exercicio = licitacao.exercicio_processo
-             
-            JOIN compras.modalidade
-              ON modalidade.cod_modalidade = licitacao.cod_modalidade
-              
-            JOIN compras.tipo_objeto
-              ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
-              
-            JOIN licitacao.edital
-              ON edital.cod_licitacao = licitacao.cod_licitacao
-             AND edital.cod_modalidade = licitacao.cod_modalidade
-             AND edital.cod_entidade = licitacao.cod_entidade
-             AND edital.exercicio_licitacao = licitacao.exercicio
-             
-            JOIN licitacao.publicacao_edital
-              ON publicacao_edital.num_edital = edital.num_edital
-             AND publicacao_edital.exercicio = edital.exercicio
-             
-            JOIN sw_cgm AS responsavel
-              ON responsavel.numcgm = edital.responsavel_juridico
-              
-            JOIN sw_cgm_pessoa_fisica
-              ON sw_cgm_pessoa_fisica.numcgm = responsavel.numcgm
-              
-            JOIN sw_municipio
-              ON sw_municipio.cod_municipio = responsavel.cod_municipio
-             AND sw_municipio.cod_uf = responsavel.cod_uf
-             
-            JOIN sw_uf
-              ON sw_uf.cod_uf = sw_municipio.cod_uf
-              
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_abertura_disp
+                  
+                WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+                  AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+                  AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+                  AND modalidade.cod_modalidade IN (8,9)
+            
+            --------------------- 2
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 2 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_cotacao_precos
+                  
             WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
               AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
               AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
               AND modalidade.cod_modalidade IN (8,9)
-            ";
+            
+            --------------------- 3
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 3 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_recurso
+                  
+            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+              AND modalidade.cod_modalidade IN (8,9)
+              
+            --------------------- 4
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 4 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_ratificacao
+            
+            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+              AND modalidade.cod_modalidade IN (8,9)
+              
+            --------------------- 5
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 5 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_publicacao_orgao
+            
+            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+              AND modalidade.cod_modalidade IN (8,9)
+            
+            --------------------- 6
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 6 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_parecer_juridico
+            
+            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+              AND modalidade.cod_modalidade IN (8,9)
+            
+            --------------------- 7
+            UNION
+            
+                SELECT 11 AS tipo_registro
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
+                 , sw_processo.cod_processo AS num_processo
+                 , sw_processo.ano_exercicio AS ano_exercicio_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                    WHEN modalidade.cod_modalidade = 9 THEN 2
+                 END AS tipo_processo
+                 , 7 AS tipo_resp
+                 , responsavel_dispensa.cpf AS num_cpf_responsavel
+                 , responsavel_dispensa.nom_cgm AS nome_responsavel
+                 , responsavel_dispensa.logradouro AS logradouro
+                 , responsavel_dispensa.bairro AS setor
+                 , responsavel_dispensa.nom_municipio AS cidade
+                 , responsavel_dispensa.cep AS cep
+                 , responsavel_dispensa.sigla_uf AS uf 
+            
+                 , CASE WHEN responsavel_dispensa.fone_residencial = ''
+                    THEN CASE WHEN responsavel_dispensa.fone_comercial = ''
+                          THEN CASE WHEN responsavel_dispensa.fone_celular = ''
+                                THEN ''
+                                ELSE responsavel_dispensa.fone_celular
+                               END
+                          ELSE responsavel_dispensa.fone_comercial
+                         END
+                    ELSE responsavel_dispensa.fone_residencial
+                 END AS telefone
+            
+                 , CASE WHEN responsavel_dispensa.e_mail = ''
+                    THEN CASE WHEN responsavel_dispensa.e_mail_adcional = ''
+                          THEN ''
+                          ELSE responsavel_dispensa.e_mail_adcional
+                         END
+                    ELSE responsavel_dispensa.e_mail
+                 END AS email
+                 , '' AS brancos
+                 , 0 AS numero_sequencial
+                 
+                FROM licitacao.licitacao
+                
+                JOIN compras.objeto
+                  ON objeto.cod_objeto = licitacao.cod_objeto
+                  
+                JOIN sw_processo
+                  ON sw_processo.cod_processo = licitacao.cod_processo
+                 AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                 
+                JOIN compras.modalidade
+                  ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                  
+                JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                  
+                JOIN licitacao.edital
+                  ON edital.cod_licitacao = licitacao.cod_licitacao
+                 AND edital.cod_modalidade = licitacao.cod_modalidade
+                 AND edital.cod_entidade = licitacao.cod_entidade
+                 AND edital.exercicio_licitacao = licitacao.exercicio
+                 
+                JOIN licitacao.publicacao_edital
+                  ON publicacao_edital.num_edital = edital.num_edital
+                 AND publicacao_edital.exercicio = edital.exercicio
+                 
+                JOIN tcmgo.responsavel_licitacao_dispensa AS responsavel
+                  ON responsavel.exercicio      = licitacao.exercicio
+                 AND responsavel.cod_entidade   = licitacao.cod_entidade
+                 AND responsavel.cod_modalidade = licitacao.cod_modalidade
+                 AND responsavel.cod_licitacao  = licitacao.cod_licitacao
+            
+                JOIN ( SELECT sw_cgm.nom_cgm
+                    , sw_cgm.numcgm
+                    , sw_cgm_pessoa_fisica.cpf
+                    , sw_cgm.logradouro
+                    , sw_cgm.bairro
+                    , sw_cgm.cep
+                    , sw_municipio.nom_municipio
+                    , sw_uf.sigla_uf
+                    , sw_cgm.fone_residencial
+                    , sw_cgm.fone_celular
+                    , sw_cgm.fone_comercial
+                    , sw_cgm.e_mail
+                    , sw_cgm.e_mail_adcional
+                     FROM sw_cgm
+                     JOIN sw_cgm_pessoa_fisica
+                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                     JOIN sw_municipio
+                       ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                      AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                     JOIN sw_uf
+                       ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                ) AS responsavel_dispensa
+                  ON responsavel_dispensa.numcgm = responsavel.cgm_resp_parecer_outro
+
+            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+              AND modalidade.cod_modalidade IN (8,9)
+
+            ORDER BY tipo_resp
+        ";
             
         return $stSql;
     }
@@ -201,90 +885,94 @@ class TTGODSI extends Persistente
 
     public function montaRecuperaDetalhamento12()
     {
-        $stSql = "
-            SELECT 12 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
-                 , sw_processo.cod_processo AS num_processo
-                 , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
-                 , mapa_item.lote AS num_lote
-                 , mapa_item.cod_item AS num_item
-                 , mapa_item.vl_total AS vl_cot_precos_unitario
-                 , '' AS brancos
-                 , 0 AS nro_sequencial
+        $stSql = "  SELECT DISTINCT 
+                                12 AS tipo_registro
+                                , licitacao.num_orgao AS cod_orgao
+                                , licitacao.num_unidade AS cod_unidade
+                                , sw_processo.cod_processo AS num_processo
+                                , sw_processo.ano_exercicio AS ano_exercicio_processo
+                                , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
+                                       WHEN modalidade.cod_modalidade = 9 THEN 2
+                                  END AS tipo_processo
+                                , mapa_item.lote AS num_lote
+                                , mapa_item.cod_item AS num_item
+                                , mapa_item.vl_total AS vl_cot_precos_unitario
+                                , catalogo_item.descricao::varchar(250) as desc_item
+                                , '' AS brancos
+                                , 0 AS nro_sequencial
                  
-            FROM licitacao.licitacao
+                    FROM licitacao.licitacao
             
-            JOIN compras.objeto
-              ON objeto.cod_objeto = licitacao.cod_objeto
-              
-            JOIN sw_processo
-              ON sw_processo.cod_processo = licitacao.cod_processo
-             AND sw_processo.ano_exercicio = licitacao.exercicio_processo
-             
-            JOIN compras.modalidade
-              ON modalidade.cod_modalidade = licitacao.cod_modalidade
-              
-            JOIN compras.tipo_objeto
-              ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
-              
-            JOIN licitacao.edital
-              ON edital.cod_licitacao = licitacao.cod_licitacao
-             AND edital.cod_modalidade = licitacao.cod_modalidade
-             AND edital.cod_entidade = licitacao.cod_entidade
-             AND edital.exercicio_licitacao = licitacao.exercicio
-             
-            JOIN licitacao.publicacao_edital
-              ON publicacao_edital.num_edital = edital.num_edital
-             AND publicacao_edital.exercicio = edital.exercicio
-             
-            JOIN sw_cgm AS responsavel
-              ON responsavel.numcgm = edital.responsavel_juridico
-              
-            JOIN sw_cgm_pessoa_fisica
-              ON sw_cgm_pessoa_fisica.numcgm = responsavel.numcgm
-              
-            JOIN sw_municipio
-              ON sw_municipio.cod_municipio = responsavel.cod_municipio
-             AND sw_municipio.cod_uf = responsavel.cod_uf
-             
-            JOIN sw_uf
-              ON sw_uf.cod_uf = sw_municipio.cod_uf
-              
-            JOIN compras.mapa
-              ON mapa.exercicio = licitacao.exercicio_mapa
-             AND mapa.cod_mapa = licitacao.cod_mapa
-             
-            JOIN compras.mapa_solicitacao
-              ON mapa_solicitacao.exercicio = mapa.exercicio
-             AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
-             
-            JOIN compras.mapa_item
-              ON mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
-             AND mapa_item.exercicio = mapa_solicitacao.exercicio
-             AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
-             AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
-             AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-             
-            JOIN compras.mapa_cotacao
-              ON mapa_cotacao.exercicio_cotacao = mapa.exercicio
-             AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-             
-            JOIN compras.cotacao
-              ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-             AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-             
-            JOIN compras.cotacao_item
-              ON cotacao_item.exercicio = cotacao.exercicio
-             AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
-              
-            WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
-              AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
-              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
-              AND modalidade.cod_modalidade IN (8,9)
+                    JOIN compras.objeto
+                      ON objeto.cod_objeto = licitacao.cod_objeto
+                      
+                    JOIN sw_processo
+                      ON sw_processo.cod_processo = licitacao.cod_processo
+                     AND sw_processo.ano_exercicio = licitacao.exercicio_processo
+                     
+                    JOIN compras.modalidade
+                      ON modalidade.cod_modalidade = licitacao.cod_modalidade
+                      
+                    JOIN compras.tipo_objeto
+                      ON tipo_objeto.cod_tipo_objeto = licitacao.cod_tipo_objeto
+                      
+                    JOIN licitacao.edital
+                      ON edital.cod_licitacao = licitacao.cod_licitacao
+                     AND edital.cod_modalidade = licitacao.cod_modalidade
+                     AND edital.cod_entidade = licitacao.cod_entidade
+                     AND edital.exercicio_licitacao = licitacao.exercicio
+                     
+                    JOIN licitacao.publicacao_edital
+                      ON publicacao_edital.num_edital = edital.num_edital
+                     AND publicacao_edital.exercicio = edital.exercicio
+                     
+                    JOIN sw_cgm AS responsavel
+                      ON responsavel.numcgm = edital.responsavel_juridico
+                      
+                    JOIN sw_cgm_pessoa_fisica
+                      ON sw_cgm_pessoa_fisica.numcgm = responsavel.numcgm
+                      
+                    JOIN sw_municipio
+                      ON sw_municipio.cod_municipio = responsavel.cod_municipio
+                     AND sw_municipio.cod_uf = responsavel.cod_uf
+                     
+                    JOIN sw_uf
+                      ON sw_uf.cod_uf = sw_municipio.cod_uf
+                      
+                    JOIN compras.mapa
+                      ON mapa.exercicio = licitacao.exercicio_mapa
+                     AND mapa.cod_mapa = licitacao.cod_mapa
+                     
+                    JOIN compras.mapa_solicitacao
+                      ON mapa_solicitacao.exercicio = mapa.exercicio
+                     AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
+                     
+                    JOIN compras.mapa_item
+                      ON mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
+                     AND mapa_item.exercicio = mapa_solicitacao.exercicio
+                     AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
+                     AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                     AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                     
+                    JOIN compras.mapa_cotacao
+                      ON mapa_cotacao.exercicio_cotacao = mapa.exercicio
+                     AND mapa_cotacao.cod_mapa = mapa.cod_mapa
+                     
+                    JOIN compras.cotacao
+                      ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+                     AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+                     
+                    JOIN compras.cotacao_item
+                      ON cotacao_item.exercicio   = cotacao.exercicio
+                     AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
+                    
+                    JOIN almoxarifado.catalogo_item
+                        ON catalogo_item.cod_item   = cotacao_item.cod_item
+        
+                    WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+                    AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
+                    AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+                    AND modalidade.cod_modalidade IN (8,9)
             ";
             
         return $stSql;
@@ -299,8 +987,8 @@ class TTGODSI extends Persistente
     {
         $stSql = "
             SELECT 13 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
                  , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
@@ -433,8 +1121,8 @@ class TTGODSI extends Persistente
     {
         $stSql = "
             SELECT 14 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
                  , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
@@ -544,6 +1232,32 @@ class TTGODSI extends Persistente
               AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
               AND modalidade.cod_modalidade IN (8,9)
               AND documento.cod_documento IN (5,6,7)
+              
+         GROUP BY  tipo_registro
+                 , cod_orgao
+                 , cod_unidade
+                 , num_processo
+                 , ano_exercicio_processo
+                 , tipo_processo
+                 , tipo_documento
+                 , documento_pessoa.num_documento
+                 , num_lote
+                 , num_item
+                 , nom_razao_social
+                 , num_inscricao_estadual
+                 , uf_inscricao_estadual
+                 , num_certidao_regularidade_inss
+                 , dt_emissao_certidao_regularidade_inss
+                 , dt_validade_certidao_regularida_inss
+                 , num_certidao_regularidade_fgts
+                 , dt_emissao_certidao_regularidade_fgts
+                 , dt_validade_certidao_regularida_fgts
+                 , num_cndt
+                 , dt_emissao_cndt
+                 , dt_validade_cndt
+                 , quantidade
+                 , valor_item
+                 , brancos
             ";
             
         return $stSql;
@@ -558,8 +1272,8 @@ class TTGODSI extends Persistente
     {
         $stSql = "
             SELECT 15 AS tipo_registro
-                 , 5 AS cod_orgao
-                 , 1 AS cod_unidade
+                 , licitacao.num_orgao AS cod_orgao
+                 , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
                  , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
@@ -673,6 +1387,30 @@ class TTGODSI extends Persistente
               AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
               AND modalidade.cod_modalidade IN (8,9)
               AND documento.cod_documento IN (5,6,7)
+              
+         GROUP BY  tipo_registro
+                 , cod_orgao
+                 , cod_unidade
+                 , sw_processo.cod_processo
+                 , sw_processo.ano_exercicio
+                 , tipo_processo
+                 , documento_pessoa.tipo_documento
+                 , documento_pessoa.num_documento
+                 , dt_credenciamento
+                 , num_lote
+                 , num_item
+                 , nome_razao_social
+                 , num_inscricao_estadual
+                 , uf_inscricao_estadual
+                 , num_certidao_regularidade_inss
+                 , dt_emissao_certidao_regularidade_inss
+                 , dt_validade_certidao_regularida_inss
+                 , num_certidao_regularidade_fgts
+                 , dt_emissao_certidao_regularidade_fgts
+                 , dt_validade_certidao_regularida_fgts
+                 , num_cndt
+                 , dt_emissao_cndt
+                 , dt_validade_cndt
             ";
             
         return $stSql;

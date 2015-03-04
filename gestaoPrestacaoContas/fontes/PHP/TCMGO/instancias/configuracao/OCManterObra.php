@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: OCManterObra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterObra.php 61522 2015-01-29 18:33:35Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -185,47 +185,49 @@ switch ($stCtrl) {
 
     case 'incluirEmpenho' :
 
-            $arRequest = array();
-            $arRequest = explode('/', $_REQUEST['inCodEmpenho']);
-            $inReqCodEmpenho = $arRequest[0];
+        //SistemaLegado::mostravar($_REQUEST);
 
-            $boIncluir = true;
-            if ( count( $arEmpenhos ) > 0 ) {
-                foreach ($arEmpenhos as $key => $array) {
-                    $stCod = $array['cod_empenho'];
-                    $stEnt = $array['cod_entidade'];
+        $arRequest = array();
+        $arRequest = explode('/', $_REQUEST['inCodEmpenho']);
+        $inReqCodEmpenho = $arRequest[0];
 
-                    if ($inReqCodEmpenho == $stCod && $_REQUEST['inCodEntidade'] == $stEnt) {
-                        $boIncluir = false;
-                        $stErro = "Este empenho já está na lista.";
-                        break;
-                    }
+        $boIncluir = true;
+        if ( count( $arEmpenhos ) > 0 ) {
+            foreach ($arEmpenhos as $key => $array) {
+                $stCod = $array['cod_empenho'];
+                $stEnt = $array['cod_entidade'];
+
+                if ($inReqCodEmpenho == $stCod && $_REQUEST['inCodEntidade'] == $stEnt) {
+                    $boIncluir = false;
+                    $stErro = "Este empenho já está na lista.";
+                    break;
                 }
             }
+        }
 
-            if ($boIncluir) {
-                include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php" );
-                $arEmpenho = explode('/', $_REQUEST["inCodEmpenho"]);
+        if ($boIncluir) {
+            include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php" );
+            $arEmpenho = explode('/', $_REQUEST["inCodEmpenho"]);
 
-                $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
-                $obTEmpenhoEmpenho->setDado( 'cod_entidade'   , $_REQUEST["inCodEntidade"     ] );
-                $obTEmpenhoEmpenho->setDado( 'exercicio'      , $_REQUEST["stExercicioEmpenho"] );
-                $obTEmpenhoEmpenho->setDado( 'cod_empenho'    , $arEmpenho[0]                   );
-                $obTEmpenhoEmpenho->recuperaEmpenhoObra ($rsLista);
+            $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+            $obTEmpenhoEmpenho->setDado( 'cod_entidade'   , $_REQUEST["inCodEntidade"]);
+            $obTEmpenhoEmpenho->setDado( 'cod_empenho'    , $arEmpenho[0]             );
+            $obTEmpenhoEmpenho->setDado( 'exercicio'      , $arEmpenho[1]             );
+            $obTEmpenhoEmpenho->recuperaEmpenhoObra ($rsLista);
 
-                $arRegistro['cod_entidade'] = $rsLista->getCampo('cod_entidade');
-                $arRegistro['cod_empenho' ] = $rsLista->getCampo('cod_empenho');
-                $arRegistro['data_empenho'] = $rsLista->getCampo('dt_empenho');
-                $arRegistro['nom_cgm'     ] = $rsLista->getCampo('nom_fornecedor');
-                $arRegistro['exercicio'   ] = $rsLista->getCampo('exercicio_empenho');
+            $arRegistro['cod_entidade'] = $rsLista->getCampo('cod_entidade');
+            $arRegistro['cod_empenho' ] = $rsLista->getCampo('cod_empenho');
+            $arRegistro['data_empenho'] = $rsLista->getCampo('dt_empenho');
+            $arRegistro['nom_cgm'     ] = $rsLista->getCampo('nom_fornecedor');
+            $arRegistro['exercicio'   ] = $rsLista->getCampo('exercicio_empenho');
 
-                $arEmpenhos[] = $arRegistro ;
+            $arEmpenhos[] = $arRegistro ;
 
-                Sessao::write('arEmpenhos', $arEmpenhos);
-                $stJs = listaEmpenhos();
-            } else {
-                $stJs .= "alertaAviso('$stErro','form','erro','".Sessao::getId()."');\n";
-            }
+            Sessao::write('arEmpenhos', $arEmpenhos);
+            $stJs = listaEmpenhos();
+        } else {
+            $stJs .= "alertaAviso('$stErro','form','erro','".Sessao::getId()."');\n";
+        }
 
     break;
 

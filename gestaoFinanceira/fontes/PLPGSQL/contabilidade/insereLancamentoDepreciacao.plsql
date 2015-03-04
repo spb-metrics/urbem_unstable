@@ -40,6 +40,7 @@ DECLARE
     PboEstorno                  ALIAS FOR $7;
     
     inCodLote                   INTEGER := 0;
+    inCodContaAnalitica         INTEGER := 0;
     inCodPlanoDeb               INTEGER := 0;
     inCodPlanoCred              INTEGER := 0;
     inCodPlanoEstrutural        INTEGER := 0;
@@ -48,17 +49,18 @@ DECLARE
     inCodDepreciacao            INTEGER := 0;
     stDataLote                  DATE;
     chTipo                      CHAR    := '';
-    stCodEstruturalDepreciacao  VARCHAR := '3.3.3.1.1.01.01.00.00.00';
+    stCodEstruturalDepreciacao  VARCHAR;
     stNomeLote                  VARCHAR := '';
     stSql                       VARCHAR := '';
     stFiltro                    VARCHAR := '';
     reRegistro                  RECORD;
+    reCodPlano                  RECORD;
     
 BEGIN
 
     -- Verifica se existe depreciação na competência que não esteja anulada
     SELECT INTO inCodDepreciacao 
-           cod_depreciacao
+                cod_depreciacao
       FROM patrimonio.depreciacao
      WHERE competencia =  PstExercicio || PstMesCompetencia
        AND NOT EXISTS ( SELECT 1 
@@ -71,27 +73,151 @@ BEGIN
     IF inCodDepreciacao IS NULL THEN
         RAISE EXCEPTION 'Não existem bens depreciados na competência: % !',  PstMesCompetencia || '/' || PstExercicio;
     END IF;
+
+    -- Verifica se determinado bem possui um depreciação e cod_plano de depreciação acumulada relacionados no exercicio.
+    stSql := '  
+        SELECT depreciacao.cod_bem
+             , CASE WHEN bem_plano_depreciacao.cod_plano IS NOT NULL
+                    THEN bem_plano_depreciacao.cod_plano
+                    ELSE grupo_plano_depreciacao.cod_plano
+               END AS cod_plano
+             , tipo_natureza.cod_natureza
+             , tipo_natureza.codigo
+             , tipo_natureza.nom_natureza
+                  
+              FROM patrimonio.depreciacao          
+       
+         LEFT JOIN (
+                 SELECT bem_plano_depreciacao.cod_bem
+                      , bem_plano_depreciacao.cod_plano
+                      , bem_plano_depreciacao.exercicio
+                                             
+                   FROM patrimonio.bem_plano_depreciacao 
+       
+              LEFT JOIN contabilidade.plano_analitica
+                     ON plano_analitica.cod_plano = bem_plano_depreciacao.cod_plano
+                    AND plano_analitica.exercicio = bem_plano_depreciacao.exercicio
+       
+              LEFT JOIN contabilidade.plano_conta
+                     ON plano_conta.cod_conta = plano_analitica.cod_conta
+                    AND plano_conta.exercicio = plano_analitica.exercicio
+                      
+                  WHERE bem_plano_depreciacao.timestamp::timestamp = ( SELECT MAX(bem_plano.timestamp::timestamp) AS timestamp 
+                                                                         FROM patrimonio.bem_plano_depreciacao AS bem_plano
+                                                                        
+                                                                        WHERE bem_plano_depreciacao.cod_bem   = bem_plano.cod_bem
+                                                                          AND bem_plano_depreciacao.exercicio = bem_plano.exercicio
+                                                                          AND bem_plano_depreciacao.exercicio   = '|| quote_literal(PstExercicio) ||'
+                                                                     
+                                                                     GROUP BY bem_plano.cod_bem
+                                                                            , bem_plano.exercicio )
+                    AND bem_plano_depreciacao.exercicio   = '|| quote_literal(PstExercicio) ||'
+               ORDER BY timestamp DESC
+               
+              )AS bem_plano_depreciacao
+               ON bem_plano_depreciacao.cod_bem = depreciacao.cod_bem
+            
+        LEFT JOIN ( SELECT grupo_plano_depreciacao.cod_plano
+                         , bem.cod_bem
+                         , grupo_plano_depreciacao.exercicio
+               
+                     FROM patrimonio.grupo_plano_depreciacao
+          
+               INNER JOIN patrimonio.grupo
+                       ON grupo.cod_natureza = grupo_plano_depreciacao.cod_natureza
+                      AND grupo.cod_grupo    = grupo_plano_depreciacao.cod_grupo
+               
+               INNER JOIN patrimonio.especie
+                       ON especie.cod_grupo    = grupo.cod_grupo
+                      AND especie.cod_natureza = grupo.cod_natureza
+               
+               INNER JOIN patrimonio.bem
+                       ON bem.cod_especie  = especie.cod_especie
+                      AND bem.cod_grupo    = especie.cod_grupo
+                      AND bem.cod_natureza = especie.cod_natureza
+                   
+                    WHERE grupo_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
+                    
+               ) AS grupo_plano_depreciacao
+                 ON grupo_plano_depreciacao.cod_bem = depreciacao.cod_bem
+                 
+         INNER JOIN
+                  ( SELECT bem.cod_bem
+                         , bem.cod_natureza
+                         , tipo_natureza.codigo
+                         , natureza.nom_natureza
+                         
+                      FROM patrimonio.bem
+
+                INNER JOIN patrimonio.especie
+                        ON especie.cod_especie  = bem.cod_especie
+                       AND especie.cod_grupo    = bem.cod_grupo
+                       AND especie.cod_natureza = bem.cod_natureza
+
+                INNER JOIN patrimonio.grupo
+                        ON grupo.cod_grupo    = especie.cod_grupo
+                       AND grupo.cod_natureza = especie.cod_natureza
+                
+                INNER JOIN patrimonio.natureza
+                        ON natureza.cod_natureza = grupo.cod_natureza
+
+                INNER JOIN patrimonio.tipo_natureza
+                        ON tipo_natureza.codigo = natureza.cod_tipo
+                 
+                 ) AS tipo_natureza
+                 ON tipo_natureza.cod_bem = depreciacao.cod_bem
         
+          WHERE competencia = '|| quote_literal( PstExercicio || PstMesCompetencia) ||'
+            AND NOT EXISTS ( SELECT 1 
+                               FROM patrimonio.depreciacao_anulada
+                              WHERE depreciacao_anulada.cod_depreciacao = depreciacao.cod_depreciacao
+                                AND depreciacao_anulada.cod_bem         = depreciacao.cod_bem
+                                AND depreciacao_anulada.timestamp       = depreciacao.timestamp
+                            )
+                            
+            AND grupo_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
+             OR bem_plano_depreciacao.exercicio   = '|| quote_literal(PstExercicio) ||'
+
+        ORDER BY tipo_natureza.cod_natureza ';
+    
+    FOR reCodPlano IN EXECUTE stSql
+    LOOP
+                
+        -- Verifica se está configurada um tipo de natureza para a natureza do Grupo
+        IF reCodPlano.codigo = 0 OR reCodPlano.codigo != 1 AND reCodPlano.codigo != 2
+        THEN
+            RAISE EXCEPTION 'Necessário configurar um Tipo de Natureza ( 1 - Bens móveis ou 2 - Bens imóveis ) para a Natureza: %', reCodPlano.cod_natureza || ' - ' || reCodPlano.nom_natureza;
+        END IF;
+        
+        -- Verifica se o tipo de bem é Movel (1) ou Imóvel (2) para setar o cod_estrutural e buscar o cod_plano que será creditado ou debitado.
+        IF reCodPlano.codigo = 1 THEN 
+            stCodEstruturalDepreciacao = '3.3.3.1.1.01.01.00.00.00';
+        ELSEIF reCodPlano.codigo = 2 THEN
+            stCodEstruturalDepreciacao = '3.3.3.1.1.01.02.00.00.00';
+        END IF;
+        
+        -- Recupera cod_plano apartir do cod_estrutural (3.3.3.1.1.01.01.00.00.00), para depreciação de bens móveis ou (3.3.3.1.1.01.02.00.00.00) para bens imóveis.
+        -- Quando não for estorno (estorno = false), insere o cod_plano na contabilidade.conta_debito
+        -- Quando for estorno (estorno = true), insere o cod_plano na contabilidade.conta_credito
+           SELECT INTO
+                  inCodPlanoEstrutural
+                  cod_plano
+            FROM contabilidade.plano_conta 
+      INNER JOIN contabilidade.plano_analitica
+              ON plano_analitica.exercicio  = plano_conta.exercicio 
+             AND plano_analitica.cod_conta  = plano_conta.cod_conta 
+           WHERE plano_conta.cod_estrutural = stCodEstruturalDepreciacao
+             AND plano_analitica.exercicio  = PstExercicio;
+        
+        IF inCodPlanoEstrutural IS NULL THEN
+           RAISE EXCEPTION 'Conta ( % ) não é analítica ou não está cadastrada no plano de contas.',stCodEstruturalDepreciacao;
+        END IF;
+       
+    END LOOP;
+       
     -- Caso tenha informado uma string com mais de 1 caracter trunca
     chTipo := substr(trim(PstTipo),1,1);
 
-    -- Recupera cod_plano apartir do cod_estrutural fixo (3.3.3.1.1.01.01.00.00.00), para depreciação de bens móvies.
-    -- Quando não for estorno (estorno = false), insere o cod_pano na contabilidade.conta_debito
-    -- Quando for estorno (estorno = true), insere o cod_pano na contabilidade.conta_credito
-       SELECT INTO
-              inCodPlanoEstrutural
-              cod_plano
-        FROM contabilidade.plano_conta 
-  INNER JOIN contabilidade.plano_analitica
-          ON plano_analitica.exercicio  = plano_conta.exercicio 
-         AND plano_analitica.cod_conta  = plano_conta.cod_conta 
-       WHERE plano_conta.cod_estrutural = stCodEstruturalDepreciacao
-         AND plano_analitica.exercicio  = PstExercicio;
-         
-    IF inCodPlanoEstrutural IS NULL THEN
-       RAISE EXCEPTION 'Conta ( % ) não é analítica ou não está cadastrada no plano de contas.',stCodEstruturalDepreciacao;
-    END IF;
-    
     -- Se estiver no mês da competência, deve ser o dia atual, senão será o último dia do mês caso estiver em mês posterior
     IF TO_CHAR(CURRENT_DATE, 'MM') = PstMesCompetencia THEN
         stDataLote := CURRENT_DATE;
@@ -115,7 +241,8 @@ BEGIN
         (cod_lote, exercicio, tipo, cod_entidade, nom_lote, dt_lote)
     VALUES
         (inCodLote, PstExercicio, chTipo, PinCodEntidade, stNomeLote, stDataLote);
-    
+
+    -- Recupera as depreciações, e seus valores agrupados por cod_plano, agrupados por grupo ou bem.
     stSql := '   
           SELECT  depreciacao.cod_depreciacao
                 , SUM ( depreciacao.vl_depreciado ) AS vl_depreciado
@@ -147,11 +274,14 @@ BEGIN
                    WHERE bem_plano_depreciacao.timestamp::timestamp = ( SELECT MAX(bem_plano.timestamp::timestamp) AS timestamp 
                                                                           FROM patrimonio.bem_plano_depreciacao AS bem_plano
                                                                          
-                                                                         WHERE bem_plano_depreciacao.cod_bem   = bem_plano.cod_bem
-                                                                           AND bem_plano_depreciacao.exercicio = bem_plano.exercicio
-                                                                      
-                                                                      GROUP BY bem_plano.cod_bem
-                                                                             , bem_plano.exercicio )
+                                                                        WHERE bem_plano_depreciacao.cod_bem   = bem_plano.cod_bem
+                                                                          AND bem_plano_depreciacao.exercicio = bem_plano.exercicio
+                                                                          AND bem_plano_depreciacao.exercicio   = '|| quote_literal(PstExercicio) ||'
+                                                                     
+                                                                     GROUP BY bem_plano.cod_bem
+                                                                            , bem_plano.exercicio )
+                    AND bem_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
+                    
                 GROUP BY bem_plano_depreciacao.cod_bem
                        , bem_plano_depreciacao.cod_plano
                        , bem_plano_depreciacao.exercicio
@@ -163,8 +293,9 @@ BEGIN
               )AS bem_plano_depreciacao
                ON bem_plano_depreciacao.cod_bem = depreciacao.cod_bem
         
-        LEFT JOIN ( SELECT cod_plano
-                         , cod_bem
+        LEFT JOIN ( SELECT grupo_plano_depreciacao.cod_plano
+                         , bem.cod_bem
+                         , grupo_plano_depreciacao.exercicio
                
                      FROM patrimonio.grupo_plano_depreciacao
           
@@ -180,6 +311,8 @@ BEGIN
                        ON bem.cod_especie  = especie.cod_especie
                       AND bem.cod_grupo    = especie.cod_grupo
                       AND bem.cod_natureza = especie.cod_natureza
+                      
+                    WHERE grupo_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
                     
                ) AS grupo_plano_depreciacao
                  ON grupo_plano_depreciacao.cod_bem = depreciacao.cod_bem
@@ -191,14 +324,15 @@ BEGIN
                                 AND depreciacao_anulada.cod_bem         = depreciacao.cod_bem
                                 AND depreciacao_anulada.timestamp       = depreciacao.timestamp
                             )
-        
+            AND grupo_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
+             OR bem_plano_depreciacao.exercicio   = '|| quote_literal(PstExercicio) ||'
+
         GROUP BY depreciacao.cod_depreciacao
                , bem_plano_depreciacao.cod_plano
                , grupo_plano_depreciacao.cod_plano
                
         ORDER BY cod_plano ';
         
-
     FOR reRegistro IN EXECUTE stSql
     LOOP
     
@@ -221,7 +355,7 @@ BEGIN
             inCodPlanoDeb  := reRegistro.cod_plano;
             inCodPlanoCred := inCodPlanoEstrutural;
         END IF;
-    
+                
         IF inCodPlanoDeb IS NULL OR inCodPlanoCred IS NULL THEN
             RAISE EXCEPTION 'Necessário configurar uma Conta Contábil de Depreciação Acumulada!';
         END IF;
@@ -371,9 +505,12 @@ BEGIN
 									   
                                                                            WHERE bem_plano_depreciacao.cod_bem   = bem_plano.cod_bem
 									     AND bem_plano_depreciacao.exercicio = bem_plano.exercicio
+                                                                             AND bem_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
 								        
                                                                         GROUP BY bem_plano.cod_bem
                                                                                , bem_plano.exercicio )
+                       AND bem_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
+                       
                   GROUP BY bem_plano_depreciacao.cod_bem
                          , bem_plano_depreciacao.cod_plano
                          , bem_plano_depreciacao.exercicio
@@ -387,8 +524,9 @@ BEGIN
                 ON bem_plano_depreciacao.cod_bem = depreciacao.cod_bem
         
          LEFT JOIN ( SELECT grupo_plano_depreciacao.cod_plano
-	                  , cod_bem
+	                  , bem.cod_bem
                           , valor_lancamento.sequencia
+                          , grupo_plano_depreciacao.exercicio
 	             
 		      FROM patrimonio.grupo_plano_depreciacao
         
@@ -435,6 +573,8 @@ BEGIN
 
                         ) AS valor_lancamento 
                        ON valor_lancamento.cod_plano = grupo_plano_depreciacao.cod_plano
+                    
+                    WHERE grupo_plano_depreciacao.exercicio = '|| quote_literal(PstExercicio) ||'
                        
                  ) AS grupo_plano_depreciacao
                ON grupo_plano_depreciacao.cod_bem = depreciacao.cod_bem

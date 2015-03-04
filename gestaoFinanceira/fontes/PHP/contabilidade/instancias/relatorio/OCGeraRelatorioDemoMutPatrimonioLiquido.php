@@ -57,7 +57,7 @@ $preview->addParametro ( 'exercicio_anterior', (Sessao::getExercicio() - 1));
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
 
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 
 } else {
     $rsEntidade->setPrimeiroElemento();

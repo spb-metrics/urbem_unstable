@@ -33,10 +33,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 61769 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: evandro $
+    $Date: 2015-03-03 10:20:41 -0300 (Ter, 03 Mar 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -54,70 +54,189 @@ Revision 1.1  2007/05/08 14:49:18  bruce
 */
 
     include_once( CAM_GPC_TGO_MAPEAMENTO."TTCMGOAFD.class.php" );
-    $obTMapeamento = new TTCMGOAFD ();
-    $obTMapeamento->setDado('exercicio', Sessao::getExercicio());
-    $obTMapeamento->setDado('cod_entidade', $stEntidades );
+    $obTTCMGOAFD = new TTCMGOAFD();
+    $obTTCMGOAFD->setDado('exercicio', Sessao::getExercicio());
+    $obTTCMGOAFD->setDado('cod_entidade', $stEntidades );
+    
+    $obTTCMGOAFD->recuperaContasBancarias($rsRecordSetAFD10);
+    $obTTCMGOAFD->recuperaContasBancariasFonteRecurso($rsRecordSetAFD11);
+    
+    $inCount = 0;
+    
+    if (count($rsRecordSetAFD10->getElementos()) > 0) {
+        $stChave10 = '';
+        
+        //Registro 10    
+        foreach ($rsRecordSetAFD10->getElementos() as $arAFD10) {
+            
+            $inCount++;
+            $stChave10 = $arAFD10['cod_orgao'].$arAFD10['banco'].$arAFD10['agencia'].$arAFD10['conta_corrente'].$arAFD10['conta_corrente_dv'].$arAFD10['tipo_documento'];
+            $arAFD10['numero_sequencial'] = $inCount;
 
-    $obTMapeamento->recuperaContasBancarias($arRecordSet[$stArquivo]);
+            $$rsBloco10 = 'rsBloco10_'.$inCount;
+            unset($$rsBloco10);
+            $$rsBloco10 = new RecordSet();
+            $$rsBloco10->preenche(array($arAFD10));
+            $obExportador->roUltimoArquivo->addBloco( $$rsBloco10 );
+    
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("banco");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("agencia");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente_dv");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_inicial");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_entradas");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saidas");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_final");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(26);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
 
-    $i = 0;
-
-    foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
-        $arRecordSet[$stArquivo]->arElementos[$i]['numero_sequencial'] = ++$i;
+            // Registro 11    
+            if (count($rsRecordSetAFD11->getElementos()) > 0) {
+                $stChave11 = '';
+                
+                foreach ($rsRecordSetAFD11->getElementos() as $arAFD11){
+                    
+                    if ($stChave10 == $arAFD11['cod_orgao'].$arAFD11['banco'].$arAFD11['agencia'].$arAFD11['conta_corrente'].$arAFD11['conta_corrente_dv'].$arAFD11['tipo_documento']) {
+                        $stChave11 = $arAFD11['cod_orgao'].$arAFD11['banco'].$arAFD11['agencia'].$arAFD11['conta_corrente'].$arAFD11['conta_corrente_dv'].$arAFD11['tipo_documento'].$arAFD11['cod_fonte_recurso'];
+                        $inCount++;
+                        
+                        $arAFD11['numero_sequencial'] = $inCount;
+                        
+                        $rsBloco11 = 'rsBloco11_'.$inCount;
+                        unset($$rsBloco11);
+                        $$rsBloco11 = new RecordSet();
+                        $$rsBloco11->preenche(array($arAFD11));
+                        $obExportador->roUltimoArquivo->addBloco( $$rsBloco11 );
+        
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("banco");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("agencia");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente_dv");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+                        
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+                        
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_fonte_recurso");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+                        
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_inicial");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_entradas");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                        
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saidas");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                            
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_final");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+                            
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+                    
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+                    }
+                }// Fim foreach registro 11
+            }
+        }// Fim foreach registro 10
     }
 
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
+    //Tipo Registro 99
+    $arRecordSetAFD99 = array(
+        '0' => array(
+            'tipo_registro' => '99',
+            'brancos' => '',
+            'numero_sequencial' => $inCount+1,
+        )
+    );
+    
+    $rsRecordSetAFD99 = new RecordSet();
+    $rsRecordSetAFD99->preenche($arRecordSetAFD99);
+        
+    $obExportador->roUltimoArquivo->addBloco($rsRecordSetAFD99);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_orgao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_banco");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_agencia");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_inicial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_final");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(104);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-    //tipo99
-    $arTemp[0] = array( 'tipo_registro'=> '99', 'espacador'=> '', 'numero_sequencial' => ++$i );
-
-    $arRecordSet[$stArquivo] = new RecordSet();
-    $arRecordSet[$stArquivo]->preenche( $arTemp );
-
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(99);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+    
+    $rsRecordSetAFD10  = null;
+    $rsRecordSetAFD11  = null;
+    $rsRecordSetAFD99  = null;
+        
+?>

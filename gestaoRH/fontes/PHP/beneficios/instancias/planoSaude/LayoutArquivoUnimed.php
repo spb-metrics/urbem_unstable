@@ -40,16 +40,16 @@ class LayoutArquivoUnimed
         $cont            = 0;
         $linha           = fgets($arquivo);
         $coluna          = explode(';', $linha);
-        
         //Valida formato e padroes do arquivo
         $boArquivoValido = $this->validarArquivo($coluna);
-        
         if ( $boArquivoValido ) {
             while (!feof($arquivo)) {
                 $linha  = fgets($arquivo);
                 $coluna = explode(';', $linha);
-                //verifica se arquivo não está vazio e descarta primeira linha
-                if (($cont > 0) && ($linha != '')) {
+                $timestamp = date('Y-m-d H:i:s');
+                
+                //verifica se arquivo não está vazio
+                if (($linha != '')) {
                     $stCondicao = " WHERE EXTRACT(YEAR FROM periodo_movimentacao.dt_final) = ".$coluna[0]."   \n";
                     $stCondicao.= "   AND EXTRACT(MONTH FROM periodo_movimentacao.dt_final) = ".$coluna[1]."; \n";
                 
@@ -58,7 +58,7 @@ class LayoutArquivoUnimed
                 
                     if ($rsPeriodo->getNumLinhas() > 0) {
                         // Verifica se o usuário está cadastrado como beneficiário
-                        $stCondicao = " WHERE cgm_fornecedor    = 1              \n";
+                        $stCondicao = " WHERE cgm_fornecedor    = ".$_REQUEST['inCGMFornecedor']." \n";
                         $stCondicao.= "  AND codigo_usuario     = ".$coluna[4]." \n";
                         $stCondicao.= "  AND cod_modalidade     = ".$coluna[2]." \n";
                         $stCondicao.= "  AND cod_tipo_convenio  = ".$coluna[3]." \n";
@@ -75,34 +75,45 @@ class LayoutArquivoUnimed
                     
                         $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
                         $obTBeneficioBeneficiarioLancamento->recuperaTodos($rsBeneficioBeneficiarioLancamento, $stCondicao);
-                    
-                        // Verifica se já foi feito lançamento para o usuário
-                        if ($rsBeneficioBeneficiarioLancamento->getNumLinhas() < 1) {
-                        
-                            // Verifica se o usuário está cadastrado como beneficiário
-                            if ($rsBeneficioBeneficiario->getNumLinhas() > 0) {
-                                $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
-                                $obTBeneficioBeneficiarioLancamento->setDado('cod_contrato'             , $rsBeneficioBeneficiario->getCampo('cod_contrato'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('cgm_fornecedor'           , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('cod_modalidade'           , $rsBeneficioBeneficiario->getCampo('cod_modalidade'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('cod_tipo_convenio'        , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('codigo_usuario'           , $rsBeneficioBeneficiario->getCampo('codigo_usuario'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('timestamp'                , $rsBeneficioBeneficiario->getCampo('timestamp'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('valor'                    , str_replace(',', '.', str_replace('.', '', $coluna[6])));
-                                $obTBeneficioBeneficiarioLancamento->setDado('timestamp_lancamento'     , date('Y-m-d H:i:s'));
-                                $obTBeneficioBeneficiarioLancamento->setDado('cod_periodo_movimentacao' , $rsPeriodo->getCampo('cod_periodo_movimentacao'));
-                                $obTBeneficioBeneficiarioLancamento->inclusao();
-                            } else {
-                                $beneficiarioNaoCadastrado[] = $linha;
-                            }
-                        } else {
+
+                        // Verifica se o usuário está cadastrado como beneficiário
+                        if ($rsBeneficioBeneficiario->getNumLinhas() > 0) {
+                            $obTBeneficioBeneficiario = new TBeneficioBeneficiario();
+                            $obTBeneficioBeneficiario->setDado('cod_contrato'       , $rsBeneficioBeneficiario->getCampo('cod_contrato')        );
+                            $obTBeneficioBeneficiario->setDado('cgm_fornecedor'     , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor')      );
+                            $obTBeneficioBeneficiario->setDado('cod_modalidade'     , $rsBeneficioBeneficiario->getCampo('cod_modalidade')      );
+                            $obTBeneficioBeneficiario->setDado('cod_tipo_convenio'  , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio')   );
+                            $obTBeneficioBeneficiario->setDado('cgm_beneficiario'   , $rsBeneficioBeneficiario->getCampo('cgm_beneficiario')    );
+                            $obTBeneficioBeneficiario->setDado('grau_parentesco'    , $rsBeneficioBeneficiario->getCampo('grau_parentesco')     );
+                            $obTBeneficioBeneficiario->setDado('codigo_usuario'     , $rsBeneficioBeneficiario->getCampo('codigo_usuario')      );
+                            $obTBeneficioBeneficiario->setDado('dt_inicio'          , $rsBeneficioBeneficiario->getCampo('dt_inicio')           );
+                            $obTBeneficioBeneficiario->setDado('dt_fim'             , $rsBeneficioBeneficiario->getCampo('dt_fim')              );
+                            $obTBeneficioBeneficiario->setDado('timestamp'          , $timestamp                                                );
+                            $obTBeneficioBeneficiario->setDado('timestamp_excluido' , NULL                                                      );
+                            $obTBeneficioBeneficiario->setDado('valor'              , str_replace(',', '.', str_replace('.', '', $coluna[6]))   );                                
+                            
+                            $obTBeneficioBeneficiario->inclusao();
+                            
+                            $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
+                            $obTBeneficioBeneficiarioLancamento->setDado('cod_contrato'             , $rsBeneficioBeneficiario->getCampo('cod_contrato'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('cgm_fornecedor'           , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('cod_modalidade'           , $rsBeneficioBeneficiario->getCampo('cod_modalidade'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('cod_tipo_convenio'        , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('codigo_usuario'           , $rsBeneficioBeneficiario->getCampo('codigo_usuario'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('timestamp'                , $timestamp                                            );
+                            $obTBeneficioBeneficiarioLancamento->setDado('valor'                    , str_replace(',', '.', str_replace('.', '', $coluna[6])));
+                            $obTBeneficioBeneficiarioLancamento->setDado('timestamp_lancamento'     , date('Y-m-d H:i:s'));
+                            $obTBeneficioBeneficiarioLancamento->setDado('cod_periodo_movimentacao' , $rsPeriodo->getCampo('cod_periodo_movimentacao'));
+                            $obTBeneficioBeneficiarioLancamento->inclusao();
+                            
                             $beneficiarioCadastrado[] = $linha;
+                        } else {
+                            $beneficiarioNaoCadastrado[] = $linha;
                         }
                     } else {
                         $obErro->setDescricao('A data dos dados do arquivo não coincide com o período de movimentação da folha, verifique as coluna ano/mês do arquivo.');
                     }
                 }
-                $cont++;
             }//WHILE
         }else{//else validacao arquivo
             $obErro->setDescricao('O arquivo está fora dos padrões do Layout Unimed.');
@@ -122,15 +133,15 @@ class LayoutArquivoUnimed
                 $obArquivoZip->AdicionarArquivo(CAM_FRAMEWORK.'tmp/beneficiariosNaoCadastrados.csv', 'beneficiariosNaoCadastrados.csv');
             }
         
-            // Escresce no arquivo os beneficiários que já estão cadastrados
+            // Escresce no arquivo os beneficiários que foram cadastrados
             if (count($beneficiarioCadastrado) > 0) {
-                $fp = fopen(CAM_FRAMEWORK."tmp/beneficiariosJaCadastrados.csv", "w");
+                $fp = fopen(CAM_FRAMEWORK."tmp/beneficiariosCadastrados.csv", "w");
                 foreach ($beneficiarioCadastrado as $beneficiario) {
                     fwrite($fp, $beneficiario);
                 }
                 fclose($fp);
                 
-                $obArquivoZip->AdicionarArquivo(CAM_FRAMEWORK.'tmp/beneficiariosJaCadastrados.csv', 'beneficiariosJaCadastrados.csv');
+                $obArquivoZip->AdicionarArquivo(CAM_FRAMEWORK.'tmp/beneficiariosCadastrados.csv', 'beneficiariosCadastrados.csv');
             }
         
             $arquivoDownload = $obArquivoZip->Show();

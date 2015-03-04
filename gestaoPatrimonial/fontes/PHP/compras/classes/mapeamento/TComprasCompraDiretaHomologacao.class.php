@@ -225,6 +225,7 @@ class TComprasCompraDiretaHomologacao extends Persistente
               and homologacao.cod_cotacao = julgamento_item.cod_cotacao
               and homologacao.lote        = julgamento_item.lote
               and homologacao.cod_item    = julgamento_item.cod_item
+              and homologacao.cgm_fornecedor = julgamento_item.cgm_fornecedor
         
       LEFT JOIN empenho.item_pre_empenho_julgamento  
                 ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio  

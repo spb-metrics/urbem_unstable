@@ -200,42 +200,59 @@ class TTCEMGEMP extends Persistente
                         END
                     AS despdeclicitacao
                     , '' AS codorgaoresplicit
-                    ,     CASE WHEN C_CD.cod_compra_direta IS NULL THEN
-                            CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
-                                    ' '
-                            ELSE
-                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL THEN
-                                            LPAD((LPAD(''||L_LIC.num_orgao,2, '0')||LPAD(''||L_LIC.num_unidade,2, '0')), 5, '0')
-                                         WHEN E_AEVALOR.valor::INTEGER = 14 THEN
-                                            LPAD((LPAD(''||RegPreco.num_orgao,2, '0')||LPAD(''||RegPreco.num_unidade,2, '0')), 5, '0')
-                                    END
-                            END
-                        END
-                    AS codUnidadeSubRespLicit                    
-                    , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
+                  , CASE WHEN E_AEVALOR.valor::INTEGER = 5
+                           THEN ' '
+                           ELSE CASE WHEN C_CD.cod_compra_direta IS NULL
+                                THEN ' '
+                                ELSE CASE WHEN L_LIC.cod_licitacao IS NOT NULL
+                                          THEN LPAD((LPAD(''||L_LIC.num_orgao,2, '0')||LPAD(''||L_LIC.num_unidade,2, '0')), 5, '0')
+                                          WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 
+                                          THEN LPAD((LPAD(''||RegPreco.num_orgao,2, '0')||LPAD(''||RegPreco.num_unidade,2, '0')), 5, '0')
+                                     END
+                                END
+                       END AS codUnidadeSubRespLicit
+                       
+                       
+                   , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                     ' '
                             ELSE
                                     CASE WHEN L_LIC.cod_licitacao IS NOT NULL THEN
                                             L_LIC.exercicio::varchar||LPAD(''||L_LIC.cod_entidade::varchar,2, '0')||LPAD(''||L_LIC.cod_modalidade::varchar,2, '0')||LPAD(''||L_LIC.cod_licitacao::varchar,4, '0')
-                                         WHEN E_AEVALOR.valor::INTEGER = 14 THEN
-                                            RegPreco.exercicio_licitacao::varchar||LPAD(''||RegPreco.cod_entidade::varchar,2, '0')||LPAD(''||RegPreco.codigo_modalidade_licitacao::varchar,2, '0')||LPAD(''||RegPreco.numero_processo_licitacao ::varchar,4, '0')
+                                            
+                                         WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 THEN
+
+                                            CASE WHEN RegPreco.exercicio_licitacao IS NOT NULL THEN
+                                                RegPreco.exercicio_licitacao::varchar||LPAD(''||RegPreco.cod_entidade::varchar,2, '0')||LPAD(''||RegPreco.codigo_modalidade_licitacao::varchar,2, '0')||LPAD(''||RegPreco.numero_processo_licitacao ::varchar,4, '0')
+                                            ELSE
+                                                arquivo_emp.exercicio_licitacao::varchar||LPAD(''||arquivo_emp.cod_entidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_modalidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_licitacao ::varchar,4, '0')
+                					        END
+
+                                        ELSE
+                                            arquivo_emp.exercicio_licitacao::varchar||LPAD(''||arquivo_emp.cod_entidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_modalidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_licitacao ::varchar,4, '0')
                                     END
+                                END
                             END
-                        END
-                    AS nroProcessoLicitatorio                    
+                        AS nroProcessoLicitatorio    
+
+               
                     , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                     ' '
                             ELSE
                                     CASE WHEN L_LIC.cod_licitacao IS NOT NULL THEN
                                             L_LIC.exercicio
-                                         WHEN E_AEVALOR.valor::INTEGER = 14 THEN
-                                            RegPreco.exercicio_licitacao
-                                    END
+                                         WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 THEN
+                                            CASE WHEN RegPreco.exercicio_licitacao IS NOT NULL THEN
+                                                RegPreco.exercicio_licitacao
+                                            ELSE
+                                                arquivo_emp.exercicio_licitacao
+                                            END
+                                     END
+                                END
                             END
-                        END
-                    AS exercicioProcessoLicitatorio
+                        AS exercicioProcessoLicitatorio
+                    
                     , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                     ' '
@@ -342,7 +359,7 @@ class TTCEMGEMP extends Persistente
                     AND E_EA.cod_entidade=EE.cod_entidade
                     AND E_EA.cod_empenho=EE.cod_empenho
                     
-                    LEFT JOIN empenho.autorizacao_empenho AS E_AE 
+                    LEFT JOIN empenho.autorizacao_empenho AS E_AE
                     ON E_AE.exercicio=E_EA.exercicio
                     AND E_AE.cod_entidade=E_EA.cod_entidade
                     AND E_AE.cod_autorizacao=E_EA.cod_autorizacao
@@ -396,6 +413,7 @@ class TTCEMGEMP extends Persistente
                     AND E_AEVALOR.exercicio=EE.exercicio
                     AND E_AEVALOR.valor=(select valor from empenho.atributo_empenho_valor where cod_pre_empenho=EE.cod_pre_empenho and atributo_empenho_valor.exercicio=EE.exercicio order by timestamp desc limit 1)
                     AND E_AEVALOR.cod_atributo=101
+                    AND E_AEVALOR.cod_cadastro=1
                     
                     LEFT JOIN tcemg.empenho_registro_precos
                     ON empenho_registro_precos.cod_entidade=EE.cod_entidade
@@ -406,6 +424,11 @@ class TTCEMGEMP extends Persistente
                     ON RegPreco.numero_processo_adesao=empenho_registro_precos.numero_processo_adesao
                     AND RegPreco.exercicio_adesao=empenho_registro_precos.exercicio_adesao
                     AND RegPreco.cod_entidade=empenho_registro_precos.cod_entidade
+                    
+                    LEFT JOIN tcemg.arquivo_emp
+                    ON  arquivo_emp.exercicio    = EE.exercicio
+                    AND arquivo_emp.cod_empenho  = EE.cod_empenho
+                    AND arquivo_emp.cod_entidade = EE.cod_entidade
                 
                     WHERE EE.exercicio='".$this->getDado('exercicio')."' -- ENTRADA EXERCICIO
                     AND EE.dt_empenho BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') --ENTRADA MES
@@ -413,6 +436,7 @@ class TTCEMGEMP extends Persistente
                     GROUP BY codOrgao,codunidadesub,codfuncao,codsubfuncao,codprograma,idacao,naturezadespesa,subelemento,nroempenho,dtempenho,modalidadeempenho,tpempenho,vlbruto,especificacaoempenho,despdeccontrato,
                     codorgaorespcontrato,codunidadesubrespcontrato,nrocontrato,dataassinaturacontrato,nrosequencialtermoaditivo,despdecconvenio,nroconvenio,dataassinaturaconvenio,despdeclicitacao,nroProcessoLicitatorio,
                     tipoProcesso,cpfOrdenador,C_CD.cod_compra_direta,tipo_objeto.cod_tipo_objeto,L_LIC.exercicio, exercicioProcessoLicitatorio, codUnidadeSubRespLicit ";
+        
         return $stSql;
     }
     

@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGRegistrosArquivoPrograma.class.php 59719 2014-09-08 15:00:53Z franver $
- * $Revision: 59719 $
- * $Author: franver $
- * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
+ * $Id: TTCEMGRegistrosArquivoPrograma.class.php 61505 2015-01-27 13:16:29Z evandro $
+ * $Revision: 61505 $
+ * $Author: evandro $
+ * $Date: 2015-01-27 11:16:29 -0200 (Ter, 27 Jan 2015) $
  * 
  */
 
@@ -76,18 +76,19 @@ class TTCEMGRegistrosArquivoPrograma extends Persistente
 
     private function montaRecuperaTotalRecursos($stFiltro = '', $stOrdem = '')
     {
-        $stSql = "
-            SELECT *
-              FROM tcemg.recupera_ppa_programa('".$this->getDado('exercicio')."', ".$this->getDado('boReemissao').")
-                AS retorno (
-                            cod_programa INTEGER,
-                            nome_programa VARCHAR,
-                            objetivo VARCHAR,
-                            total_recursos_ano_1 VARCHAR,
-                            total_recursos_ano_2 VARCHAR,
-                            total_recursos_ano_3 VARCHAR,
-                            total_recursos_ano_4 VARCHAR
-                            );
+        $stSql = "  SELECT  *                            
+                    FROM tcemg.recupera_ppa_programa('".$this->getDado('exercicio')."', ".$this->getDado('boReemissao').")
+                        AS retorno (
+                                     cod_programa         INTEGER
+                                    ,num_programa         INTEGER
+                                    ,nome_programa        VARCHAR
+                                    ,objetivo             VARCHAR
+                                    ,total_recursos_ano_1 VARCHAR
+                                    ,total_recursos_ano_2 VARCHAR
+                                    ,total_recursos_ano_3 VARCHAR
+                                    ,total_recursos_ano_4 VARCHAR
+                                    )                    
+                    ORDER BY num_programa
         ";
         return $stSql;
     }

@@ -45,13 +45,14 @@ AS $$ DECLARE
     vlDepreciacaoAnual        NUMERIC(14,2);
     vlValorMinimoDepreciacao  NUMERIC(14,2);
     inCompetencia             INTEGER;
-    inExercicio               INTEGER;
     inCodDepreciacao          INTEGER;
     inCompetenciaDepreciacao  INTEGER;
     inCodBemDepreciacao       INTEGER;
     inUltimoDiaMes            INTEGER;
     inCount                   INTEGER;
+    inCodContaAnalitica       INTEGER;
     timestampDepreciacao      TIMESTAMP;
+    boPlanoAtivoExercicio     BOOLEAN;
         
     rcBens                    RECORD;
     rcDepreciacao             RECORD;
@@ -59,6 +60,9 @@ AS $$ DECLARE
     rcConfiguracao            RECORD;
     
 BEGIN
+
+-- flag que verifica se existe algum bem depreciavel com cod_plano, no bem ou no grupo, configurado para o exercicio.
+boPlanoAtivoExercicio := false;
 
 stQuery := 'SELECT parametro
                  , valor
@@ -83,6 +87,7 @@ arCompetencia := STRING_TO_ARRAY(stCompetencia,',');
 
 -- RECUPERA OS BENS QUE POSSUEM PLANO RELACIONADO
 stQuery := '   SELECT  bem.cod_bem
+                    ,  bem.descricao
                     ,  COALESCE(reavaliacao.dt_reavaliacao,bem.dt_incorporacao,bem.dt_aquisicao) AS dt_incorporacao
                     ,  TO_CHAR(COALESCE(reavaliacao.dt_reavaliacao,bem.dt_incorporacao,bem.dt_aquisicao),''YYYYMM'' ) AS competencia_incorporacao
                     ,  COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem ) AS vl_bem
@@ -92,16 +97,15 @@ stQuery := '   SELECT  bem.cod_bem
                        END AS quota_depreciacao_anual
                     ,  bem.quota_depreciacao_anual_acelerada
                     ,  bem.depreciacao_acelerada
-                    ,  bem_plano_depreciacao.timestamp as timestamp_bem_plano
-                    ,  bem_plano_depreciacao.exercicio as exercicio_bem_plano
-                    ,  bem_plano_depreciacao.cod_plano as cod_plano_bem
+                    ,  CASE WHEN bem_plano_depreciacao.cod_plano IS NOT NULL
+                            THEN bem_plano_depreciacao.cod_plano
+                            ELSE grupo_plano_depreciacao.cod_plano
+                       END AS cod_plano
                     ,  reavaliacao.cod_reavaliacao
                     ,  reavaliacao.dt_reavaliacao
                     ,  reavaliacao.vida_util
                     ,  reavaliacao.motivo
-                    ,  grupo_plano_depreciacao.cod_plano as cod_plano_grupo
-                    ,  grupo_plano_depreciacao.exercicio as exercicio_plano_grupo
-
+                    
                  FROM patrimonio.bem
 
            INNER JOIN  patrimonio.especie
@@ -119,26 +123,28 @@ stQuery := '   SELECT  bem.cod_bem
             LEFT JOIN  patrimonio.grupo_plano_depreciacao
                    ON  grupo_plano_depreciacao.cod_grupo    = grupo.cod_grupo
                   AND  grupo_plano_depreciacao.cod_natureza = grupo.cod_natureza
-                  AND grupo_plano_depreciacao.exercicio  = '|| quote_literal(stExercicio) ||'
+                  AND  grupo_plano_depreciacao.exercicio = '|| quote_literal(stExercicio) ||'
                   
             LEFT JOIN  (  SELECT cod_bem
                                , MAX(timestamp) AS timestamp
                                , exercicio
                             FROM patrimonio.bem_plano_depreciacao
-                           WHERE bem_plano_depreciacao.exercicio = '|| quote_literal(stExercicio) ||'
-                        GROUP BY cod_bem, exercicio ) AS ultimo_plano
-                   ON  bem.cod_bem = ultimo_plano.cod_bem
+                           WHERE bem_plano_depreciacao.exercicio   = '|| quote_literal(stExercicio) ||'
+                        GROUP BY cod_bem, exercicio
+                       ) AS ultimo_plano_bem_depreciacao
+                   ON  bem.cod_bem = ultimo_plano_bem_depreciacao.cod_bem
 
             LEFT JOIN  patrimonio.bem_plano_depreciacao
-                   ON  ultimo_plano.cod_bem   = bem_plano_depreciacao.cod_bem
-                  AND  ultimo_plano.timestamp = bem_plano_depreciacao.timestamp
-                  AND  ultimo_plano.exercicio = bem_plano_depreciacao.exercicio
+                   ON  ultimo_plano_bem_depreciacao.cod_bem   = bem_plano_depreciacao.cod_bem
+                  AND  ultimo_plano_bem_depreciacao.timestamp = bem_plano_depreciacao.timestamp
+                  AND  ultimo_plano_bem_depreciacao.exercicio = bem_plano_depreciacao.exercicio
+                  AND  bem_plano_depreciacao.exercicio   = '|| quote_literal(stExercicio) ||'
 
             LEFT JOIN  (   SELECT MAX(cod_reavaliacao) AS cod_reavaliacao
                                 , cod_bem
                              FROM patrimonio.reavaliacao
                          GROUP BY cod_bem
-                     ) AS ultima_reavaliacao
+                       ) AS ultima_reavaliacao
                    ON  bem.cod_bem = ultima_reavaliacao.cod_bem
 
             LEFT JOIN  patrimonio.reavaliacao
@@ -148,7 +154,9 @@ stQuery := '   SELECT  bem.cod_bem
                 WHERE  bem.depreciavel = true
                   AND  NOT EXISTS ( SELECT 1
                                       FROM patrimonio.bem_baixado
-                                     WHERE bem_baixado.cod_bem = bem.cod_bem )';
+                                     WHERE bem_baixado.cod_bem = bem.cod_bem )
+                  AND grupo_plano_depreciacao.exercicio = '|| quote_literal(stExercicio) ||'
+                   OR bem_plano_depreciacao.exercicio   = '|| quote_literal(stExercicio);
     
     IF inCodNatureza IS NOT NULL THEN
         stQuery := stQuery||' AND bem.cod_natureza = '||inCodNatureza;
@@ -165,12 +173,34 @@ stQuery := '   SELECT  bem.cod_bem
     IF vlValorMinimoDepreciacao IS NOT NULL THEN
         stQuery := stQuery||' AND bem.vl_bem >= '||vlValorMinimoDepreciacao;
     END IF;
-    
-
+        
 FOR rcBens IN EXECUTE stQuery LOOP
     
-    vlBem := rcBens.vl_bem;
-   
+    boPlanoAtivoExercicio := true;
+       
+    -- Caso o bem esteja marcado como depreciavel, mas não possua um cod_plano configurado alerta o usuario que deve configurar uma especifica para o bem ou para o grupo.
+    IF (rcBens.cod_plano IS NULL) THEN
+        RAISE EXCEPTION 'Necessário configurar uma Conta Contábil de Depreciação Acumulada para o grupo ou no próprio bem: % - %', rcBens.cod_bem, rcBens.descricao;
+    END IF;
+    
+    -- Caso não tenha sido configurada um valor de quota de depreciação, alerta ao usuário para configurar
+    IF (rcBens.quota_depreciacao_anual = 0.00) THEN
+        RAISE EXCEPTION 'Necessário configurar valor de quota depreciação para o grupo ou no próprio bem: % - %', rcBens.cod_bem, rcBens.descricao;
+    END IF;
+    
+    -- Verifica se o cod_plano do bem, está cadastrado na tabela conta_analitica. Pois após o lançamento de depreciação não é possível alterar a conta contábil.
+    -- Caso alterar o bem para nenhuma conta contábil, desmarcar a opção de depreciavel.
+    SELECT INTO
+           inCodContaAnalitica
+           cod_conta
+      FROM contabilidade.plano_analitica
+     WHERE cod_plano = rcBens.cod_plano
+       AND exercicio = stExercicio;
+       
+    IF inCodContaAnalitica IS NULL THEN
+       RAISE EXCEPTION 'Conta Contábil de Depreciação Acumulada % do bem % não é analítica ou não está cadastrada no plano de contas.',rcBens.cod_plano, rcBens.cod_bem;
+    END IF;
+        
     -- Calcula o valor da quota, para a primeira inserção e dos proximos meses
     -- Caso o bem tenha depreciação acelerada, soma junto ao calculo de depreciação.
     IF (rcBens.depreciacao_acelerada IS TRUE) THEN
@@ -202,7 +232,7 @@ FOR rcBens IN EXECUTE stQuery LOOP
     IF rcDepreciacaoAcumulada.vl_acumulado > '0.00' THEN
         vlPrimeiraDepreciacao := TRUNC(((rcDepreciacaoAcumulada.vl_atualizado * vlQuotaPrimeira) / 100),2);
         vlDepreciacaoTmp      := TRUNC(((rcDepreciacaoAcumulada.vl_atualizado * vlQuota) / 100),2);
-    ELSE
+    ELSE  
     --Calula o valor da primeira depreciação do bem
         vlPrimeiraDepreciacao := TRUNC(((rcDepreciacaoAcumulada.vl_bem * vlQuotaPrimeira) / 100),2);
         vlDepreciacaoTmp      := TRUNC(((rcDepreciacaoAcumulada.vl_bem * vlQuota) / 100),2);
@@ -247,50 +277,6 @@ FOR rcBens IN EXECUTE stQuery LOOP
          WHERE cod_bem     = rcBens.cod_bem
            AND competencia = stExercicio||LPAD(inCompetencia::VARCHAR,2,'0');
         
-        /*
-        -- Se encontrar depreciação do bem E não for possível substituir a depreciação, então finaliza
-        IF FOUND AND stSubstituirDepreciacao = 'false' THEN
-           RAISE EXCEPTION 'Já existem bens depreciados para a competência!';
-        -- Se NÃO encontrar depreciação do bem E for possível substituir a depreciação E a competência atual for menor que a última depreciação, então finaliza
-        ELSEIF NOT FOUND AND stSubstituirDepreciacao = 'true' AND (stExercicio||LPAD(inCompetencia::VARCHAR,2,'0'))::INT < rcDepreciacaoAcumulada.max_competencia::INT THEN
-            RAISE EXCEPTION 'A competência selecionada não pode ser menor que a última competência depreciada!';
-        ELSE
-            -- Exclui e substitui os valores em depreciacao, mantendo somente a ultima depreciação de cada competencia, quando sbustituir = true
-            inUltimoDiaMes = calculaUltimoDiaMes(stExercicio::INTEGER,inCompetencia);
-            
-            stQueryDelete := '';
-            stQueryDelete := '
-                DELETE FROM contabilidade.lancamento_depreciacao
-                       USING patrimonio.depreciacao
-                       WHERE depreciacao.cod_bem         = lancamento_depreciacao.cod_bem
-                         AND depreciacao.cod_depreciacao = lancamento_depreciacao.cod_depreciacao
-                         AND depreciacao.timestamp       = lancamento_depreciacao.timestamp_depreciacao
-                         AND depreciacao.cod_bem         = '||rcBens.cod_bem||'
-                         AND depreciacao.competencia     = '|| quote_literal(stExercicio || LPAD(inCompetencia::VARCHAR,2,'0')) ||';
-
-                 DELETE FROM patrimonio.depreciacao_anulada
-                       USING patrimonio.depreciacao
-                       WHERE depreciacao.cod_bem         = depreciacao_anulada.cod_bem
-                         AND depreciacao.cod_depreciacao = depreciacao_anulada.cod_depreciacao
-                         AND depreciacao.timestamp       = depreciacao_anulada.timestamp
-                         AND depreciacao.cod_bem         = '||rcBens.cod_bem||'
-                         AND depreciacao.competencia     = '|| quote_literal(stExercicio || LPAD(inCompetencia::VARCHAR,2,'0')) ||';
-
-                 DELETE FROM patrimonio.depreciacao_reavaliacao
-                       USING patrimonio.depreciacao
-                       WHERE depreciacao_reavaliacao.cod_bem         = depreciacao.cod_bem
-                         AND depreciacao_reavaliacao.cod_depreciacao = depreciacao.cod_depreciacao
-                         AND depreciacao_reavaliacao.timestamp       = depreciacao.timestamp
-                         AND depreciacao.cod_bem                     = '||rcBens.cod_bem||'
-                         AND depreciacao.competencia                 = '|| quote_literal(stExercicio || LPAD(inCompetencia::VARCHAR,2,'0')) ||';
-
-                 DELETE FROM patrimonio.depreciacao
-                       WHERE competencia = '|| quote_literal(stExercicio || LPAD(inCompetencia::VARCHAR,2,'0')) ||'
-                         AND cod_bem     = '||rcBens.cod_bem || ';';
-          EXECUTE stQueryDelete;
-        END IF;
-        */
-        
         vlBem := vlBem - vlDepreciacao;
         timestampDepreciacao := ('now'::text)::timestamp(3);
         
@@ -310,6 +296,10 @@ FOR rcBens IN EXECUTE stQuery LOOP
         
     END LOOP;
 END LOOP;
+
+IF boPlanoAtivoExercicio = false THEN
+    RAISE EXCEPTION 'Necessário configurar uma Conta Contábil de Depreciação Acumulada para o grupo ou nos bens depreciavéis do exercicío - %', stExercicio;
+END IF;
 
 RETURN;
 END;

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGORecita.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTCMGORecita.class.php 61770 2015-03-03 13:26:42Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -985,5 +985,113 @@ UNION
 
         return $stSQL;
     }
+
+    public function recuperaArquivoOrcamento10(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaArquivoOrcamento10",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    public function montaRecuperaArquivoOrcamento10()
+    {
+        $stSQL = "SELECT
+                            10 as tipo_registro
+                            , ( SELECT SUBSTR(valor,1,1)
+                                FROM administracao.configuracao_entidade 
+                                WHERE configuracao_entidade.exercicio = receita.exercicio
+                                AND configuracao_entidade.cod_entidade = receita.cod_entidade
+                                AND  parametro = 'tc_ug_orgaounidade'
+                            ) as cod_orgao
+                            , (  SELECT SUBSTR(valor,3,2) 
+                                FROM administracao.configuracao_entidade 
+                                WHERE configuracao_entidade.exercicio = receita.exercicio
+                                AND configuracao_entidade.cod_entidade = receita.cod_entidade
+                                AND  parametro = 'tc_ug_orgaounidade'
+                            ) as cod_unidade
+                            , rubrica
+                            , TRIM(descricao) as especificacao
+                            , tabela.vl_original AS vl_previsto
+                            , tabela.cod_recurso as cod_fonte_recurso
+                      FROM
+                            (
+                                SELECT
+                                        tabela.cod_recurso
+                                        , REPLACE(tabela.cod_estrutural::VARCHAR,'.','') AS rubrica
+                                        , tabela.vl_original
+                                        , tabela.descricao
+                                        , tabela.cod_receita                                        
+                                FROM tcmgo.arquivo_exportacao_orcamento_rec('".$this->getDado("exercicio")     ."',
+                                                                            '".$this->getDado("stEntidades")  ."',
+                                                                            '".$this->getDado("dtInicio")     ."',
+                                                                            '".$this->getDado("dtFim")       ."')
+                                AS tabela( 
+                                            cod_estrutural     varchar,           
+                                            cod_recurso        varchar(13),
+                                            cod_receita        integer,
+                                            descricao          varchar,           
+                                            vl_original        numeric
+                                        )
+                                ORDER BY tabela.cod_estrutural
+                            ) AS tabela
+                        JOIN orcamento.receita
+                            ON receita.cod_receita = tabela.cod_receita
+                            AND receita.exercicio = '".$this->getDado("exercicio")."'
+        ";
+        return $stSQL;
+    }
+
+    public function recuperaArquivoOrcamento11(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaArquivoOrcamento11",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    public function montaRecuperaArquivoOrcamento11()
+    {
+        $stSQL = "SELECT
+                             11 as tipo_registro
+                            , ( SELECT SUBSTR(valor,1,1)
+                                FROM administracao.configuracao_entidade 
+                                WHERE configuracao_entidade.exercicio = receita.exercicio
+                                AND configuracao_entidade.cod_entidade = receita.cod_entidade
+                                AND  parametro = 'tc_ug_orgaounidade'
+                            ) as cod_orgao
+                            , (  SELECT SUBSTR(valor,3,2) 
+                                FROM administracao.configuracao_entidade 
+                                WHERE configuracao_entidade.exercicio = receita.exercicio
+                                AND configuracao_entidade.cod_entidade = receita.cod_entidade
+                                AND  parametro = 'tc_ug_orgaounidade'
+                            ) as cod_unidade
+                            , rubrica as rubrica
+                            , tabela.cod_recurso as cod_fonte_recurso                            
+                            , vl_fonte_recurso
+                            , '' as brancos
+                      FROM
+                            (
+                                SELECT
+                                        tabela.cod_recurso
+                                        , REPLACE(tabela.cod_estrutural::VARCHAR,'.','') AS rubrica                                        
+                                        , SUM(tabela.vl_original) as vl_fonte_recurso
+                                        , tabela.cod_receita                                     
+                                FROM tcmgo.arquivo_exportacao_orcamento_rec('".$this->getDado("exercicio")     ."',
+                                                                            '".$this->getDado("stEntidades")  ."',
+                                                                            '".$this->getDado("dtInicio")     ."',
+                                                                            '".$this->getDado("dtFim")       ."')
+                                AS tabela( 
+                                            cod_estrutural     varchar,           
+                                            cod_recurso        varchar(13),
+                                            cod_receita        integer,
+                                            descricao          varchar,           
+                                            vl_original        numeric
+                                        )
+                                 
+                                GROUP BY tabela.cod_recurso, tabela.cod_estrutural, tabela.cod_receita
+                                ORDER BY  cod_recurso , cod_estrutural
+                            ) AS tabela
+                    JOIN orcamento.receita
+                            ON receita.cod_receita = tabela.cod_receita
+                            AND receita.exercicio = '".$this->getDado("exercicio")."'
+        ";
+        return $stSQL;
+    }
+
 }
 ?>

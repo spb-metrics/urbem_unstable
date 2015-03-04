@@ -65,13 +65,13 @@ $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 $pgJS      = "JS".$stPrograma.".js";
 
-$obRPrevisaoDespesa       = new ROrcamentoPrevisaoDespesa;
-$obRConfiguracaoOrcamento = new ROrcamentoConfiguracao;
+$obRPrevisaoDespesa                = new ROrcamentoPrevisaoDespesa;
+$obRConfiguracaoOrcamento          = new ROrcamentoConfiguracao;
 $obROrcamentoPrevisaoOrcamentaria  = new ROrcamentoPrevisaoOrcamentaria;
 $obROrcamentoDespesa               = new ROrcamentoDespesa;
-$obMontaOrgaoUnidade      = new MontaOrgaoUnidade;
-
-$obErro = new Erro;
+$obMontaOrgaoUnidade               = new MontaOrgaoUnidade;
+$obTransacao                       = new Transacao();
+$obErro                            = new Erro;
 
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
@@ -96,7 +96,7 @@ switch ($stAcao) {
         $obRPrevisaoDespesa->obROrcamentoPrevisaoOrcamentaria->setExercicio( $obRPrevisaoDespesa->getExercicio() );
         if ( $obRPrevisaoDespesa->getExercicio() != $obRPrevisaoDespesa->obROrcamentoPrevisaoOrcamentaria->getExercicio() ) {
             $obRPrevisaoDespesa->obROrcamentoPrevisaoOrcamentaria->setExercicio( $obRPrevisaoDespesa->getExercicio() );
-            $obRPrevisaoDespesa->obROrcamentoPrevisaoOrcamentaria->salvar();
+            $obRPrevisaoDespesa->obROrcamentoPrevisaoOrcamentaria->salvar($boTransacao);
         }
 
         $arID = explode(":", $_POST['stCodDespesa']);
@@ -108,7 +108,7 @@ switch ($stAcao) {
                 $inValor = $_POST["inCelula_".$arID[$inContLinhas]."_".$inContColunas."_".$inContLinhas];
                 $inValor = str_replace( ".", "", $inValor );
                 $inValor = str_replace( ",", ".", $inValor );
-                $arTotal[ $inContLinhas ] = $arTotal[ $inContLinhas ] + $inValor;
+                $arTotal[ $inContLinhas ] = number_format(($arTotal[ $inContLinhas ] + $inValor),2,'.','');
             }
         }
 
@@ -127,9 +127,11 @@ switch ($stAcao) {
             if ( count($arID) ) {
                 for ( $inContLinhas = 0; $inContLinhas < count($arID); $inContLinhas++) {
                     $obRPrevisaoDespesa->setCodigoDespesa   ( $arID[$inContLinhas] );
-                    $obErro = $obRPrevisaoDespesa->limparDados();
+                    $obErro = $obRPrevisaoDespesa->limparDados($boTransacao);
                 }
             }
+            $boFlagTransacao = false;
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao ); 
             if ( !$obErro->ocorreu() ) {
                 for ($inContLinhas = 0; $inContLinhas < $_POST['inQtdLin']; $inContLinhas++) {
                     for ($inContColunas = 0; $inContColunas < $_POST['inQtdCol']; $inContColunas++) {
@@ -141,14 +143,16 @@ switch ($stAcao) {
                         } else {
                             $obRPrevisaoDespesa->setValorPrevisto ( $inValor );
                         }
-                        $obErro = $obRPrevisaoDespesa->salvar();
+                        $obErro = $obRPrevisaoDespesa->salvar($boTransacao);
                     }
                 }
+                $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPrevisaoDespesa );
             }
         }
         if ( !$obErro->ocorreu() ) {
-            SistemaLegado::alertaAviso($pgList, $obRPrevisaoDespesa->getCodigoDespesa()."/".$obRPrevisaoDespesa->getExercicio(), "alterar", "aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList,"Configuração realizada com sucesso.", "alterar", "aviso", Sessao::getId(), "../");
         } else {
+            SistemaLegado::LiberaFrames(true,true);
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
         }
     break;

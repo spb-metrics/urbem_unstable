@@ -69,13 +69,13 @@ $preview->addParametro ( 'entidade', implode(',', $_REQUEST['inCodEntidade'] ) )
 $preview->addParametro ( 'exercicio_anterior', (Sessao::getExercicio() - 1));
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $rsEntidade->setPrimeiroElemento();
 
     while ( !$rsEntidade->eof() ) {
         if (preg_match("/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ))) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')));
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm'));
             break;
         }
         $rsEntidade->proximo();
@@ -97,7 +97,7 @@ if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( coun
 switch ($_REQUEST['stTipoRelatorio']) {
     case 'Mes':
         $preview->addParametro( 'periodo', $_REQUEST['cmbMes']          );
-        $stMesExtenso = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio());
+        $stMesExtenso = sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio();
         $preview->addParametro( 'mes_extenso'  , $stMesExtenso  );
         $preview->addParametro( 'peridiocidade', "mes"          );
     break;
@@ -178,7 +178,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo9novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

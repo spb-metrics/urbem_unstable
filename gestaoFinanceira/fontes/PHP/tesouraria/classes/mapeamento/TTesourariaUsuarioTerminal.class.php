@@ -115,4 +115,33 @@ function montaRecuperaRelacionamento()
     return $stSql;
 }
 
+    function recuperaCodigoTimestamp(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = ""){
+        $obErro      = new Erro;
+	$obConexao   = new Conexao;
+	$rsRecordSet = new RecordSet;
+	$stSql = $this->montaRecuperaCodigoTimestamp().$stFiltro.$stOrdem;
+	$this->stDebug = $stSql;
+	$obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+	return $obErro;
+    }
+    
+    function montaRecuperaCodigoTimestamp(){
+	$stSql = " SELECT usuario_terminal.cod_terminal
+                        , usuario_terminal.timestamp_terminal
+                     FROM tesouraria.terminal
+               
+               INNER JOIN tesouraria.usuario_terminal 
+                       ON usuario_terminal.cod_terminal       = terminal.cod_terminal
+                      AND usuario_terminal.timestamp_terminal = terminal.timestamp_terminal
+                    
+                    WHERE usuario_terminal.timestamp_terminal = ( SELECT MAX(timestamp_terminal)
+                                                                    FROM tesouraria.usuario_terminal
+                                                                   WHERE cgm_usuario = ".$this->getDado('cgm_usuario')."
+                                                                     AND responsavel = true )";
+        
+	return $stSql;
+    }
+
 }
+
+?>

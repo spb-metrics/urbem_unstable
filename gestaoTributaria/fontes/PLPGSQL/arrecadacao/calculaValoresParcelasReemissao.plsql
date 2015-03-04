@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: calculaValoresParcelasReemissao.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: calculaValoresParcelasReemissao.plsql 61622 2015-02-18 15:50:46Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
@@ -43,8 +43,8 @@ Revision 1.1  2006/12/12 15:20:55  cercato
 
 */
 
-CREATE OR REPLACE FUNCTION arrecadacao.calculaValoresParcelasReemissao(varchar,integer,integer,date) returns varchar as '
-declare
+CREATE OR REPLACE FUNCTION arrecadacao.calculaValoresParcelasReemissao(varchar,integer,integer,date) returns varchar as $$
+DECLARE
     stNumeracao     ALIAS FOR $1;
     inExercicio     ALIAS FOR $2;
     inCodParcela    ALIAS FOR $3;
@@ -110,9 +110,9 @@ begin
 
     -- retorno
     nuTotal := ( nuValorParcela + nuMulta + nuJuros + nuCorrecao )::numeric(14,2);
-    nuRetorno := nuTotal||''§''||nuValorParcela||''§''||nuMulta||''§''||nuJuros||''§''||nuDescontoParcela||''§''||nuCorrecao;
+    nuRetorno := nuTotal||'§'||nuValorParcela||'§'||nuMulta||'§'||nuJuros||'§'||nuDescontoParcela||'§'||nuCorrecao;
 
    return nuRetorno::varchar;
 
 end;
-'language 'plpgsql';
+$$ language 'plpgsql';

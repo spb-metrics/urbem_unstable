@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.07
 
-    $Id: FMManterServidor.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterServidor.php 61695 2015-02-26 12:13:37Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -127,11 +127,11 @@ $hdnContagemInicial->setValue ( $obRConfiguracaoPessoal->getContagemInicial() );
 
 // mostra atributos selecionados
 if ($stAcao == "incluir" or $stAcao == "alterar_servidor") {
-    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributos );
+    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributos, $stOrder = "", $boTransacao = "" );
 } else {
     $arChaveAtributoCandidato =  array( "cod_contrato" => $_REQUEST["inCodContrato"] );
     $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoCandidato );
-    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
+    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos, $stFiltro="" ,$stOrder=" ORDER BY AD.cod_atributo ASC " ,$boTransacao);
 
     $arAtributos = $rsAtributos->getElementos();
 

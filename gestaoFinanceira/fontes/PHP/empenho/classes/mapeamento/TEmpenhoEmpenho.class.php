@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TEmpenhoEmpenho.class.php 61279 2014-12-29 15:31:48Z evandro $
+    * $Id: TEmpenhoEmpenho.class.php 61680 2015-02-25 13:56:31Z arthur $
 
     * Casos de uso: uc-02.01.23
                     uc-02.03.03
@@ -4317,63 +4317,67 @@ function recuperaDadosExportacao(&$rsRecordSet, $stCondicao = "", $boTransacao =
 
 function MontaRecuperaDadosExportacao()
 {
-    $stSql  = "SELECT                                                           \r\n";
-    $stSql .= "tabela.num_orgao        ,                                        \r\n";
-    $stSql .= "tabela.num_unidade      ,                                        \r\n";
-    $stSql .= "tabela.cod_funcao       ,                                        \r\n";
-    $stSql .= "tabela.cod_subfuncao    ,                                        \r\n";
-    $stSql .= "tabela.cod_programa     ,                                        \r\n";
-    $stSql .= "0 as cod_subprograma    ,                                        \r\n";
-    $stSql .= "tabela.num_pao          ,                                        \r\n";
-    $stSql .= "replace(tabela.cod_estrutural,'.','') as cod_estrutural ,        \r\n";
-    $stSql .= "tabela.cod_recurso      ,                                        \r\n";
-    $stSql .= "0 as contrapartida      ,                                        \r\n";
-    $stSql .= "(tabela.exercicio || LPAD(tabela.cod_entidade::varchar,2,'0') || LPAD(tabela.cod_empenho::varchar,7,'0')) as num_empenho  ,\r\n";
-    $stSql .= "to_char(tabela.dt_empenho,'ddmmyyyy')   as dt_empenho   ,        \r\n";
-    $stSql .= "replace(cast(tabela.vl_empenhado as varchar),'.','') as vl_empenhado    ,     \r\n";
-    $stSql .= "tabela.sinal            ,                                        \r\n";
-    $stSql .= "tabela.cgm              ,                                        \r\n";
-    $stSql .= "tabela.exercicio        ,                                        \r\n";
-    $stSql .= "tabela.cod_empenho      ,                                        \r\n";
-    $stSql .= "tabela.ordem            ,                                        \r\n";
-    $stSql .= "tabela.historico        ,                                        \r\n";
-    $stSql .= "tabela.caracteristica   ,                                        \r\n";
-    $stSql .= "tabela.modalidade       ,                                        \r\n";
-    $stSql .= "tabela.nro_licitacao    ,                                        \r\n";
-    $stSql .= "tabela.outras_modalidades,                                       \r\n";
-    $stSql .= "tabela.preco             ,                                       \r\n";
-    $stSql .= "'' as branco                                                     \r\n";
-    $stSql .= "FROM                                                             \r\n";
-    $stSql .= "    tcers.exportacaoEmpenho('".$this->getDado('stExercicio')."','".$this->getDado('dtInicial')."','".$this->getDado('dtFinal')."','".$this->getDado('stCodEntidades')."')  \r\n";
-    $stSql .= "as                                                   \r\n";
-    $stSql .= "    tabela                                           \r\n";
-    $stSql .= "        (                                            \r\n";
-    $stSql .= "            num_orgao       integer         ,        \r\n";
-    $stSql .= "            num_unidade     integer         ,        \r\n";
-    $stSql .= "            cod_funcao      integer         ,        \r\n";
-    $stSql .= "            cod_subfuncao   integer         ,        \r\n";
-    $stSql .= "            cod_programa    integer         ,        \r\n";
-    $stSql .= "            num_pao         integer         ,        \r\n";
-    $stSql .= "            cod_recurso     integer         ,        \r\n";
-    $stSql .= "            cod_estrutural  varchar         ,        \r\n";
-    $stSql .= "            cod_empenho     integer         ,        \r\n";
-    $stSql .= "            dt_empenho      date            ,        \r\n";
-    $stSql .= "            vl_empenhado    numeric         ,        \r\n";
-    $stSql .= "            sinal           varchar         ,        \r\n";
-    $stSql .= "            cgm             integer         ,        \r\n";
-    $stSql .= "            historico       varchar         ,        \r\n";
-    $stSql .= "            cod_pre_empenho integer         ,        \r\n";
-    $stSql .= "            exercicio       char(4)         ,        \r\n";
-    $stSql .= "            cod_entidade    integer         ,        \r\n";
-    $stSql .= "            ordem           integer         ,        \r\n";
-    $stSql .= "            oid             oid             ,        \r\n";
-    $stSql .= "            caracteristica  integer         ,        \r\n";
-    $stSql .= "            modalidade      integer         ,        \r\n";
-    $stSql .= "            nro_licitacao   text            ,        \r\n";
-    $stSql .= "            outras_modalidades  text        ,        \r\n";
-    $stSql .= "            preco             text                   \r\n";
-    $stSql .= "        )                                            \r\n";
-    $stSql .= "ORDER BY tabela.exercicio,tabela.cod_empenho, tabela.ordem;  \r\n";
+    $stSql  = " SELECT                                                           
+                        tabela.num_orgao                                                
+                        ,tabela.num_unidade                                              
+                        ,tabela.cod_funcao                                               
+                        ,tabela.cod_subfuncao                                            
+                        ,tabela.cod_programa                                             
+                        ,0 as cod_subprograma                                            
+                        ,tabela.num_pao                                                  
+                        ,replace(tabela.cod_estrutural,'.','') as cod_estrutural       
+                        ,tabela.cod_recurso                                              
+                        ,0 as contrapartida                                              
+                        ,(tabela.exercicio || LPAD(tabela.cod_entidade::varchar,2,'0') || LPAD(tabela.cod_empenho::varchar,7,'0')) as num_empenho  
+                        ,to_char(tabela.dt_empenho,'ddmmyyyy')   as dt_empenho   
+                        ,replace(cast(tabela.vl_empenhado as varchar),'.','') as vl_empenhado    
+                        ,tabela.sinal                                                    
+                        ,tabela.cgm                                                      
+                        ,tabela.exercicio                                                
+                        ,tabela.cod_empenho                                              
+                        ,tabela.ordem                                                    
+                        ,tabela.historico                                                
+                        ,tabela.caracteristica                                           
+                        ,tabela.modalidade                                               
+                        ,tabela.nro_licitacao                                            
+                        ,tabela.outras_modalidades
+                        ,tabela.preco             
+                        ,'' as branco
+                        ,modalidade_licitacao
+                FROM                                                             
+                    tcers.exportacaoEmpenho('".$this->getDado('stExercicio')."','".$this->getDado('dtInicial')."','".$this->getDado('dtFinal')."','".$this->getDado('stCodEntidades')."')  
+                    AS tabela
+                    (                                            
+                        num_orgao               integer                 
+                        ,num_unidade            integer                 
+                        ,cod_funcao             integer                 
+                        ,cod_subfuncao          integer                 
+                        ,cod_programa           integer                 
+                        ,num_pao                integer                 
+                        ,cod_recurso            integer                 
+                        ,cod_estrutural         varchar                 
+                        ,cod_empenho            integer                 
+                        ,dt_empenho             date                    
+                        ,vl_empenhado           numeric                 
+                        ,sinal                  varchar                 
+                        ,cgm                    integer                 
+                        ,historico              varchar                 
+                        ,cod_pre_empenho        integer                 
+                        ,exercicio              char(4)                 
+                        ,cod_entidade           integer                 
+                        ,ordem                  integer                 
+                        ,oid                    oid                     
+                        ,caracteristica         integer                 
+                        ,modalidade             integer                 
+                        ,nro_licitacao          text                    
+                        ,outras_modalidades     text                
+                        ,preco                  text                  
+                        ,modalidade_licitacao   text               
+                    )                                            
+                ORDER BY tabela.exercicio
+                        ,tabela.cod_empenho
+                        ,tabela.ordem; 
+    "; 
 
     return $stSql;
 }

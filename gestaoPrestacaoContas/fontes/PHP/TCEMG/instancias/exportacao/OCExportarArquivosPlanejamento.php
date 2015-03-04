@@ -322,7 +322,7 @@ if (in_array("DSP.csv",$arFiltro["arArquivosSelecionados"])) {
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
                     }
                 }
-            }
+            } 
         }
     }
 }
@@ -760,7 +760,7 @@ if (in_array("PRO.csv",$arFiltro["arArquivosSelecionados"])) {
 
     $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
     $obExportador->roUltimoArquivo->addBloco($arRecordSetArquivos["PRO.csv"]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_programa");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);

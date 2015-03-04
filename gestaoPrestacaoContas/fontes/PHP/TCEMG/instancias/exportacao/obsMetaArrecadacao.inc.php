@@ -44,6 +44,8 @@
 
     $obTTCEMGObsMetaArrecadacao = new TTCEMGObsMetaArrecadacao();
     $obTTCEMGObsMetaArrecadacao->setDado('exercicio'   , Sessao::getExercicio());
+    $obTTCEMGObsMetaArrecadacao->setDado('mes'         , $arFiltros['inPeriodo']);
+
     $obTTCEMGObsMetaArrecadacao->recuperaDadosArquivo($rsArquivo);
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);

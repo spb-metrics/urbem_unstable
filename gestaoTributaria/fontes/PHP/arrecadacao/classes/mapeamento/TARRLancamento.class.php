@@ -29,7 +29,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRLancamento.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TARRLancamento.class.php 61508 2015-01-27 19:54:30Z carolina $
 
 * Casos de uso: uc-05.03.05
 */
@@ -1201,5 +1201,84 @@ function montaVerificaLancamentos()
     return $stSql;
 }
 
+function recuperaRelatorioLancamentoAutomatico(&$rsRecordSet, $stFiltro = "", $boTransacao = "", $stOrder = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql  = $this->montaRecuperaRelatorioLancamentoAutomatico().$stFiltro.$stOrder;
+    $this->setDebug($stSql); 
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaRelatorioLancamentoAutomatico()
+{
+    $stSql = "
+        SELECT *
+          FROM ( SELECT DISTINCT lancamento.cod_lancamento
+                      , to_char( lancamento.vencimento, 'dd/mm/yyyy' ) AS vencimento
+                      , lancamento.total_parcelas
+                      , lancamento.valor
+                      , CAST((SELECT array_to_string( ARRAY( select numcgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS numcgm
+                      , CAST((SELECT array_to_string( ARRAY( select nom_cgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS nom_cgm
+                      , COALESCE ( cadastro_economico_calculo.inscricao_economica, imovel_calculo.inscricao_municipal, 0 ) AS inscricao
+                      , CASE WHEN parcela_desconto.valor IS NOT NULL THEN
+                                parcela_desconto.valor
+                        ELSE
+                                parcela.valor
+                        END AS valor_parcela
+                      , COALESCE ( carne.numeracao::varchar, '    -    ' ) AS numeracao
+                      , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN
+                                             'única'::text
+                                     ELSE
+                                             parcela.nr_parcela||'/'||lancamento.total_parcelas::text
+                                     END
+                                   ), ' - ' ) AS nr_parcela
+                      , COALESCE( to_char( parcela.vencimento, 'dd/mm/yyyy' ), ' - ' ) AS data_vencimento
+                      , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN
+                                             0
+                                     ELSE
+                                             parcela.nr_parcela
+                                     END
+                                   ), 0) AS ordenacao
+                       , grupo_credito.ano_exercicio
+                       , grupo_credito.cod_grupo
+                       , COALESCE ( imovel_calculo.inscricao_municipal, 0 ) as inscricao_municipal
+                       ,  COALESCE ( cadastro_economico_calculo.inscricao_economica, 0 ) AS inscricao_economica
+                   FROM arrecadacao.lancamento
+             INNER JOIN arrecadacao.lancamento_calculo
+                     ON lancamento_calculo.cod_lancamento = lancamento.cod_lancamento
+
+              LEFT JOIN arrecadacao.imovel_calculo
+                     ON imovel_calculo.cod_calculo = lancamento_calculo.cod_calculo
+
+              LEFT JOIN arrecadacao.cadastro_economico_calculo
+                     ON cadastro_economico_calculo.cod_calculo = lancamento_calculo.cod_calculo
+
+              LEFT JOIN arrecadacao.parcela
+                     ON parcela.cod_lancamento = lancamento.cod_lancamento
+
+              LEFT JOIN arrecadacao.parcela_desconto
+                     ON parcela_desconto.cod_parcela = parcela.cod_parcela
+
+
+              LEFT JOIN arrecadacao.carne
+                     ON carne.cod_parcela = parcela.cod_parcela
+                                  
+               LEFT JOIN arrecadacao.calculo_grupo_credito 
+                        ON calculo_grupo_credito.cod_calculo = lancamento_calculo.cod_calculo
+                   
+                       
+               LEFT JOIN arrecadacao.grupo_credito
+                        ON grupo_credito.ano_exercicio = calculo_grupo_credito.ano_exercicio
+                      AND grupo_credito.cod_grupo = calculo_grupo_credito.cod_grupo
+            ) AS lancamento
+
+    ";
+
+    return $stSql;
+}
 }//fim da class
 ?>

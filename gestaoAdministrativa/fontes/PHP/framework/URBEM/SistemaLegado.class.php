@@ -184,6 +184,33 @@ public static function isAL($boTransacao = '')
     return false;
 }
 
+public static function isTCMGO($boTransacao = '')
+{
+    $stSql = "SELECT
+                valor
+              FROM
+                administracao.configuracao
+              WHERE
+                    cod_modulo = 2
+                AND parametro  = 'cod_uf'
+                AND exercicio  = '".Sessao::getExercicio()."'
+            ";
+
+    $obConexao   = new Conexao;
+    $obErro      = new Erro;
+    $obRecordSet = new RecordSet;
+
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    if ( $obErro->ocorreu() ) {
+        return false;
+    }
+    if ( ( trim($rsRecordSet->getCampo('valor')) == trim('9') ) ) {
+        return true;
+    }
+
+    return false;
+}
+
 /**************************************************************************/
 /**** Retorna um dado de qualquer tabela                                ***/
 /**************************************************************************/

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoBalancete.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportacaoBalancete.php 61662 2015-02-23 18:48:44Z carlos.silva $
 
     * Casos de uso: uc-06.04.00
 */
@@ -54,7 +54,7 @@ $arFiltroRelatorio = Sessao::read('filtroRelatorio');
 $inMes = $arFiltroRelatorio['inMes'];
 
 $arFiltroRelatorio['stDataInicial'] = '01/'.$inMes.'/'.Sessao::getExercicio();
-$arFiltroRelatorio['stDataFinal'] = SistemaLegado::retornaUltimoDiaMes($inMes, Sessao::getExercicio());
+$arFiltroRelatorio['stDataFinal']   = SistemaLegado::retornaUltimoDiaMes($inMes, Sessao::getExercicio());
 
 Sessao::write('filtroRelatorio', $arFiltroRelatorio);
 
@@ -73,12 +73,14 @@ foreach ($arFiltroRelatorio['inCodEntidade'] as $inCodEntidade) {
     $arUnidadesGestoras[ $obTConfiguracao->getDado('valor') ] .= $inCodEntidade;
 }
 
+
 $stTipoDocumento = "TCM_GO";
 $obExportador    = new Exportador();
 
 foreach ($arFiltroRelatorio["arArquivosSelecionados"] as $stArquivo) {
     //foreach ($arUnidadesGestoras as $inUnidadeGestora => $stEntidades) {
         $arArquivo = explode( '.',$stArquivo );
+        
         if ($stArquivo == 'Ide.txt' OR $stArquivo == 'Orgao.txt') {
             $obExportador->addArquivo($arArquivo[0].'.'.$arArquivo[1]);
         } elseif ($stArquivo == 'CON.txt') {
@@ -86,6 +88,7 @@ foreach ($arFiltroRelatorio["arArquivosSelecionados"] as $stArquivo) {
         } else {
             $obExportador->addArquivo($arArquivo[0].$inMes.substr(Sessao::getExercicio(),2,2).'.'.$arArquivo[1]);
         }
+        
         $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
         if ($stArquivo == 'CON.txt') {
             include ('CONArq'. ".inc.php");
@@ -102,5 +105,3 @@ if ($arFiltroRelatorio['stTipoExport'] == 'compactados') {
 
 $obExportador->show();
 SistemaLegado::LiberaFrames();
-
-?>

@@ -96,7 +96,7 @@ function recuperaContratosDetalhadosEscala(&$rsRecordset,$stFiltro="",$stOrdem="
 function montaRecuperaContratosDetalhadosEscala()
 {
     $stSql .= "    SELECT escala_contrato.cod_escala\n";
-    $stSql .= "         , lpad(escala_contrato.cod_escala, 5, '0') as cod_escala_formatado\n";
+    $stSql .= "         , lpad(escala_contrato.cod_escala::VARCHAR, 5, '0') as cod_escala_formatado\n";
 
     if ($this->getDado('stRetorno') == 'contrato') {
         $stSql .= "         , contrato.cod_contrato\n";

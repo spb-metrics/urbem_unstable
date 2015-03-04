@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOROP.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTGOROP.class.php 61551 2015-02-04 15:12:44Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -55,51 +55,100 @@ class TTGOROP extends Persistente
     //Mapeamento do case pode ser encontrado no documento de tabelas auxiliares do tribunal
     public function montaRecuperaTodos()
     {
-        $stSql = " select '10' as  tipo_registro
-                , cons.codigo_obra
-                , cons.num_orgao
-                , cons.num_unidade
-                , cons.ano_obra
-                , cons.especificacao
-                , sum ( saldo ) as saldo
-            from (
-               select   obra.ano_obra ||obra.cod_obra as codigo_obra
-                    , obra.especificacao
-                    , obra.ano_obra
-                    , despesa.num_orgao
-                    , despesa.num_unidade
-                    , ( empenho.fn_consultar_valor_empenhado( empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade ) -
-                    empenho.fn_consultar_valor_empenhado_anulado( empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade) )
-                   -
-                    ( empenho.fn_consultar_valor_liquidado(empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade ) -
-                      empenho.fn_consultar_valor_liquidado_anulado( empenho.exercicio, empenho.cod_empenho, empenho.cod_entidade )
-                    ) AS saldo
-                 from tcmgo.obra
-                 join tcmgo.obra_empenho
-                   on ( obra.cod_obra = obra_empenho.cod_obra
-                  and   obra.ano_obra = obra_empenho.ano_obra )
-                 join empenho.empenho
-                   on ( obra_empenho.cod_empenho  = empenho.cod_empenho
-                  and   obra_empenho.cod_entidade = empenho.cod_entidade
-                  and   obra_empenho.exercicio    = empenho.exercicio )
-                 join empenho.pre_empenho
-                   on ( empenho.exercicio       = pre_empenho.exercicio
-                  and   empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho )
-                 join empenho.pre_empenho_despesa
-                   on ( pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-                  and   pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho )
-                 join orcamento.despesa
-                   on ( despesa.exercicio   = pre_empenho_despesa.exercicio
-                  and   despesa.cod_despesa = pre_empenho_despesa.cod_despesa )
-                where obra_empenho.cod_entidade in ( ". $this->getDado ( 'stEntidades') ." )
-                  and obra_empenho.exercicio = '". $this->getDado( 'exercicio' ) ."'
-               ) as  cons
-           group by tipo_registro
-                  , cons.codigo_obra
-                  , cons.num_orgao
-                  , cons.num_unidade
-                  , cons.ano_obra
-                  , cons.especificacao";
+        $stSql = "  SELECT
+                            '10' as  tipo_registro
+                            , despesa.num_orgao as cod_orgao
+                            , despesa.num_unidade as cod_unidade
+                            , TRIM(obra.especificacao) as descricao_obra
+                            , obra.cod_obra                                  
+                            , obra.ano_obra
+                            , bem.vl_bem as vl_aquisicao
+                            ,(   SELECT vl_atualizado 
+                                        FROM patrimonio.fn_depreciacao_acumulada(COALESCE(reavaliacao.cod_bem,bem.cod_bem))
+                                        as retorno (
+                                            cod_bem             INTEGER
+                                            ,vl_acumulado       NUMERIC
+                                            ,vl_atualizado      NUMERIC
+                                            ,vl_bem             NUMERIC
+                                            ,min_competencia    VARCHAR
+                                            ,max_competencia    VARCHAR)
+                            ) as vl_inc_reavaliacao
+                            , CASE WHEN bem_baixado.tipo_baixa = 1 THEN
+                                    (   SELECT vl_atualizado 
+                                        FROM patrimonio.fn_depreciacao_acumulada(bem_baixado.cod_bem)
+                                        as retorno (
+                                            cod_bem             INTEGER
+                                            ,vl_acumulado       NUMERIC
+                                            ,vl_atualizado      NUMERIC
+                                            ,vl_bem             NUMERIC
+                                            ,min_competencia    VARCHAR
+                                            ,max_competencia    VARCHAR)
+                                    )
+                                ELSE
+                                    (   SELECT vl_bem 
+                                        FROM patrimonio.fn_depreciacao_acumulada(COALESCE(bem_baixado.cod_bem,bem.cod_bem))
+                                        as retorno (
+                                            cod_bem             INTEGER
+                                            ,vl_acumulado       NUMERIC
+                                            ,vl_atualizado      NUMERIC
+                                            ,vl_bem             NUMERIC
+                                            ,min_competencia    VARCHAR
+                                            ,max_competencia    VARCHAR)
+                                    )
+                            END AS vl_bai_doacao
+                            ,(   SELECT vl_atualizado 
+                                        FROM patrimonio.fn_depreciacao_acumulada(COALESCE(bem_baixado.cod_bem,bem.cod_bem))
+                                        as retorno (
+                                            cod_bem             INTEGER
+                                            ,vl_acumulado       NUMERIC
+                                            ,vl_atualizado      NUMERIC
+                                            ,vl_bem             NUMERIC
+                                            ,min_competencia    VARCHAR
+                                            ,max_competencia    VARCHAR)
+                            ) as vl_bai_depreciacao                                    
+                            , ( empenho.fn_consultar_valor_empenhado( empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade ) -
+                            empenho.fn_consultar_valor_empenhado_anulado( empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade) )
+                            -
+                            ( empenho.fn_consultar_valor_liquidado(empenho.exercicio ,empenho.cod_empenho ,empenho.cod_entidade ) -
+                              empenho.fn_consultar_valor_liquidado_anulado( empenho.exercicio, empenho.cod_empenho, empenho.cod_entidade )
+                            ) AS saldo_atual
+                    FROM tcmgo.obra
+                    JOIn tcmgo.patrimonio_bem_obra
+                         ON patrimonio_bem_obra.cod_obra = obra.cod_obra
+                        AND patrimonio_bem_obra.ano_obra = obra.ano_obra
+                    
+                    JOIN patrimonio.bem
+                         ON bem.cod_bem = patrimonio_bem_obra.cod_bem
+                    LEFT JOIN patrimonio.reavaliacao
+                         ON reavaliacao.cod_bem = bem.cod_bem
+                    
+                    LEFT JOIN patrimonio.bem_baixado
+                         ON bem_baixado.cod_bem = bem.cod_bem                                
+                    
+                    JOIN tcmgo.obra_empenho
+                         on obra.cod_obra = obra_empenho.cod_obra
+                        and obra.ano_obra = obra_empenho.ano_obra
+                    
+                    JOIN empenho.empenho
+                         on obra_empenho.cod_empenho  = empenho.cod_empenho
+                        and obra_empenho.cod_entidade = empenho.cod_entidade
+                        and obra_empenho.exercicio    = empenho.exercicio
+                    
+                    JOIN empenho.pre_empenho
+                         on empenho.exercicio       = pre_empenho.exercicio
+                        and empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                    
+                    JOIN empenho.pre_empenho_despesa
+                         on pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                        and pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                    
+                    JOIN orcamento.despesa
+                         on despesa.exercicio   = pre_empenho_despesa.exercicio
+                        and despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                    
+                    WHERE obra_empenho.cod_entidade in ( ". $this->getDado ( 'stEntidades') ." )
+                    AND obra.ano_obra = '". $this->getDado( 'exercicio' ) ."'
+            ";
 
         return $stSql;
     }

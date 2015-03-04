@@ -28,7 +28,7 @@
 # $Revision: 28724 $
 # $Name$
 # $Author: gelson $
-# $Date: 2014-09-29 08:53:57 -0300 (Seg, 29 Set 2014) $
+# $Date: 2015-02-12 11:36:25 -0200 (Qui, 12 Fev 2015) $
 
 trap "" 2
 export LC_ALL=pt_BR.UTF-8
@@ -513,6 +513,7 @@ definePermissao(){
     controle=`find $raizWWW -type d -exec chmod 755 {} \;`
     controle=`find $raizWWW -type f -exec chmod 644 {} \;`
     controle=`chmod 777 $raizWWW/gestaoAdministrativa/fontes/PHP/framework/tmp 1>/dev/null`
+    controle=`chmod 777 $raizWWW/gestaoAdministrativa/fontes/PHP/normas/anexos 1>/dev/null`
     forceInfo "Permissoes ajustadas. " 1
 }
 

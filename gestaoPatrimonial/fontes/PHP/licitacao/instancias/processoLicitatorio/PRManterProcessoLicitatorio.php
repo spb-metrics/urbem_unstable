@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: PRManterProcessoLicitatorio.php 60659 2014-11-06 16:17:39Z diogo.zarpelon $
+    $Id: PRManterProcessoLicitatorio.php 61490 2015-01-23 18:50:21Z evandro $
 
 */
 
@@ -79,9 +79,9 @@ switch ($stAcao) {
                 $stMensagem = verificaUtilizacaoMapa($arMapa[0], $arMapa[1], 'incluir');
             }
 
-            //Só entra no if se município pertencer ao estado de MG
+            //Só entra no if se município pertencer ao estado de MG ou GO
             $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf');
-            if ($request->get('inCodTipoObjeto') == 2 && $request->get('inCodRegime') == '' && $inCodUF == 11) {
+            if ( ($request->get('inCodTipoObjeto') == 2 && $request->get('inCodRegime') == '') && ($inCodUF == 11 || $inCodUF == 9) ) {
                 $stMensagem = "O Regime de execução de Obras é obrigatório para o Tipo de Objeto selecionado.";
             }
 
@@ -104,16 +104,16 @@ switch ($stAcao) {
 
                 $boReservaSaldo = true;
 
-                $obTComprasMapaSolicitacao->setDado('cod_mapa',	$arMapa[0]);
-                $obTComprasMapaSolicitacao->setDado('exercicio',$arMapa[1]);
+                $obTComprasMapaSolicitacao->setDado('cod_mapa'  , $arMapa[0]);
+                $obTComprasMapaSolicitacao->setDado('exercicio' , $arMapa[1]);
                 $obTComprasMapaSolicitacao->recuperaPorChave( $rsSolicitacaoMapa );
 
                 $soma = 0;
 
                 while (!$rsSolicitacaoMapa->eof()) {
-                    $obTComprasSolicitacao->setDado('cod_solicitacao',$rsSolicitacaoMapa->getCampo('cod_solicitacao'));
-                    $obTComprasSolicitacao->setDado('cod_entidade',$rsSolicitacaoMapa->getCampo('cod_entidade'));
-                    $obTComprasSolicitacao->setDado('exercicio',$rsSolicitacaoMapa->getCampo('exercicio'));
+                    $obTComprasSolicitacao->setDado('cod_solicitacao'   , $rsSolicitacaoMapa->getCampo('cod_solicitacao'));
+                    $obTComprasSolicitacao->setDado('cod_entidade'      , $rsSolicitacaoMapa->getCampo('cod_entidade'));
+                    $obTComprasSolicitacao->setDado('exercicio'         , $rsSolicitacaoMapa->getCampo('exercicio'));
                     $obTComprasSolicitacao->recuperaValoresTotaisSolicitacao($rsValoresSolicitacao);
 
                     $soma = $soma + $rsValoresSolicitacao->getCampo("total");
@@ -122,9 +122,9 @@ switch ($stAcao) {
                 }
 
                 while (!$rsSolicitacaoMapa->eof()) {
-                    $obTComprasMapaItemReserva->setDado('cod_solicitacao',$rsSolicitacaoMapa->getCampo('cod_solicitacao'));
-                    $obTComprasMapaItemReserva->setDado('cod_entidade',$rsSolicitacaoMapa->getCampo('cod_entidade'));
-                    $obTComprasMapaItemReserva->setDado('exercicio',$rsSolicitacaoMapa->getCampo('exercicio'));
+                    $obTComprasMapaItemReserva->setDado('cod_solicitacao'   , $rsSolicitacaoMapa->getCampo('cod_solicitacao'));
+                    $obTComprasMapaItemReserva->setDado('cod_entidade'      , $rsSolicitacaoMapa->getCampo('cod_entidade'));
+                    $obTComprasMapaItemReserva->setDado('exercicio'         , $rsSolicitacaoMapa->getCampo('exercicio'));
                     $obTComprasMapaItemReserva->recuperaMapaItemReserva( $rsMapaItemReserva );
                         if ( $rsMapaItemReserva->getNumLinhas() > 0 ) {
                                 $boReservaSaldo = false;
@@ -138,10 +138,10 @@ switch ($stAcao) {
                     if ($_REQUEST['inCodLicitacaoImplantacao'] == '' || $_REQUEST['inCodLicitacaoImplantacao'] == '0') {
                         $stMensagem = "Código da Licitação inválido.";
                     } else {
-                        $obTLicitacaoLicitacao->setDado('cod_licitacao', $_REQUEST['inCodLicitacaoImplantacao'] );
-                        $obTLicitacaoLicitacao->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
-                        $obTLicitacaoLicitacao->setDado('cod_entidade',$_REQUEST['inCodEntidade'] );
-                        $obTLicitacaoLicitacao->setDado('exercicio',Sessao::getExercicio() );
+                        $obTLicitacaoLicitacao->setDado('cod_licitacao' , $_REQUEST['inCodLicitacaoImplantacao'] );
+                        $obTLicitacaoLicitacao->setDado('cod_modalidade', $_REQUEST['inCodModalidade']);
+                        $obTLicitacaoLicitacao->setDado('cod_entidade'  , $_REQUEST['inCodEntidade'] );
+                        $obTLicitacaoLicitacao->setDado('exercicio'     , Sessao::getExercicio() );
                         $obTLicitacaoLicitacao->recuperaPorChave( $rsLicitacao );
 
                         if ( $rsLicitacao->getNumLinhas() > 0 ) {
@@ -166,27 +166,27 @@ switch ($stAcao) {
 
                     $arStUnidadeOrcamentaria = explode('.',$request->get('stUnidadeOrcamentaria'));
 
-                    $obTLicitacaoLicitacao->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
-                    $obTLicitacaoLicitacao->setDado('cod_entidade',$_REQUEST['inCodEntidade'] );
-                    $obTLicitacaoLicitacao->setDado('exercicio',Sessao::getExercicio() );
-                    $obTLicitacaoLicitacao->setDado('cod_tipo_objeto',$_REQUEST['inCodTipoObjeto'] );
-                    $obTLicitacaoLicitacao->setDado('cod_objeto',$_REQUEST['stObjeto'] );
-                    $obTLicitacaoLicitacao->setDado('cod_criterio',$_REQUEST['inCodCriterio'] );
-                    $obTLicitacaoLicitacao->setDado('cod_tipo_licitacao',$_REQUEST['inCodTipoCotacao'] );
-                    $obTLicitacaoLicitacao->setDado('cod_mapa',$arMapa[0]);
-                    $obTLicitacaoLicitacao->setDado('exercicio_mapa',"".$arMapa[1]."");
-                    $obTLicitacaoLicitacao->setDado('cod_processo',$arProcesso[0]);
-                    $obTLicitacaoLicitacao->setDado('exercicio_processo',"".$arProcesso[1]."");
-                    $obTLicitacaoLicitacao->setDado('vl_cotado',$_REQUEST['stValorReferencial']  );
-                    $obTLicitacaoLicitacao->setDado('timestamp', substr($dtLicitacao, 6, 4).'-'.substr($dtLicitacao, 3, 2).'-'.substr($dtLicitacao,0,2).date(' H:i:s.ms'));
-                    $obTLicitacaoLicitacao->setDado('num_orgao'  , $arStUnidadeOrcamentaria[0]);
-                    $obTLicitacaoLicitacao->setDado('num_unidade', $arStUnidadeOrcamentaria[1]);
-                    $obTLicitacaoLicitacao->setDado('cod_regime',$_REQUEST['inCodRegime'] != '' ? $_REQUEST['inCodRegime'] : 'null');
+                    $obTLicitacaoLicitacao->setDado('cod_modalidade'        , $_REQUEST['inCodModalidade']      );
+                    $obTLicitacaoLicitacao->setDado('cod_entidade'          , $_REQUEST['inCodEntidade']        );
+                    $obTLicitacaoLicitacao->setDado('exercicio'             , Sessao::getExercicio()            );
+                    $obTLicitacaoLicitacao->setDado('cod_tipo_objeto'       , $_REQUEST['inCodTipoObjeto']      );
+                    $obTLicitacaoLicitacao->setDado('cod_objeto'            , $_REQUEST['stObjeto']             );
+                    $obTLicitacaoLicitacao->setDado('cod_criterio'          , $_REQUEST['inCodCriterio']        );
+                    $obTLicitacaoLicitacao->setDado('cod_tipo_licitacao'    , $_REQUEST['inCodTipoCotacao']     );
+                    $obTLicitacaoLicitacao->setDado('cod_mapa'              , $arMapa[0]                        );
+                    $obTLicitacaoLicitacao->setDado('exercicio_mapa'        , "".$arMapa[1].""                  );
+                    $obTLicitacaoLicitacao->setDado('cod_processo'          , $arProcesso[0]                    );
+                    $obTLicitacaoLicitacao->setDado('exercicio_processo'    , "".$arProcesso[1].""              );
+                    $obTLicitacaoLicitacao->setDado('vl_cotado'             , $_REQUEST['stValorReferencial']   );
+                    $obTLicitacaoLicitacao->setDado('timestamp'             , substr($dtLicitacao, 6, 4).'-'.substr($dtLicitacao, 3, 2).'-'.substr($dtLicitacao,0,2).date(' H:i:s.ms'));
+                    $obTLicitacaoLicitacao->setDado('num_orgao'             , $arStUnidadeOrcamentaria[0]       );
+                    $obTLicitacaoLicitacao->setDado('num_unidade'           , $arStUnidadeOrcamentaria[1]       );
+                    $obTLicitacaoLicitacao->setDado('cod_regime'            , $_REQUEST['inCodRegime'] != '' ? $_REQUEST['inCodRegime'] : 'null');
                     $obTLicitacaoLicitacao->inclusao();
                     
                     $obTMapaModalidade = new TComprasMapaModalidade();
-                    $obTMapaModalidade->setDado('cod_mapa'  ,$arMapa[0]);
-                    $obTMapaModalidade->setDado('exercicio' ,$arMapa[1]);
+                    $obTMapaModalidade->setDado('cod_mapa'      ,$arMapa[0]);
+                    $obTMapaModalidade->setDado('exercicio'     ,$arMapa[1]);
                     $obTMapaModalidade->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
                     $obTMapaModalidade->recuperaTodos( $rsMapaModalidade );
                     if ( $rsMapaModalidade->getNumLinhas() > 0 ) {
@@ -197,11 +197,11 @@ switch ($stAcao) {
 
                     include_once(TLIC."TLicitacaoComissaoLicitacao.class.php");
                     $obTLicitacaoComissaoLicitacao = new TLicitacaoComissaoLicitacao();
-                    $obTLicitacaoComissaoLicitacao->setDado('exercicio'     ,Sessao::getExercicio()                              );
-                    $obTLicitacaoComissaoLicitacao->setDado('cod_entidade'  ,$_REQUEST['inCodEntidade']                      );
-                    $obTLicitacaoComissaoLicitacao->setDado('cod_licitacao' ,$obTLicitacaoLicitacao->getDado('cod_licitacao'));
-                    $obTLicitacaoComissaoLicitacao->setDado('cod_modalidade',$_REQUEST['inCodModalidade']                    );
-                    $obTLicitacaoComissaoLicitacao->setDado('cod_comissao'  ,$_REQUEST['inCodComissao'  ]                    );
+                    $obTLicitacaoComissaoLicitacao->setDado('exercicio'     , Sessao::getExercicio()                              );
+                    $obTLicitacaoComissaoLicitacao->setDado('cod_entidade'  , $_REQUEST['inCodEntidade']                      );
+                    $obTLicitacaoComissaoLicitacao->setDado('cod_licitacao' , $obTLicitacaoLicitacao->getDado('cod_licitacao'));
+                    $obTLicitacaoComissaoLicitacao->setDado('cod_modalidade', $_REQUEST['inCodModalidade']                    );
+                    $obTLicitacaoComissaoLicitacao->setDado('cod_comissao'  , $_REQUEST['inCodComissao'  ]                    );
                     $obTLicitacaoComissaoLicitacao->inclusao();
 
                     if ( $request->get('inCodComissaoApoio') ) {
@@ -214,11 +214,11 @@ switch ($stAcao) {
                         $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional();
                         foreach (Sessao::read('arMembro') as $value) {
                             if (trim($value['adicional']) == 'Sim') {
-                                $obTLicitacaoMembroAdicional->setDado('numcgm',$value['num_cgm']);
-                                $obTLicitacaoMembroAdicional->setDado('cod_licitacao',$obTLicitacaoLicitacao->getDado('cod_licitacao'));
-                                $obTLicitacaoMembroAdicional->setDado('exercicio',Sessao::getExercicio());
-                                $obTLicitacaoMembroAdicional->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
-                                $obTLicitacaoMembroAdicional->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+                                $obTLicitacaoMembroAdicional->setDado('numcgm'          , $value['num_cgm']);
+                                $obTLicitacaoMembroAdicional->setDado('cod_licitacao'   , $obTLicitacaoLicitacao->getDado('cod_licitacao'));
+                                $obTLicitacaoMembroAdicional->setDado('exercicio'       , Sessao::getExercicio());
+                                $obTLicitacaoMembroAdicional->setDado('cod_modalidade'  , $_REQUEST['inCodModalidade']);
+                                $obTLicitacaoMembroAdicional->setDado('cod_entidade'    , $_REQUEST['inCodEntidade']);
                                 $obTLicitacaoMembroAdicional->inclusao();
                             }
                         }
@@ -228,11 +228,11 @@ switch ($stAcao) {
                         include_once(TLIC."TLicitacaoLicitacaoDocumentos.class.php");
                         $obTLicitacaoLicitacaoDocumentos = new TLicitacaoLicitacaoDocumentos();
                         foreach (Sessao::read('arDocumentos') as $value) {
-                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_documento',$value['cod_documento']);
-                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_licitacao',$obTLicitacaoLicitacao->getDado('cod_licitacao'));
-                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
-                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-                            $obTLicitacaoLicitacaoDocumentos->setDado('exercicio',Sessao::getExercicio());
+                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_documento'   , $value['cod_documento']);
+                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_licitacao'   , $obTLicitacaoLicitacao->getDado('cod_licitacao'));
+                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_modalidade'  , $_REQUEST['inCodModalidade']);
+                            $obTLicitacaoLicitacaoDocumentos->setDado('cod_entidade'    , $_REQUEST['inCodEntidade']);
+                            $obTLicitacaoLicitacaoDocumentos->setDado('exercicio'       , Sessao::getExercicio());
                             $obTLicitacaoLicitacaoDocumentos->inclusao();
                         }
                     }

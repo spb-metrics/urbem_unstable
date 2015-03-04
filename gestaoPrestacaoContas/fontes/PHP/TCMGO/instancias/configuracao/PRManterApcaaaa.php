@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Processamento
     * Data de Criação   : 10/05/2007
 
@@ -31,7 +28,7 @@
 
     * @ignore
 
-    *$Id: PRManterApcaaaa.php 59612 2014-09-02 12:00:51Z gelson $
+    *$Id: PRManterApcaaaa.php 61679 2015-02-25 13:07:38Z evandro $
 
     * Casos de uso : uc-06.04.00
 */
@@ -57,30 +54,33 @@ $arExcluidas = Sessao::read('arExcluidas');
 switch ($_REQUEST['stAcao']) {
     case 'configurar' :
         $obTTGOBalancoApcaaaa = new TTGOBalancoApcaaaa();
-        $obTTGOBalancoApcaaaa->setDado( 'exercicio', Sessao::getExercicio() );
-        if ( count( $arExcluidas ) > 0 ) {
-            foreach ($arExcluidas as $arAux) {
-                foreach ($arAux as $arContas) {
-                    $obTTGOBalancoApcaaaa->setDado('cod_plano',$arContas['cod_plano']);
-                    $obTTGOBalancoApcaaaa->exclusao();
-                }
+        $obTTGOBalancoApcaaaa->setDado( 'exercicio', Sessao::getExercicio() );      
+
+        //excluir contas
+        if ( count( $arExcluidas['arExcluidas_'.$_REQUEST['inTipoLancamento']] ) > 0 ) {
+            foreach ( $arExcluidas['arExcluidas_'.$_REQUEST['inTipoLancamento']] as $arAux ) {                                
+                $obTTGOBalancoApcaaaa->setDado('cod_plano',$arAux['cod_plano']);
+                $obTTGOBalancoApcaaaa->exclusao( $boTransacao );
             }
         }
-        if ( count( $arContas ) > 0 ) {
-            foreach ($arContas as $arAux) {
-                if ( count( $arAux ) > 0 ) {
-                    foreach ($arAux as $arContas) {
-                        $obTTGOBalancoApcaaaa->setDado( 'cod_plano', $arContas['cod_plano'] );
-                        $obTTGOBalancoApcaaaa->setDado( 'tipo_lancamento', $arContas['tipo_lancamento'] );
-                        $obTTGOBalancoApcaaaa->recuperaRelacionamento( $rsContas );
-                        if ( $rsContas->getNumLinhas() <= 0 ) {
-                            $obTTGOBalancoApcaaaa->inclusao();
-                        }
-                    }
-                }
+
+        //Adicionar ou atualizar contas de acordo com o tipo de lancamento
+        if ( count( $arContas['arContas_'.$_REQUEST['inTipoLancamento']] ) > 0 ) {                         
+            foreach ($arContas['arContas_'.$_REQUEST['inTipoLancamento']] as $arAux) {
+                $obTTGOBalancoApcaaaa->setDado( 'cod_plano', $arAux['cod_plano'] );
+                $obTTGOBalancoApcaaaa->setDado( 'tipo_lancamento', $arAux['tipo_lancamento'] );
+                $obTTGOBalancoApcaaaa->recuperaRelacionamento( $rsContas );
+                       
+                if ( $rsContas->getNumLinhas() > 0 ) {
+                    $obTTGOBalancoApcaaaa->alteracao( $boTransacao );
+                }  else {
+                    $obTTGOBalancoApcaaaa->inclusao( $boTransacao );
+                }                
             }
         }
         SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
 }
 
 Sessao::encerraExcecao();
+
+?>

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOPassivoFinanceiro.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTCMGOPassivoFinanceiro.class.php 61684 2015-02-25 15:24:42Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -48,26 +48,39 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
         $this->setDado('exercicio', Sessao::getExercicio() );
     }
 
-    public function montaRecuperaTodos()
+    public function recuperaArquivoExportacao10(&$rsRecordSet, $boTransacao = "")
     {
-        $stEntidades = $this->getDado( 'stEntidades' );
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaArquivoExportacao10();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    return $obErro;
+    }
 
-        $stSql = "  select consulta.*
-                         , total_debitos
-                         , total_creditos
-                         , ( total_creditos - total_debitos ) as saldo_atual
+    public function montaRecuperaArquivoExportacao10()
+    {
+        $stSql = "  SELECT 
+                            '10' AS tipo_registro
+                            , consulta.*
+                            , total_debitos
+                            , total_creditos
+                            , ( total_creditos - total_debitos ) as saldo_atual
+                            , '' AS brancos
                     from (
-                          select plano_conta.cod_estrutural
+                            select 
+                                REPLACE(plano_conta.cod_estrutural,'.','') as cod_estrutural
                                , plano_conta.nom_conta
                                , plano_conta.exercicio
-                               , balanco_pfdaaaa.tipo_lancamento
-                               , balanco_pfdaaaa.desdobramento_tipo
-                               , orgao_plano_banco.num_orgao
-                               , unidade.num_unidade
+                               , balancete_extmmaa.tipo_lancamento
+                               , balancete_extmmaa.sub_tipo_lancamento
+                               , (string_to_array(configuracao_entidade.valor, '_'))[1] AS num_orgao
+                               , (string_to_array(configuracao_entidade.valor, '_'))[2] AS num_unidade
                                ---- soma dos debitos
                                , coalesce(  ( select sum ( vl_lancamento  )
                                                 from contabilidade.conta_debito
-                                                join contabilidade.valor_lancamento
+                                                JOIN contabilidade.valor_lancamento
                                                   on ( conta_debito.exercicio    = valor_lancamento.exercicio
                                                  and   conta_debito.cod_entidade = valor_lancamento.cod_entidade
                                                  and   conta_debito.tipo         = valor_lancamento.tipo
@@ -77,12 +90,12 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                                where conta_debito.exercicio = plano_analitica.exercicio
                                                  and conta_debito.cod_plano = plano_analitica.cod_plano
                                                  and valor_lancamento.tipo <> 'I'
-                                                 and conta_debito.cod_entidade in ( $stEntidades )  )
+                                                 and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ) 
                                           , 0 ) as total_debitos
                                ---- soma dos creditos
                                ,coalesce ( ( select sum ( vl_lancamento  )
                                               from contabilidade.conta_credito
-                                              join contabilidade.valor_lancamento
+                                              JOIN contabilidade.valor_lancamento
                                                 on ( conta_credito.exercicio    = valor_lancamento.exercicio
                                                and   conta_credito.cod_entidade = valor_lancamento.cod_entidade
                                                and   conta_credito.tipo         = valor_lancamento.tipo
@@ -92,7 +105,7 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                              where conta_credito.exercicio = plano_analitica.exercicio
                                                and conta_credito.cod_plano = plano_analitica.cod_plano
                                                and valor_lancamento.tipo <> 'I'
-                                               and conta_credito.cod_entidade in ( $stEntidades ) )
+                                               and conta_credito.cod_entidade = configuracao_entidade.cod_entidade )
                                           , 0 ) as total_creditos
 
                                 ---- saldo inicial
@@ -100,7 +113,7 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                       coalesce(
                                       ( select sum ( vl_lancamento  )
                                                from contabilidade.conta_debito
-                                               join contabilidade.valor_lancamento
+                                               JOIN contabilidade.valor_lancamento
                                                  on ( conta_debito.exercicio    = valor_lancamento.exercicio
                                                 and   conta_debito.cod_entidade = valor_lancamento.cod_entidade
                                                 and   conta_debito.tipo         = valor_lancamento.tipo
@@ -110,12 +123,12 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                               where conta_debito.exercicio = plano_analitica.exercicio
                                                 and conta_debito.cod_plano = plano_analitica.cod_plano
                                                 and valor_lancamento.tipo = 'I'
-                                                and conta_debito.cod_entidade in ( $stEntidades ) ), 0 )
+                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
                                         +
                                        coalesce (
                                        ( select sum ( vl_lancamento  )
                                            from contabilidade.conta_credito
-                                           join contabilidade.valor_lancamento
+                                           JOIN contabilidade.valor_lancamento
                                              on ( conta_credito.exercicio    = valor_lancamento.exercicio
                                             and   conta_credito.cod_entidade = valor_lancamento.cod_entidade
                                             and   conta_credito.tipo         = valor_lancamento.tipo
@@ -125,29 +138,143 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                           where conta_credito.exercicio = plano_analitica.exercicio
                                             and conta_credito.cod_plano = plano_analitica.cod_plano
                                             and valor_lancamento.tipo = 'I'
-                                            and conta_credito.cod_entidade in ( $stEntidades ) ), 0 )
+                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
                                   )  as saldo_anterior
-                          from contabilidade.plano_conta
-                          join contabilidade.plano_analitica
-                            on ( plano_analitica.cod_conta = plano_conta.cod_conta
-                           and   plano_analitica.exercicio = plano_conta.exercicio )
-                          join tcmgo.balanco_pfdaaaa
-                            on ( plano_analitica.cod_plano = balanco_pfdaaaa.cod_plano
-                           and   plano_analitica.exercicio = balanco_pfdaaaa.exercicio )
-                          join tcmgo.orgao_plano_banco
-                            on ( plano_analitica.exercicio = orgao_plano_banco.exercicio
-                           and   plano_analitica.cod_plano = orgao_plano_banco.cod_plano )
-                          join orcamento.unidade
-                            on ( orgao_plano_banco.exercicio = unidade.exercicio
-                           and   orgao_plano_banco.num_orgao = unidade.cod_orgao )
-                         where plano_conta.exercicio = '".$this->getDado('exercicio')."'
-                       order by  plano_conta.cod_estrutural
-                      ) as consulta
+                            from contabilidade.plano_conta
+                            JOIN contabilidade.plano_analitica
+                                on ( plano_analitica.cod_conta = plano_conta.cod_conta
+                                and   plano_analitica.exercicio = plano_conta.exercicio )
+                            JOIN tcmgo.balancete_extmmaa
+                                on ( plano_analitica.exercicio = balancete_extmmaa.exercicio
+                                and   plano_analitica.cod_plano = balancete_extmmaa.cod_plano )
+                            JOIN administracao.configuracao_entidade
+                              ON configuracao_entidade.cod_entidade IN ( ".$this->getDado( 'stEntidades' )." )
+                             AND configuracao_entidade.exercicio = balancete_extmmaa.exercicio
+                             AND configuracao_entidade.parametro = 'tc_ug_orgaounidade'
+                            where plano_conta.exercicio = '".$this->getDado('exercicio')."'
+                            order by  plano_conta.cod_estrutural
+                    ) as consulta
                     where saldo_anterior <> 0
-                       or total_debitos <> 0
-                       or total_creditos <> 0
+                    or total_debitos <> 0
+                    or total_creditos <> 0
                     ORDER BY cod_estrutural ";
 
+        return $stSql;
+    }
+
+    public function recuperaArquivoExportacao11(&$rsRecordSet, $boTransacao = "")
+    {
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaArquivoExportacao11();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    return $obErro;
+    }
+
+    public function montaRecuperaArquivoExportacao11()
+    {
+        $stSql = "  SELECT 
+                            '11' as tipo_registro
+                            , consulta.*
+                            , total_debitos
+                            , total_creditos
+                            , ( total_creditos - total_debitos ) as saldo_atual                            
+                    FROM (
+                            select 
+                                    REPLACE(plano_conta.cod_estrutural,'.','') as cod_estrutural
+                                    , plano_conta.nom_conta
+                                    , plano_conta.exercicio
+                                    , balancete_extmmaa.tipo_lancamento
+                                    , balancete_extmmaa.sub_tipo_lancamento
+                                    , (string_to_array(configuracao_entidade.valor, '_'))[1] AS num_orgao
+                                    , (string_to_array(configuracao_entidade.valor, '_'))[2] AS num_unidade
+                                    , plano_recurso.cod_recurso
+                                    ---- soma dos debitos
+                                    , coalesce( ( select sum ( vl_lancamento  )
+                                                    from contabilidade.conta_debito
+                                                    JOIN contabilidade.valor_lancamento
+                                                       on ( conta_debito.exercicio    = valor_lancamento.exercicio
+                                                      and   conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                                      and   conta_debito.tipo         = valor_lancamento.tipo
+                                                      and   conta_debito.cod_lote     = valor_lancamento.cod_lote
+                                                      and   conta_debito.sequencia    = valor_lancamento.sequencia
+                                                      and   conta_debito.tipo_valor   = valor_lancamento.tipo_valor )
+                                                    where conta_debito.exercicio = plano_analitica.exercicio
+                                                    and conta_debito.cod_plano = plano_analitica.cod_plano
+                                                    and valor_lancamento.tipo <> 'I'
+                                                    and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ),0 
+                                    ) as total_debitos
+                                    ---- soma dos creditos
+                                    ,coalesce ( ( select sum ( vl_lancamento  )
+                                                   from contabilidade.conta_credito
+                                                   JOIN contabilidade.valor_lancamento
+                                                     on ( conta_credito.exercicio    = valor_lancamento.exercicio
+                                                    and   conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                                    and   conta_credito.tipo         = valor_lancamento.tipo
+                                                    and   conta_credito.cod_lote     = valor_lancamento.cod_lote
+                                                    and   conta_credito.sequencia    = valor_lancamento.sequencia
+                                                    and   conta_credito.tipo_valor   = valor_lancamento.tipo_valor )
+                                                  where conta_credito.exercicio = plano_analitica.exercicio
+                                                    and conta_credito.cod_plano = plano_analitica.cod_plano
+                                                    and valor_lancamento.tipo <> 'I'
+                                                    and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0
+                                    ) as total_creditos
+                                    ---- saldo inicial
+                                    , (
+                                        coalesce(
+                                        ( select sum ( vl_lancamento  )
+                                               from contabilidade.conta_debito
+                                               JOIN contabilidade.valor_lancamento
+                                                 on ( conta_debito.exercicio    = valor_lancamento.exercicio
+                                                and   conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                                and   conta_debito.tipo         = valor_lancamento.tipo
+                                                and   conta_debito.cod_lote     = valor_lancamento.cod_lote
+                                                and   conta_debito.sequencia    = valor_lancamento.sequencia
+                                                and   conta_debito.tipo_valor   = valor_lancamento.tipo_valor )
+                                              where conta_debito.exercicio = plano_analitica.exercicio
+                                                and conta_debito.cod_plano = plano_analitica.cod_plano
+                                                and valor_lancamento.tipo = 'I'
+                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
+                                        +
+                                        coalesce (
+                                        ( select sum ( vl_lancamento  )
+                                           from contabilidade.conta_credito
+                                           JOIN contabilidade.valor_lancamento
+                                             on ( conta_credito.exercicio    = valor_lancamento.exercicio
+                                            and   conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                            and   conta_credito.tipo         = valor_lancamento.tipo
+                                            and   conta_credito.cod_lote     = valor_lancamento.cod_lote
+                                            and   conta_credito.sequencia    = valor_lancamento.sequencia
+                                            and   conta_credito.tipo_valor   = valor_lancamento.tipo_valor )
+                                          where conta_credito.exercicio = plano_analitica.exercicio
+                                            and conta_credito.cod_plano = plano_analitica.cod_plano
+                                            and valor_lancamento.tipo = 'I'
+                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
+                                    )  as saldo_anterior
+                            FROM contabilidade.plano_conta
+                            JOIN contabilidade.plano_analitica
+                                on plano_analitica.cod_conta = plano_conta.cod_conta
+                                and   plano_analitica.exercicio = plano_conta.exercicio
+                            JOIN contabilidade.plano_recurso
+                                ON plano_recurso.exercicio = plano_analitica.exercicio
+                                AND plano_recurso.cod_plano = plano_analitica.cod_plano 
+                            JOIN tcmgo.balancete_extmmaa
+                              ON plano_analitica.exercicio = balancete_extmmaa.exercicio
+                             AND plano_analitica.cod_plano = balancete_extmmaa.cod_plano
+                            JOIN administracao.configuracao_entidade
+                              ON configuracao_entidade.cod_entidade IN ( ".$this->getDado( 'stEntidades' )." )
+                             AND configuracao_entidade.exercicio = balancete_extmmaa.exercicio
+                             AND configuracao_entidade.parametro = 'tc_ug_orgaounidade'
+                            where plano_conta.exercicio = '".$this->getDado('exercicio')."'
+                            order by  plano_conta.cod_estrutural
+                    ) as consulta
+                    where saldo_anterior <> 0
+                    or total_debitos <> 0
+                    or total_creditos <> 0
+                    ORDER BY cod_estrutural 
+            ";
         return $stSql;
     }
 

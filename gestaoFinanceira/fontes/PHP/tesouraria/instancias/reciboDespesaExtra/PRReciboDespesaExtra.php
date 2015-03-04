@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: PRReciboDespesaExtra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRReciboDespesaExtra.php 61703 2015-02-26 14:35:46Z arthur $
 
     * Casos de uso: uc-02.04.30
 */
@@ -55,6 +55,8 @@ $pgOcul       = "OC".$stPrograma.".php";
 $pgJS         = "JS".$stPrograma.".js";
 
 $obTReciboExtra = new TTesourariaReciboExtra;
+
+SistemaLegado::BloqueiaFrames(true,true);
 
 switch ($stAcao) {
 
@@ -327,5 +329,7 @@ switch ($stAcao) {
     break;
 
 }
+
+SistemaLegado::LiberaFrames(true,true);
 
 ?>

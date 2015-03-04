@@ -1194,9 +1194,13 @@ class TPPAAcao extends TPPAUtils //Persistente
          JOIN orcamento.conta_despesa
            ON conta_despesa.cod_conta = despesa.cod_conta
           AND conta_despesa.exercicio = despesa.exercicio
+          
          JOIN administracao.configuracao_entidade
            ON configuracao_entidade.cod_entidade = despesa.cod_entidade
           AND configuracao_entidade.exercicio = despesa.exercicio
+          AND configuracao_entidade.cod_modulo = 55
+          AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+          
          JOIN orcamento.programa_ppa_programa
            ON programa_ppa_programa.cod_programa = despesa.cod_programa
           AND programa_ppa_programa.exercicio   = despesa.exercicio

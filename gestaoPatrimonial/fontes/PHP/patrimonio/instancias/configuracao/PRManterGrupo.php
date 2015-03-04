@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.04
 
- * $Id: PRManterGrupo.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: PRManterGrupo.php 61751 2015-02-27 21:30:49Z arthur $
 
  */
 
@@ -43,6 +43,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioGrupo.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioGrupoPlanoAnalitica.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioGrupoPlanoDepreciacao.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioDepreciacao.class.php";
 
 $stPrograma = "ManterGrupo";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -57,10 +58,13 @@ $stAcao = $request->get('stAcao');
 $obTPatrimonioGrupo = new TPatrimonioGrupo();
 $obTPatrimonioGrupoPlanoAnalitica = new TPatrimonioGrupoPlanoAnalitica();
 $obTPatrimonioGrupoPlanoDepreciacao = new TPatrimonioGrupoPlanoDepreciacao();
+$obTPatrimonioDepreciacao = new TPatrimonioDepreciacao();
 
 Sessao::setTrataExcecao( true );
 Sessao::getTransacao()->setMapeamento( $obTPatrimonioGrupo );
 Sessao::getTransacao()->setMapeamento( $obTPatrimonioGrupoPlanoAnalitica );
+Sessao::getTransacao()->setMapeamento( $obTPatrimonioGrupoPlanoDepreciacao );
+Sessao::getTransacao()->setMapeamento( $obTPatrimonioDepreciacao );
 
 switch ($stAcao) {
     case 'incluir':
@@ -100,6 +104,7 @@ switch ($stAcao) {
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'   , $_REQUEST['inCodConta'] );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
+            
             if(!empty($_REQUEST['inCodContaDepreciacao'])){
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'   , $inCodGrupo );
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
@@ -107,7 +112,9 @@ switch ($stAcao) {
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'   , $_REQUEST['inCodContaDepreciacao'] );
                 $obTPatrimonioGrupoPlanoDepreciacao->inclusao();
             }
+            
             SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$inCodGrupo,"incluir","aviso", Sessao::getId(), "../");
+            
         } else {
             SistemaLegado::exibeAviso(urlencode('Já existe um grupo com esta descrição para esta natureza'),"n_incluir","erro");
         }
@@ -124,6 +131,31 @@ switch ($stAcao) {
         $obTPatrimonioGrupo->recuperaGrupo($rsPatrimonioGrupo, $stFiltro);
 
         if ($rsPatrimonioGrupo->getNumLinhas() <= 0) {
+            
+            $obTPatrimonioGrupo->setDado('cod_plano_grupo' , $_REQUEST['inCodPlanoDepreciacao']);
+            $obTPatrimonioGrupo->recuperaGrupoPlanoDepreciacao( $rsGrupoPlanoDepreciacao );
+                        
+            if ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo("cod_plano") != $_REQUEST['inCodContaDepreciacao']) {
+                SistemaLegado::exibeAviso(urlencode('Já existem depreciações lançadas para este Grupo. Anule-as para alterar a Conta Contábil de Depreciação.'),"n_incluir","erro");
+                Sessao::encerraExcecao();
+                die();
+            } else {
+            
+                //deleta da table grupo_plano_depreciacao
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $_REQUEST['inCodGrupo'] );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
+                $obTPatrimonioGrupoPlanoDepreciacao->exclusao();
+    
+                //inclui na table grupo_plano_depreciacao
+                if(!empty($_REQUEST['inCodContaDepreciacao'])){
+                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
+                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
+                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'    , $_REQUEST['inCodContaDepreciacao'] );
+                    $obTPatrimonioGrupoPlanoDepreciacao->inclusao();
+                }
+            }
+            
             $obTPatrimonioGrupo->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
             $obTPatrimonioGrupo->proximoCod( $inCodGrupo );
             $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $_REQUEST['inCodGrupo'] );
@@ -141,7 +173,6 @@ switch ($stAcao) {
             }
             
             $obTPatrimonioGrupo->setDado( 'depreciacao', $inDepreciacao );
-
             $obTPatrimonioGrupo->alteracao();
 
             //deleta da table grupo_plano_analitica
@@ -157,19 +188,7 @@ switch ($stAcao) {
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'    , $_REQUEST['inCodConta'] );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
-            //deleta da table grupo_plano_depreciacao
-            $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-            $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $_REQUEST['inCodGrupo'] );
-            $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
-            $obTPatrimonioGrupoPlanoDepreciacao->exclusao();
-
-            //inclui na table grupo_plano_depreciacao
-            if(!empty($_REQUEST['inCodContaDepreciacao'])){
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'    , $_REQUEST['inCodContaDepreciacao'] );
-                $obTPatrimonioGrupoPlanoDepreciacao->inclusao();
-             }
+            
             SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$_REQUEST['inCodGrupo'],"alterar","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode('Já existe um grupo com esta descrição para esta natureza'),"n_incluir","erro");

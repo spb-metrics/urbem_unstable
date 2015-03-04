@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRGFAnexo1.php 61307 2015-01-05 15:58:11Z carolina $
+ * $Id: OCGeraRGFAnexo1.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
  * Casos de uso : uc-06.01.20
  */
@@ -81,11 +81,11 @@ $preview->setExportaExcel( true );
 
 $preview->addParametro( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     while ( !$rsEntidade->eof() ) {
         if ( preg_match("/prefeitura/i", $rsEntidade->getCampo('nom_cgm')) ) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
             break;
         }
         $rsEntidade->proximo();
@@ -277,14 +277,14 @@ $stFiltro = " WHERE sw_cgm.numcgm = ".Sessao::read('numCgm');
 $obTAdministracaoUsuario = new TAdministracaoUsuario;
 
 $obTAdministracaoUsuario->recuperaRelacionamento($rsUsuario, $stFiltro);
-$preview->addParametro( 'unidade_responsavel', utf8_encode($rsUsuario->getCampo('orgao')) );
+$preview->addParametro( 'unidade_responsavel', $rsUsuario->getCampo('orgao') );
 
 //adicionada data de emissão no rodapé do relatório
 $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 $preview->addParametro( 'tipoAnexo', 'anexo1novo');
 #################################################################################################
 

@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.02
 
-    $Id: OCGeraRREOAnexo2.php 61299 2014-12-30 19:21:12Z arthur $
+    $Id: OCGeraRREOAnexo2.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -63,14 +63,14 @@ $preview->addParametro('tipo_periodo', $_REQUEST['stTipoRelatorio'] );
 
 switch ($_REQUEST['stTipoRelatorio']) {
     case 'Mes':
-        $preview->addParametro( 'titulo_periodo',  utf8_encode(SistemaLegado::mesExtensoBR($_REQUEST['cmbMes']).' de '.Sessao::getExercicio()));
+        $preview->addParametro( 'titulo_periodo',  SistemaLegado::mesExtensoBR($_REQUEST['cmbMes']).' de '.Sessao::getExercicio());
         $preview->addParametro( 'periodo'  , $_REQUEST['cmbMes'] );
         $preview->addParametro( 'dt_inicial', '01/'.$_REQUEST['cmbMes'].'/'.Sessao::getExercicio() );
         $preview->addParametro( 'dt_final', SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'],Sessao::getExercicio()));
         $stNomeArquivo .= $_REQUEST['cmbMes'] . "mes";
     break;
     case 'Bimestre':
-        $preview->addParametro( 'titulo_periodo',  utf8_encode($_REQUEST['cmbBimestre'].'° bimestre de '.Sessao::getExercicio()));
+        $preview->addParametro( 'titulo_periodo',  $_REQUEST['cmbBimestre'].'° bimestre de '.Sessao::getExercicio());
         $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
         SistemaLegado::periodoInicialFinalBimestre($stDtInicial, $stDtFinal, $_REQUEST['cmbBimestre'], Sessao::getExercicio());
         
@@ -91,7 +91,7 @@ switch ($_REQUEST['stTipoRelatorio']) {
 
 while ( !$rsEntidade->eof() ) {
     if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo('nom_cgm')) || preg_match( "/tribunal/i", $rsEntidade->getCampo('nom_cgm'))) {
-        $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')));
+        $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm'));
         break;
     }
     $rsEntidade->proximo();
@@ -120,7 +120,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo2novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

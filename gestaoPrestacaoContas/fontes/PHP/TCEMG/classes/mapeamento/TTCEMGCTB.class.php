@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCTB.class.php 61121 2014-12-10 12:11:19Z lisiane $
+    * $Id: TTCEMGCTB.class.php 61742 2015-02-27 19:28:57Z lisiane $
 
 */
 
@@ -51,118 +51,62 @@ class TTCEMGCTB extends Persistente
         $inMes = explode('/',$this->getDado('dtInicio'));
         $inMes = $inMes[1];
         $stSql = "
-                 SELECT  c.tipo_registro
-                            , c.cod_ctb
-                            , c.tipo_conta||regexp_replace((c.conta), '[-|,|.|x]', '', 'gi') AS cod_ctb_view
-                            , c.cod_orgao
-                            , c.num_banco::VARCHAR as banco
-                            , c.num_agencia::VARCHAR as agencia
-                            , c.digito_verificador_agencia::VARCHAR
-                            , c.digito_verificador_conta_bancaria::VARCHAR
-                            , c.num_conta_corrente as conta_bancaria
-                            , c.conta_corrente
-                            , c.tipo_conta	 
-                            , CASE WHEN c.tipo_conta = '1' THEN ''
-                                   ELSE LPAD(c.tipo_aplicacao::VARCHAR,2,'0') 
-                              END AS tipo_aplicacao
-                            , nro_seq_aplicacao
-                            , desc_conta_bancaria
-                            , c.conta_convenio
-                            , c.num_convenio::varchar as nro_convenio
-                            , TO_CHAR(c.dt_assinatura, 'DDMMYYYY') as data_assinatura_convenio
-                    FROM  ( 
-                              SELECT '10'::int  AS  tipo_registro
-                                        , (banco.num_banco || agencia.num_agencia || plano_banco.conta_corrente) AS conta
-                                        , conta_bancaria.cod_ctb_anterior as cod_ctb
-                                        , CASE WHEN LTRIM(replace(num_agencia,'-',''),'9') = '' AND num_banco = '999' THEN 
-                                            '999999999999'
-                                          ELSE
-                                            LTRIM( REPLACE(split_part(plano_banco.conta_corrente,'-',1),'.',''),'0') 
-                                          END as num_conta_corrente
-                                        , REPLACE(plano_banco.conta_corrente,'.','') AS conta_corrente
-                                        , plano_banco.cod_entidade AS cod_orgao
-                                        , num_banco 
-                                        , split_part(num_agencia,'-',1) AS num_agencia
-                                        , SPLIT_PART(num_agencia,'-',2) AS digito_verificador_agencia
-                                        , SPLIT_PART(plano_banco.conta_corrente,'-',2) AS digito_verificador_conta_bancaria
-                                        , ( 'Banco:'||banco.num_banco || ' Agencia:' ||agencia.num_agencia || ' Conta Corrente:' || REPLACE(plano_banco.conta_corrente,'.','')) as desc_conta_bancaria
-                                        , plano_analitica.exercicio
-                                        , CASE WHEN (plano_conta.cod_estrutural LIKE '1.1.1.1.1.19%') THEN '1'
-                                               WHEN (plano_conta.cod_estrutural LIKE '1.1.1.1.1.50%' OR plano_conta.cod_estrutural LIKE '1.1.4%') THEN '2'
-                                          END AS tipo_conta
-                                        , '' AS  nro_seq_aplicacao
-                                        , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
-                                        , CASE WHEN (convenio_plano_banco.num_convenio <> NULL) THEN 1
-                                               ELSE 2
-                                          END AS conta_convenio
-                                        , convenio_plano_banco.num_convenio
-                                        , convenio_plano_banco.dt_assinatura
-                                      
-                                      FROM  contabilidade.plano_banco
-
-                                INNER JOIN  contabilidade.plano_analitica
-                                        ON  plano_analitica.cod_plano = plano_banco.cod_plano
-                                       AND  plano_analitica.exercicio = plano_banco.exercicio
-
-                                INNER JOIN  contabilidade.plano_conta
-                                        ON  plano_conta.cod_conta = plano_analitica.cod_conta
-                                       AND  plano_conta.exercicio = plano_analitica.exercicio
-
-                                INNER JOIN  monetario.agencia
-                                        ON  agencia.cod_banco = plano_banco.cod_banco
-                                       AND  agencia.cod_agencia = plano_banco.cod_agencia
-
-                                INNER JOIN  monetario.banco
-                                        ON  banco.cod_banco = plano_banco.cod_banco
-                                  
-                                 LEFT JOIN  tcemg.conta_bancaria
-                                        ON  conta_bancaria.cod_conta = plano_conta.cod_conta
-                                       AND  conta_bancaria.exercicio =plano_conta.exercicio
-                                
-                                 LEFT JOIN  tcemg.convenio_plano_banco 
-                                        ON  convenio_plano_banco.cod_plano = plano_banco.cod_plano 
-                                       AND  convenio_plano_banco.exercicio = plano_banco.exercicio
-
-                                    WHERE plano_banco.exercicio = '".$this->getDado('exercicio')."'
-                                      AND plano_banco.cod_entidade IN (".$this->getDado('entidades').")
-                                      AND SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 7) <> '1111101'
-
-                                 GROUP BY cod_ctb
-					, banco.num_banco
-					, agencia.num_agencia
-					, plano_banco.conta_corrente
-					, tipo_aplicacao
-					, tipo_conta
-                                        , plano_banco.cod_entidade
-                                        , desc_conta_bancaria
-                                        , plano_analitica.cod_plano
-                                        , plano_analitica.exercicio
-                                        , plano_conta.cod_estrutural
-                                        , nro_seq_aplicacao
-                                        , conta_convenio
-                                        , convenio_plano_banco.num_convenio
-                                        , convenio_plano_banco.dt_assinatura
-                             ) AS c
-
-                      GROUP BY c.tipo_registro
-                             , c.cod_ctb
-                             , c.num_banco
-                             , c.num_agencia
-                             , c.conta_corrente
-                             , c.tipo_aplicacao
-                             , c.tipo_conta   
-                             , c.cod_orgao
-                             , c.num_conta_corrente
-                             , digito_verificador_agencia
-                             , c.digito_verificador_conta_bancaria
-                             , nro_seq_aplicacao
-                             , desc_conta_bancaria
-                             , c.conta_convenio
-                             , c.num_convenio
-                             , c.dt_assinatura
-                             , c.conta
-
-                      ORDER BY c.cod_ctb";
+                 SELECT '10' AS tipo_registro
+                      ,	cod_ctb
+                      , tipo_conta||regexp_replace((conta), '[-|,|.|x]', '', 'gi') AS cod_ctb_view 
+                      , cod_orgao
+                      , banco
+                      , agencia 
+                      , digito_verificador_agencia
+                      , digito_verificador_conta_bancaria
+                      , conta_bancaria
+                      , retorno.conta_corrente
+                      , tipo_conta
+                      , tipo_aplicacao
+                      , ''::VARCHAR nro_seq_aplicacao
+                      , desc_conta_bancaria
+                      , CASE WHEN (convenio_plano_banco.num_convenio <> NULL) THEN 1
+                             ELSE 2
+                        END AS conta_convenio
+                      , convenio_plano_banco.num_convenio
+                      , convenio_plano_banco.dt_assinatura
+                  FROM tcemg.contasCTB('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."') as retorno
+                                                        (  cod_conta                         INTEGER
+					                  ,tipo_aplicacao                    VARCHAR
+					                  ,cod_ctb                           INTEGER
+					                  ,tipo_conta                        INTEGER
+					                  ,exercicio                         CHAR(4)  
+					                  ,conta                             TEXT                         
+                                                          ,conta_bancaria                    TEXT  
+                                                          ,conta_corrente                    TEXT                                                         
+                                                          ,cod_orgao                         INTEGER                                                        
+                                                          ,banco                             VARCHAR                                                        
+                                                          ,agencia             		     TEXT                                                        
+                                                          ,digito_verificador_agencia        TEXT                                                        
+                                                          ,digito_verificador_conta_bancaria TEXT                                                        
+                                                          ,desc_conta_bancaria               VARCHAR                                         
+                                                        )
+            INNER JOIN contabilidade.plano_analitica
+                    ON retorno.cod_conta = plano_analitica.cod_conta
+                   AND retorno.exercicio = plano_analitica.exercicio
+            INNER JOIN contabilidade.plano_banco
+                    ON plano_analitica.cod_plano = plano_banco.cod_plano
+                   AND plano_analitica.exercicio = plano_banco.exercicio
+             LEFT JOIN tcemg.convenio_plano_banco 
+                    ON convenio_plano_banco.cod_plano = plano_banco.cod_plano 
+                   AND convenio_plano_banco.exercicio = plano_banco.exercicio
+              GROUP BY cod_ctb
+                     , cod_ctb_view
+                     , cod_orgao,banco
+                     , agencia
+                     , digito_verificador_agencia
+                     , digito_verificador_conta_bancaria
+                     , conta_bancaria,retorno.conta_corrente
+                     , tipo_conta,tipo_aplicacao
+                     , desc_conta_bancaria
+                     , conta_convenio,num_convenio
+                     , dt_assinatura
+              ORDER BY cod_ctb";
         return $stSql;
     }
     
@@ -176,273 +120,161 @@ class TTCEMGCTB extends Persistente
         $inMes = explode('/',$this->getDado('dtInicio'));
         $inMes = $inMes[1];
         $stSql = "
-                 SELECT  c.tipo_registro
+                   SELECT c.tipo_registro
                         , c.cod_ctb
-                        , c.tipo_conta||regexp_replace((c.conta), '[-|,|.|x]', '', 'gi') AS cod_ctb_view
-                        , c.tipo_aplicacao
+                        , c.cod_ctb_view
+                        , tipo_aplicacao
                         , c.tipo_conta 
                         , c.cod_orgao
                         , c.cod_recurso as cod_fonte_recursos
                         , ABS(SUM(c.vl_saldo_inicial_fonte)) as vl_saldo_inicial_fonte 
                         , SUM(c.vl_saldo_final_fonte) as vl_saldo_final_fonte
                         , c.movimentacao
-                    FROM  ( 
-                              SELECT '20'::int  AS  tipo_registro
-                                        , (banco.num_banco || agencia.num_agencia || plano_banco.conta_corrente) AS conta
-                                        , conta_bancaria.cod_ctb_anterior as cod_ctb
-					, banco.num_banco AS num_banco
-					, agencia.num_agencia AS num_agencia
-					, plano_banco.conta_corrente AS conta_corrente
-                                        , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
-                                        , CASE WHEN (plano_conta.cod_estrutural LIKE '1.1.1.1.1.19%') THEN '1'
-                                               WHEN (plano_conta.cod_estrutural LIKE '1.1.1.1.1.50%' OR plano_conta.cod_estrutural LIKE '1.1.4%') THEN '2'
-                                        END AS tipo_conta
-                                          
-                                        , plano_banco.cod_entidade AS cod_orgao
-                                        , plano_recurso.cod_recurso
-                                        , plano_analitica.cod_plano
-                                        , plano_analitica.exercicio
-                                        ,  (   SELECT  SUM(
-                                                               (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                                     FROM  contabilidade.conta_debito
-                                                               INNER JOIN  contabilidade.valor_lancamento
-                                                                       ON  valor_lancamento.cod_lote = conta_debito.cod_lote
-                                                                      AND  valor_lancamento.tipo = conta_debito.tipo
-                                                                      AND  valor_lancamento.sequencia = conta_debito.sequencia
-                                                                      AND  valor_lancamento.exercicio = conta_debito.exercicio
-                                                                      AND  valor_lancamento.tipo_valor = conta_debito.tipo_valor
-                                                                      AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                                               INNER JOIN  contabilidade.lancamento
-                                                                       ON  lancamento.sequencia = valor_lancamento.sequencia
-                                                                      AND  lancamento.cod_lote = valor_lancamento.cod_lote
-                                                                      AND  lancamento.tipo = valor_lancamento.tipo
-                                                                      AND  lancamento.exercicio = valor_lancamento.exercicio
-                                                                      AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                                               INNER JOIN  contabilidade.lote
-                                                                       ON  lote.cod_lote = lancamento.cod_lote
-                                                                      AND  lote.exercicio = lancamento.exercicio
-                                                                      AND  lote.tipo = lancamento.tipo
-                                                                      AND  lote.cod_entidade = lancamento.cod_entidade
-                                                                      ";
-                                                if ($inMes == '01') {
-                                                $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                                       AND  lote.exercicio = '".$this->getDado('exercicio')."'
-                                                       AND  lote.tipo = 'I'
-                                                ";
-                                                } else {
-                                                $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
-                                                }
-                                                $stSql.="   WHERE  conta_debito.exercicio = pa.exercicio
-                                                      AND  conta_debito.cod_plano = pa.cod_plano
-                                                               )
-                                                               +
-                                                               (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                                     FROM  contabilidade.conta_credito
-                                                               INNER JOIN  contabilidade.valor_lancamento
-                                                                       ON  valor_lancamento.cod_lote = conta_credito.cod_lote
-                                                                      AND  valor_lancamento.tipo = conta_credito.tipo
-                                                                      AND  valor_lancamento.sequencia = conta_credito.sequencia
-                                                                      AND  valor_lancamento.exercicio = conta_credito.exercicio
-                                                                      AND  valor_lancamento.tipo_valor = conta_credito.tipo_valor
-                                                                      AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                                               INNER JOIN  contabilidade.lancamento
-                                                                       ON  lancamento.sequencia = valor_lancamento.sequencia
-                                                                      AND  lancamento.cod_lote = valor_lancamento.cod_lote
-                                                                      AND  lancamento.tipo = valor_lancamento.tipo
-                                                                      AND  lancamento.exercicio = valor_lancamento.exercicio
-                                                                      AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                                               INNER JOIN  contabilidade.lote
-                                                                       ON  lote.cod_lote = lancamento.cod_lote
-                                                                      AND  lote.exercicio = lancamento.exercicio
-                                                                      AND  lote.tipo = lancamento.tipo
-                                                                      AND  lote.cod_entidade = lancamento.cod_entidade
-                                                      ";
-                                                      if ($inMes == '01') {
-                                                $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                                       AND  lote.exercicio = '".$this->getDado('exercicio')."'
-                                                       AND  lote.tipo = 'I'
-                                                ";
-                                                } else {
-                                                $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
-                                                }
-                                                $stSql.="   WHERE  conta_credito.exercicio = pa.exercicio
-                                                      AND  conta_credito.cod_plano = pa.cod_plano
-                                                               )
-                                                       )  as vl_total
-                                                 FROM  contabilidade.plano_analitica AS pa
-                                                WHERE  pa.cod_plano = plano_analitica.cod_plano
-                                                  AND  pa.exercicio = plano_analitica.exercicio
-                                           )   AS  vl_saldo_inicial_fonte
-
-
-                                        ,  (   SELECT  SUM(
-                                                               (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                                     FROM  contabilidade.conta_debito
-                                                               INNER JOIN  contabilidade.valor_lancamento
-                                                                       ON  valor_lancamento.cod_lote = conta_debito.cod_lote
-                                                                      AND  valor_lancamento.tipo = conta_debito.tipo
-                                                                      AND  valor_lancamento.sequencia = conta_debito.sequencia
-                                                                      AND  valor_lancamento.exercicio = conta_debito.exercicio
-                                                                      AND  valor_lancamento.tipo_valor = conta_debito.tipo_valor
-                                                                      AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                                               INNER JOIN  contabilidade.lancamento
-                                                                       ON  lancamento.sequencia = valor_lancamento.sequencia
-                                                                      AND  lancamento.cod_lote = valor_lancamento.cod_lote
-                                                                      AND  lancamento.tipo = valor_lancamento.tipo
-                                                                      AND  lancamento.exercicio = valor_lancamento.exercicio
-                                                                      AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                                               INNER JOIN  contabilidade.lote
-                                                                       ON  lote.cod_lote = lancamento.cod_lote
-                                                                      AND  lote.exercicio = lancamento.exercicio
-                                                                      AND  lote.tipo = lancamento.tipo
-                                                                      AND  lote.cod_entidade = lancamento.cod_entidade
-                                                                      AND  lote.dt_lote BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND	TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                                                    WHERE  conta_debito.exercicio = pa.exercicio
-                                                                      AND  conta_debito.cod_plano = pa.cod_plano
-                                                               )
-                                                               +
-                                                               (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                                     FROM  contabilidade.conta_credito
-                                                               INNER JOIN  contabilidade.valor_lancamento
-                                                                       ON  valor_lancamento.cod_lote = conta_credito.cod_lote
-                                                                      AND  valor_lancamento.tipo = conta_credito.tipo
-                                                                      AND  valor_lancamento.sequencia = conta_credito.sequencia
-                                                                      AND  valor_lancamento.exercicio = conta_credito.exercicio
-                                                                      AND  valor_lancamento.tipo_valor = conta_credito.tipo_valor
-                                                                      AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                                               INNER JOIN  contabilidade.lancamento
-                                                                       ON  lancamento.sequencia = valor_lancamento.sequencia
-                                                                      AND  lancamento.cod_lote = valor_lancamento.cod_lote
-                                                                      AND  lancamento.tipo = valor_lancamento.tipo
-                                                                      AND  lancamento.exercicio = valor_lancamento.exercicio
-                                                                      AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                                               INNER JOIN  contabilidade.lote
-                                                                       ON  lote.cod_lote = lancamento.cod_lote
-                                                                      AND  lote.exercicio = lancamento.exercicio
-                                                                      AND  lote.tipo = lancamento.tipo
-                                                                      AND  lote.cod_entidade = lancamento.cod_entidade
-                                                                      AND  lote.dt_lote BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND	TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                                                    WHERE  conta_credito.exercicio = pa.exercicio
-                                                                      AND  conta_credito.cod_plano = pa.cod_plano
-                                                               )
-                                                         )
-                                                 FROM  contabilidade.plano_analitica AS pa
-                                                WHERE  pa.cod_plano = plano_analitica.cod_plano
-                                                  AND  pa.exercicio = plano_analitica.exercicio
-                                           )   AS  vl_saldo_final_fonte
-                                           , CASE WHEN (vl_lancamento IS NOT NULL) THEN 1 END AS movimentacao  
-
-                                   FROM  contabilidade.plano_banco
-                             
-                             INNER JOIN  contabilidade.plano_analitica
-                                     ON  plano_analitica.cod_plano = plano_banco.cod_plano
-                                    AND  plano_analitica.exercicio = plano_banco.exercicio
-                             
-                             INNER JOIN  contabilidade.plano_conta
-                                     ON  plano_conta.cod_conta = plano_analitica.cod_conta
-                                    AND  plano_conta.exercicio = plano_analitica.exercicio
-                             
-                             INNER JOIN  monetario.agencia
-                                     ON  agencia.cod_banco = plano_banco.cod_banco
-                                    AND  agencia.cod_agencia = plano_banco.cod_agencia
-                             
-                             INNER JOIN  monetario.banco
-                                     ON  banco.cod_banco = plano_banco.cod_banco
-                             
-                             INNER JOIN  contabilidade.plano_recurso
-                                     ON  plano_analitica.cod_plano = plano_recurso.cod_plano
-                                    AND  plano_analitica.exercicio = plano_recurso.exercicio
-                              
-                              LEFT JOIN  tcemg.conta_bancaria
-                                     ON  conta_bancaria.cod_conta = plano_conta.cod_conta
-                                    AND  conta_bancaria.exercicio =plano_conta.exercicio
-                              
-                              LEFT JOIN  tcemg.convenio_plano_banco 
-                                     ON  convenio_plano_banco.cod_plano = plano_banco.cod_plano 
-                                    AND  convenio_plano_banco.exercicio = plano_banco.exercicio
-                                    
-                                    
-                              LEFT JOIN ( SELECT cod_plano
-						, exercicio
-						, cod_lote
-						, tipo
-						, sequencia
-						, tipo_valor
-						, cod_entidade
-						, '1'::VARCHAR AS tipo_movimentacao 
-					   FROM contabilidade.conta_debito
-
-				      UNION ALL
-
-					SELECT cod_plano
-					      , exercicio
-                                              , cod_lote
-                                              , tipo
-                                              , sequencia
-                                              , tipo_valor
-                                              , cod_entidade
-                                              , '2'::VARCHAR AS tipo_movimentacao 
-                                          FROM contabilidade.conta_credito
-                                      ) AS conta_debito_credito
-                                     ON plano_analitica.cod_plano = conta_debito_credito.cod_plano
-                                    AND plano_analitica.exercicio = conta_debito_credito.exercicio
-
-                              LEFT JOIN contabilidade.valor_lancamento AS vl
-                                     ON conta_debito_credito.cod_lote     = vl.cod_lote
-                                    AND conta_debito_credito.tipo         = vl.tipo
-                                    AND conta_debito_credito.sequencia    = vl.sequencia
-                                    AND conta_debito_credito.exercicio    = vl.exercicio
-                                    AND conta_debito_credito.tipo_valor   = vl.tipo_valor
-                                    AND conta_debito_credito.cod_entidade = vl.cod_entidade
-
-                              LEFT JOIN contabilidade.lancamento
-                                     ON lancamento.exercicio    = vl.exercicio
-                                    AND lancamento.cod_entidade = vl.cod_entidade
-                                    AND lancamento.tipo         = vl.tipo
-                                    AND lancamento.cod_lote     = vl.cod_lote
-                                    AND lancamento.sequencia    = vl.sequencia
-
-                              LEFT JOIN contabilidade.lancamento_receita
-                                     ON lancamento_receita.exercicio    = lancamento.exercicio
-                                    AND lancamento_receita.cod_entidade = lancamento.cod_entidade
-                                    AND lancamento_receita.tipo         = lancamento.tipo
-                                    AND lancamento_receita.cod_lote     = lancamento.cod_lote
-                                    AND lancamento_receita.sequencia    = lancamento.sequencia
-
-                              LEFT JOIN contabilidade.lote AS lo
-                                     ON vl.cod_lote     = lo.cod_lote
-                                    AND vl.exercicio    = lo.exercicio
-                                    AND vl.cod_entidade = lo.cod_entidade
-		                    AND  lo.dt_lote BETWEEN TO_DATE('01/01/2014','dd/mm/yyyy') AND TO_DATE('31/01/2014','dd/mm/yyyy')
-                                    AND  lo.exercicio = '2014'
-
-                                  WHERE  plano_banco.exercicio = '".$this->getDado('exercicio')."'
-                                    AND  plano_banco.cod_entidade IN (".$this->getDado('entidades').")
-                                    AND  SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 7) <> '1111101'
-
-                               GROUP BY cod_ctb
-                                      , banco.num_banco
-                                      , agencia.num_agencia
-                                      , plano_banco.conta_corrente
-                                      , tipo_aplicacao
-                                      , tipo_conta 
-                                      , plano_banco.cod_entidade 
-                                      , plano_recurso.cod_recurso
-                                      , plano_analitica.cod_plano
-                                      , plano_analitica.exercicio
-                                      , movimentacao
-                             ) as c
-                         WHERE movimentacao = 1   
-                      GROUP BY c.tipo_registro
-                             , c.cod_ctb
-                             , c.tipo_aplicacao
-                             , c.tipo_conta 
-                             , c.cod_orgao
-                             , c.cod_recurso
-                             , c.conta
-                             , c.movimentacao
-                            
-                      ORDER BY c.cod_ctb ";
+                     FROM (SELECT '20'::VARCHAR AS tipo_registro
+                                , cod_ctb
+                                , tipo_conta||regexp_replace((conta), '[-|,|.|x]', '', 'gi') AS cod_ctb_view 
+                                , tipo_aplicacao
+                                , tipo_conta
+                                , cod_orgao
+                                , plano_recurso.cod_recurso
+                                , plano_analitica.cod_plano
+                                , plano_analitica.exercicio
+                                , saldo_inicial.saldo_anterior AS vl_saldo_inicial_fonte
+                                , saldo_inicial.saldo_atual AS vl_saldo_final_fonte
+                                , CASE WHEN (vl_lancamento IS NOT NULL) THEN 1 END AS movimentacao  
+                                , conta
+                             FROM tcemg.contasCTB('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."') as retorno
+                                           (  cod_conta                          INTEGER
+					    , tipo_aplicacao                    VARCHAR
+					    , cod_ctb                           INTEGER
+					    , tipo_conta                        INTEGER
+					    , exercicio                         CHAR(4)  
+					    , conta                             TEXT                         
+                                            , conta_bancaria                    TEXT  
+                                            , conta_corrente                    TEXT                                                         
+                                            , cod_orgao                         INTEGER                                                        
+                                            , banco                             VARCHAR                                                        
+                                            , agencia             		   TEXT                                                        
+                                            , digito_verificador_agencia        TEXT                                                        
+                                            , digito_verificador_conta_bancaria TEXT                                                        
+                                            , desc_conta_bancaria               VARCHAR                                         
+                                           )
+                       INNER JOIN contabilidade.plano_analitica
+                               ON retorno.cod_conta = plano_analitica.cod_conta
+                              AND retorno.exercicio = plano_analitica.exercicio
+                       INNER JOIN contabilidade.plano_banco
+                               ON plano_analitica.cod_plano = plano_banco.cod_plano
+                              AND plano_analitica.exercicio = plano_banco.exercicio
+                        LEFT JOIN  tcemg.convenio_plano_banco 
+                               ON  convenio_plano_banco.cod_plano = plano_banco.cod_plano 
+                              AND  convenio_plano_banco.exercicio = plano_banco.exercicio
+                       INNER JOIN  contabilidade.plano_recurso
+                               ON  plano_analitica.cod_plano = plano_recurso.cod_plano
+                              AND  plano_analitica.exercicio = plano_recurso.exercicio
+                        LEFT JOIN ( SELECT cod_plano
+                                         , exercicio
+                                         , cod_lote
+                                         , tipo
+                                         , sequencia
+                                         , tipo_valor
+                                         , cod_entidade
+                                         , '1'::VARCHAR AS tipo_movimentacao 
+                                      FROM contabilidade.conta_debito
+                                 UNION ALL
+                                    SELECT cod_plano
+                                         , exercicio
+                                         , cod_lote
+                                         , tipo
+                                         , sequencia
+                                         , tipo_valor
+                                         , cod_entidade
+                                         , '2'::VARCHAR AS tipo_movimentacao 
+                                      FROM contabilidade.conta_credito
+                                ) AS conta_debito_credito
+                               ON plano_analitica.cod_plano = conta_debito_credito.cod_plano
+                              AND plano_analitica.exercicio = conta_debito_credito.exercicio
+                        LEFT JOIN contabilidade.valor_lancamento AS vl
+                               ON conta_debito_credito.cod_lote     = vl.cod_lote
+                              AND conta_debito_credito.tipo         = vl.tipo
+                              AND conta_debito_credito.sequencia    = vl.sequencia
+                              AND conta_debito_credito.exercicio    = vl.exercicio
+                              AND conta_debito_credito.tipo_valor   = vl.tipo_valor
+                              AND conta_debito_credito.cod_entidade = vl.cod_entidade
+                        LEFT JOIN contabilidade.lancamento
+                               ON lancamento.exercicio    = vl.exercicio
+                              AND lancamento.cod_entidade = vl.cod_entidade
+                              AND lancamento.tipo         = vl.tipo
+                              AND lancamento.cod_lote     = vl.cod_lote
+                              AND lancamento.sequencia    = vl.sequencia
+                        LEFT JOIN contabilidade.lancamento_receita
+                               ON lancamento_receita.exercicio    = lancamento.exercicio
+                              AND lancamento_receita.cod_entidade = lancamento.cod_entidade
+                              AND lancamento_receita.tipo         = lancamento.tipo
+                              AND lancamento_receita.cod_lote     = lancamento.cod_lote
+                              AND lancamento_receita.sequencia    = lancamento.sequencia
+                        LEFT JOIN contabilidade.lote AS lo
+                               ON vl.cod_lote     = lo.cod_lote
+                              AND vl.exercicio    = lo.exercicio
+                              AND vl.cod_entidade = lo.cod_entidade
+                              AND  lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                              AND  lo.exercicio = '".$this->getDado('exercicio')."'
+                       INNER JOIN ( SELECT *
+                                         , ((vl_debito - vl_credito) + saldo_anterior) as saldo_atual                                                                                     
+                                      FROM tesouraria.fn_relatorio_demostrativo_saldos( '".$this->getDado('exercicio')."',           
+                                                                                        '".$this->getDado('entidades')."',           
+                                                                                        '".$this->getDado('dtInicio')."',            
+                                                                                        '".$this->getDado('dtFim')."',               
+                                                                                        '',   
+                                                                                        '',      
+                                                                                        '',     
+                                                                                        '',        
+                                                                                        '',            
+                                                                                        'S',          
+                                                                                        '',     
+                                                                                        '',       
+                                                                                        'true'   
+                                                                   ) as retorno( exercicio          VARCHAR                                                        
+                                                                            ,cod_estrutural     VARCHAR                                                        
+                                                                            ,cod_plano          INTEGER                                                        
+                                                                            ,nom_conta          VARCHAR                                                        
+                                                                            ,saldo_anterior     NUMERIC                                                        
+                                                                            ,vl_credito         NUMERIC                                                        
+                                                                            ,vl_debito          NUMERIC                                                        
+                                                                            ,cod_recurso        INTEGER                                                        
+                                                                            ,nom_recurso        VARCHAR                                                        
+                                                                   )
+                                ) AS saldo_inicial
+                               ON saldo_inicial.exercicio = plano_analitica.exercicio
+                              AND saldo_inicial.cod_plano = plano_analitica.cod_plano
+                              AND saldo_inicial.cod_recurso = plano_recurso.cod_recurso
+                            WHERE  plano_banco.exercicio = '".$this->getDado('exercicio')."'
+                              AND  plano_banco.cod_entidade IN (".$this->getDado('entidades').")
+                         GROUP BY cod_ctb
+                                , cod_ctb_view
+                                , cod_orgao
+                                , tipo_conta
+                                , tipo_aplicacao 
+                                , plano_recurso.cod_recurso
+                                , plano_analitica.cod_plano
+                                , plano_analitica.exercicio
+                                , movimentacao
+                                , saldo_inicial.saldo_anterior
+                                , saldo_inicial.saldo_atual
+                                , conta
+                         ORDER BY cod_ctb
+                        ) AS c
+                --    WHERE movimentacao = 1   
+                 GROUP BY c.tipo_registro
+                        , c.cod_ctb
+                        , c.cod_ctb_view
+                        , c.tipo_aplicacao
+                        , c.tipo_conta 
+                        , c.cod_orgao
+                        , c.cod_recurso
+                        , c.conta
+                        , c.movimentacao    
+                 ORDER BY c.cod_ctb  
+                 ";
         return $stSql;
     }
     
@@ -477,11 +309,9 @@ class TTCEMGCTB extends Persistente
                             '21'::int  AS  tipo_registro
                              , SUM(vl.vl_lancamento ) AS valor_entr_saida
                              , plano_banco.cod_entidade as cod_orgao
-                             , conta_bancaria.cod_ctb_anterior AS cod_ctb
-                             , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
-                             , CASE WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.19%') THEN '1'
-                                    WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.50%' OR pc.cod_estrutural LIKE '1.1.4%') THEN '2'
-                               END AS tipo_conta
+                             , conta_bancaria.cod_ctb
+                             , conta_bancaria.tipo_aplicacao
+                             , conta_bancaria.tipo_conta::VARCHAR
                              , pa.exercicio 
                              , plano_recurso.cod_recurso AS cod_fonte_recursos
                              , '1'::VARCHAR AS tipo_movimentacao 
@@ -565,16 +395,24 @@ class TTCEMGCTB extends Persistente
                         ON plano_banco.cod_plano = pa.cod_plano
                        AND plano_banco.exercicio = pa.exercicio 
                     
-                INNER JOIN monetario.agencia
-                        ON agencia.cod_banco   = plano_banco.cod_banco
-                       AND agencia.cod_agencia = plano_banco.cod_agencia
-                    
-                INNER JOIN monetario.banco
-                        ON banco.cod_banco = plano_banco.cod_banco
-                                                         
-                 LEFT JOIN tcemg.conta_bancaria
-                        ON conta_bancaria.cod_conta = pc.cod_conta
-                       AND conta_bancaria.exercicio = pc.exercicio
+                 LEFT JOIN tcemg.contasCTB('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."') as conta_bancaria
+                                           (  cod_conta                          INTEGER
+					    , tipo_aplicacao                    VARCHAR
+					    , cod_ctb                           INTEGER
+					    , tipo_conta                        INTEGER
+					    , exercicio                         CHAR(4)  
+					    , conta                             TEXT                         
+                                            , conta_bancaria                    TEXT  
+                                            , conta_corrente                    TEXT                                                         
+                                            , cod_orgao                         INTEGER                                                        
+                                            , banco                             VARCHAR                                                        
+                                            , agencia             		TEXT                                                        
+                                            , digito_verificador_agencia        TEXT                                                        
+                                            , digito_verificador_conta_bancaria TEXT                                                        
+                                            , desc_conta_bancaria               VARCHAR                                         
+                                           )
+                       ON conta_bancaria.cod_conta = pc.cod_conta
+                      AND conta_bancaria.exercicio = pc.exercicio
                           
                 INNER JOIN contabilidade.conta_debito AS cd
                         ON pa.cod_plano = cd.cod_plano
@@ -725,7 +563,7 @@ class TTCEMGCTB extends Persistente
                        AND vl.tipo <> 'I'                       
                   GROUP BY tipo_registro
                          , cod_ctb
-		         , conta_bancaria.cod_tipo_aplicacao
+		         , conta_bancaria.tipo_aplicacao
 			 , tipo_conta
                          , plano_banco.cod_entidade
                          , plano_recurso.cod_recurso
@@ -761,11 +599,9 @@ class TTCEMGCTB extends Persistente
                             '21'::int  AS  tipo_registro
                           , SUM(vl.vl_lancamento) * -1 as valor_entr_saida
                           , plano_banco.cod_entidade as cod_orgao
-                          , conta_bancaria.cod_ctb_anterior AS cod_ctb
-                          , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
-                          , CASE WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.19%') THEN '1'
-                                 WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.50%' OR pc.cod_estrutural LIKE '1.1.4%') THEN '2'
-                            END AS tipo_conta
+                          , conta_bancaria.cod_ctb
+                          , conta_bancaria.tipo_aplicacao
+                          , conta_bancaria.tipo_conta::VARCHAR
                           , pa.exercicio
                           , plano_recurso.cod_recurso as cod_fonte_recursos
                           , '2'::VARCHAR AS tipo_movimentacao
@@ -850,16 +686,24 @@ class TTCEMGCTB extends Persistente
                         ON plano_banco.cod_plano = pa.cod_plano
                        AND plano_banco.exercicio = pa.exercicio 
                 
-                INNER JOIN monetario.agencia
-                        ON agencia.cod_banco   = plano_banco.cod_banco
-                       AND agencia.cod_agencia = plano_banco.cod_agencia
-                
-                INNER JOIN monetario.banco
-                        ON banco.cod_banco = plano_banco.cod_banco
-                        
-                 LEFT JOIN tcemg.conta_bancaria
-                        ON conta_bancaria.cod_conta = pc.cod_conta
-                       AND conta_bancaria.exercicio = pc.exercicio
+                 LEFT JOIN tcemg.contasCTB('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."') as conta_bancaria
+                                           (  cod_conta                          INTEGER
+					    , tipo_aplicacao                    VARCHAR
+					    , cod_ctb                           INTEGER
+					    , tipo_conta                        INTEGER
+					    , exercicio                         CHAR(4)  
+					    , conta                             TEXT                         
+                                            , conta_bancaria                    TEXT  
+                                            , conta_corrente                    TEXT                                                         
+                                            , cod_orgao                         INTEGER                                                        
+                                            , banco                             VARCHAR                                                        
+                                            , agencia             		TEXT                                                        
+                                            , digito_verificador_agencia        TEXT                                                        
+                                            , digito_verificador_conta_bancaria TEXT                                                        
+                                            , desc_conta_bancaria               VARCHAR                                         
+                                           )
+                       ON conta_bancaria.cod_conta = pc.cod_conta
+                      AND conta_bancaria.exercicio = pc.exercicio
                       
                 INNER JOIN contabilidade.conta_credito AS cc
                         ON pa.cod_plano = cc.cod_plano
@@ -1011,7 +855,7 @@ class TTCEMGCTB extends Persistente
                        
                   GROUP BY tipo_registro
                          , cod_ctb
-		         , conta_bancaria.cod_tipo_aplicacao
+		         , conta_bancaria.tipo_aplicacao
 		         , tipo_conta
                          , plano_banco.cod_entidade
                          , plano_recurso.cod_recurso
@@ -1048,7 +892,7 @@ class TTCEMGCTB extends Persistente
               , tipo_entr_saida
               , c.tipo_movimentacao
               , c.cod_fonte_recursos
-              , ABS(c.vlr_receita_cont) AS vlr_receita_cont
+              , ABS(SUM(c.vlr_receita_cont)) AS vlr_receita_cont
            FROM ( SELECT '22'::int  AS  tipo_registro
                        , replace(pc.cod_estrutural,'.','') as cod_reduzido_mov
                        , CASE WHEN (substr(conta_receita.cod_estrutural,1,1) = '9') THEN
@@ -1066,16 +910,9 @@ class TTCEMGCTB extends Persistente
                                  END
                            END AS natureza_receita
                        , SUM(vl.vl_lancamento) as vlr_receita_cont
-                       , plano_banco.cod_entidade as cod_orgao
-                       , (banco.num_banco || agencia.num_agencia || plano_banco.conta_corrente) AS conta
-                       , conta_bancaria.cod_ctb_anterior as cod_ctb
-		       , banco.num_banco AS num_banco
-		       , agencia.num_agencia AS num_agencia
-		       , plano_banco.conta_corrente AS conta_corrente
-		       , conta_bancaria.cod_tipo_aplicacao AS tipo_aplicacao
-                       , CASE WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.19%') THEN '1'
-                              WHEN (pc.cod_estrutural LIKE '1.1.1.1.1.50%' OR pc.cod_estrutural LIKE '1.1.4%') THEN '2'
-                         END AS tipo_conta
+                       , conta_bancaria.cod_ctb
+		       , conta_bancaria.tipo_aplicacao
+                       , conta_bancaria.tipo_conta::VARCHAR
                        , lo.tipo
                        , CASE WHEN lo.tipo = 'A' AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 1) <> '9'
                                     AND lancamento_receita.estorno = false AND SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 4) <> '1325' THEN '01'
@@ -1096,14 +933,24 @@ class TTCEMGCTB extends Persistente
               INNER JOIN contabilidade.plano_banco
                       ON plano_banco.cod_plano = pa.cod_plano
                      AND plano_banco.exercicio = pa.exercicio 
-              INNER JOIN monetario.agencia
-                      ON agencia.cod_banco   = plano_banco.cod_banco
-                     AND agencia.cod_agencia = plano_banco.cod_agencia
-              INNER JOIN monetario.banco
-                      ON banco.cod_banco = plano_banco.cod_banco
-               LEFT JOIN tcemg.conta_bancaria
-		      ON conta_bancaria.cod_conta = pc.cod_conta
-	             AND conta_bancaria.exercicio = pc.exercicio
+               LEFT JOIN tcemg.contasCTB('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."') as conta_bancaria
+                                           (  cod_conta                          INTEGER
+					    , tipo_aplicacao                    VARCHAR
+					    , cod_ctb                           INTEGER
+					    , tipo_conta                        INTEGER
+					    , exercicio                         CHAR(4)  
+					    , conta                             TEXT                         
+                                            , conta_bancaria                    TEXT  
+                                            , conta_corrente                    TEXT                                                         
+                                            , cod_orgao                         INTEGER                                                        
+                                            , banco                             VARCHAR                                                        
+                                            , agencia             		TEXT                                                        
+                                            , digito_verificador_agencia        TEXT                                                        
+                                            , digito_verificador_conta_bancaria TEXT                                                        
+                                            , desc_conta_bancaria               VARCHAR                                         
+                                           )
+                      ON conta_bancaria.cod_conta = pc.cod_conta
+                     AND conta_bancaria.exercicio = pc.exercicio
               INNER JOIN (
                            SELECT cod_plano
                                 , exercicio
@@ -1192,7 +1039,7 @@ class TTCEMGCTB extends Persistente
                      AND plano_banco.cod_entidade IN (".$this->getDado('entidades').")
                      AND lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
                 
-                GROUP BY 2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18
+                GROUP BY 2,3,4,5,7,8,9,10,11,12,13
               ) AS c
           WHERE tipo_entr_saida != '99'
        GROUP BY c.tipo_registro
@@ -1203,7 +1050,6 @@ class TTCEMGCTB extends Persistente
 	      , c.identificador_deducao
 	      , c.natureza_receita
 	      , c.tipo
-	      , c.vlr_receita_cont
               , tipo_entr_saida
               , c.tipo_movimentacao
               , c.cod_fonte_recursos

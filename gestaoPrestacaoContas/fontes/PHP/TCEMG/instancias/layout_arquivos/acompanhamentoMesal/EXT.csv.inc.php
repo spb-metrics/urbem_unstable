@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EXT.csv.inc.php 61383 2015-01-13 12:55:37Z evandro $
-  * $Date: 2015-01-13 10:55:37 -0200 (Ter, 13 Jan 2015) $
+  * $Id: EXT.csv.inc.php 61519 2015-01-29 15:38:40Z evandro $
+  * $Date: 2015-01-29 13:38:40 -0200 (Qui, 29 Jan 2015) $
   * $Author: evandro $
-  * $Rev: 61383 $
+  * $Rev: 61519 $
   *
 */
 /**
@@ -50,11 +50,11 @@ $rsRecordSetEXT23 = new RecordSet();
 $rsRecordSetEXT24 = new RecordSet();
 
 $obTTCEMGExtraOrcamentarias = new TTCEMGExtraOrcamentarias();
-$obTTCEMGExtraOrcamentarias->setDado('exercicio', Sessao::getExercicio());
-$obTTCEMGExtraOrcamentarias->setDado('entidades', $stEntidades);
-$obTTCEMGExtraOrcamentarias->setDado('mes', $stMes);
-$obTTCEMGExtraOrcamentarias->setDado('dt_inicial', $stDataInicial);
-$obTTCEMGExtraOrcamentarias->setDado('dt_final', $stDataFinal);
+$obTTCEMGExtraOrcamentarias->setDado('exercicio'  , Sessao::getExercicio());
+$obTTCEMGExtraOrcamentarias->setDado('entidades'  , $stEntidades);
+$obTTCEMGExtraOrcamentarias->setDado('mes'        , $stMes);
+$obTTCEMGExtraOrcamentarias->setDado('dt_inicial' , $stDataInicial);
+$obTTCEMGExtraOrcamentarias->setDado('dt_final'   , $stDataFinal);
 
 //Tipo Registro 10
 $obTTCEMGExtraOrcamentarias->recuperaExportacao10($rsRecordSetEXT10);
@@ -70,7 +70,6 @@ $obTTCEMGExtraOrcamentarias->recuperaExportacao22($rsRecordSetEXT22);
 
 //Tipo Registro 23
 $obTTCEMGExtraOrcamentarias->recuperaExportacao23($rsRecordSetEXT23);
-
 /* ------------------------------
  O registro 24 foi comentado para motivos de teste conforme requisitado por Silvia Martins Silva
 

@@ -76,7 +76,16 @@ if ($arquivo == false) {
     die;
 }
 
-if ($_FILES['stArquivo']['type'] != 'text/csv') {
+$csv_mimetypes = array(
+    'text/csv',    
+    'application/csv',
+    'text/comma-separated-values',
+    'application/excel',
+    'application/vnd.ms-excel',
+    'application/vnd.msexcel'
+);
+//Verificas os varios modos de como o sistema identifica um arquivo CSV e valida se o formato esta correto
+if ( !in_array($_FILES['stArquivo']['type'],$csv_mimetypes) ) {
     SistemaLegado::exibeAviso(urlencode("Extensão de arquivo não permitida. Por favor, selecione o arquivo em formato csv."),"n_erro","erro",Sessao::getId(), "../" );
     sistemaLegado::LiberaFrames();
     die;

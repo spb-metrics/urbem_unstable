@@ -59,10 +59,10 @@ $pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 $pgProc = "PR".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 $pgOcul = "OC".$stPrograma.".php";
 
-$obTPessoalCausaRescisao = new TPessoalCausaRescisao();
-$obTPessoalCasoCausa = new TPessoalCasoCausa();
+$obTPessoalCausaRescisao       = new TPessoalCausaRescisao();
+$obTPessoalCasoCausa           = new TPessoalCasoCausa();
 $obTPessoalCasoCausaSubDivisao = new TPessoalCasoCausaSubDivisao();
-$obTPessoalSefip = new TPessoalSefip();
+$obTPessoalSefip               = new TPessoalSefip();
 
 function procurarCaso($arCasos,$inCodCasoCausa)
 {
@@ -80,64 +80,92 @@ function procurarCaso($arCasos,$inCodCasoCausa)
 
 switch ($stAcao) {
     case "incluir":
-        Sessao::setTrataExcecao(true);
-        $stFiltro = " WHERE num_sefip = '".$_POST['inCodTxtSefipSaida']."'";
-        $obTPessoalSefip->recuperaTodos($rsSefip,$stFiltro);
-        $obTPessoalCausaRescisao->setDado("cod_sefip_saida",$rsSefip->getCampo("cod_sefip"));
-        $obTPessoalCausaRescisao->setDado("num_causa",$_POST['inNumCausa']);
-        $obTPessoalCausaRescisao->setDado("descricao",$_POST['stDescricaoCausa']);
-        $obTPessoalCausaRescisao->setDado("cod_caged",$_POST['inCodCaged']);
-        $obTPessoalCausaRescisao->setDado("cod_causa_afastamento", $_POST['inNumCausaMTE']);
-        $obTPessoalCausaRescisao->inclusao();
-        $inCodCausaRescisao = $obTPessoalCausaRescisao->getDado("cod_causa_rescisao");
-
-        if ($_POST["inNumCaged"] != "") {
-            include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalCaged.class.php");
-            $obTPessoalCaged = new TPessoalCaged();
-            $stFiltro = " WHERE num_caged = ".$_POST["inNumCaged"];
-            $obTPessoalCaged->recuperaTodos($rsCaged,$stFiltro);
-
-            include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalCausaRescisaoCaged.class.php");
-            $obTPessoalCausaRescisaoCaged = new TPessoalCausaRescisaoCaged();
-            $obTPessoalCausaRescisaoCaged->setDado("cod_causa_rescisao",$inCodCausaRescisao);
-            $obTPessoalCausaRescisaoCaged->setDado("cod_caged",$rsCaged->getCampo("cod_caged"));
-            $obTPessoalCausaRescisaoCaged->inclusao();
-        }
-
-        foreach (Sessao::read('arCasosCausa') as $arCasoCausa) {
-            if(!empty($inCodCasoCausa))
-                $obTPessoalCasoCausa->setDado("cod_caso_causa"          ,$inCodCasoCausa);
-            $obTPessoalCasoCausa->setDado("cod_periodo"                 ,$arCasoCausa['inCodPeriodo']);
-            $obTPessoalCasoCausa->setDado("cod_causa_rescisao"          ,$inCodCausaRescisao);
-            $obTPessoalCasoCausa->setDado("descricao"                   ,$arCasoCausa['stDescricaoCaso']);
-            $obTPessoalCasoCausa->setDado("paga_aviso_previo"           ,$arCasoCausa['boPagaAvisoPrevio']);
-            $obTPessoalCasoCausa->setDado("paga_ferias_vencida"         ,$arCasoCausa['boFeriasVencidas']);
-            $obTPessoalCasoCausa->setDado("cod_saque_fgts"              ,$arCasoCausa['inCodSaqueFGTS']);
-            $obTPessoalCasoCausa->setDado("perc_cont_social"            ,$arCasoCausa['flContribuicao']);
-            $obTPessoalCasoCausa->setDado("multa_fgts"                  ,$arCasoCausa['flMultaFGTS']);
-            $obTPessoalCasoCausa->setDado("inc_fgts_ferias"             ,$arCasoCausa['boFeriasFGTS']);
-            $obTPessoalCasoCausa->setDado("inc_fgts_aviso_previo"       ,$arCasoCausa['boAvisoPrevioFGTS']);
-            $obTPessoalCasoCausa->setDado("inc_fgts_13"                 ,$arCasoCausa['bo13FGTS']);
-            $obTPessoalCasoCausa->setDado("inc_irrf_ferias"             ,$arCasoCausa['boFeriasIRRF']);
-            $obTPessoalCasoCausa->setDado("inc_irrf_aviso_previo"       ,$arCasoCausa['boAvisoPrevioIRRF']);
-            $obTPessoalCasoCausa->setDado("inc_irrf_13"                 ,$arCasoCausa['bo13IRRF']);
-            $obTPessoalCasoCausa->setDado("inc_prev_ferias"             ,$arCasoCausa['boFeriasPrevidencia']);
-            $obTPessoalCasoCausa->setDado("inc_prev_aviso_previo"       ,$arCasoCausa['boAvisoPrevioPrevidencia']);
-            $obTPessoalCasoCausa->setDado("inc_prev_13"                 ,$arCasoCausa['bo13Previdencia']);
-            $obTPessoalCasoCausa->setDado("paga_ferias_proporcional"    ,$arCasoCausa['boFeriasProporcionais']);
-            $obTPessoalCasoCausa->setDado("inden_art_479"               ,$arCasoCausa['boArtigo479']);
-            $obTPessoalCasoCausa->inclusao();
-            $inCodCasoCausa = $obTPessoalCasoCausa->getDado("cod_caso_causa");
-            foreach ($arCasoCausa['inCodRegimeSelecionados'] as $inCodSubDivisao) {
-                $obTPessoalCasoCausaSubDivisao->setDado("cod_sub_divisao",$inCodSubDivisao);
-                $obTPessoalCasoCausaSubDivisao->setDado("cod_caso_causa",$inCodCasoCausa);
-                $obTPessoalCasoCausaSubDivisao->inclusao();
+        
+        $obErro = new Erro();
+        $boFlagTransacao = false;
+        $obTransacao = new Transacao;
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        
+        $stFiltro = " WHERE num_causa = '".$_POST['inNumCausa']."'";
+        $obTPessoalCausaRescisao->recuperaTodos($rsNumeroCausaRescisao, $stFiltro);
+                
+        if ( $rsNumeroCausaRescisao->getNumLinhas() >= 1 ) {
+            $obErro->setDescricao( "Código ".$_POST['inNumCausa']." já cadastrado. Informe um código diferente." );
+        }        
+        
+        if ( $obErro->ocorreu() ) {
+            
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+            
+        } else {
+            
+            $stFiltro = " WHERE num_sefip = '".$_POST['inCodTxtSefipSaida']."'";
+            $obTPessoalSefip->recuperaTodos($rsSefip,$stFiltro);
+            
+            $obTPessoalCausaRescisao->setDado("cod_sefip_saida",$rsSefip->getCampo("cod_sefip"));
+            $obTPessoalCausaRescisao->setDado("num_causa",$_POST['inNumCausa']);
+            $obTPessoalCausaRescisao->setDado("descricao",$_POST['stDescricaoCausa']);
+            $obTPessoalCausaRescisao->setDado("cod_caged",$_POST['inCodCaged']);
+            $obTPessoalCausaRescisao->setDado("cod_causa_afastamento", $_POST['inNumCausaMTE']);
+            $obTPessoalCausaRescisao->inclusao($obTransacao);
+            
+            $inCodCausaRescisao = $obTPessoalCausaRescisao->getDado("cod_causa_rescisao");
+    
+            if ($_POST["inNumCaged"] != "") {
+                include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalCaged.class.php");
+                $obTPessoalCaged = new TPessoalCaged();
+                $stFiltro = " WHERE num_caged = ".$_POST["inNumCaged"];
+                $obTPessoalCaged->recuperaTodos($rsCaged,$stFiltro);
+    
+                include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalCausaRescisaoCaged.class.php");
+                $obTPessoalCausaRescisaoCaged = new TPessoalCausaRescisaoCaged();
+                $obTPessoalCausaRescisaoCaged->setDado("cod_causa_rescisao",$inCodCausaRescisao);
+                $obTPessoalCausaRescisaoCaged->setDado("cod_caged",$rsCaged->getCampo("cod_caged"));
+                $obTPessoalCausaRescisaoCaged->inclusao($obTransacao);
             }
-            $inCodCasoCausa++;
+    
+            foreach (Sessao::read('arCasosCausa') as $arCasoCausa) {
+                
+                if(!empty($inCodCasoCausa))
+                    $obTPessoalCasoCausa->setDado("cod_caso_causa"          ,$inCodCasoCausa);
+                    
+                $obTPessoalCasoCausa->setDado("cod_periodo"                 ,$arCasoCausa['inCodPeriodo']);
+                $obTPessoalCasoCausa->setDado("cod_causa_rescisao"          ,$inCodCausaRescisao);
+                $obTPessoalCasoCausa->setDado("descricao"                   ,$arCasoCausa['stDescricaoCaso']);
+                $obTPessoalCasoCausa->setDado("paga_aviso_previo"           ,$arCasoCausa['boPagaAvisoPrevio']);
+                $obTPessoalCasoCausa->setDado("paga_ferias_vencida"         ,$arCasoCausa['boFeriasVencidas']);
+                $obTPessoalCasoCausa->setDado("cod_saque_fgts"              ,$arCasoCausa['inCodSaqueFGTS']);
+                $obTPessoalCasoCausa->setDado("perc_cont_social"            ,$arCasoCausa['flContribuicao']);
+                $obTPessoalCasoCausa->setDado("multa_fgts"                  ,$arCasoCausa['flMultaFGTS']);
+                $obTPessoalCasoCausa->setDado("inc_fgts_ferias"             ,$arCasoCausa['boFeriasFGTS']);
+                $obTPessoalCasoCausa->setDado("inc_fgts_aviso_previo"       ,$arCasoCausa['boAvisoPrevioFGTS']);
+                $obTPessoalCasoCausa->setDado("inc_fgts_13"                 ,$arCasoCausa['bo13FGTS']);
+                $obTPessoalCasoCausa->setDado("inc_irrf_ferias"             ,$arCasoCausa['boFeriasIRRF']);
+                $obTPessoalCasoCausa->setDado("inc_irrf_aviso_previo"       ,$arCasoCausa['boAvisoPrevioIRRF']);
+                $obTPessoalCasoCausa->setDado("inc_irrf_13"                 ,$arCasoCausa['bo13IRRF']);
+                $obTPessoalCasoCausa->setDado("inc_prev_ferias"             ,$arCasoCausa['boFeriasPrevidencia']);
+                $obTPessoalCasoCausa->setDado("inc_prev_aviso_previo"       ,$arCasoCausa['boAvisoPrevioPrevidencia']);
+                $obTPessoalCasoCausa->setDado("inc_prev_13"                 ,$arCasoCausa['bo13Previdencia']);
+                $obTPessoalCasoCausa->setDado("paga_ferias_proporcional"    ,$arCasoCausa['boFeriasProporcionais']);
+                $obTPessoalCasoCausa->setDado("inden_art_479"               ,$arCasoCausa['boArtigo479']);
+                $obTPessoalCasoCausa->inclusao($obTransacao);
+                
+                $inCodCasoCausa = $obTPessoalCasoCausa->getDado("cod_caso_causa");
+                
+                foreach ($arCasoCausa['inCodRegimeSelecionados'] as $inCodSubDivisao) {
+                    $obTPessoalCasoCausaSubDivisao->setDado("cod_sub_divisao",$inCodSubDivisao);
+                    $obTPessoalCasoCausaSubDivisao->setDado("cod_caso_causa",$inCodCasoCausa);
+                    $obTPessoalCasoCausaSubDivisao->inclusao($obTransacao);
+                }
+                
+                $inCodCasoCausa++;
+            }
+            $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro);
+            sistemaLegado::alertaAviso($pgForm,"Incluir Causa realizada com sucesso." ,"incluir","aviso", Sessao::getId(), "../");
         }
-        Sessao::encerraExcecao();
-        sistemaLegado::alertaAviso($pgForm,"Incluir Causa realizada com sucesso." ,"incluir","aviso", Sessao::getId(), "../");
+        
     break;
+
     case "alterar":
         Sessao::setTrataExcecao(true);
 

@@ -25,11 +25,11 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-* $Id: FTCEMGArquivoEXTRegistro20.plsql 59612 2014-09-02 12:00:51Z gelson $
-* $Revision: 59612 $
+* $Id: FTCEMGArquivoEXTRegistro20.plsql 61569 2015-02-09 13:08:15Z michel $
+* $Revision: 61569 $
 * $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Author: michel $
+* $Date: 2015-02-09 11:08:15 -0200 (Seg, 09 Fev 2015) $
 *
 */
 
@@ -231,159 +231,315 @@ BEGIN
                                        )
                     ORDER BY cod_estrutural ';
     ELSE
-        stSql := '
-            SELECT cod_estrutural
-                 , tipo_registro
-                 , cod_orgao
-                 , cod_ext
-                 , cod_recurso
-                 , SUM(0.00) as vl_saldo_anterior
-                 , SUM(0.00) as vl_saldo_debitos
-                 , SUM(0.00) as vl_saldo_creditos
-                 , SUM(0.00) as vl_saldo_atual
-              FROM ( SELECT pc.cod_estrutural
-                          , 20 AS tipo_registro
-                          , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
-                          , t_be.cod_plano AS cod_ext
-                          , c_pr.cod_recurso
-                          , 0.00 as vl_saldo_anterior
-                          , 0.00 as vl_saldo_debitos
-                          , 0.00 as vl_saldo_creditos
-                          , 0.00 as vl_saldo_atual
-            
-                       FROM tesouraria.transferencia
-            
-                       JOIN contabilidade.plano_analitica as pa
-                         ON pa.cod_plano = transferencia.cod_plano_credito
-                        AND pa.exercicio = transferencia.exercicio
-            
-                       JOIN tcemg.balancete_extmmaa AS t_be
-                         ON t_be.cod_plano = pa.cod_plano
-                        AND t_be.exercicio = pa.exercicio
-                        
-                       JOIN contabilidade.plano_conta     as pc
-                         ON pa.cod_conta = pc.cod_conta
-                        and pa.exercicio = pc.exercicio
-                        
-                       JOIN (SELECT lote.exercicio
-                                  , conta_credito.cod_plano
-                                  , lote.tipo
-                                  , lote.cod_entidade
-                               FROM contabilidade.lote
-                               JOIN contabilidade.valor_lancamento
-                                 ON valor_lancamento.exercicio = lote.exercicio
-                                AND valor_lancamento.cod_entidade = lote.cod_entidade
-                                AND valor_lancamento.tipo = lote.tipo
-                                AND valor_lancamento.cod_lote = lote.cod_lote
-                                AND valor_lancamento.tipo_valor = ''C''
-            
-                               JOIN contabilidade.conta_credito
-                                 ON conta_credito.exercicio = valor_lancamento.exercicio
-                                AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
-                                AND conta_credito.tipo = valor_lancamento.tipo
-                                AND conta_credito.cod_lote = valor_lancamento.cod_lote
-                                AND conta_credito.sequencia = valor_lancamento.sequencia
-                                --AND valor_lancamento.tipo = ''T''
-            
-                              WHERE lote.exercicio = '''||stExercicio||'''
-                                --AND lote.tipo = ''T''
-                                AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
-                           GROUP BY 1,2,3,4
-            
-                            ) as valor
-                         ON valor.exercicio    = pa.exercicio
-                        AND valor.cod_plano    = pa.cod_plano
-                        AND valor.tipo         = transferencia.tipo
-                        AND valor.cod_entidade =  transferencia.cod_entidade 
-            
-                       JOIN contabilidade.plano_recurso AS c_pr
-                         ON c_pr.cod_plano = valor.cod_plano
-                        AND c_pr.exercicio = valor.exercicio
-            
-                       JOIN administracao.configuracao_entidade
-                         ON configuracao_entidade.cod_entidade = valor.cod_entidade
-                        AND configuracao_entidade.exercicio = valor.exercicio
-                        AND configuracao_entidade.cod_modulo = 55
-                        AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
-            
-                      WHERE t_be.exercicio   = '''||stExercicio||'''
-                        AND transferencia.'||stFiltro||'
-                        AND transferencia.cod_tipo = 2
-                   GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
-                   UNION
-                     SELECT pc.cod_estrutural
-                          , 20 AS tipo_registro
-                          , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
-                          , t_be.cod_plano AS cod_ext
-                          , c_pr.cod_recurso
-                          , 0.00 as vl_saldo_anterior
-                          , 0.00 as vl_saldo_debitos
-                          , 0.00 as vl_saldo_creditos
-                          , 0.00 as vl_saldo_atual
-            
-                       FROM tesouraria.transferencia
-            
-                       JOIN contabilidade.plano_analitica as pa
-                         ON pa.cod_plano = transferencia.cod_plano_debito
-                        AND pa.exercicio = transferencia.exercicio
-            
-                       JOIN tcemg.balancete_extmmaa AS t_be
-                         ON t_be.cod_plano = pa.cod_plano
-                        AND t_be.exercicio = pa.exercicio
-                        
-                       JOIN contabilidade.plano_conta     as pc
-                         ON pa.cod_conta = pc.cod_conta
-                        and pa.exercicio = pc.exercicio
-                        
-                       JOIN (SELECT lote.exercicio
-                                  , conta_debito.cod_plano
-                                  , lote.tipo
-                                  , lote.cod_entidade
-                               FROM contabilidade.lote
-                               JOIN contabilidade.valor_lancamento
-                                 ON valor_lancamento.exercicio = lote.exercicio
-                                AND valor_lancamento.cod_entidade = lote.cod_entidade
-                                AND valor_lancamento.tipo = lote.tipo
-                                AND valor_lancamento.cod_lote = lote.cod_lote
-                                AND valor_lancamento.tipo_valor = ''D''
-            
-                               JOIN contabilidade.conta_debito
-                                 ON conta_debito.exercicio = valor_lancamento.exercicio
-                                AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
-                                AND conta_debito.tipo = valor_lancamento.tipo
-                                AND conta_debito.cod_lote = valor_lancamento.cod_lote
-                                AND conta_debito.sequencia = valor_lancamento.sequencia
-                                --AND valor_lancamento.tipo = ''T''
-            
-                              WHERE lote.exercicio = '''||stExercicio||'''
-                                --AND lote.tipo = ''T''
-                                AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
-                           GROUP BY 1,2,3,4
-            
-                            ) as valor
-                         ON valor.exercicio    = pa.exercicio
-                        AND valor.cod_plano    = pa.cod_plano
-                        AND valor.tipo         = transferencia.tipo
-                        AND valor.cod_entidade =  transferencia.cod_entidade 
-            
-                       JOIN contabilidade.plano_recurso AS c_pr
-                         ON c_pr.cod_plano = valor.cod_plano
-                        AND c_pr.exercicio = valor.exercicio
-            
-                       JOIN administracao.configuracao_entidade
-                         ON configuracao_entidade.cod_entidade = valor.cod_entidade
-                        AND configuracao_entidade.exercicio = valor.exercicio
-                        AND configuracao_entidade.cod_modulo = 55
-                        AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
-            
-                      WHERE t_be.exercicio   = '''||stExercicio||'''
-                        AND transferencia.'||stFiltro||'
-                        AND transferencia.cod_tipo = 1
-                   GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
-            ) AS registros
-            GROUP BY tipo_registro, cod_orgao, cod_ext , cod_recurso, cod_estrutural
-            ORDER BY cod_ext
-        ';
+        IF quote_literal(stExercicio) >= '2015' THEN
+            stSql := '
+                SELECT cod_estrutural
+                     , tipo_registro
+                     , cod_orgao
+                     , cod_ext
+                     , cod_recurso
+                     , SUM(0.00) as vl_saldo_anterior
+                     , SUM(0.00) as vl_saldo_debitos
+                     , SUM(0.00) as vl_saldo_creditos
+                     , SUM(0.00) as vl_saldo_atual
+                  FROM ( SELECT pc.cod_estrutural
+                              , 20 AS tipo_registro
+                              , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
+                              , t_be.cod_plano AS cod_ext
+                              , c_pr.cod_recurso
+                              , 0.00 as vl_saldo_anterior
+                              , 0.00 as vl_saldo_debitos
+                              , 0.00 as vl_saldo_creditos
+                              , 0.00 as vl_saldo_atual
+                
+                           FROM tesouraria.transferencia
+                
+                           JOIN contabilidade.plano_analitica as pa
+                             ON pa.cod_plano = transferencia.cod_plano_credito
+                            AND pa.exercicio = transferencia.exercicio
+                
+                           JOIN tcemg.balancete_extmmaa AS t_be
+                             ON t_be.cod_plano = pa.cod_plano
+                            AND t_be.exercicio = pa.exercicio
+                            
+                           JOIN contabilidade.plano_conta     as pc
+                             ON pa.cod_conta = pc.cod_conta
+                            and pa.exercicio = pc.exercicio
+                            
+                           JOIN (SELECT lote.exercicio
+                                      , conta_credito.cod_plano
+                                      , lote.tipo
+                                      , lote.cod_entidade
+                                   FROM contabilidade.lote
+                                   JOIN contabilidade.valor_lancamento
+                                     ON valor_lancamento.exercicio = lote.exercicio
+                                    AND valor_lancamento.cod_entidade = lote.cod_entidade
+                                    AND valor_lancamento.tipo = lote.tipo
+                                    AND valor_lancamento.cod_lote = lote.cod_lote
+                                    AND valor_lancamento.tipo_valor = ''C''
+                
+                                   JOIN contabilidade.conta_credito
+                                     ON conta_credito.exercicio = valor_lancamento.exercicio
+                                    AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                    AND conta_credito.tipo = valor_lancamento.tipo
+                                    AND conta_credito.cod_lote = valor_lancamento.cod_lote
+                                    AND conta_credito.sequencia = valor_lancamento.sequencia
+                                    --AND valor_lancamento.tipo = ''T''
+                
+                                  WHERE lote.exercicio = '''||stExercicio||'''
+                                    --AND lote.tipo = ''T''
+                                    AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
+                               GROUP BY 1,2,3,4
+                
+                                ) as valor
+                             ON valor.exercicio    = pa.exercicio
+                            AND valor.cod_plano    = pa.cod_plano
+                            AND valor.tipo         = transferencia.tipo
+                            AND valor.cod_entidade =  transferencia.cod_entidade 
+                
+                            LEFT JOIN contabilidade.plano_recurso AS c_pr
+                             ON c_pr.cod_plano = valor.cod_plano
+                            AND c_pr.exercicio = valor.exercicio
+                
+                           JOIN administracao.configuracao_entidade
+                             ON configuracao_entidade.cod_entidade = valor.cod_entidade
+                            AND configuracao_entidade.exercicio = valor.exercicio
+                            AND configuracao_entidade.cod_modulo = 55
+                            AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
+                
+                          WHERE t_be.exercicio   = '''||stExercicio||'''
+                            AND transferencia.'||stFiltro||'
+                            AND transferencia.cod_tipo = 2
+                       GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
+                       UNION
+                         SELECT pc.cod_estrutural
+                              , 20 AS tipo_registro
+                              , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
+                              , t_be.cod_plano AS cod_ext
+                              , c_pr.cod_recurso
+                              , 0.00 as vl_saldo_anterior
+                              , 0.00 as vl_saldo_debitos
+                              , 0.00 as vl_saldo_creditos
+                              , 0.00 as vl_saldo_atual
+                
+                           FROM tesouraria.transferencia
+                
+                           JOIN contabilidade.plano_analitica as pa
+                             ON pa.cod_plano = transferencia.cod_plano_debito
+                            AND pa.exercicio = transferencia.exercicio
+                
+                           JOIN tcemg.balancete_extmmaa AS t_be
+                             ON t_be.cod_plano = pa.cod_plano
+                            AND t_be.exercicio = pa.exercicio
+                            
+                           JOIN contabilidade.plano_conta     as pc
+                             ON pa.cod_conta = pc.cod_conta
+                            and pa.exercicio = pc.exercicio
+                            
+                           JOIN (SELECT lote.exercicio
+                                      , conta_debito.cod_plano
+                                      , lote.tipo
+                                      , lote.cod_entidade
+                                   FROM contabilidade.lote
+                                   JOIN contabilidade.valor_lancamento
+                                     ON valor_lancamento.exercicio = lote.exercicio
+                                    AND valor_lancamento.cod_entidade = lote.cod_entidade
+                                    AND valor_lancamento.tipo = lote.tipo
+                                    AND valor_lancamento.cod_lote = lote.cod_lote
+                                    AND valor_lancamento.tipo_valor = ''D''
+                
+                                   JOIN contabilidade.conta_debito
+                                     ON conta_debito.exercicio = valor_lancamento.exercicio
+                                    AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                    AND conta_debito.tipo = valor_lancamento.tipo
+                                    AND conta_debito.cod_lote = valor_lancamento.cod_lote
+                                    AND conta_debito.sequencia = valor_lancamento.sequencia
+                                    --AND valor_lancamento.tipo = ''T''
+                
+                                  WHERE lote.exercicio = '''||stExercicio||'''
+                                    --AND lote.tipo = ''T''
+                                    AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
+                               GROUP BY 1,2,3,4
+                
+                                ) as valor
+                             ON valor.exercicio    = pa.exercicio
+                            AND valor.cod_plano    = pa.cod_plano
+                            AND valor.tipo         = transferencia.tipo
+                            AND valor.cod_entidade =  transferencia.cod_entidade 
+                
+                            LEFT JOIN contabilidade.plano_recurso AS c_pr
+                             ON c_pr.cod_plano = valor.cod_plano
+                            AND c_pr.exercicio = valor.exercicio
+                
+                           JOIN administracao.configuracao_entidade
+                             ON configuracao_entidade.cod_entidade = valor.cod_entidade
+                            AND configuracao_entidade.exercicio = valor.exercicio
+                            AND configuracao_entidade.cod_modulo = 55
+                            AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
+                
+                          WHERE t_be.exercicio   = '''||stExercicio||'''
+                            AND transferencia.'||stFiltro||'
+                            AND transferencia.cod_tipo = 1
+                       GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
+                ) AS registros
+                GROUP BY tipo_registro, cod_orgao, cod_ext , cod_recurso, cod_estrutural
+                ORDER BY cod_ext
+            ';
+        ELSE
+            stSql := '
+                SELECT cod_estrutural
+                     , tipo_registro
+                     , cod_orgao
+                     , cod_ext
+                     , cod_recurso
+                     , SUM(0.00) as vl_saldo_anterior
+                     , SUM(0.00) as vl_saldo_debitos
+                     , SUM(0.00) as vl_saldo_creditos
+                     , SUM(0.00) as vl_saldo_atual
+                  FROM ( SELECT pc.cod_estrutural
+                              , 20 AS tipo_registro
+                              , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
+                              , t_be.cod_plano AS cod_ext
+                              , c_pr.cod_recurso
+                              , 0.00 as vl_saldo_anterior
+                              , 0.00 as vl_saldo_debitos
+                              , 0.00 as vl_saldo_creditos
+                              , 0.00 as vl_saldo_atual
+                
+                           FROM tesouraria.transferencia
+                
+                           JOIN contabilidade.plano_analitica as pa
+                             ON pa.cod_plano = transferencia.cod_plano_credito
+                            AND pa.exercicio = transferencia.exercicio
+                
+                           JOIN tcemg.balancete_extmmaa AS t_be
+                             ON t_be.cod_plano = pa.cod_plano
+                            AND t_be.exercicio = pa.exercicio
+                            
+                           JOIN contabilidade.plano_conta     as pc
+                             ON pa.cod_conta = pc.cod_conta
+                            and pa.exercicio = pc.exercicio
+                            
+                           JOIN (SELECT lote.exercicio
+                                      , conta_credito.cod_plano
+                                      , lote.tipo
+                                      , lote.cod_entidade
+                                   FROM contabilidade.lote
+                                   JOIN contabilidade.valor_lancamento
+                                     ON valor_lancamento.exercicio = lote.exercicio
+                                    AND valor_lancamento.cod_entidade = lote.cod_entidade
+                                    AND valor_lancamento.tipo = lote.tipo
+                                    AND valor_lancamento.cod_lote = lote.cod_lote
+                                    AND valor_lancamento.tipo_valor = ''C''
+                
+                                   JOIN contabilidade.conta_credito
+                                     ON conta_credito.exercicio = valor_lancamento.exercicio
+                                    AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                    AND conta_credito.tipo = valor_lancamento.tipo
+                                    AND conta_credito.cod_lote = valor_lancamento.cod_lote
+                                    AND conta_credito.sequencia = valor_lancamento.sequencia
+                                    --AND valor_lancamento.tipo = ''T''
+                
+                                  WHERE lote.exercicio = '''||stExercicio||'''
+                                    --AND lote.tipo = ''T''
+                                    AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
+                               GROUP BY 1,2,3,4
+                
+                                ) as valor
+                             ON valor.exercicio    = pa.exercicio
+                            AND valor.cod_plano    = pa.cod_plano
+                            AND valor.tipo         = transferencia.tipo
+                            AND valor.cod_entidade =  transferencia.cod_entidade 
+                
+                           JOIN contabilidade.plano_recurso AS c_pr
+                             ON c_pr.cod_plano = valor.cod_plano
+                            AND c_pr.exercicio = valor.exercicio
+                
+                           JOIN administracao.configuracao_entidade
+                             ON configuracao_entidade.cod_entidade = valor.cod_entidade
+                            AND configuracao_entidade.exercicio = valor.exercicio
+                            AND configuracao_entidade.cod_modulo = 55
+                            AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
+                
+                          WHERE t_be.exercicio   = '''||stExercicio||'''
+                            AND transferencia.'||stFiltro||'
+                            AND transferencia.cod_tipo = 2
+                       GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
+                       UNION
+                         SELECT pc.cod_estrutural
+                              , 20 AS tipo_registro
+                              , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
+                              , t_be.cod_plano AS cod_ext
+                              , c_pr.cod_recurso
+                              , 0.00 as vl_saldo_anterior
+                              , 0.00 as vl_saldo_debitos
+                              , 0.00 as vl_saldo_creditos
+                              , 0.00 as vl_saldo_atual
+                
+                           FROM tesouraria.transferencia
+                
+                           JOIN contabilidade.plano_analitica as pa
+                             ON pa.cod_plano = transferencia.cod_plano_debito
+                            AND pa.exercicio = transferencia.exercicio
+                
+                           JOIN tcemg.balancete_extmmaa AS t_be
+                             ON t_be.cod_plano = pa.cod_plano
+                            AND t_be.exercicio = pa.exercicio
+                            
+                           JOIN contabilidade.plano_conta     as pc
+                             ON pa.cod_conta = pc.cod_conta
+                            and pa.exercicio = pc.exercicio
+                            
+                           JOIN (SELECT lote.exercicio
+                                      , conta_debito.cod_plano
+                                      , lote.tipo
+                                      , lote.cod_entidade
+                                   FROM contabilidade.lote
+                                   JOIN contabilidade.valor_lancamento
+                                     ON valor_lancamento.exercicio = lote.exercicio
+                                    AND valor_lancamento.cod_entidade = lote.cod_entidade
+                                    AND valor_lancamento.tipo = lote.tipo
+                                    AND valor_lancamento.cod_lote = lote.cod_lote
+                                    AND valor_lancamento.tipo_valor = ''D''
+                
+                                   JOIN contabilidade.conta_debito
+                                     ON conta_debito.exercicio = valor_lancamento.exercicio
+                                    AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                    AND conta_debito.tipo = valor_lancamento.tipo
+                                    AND conta_debito.cod_lote = valor_lancamento.cod_lote
+                                    AND conta_debito.sequencia = valor_lancamento.sequencia
+                                    --AND valor_lancamento.tipo = ''T''
+                
+                                  WHERE lote.exercicio = '''||stExercicio||'''
+                                    --AND lote.tipo = ''T''
+                                    AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
+                               GROUP BY 1,2,3,4
+                
+                                ) as valor
+                             ON valor.exercicio    = pa.exercicio
+                            AND valor.cod_plano    = pa.cod_plano
+                            AND valor.tipo         = transferencia.tipo
+                            AND valor.cod_entidade =  transferencia.cod_entidade 
+                
+                           JOIN contabilidade.plano_recurso AS c_pr
+                             ON c_pr.cod_plano = valor.cod_plano
+                            AND c_pr.exercicio = valor.exercicio
+                
+                           JOIN administracao.configuracao_entidade
+                             ON configuracao_entidade.cod_entidade = valor.cod_entidade
+                            AND configuracao_entidade.exercicio = valor.exercicio
+                            AND configuracao_entidade.cod_modulo = 55
+                            AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
+                
+                          WHERE t_be.exercicio   = '''||stExercicio||'''
+                            AND transferencia.'||stFiltro||'
+                            AND transferencia.cod_tipo = 1
+                       GROUP BY cod_estrutural, t_be.cod_plano, cod_recurso, cod_orgao
+                ) AS registros
+                GROUP BY tipo_registro, cod_orgao, cod_ext , cod_recurso, cod_estrutural
+                ORDER BY cod_ext
+            ';
+        END IF;
     END IF;
     FOR reRegistro IN EXECUTE stSql
     LOOP

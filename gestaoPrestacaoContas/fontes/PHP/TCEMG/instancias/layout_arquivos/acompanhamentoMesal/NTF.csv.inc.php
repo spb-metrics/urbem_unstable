@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: NTF.csv.inc.php 61365 2015-01-12 11:41:35Z evandro $
-  * $Date: 2015-01-12 09:41:35 -0200 (Seg, 12 Jan 2015) $
-  * $Author: evandro $
-  * $Rev: 61365 $
+  * $Id: NTF.csv.inc.php 61568 2015-02-09 11:41:58Z michel $
+  * $Date: 2015-02-09 09:41:58 -0200 (Seg, 09 Fev 2015) $
+  * $Author: michel $
+  * $Rev: 61568 $
   *
 */
 /**
@@ -67,8 +67,13 @@ for ($i=0; $i<count($arRecordSetNTF10);$i++) {
     for ($count=0; $count<count($rsRecordSet->arElementos); $count++) {
         if ($aux==0)
             $rsRecordSetNTF20->inNumLinhas = 0;
-            $rsRecordSetNTF20->arElementos[$aux] = $rsRecordSet->arElementos[$count];
-            $aux++;
+        
+        $rsRecordSetNTF20->arElementos[$aux] = $rsRecordSet->arElementos[$count];
+        //Se o exercicio é anterior a 2015, o nro do registro é 12.
+        if(Sessao::getExercicio() < '2015')
+            $rsRecordSetNTF20->arElementos[$aux]['tiporegistro'] = '12';
+        
+        $aux++;
     }
     $rsRecordSetNTF20->inNumLinhas  = $rsRecordSetNTF20->inNumLinhas + $rsRecordSet->inNumLinhas;
     $rsRecordSetNTF20->inNumColunas = $rsRecordSet->inNumColunas;

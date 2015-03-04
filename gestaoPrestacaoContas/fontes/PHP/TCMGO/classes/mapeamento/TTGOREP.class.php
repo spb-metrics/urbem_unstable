@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOREP.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTGOREP.class.php 61600 2015-02-12 12:13:25Z franver $
 
     * Casos de uso: uc-06.04.00
 */
@@ -695,4 +695,240 @@ GROUP BY
 ";
 return $stSql;
 }
+
+public function recuperaTodos2015(&$rsRecordSet, $stFiltro = '', $stOrdem = '', $boTransacao = '')
+{
+    $rsRecordSet = new RecordSet();
+    $obConexao   = new Conexao();
+    
+    $stSQL = $this->montaRecuperaTodos2015();
+    $this->setDebug($stSQL);
+    
+    return $obConexao->executaSQL($rsRecordSet, $stSQL, $boTransacao);
+}
+
+//Mapeamento do case pode ser encontrado no documento de tabelas auxiliares do tribunal
+function montaRecuperaTodos2015()
+{
+$stSql = "
+SELECT *
+     , 10 AS tipo_registro
+     , '".$this->getDado('stEntidades')."' AS cod_orgao
+     , '".$this->getDado('exercicio')."' AS exercicio
+     , 0 AS numero_registro
+  FROM
+(
+SELECT CASE WHEN SUM(despesas) > SUM(receitas)
+            THEN '02'
+            ELSE '01'
+        END AS tipo_saldo_pat_ex
+     , SUM(receitas) - SUM(despesas) AS saldo_pat_ex
+  FROM (
+SELECT CASE WHEN cod_estrutural ILIKE '5.%'
+            THEN tabela1.vl_arrecadado
+            ELSE 0.00
+        END AS despesas
+     , CASE WHEN cod_estrutural ILIKE '4.%'
+            THEN tabela1.vl_arrecadado
+            ELSE CASE WHEN cod_estrutural ILIKE '6.%'
+                      THEN tabela1.vl_arrecadado
+                      ELSE 0.00
+                  END
+             END AS receitas
+     , cod_estrutural
+FROM (
+   SELECT tbl.cod_estrutural                                                                                
+        , abs( sum( tbl.vl_arrecadado_debito ) + sum( tbl.vl_arrecadado_credito ) ) as vl_arrecadado        
+        , OCR.nom_conta                                                                                     
+        , CASE WHEN publico.fn_nivel( tbl.cod_estrutural ) > 5                                              
+               THEN 5                                                                                           
+               ELSE publico.fn_nivel( tbl.cod_estrutural )                                                      
+           END AS nivel                                                                                       
+     FROM ( SELECT substr( OPC.cod_estrutural, 1, 9 )  AS cod_estrutural                                       
+                 , OPC.exercicio                                                                               
+                 , sum( coalesce( CCD.vl_lancamento, 0.00 ) ) * ( -1 ) AS vl_arrecadado_debito                 
+                 , sum( coalesce( CCC.vl_lancamento, 0.00 ) ) * ( -1 ) AS vl_arrecadado_credito                
+              FROM contabilidade.plano_conta    AS OPC
+              -- Join com plano analitica                                                                        
+         LEFT JOIN contabilidade.plano_analitica AS OCA
+                ON OPC.cod_conta = OCA.cod_conta
+               AND OPC.exercicio = OCA.exercicio
+         -- Join com contabilidade.valor_lancamento                                                         
+         LEFT JOIN (SELECT CCD.cod_plano
+                         , CCD.exercicio
+                         , sum( vl_lancamento ) as vl_lancamento                                           
+                      FROM contabilidade.conta_debito     AS CCD                                         
+                         , contabilidade.valor_lancamento AS CVLD                                        
+                         , contabilidade.lancamento       AS CLA                                        
+                         , contabilidade.lote             AS CLO                                         
+                     WHERE CCD.cod_lote      = CVLD.cod_lote                                               
+                       AND CCD.tipo          = CVLD.tipo
+                       AND CCD.sequencia     = CVLD.sequencia
+                       AND CCD.exercicio     = CVLD.exercicio
+                       AND CCD.tipo_valor    = CVLD.tipo_valor
+                       AND CCD.cod_entidade  = CVLD.cod_entidade
+                       AND CVLD.tipo_valor   = 'D'
+                       AND CVLD.cod_lote     = CLA.cod_lote
+                       AND CVLD.tipo         = CLA.tipo
+                       AND CVLD.cod_entidade = CLA.cod_entidade
+                       AND CVLD.exercicio    = CLA.exercicio
+                       AND CVLD.sequencia    = CLA.sequencia
+                       AND CLA.cod_lote      = CLO.cod_lote
+                       AND CLA.tipo          = CLO.tipo
+                       AND CLA.cod_entidade  = CLO.cod_entidade
+                       AND CLA.exercicio     = CLO.exercicio
+                       AND CCD.exercicio     = '".$this->getDado('exercicio')."'
+                       AND CVLD.cod_entidade IN( ".$this->getDado('stEntidades')." )
+                       AND CLO.dt_lote BETWEEN TO_DATE( '01/01/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )
+                                           AND TO_DATE( '31/12/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )
+                       AND CLA.cod_historico not between 800 and 899
+                  GROUP BY CCD.cod_plano
+                         , CCD.exercicio
+                  ORDER BY CCD.cod_plano
+                         , CCD.exercicio
+                   ) AS CCD
+                ON OCA.cod_plano = CCD.cod_plano
+               AND OCA.exercicio = CCD.exercicio
+         -- Join com contabilidade.valor_lancamento
+         LEFT JOIN (SELECT CCC.cod_plano
+                         , CCC.exercicio
+                         , sum(vl_lancamento) as vl_lancamento
+                      FROM contabilidade.conta_credito    AS CCC
+                         , contabilidade.valor_lancamento AS CVLC
+                         , contabilidade.lancamento       AS CLA                                        
+                         , contabilidade.lote             AS CLO                                         
+                     WHERE CCC.cod_lote      = CVLC.cod_lote                                               
+                       AND CCC.tipo          = CVLC.tipo                                                   
+                       AND CCC.sequencia     = CVLC.sequencia                                              
+                       AND CCC.exercicio     = CVLC.exercicio                                              
+                       AND CCC.tipo_valor    = CVLC.tipo_valor                                             
+                       AND CCC.cod_entidade  = CVLC.cod_entidade                                           
+                       AND CVLC.tipo_valor   = 'C'                                                         
+                       AND CVLC.cod_lote     = CLA.cod_lote                                                 
+                       AND CVLC.tipo         = CLA.tipo                                                     
+                       AND CVLC.cod_entidade = CLA.cod_entidade                                             
+                       AND CVLC.exercicio    = CLA.exercicio                                                
+                       AND CVLC.sequencia    = CLA.sequencia                                                
+                       AND CLA.cod_lote      = CLO.cod_lote                                                
+                       AND CLA.tipo          = CLO.tipo                                                    
+                       AND CLA.cod_entidade  = CLO.cod_entidade                                            
+                       AND CLA.exercicio     = CLO.exercicio                                               
+                       AND CCC.exercicio     = '".$this->getDado('exercicio')."'                           
+                       AND CVLC.cod_entidade IN( ".$this->getDado('stEntidades')." )                      
+                       AND CLO.dt_lote BETWEEN TO_DATE( '01/01/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )  
+                                           AND TO_DATE( '31/12/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )  
+                       AND CLA.cod_historico not between 800 and 899                                          
+                  GROUP BY CCC.cod_plano                                                                 
+                         , CCC.exercicio                                                                 
+                  ORDER BY CCC.cod_plano                                                                 
+                         , CCC.exercicio                                                                 
+                   ) AS CCC
+                ON OCA.cod_plano = CCC.cod_plano                                                        
+               AND  OCA.exercicio = CCC.exercicio                                                                                             
+             WHERE OPC.exercicio = '".$this->getDado('exercicio')."'                                            
+               AND (OPC.cod_estrutural LIKE '4.1%'   OR
+                    OPC.cod_estrutural LIKE '4.2%'   OR
+                    OPC.cod_estrutural LIKE '4.7%'   OR
+                    OPC.cod_estrutural LIKE '4.8%'   OR
+                    OPC.cod_estrutural LIKE '9.%'    OR
+                    OPC.cod_estrutural LIKE '3.3%'   OR
+                    OPC.cod_estrutural LIKE '3.4%'   OR
+                    OPC.cod_estrutural LIKE '5.1.2%' OR
+                    OPC.cod_estrutural LIKE '5.1.3%' OR
+                    OPC.cod_estrutural LIKE '5.2%'   OR
+                    OPC.cod_estrutural LIKE '6.1%'   OR
+                    OPC.cod_estrutural LIKE '6.2%'
+                   )
+          GROUP BY OPC.cod_estrutural                                                                        
+                 , OPC.exercicio                                                                             
+          ORDER BY OPC.cod_estrutural                                                                        
+                 , OPC.exercicio                                                                             
+          ) AS tbl                                                                                                 
+        , contabilidade.plano_conta AS OCR                                                                        
+    WHERE tbl.cod_estrutural = substr( OCR.cod_estrutural, 1, 9 )                                            
+      AND length( publico.fn_mascarareduzida( OCR.cod_estrutural ) ) <= 9                               
+      AND tbl.exercicio      = OCR.exercicio                                                                 
+ GROUP BY tbl.cod_estrutural                                                                              
+        , OCR.nom_conta                                                                                   
+ ORDER BY tbl.cod_estrutural                                                                              
+        , OCR.nom_conta                                                                                   
+ ) AS tabela1
+ ) AS tabela2
+) AS resultado_patrimonial
+,(
+SELECT CASE WHEN abs(ativo.vl_ativo_real) - abs(passivo.vl_passivo_real) > 0.00
+            THEN '01'
+            ELSE '02'
+        END AS tipo_saldo_ex_ant
+     , abs(abs(ativo.vl_ativo_real) - abs(passivo.vl_passivo_real)) AS saldo_pat_ex_ant
+  FROM (SELECT SUM(vl_saldo_atual) AS vl_ativo_real
+          FROM contabilidade.fn_rl_balanco_patrimonial('".($this->getDado('exercicio')-1)."','cod_entidade IN  ( ".$this->getDado('stEntidades')." )  ','01/01/".($this->getDado('exercicio')-1)."','31/12/".($this->getDado('exercicio')-1)."','')
+            AS retorno( cod_estrutural varchar
+                      , nivel integer
+                      , nom_conta varchar
+                      , vl_saldo_anterior numeric
+                      , vl_saldo_debitos  numeric
+                      , vl_saldo_creditos numeric
+                      , vl_saldo_atual    numeric
+                      , nom_sistema varchar
+                      )
+         WHERE cod_estrutural ILIKE '1.%'
+           AND (nom_sistema ILIKE '%Financeiro%' OR nom_sistema ILIKE '%Patrimonial%')
+       )
+    AS ativo
+     , (SELECT SUM(vl_saldo_atual) AS vl_passivo_real
+          FROM contabilidade.fn_rl_balanco_patrimonial('".($this->getDado('exercicio')-1)."','cod_entidade IN  ( ".$this->getDado('stEntidades')." )  ','01/01/".($this->getDado('exercicio')-1)."','31/12/".($this->getDado('exercicio')-1)."','')
+            AS retorno( cod_estrutural varchar
+                      , nivel integer
+                      , nom_conta varchar
+                      , vl_saldo_anterior numeric
+                      , vl_saldo_debitos  numeric
+                      , vl_saldo_creditos numeric
+                      , vl_saldo_atual    numeric
+                      , nom_sistema varchar
+                      )
+         WHERE (cod_estrutural  ILIKE '2.1%' OR cod_estrutural  ILIKE '2.2%')
+           AND (nom_sistema ILIKE '%Financeiro%' OR nom_sistema ILIKE '%Patrimonial%')
+       ) AS passivo
+) AS exercicio_anterior
+,(
+SELECT CASE WHEN abs(ativo.vl_ativo_real) - abs(passivo.vl_passivo_real) > 0.00
+            THEN '01'
+            ELSE '02'
+        END AS tipo_saldo_ex_atual
+     , ABS(abs(ativo.vl_ativo_real) - abs(passivo.vl_passivo_real)) AS saldo_pat_ex_atual
+  FROM (SELECT SUM(vl_saldo_atual) AS vl_ativo_real
+          FROM contabilidade.fn_rl_balanco_patrimonial('".$this->getDado('exercicio')."','cod_entidade IN  ( ".$this->getDado('stEntidades')." )  ','01/01/".$this->getDado('exercicio')."','31/12/".$this->getDado('exercicio')."','')
+            AS retorno( cod_estrutural varchar
+                      , nivel integer
+                      , nom_conta varchar
+                      , vl_saldo_anterior numeric
+                      , vl_saldo_debitos  numeric
+                      , vl_saldo_creditos numeric
+                      , vl_saldo_atual    numeric
+                      , nom_sistema varchar
+                      )
+         WHERE cod_estrutural ILIKE '1.%'
+           AND (nom_sistema ILIKE '%Financeiro%' OR nom_sistema ILIKE '%Patrimonial%')
+       )
+    AS ativo
+     , (SELECT SUM(vl_saldo_atual) AS vl_passivo_real
+          FROM contabilidade.fn_rl_balanco_patrimonial('".$this->getDado('exercicio')."','cod_entidade IN  ( ".$this->getDado('stEntidades')." )  ','01/01/".$this->getDado('exercicio')."','31/12/".$this->getDado('exercicio')."','')
+            AS retorno( cod_estrutural varchar
+                      , nivel integer
+                      , nom_conta varchar
+                      , vl_saldo_anterior numeric
+                      , vl_saldo_debitos  numeric
+                      , vl_saldo_creditos numeric
+                      , vl_saldo_atual    numeric
+                      , nom_sistema varchar
+                      )
+         WHERE (cod_estrutural  ILIKE '2.1%' OR cod_estrutural  ILIKE '2.2%')
+           AND (nom_sistema ILIKE '%Financeiro%' OR nom_sistema ILIKE '%Patrimonial%')
+       ) AS passivo
+ ) AS exercicio_atual
+";
+return $stSql;
+}
+
 }

@@ -57,7 +57,7 @@ $preview->addParametro('final_date'  , $_REQUEST['stDataFinal']       );
 // parametros para conta caixa
 if ($_REQUEST['inCodPlanoCredito']) {
     $preview->addParametro('ccaixa'      , $_REQUEST['inCodPlanoCredito'] );
-    $preview->addParametro('f_ccaixa'    , $_REQUEST['inCodPlanoCredito']." - ".utf8_encode($_REQUEST['stNomContaCredito']) );
+    $preview->addParametro('f_ccaixa'    , $_REQUEST['inCodPlanoCredito']." - ".$_REQUEST['stNomContaCredito'] );
 } else {
     $preview->addParametro('ccaixa'      , "" );
     $preview->addParametro('f_ccaixa'    , "" );
@@ -66,7 +66,7 @@ if ($_REQUEST['inCodPlanoCredito']) {
 // parametros para conta debito
 if ($_REQUEST['inCodPlanoDebito']) {
     $preview->addParametro('cdespesa'    , $_REQUEST['inCodPlanoDebito']  );
-    $preview->addParametro('f_cdespesa'  , $_REQUEST['inCodPlanoDebito']." - ".utf8_encode($_REQUEST['stNomContaDebito'])  );
+    $preview->addParametro('f_cdespesa'  , $_REQUEST['inCodPlanoDebito']." - ".$_REQUEST['stNomContaDebito']  );
 } else {
     $preview->addParametro('cdespesa'    , ""  );
     $preview->addParametro('f_cdespesa'  , ""  );

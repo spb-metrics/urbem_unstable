@@ -58,7 +58,7 @@ $preview->addParametro ( 'cod_entidades', implode(',',$_REQUEST['inCodEntidade']
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
     $CodEntidade=$_REQUEST['inCodEntidade'][0];
     $preview->addParametro( 'entidade', $CodEntidade );
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 
 } else {
     $rsEntidade->setPrimeiroElemento();

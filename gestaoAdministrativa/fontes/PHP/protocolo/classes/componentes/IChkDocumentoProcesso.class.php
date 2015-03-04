@@ -36,79 +36,89 @@
 Casos de uso: uc-01.06.98
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once( CAM_GA_PROT_COMPONENTES."JSIChkDocumentoProcesso.js");
+include_once CAM_GA_PROT_COMPONENTES."JSIChkDocumentoProcesso.js";
 
 class IChkDocumentoProcesso extends Componente
 {
-var $inCodigoClassificacao;
-var $inCodigoAssunto;
-var $rsDocumentos;
+    public $inCodigoClassificacao;
+    public $inCodigoAssunto;
+    public $rsDocumentos;
+    public $inCodProcesso;
+    public $stAnoProcesso;
 
-function IChkDocumentoProcesso()
-{
-    parent::Componente();
-    $this->setRotulo ("Documentos");
-}
-
-function setCodigoClassificacao($valor) { $this->inCodigoClassificacao = $valor; }
-function setCodigoAssunto($valor) { $this->inCodigoAssunto       = $valor; }
-function setDocumentos($valor) { $this->rsDocumentos          = $valor; }
-
-function getCodigoClassificacao() { return $this->inCodigoClassificacao; }
-function getCodigoAssunto() { return $this->inCodigoAssunto;       }
-
-function montaChkDocumentos()
-{
-    include_once( CAM_GA_PROT_MAPEAMENTO."TPRODocumentoAssunto.class.php" );
-    $obTPRODocumentoAssunto =  new TPRODocumentoAssunto();
-    $stFiltro .= " AND SW_DOCUMENTO_ASSUNTO.cod_classificacao = ".$this->getCodigoClassificacao();
-    $stFiltro .= " AND SW_DOCUMENTO_ASSUNTO.cod_assunto = ".$this->getCodigoAssunto();
-    $obTPRODocumentoAssunto->recuperaRelacionamento($rsDocumento, $stFiltro," SW_DOCUMENTO.nom_documento" );
-    $arDocumento = array();
-    while (!$rsDocumento->eof()) {
-        $obChkDocumento = new CheckBox();
-        $obChkDocumento->setRotulo ("Documentos");
-        $obChkDocumento->setName   ("arCodigoDocumento[]");
-        $obChkDocumento->setLabel  ($rsDocumento->getCampo('nom_documento'));
-        $obChkDocumento->setValue  ($rsDocumento->getCampo('cod_documento'));
-        $obChkDocumento->setChecked(true);
-
-        $obBtnDocumento = new Button();
-        $obBtnDocumento->setRotulo ("Documentos");
-        $obBtnDocumento->setName('btDocumento'.$rsDocumento->getCampo('cod_documento') );
-        $obBtnDocumento->setValue('Cópia Digital');
-        $obBtnDocumento->obEvento->setOnClick("copiaDigital(".$rsDocumento->getCampo('cod_documento').");");
-
-        $this->roFormulario->obJavaScript->addComponente($obBtnDocumento);
-        $this->roFormulario->obJavaScript->addComponente($obChkDocumento);
-
-        $arDocumento[] = array( $obChkDocumento,$obBtnDocumento );
-        unset($obChkDocumento);
-        unset($obBtnDocumento);
-        $rsDocumento->proximo();
+    public function IChkDocumentoProcesso()
+    {
+        parent::Componente();
+        $this->setRotulo ("Documentos");
     }
 
-    return $arDocumento;
-}
+    public function setCodigoClassificacao($valor) { $this->inCodigoClassificacao = $valor; }
+    public function setCodigoAssunto($valor)       { $this->inCodigoAssunto = $valor; }
+    public function setDocumentos($valor)          { $this->rsDocumentos = $valor; }
+    public function setCodProcesso($valor)         { $this->inCodProcesso = $valor; }
+    public function setAnoProcesso($valor)         { $this->stAnoProcesso = $valor; }
 
-function montaHTML()
-{
-    $arDocumento = $this->montaChkDocumentos();
-    $stHTML = "<table width='100%' >";
-    foreach ($arDocumento as $arComponentes) {
-        $arComponentes[0]->montaHTML();
-        $arComponentes[1]->montaHTML();
-        $stHTML .= "<tr><td class=field>".$arComponentes[0]->getHTML()."</td>";
-        $stHTML .= "<td class=field>".$arComponentes[1]->getHTML()."</td></tr>";
+    public function getCodigoClassificacao() { return $this->inCodigoClassificacao; }
+    public function getCodigoAssunto()       { return $this->inCodigoAssunto; }
+    public function getCodProcesso()         { return $this->inCodProcesso; }
+    public function getAnoProcesso()         { return $this->stAnoProcesso; }
+
+    public function montaChkDocumentos()
+    {
+        include_once( CAM_GA_PROT_MAPEAMENTO."TPRODocumentoAssunto.class.php" );
+        $obTPRODocumentoAssunto =  new TPRODocumentoAssunto();
+        $stFiltro .= " AND SW_DOCUMENTO_ASSUNTO.cod_classificacao = ".$this->getCodigoClassificacao();
+        $stFiltro .= " AND SW_DOCUMENTO_ASSUNTO.cod_assunto = ".$this->getCodigoAssunto();
+        $obTPRODocumentoAssunto->recuperaRelacionamento($rsDocumento, $stFiltro," SW_DOCUMENTO.nom_documento" );
+        $arDocumento = array();
+        while (!$rsDocumento->eof()) {
+            $obChkDocumento = new CheckBox();
+            $obChkDocumento->setRotulo ("Documentos");
+            $obChkDocumento->setName   ("arCodigoDocumento[]");
+            $obChkDocumento->setLabel  ($rsDocumento->getCampo('nom_documento'));
+            $obChkDocumento->setValue  ($rsDocumento->getCampo('cod_documento'));
+            $obChkDocumento->setChecked(true);
+
+            $obBtnDocumento = new Button();
+            $obBtnDocumento->setRotulo ("Documentos");
+            $obBtnDocumento->setName('btDocumento'.$rsDocumento->getCampo('cod_documento') );
+            $obBtnDocumento->setValue('Cópia Digital');
+            
+            $stEventoOnClick = "copiaDigital(".$rsDocumento->getCampo('cod_documento').", ".$this->getCodProcesso().", ".$this->getAnoProcesso().");";
+
+            $obBtnDocumento->obEvento->setOnClick($stEventoOnClick);
+
+            $this->roFormulario->obJavaScript->addComponente($obBtnDocumento);
+            $this->roFormulario->obJavaScript->addComponente($obChkDocumento);
+
+            $arDocumento[] = array( $obChkDocumento,$obBtnDocumento );
+            unset($obChkDocumento);
+            unset($obBtnDocumento);
+            $rsDocumento->proximo();
+        }
+
+        return $arDocumento;
     }
-    $stHTML .= "</table>";
-    $this->setHtml($stHTML);
+
+    public function montaHTML()
+    {
+        $arDocumento = $this->montaChkDocumentos();
+        $stHTML = "<table width='100%' >";
+        foreach ($arDocumento as $arComponentes) {
+            $arComponentes[0]->montaHTML();
+            $arComponentes[1]->montaHTML();
+            $stHTML .= "<tr><td class=field>".$arComponentes[0]->getHTML()."</td>";
+            $stHTML .= "<td class=field>".$arComponentes[1]->getHTML()."</td></tr>";
+        }
+        $stHTML .= "</table>";
+        $this->setHtml($stHTML);
+    }
+
+    public function geraFormulario(&$obFormulario)
+    {
+        $this->roFormulario = $obFormulario;
+        $obFormulario->addComponente($this);
+    }
 }
 
-function geraFormulario(&$obFormulario)
-{
-    $this->roFormulario = $obFormulario;
-    $obFormulario->addComponente($this);
-}
-}
 ?>

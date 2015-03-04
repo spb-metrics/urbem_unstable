@@ -98,6 +98,8 @@ $stAcao = $_GET['stAcao'] ? $_GET['stAcao'] : $_POST['stAcao'];
 
 $obTReciboExtra = new TTesourariaReciboExtra;
 
+SistemaLegado::BloqueiaFrames(true,true);
+
 switch ($stAcao) {
 
     case 'incluir':
@@ -351,5 +353,7 @@ switch ($stAcao) {
 
     break;
 }
+
+SistemaLegado::LiberaFrames(true,true);
 
 ?>

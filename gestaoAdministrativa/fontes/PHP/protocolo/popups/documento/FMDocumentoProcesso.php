@@ -39,8 +39,8 @@ Casos de uso: uc-01.06.98
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GA_PROT_MAPEAMENTO."TPRODocumento.class.php");
-include_once(CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php");
+include_once CAM_GA_PROT_MAPEAMENTO."TPRODocumento.class.php";
+include_once CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "DocumentoProcesso";
@@ -52,23 +52,32 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 include_once($pgJs);
 
-$inCodProcesso = Sessao::read('codigo_processo');
-$stAnoExercicio = Sessao::getExercicio();
+$inCodProcesso = (!empty($_REQUEST['inCodProcesso'])) ? $_REQUEST['inCodProcesso'] : Sessao::read('codigo_processo');
+$stAnoProcesso = (!empty($_REQUEST['stAnoProcesso'])) ? $_REQUEST['stAnoProcesso'] : Sessao::getExercicio();
+$inCodDocumento = $_GET['codDoc'];
 
 $obTPRODocumento = new TPRODocumento();
-$obTPRODocumento->setDado('cod_documento',$_GET['codDoc']);
+$obTPRODocumento->setDado('cod_documento',$inCodDocumento);
 $obTPRODocumento->recuperaPorChave($rsDocumento);
 
 $obTPROCopiaDigital = new TPROCopiaDigital();
-$obTPROCopiaDigital->setDado('cod_documento', $_GET['codDoc']);
-$obTPROCopiaDigital->setDado('cod_processo',$inCodProcesso);
-$obTPROCopiaDigital->setDado('exercicio',$stAnoExercicio);
+$obTPROCopiaDigital->setDado('cod_documento' , $inCodDocumento);
+$obTPROCopiaDigital->setDado('cod_processo'  , $inCodProcesso);
+$obTPROCopiaDigital->setDado('exercicio'     , $stAnoProcesso);
 $obTPROCopiaDigital->setCampoCod('');
 $obTPROCopiaDigital->recuperaPorChave($rsDocumentos);
 
 $obHdnDocumento = new Hidden();
-$obHdnDocumento->setName('inCodigoDocumento');
-$obHdnDocumento->setValue($_GET['codDoc']);
+$obHdnDocumento->setName('inCodDocumento');
+$obHdnDocumento->setValue($inCodDocumento);
+
+$obHdnCodProcesso = new Hidden();
+$obHdnCodProcesso->setName('inCodProcesso');
+$obHdnCodProcesso->setValue($inCodProcesso);
+
+$obHdnAnoProcesso = new Hidden();
+$obHdnAnoProcesso->setName('stAnoProcesso');
+$obHdnAnoProcesso->setValue($stAnoProcesso);
 
 $obRdImagemSim = new Radio();
 $obRdImagemSim->setChecked( true );
@@ -103,6 +112,8 @@ $obForm->setTarget('oculto');
 $obFormulario = new Formulario();
 $obFormulario->addForm($obForm);
 $obFormulario->addHidden($obHdnDocumento);
+$obFormulario->addHidden($obHdnCodProcesso);
+$obFormulario->addHidden($obHdnAnoProcesso);
 $obFormulario->addTitulo($rsDocumento->getCampo('nom_documento'));
 $obFormulario->agrupaComponentes(array($obRdImagemSim, $obRdImagemNao));
 $obFormulario->addComponente($obFleArquivo);
@@ -111,9 +122,9 @@ $obFormulario->show();
 
 $obIFrameOculto = new IFrame();
 $obIFrameOculto->setName('oculto');
-$obIFrameOculto->setHeight ('0');
-$obIFrameOculto->setWidth  ('0');
-$obIFrameOculto->setFrameBorder(0);
+$obIFrameOculto->setHeight ('0%');
+$obIFrameOculto->setWidth  ('0%');
+$obIFrameOculto->setFrameBorder(1);
 $obIFrameOculto->show();
 
 $obIFrame = new IFrame();
@@ -123,4 +134,5 @@ $obIFrame->setHeight('20%');
 $obIFrame->setWidth('100%');
 $obIFrame->setFrameBorder(1);
 $obIFrame->show();
+
 ?>

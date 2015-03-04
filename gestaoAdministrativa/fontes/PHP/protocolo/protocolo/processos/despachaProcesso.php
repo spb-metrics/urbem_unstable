@@ -32,7 +32,7 @@
 
  Casos de uso: uc-01.06.98
 
- $Id: despachaProcesso.php 60209 2014-10-07 12:35:42Z lisiane $
+ $Id: despachaProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
 
  */
 
@@ -446,9 +446,10 @@ break;
        {
             var x = 200;
             var y = 140;
-            var sArq = '../../../framework/legado/imagens/copiaDigitalLegado.php?<?=Sessao::getId();?>&codDoc='+cod+'&acao='+acao+'&codProcesso='+codProcesso+'&anoExercicio='+anoExercicio;
+            var sArq = '<?=CAM_GA_PROT_POPUPS."documento/FMDocumentoProcesso.php";?>?<?=Sessao::getId();?>&codDoc='+cod+'&acao='+acao+'&inCodProcesso='+codProcesso+'&stAnoProcesso='+anoExercicio;
             var wVolta=false;
-            tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=450px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+            tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=550px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+            window.tela.focus();
 
        }
 
@@ -654,7 +655,7 @@ break;
 
         <tr>
             <td class=field colspan="2">
-                <?geraBotaoAltera();?>
+                <?php echo geraBotaoAltera();?>
             </td>
         </tr>
     </table>

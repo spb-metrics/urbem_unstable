@@ -95,7 +95,7 @@ switch ($stAcao) {
             
             // Verifica se existe se já foi feito algum lançamento. Caso sim, o proximo lançamento não pode ser menor, nem maior que próximo mês a lançar
             } elseif ($rsUltimoLancamento->getCampo('max_competencia') != "" && ($inAnoMesCompetencia < $rsUltimoLancamento->getCampo('max_competencia')  || $inAnoMesCompetencia > ($rsUltimoLancamento->getCampo('max_competencia') + 1))) {
-                $stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != "201412") ? substr(($rsUltimoLancamento->getCampo('max_competencia') + 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
+		$stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != $inExercicio."12") ? substr(($rsUltimoLancamento->getCampo('max_competencia') + 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
                 $obErro->setDescricao("A competência selecionada deve ser igual a ".$stProximaCompetencia);
                 
             // Verifica se não existe nenhuma depreciação no sistema, só pode efetuar lançamentos se existir depreciação.
@@ -167,7 +167,7 @@ switch ($stAcao) {
            
             // Quando já foi feito ao menos um estorno, avisa o usário o mês a ser estornado. Deve seguir a seguencia do maior para o menor lançamento.
             if ( $rsUltimoLancamento->getNumLinhas() > 0 && $rsUltimoLancamento->getCampo('estorno') == "t" && ( $inAnoMesCompetencia > $rsUltimoLancamento->getCampo('max_competencia') || $inAnoMesCompetencia < ($rsUltimoLancamento->getCampo('max_competencia') -1))) {
-                $stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != "201401") ? substr(($rsUltimoLancamento->getCampo('max_competencia') - 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
+		$stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != $inExercicio."01") ? substr(($rsUltimoLancamento->getCampo('max_competencia') - 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
                 $obErro->setDescricao("A competência selecionada deve ser igual a ".$stProximaCompetencia);
                 
             // Verifica se é o primeiro estorno das competências.

@@ -34,7 +34,7 @@ $Revision: 27553 $
 $Name$
 $Author: melo $
 $Date: 2008-01-15 17:12:04 -0200 (Ter, 15 Jan 2008) $
-$Id: RNorma.class.php 61405 2015-01-14 13:55:15Z lisiane $
+$Id: RNorma.class.php 61604 2015-02-12 15:21:35Z evandro $
 
 Casos de uso: uc-01.04.02
 */
@@ -486,20 +486,20 @@ function salvar($boTransacao = "")
         
     if ( !$obErro->ocorreu() ) {
         
-        $this->obTNorma->setDado("dt_publicacao" , $this->getDataPublicacao() );
-        $this->obTNorma->setDado("dt_assinatura" , $this->getDataAssinatura() );
-        $this->obTNorma->setDado("nom_norma"     , $this->getNomeNorma() );
-        $this->obTNorma->setDado("descricao"     , $this->getDescricaoNorma() );
-        $this->obTNorma->setDado("link"          , $this->getNomeArquivo() );
-        $this->obTNorma->setDado("exercicio"     , $this->getExercicio() );
-        $this->obTNorma->setDado("num_norma"     , $this->getNumNorma() );
-        $this->obTNorma->setDado("cod_tipo_norma", $this->obRTipoNorma->getCodTipoNorma() );
-        
         $inCodNorma = $this->getCodNorma();
                
         if (isset($inCodNorma)) {
-           
+            $this->obTNorma->setDado("dt_publicacao" , $this->getDataPublicacao() );
+            $this->obTNorma->setDado("dt_assinatura" , $this->getDataAssinatura() );
+            $this->obTNorma->setDado("nom_norma"     , $this->getNomeNorma() );
+            $this->obTNorma->setDado("descricao"     , $this->getDescricaoNorma() );
+            $this->obTNorma->setDado("link"          , $this->getNomeArquivo() );
+            $this->obTNorma->setDado("exercicio"     , $this->getExercicio() );
+            $this->obTNorma->setDado("num_norma"     , $this->getNumNorma() );
+            $this->obTNorma->setDado("cod_tipo_norma", $this->obRTipoNorma->getCodTipoNorma() );
+            
             $obErro = $this->validarNumeroNorma( $this->getCodNorma(), $boTransacao );
+            
             if ( !$obErro->ocorreu() ) {
                 $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
                 $obErro = $this->obTNorma->alteracao( $boTransacao );
@@ -520,11 +520,21 @@ function salvar($boTransacao = "")
         } else {
             
             $obErro = $this->validarNumeroNorma( $this->getCodNorma(), $boTransacao );
-            if ( !$obErro->ocorreu() ) {
-                $this->obTNorma->proximoCod( $inCodNorma , $boTransacao );
-                $this->setCodNorma( $inCodNorma );
-                $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
+            if ( !$obErro->ocorreu() ) {                
+                $this->obTNorma->proximoCod( $inCodNorma , $boTransacao );                                
+                $this->setCodNorma($inCodNorma);
+
+                $this->obTNorma->setDado("cod_norma"     , $this->getCodNorma()         );
+                $this->obTNorma->setDado("dt_publicacao" , $this->getDataPublicacao()   );
+                $this->obTNorma->setDado("dt_assinatura" , $this->getDataAssinatura()   );
+                $this->obTNorma->setDado("nom_norma"     , $this->getNomeNorma()        );
+                $this->obTNorma->setDado("descricao"     , $this->getDescricaoNorma()   );
+                $this->obTNorma->setDado("link"          , $this->getNomeArquivo()      );
+                $this->obTNorma->setDado("exercicio"     , $this->getExercicio()        );
+                $this->obTNorma->setDado("num_norma"     , $this->getNumNorma()         );
+                $this->obTNorma->setDado("cod_tipo_norma", $this->obRTipoNorma->getCodTipoNorma() );
                 $obErro = $this->obTNorma->inclusao( $boTransacao );
+                
                 if ( !$obErro->ocorreu() ) {
                      $this->obTNormaTipoNorma->setDado("cod_norma", $this->getCodNorma() );
                      $this->obTNormaTipoNorma->setDado("cod_tipo_norma", $this->obRTipoNorma->getCodTipoNorma() );
@@ -701,7 +711,7 @@ function excluir($boTransacao = "")
             if ( !$obErro->ocorreu() ) {
                 $this->obTNormaDataTermino->setDado("cod_norma", $this->getCodNorma() );
                 $obErro = $this->obTNormaDataTermino->exclusao( $boTransacao );
-                if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())==11) { 
+                if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao)==11) { 
                     include_once ( CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNormaDetalhe.class.php" );
                     $obTTCEMGNormaDetalhe = new TTCEMGNormaDetalhe;
                     $obTTCEMGNormaDetalhe->setDado( 'cod_norma' , $this->getCodNorma() );
@@ -709,7 +719,16 @@ function excluir($boTransacao = "")
                     if($rsNormaDetalhe->getNumLinhas()>0){
                       $obTTCEMGNormaDetalhe->exclusao($boTransacao);  
                     }
-                }   
+                }
+                if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao)==27) { 
+                    include_once ( CAM_GPC_TCETO_MAPEAMENTO."TTCETONormaDetalhe.class.php" );
+                    $obTTCETONormaDetalhe = new TTCETONormaDetalhe();
+                    $obTTCETONormaDetalhe->setDado( 'cod_norma' , $this->getCodNorma() );
+                    $obTTCETONormaDetalhe->recuperaPorChave($rsNormaDetalhe, $boTransacao);
+                    if($rsNormaDetalhe->getNumLinhas()>0){
+                      $obTTCETONormaDetalhe->exclusao($boTransacao);  
+                    }
+                }
                 if ( !$obErro->ocorreu() ) {
                     $this->obTNorma->setDado("cod_norma", $this->getCodNorma() );
                     $obErro = $this->obTNorma->exclusao( $boTransacao );

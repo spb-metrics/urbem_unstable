@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterSolicitacaoCompra.php 61756 2015-03-02 16:03:30Z michel $
 
  */
 
@@ -182,6 +182,11 @@ $obISelectEntidadeUsuario->obTextBox->obEvento->setOnChange( "montaParametrosGET
 
 if ($obISelectEntidadeUsuario->inCodEntidade != '') {
     $obHdnCodEntidade->setValue( $obISelectEntidadeUsuario->inCodEntidade );
+}
+
+// Se houver um único registro de Entidade, executa comando para preencher Data solicitação
+if ((count($obISelectEntidadeUsuario->obSelect->arOption) == 1) && ($stAcao=="incluir")) {
+    $stJs .= "montaParametrosGET( 'montaDotacao', 'inCodEntidade', 'inCodCentroCusto' ); montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');";
 }
 
 // Define objeto Data da Solicitação
@@ -477,11 +482,11 @@ if ($stAcao == 'alterar') {
 $obFormulario->show();
 
 if ($stAcao=="alterar") {
-    $stJs = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&cod_solicitacao=".$_GET['cod_solicitacao']."&cod_entidade=".$_GET['cod_entidade']."&exercicio=".$_GET['exercicio']."','carregaSolicitacao');";
+    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&cod_solicitacao=".$_GET['cod_solicitacao']."&cod_entidade=".$_GET['cod_entidade']."&exercicio=".$_GET['exercicio']."','carregaSolicitacao');";
 } else {
     $arValores = Sessao::read('arValores');
     if (count($arValores) > 0) {
-        $stJs = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','carregaListaItens');";
+        $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','carregaListaItens');";
     }
 }
 

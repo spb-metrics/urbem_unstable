@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioSimulacaoCobranca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioSimulacaoCobranca.php 61651 2015-02-20 18:47:10Z evandro $
 
     * Casos de uso: uc-05.04.04
 */
@@ -233,6 +233,7 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $rsTitulo = new Recordset;
     $rsTitulo->preenche ( $arTitulo );
     $obPDF->addRecordSet( $rsTitulo );
+    $obPDF->setAlturaLinha ( 5 );    
     $obPDF->setAlinhamento ( "R" );
     $obPDF->addCabecalho   ( "" , 10, 7 );
     $obPDF->setAlinhamento ( "L" );
@@ -248,14 +249,27 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $rsTituloCredito = new Recordset;
     $rsTituloCredito->preenche ( $arTituloCredito );
     $obPDF->addRecordSet( $rsTituloCredito );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setQuebraPaginaLista( false );
     $obPDF->setAlinhamento ( "C" );
     $obPDF->addCabecalho   ( "", 70, 2 );
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCampo       ( "[titulo]", 11, "B" );
 
+    $arAux = $rsDados->getElementos();
+
+    $i = 0;
+    foreach ($arAux as $key => $value) {
+        $arAux[$i]["vlr_reducao"] = number_format($arAux[$i]["vlr_reducao"] ,2 ,",",".");
+        $i++;
+    }
+    unset( $rsDados );
+    $rsDados = new Recordset;
+    $rsDados->preenche ( $arAux );
+
     $obPDF->addRecordSet( $rsDados );
     $obPDF->setQuebraPaginaLista( false );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCabecalho   ( "Inscrição Dívida", 12, 9, "B" );
     $obPDF->setAlinhamento ( "C" );
@@ -264,7 +278,7 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $obPDF->addCabecalho   ( "Valor Origem", 6, 9, "B" );
 
     for ( $inJ=0; $inJ<$rsDados->getCampo("total_de_acrescimos"); $inJ++ ) {
-        $obPDF->addCabecalho ( $rsDados->getCampo( "nome_acrescimo_".$inJ ), 10, 9, "B" );
+        $obPDF->addCabecalho ( $rsDados->getCampo( "nome_acrescimo_".$inJ ), 10, 8, "B" );
     }
 
     $obPDF->addCabecalho   ( "Redução", 8, 9, "B" );
@@ -280,10 +294,10 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $obPDF->addCampo       ( "[vlr_parcela]", 9 );
 
     for ( $inJ=0; $inJ<$rsDados->getCampo("total_de_acrescimos"); $inJ++ ) {
-        $obPDF->addCampo ( "[valor_acrescimo_".$inJ."]", 9 );
+        $obPDF->addCampo ( "[valor_acrescimo_".$inJ."]", 10 );
     }
 
-    $obPDF->addCampo       ( "[vlr_reducao]", 9 );
+    $obPDF->addCampo       ( "[reducao]", 9 );
     $obPDF->setAlinhamento ( "R" );
     $obPDF->addCampo       ( "[vlr_final]", 9 );
 
@@ -292,37 +306,29 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $rsSomatorioParcela = new Recordset;
     $rsSomatorioParcela->preenche ( $arSomatorioCredito );
 
-    $flValorTotal = number_format ( $flValorTotal, 2, ',', '.' );
-    $flValorOrigem = number_format ( $flValorOrigem, 2, ',', '.' );
-    $flReducao = number_format ( $flReducao, 2, ',', '.' );
+    $flValorTotal   = number_format ( $flValorTotal, 2, ',', '.' );
+    $flValorOrigem  = number_format ( $flValorOrigem, 2, ',', '.' );
+    $flReducao      = number_format ( $flReducao, 2, ',', '.' );
 
     $obPDF->addRecordSet( $rsSomatorioParcela );
     $obPDF->setQuebraPaginaLista( false );
-
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "L" );
-    $obPDF->addCabecalho   ( "", 20, 10, "B" );
-    $obPDF->addCabecalho   ( "Totais:", 8, 10, "B" );
-    $obPDF->addCabecalho   ( $flValorOrigem, 8, 9, "B" );
+    $obPDF->addCabecalho   ( "", 7, 10, "B" );
+    $obPDF->addCabecalho   ( "Totais:", 21.8, 10, "B" );
+    $obPDF->addCabecalho   ( $flValorOrigem, 7.3, 10, "B" );
+    
+    $arTamanhos[0] = 10;
+    $arTamanhos[1] = 10;
+    $arTamanhos[2] = 10.4;
+    $arTamanhos[3] = 10;
     for ( $inJ=0; $inJ<count($arAcrescimos); $inJ++ ) {
         $arAcrescimos[$inJ] = number_format ( $arAcrescimos[$inJ], 2, ',', '.' );
-        $obPDF->addCabecalho   ( $arAcrescimos[$inJ], 10, 9, "B" );
+        $obPDF->addCabecalho   ( $arAcrescimos[$inJ], $arTamanhos[$inJ], 10, "B" );
     }
 
-    $obPDF->addCabecalho   ( $flReducao, 10.5, 9, "B" );
-    $obPDF->addCabecalho   ( $flValorTotal, 10, 10, "B" );
-
-    $obPDF->setAlinhamento ( "L" );
-    $obPDF->addCampo   ( "", 12, "B" );
-    $obPDF->addCampo   ( "", 2, "B" );
-    $obPDF->addCampo   ( "", 2, "B" );
-
-    for ( $inJ=0; $inJ<count($arAcrescimos); $inJ++ ) {
-        $arAcrescimos[$inJ] = number_format ( $arAcrescimos[$inJ], 2, ',', '.' );
-        $obPDF->addCabecalho   ( "", 2, "B" );
-    }
-
-    $obPDF->addCampo   ( "", 2, "B" );
-    $obPDF->addCampo   ( "", 2, "B" );
+    $obPDF->addCabecalho   ( $flReducao, 9.3, 10, "B" );
+    $obPDF->addCabecalho   ( $flValorTotal, 7, 10, "B" );
 
     unset( $arSomatorioCredito );
     $arSomatorioCredito[] = array( "labelListaParcela" => "Detalhamento do tributo de dívidas vinculadas" );
@@ -332,8 +338,9 @@ $rsParcelas->preenche ( $arParcelasSessao );
 
     $obPDF->addRecordSet( $rsSomatorioParcela );
     $obPDF->setQuebraPaginaLista( false );
-    $obPDF->addCabecalho   ( "", 40, 10, "B" );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "L" );
+    $obPDF->addCabecalho   ( "", 40, 10, "B" );
     $obPDF->addCampo   ( "[labelListaParcela]", 10, "B" );
 
     unset( $rsDados );
@@ -342,6 +349,7 @@ $rsParcelas->preenche ( $arParcelasSessao );
 
     $obPDF->addRecordSet( $rsDados );
     $obPDF->setQuebraPaginaLista( false );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCabecalho   ( "Inscrição Dívida", 12, 9, "B" );
     $obPDF->addCabecalho   ( "Grupo Origem", 14, 9, "B" );
@@ -357,18 +365,20 @@ $rsParcelas->preenche ( $arParcelasSessao );
 
     $obPDF->addRecordSet( $rsSomatorioParcela );
     $obPDF->setQuebraPaginaLista( false );
-    $obPDF->addCabecalho   ( "", 20, 10, "B" );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "L" );
+    $obPDF->addCabecalho   ( "", 20, 10, "B" );
     $obPDF->addCampo   ( "[labelListaParcela]", 12, "B" );
     # LISTA DE PARCELAS
 
     $rsParcelas->addFormatacao("vlr_parcela", "NUMERIC_BR");
     $obPDF->addRecordSet( $rsParcelas );
     $obPDF->setQuebraPaginaLista( false );
+    $obPDF->setAlturaLinha ( 3 );
     $obPDF->setAlinhamento ( "C" );
     $obPDF->addCabecalho   ( "Parcela", 8, 9, "B" );
     $obPDF->addCabecalho   ( "Vencimento", 8, 9, "B" );
-    $obPDF->addCabecalho   ( "Valor", 10, 9, "B" );
+    $obPDF->addCabecalho   ( "Valor", 7, 9, "B" );
 
     $obPDF->setAlinhamento ( "C" );
     $obPDF->addCampo       ( "[nr_parcela]", 9 );

@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.03.01
 
-    $Id: LSManterAlmoxarifado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterAlmoxarifado.php 61639 2015-02-19 13:05:36Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -51,7 +51,7 @@ $pgJs   = "JS".$stPrograma.".js";
 
 $stCaminho = CAM_GP_ALM_INSTANCIAS."almoxarifado/";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 if (empty( $stAcao )) {
     $stAcao = "alterar";
@@ -81,10 +81,6 @@ $stLink .= '&inCodigo='.$_REQUEST['inCodigo'];
 $stLink .= "&stAcao=".$stAcao;
 
 $rsLista = new RecordSet;
-//$obRegra->setCodSistema( $_REQUEST['inCodSistema'] );
-//$obRegra->setNomSistema( $_REQUEST['stNomSistema'] );
-//$obRegra->setExercicio ( Sessao::getExercicio()        );
-
 $obRegra->listar( $rsLista, ' nom_a ');
 
 $obLista = new Lista;

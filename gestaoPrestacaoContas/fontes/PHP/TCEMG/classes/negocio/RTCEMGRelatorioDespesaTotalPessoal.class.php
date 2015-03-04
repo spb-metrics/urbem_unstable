@@ -109,14 +109,14 @@ class RTCEMGRelatorioDespesaTotalPessoal{
         $rsDespesas = new RecordSet();
         $rsDespesasExclusoes = new RecordSet();
         $rsDespesas2013 = new RecordSet();
-        
+    
         list( $dia, $mes, $ano ) = explode( "/", $this->getDataInicial() );
-        if($this->getExercicio() == '2014' ){
+        if($this->getExercicio() == '2014' ) {
             $obTSTNDespesaPessoal = new  TSTNDespesaPessoal();
             $obTSTNDespesaPessoal->setDado( "exercicio"         , $this->getExercicio() );
             $obTSTNDespesaPessoal->setDado( "cod_entidades"     , $this->getCodEntidades());
-            $obTSTNDespesaPessoal->setDado( "mes"     , (int)$mes);
-            $obTSTNDespesaPessoal->listValorEntidade( $rsDespesas2013);     
+            $obTSTNDespesaPessoal->setDado( "mes"               , (int)$mes);
+            $obTSTNDespesaPessoal->listValorEntidade( $rsDespesas2013 );  $obTSTNDespesaPessoal->debug();
 
             $inCountDespesas2013 = 1;
             $arDemostrativoDespesa2013 = array();
@@ -124,14 +124,26 @@ class RTCEMGRelatorioDespesaTotalPessoal{
             foreach( $rsDespesas2013->getElementos() as $arDespesas2013 )
             {
  
-               $arDemostrativoDespesa2013["nom_conta"]     = 'DESPESAS TOTAL COM PESSOAL EM 2013';
+               $arDemostrativoDespesa2013["nom_conta"]    = 'DESPESAS TOTAL COM PESSOAL EM 2013';
                $arDemostrativoDespesa2013["entidade"]     = $arDespesas2013["cod_entidade"];
                $vlTotalDespesas2013Total = $vlTotalDespesas2013Total+ $arDespesas2013["valor"];
-               $inMes = $arDespesas2013["mes"] -1;
+               
+               if ($_REQUEST['stPeriodicidade' ] == "Mes"){
+                  $inMes = $arDespesas2013["mes"] - $mes;
+               } elseif ($_REQUEST['stPeriodicidade' ] == "Bimestre") {
+                  $inMes = $arDespesas2013["mes"]-($mes+1);
+               } elseif ($_REQUEST['stPeriodicidade' ] == "Trimestre") {
+                  $inMes = $arDespesas2013["mes"]-($mes+2);
+               } elseif ($_REQUEST['stPeriodicidade' ] == "Quadrimestre") {
+                  $inMes = $arDespesas2013["mes"]-($mes+3);
+               } elseif ($_REQUEST['stPeriodicidade' ] == "Semestre") {
+                 $inMes = $arDespesas2013["mes"] - ($mes+5);
+               }
+               
                $idMes = 'mes_'.$inMes;
                switch ($arDespesas2013["mes"]) {
                    case 1:
-                        $arDemostrativoDespesa2013[$idMes]         = number_format($arDespesas2013["valor"] , 2, ',','.');  
+                       $arDemostrativoDespesa2013[$idMes]          = number_format($arDespesas2013["valor"] , 2, ',','.');  
                        $arDespesa2013[$idMes] =$arDespesas2013["valor"];
                     break; 
                     case 2:
@@ -185,6 +197,7 @@ class RTCEMGRelatorioDespesaTotalPessoal{
             
             $inCountDespesas2013 = 0;            
         }
+        
         $vlTotalDespesas2013Mes1  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_1"] != "" ) ? $arDespesa2013["mes_1"]:0;
         $vlTotalDespesas2013Mes2  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_2"] != "" ) ? $arDespesa2013["mes_2"]:0;
         $vlTotalDespesas2013Mes3  = ($this->getExercicio() == 2014 && $arDespesa2013["mes_3"] != "" ) ? $arDespesa2013["mes_3"]:0;

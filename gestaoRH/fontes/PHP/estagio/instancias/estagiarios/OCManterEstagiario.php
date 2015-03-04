@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.07.01
 
-    $Id: OCManterEstagiario.php 60993 2014-11-27 17:32:39Z gelson $
+    $Id: OCManterEstagiario.php 61562 2015-02-05 13:03:54Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -392,11 +392,14 @@ function preencherMesValorBolsa()
 }
 
 function _Salvar()
-{
+{    
     $obErro = new Erro();
     if (!$obErro->ocorreu()) {
         if ($_GET['inCodBancoTxt'] != "" and $_GET['stNumAgenciaTxt'] == "") {
             $obErro->setDescricao("A agência do banco deve ser informada!");
+        }
+        if ($_REQUEST['inCodCalendario'] == "") {
+            $obErro->setDescricao("O calendário deve ser informada!");   
         }
     }
     if (!$obErro->ocorreu()) {
@@ -826,8 +829,8 @@ function preencherSpanCalendario()
         $obTxtCodCalendario->setRotulo  ( "Calendário"                      );
         $obTxtCodCalendario->setId      ( "inCodCalendario"                 );
         $obTxtCodCalendario->setName    ( "inCodCalendario"                 );
-        $obTxtCodCalendario->setValue   ( $inCodCalendario );
-        $obTxtCodCalendario->setTitle   ("Selecione o calendário, para avaliação dos dias úteis"            );
+        $obTxtCodCalendario->setValue   ( $inCodCalendario                  );
+        $obTxtCodCalendario->setTitle   ( "Selecione o calendário, para avaliação dos dias úteis"            );
         $obTxtCodCalendario->setMaxLength( 10                               );
         $obTxtCodCalendario->setSize    ( 10                                );
         $obTxtCodCalendario->setNull    ( false                             );

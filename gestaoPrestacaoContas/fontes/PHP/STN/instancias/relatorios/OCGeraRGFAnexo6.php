@@ -139,7 +139,7 @@ $preview->addParametro( 'entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 $preview->addParametro( 'data_inicio', $stDataInicial );
 $preview->addParametro( 'data_fim', $stDataFinal );
 $preview->addParametro( 'exercicio', $_REQUEST['stExercicio'] );
-$preview->addParametro( 'intervalo', utf8_encode($stIntervalo) );
+$preview->addParametro( 'intervalo', $stIntervalo );
 
 if (preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($_REQUEST['inCodEntidade']) > 0 ) ) {
     $preview->addParametro( 'poder' , 'Executivo' );
@@ -151,7 +151,7 @@ $rsEntidade->setPrimeiroElemento();
 while (!$rsEntidade->eof()) {
     $stNomeEntidade = $rsEntidade->getCampo('nom_cgm');
     if (preg_match( "/prefeitura/i", $stNomeEntidade ) || preg_match( "/c[âa]mara/i", $stNomeEntidade )) {
-        $preview->addParametro('nom_entidade', utf8_encode($stNomeEntidade));
+        $preview->addParametro('nom_entidade', $stNomeEntidade);
     }
     $rsEntidade->proximo();
 }
@@ -176,7 +176,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 if( !$obErro->ocorreu() )

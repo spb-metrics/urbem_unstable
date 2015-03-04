@@ -31,7 +31,7 @@
     * @author Desenvolvedor: Andre Almeida
 
     * @ignore
-    $Id: OCManterGeracaoAssentamento.php 60911 2014-11-24 16:26:04Z evandro $
+    $Id: OCManterGeracaoAssentamento.php 61778 2015-03-03 17:49:22Z michel $
 
     * Caso de uso: uc-04.04.14
 
@@ -72,7 +72,7 @@ include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php
 
 function gerarAssentamento($boExecuta=false,$stArquivo="Form")
 {
-    switch ($_POST['stModoGeracao']) {
+    switch ($_REQUEST['stModoGeracao']) {
         case 'contrato':
             $stJs .= gerarSpan1($boExecuta,$stArquivo);
         break;
@@ -86,7 +86,7 @@ function gerarAssentamento($boExecuta=false,$stArquivo="Form")
             $stJs .= gerarSpan4($boExecuta,$stArquivo);
         break;
     }
-    $stJs .= "f.hdnModoGeracao.value = '".$_POST['stModoGeracao']."';";
+    $stJs .= "f.hdnModoGeracao.value = '".$_REQUEST['stModoGeracao']."';";
     if ($boExecuta) {
         sistemaLegado::executaFrameOculto( $stJs );
     } else {
@@ -105,7 +105,7 @@ function gerarSpan1($boExecuta=false,$stArquivo="Form")
         $obIContrato->setTituloFormulario ( "Filtro por Matrícula" );
     }
     $stOnBlur = $obIContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->getOnBlur();
-    $obIContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnBlur($stOnBlur." preencheClassificacao(this.value, 'matricula');");
+    $obIContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnBlur($stOnBlur." preencheClassificacao(this.value, 'matricula');buscaValor('buscaContrato');");
     //$obIContrato->obIContratoDigitoVerificador->setNull(false);
     $obIContrato->geraFormulario( $obFormulario );
 
@@ -319,15 +319,15 @@ function gerarSpan4($boExecuta=false,$stArquivo="Form")
 
 function calcularDataFinal($boExecuta=false)
 {
-//    if ($_POST['inQuantidadeDias'] == 0) {
+//    if ($_REQUEST['inQuantidadeDias'] == 0) {
 //        $inQuantidadeDias = 0;
 //        $stJs .= "f.inQuantidadeDias.value = '".$inQuantidadeDias."';";
 //    } else {
-//        $inQuantidadeDias = $_POST['inQuantidadeDias'];
+//        $inQuantidadeDias = $_REQUEST['inQuantidadeDias'];
 //    }
-    $inQuantidadeDias = $_POST['inQuantidadeDias'];
-    if ($_POST['stDataInicial'] != "" and $_POST['inQuantidadeDias'] != 0) {
-        $arDataInicial  = explode("/", $_POST['stDataInicial'] );
+    $inQuantidadeDias = $_REQUEST['inQuantidadeDias'];
+    if ($_REQUEST['stDataInicial'] != "" and $_REQUEST['inQuantidadeDias'] != 0) {
+        $arDataInicial  = explode("/", $_REQUEST['stDataInicial'] );
         $stDataFinal = date("d/m/Y", mktime(0, 0, 0, $arDataInicial[1], ($arDataInicial[0]+$inQuantidadeDias-1), $arDataInicial[2]));
 
         $stJs .= "f.stDataFinal.value = '".$stDataFinal."';";
@@ -341,12 +341,12 @@ function calcularDataFinal($boExecuta=false)
 
 function ajustarQuantidadeDias($boExecuta=false,$boSpan=false)
 {
-    $stDataInicial = ( $_POST['stDataInicial'] != "" ) ? $_POST['stDataInicial'] : Sessao::read('stDataInicial');
-    $stDataFinal   = ( $_POST['stDataFinal']   != "" ) ? $_POST['stDataFinal']   : Sessao::read('stDataFinal');
+    $stDataInicial = ( $_REQUEST['stDataInicial'] != "" ) ? $_REQUEST['stDataInicial'] : Sessao::read('stDataInicial');
+    $stDataFinal   = ( $_REQUEST['stDataFinal']   != "" ) ? $_REQUEST['stDataFinal']   : Sessao::read('stDataFinal');
 
 //    if ($stDataFinal == "") {
 //        $arDataInicial  = explode("/", $stDataInicial );
-//        $stDataFinal    = date("d/m/Y", mktime(0, 0, 0, $arDataInicial[1], ($arDataInicial[0]+$_POST['inQuantidadeDias']-1), $arDataInicial[2]));
+//        $stDataFinal    = date("d/m/Y", mktime(0, 0, 0, $arDataInicial[1], ($arDataInicial[0]+$_REQUEST['inQuantidadeDias']-1), $arDataInicial[2]));
 //        $stJs .= "f.stDataFinal.value = '".$stDataFinal."';";
 //    }
     $arDataInicial = explode("/",$stDataInicial);
@@ -376,7 +376,7 @@ function ajustarQuantidadeDias($boExecuta=false,$boSpan=false)
 function preencherEspecialidade($boExecuta=false)
 {
     $obRPessoalCargo = new RPessoalCargo;
-    $obRPessoalCargo->setCodCargo( $_POST['inCodCargo'] );
+    $obRPessoalCargo->setCodCargo( $_REQUEST['inCodCargo'] );
     $obRPessoalCargo->addEspecialidade();
     $obRPessoalCargo->roUltimoEspecialidade->listarEspecialidadesPorCargo( $rsEspecialidades );
 
@@ -399,7 +399,7 @@ function preencherAssentamento($boExecuta=false)
 {
     $rsAssentamentos = new RecordSet;
     $obRPessoalAssentamento = new RPessoalAssentamento( new RPessoalVantagem );
-    $inCodClassificacao = ( $_POST['inCodClassificacao'] ) ? $_POST['inCodClassificacao'] : Sessao::read('inCodClassificacao');
+    $inCodClassificacao = ( $_REQUEST['inCodClassificacao'] ) ? $_REQUEST['inCodClassificacao'] : Sessao::read('inCodClassificacao');
     $obRPessoalAssentamento->obRPessoalClassificacaoAssentamento->setCodClassificacaoAssentamento( $inCodClassificacao );
 
     if ($_REQUEST['stModoGeracao'] == '') {
@@ -454,9 +454,9 @@ function preencherAssentamento($boExecuta=false)
 function preencherLotacao($boExecuta=false)
 {
     $obROrganogramaOrgao = new ROrganogramaOrgao;
-    if ($_POST['inCodLotacao']) {
+    if ($_REQUEST['inCodLotacao']) {
         $obROrganogramaOrgao->setCodOrgaoEstruturado( $inCodLotacao );
-        $obROrganogramaOrgao->setCodOrgaoEstruturado($_POST['inCodLotacao']);
+        $obROrganogramaOrgao->setCodOrgaoEstruturado($_REQUEST['inCodLotacao']);
         $obROrganogramaOrgao->listarOrgaoReduzido( $rsOrgao, "", "" );
         $stNull = "";
         if ( $rsOrgao->getNumLinhas() <= 0) {
@@ -479,76 +479,106 @@ function validarAssentamento($stAcao="",&$stDescricaoClassificacao,&$stDescricao
 {
     $obErro = new erro;
     if ( !$obErro->ocorreu() ) {
-        $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+        $stModoGeracao = ( $_REQUEST['stModoGeracao'] ) ? $_REQUEST['stModoGeracao'] : $_REQUEST['hdnModoGeracao'];
         switch ($stModoGeracao) {
             case "contrato":
             case "cgm/contrato":
-                if ($_POST['inContrato'] == "") {
+                if ($_REQUEST['inContrato'] == "") {
                     $obErro->setDescricao("@Campo Matrícula inválido!()");
                 }
             break;
             case "cargo":
-                if ( !isset($_POST['boCargoExercido']) and !isset($_POST['boFuncaoExercida']) ) {
+                if ( !isset($_REQUEST['boCargoExercido']) and !isset($_REQUEST['boFuncaoExercida']) ) {
                     $obErro->setDescricao("@Campo Cargo Exercido ou Função Exercida inválidos!()");
                 }
-                if ( !$obErro->ocorreu() and $_POST['inCodCargo'] == "" ) {
+                if ( !$obErro->ocorreu() and $_REQUEST['inCodCargo'] == "" ) {
                     $obErro->setDescricao("@Campo Cargo inválido!()");
                 }
             break;
             case "lotacao":
-                if ($_POST['inCodLotacao'] == "") {
+                if ($_REQUEST['inCodLotacao'] == "") {
                     $obErro->setDescricao("@Campo Lotação inválido!()");
                 }
             break;
         }
     }
-    if ($_POST['inCodClassificacao'] == "") {
+    if ($_REQUEST['inCodClassificacao'] == "") {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Classificação inválido!()");
     }
-    if ($_POST['inCodAssentamento'] == "") {
+    if ($_REQUEST['inCodAssentamento'] == "") {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Assentamento inválido!()");
     }
-    //if ( ($_POST['stDataInicial'] == "" or $_POST['stDataFinal'] == "") ) {
+    //if ( ($_REQUEST['stDataInicial'] == "" or $_REQUEST['stDataFinal'] == "") ) {
     //    $obErro->setDescricao($obErro->getDescricao()."@Campo Período inválido!()");
     //}
-    if ( ($_POST['stDataInicial'] == "") ) {
+    if ( ($_REQUEST['stDataInicial'] == "") ) {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Período inválido!(Informe a data inicial)");
     }
-    if ( ($_POST['stDataInicial'] != "" and $_POST['stDataFinal'] != "") and SistemaLegado::comparaDatas($_POST['stDataInicial'],$_POST['stDataFinal']) ) {
-        $obErro->setDescricao($obErro->getDescricao()."@Campo Período inválido!( Data Final (".$_POST['stDataFinal'].") deve ser maior que Data Inicial (".$_POST['stDataInicial']."))");
+    if ( ($_REQUEST['stDataInicial'] != "" and $_REQUEST['stDataFinal'] != "") and SistemaLegado::comparaDatas($_REQUEST['stDataInicial'],$_REQUEST['stDataFinal']) ) {
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Período inválido!( Data Final (".$_REQUEST['stDataFinal'].") deve ser maior que Data Inicial (".$_REQUEST['stDataInicial']."))");
     }
     if (Sessao::read("boValidaLicencaPremio") == "true") {
-        if ( ($_POST['dtInicial'] == "" or $_POST['dtFinal'] == "") ) {
+        if ( ($_REQUEST['dtInicial'] == "" or $_REQUEST['dtFinal'] == "") ) {
             $obErro->setDescricao($obErro->getDescricao()."@Campo Período Aquisitivo Licença Prêmio inválido!()");
         }
-        if ( ($_POST['dtInicial'] != "" and $_POST['dtFinal'] != "") and SistemaLegado::comparaDatas($_POST['dtInicial'],$_POST['dtFinal']) ) {
-            $obErro->setDescricao($obErro->getDescricao()."@Campo Período Aquisitivo Licença Prêmio inválido!( Data Final (".$_POST['dtFinal'].") deve ser maior que Data Inicial (".$_POST['dtInicial']."))");
+        if ( ($_REQUEST['dtInicial'] != "" and $_REQUEST['dtFinal'] != "") and SistemaLegado::comparaDatas($_REQUEST['dtInicial'],$_REQUEST['dtFinal']) ) {
+            $obErro->setDescricao($obErro->getDescricao()."@Campo Período Aquisitivo Licença Prêmio inválido!( Data Final (".$_REQUEST['dtFinal'].") deve ser maior que Data Inicial (".$_REQUEST['dtInicial']."))");
         }
+    }
+    if((isset($_REQUEST['inCodRegime'])&&$_REQUEST['inCodRegime']=='')||(isset($_REQUEST['inCodRegimeFuncao'])&&$_REQUEST['inCodRegimeFuncao']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Regime inválido!()");
+    }
+    if((isset($_REQUEST['inCodSubDivisao'])&&$_REQUEST['inCodSubDivisao']=='')||(isset($_REQUEST['inCodSubDivisaoFuncao'])&&$_REQUEST['inCodSubDivisaoFuncao']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Subdivisão inválido!()");
+    }
+    if((isset($_REQUEST['inCodCargo'])&&$_REQUEST['inCodCargo']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Cargo inválido!()");
+    }
+    if((isset($_REQUEST['inCodFuncao'])&&$_REQUEST['inCodFuncao']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Função inválido!()");
+    }
+    if((isset($_REQUEST['dtDataAlteracaoFuncao'])&&$_REQUEST['dtDataAlteracaoFuncao']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Data da Alteração da Função inválido!()");
+    }
+    if((isset($_REQUEST['stHorasMensais'])&&$_REQUEST['stHorasMensais']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Horas Mensais inválido!()");
+    }
+    if((isset($_REQUEST['stHorasSemanais'])&&$_REQUEST['stHorasSemanais']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Horas Semanais inválido!()");
+    }
+    if((isset($_REQUEST['inSalario'])&&$_REQUEST['inSalario']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Salário inválido!()");
+    }
+    if((isset($_REQUEST['dtVigenciaSalario'])&&$_REQUEST['dtVigenciaSalario']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Vigência do Salário inválido!()");
+    }
+    if((isset($_REQUEST['stObservacao'])&&$_REQUEST['stObservacao']=='')){
+        $obErro->setDescricao($obErro->getDescricao()."@Campo Observação inválido!()");
     }
     if ( !$obErro->ocorreu() ) {
         $obRPessoalAssentamento = new RPessoalAssentamento( new RPessoalVantagem );
         $obRPessoalClassificacaoAssentamento = new RPessoalClassificacaoAssentamento();
 
-        $obRPessoalAssentamento->setCodAssentamento($_POST['inCodAssentamento']);
+        $obRPessoalAssentamento->setCodAssentamento($_REQUEST['inCodAssentamento']);
         $obRPessoalAssentamento->listarAssentamento( $rsAssentamentos );
         $stDescricaoAssentamento = $rsAssentamentos->getCampo("descricao");
 
-        $obRPessoalClassificacaoAssentamento->setCodClassificacaoAssentamento($_POST['inCodClassificacao']);
+        $obRPessoalClassificacaoAssentamento->setCodClassificacaoAssentamento($_REQUEST['inCodClassificacao']);
         $obRPessoalClassificacaoAssentamento->listarClassificacao( $rsClassificacao );
         $stDescricaoClassificacao = $rsClassificacao->getCampo("descricao");
 
         $arAssentamentosGerados = ( is_array(Sessao::read('arAssentamentos')) ) ? Sessao::read('arAssentamentos') : array();
         foreach ($arAssentamentosGerados as $arAssentamento) {
-            if ($arAssentamento['inCodClassificacao'] == $_POST['inCodClassificacao']
-            AND $arAssentamento['inCodAssentamento']  == $_POST['inCodAssentamento']) {
+            if ($arAssentamento['inCodClassificacao'] == $_REQUEST['inCodClassificacao']
+            AND $arAssentamento['inCodAssentamento']  == $_REQUEST['inCodAssentamento']) {
                 $boIgual = false;
-                $arPeriodo1 = array($_POST['stDataInicial'],$_POST['stDataFinal']);
+                $arPeriodo1 = array($_REQUEST['stDataInicial'],$_REQUEST['stDataFinal']);
                 $arPeriodo2 = array($arAssentamento['stDataInicial'],$arAssentamento['stDataFinal']);
                 switch ($stModoGeracao) {
                     case "contrato":
                     case "cgm/contrato":
-                        $stComplemento = "contrato(".$_POST['inContrato'].")";
-                        if ($arAssentamento['inRegistro'] == $_POST['inContrato']) {
+                        $stComplemento = "contrato(".$_REQUEST['inContrato'].")";
+                        if ($arAssentamento['inRegistro'] == $_REQUEST['inContrato']) {
                             $boIgual = true;
                         }
                     break;
@@ -558,19 +588,19 @@ function validarAssentamento($stAcao="",&$stDescricaoClassificacao,&$stDescricao
                         } else {
                             $stComplemento = "cargo(".$arAssentamento['stDescricaoCargo'].")";
                         }
-                        if ($arAssentamento['inCodCargo']         == $_POST['inCodCargo']
-                        AND $arAssentamento['inCodEspecialidade'] == $_POST['inCodEspecialidade']) {
+                        if ($arAssentamento['inCodCargo']         == $_REQUEST['inCodCargo']
+                        AND $arAssentamento['inCodEspecialidade'] == $_REQUEST['inCodEspecialidade']) {
                             $boIgual = true;
                         }
                     break;
                     case "lotacao":
-                        $stComplemento = "lotação(".$_POST['inCodLotacao'].")";
-                        if ($arAssentamento['inCodLotacao'] == $_POST['inCodLotacao']) {
+                        $stComplemento = "lotação(".$_REQUEST['inCodLotacao'].")";
+                        if ($arAssentamento['inCodLotacao'] == $_REQUEST['inCodLotacao']) {
                             $boIgual = true;
                         }
                     break;
                 }
-                $stMensagem = "@Este período(".$_POST['stDataInicial']." até ".$_POST['stDataFinal'].") já foi cadastrado para o $stComplemento, classifiação($stDescricaoClassificacao) e assentamento($stDescricaoAssentamento).";
+                $stMensagem = "@Este período(".$_REQUEST['stDataInicial']." até ".$_REQUEST['stDataFinal'].") já foi cadastrado para o $stComplemento, classifiação($stDescricaoClassificacao) e assentamento($stDescricaoAssentamento).";
                 if ($stAcao == "incluir" and $boIgual) {
                     if ( verificarPeriodo($arPeriodo1,$arPeriodo2) ) {
                         $obErro->setDescricao($stMensagem);
@@ -623,34 +653,34 @@ function retornarArrayPost($stAcao,$stDescricaoClassificacao,$stDescricaoAssenta
     } else {
         $arTemp['inId'] = Sessao::read('inId');
     }
-    $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+    $stModoGeracao = ( $_REQUEST['stModoGeracao'] ) ? $_REQUEST['stModoGeracao'] : $_REQUEST['hdnModoGeracao'];
     switch ($stModoGeracao) {
         case "contrato":
-            $arTemp['inRegistro']         = $_POST['inContrato'];
-            $arTemp['stNomCgm']           = $_POST['hdnCGM'];
+            $arTemp['inRegistro']         = $_REQUEST['inContrato'];
+            $arTemp['stNomCgm']           = $_REQUEST['hdnCGM'];
         break;
         case "cgm/contrato":
-            $arTemp['inNumCGM']           = $_POST['inNumCGM'];
-            $arTemp['inCampoInner']       = $_POST['inCampoInner'];
-            $arTemp['inRegistro']         = $_POST['inContrato'];
+            $arTemp['inNumCGM']           = $_REQUEST['inNumCGM'];
+            $arTemp['inCampoInner']       = $_REQUEST['inCampoInner'];
+            $arTemp['inRegistro']         = $_REQUEST['inContrato'];
         break;
         case "cargo":
             $obRPessoalCargo = new RPessoalCargo;
-            $obRPessoalCargo->setCodCargo( $_POST['inCodCargo'] );
+            $obRPessoalCargo->setCodCargo( $_REQUEST['inCodCargo'] );
 
-            if ($_POST['inCodEspecialidade'] != "") {
+            if ($_REQUEST['inCodEspecialidade'] != "") {
                 $obRPessoalEspecialidade = new RPessoalEspecialidade( $obRPessoalCargo );
-                $obRPessoalEspecialidade->setCodEspecialidade( $_POST['inCodEspecialidade'] );
+                $obRPessoalEspecialidade->setCodEspecialidade( $_REQUEST['inCodEspecialidade'] );
                 $obRPessoalEspecialidade->consultaEspecialidadeCargo($rsCargoEspecialidade);
             } else {
                 $obRPessoalCargo->listarCargo($rsCargoEspecialidade);
             }
 
-            $arTemp['boCargoExercido']    = $_POST['boCargoExercido'];
-            $arTemp['boFuncaoExercida']   = $_POST['boFuncaoExercida'];
-            $arTemp['inCodCargo']         = $_POST['inCodCargo'];
+            $arTemp['boCargoExercido']    = $_REQUEST['boCargoExercido'];
+            $arTemp['boFuncaoExercida']   = $_REQUEST['boFuncaoExercida'];
+            $arTemp['inCodCargo']         = $_REQUEST['inCodCargo'];
             $arTemp['stDescricaoCargo']   = $rsCargoEspecialidade->getCampo('descricao');
-            $arTemp['inCodEspecialidade'] = $_POST['inCodEspecialidade'];
+            $arTemp['inCodEspecialidade'] = $_REQUEST['inCodEspecialidade'];
             $arTemp['stDescricaoEspecialidade'] = $rsCargoEspecialidade->getCampo('descricao_especialidade');
             if ( $rsCargoEspecialidade->getCampo('descricao_especialidade') != "" ) {
                 $arTemp['stDescricaoCargoEspecialidade']   = $rsCargoEspecialidade->getCampo('descricao')."/".$rsCargoEspecialidade->getCampo('descricao_especialidade');
@@ -659,45 +689,45 @@ function retornarArrayPost($stAcao,$stDescricaoClassificacao,$stDescricaoAssenta
             }
         break;
         case "lotacao":
-            $arTemp['inCodLotacao']       = $_POST['inCodLotacao'];
+            $arTemp['inCodLotacao']       = $_REQUEST['inCodLotacao'];
         break;
     }
-    $arTemp['inCodClassificacao']       = $_POST['inCodClassificacao'];
+    $arTemp['inCodClassificacao']       = $_REQUEST['inCodClassificacao'];
     $arTemp['stClassificacao']          = TRIM($stDescricaoClassificacao);
-    $arTemp['inCodAssentamento']        = $_POST['inCodAssentamento'];
+    $arTemp['inCodAssentamento']        = $_REQUEST['inCodAssentamento'];
     $arTemp['stAssentamento']           = TRIM($stDescricaoAssentamento);
-    $arTemp['inQuantidadeDias']         = $_POST['inQuantidadeDias'];
-    $arTemp['stDataInicial']            = $_POST['stDataInicial'];
-    $arTemp['stDataFinal']              = $_POST['stDataFinal'];
-    $arTemp["dtInicial"]                = $_POST["dtInicial"];
-    $arTemp["dtFinal"]                  = $_POST["dtFinal"];
-    $arTemp['stObservacao']             = TRIM($_POST['stObservacao']);
-    $arTemp['inCodNorma']               = $_POST['inCodNorma'];
-    $arTemp['inCodTipoNorma']           = $_POST['inCodTipoNorma'];
-    $arTemp['hdnDataAlteracaoFuncao']   = $_POST['hdnDataAlteracaoFuncao'];
-    $arTemp['inCodProgressao']          = $_POST['inCodProgressao'];
-    $arTemp['inCodRegime']              = $_POST['inCodRegime'];
-    $arTemp['stRegime']                 = $_POST['stRegime'];
-    $arTemp['inCodSubDivisao']          = $_POST['inCodSubDivisao'];
-    $arTemp['stSubDivisao']             = $_POST['stSubDivisao'];
-    $arTemp['stCargo']                  = $_POST['stCargo'];
-    $arTemp['inCodEspecialidadeCargo']  = $_POST['inCodEspecialidadeCargo'];
-    $arTemp['stEspecialidadeCargo']     = $_POST['stEspecialidadeCargo'];
-    $arTemp['inCodRegimeFuncao']        = $_POST['inCodRegimeFuncao'];
-    $arTemp['stRegimeFuncao']           = $_POST['stRegimeFuncao'];
-    $arTemp['inCodSubDivisaoFuncao']    = $_POST['inCodSubDivisaoFuncao'];
-    $arTemp['stSubDivisaoFuncao']       = $_POST['stSubDivisaoFuncao'];
-    $arTemp['inCodFuncao']              = $_POST['inCodFuncao'];
-    $arTemp['stFuncao']                 = $_POST['stFuncao'];
-    $arTemp['inCodEspecialidadeFuncao'] = $_POST['inCodEspecialidadeFuncao'];
-    $arTemp['stEspecialidadeFuncao']    = $_POST['stEspecialidadeFuncao'];
-    $arTemp['dtDataAlteracaoFuncao']    = $_POST['dtDataAlteracaoFuncao'];
-    $arTemp['stHorasMensais']           = $_POST['stHorasMensais'];
-    $arTemp['stHorasSemanais']          = $_POST['stHorasSemanais'];
-    $arTemp['inCodPadrao']              = $_POST['inCodPadrao'];
-    $arTemp['stPadrao']                 = $_POST['stPadrao'];
-    $arTemp['inSalario']                = $_POST['inSalario'];
-    $arTemp['dtVigenciaSalario']        = $_POST['dtVigenciaSalario'];
+    $arTemp['inQuantidadeDias']         = $_REQUEST['inQuantidadeDias'];
+    $arTemp['stDataInicial']            = $_REQUEST['stDataInicial'];
+    $arTemp['stDataFinal']              = $_REQUEST['stDataFinal'];
+    $arTemp["dtInicial"]                = $_REQUEST["dtInicial"];
+    $arTemp["dtFinal"]                  = $_REQUEST["dtFinal"];
+    $arTemp['stObservacao']             = TRIM($_REQUEST['stObservacao']);
+    $arTemp['inCodNorma']               = $_REQUEST['inCodNorma'];
+    $arTemp['inCodTipoNorma']           = $_REQUEST['inCodTipoNorma'];
+    $arTemp['hdnDataAlteracaoFuncao']   = $_REQUEST['hdnDataAlteracaoFuncao'];
+    $arTemp['inCodProgressao']          = $_REQUEST['inCodProgressao'];
+    $arTemp['inCodRegime']              = $_REQUEST['inCodRegime'];
+    $arTemp['stRegime']                 = $_REQUEST['stRegime'];
+    $arTemp['inCodSubDivisao']          = $_REQUEST['inCodSubDivisao'];
+    $arTemp['stSubDivisao']             = $_REQUEST['stSubDivisao'];
+    $arTemp['stCargo']                  = $_REQUEST['stCargo'];
+    $arTemp['inCodEspecialidadeCargo']  = $_REQUEST['inCodEspecialidadeCargo'];
+    $arTemp['stEspecialidadeCargo']     = $_REQUEST['stEspecialidadeCargo'];
+    $arTemp['inCodRegimeFuncao']        = $_REQUEST['inCodRegimeFuncao'];
+    $arTemp['stRegimeFuncao']           = $_REQUEST['stRegimeFuncao'];
+    $arTemp['inCodSubDivisaoFuncao']    = $_REQUEST['inCodSubDivisaoFuncao'];
+    $arTemp['stSubDivisaoFuncao']       = $_REQUEST['stSubDivisaoFuncao'];
+    $arTemp['inCodFuncao']              = $_REQUEST['inCodFuncao'];
+    $arTemp['stFuncao']                 = $_REQUEST['stFuncao'];
+    $arTemp['inCodEspecialidadeFuncao'] = $_REQUEST['inCodEspecialidadeFuncao'];
+    $arTemp['stEspecialidadeFuncao']    = $_REQUEST['stEspecialidadeFuncao'];
+    $arTemp['dtDataAlteracaoFuncao']    = $_REQUEST['dtDataAlteracaoFuncao'];
+    $arTemp['stHorasMensais']           = $_REQUEST['stHorasMensais'];
+    $arTemp['stHorasSemanais']          = $_REQUEST['stHorasSemanais'];
+    $arTemp['inCodPadrao']              = $_REQUEST['inCodPadrao'];
+    $arTemp['stPadrao']                 = $_REQUEST['stPadrao'];
+    $arTemp['inSalario']                = $_REQUEST['inSalario'];
+    $arTemp['dtVigenciaSalario']        = $_REQUEST['dtVigenciaSalario'];
 
     return $arTemp;
 }
@@ -765,7 +795,7 @@ function alterarAssentamento($boExecuta=false)
 
 function limparAssentamento($boExecuta=false)
 {
-    $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+    $stModoGeracao = ( $_REQUEST['stModoGeracao'] ) ? $_REQUEST['stModoGeracao'] : $_REQUEST['hdnModoGeracao'];
     switch ($stModoGeracao) {
         case "contrato":
             $stJs .= "f.inContrato.value = '';                                              \n";
@@ -792,6 +822,8 @@ function limparAssentamento($boExecuta=false)
             $stJs .= "d.getElementById('stLotacao').innerHTML = '&nbsp;';                   \n";
         break;
     }
+    $stJs .= "f.inCodContrato.value         = '';                                           \n";
+    $stJs .= "f.inCodMatricula.value        = '';                                           \n";
     $stJs .= "f.inCodClassificacao.value    = '';                                           \n";
     $stJs .= "f.inCodClassificacaoTxt.value = '';                                           \n";
     $stJs .= "limpaSelect(f.inCodAssentamento,0);                                           \n";
@@ -802,11 +834,8 @@ function limparAssentamento($boExecuta=false)
     $stJs .= "f.stDataFinal.value           = '';                                           \n";
     $stJs .= "d.getElementById('spnLicencaPremio').innerHTML = '';                          \n";
     $stJs .= "f.stObservacao.value          = '';                                           \n";
-    $stJs .= "limpaSelect(f.inCodNorma,0);                                                  \n";
-    $stJs .= "f.inCodNorma.options[0] = new Option('Selecione','', 'selected');             \n";
-    $stJs .= "f.inCodNormaTxt.value           = '';                                         \n";
-    $stJs .= "f.inCodTipoNormaTxt.value           = '';                                     \n";
-    $stJs .= "f.inCodTipoNorma.value           = '';                                        \n";
+    $stJs .= "f.stCodNorma.value           = '';                                            \n";
+    $stJs .= "d.getElementById('stNorma').innerHTML = '&nbsp;';                             \n";
     $stJs .= "d.getElementById('spnCargoFuncaoSalario').innerHTML = '';                     \n";
     Sessao::remove('arNormas');
     $stJs .= montaListaNorma();
@@ -846,7 +875,7 @@ function montaAlterarAssentamento($boExecuta=false)
 {
     $arAssentamentos = Sessao::read('arAssentamentos');
     $arAssentamento  = $arAssentamentos[$_GET['inId']];
-    $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+    $stModoGeracao = ( $_REQUEST['stModoGeracao'] ) ? $_REQUEST['stModoGeracao'] : $_REQUEST['hdnModoGeracao'];
 
     switch ($stModoGeracao) {
         case "contrato":
@@ -883,7 +912,7 @@ function montaAlterarAssentamento($boExecuta=false)
             $stJs .= "f.inCodExpecialidadeTxt.value     = '".$arAssentamento['inCodEspecialidade']."';      \n";
             $stJs .= "limpaSelect(f.inCodEspecialidade,0);                                                  \n";
             $obRPessoalCargo = new RPessoalCargo;
-            $obRPessoalCargo->setCodCargo( $_POST['inCodCargo'] );
+            $obRPessoalCargo->setCodCargo( $_REQUEST['inCodCargo'] );
             $obRPessoalEspecialidade = new RPessoalEspecialidade( $obRPessoalCargo );
             $obRPessoalEspecialidade->consultaEspecialidadeCargo($rsEspecialidades);
             $stJs .= "f.inCodEspecialidade.options[0] = new Option('Selecione','', 'selected');             \n";
@@ -921,11 +950,12 @@ function montaAlterarAssentamento($boExecuta=false)
 //    $stJs .= MontaNorma();
 //    $stJs .= "f.inCodNorma.value           = '".$arAssentamento['inCodNorma']."';\n";
 //    $stJs .= "f.inCodNormaTxt.value           = '".$arAssentamento['inCodNorma']."';\n";
-    $_POST["inCodClassificacao"] = $arAssentamento['inCodClassificacao'];
-    $_POST["inCodAssentamento"]  = $arAssentamento['inCodAssentamento'];
-    $_POST["dtInicial"]          = $arAssentamento["dtInicial"];
-    $_POST["dtFinal"]            = $arAssentamento["dtFinal"];
+    $_REQUEST["inCodClassificacao"] = $arAssentamento['inCodClassificacao'];
+    $_REQUEST["inCodAssentamento"]  = $arAssentamento['inCodAssentamento'];
+    $_REQUEST["dtInicial"]          = $arAssentamento["dtInicial"];
+    $_REQUEST["dtFinal"]            = $arAssentamento["dtFinal"];
     $stJs .= gerarSpanLicencaPremio();
+    $stJs .= buscaContrato($arAssentamento['inRegistro']);
     $stJs .= "f.stObservacao.value          = '".$arAssentamento['stObservacao']    ."';\n";
     if ($boExecuta) {
         sistemaLegado::executaFrameOculto( $stJs );
@@ -949,7 +979,7 @@ function montarListaAssentamento($boExecuta=false)
     $obLista->ultimoCabecalho->setWidth( 2 );
     $obLista->commitCabecalho();
 
-    $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+    $stModoGeracao = ( $_REQUEST['stModoGeracao'] ) ? $_REQUEST['stModoGeracao'] : $_REQUEST['hdnModoGeracao'];
 
     switch ($stModoGeracao) {
         case "contrato":
@@ -1066,18 +1096,32 @@ function processarForm($boExecuta = false, $stArquivo = "Form", $stAcao = "inclu
         break;
 
         case "alterar":
+
             $stJs  = preencherAssentamento($boExecuta);
             $stJs .= processarTriadi(3);
             $stJs .= buscaNormas();
             $stJs .= montaListaNorma();
+            $stJs .= buscaContrato($_REQUEST['inRegistro'], false);
+            
+            $_REQUEST['inRegistro'] = $_REQUEST['inCodContrato'];
             $arDados = carregaDados();
-            $stJs .= gerarSpanCargoFuncaoSalario($arDados);
+
+            $inCodMotivo = SistemaLegado::pegaDado("cod_motivo"
+                                            ,"pessoal.assentamento_assentamento"
+                                            ,"WHERE cod_assentamento = ".Sessao::read('inCodAssentamento')." AND cod_classificacao = ".Sessao::read('inCodClassificacao')."");
+            
+            if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) )
+                $stJs .= gerarSpanCargoFuncaoSalario($arDados);
+
             $stJs .= preencheSubDivisaoAlterar();
             $stJs .= preencheCargoAlterar();
             $stJs .= preencheEspecialidadeAlterar();
             $stJs .= preencheSubDivisaoFuncaoAlterar();
             $stJs .= preencheFuncaoAlterar();
             $stJs .= preencheEspecialidadeFuncaoAlterar();
+            
+            if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) )
+                $stJs .= preencheInformacoesSalariais($arDados['inCodFuncao'], $arDados['inCodEspecialidadeFuncao']);
             
             $stJs .= preencheProgressaoAlterar();
         break;
@@ -1115,8 +1159,8 @@ function submeter($boExecuta=false)
 function processarTriadi($inCampo,$boSpan=false)
 {
     $rsContrato = new RecordSet();
-    $stDataInicial = ( $_POST['stDataInicial'] != "" ) ? $_POST['stDataInicial'] : Sessao::read('stDataInicial');
-    $stDataFinal   = ( $_POST['stDataFinal']   != "" ) ? $_POST['stDataFinal']   : Sessao::read('stDataFinal');
+    $stDataInicial = ( $_REQUEST['stDataInicial'] != "" ) ? $_REQUEST['stDataInicial'] : Sessao::read('stDataInicial');
+    $stDataFinal   = ( $_REQUEST['stDataFinal']   != "" ) ? $_REQUEST['stDataFinal']   : Sessao::read('stDataFinal');
     include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
     $obTPessoalContrato = new TPessoalContrato();
 
@@ -1171,10 +1215,10 @@ function processarTriadi($inCampo,$boSpan=false)
                 break;
         }
 
-        if ($_POST['inCodClassificacao'] != "") {
+        if ($_REQUEST['inCodClassificacao'] != "") {
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalClassificacaoAssentamento.class.php");
             $obTPessoalClassificacaoAssentamento = new TPessoalClassificacaoAssentamento();
-            $stFiltro  = " AND ca.cod_classificacao = ".$_POST["inCodClassificacao"];
+            $stFiltro  = " AND ca.cod_classificacao = ".$_REQUEST["inCodClassificacao"];
             $obTPessoalClassificacaoAssentamento->recuperaRelacionamento($rsClassificacao,$stFiltro);
             $stTipoClassificacao = $rsClassificacao->getCampo('cod_tipo');
         } else {
@@ -1207,11 +1251,11 @@ function processarTriadi($inCampo,$boSpan=false)
         }
 
         if ($rsContratoServidorCasoCausa->getNumLinhas() < 0 || $stTipoClassificacao=='1') {
-            if (Sessao::read("inQuantDiasAfastamentoTemporario") != "" and $_POST['inQuantidadeDias'] > Sessao::read("inQuantDiasAfastamentoTemporario")) {
-                $_POST['inQuantidadeDias'] = Sessao::read("inQuantDiasAfastamentoTemporario");
+            if (Sessao::read("inQuantDiasAfastamentoTemporario") != "" and $_REQUEST['inQuantidadeDias'] > Sessao::read("inQuantDiasAfastamentoTemporario")) {
+                $_REQUEST['inQuantidadeDias'] = Sessao::read("inQuantDiasAfastamentoTemporario");
                 $stJs .= "f.inQuantidadeDias.value = '".Sessao::read("inQuantDiasAfastamentoTemporario")."';\n";
             }
-            $inQuantDias   = $_POST['inQuantidadeDias'];
+            $inQuantDias   = $_REQUEST['inQuantidadeDias'];
             switch ($inCampo) {
                 case 1:
                     switch (true) {
@@ -1262,28 +1306,31 @@ function processarTriadi($inCampo,$boSpan=false)
 function processarQuantDiasAssentamento()
 {
     $inDias = "";
-    if ($_POST["inCodClassificacao"] != "") {
+    if ($_REQUEST["inCodClassificacao"] != "") {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalClassificacaoAssentamento.class.php");
         $obTPessoalClassificacaoAssentamento = new TPessoalClassificacaoAssentamento();
-        $stFiltro  = " AND ca.cod_classificacao = ".$_POST["inCodClassificacao"];
+        $stFiltro  = " AND ca.cod_classificacao = ".$_REQUEST["inCodClassificacao"];
         $stFiltro .= " AND ca.cod_tipo = 2";
         $obTPessoalClassificacaoAssentamento->recuperaRelacionamento($rsClassificacao,$stFiltro);
     }
-    if (($_POST["inCodAssentamento"] != "") && ($rsClassificacao->getNumLinhas() == 1) ) {
+    if (($_REQUEST["inCodAssentamento"] != "") && ($rsClassificacao->getNumLinhas() == 1) ) {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamento.class.php");
         $obTPessoalAssentamento = new TPessoalAssentamento();
-        $stFiltro  = " AND A.cod_assentamento = ".$_POST["inCodAssentamento"];
+        $stFiltro  = " AND A.cod_assentamento = ".$_REQUEST["inCodAssentamento"];
         $obTPessoalAssentamento->recuperaAssentamentos($rsAssentamento,$stFiltro);
         if ($rsAssentamento->getNumLinhas() == 1) {
             $inDias = $rsAssentamento->getCampo("dia");
         }
     }
     
-    if ( ($_POST["inCodAssentamento"] != "") && ($_POST["inCodClassificacao"] != "") ) {
-        $inCodMotivo = SistemaLegado::pegaDado("cod_motivo","pessoal.assentamento_assentamento","WHERE cod_assentamento = ".$_POST['inCodAssentamento']." AND cod_classificacao = ".$_POST["inCodClassificacao"]."");
+    if ( ($_REQUEST["inCodAssentamento"] != "") && ($_REQUEST["inCodClassificacao"] != "") ) {
+        $inCodMotivo = SistemaLegado::pegaDado("cod_motivo","pessoal.assentamento_assentamento","WHERE cod_assentamento = ".$_REQUEST['inCodAssentamento']." AND cod_classificacao = ".$_REQUEST["inCodClassificacao"]."");
         //Verifica se o cod_motivo é '18 - Readaptação' ou '14 - Alteração de Cargo'
-        if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) )
+        if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) ){            
+            $_REQUEST['inRegistro'] = $_REQUEST['inCodContrato'];
+            $arDados = carregaDados();            
             $stJs .= gerarSpanCargoFuncaoSalario($arDados);
+        }
     }else{
         $stJs .= "d.getElementById('spnCargoFuncaoSalario').innerHTML = '';\n";
     }
@@ -1297,6 +1344,7 @@ function processarQuantDiasAssentamento()
 
 function gerarSpanCargoFuncaoSalario($arDados = "")
 {
+
     $obRFolhaPagamentoPadrao = new RFolhaPagamentoPadrao();
     $obRPessoalRegime = new RPessoalRegime();
     $obRPessoalServidor = new RPessoalServidor();
@@ -1498,7 +1546,7 @@ function gerarSpanCargoFuncaoSalario($arDados = "")
     $obDataAlteracaoFuncao->setInteiro          ( false                                 );
     $obDataAlteracaoFuncao->setReadOnly         ( true                                  );
     $obDataAlteracaoFuncao->setStyle            ( "color: #888888"                      );
-    $obDataAlteracaoFuncao->obEvento->setOnChange("buscaValor('validaDataAlteracaoFuncao');");
+    //$obDataAlteracaoFuncao->obEvento->setOnChange("buscaValor('validaDataAlteracaoFuncao');");
     
     $obHdnDataAlteracaoFuncao = new Hidden;
     $obHdnDataAlteracaoFuncao->setName          ( "hdnDataAlteracaoFuncao"              );
@@ -1583,7 +1631,12 @@ function gerarSpanCargoFuncaoSalario($arDados = "")
     $obDtVigenciaSalario->obEvento->setOnChange ( "buscaValor('validarVigenciaSalario');" );
     //FIM SALARIAIS
 
-    $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $_REQUEST["inContrato"] );
+    if ( isset($_REQUEST["inCodContrato"]) )
+        $inCodContrato = $_REQUEST["inCodContrato"];
+    else
+        $inCodContrato = $arDados["inCodContrato"];
+
+    $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $inCodContrato );
     $obRPessoalServidor->roUltimoContratoServidor->listarDadosAbaContratoServidor( $rsContrato,$boTransacao );
     $dtDataProgressao = $rsContrato->getCampo("dt_inicio_progressao");
     
@@ -1595,18 +1648,13 @@ function gerarSpanCargoFuncaoSalario($arDados = "")
     if (isset($arDados)) {
         $obTxtCodRegime->setValue              ( $arDados['inCodRegime']              );
         $obCmbCodRegime->setValue              ( $arDados['inCodRegime']              );
-        $obTxtCodSubDivisao->setValue          ( $arDados['inCodSubDivisao']          );
-        $obCmbCodSubDivisao->setValue          ( $arDados['inCodSubDivisao']          );
-        $obTxtCargo->setValue                  ( $arDados['inCodCargo']               );
-        $obTxtCodEspecialidadeCargo->setValue  ( $arDados['inCodEspecialidadeCargo']  );
+        $_REQUEST["inCodRegime"]                = $arDados['inCodRegime'];
+        $_REQUEST["inCodSubDivisao"]            = $arDados['inCodSubDivisao'];
+        $_REQUEST["inCodCargo"]                 = $arDados['inCodCargo'];
+        $_REQUEST["inCodSubDivisaoFuncao"]      = $arDados['inCodSubDivisaoFuncao'];
+        $_REQUEST["inCodFuncao"]                = $arDados['inCodFuncao'];
         $obTxtCodRegimeFuncao->setValue        ( $arDados['inCodRegimeFuncao']        );
-        $obCmbCargo->setValue                  ( $arDados['inCodCargo']               );
-        $obCmbCodEspecialidadeCargo->setValue  ( $arDados['inCodEspecialidadeCargo']  );
         $obCmbCodRegimeFuncao->setValue        ( $arDados['inCodRegimeFuncao']        );
-        $obTxtCodSubDivisaoFuncao->setValue    ( $arDados['inCodSubDivisaoFuncao']    );
-        $obCmbCodSubDivisaoFuncao->setValue    ( $arDados['inCodSubDivisao']          );
-        $obTxtCodFuncao->setValue              ( $arDados['inCodFuncao']              );
-        $obCmbCodFuncao->setValue              ( $arDados['inCodFuncao']              );
         $obTxtCodEspecialidadeFuncao->setValue ( $arDados['inCodEspecialidadeFuncao'] );
         $obCmbCodEspecialidadeFuncao->setValue ( $arDados['inCodEspecialidadeFuncao'] );
         $obDataAlteracaoFuncao->setValue       ( $arDados['dtDataAlteracaoFuncao']    );
@@ -1652,18 +1700,27 @@ function gerarSpanCargoFuncaoSalario($arDados = "")
     $stHtml = $obFormulario->getHTML();
 
     $stJs = "d.getElementById('spnCargoFuncaoSalario').innerHTML = '".$stHtml."';\n";
+    $stJs .= preencheSubDivisao();
+    $stJs .= preencheCargo();
+    $stJs .= preencheEspecialidade();
 
     return $stJs;
 }
 
 function carregaDados()
 {       
-    
+
     $obRPessoalServidor = new RPessoalServidor();
     $obRPessoalServidor->addContratoServidor();
 
-    $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $_REQUEST["inRegistro"] );
+    if ( isset($_REQUEST['inCodMatricula'])) 
+        $inRegistro = $_REQUEST['inCodMatricula'];
+    else
+        $inRegistro = $_REQUEST["inRegistro"];
 
+    $inCodContrato = SistemaLegado::pegaDado("cod_contrato","pessoal.contrato","WHERE registro = ".$inRegistro);
+
+    $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $inCodContrato );
     $obRPessoalServidor->roUltimoContratoServidor->listarDadosAbaContratoServidor( $rsContrato,$boTransacao );
     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->setCodOcorrencia($rsContrato->getCampo("cod_ocorrencia"));
     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->listarOcorrencia( $rsOcorrencia,$boTransacao );
@@ -1677,7 +1734,10 @@ function carregaDados()
         
     $rsContrato->addFormatacao('salario','NUMERIC_BR');
         
-    $inContrato                            = $rsContrato->getCampo("registro");
+    $inContrato                            = $rsContrato->getCampo("cod_contrato");
+    $arDados['inCodContrato']              = $rsContrato->getCampo("cod_contrato");
+    $inRegistro                            = $rsContrato->getCampo("registro");
+    $arDados['inRegistro']                 = $rsContrato->getCampo("registro");
     //Informações do cargo
     $arDados['inCodRegime']                = $rsContrato->getCampo("cod_regime");
     $inCodRegime                           = $rsContrato->getCampo("cod_regime");
@@ -1724,17 +1784,17 @@ function gerarSpanLicencaPremio()
     $rsAssentamento  = new RecordSet();
     $rsClassificacao = new RecordSet();
 
-    if ($_POST["inCodAssentamento"] != "") {
+    if ($_REQUEST["inCodAssentamento"] != "") {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoAssentamento.class.php");
         $obTPessoalAssentamentoAssentamento = new TPessoalAssentamentoAssentamento();
-        $stFiltro  = " AND assentamento_assentamento.cod_assentamento = ".$_POST["inCodAssentamento"];
+        $stFiltro  = " AND assentamento_assentamento.cod_assentamento = ".$_REQUEST["inCodAssentamento"];
         $stFiltro .= " AND assentamento_assentamento.cod_motivo = 9";
         $obTPessoalAssentamentoAssentamento->recuperaAssentamento($rsAssentamento,$stFiltro);
     }
-    if ($_POST["inCodClassificacao"] != "") {
+    if ($_REQUEST["inCodClassificacao"] != "") {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalClassificacaoAssentamento.class.php");
         $obTPessoalClassificacaoAssentamento = new TPessoalClassificacaoAssentamento();
-        $stFiltro  = " AND ca.cod_classificacao = ".$_POST["inCodClassificacao"];
+        $stFiltro  = " AND ca.cod_classificacao = ".$_REQUEST["inCodClassificacao"];
         $stFiltro .= " AND ca.cod_tipo = 2";
         $obTPessoalClassificacaoAssentamento->recuperaRelacionamento($rsClassificacao,$stFiltro);
     }
@@ -1745,7 +1805,7 @@ function gerarSpanLicencaPremio()
         $obDtInicial->setName("dtInicial");
         $obDtInicial->setTitle("Informe o período aquisitivo da licença prêmio, ver relatório controle de licenças prêmio.");
         $obDtInicial->setNull(false);
-        $obDtInicial->setValue($_POST["dtInicial"]);
+        $obDtInicial->setValue($_REQUEST["dtInicial"]);
 
         $obLabelAte = new Label;
         $obLabelAte->setRotulo                          ( "Período Aquisitivo Licença Prêmio"                                                        );
@@ -1757,7 +1817,7 @@ function gerarSpanLicencaPremio()
         $obDtFinal->setName("dtFinal");
         $obDtFinal->setTitle("Informe o período aquisitivo da licença prêmio, ver relatório controle de licenças prêmio.");
         $obDtFinal->setNull(false);
-        $obDtFinal->setValue($_POST["dtFinal"]);;
+        $obDtFinal->setValue($_REQUEST["dtFinal"]);;
 
         $obFormulario = new Formulario();
         $obFormulario->agrupaComponentes( array($obDtInicial, $obLabelAte, $obDtFinal)                  );
@@ -1765,6 +1825,7 @@ function gerarSpanLicencaPremio()
         $stHtml = $obFormulario->getHTML();
     }
     $stJs  = "d.getElementById('spnLicencaPremio').innerHTML = '$stHtml';\n";
+    $stJs .= "LiberaFrames();\n";
 
     return $stJs;
 }
@@ -1776,7 +1837,7 @@ function MontaNorma($stSelecionado = "")
     $stJs .= "limpaSelect(f.$stCombo,0); \n";
     $stJs .= "f.$stCombo.options[0] = new Option('Selecione','', 'selected');\n";
     $stJs .= "f.".$stCombo."Txt.value='$stSelecionado';\n";
-    $inCodTipoNorma = (trim($_POST[$stFiltro]) != "") ? trim($_POST[$stFiltro]) : Sessao::read("inCodTipoNorma");
+    $inCodTipoNorma = (trim($_REQUEST[$stFiltro]) != "") ? trim($_REQUEST[$stFiltro]) : Sessao::read("inCodTipoNorma");
     if ($inCodTipoNorma != "") {
         include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPadrao.class.php" );
         $obRFolhaPagamentoPadrao = new RFolhaPagamentoPadrao;
@@ -2079,15 +2140,12 @@ function preencheSubDivisao()
         while ( !$rsSubDivisao->eof() ) {
             $inCodSubDivisao  = $rsSubDivisao->getCampo( "cod_sub_divisao" );
             $stSubDivisao     = $rsSubDivisao->getCampo( "nom_sub_divisao" );
-            $arAcao = explode("_",$_POST['stAcao']);
-            if ($arAcao[0] == 'alterar') {
-                if ($inCodSubDivisao == $_REQUEST["inCodSubDivisao"]) {
-                    $stSelected = "selected";
-                    $js .= "f.inCodSubDivisao.value = '".$_REQUEST["inCodSubDivisao"]."'; \n";
-
-                } else {
-                    $stSelected = "";
-                }
+            $arAcao = explode("_",$_REQUEST['stAcao']);
+            if ($inCodSubDivisao == $_REQUEST["inCodSubDivisao"]) {
+                $stSelected = "selected";
+                $js .= "f.inCodSubDivisao.value = '".$_REQUEST["inCodSubDivisao"]."'; \n";
+            } else {
+                $stSelected = "";
             }
             $js .= "f.stSubDivisao.options[$inContador] = new Option('".$stSubDivisao."','".$inCodSubDivisao."','".$stSelected."'); \n";
             $inContador++;
@@ -2123,11 +2181,13 @@ function preencheSubDivisaoFuncao()
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->roUltimoPessoalSubDivisao->listarSubDivisao( $rsSubDivisao, $stFiltro,"", $boTransacao );
         $inContador = 1;
         while ( !$rsSubDivisao->eof() ) {
+            $stSelected       = "";
             $inCodSubDivisao  = $rsSubDivisao->getCampo( "cod_sub_divisao" );
             $stSubDivisao     = $rsSubDivisao->getCampo( "nom_sub_divisao" );
-            $arAcao = explode("_",$_POST['stAcao']);
-            if ($arAcao[0] == 'alterar') {
-                $stSelected = "";
+            $arAcao = explode("_",$_REQUEST['stAcao']);
+            if ($inCodSubDivisao == $_REQUEST["inCodSubDivisaoFuncao"]) {
+                $stSelected = "selected";
+                $js .= "f.inCodSubDivisaoFuncao.value = '".$_REQUEST["inCodSubDivisaoFuncao"]."'; \n";
             }
             $js .= "f.stSubDivisaoFuncao.options[$inContador] = new Option('".$stSubDivisao."','".$inCodSubDivisao."','".$stSelected."'); \n";
             $inContador++;
@@ -2168,11 +2228,11 @@ function preencheCargo()
     $js .= "f.inCodEspecialidadeFuncao.value = ''; \n";
     if ($_REQUEST["inCodSubDivisao"]) {
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
-        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao($_POST['inCodSubDivisao']);
+        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao($_REQUEST['inCodSubDivisao']);
 
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsCargo);
 
-        $arAcao = explode("_",$_POST['stAcao']);
+        $arAcao = explode("_",$_REQUEST['stAcao']);
         if ($arAcao[0] != "alterar") {
             $js .= "f.inCodCargo.value = ''; \n";
             $js .= "limpaSelect(f.stCargo,0); f.stCargo[0] = new Option('Selecione','', 'selected');\n";
@@ -2184,16 +2244,13 @@ function preencheCargo()
         while ( !$rsCargo->eof() ) {
             $inCodCargo = $rsCargo->getCampo( "cod_cargo" );
             $stCargo    = $rsCargo->getCampo( "descricao" );
-            $arAcao = explode("_",$_POST['stAcao']);
-            if ($arAcao[0] == 'alterar') {
-                if ($inCodCargo == $_REQUEST["inCodCargo"]) {
-                    $stSelected = "selected";
-                    $js .= "f.inCodCargo.value = '".$_REQUEST["inCodCargo"]."'; \n";
-                } else {
-                    $stSelected = "";
-                }
+            $arAcao = explode("_",$_REQUEST['stAcao']);
+            if ($inCodCargo == $_REQUEST["inCodCargo"]) {
+                $stSelected = "selected";
+                $js .= "f.inCodCargo.value = '".$_REQUEST["inCodCargo"]."'; \n";
+            } else {
+                $stSelected = "";
             }
-            if( $stSelected != "selected" )
             $js .= "f.stCargo.options[$inContador] = new Option('".$stCargo."','".$inCodCargo."','".$stSelected."'); \n";
             $inContador++;
             $rsCargo->proximo();
@@ -2231,14 +2288,21 @@ function preencheFuncao()
         while ( !$rsFuncao->eof() ) {
             $inCodFuncao = $rsFuncao->getCampo( "cod_cargo" );
             $stFuncao    = $rsFuncao->getCampo( "descricao" );
+            if ($inCodFuncao == $_REQUEST["inCodFuncao"]) {
+                $stSelected = "selected";
+                $js .= "f.inCodFuncao.value = '".$_REQUEST["inCodFuncao"]."'; \n";
+            } else {
+                $stSelected = "";
+            }
             $js .= "f.stFuncao.options[$inContador] = new Option('".$stFuncao."','".$inCodFuncao."','".$stSelected."'); \n";
             $inContador++;
             $rsFuncao->proximo();
         }
     }
     $js .= limpaInformacoesSalariais();
+    $js .= preencheEspecialidadeFuncao();
     $stJs .= $js;
-    if ($_POST['stAcao'] == "alterar") {
+    if ($_REQUEST['stAcao'] == "alterar") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php" );
         $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
@@ -2297,7 +2361,7 @@ function preencheEspecialidade()
         }
         $js .= preencheInformacoesSalariais( $_REQUEST["inCodCargo"] );
     }
-    if ($_POST['stAcao'] == "alterar") {
+    if ($_REQUEST['stAcao'] == "alterar") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php" );
     $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
     $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
@@ -2331,7 +2395,7 @@ function preencheEspecialidadeFuncao()
             $rsEspecialidade->proximo();
         }
     }
-    if ($_POST['stAcao'] == "alterar") {
+    if ($_REQUEST['stAcao'] == "alterar") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php" );
         $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
@@ -2341,7 +2405,7 @@ function preencheEspecialidadeFuncao()
 
     $js .= preencheInformacoesSalariais();
 
-    if ($_POST['stAcao'] == "alterar") {
+    if ($_REQUEST['stAcao'] == "alterar") {
         $js .= "f.dtDataAlteracaoFuncao.value = '$dtCompetenciaFinal';  \n";
     }
 
@@ -2350,11 +2414,11 @@ function preencheEspecialidadeFuncao()
 
 function preenchePreEspecialidadeFuncao()
 {
-    if ($_POST['inCodFuncao'] == $_POST['inCodCargo']) {
+    if ($_REQUEST['inCodFuncao'] == $_REQUEST['inCodCargo']) {
         $stJs .= "f.inCodEspecialidadeFuncao.value = f.inCodEspecialidadeCargo.value; \n";
         $stJs .= "f.stEspecialidadeFuncao.value    = f.inCodEspecialidadeCargo.value; \n";
     }
-    $stJs .= preencheInformacoesSalariais("", $_POST['inCodEspecialidadeCargo'], "");
+    $stJs .= preencheInformacoesSalariais("", $_REQUEST['inCodEspecialidadeCargo'], "");
 
     return $stJs;
 }
@@ -2362,9 +2426,9 @@ function preenchePreEspecialidadeFuncao()
 function preencheInformacoesSalariais($inCodFuncao = "", $inCodEspecialidadeFuncao = "", $stDataProgressao = "")
 {
     include_once ( CAM_GRH_PES_NEGOCIO."RPessoalCargo.class.php" );
-    $inCodFuncao              = $inCodFuncao              ? $inCodFuncao              : $_POST["stFuncao"];
-    $inCodEspecialidadeFuncao = $inCodEspecialidadeFuncao ? $inCodEspecialidadeFuncao : $_POST["stEspecialidadeFuncao"];
-    $stDataProgressao         = $stDataProgressao         ? $stDataProgressao         : $_POST["dtDataProgressao"];
+    $inCodFuncao              = $inCodFuncao              ? $inCodFuncao              : $_REQUEST["stFuncao"];
+    $inCodEspecialidadeFuncao = $inCodEspecialidadeFuncao ? $inCodEspecialidadeFuncao : $_REQUEST["stEspecialidadeFuncao"];
+    $stDataProgressao         = $stDataProgressao         ? $stDataProgressao         : $_REQUEST["dtDataProgressao"];
     $stHorasMensais           = "";
     $stHorasSemanais          = "";
     $inCodPadrao              = "";
@@ -2418,7 +2482,7 @@ function preencheInformacoesSalariais($inCodFuncao = "", $inCodEspecialidadeFunc
             $js .= "f.stPadrao.value = '".$inCodPadrao."'; \n";
         }
     }
-    if ($_POST['stAcao'] == "alterar") {
+    if ($_REQUEST['stAcao'] == "alterar") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php" );
         $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
@@ -2470,8 +2534,8 @@ function preencheProgressao($inCodPadrao)
         include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPadrao.class.php" );
         $inCodProgressao  = "";
         $stLblProgressao  = "&nbsp;";
-        //$inCodPadrao      = $_POST['inCodPadrao'];
-        $stDataProgressao = $_POST['dtDataProgressao'];
+        //$inCodPadrao      = $_REQUEST['inCodPadrao'];
+        $stDataProgressao = $_REQUEST['dtDataProgressao'];
         if ($inCodPadrao != "" and $stDataProgressao != "") {
             //calcula diferença de meses entre datas
             $stDataProgressao    = explode('/',$stDataProgressao);
@@ -2523,7 +2587,7 @@ function calculaSalario($inCodPadrao = "", $inCodProgressao = "", $inHorasMensai
     //O valor do $_REQUEST["stHorasMensais"] é setado na função preencheInformacoesSalariais
     $inHorasMensais = $inHorasMensais != ""   ? $inHorasMensais   : $_REQUEST["stHorasMensais"];
     //Para quando o calculaSalario é chamado sem ter passado pelo preencheInformacoesSalariais
-    $inHorasMensais = $inHorasMensais   ? $inHorasMensais   : $_POST["stHorasMensais"];
+    $inHorasMensais = $inHorasMensais   ? $inHorasMensais   : $_REQUEST["stHorasMensais"];
     $nuSalario = "";
 
     if ($inCodPadrao != "") {
@@ -2568,7 +2632,7 @@ function validarVigenciaSalario()
     if ($stValida != "") {
         $stJs .= $stValida;
     } else {
-        if ( sistemaLegado::comparaDatas(Sessao::read('dtVigenciaSalario'),$_POST['dtVigenciaSalario']) ) {
+        if ( sistemaLegado::comparaDatas(Sessao::read('dtVigenciaSalario'),$_REQUEST['dtVigenciaSalario']) ) {
             $stMensagem = "A vigência deve ser posterior a ".Sessao::read('dtVigenciaSalario');
             $stJs .= "alertaAviso('$stMensagem','form','erro','".Sessao::getId()."');       \n";
             $stJs .= "f.dtVigenciaSalario.value = '".Sessao::read('dtVigenciaSalario')."';";
@@ -2869,6 +2933,34 @@ function preencheProgressaoAlterar()
 }
 
 
+function buscaContrato($codMatricula = '', $boCarregaAssentamento = true){
+    $codContrato = "";
+    $inRegistro = "";
+    $stJs = "";
+    
+    if($codMatricula!=''){
+        $obRPessoalServidor = new RPessoalServidor();
+        $obRPessoalServidor->addContratoServidor();
+        $obRPessoalServidor->roUltimoContratoServidor->setRegistro( $codMatricula );
+        $obRPessoalServidor->roUltimoContratoServidor->listarContratos($rsContrato);
+        while (!$rsContrato->eof()) {
+            $codContrato = $rsContrato->getCampo("cod_contrato");
+            $inRegistro = $rsContrato->getCampo("registro");
+            $_REQUEST['inCodContrato'] = $codContrato;
+            $_REQUEST['inCodMatricula'] = $inRegistro;
+            $_REQUEST['inContrato'] = $codMatricula;
+            $rsContrato->proximo();
+        }
+    }
+    
+    if($boCarregaAssentamento){
+        $stJs .= "f.inCodContrato.value = '".$codContrato."';";
+        $stJs .= "f.inCodMatricula.value = '".$inRegistro."';";
+        $stJs .= processarQuantDiasAssentamento();
+    }
+    
+    return $stJs;
+}
 
 switch ($request->get('stCtrl')) {
     case "incluirNorma":
@@ -2940,6 +3032,9 @@ switch ($request->get('stCtrl')) {
     case "preencheClassificacao":
         $stAjaxReturn = preencheClassificacao($_REQUEST['inCod'], $_REQUEST['combo_type']);
         break;
+    case "buscaContrato":
+        $stJs .= buscaContrato($_REQUEST['inContrato']);
+    break;
     case "preencheSubDivisao":
         $stJs .= preencheSubDivisao();
         break;
@@ -2964,14 +3059,14 @@ switch ($request->get('stCtrl')) {
     case "preencheInformacoesSalariais":
         $stJs .= preencheInformacoesSalariais();
         break;
-    case "validaDataAlteracaoFuncao":
-        $stJs .= comparaComDataNascimento("dtDataAlteracaoFuncao","Data da Alteração da Função");
-        break;
+    // case "validaDataAlteracaoFuncao":
+    //     $stJs .= comparaComDataNascimento("dtDataAlteracaoFuncao","Data da Alteração da Função");
+    //     break;
     case "preencheProgressao":
-        $stJs .= preencheProgressao($_POST['inCodPadrao']);
+        $stJs .= preencheProgressao($_REQUEST['inCodPadrao']);
         break;
     case "calculaSalario":
-        $stJs .= calculaSalario($_POST['inCodPadrao'],$_POST['inCodProgressao']);
+        $stJs .= calculaSalario($_REQUEST['inCodPadrao'],$_REQUEST['inCodProgressao']);
         break;
     case "validarVigenciaSalario":
         $stJs .= validarVigenciaSalario();

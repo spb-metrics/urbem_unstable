@@ -555,10 +555,8 @@ if ( $rsConcursoCandidato->getNumLinhas() != -1 ) {
     $obFormulario->addComponenteComposto( $obTxtCodTipoNorma , $obCmbTipoNorma );
     $obFormulario->addComponenteComposto( $obTxtCodNorma , $obCmbNorma         );
     $obFormulario->addComponente        ( $obLblLinkNorma                      );
-    if ($stAcao != 'incluir') {
-        $obFormulario->addComponenteComposto( $obTxtEditalHomologacao ,$obCmbEditalHomologacao );
-        $obFormulario->addComponente        ( $obLblDtHomologacao                  );
-    }
+    $obFormulario->addComponenteComposto( $obTxtEditalHomologacao ,$obCmbEditalHomologacao );
+    $obFormulario->addComponente        ( $obLblDtHomologacao                  );
     $obFormulario->addComponente        ( $obTxtDtAplicacao                    );
     $obFormulario->addComponente        ( $obTxtValidade                       );
     $obFormulario->addComponente        ( $obTxtNotaMinima                     );

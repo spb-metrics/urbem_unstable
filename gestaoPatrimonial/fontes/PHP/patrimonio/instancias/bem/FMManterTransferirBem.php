@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FMManterTransferirBem.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterTransferirBem.php 61462 2015-01-20 13:17:23Z diogo.zarpelon $
 
     * Casos de uso: uc-03.01.06
 */
@@ -40,15 +40,15 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
-include_once( CAM_GP_PAT_COMPONENTES."IPopUpBem.class.php");
+include_once CAM_GP_PAT_COMPONENTES."IPopUpBem.class.php";
 
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganogramaLocal.class.php";
-
-include_once( CAM_GA_ADM_MAPEAMENTO."TLocal.class.php" );
+include_once CAM_GA_ORGAN_MAPEAMENTO."TOrganogramaOrganograma.class.php";
+include_once CAM_GA_ADM_MAPEAMENTO."TLocal.class.php" ;
 include_once CAM_GA_ORGAN_MAPEAMENTO."TOrganogramaLocal.class.php";
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php" );
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioSituacaoBem.class.php" );
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php" ;
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioSituacaoBem.class.php";
 
 $stPrograma = "ManterTransferirBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -58,7 +58,18 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
+
+# Recupera o Organograma Ativo no sistema.
+$obTOrganogramaOrganograma = new TOrganogramaOrganograma;
+$obTOrganogramaOrganograma->setDado('ativo', true);
+$obTOrganogramaOrganograma->recuperaOrganogramasAtivo($rsOrganogramaAtivo);
+
+$inCodOrganogramaAtivo = $rsOrganogramaAtivo->getCampo('cod_organograma');
+
+$obHdnOrganogramaAtivo = new Hidden;
+$obHdnOrganogramaAtivo->setName ("inCodOrganogramaAtivo" );
+$obHdnOrganogramaAtivo->setValue($inCodOrganogramaAtivo);
 
 include_once( $pgJs );
 
@@ -99,10 +110,24 @@ $obSpnBem = new Span();
 $obSpnBem->setId( 'spnBem' );
 
 //recupera bens para a localizacao
-$obTPatrimonioBem = new TPatrimonioBem();
-$stFiltro = "
-    WHERE historico_bem.cod_orgao = ".$_REQUEST['hdnUltimoOrgaoSelecionado']."
-      AND historico_bem.cod_local = ".$_REQUEST['inCodLocal']." ";
+$obTPatrimonioBem = new TPatrimonioBem;
+
+$stFiltro = " WHERE 1=1 ";
+
+if (!empty($_REQUEST['hdnUltimoOrgaoSelecionado'])) {
+    $stFiltro .= "
+          AND historico_bem.cod_orgao = ".$_REQUEST['hdnUltimoOrgaoSelecionado']."
+          AND historico_bem.cod_local = ".$_REQUEST['inCodLocal']." ";
+    
+} else {
+    $stMensagem = "Selecione o Organograma";
+    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,$stMensagem,"erro","aviso", Sessao::getId(), "../");
+}
+
+if (!empty($_REQUEST['inNumResponsavelAtual'])){
+    $stFiltro .= " AND bem_responsavel.numcgm = ".$_REQUEST['inNumResponsavelAtual'];
+}
+
 $obTPatrimonioBem->recuperaRelacionamentoTransferencia( $rsBens, $stFiltro,' ORDER BY cod_bem' );
 
 $obLista = new Lista;
@@ -222,7 +247,7 @@ $obLblIMontaOrganograma->setComponenteSomenteLeitura(true);
 $obLblIMontaOrganograma->setHiddenInformacoes(false);
 
 //instancia o componenete IMontaOrganograma
-$obIMontaOrganograma = new IMontaOrganograma(true);
+$obIMontaOrganograma = new IMontaOrganograma(false);
 $obIMontaOrganograma->setCodOrgao($codOrgao);
 $obIMontaOrganograma->setRotuloComboOrganograma('Organograma Destino');
 $obIMontaOrganograma->setCadastroOrganograma(true);
@@ -254,7 +279,7 @@ $obIPopUpCGMResponsavel->setName             ( 'stNomResponsavel'       );
 $obIPopUpCGMResponsavel->setId               ( 'stNomResponsavel'       );
 $obIPopUpCGMResponsavel->obCampoCod->setName ( 'inCodResponsavel'       );
 $obIPopUpCGMResponsavel->obCampoCod->setId   ( 'inCodResponsavel'       );
-$obIPopUpCGMResponsavel->setNull             ( true                     );
+$obIPopUpCGMResponsavel->setNull             ( false                     );
 
 //Gerar Termo
 $obCheckBoxEmitirTermo = new CheckBox;
@@ -280,6 +305,7 @@ $obFormulario->addForm      ( $obForm );
 $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addHidden    ( $obHdnLocalOrigem );
+$obFormulario->addHidden    ( $obHdnOrganogramaAtivo );
 
 $obFormulario->addTitulo( 'Localização de Origem' );
 $obLblIMontaOrganograma->geraFormulario( $obFormulario );

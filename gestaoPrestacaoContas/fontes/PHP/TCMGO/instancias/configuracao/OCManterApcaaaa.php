@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Página de Formulário para configuração
     * Data de Criação   : 30s/04/2007
 
@@ -31,7 +28,7 @@
 
     * @ignore
 
-    * $Id: OCManterApcaaaa.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterApcaaaa.php 61679 2015-02-25 13:07:38Z evandro $
 
     * Casos de uso : uc-06.04.00
 */
@@ -53,9 +50,12 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 
 $stCtrl = $_REQUEST['stCtrl'];
+$arContas = Sessao::read('arContas');
+$arExcluidas = Sessao::read('arExcluidas');
 
 function montaLista($arConta)
 {
+    
     $rsConta = new RecordSet();
     if ( is_array($arConta) ) {
         $rsConta->preenche( $arConta );
@@ -85,13 +85,10 @@ function montaLista($arConta)
     $stHTML = str_replace( "  " ,"" ,$stHTML );
     $stHTML = str_replace( "'","\\'",$stHTML );
 
-    $stJs = "document.getElementById('spnContas').innerHTML = '".$stHTML."';";
+    $stJs .= "document.getElementById('spnContas').innerHTML = '".$stHTML."';";
 
     return $stJs;
 }
-
-$arContas = Sessao::read('arContas');
-$arExcluidas = Sessao::read('arExcluidas');
 
 switch ($stCtrl) {
     case 'buscaEstrutural' :
@@ -112,14 +109,16 @@ switch ($stCtrl) {
                                             ) ";
         $obTContabilidadePlanoAnalitica->recuperaContaAnalitica( $rsConta, $stFiltro );
         if ( $rsConta->getNumLinhas() > 0 ) {
-            $stJs = "document.getElementById('stConta').innerHTML = '".$rsConta->getCampo('nom_conta')."'; ";
+            $stJs .= "document.getElementById('stConta').innerHTML = '".$rsConta->getCampo('nom_conta')."'; ";
         } else {
             $stJs.= "alertaAviso('@Código estrutural inválido!', 'form','erro','".Sessao::getId()."');";
             $stJs.= "document.getElementById('stConta').innerHTML = '&nbsp;';";
             $stJs.= "document.getElementById('inCodConta').value = '';";
         }
         break;
+    
     case 'incluirConta' :
+        $arContas = Sessao::read('arContas');
         if ($_REQUEST['inCodConta'] == '') {
             $stMensagem = 'Conta inválida!';
         }
@@ -128,35 +127,45 @@ switch ($stCtrl) {
             $stMensagem = 'Preencha o tipo do lançamento!';
         }
 
-        if ( count( $arContas ) > 0 ) {
-            foreach ($arContas as $arAux) {
-                foreach ($arAux as $arContas) {
-                    if ($arContas['cod_plano'] == $_REQUEST['inCodConta']) {
+        if ( count( $arContas['arContas_'.$_REQUEST['inTipoLancamento']] ) > 0 ) {
+            foreach ($arContas['arContas_'.$_REQUEST['inTipoLancamento']] as $arAux) {
+                if ( $arAux['cod_plano'] == $_REQUEST['inCodConta'] ) {
                         $stMensagem = 'Esta conta já consta na lista!';
                         break;
-                    }
                 }
             }
         }
 
-        if (!$stMensagem) {
+        if (!$stMensagem) {            
+            
             $inCount = count($arContas['arContas_'.$_REQUEST['inTipoLancamento']]);
 
             $obTContabilidadePlanoAnalitica = new TContabilidadePlanoAnalitica();
             $stFiltro.= " AND pa.exercicio = '".Sessao::getExercicio()."' ";
             $stFiltro.= " AND pa.cod_plano = ".$_REQUEST['inCodConta']." ";
             $obTContabilidadePlanoAnalitica->recuperaContaAnalitica( $rsConta, $stFiltro );
-            $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$inCount]['id'] = $inCount;
-            $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$inCount]['cod_estrutural'] = $rsConta->getCampo('cod_estrutural');
-            $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$inCount]['cod_plano'] = $rsConta->getCampo('cod_plano');
-            $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$inCount]['nom_conta'] = $rsConta->getCampo('nom_conta');
-            $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$inCount]['tipo_lancamento'] = $_REQUEST['inTipoLancamento'];
-
-            Sessao::write('arContas', $arContas);
-
-            $stJs.= montaLista( $arContas['arContas_'.$_REQUEST['inTipoLancamento']] );
+            
+            for($i=0; $i <= $inCount; $i++){                                                
+                if ( $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['id'] === $i ) {
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['id']              = $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['id'];
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_estrutural']  = $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_estrutural'];
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_plano']       = $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_plano'];
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['nom_conta']       = $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['nom_conta'];
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['tipo_lancamento'] = $arContas['arContas_'.$_REQUEST['inTipoLancamento']][$i]['tipo_lancamento'];
+                } else {                    
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['id']              = $inCount;
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_estrutural']  = $rsConta->getCampo('cod_estrutural');
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['cod_plano']       = $rsConta->getCampo('cod_plano');
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['nom_conta']       = $rsConta->getCampo('nom_conta');
+                    $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']][$i]['tipo_lancamento'] = $_REQUEST['inTipoLancamento'];
+                }                       
+            }            
+            Sessao::write('arContas', $arContasAux);
+       
             $stJs.= "document.getElementById('stConta').innerHTML = '&nbsp;';";
             $stJs.= "document.getElementById('inCodConta').value = '';";
+            $stJs.= montaLista( $arContasAux['arContas_'.$_REQUEST['inTipoLancamento']] );
+            
             if (count($arExcluidas['arExcluidas_'.$_REQUEST['inTipoLancamento']]) > 0) {
                 foreach ($arExcluidas['arExcluidas_'.$_REQUEST['inTipoLancamento']] as $arAux) {
                     if ( $arAux['cod_plano'] != $rsConta->getCampo('cod_plano') ) {
@@ -170,9 +179,10 @@ switch ($stCtrl) {
             $stJs .= "alertaAviso('@".$stMensagem."!', 'form','erro','".Sessao::getId()."');";
         }
         break;
+    
     case 'excluirListaItens' :
         $i=0;
-        foreach ($arContas['arContas_'.$_REQUEST['tipo_lancamento']] as $arAux) {
+        foreach ($arContas['arContas_'.$_REQUEST['tipo_lancamento']] as $arAux) {                        
             if ($arAux['id'] != $_REQUEST['id']) {
                 $arTemp[$i] = $arAux;
                 $arTemp[$i]['id'] = $i;
@@ -183,10 +193,11 @@ switch ($stCtrl) {
                 Sessao::write('arExcluidas', $arExcluidas);
             }
         }
-        $arContas['arContas_'.$_REQUEST['tipo_lancamento']] = $arTemp;
+        $arContas['arContas_'.$_REQUEST['tipo_lancamento']] = $arTemp;        
         Sessao::write('arContas', $arContas);
-        $stJs = montaLista( $arContas['arExcluidas_'.$_REQUEST['tipo_lancamento']] );
+        $stJs .= montaLista( $arContas['arContas_'.$_REQUEST['tipo_lancamento']] );
         break;
+    
     case 'preencheLista' :
         if ($_REQUEST['inTipoLancamento'] != '') {
             $obTTGOBalancoApcaaaa = new TTGOBalancoApcaaaa();
@@ -222,7 +233,9 @@ switch ($stCtrl) {
             }
         }
         Sessao::write('arContas', $arContas);
-        $stJs.= montaLista( $arContas['arContas_'.$_REQUEST['inTipoLancamento']] );
+        $stJs .= montaLista( $arContas['arContas_'.$_REQUEST['inTipoLancamento']] );
         break;
 }
 echo $stJs;
+
+?>

@@ -21,8 +21,7 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?php
+
 /**
   * Página de Formulario para Relatorio de dados do calculo realizado
   * Data de criação : 03/01/2006
@@ -30,7 +29,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: FMRelatorioExecucao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMRelatorioExecucao.php 61457 2015-01-19 13:55:53Z carolina $
 
     Caso de uso: uc-05.03.05
 **/
@@ -400,8 +399,11 @@ if ($stTipoCalculo != 'geral') {
     unset( $arNovoTudo );
 }
 
-$rsCalculosErro = Sessao::read('arCalculoErro');
-IF( $rsCalculosErro ){
+$arCalculosErro = Sessao::read('arCalculoErro');
+IF( $arCalculosErro ){
+    
+    $rsCalculosErro = new RecordSet;
+    $rsCalculosErro->preenche ( $arCalculosErro );
     $rsCalculosErro->addFormatacao ( 'NUMERIC_BR' , 'valor' );
     $rsCalculosErro->ordena ('registro');
 

@@ -81,4 +81,12 @@ function somatorio( inQtdLinhas, inQtdColunas, inLinhaCorrente, inColunaCorrente
     
 }
 
+function validaRequest(){    
+    jQuery("input[name^='inCelula']").each(function(){            
+        if (!jQuery(this).val() || jQuery(this).val() == '0.00' || jQuery(this).val() == '0,00' || jQuery(this).val() == 0.00){
+            jQuery(this).attr('disabled', 'disabled');
+        }
+    });
+}
+
 </script>

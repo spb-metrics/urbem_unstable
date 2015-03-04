@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLExportacaoBalanco.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLExportacaoBalanco.php 61571 2015-02-09 13:28:01Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -93,10 +93,11 @@ $obRdbTipoExportArqCompactado->setValue ( "compactados"     );
 $arNomeArquivos = array(
                        'AFD.txt',
                        'AFR.txt',
-                    // 'APB.txt',
-                        'APC.txt',
+                       'APB.txt',
+                       'APC.txt',
                        'BLP.txt',
                        'COM.txt',
+                       'DDA.txt',
                        'DES.txt',
                        'IdeBalanco.txt',
                        'OrgaoBalanco.txt',

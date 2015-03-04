@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TOrcamentoDespesa.class.php 59856 2014-09-16 13:49:58Z lisiane $
+    $Id: TOrcamentoDespesa.class.php 61640 2015-02-19 13:32:40Z michel $
 
     $Revision: 30668 $
     $Name$
@@ -408,7 +408,6 @@ function montaRecuperaDotacao()
     $stSql .= "            SELECT                                                       \n";
     $stSql .= "                R.cod_despesa,                                           \n";
     $stSql .= "                R.exercicio,                                             \n";
-    $stSql .= "                R.dt_validade_final,                                     \n";
     $stSql .= "                coalesce(sum(R.vl_reserva),0.00) as vl_reserva           \n";
     $stSql .= "            FROM                                                         \n";
     $stSql .= "                orcamento.reserva_saldos        AS R                     \n";
@@ -424,7 +423,7 @@ function montaRecuperaDotacao()
     if ($this->getDado("stDataInicial")) {
        $stSql .= "        AND  R.dt_inclusao BETWEEN to_date('".$this->getDado("stDataInicial")."'::varchar,'dd/mm/yyyy') AND to_date('".$this->getDado("stDataFinal")."'::varchar,'dd/mm/yyyy') \n";
     }
-    $stSql .= "        GROUP BY R.cod_despesa, R.exercicio, R.dt_validade_final         \n";
+    $stSql .= "        GROUP BY R.cod_despesa, R.exercicio                              \n";
     $stSql .= "        )            as RS ON                                            \n";
     $stSql .= "            D.cod_despesa   = RS.cod_despesa    AND                      \n";
     $stSql .= "            D.exercicio     = RS.exercicio                               \n";

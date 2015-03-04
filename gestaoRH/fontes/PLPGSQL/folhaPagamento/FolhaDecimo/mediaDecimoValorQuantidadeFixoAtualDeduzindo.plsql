@@ -78,7 +78,7 @@ BEGIN
     stAdmissaoPosse := selectIntoVarchar('SELECT configuracao.valor
                                    FROM administracao.configuracao 
                                   WHERE cod_modulo = 22
-                                    AND parametro =  ''dtContagemInicial'' '||stEntidade||' 
+                                    AND parametro =  ''dtContagemInicial'||stEntidade||' ''
                                     AND exercicio = '||quote_literal(stExercicio));    
     IF stAdmissaoPosse = 'dtPosse' THEN
         dtDataAdmissao := selectIntoVarchar('SELECT contrato_servidor_nomeacao_posse.dt_posse

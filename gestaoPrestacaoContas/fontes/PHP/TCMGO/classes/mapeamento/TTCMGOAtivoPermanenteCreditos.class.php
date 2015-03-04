@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoPermanenteCreditos.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTCMGOAtivoPermanenteCreditos.class.php 61679 2015-02-25 13:07:38Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -54,18 +54,21 @@ class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
         $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
         $stSql = "
                     SELECT
-                         *
+                        0::integer AS numero_registro
+                       , 10::integer AS tipo_registro
+                       , 0.00 AS vl_cancelamento
+                       , 0.00 AS vl_encampacao
+                        ,*
                      FROM
                        tcmgo.ativo_permanente_creditos ( '" .$this->getDado( 'exercicio' ) .  "'
-                                                     , 'cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." )
-                                                    and tipo <> ''I''
-                                                    and cod_estrutural like ''1.%''
-                                                    ' ,'$stDataIni','$stDataFim','')
+                                                        , ' cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." ) and cod_estrutural like ''1.%'' ' 
+                                                        ,'".$stDataIni."'
+                                                        ,'".$stDataFim."')
                          as retorno ( cod_estrutural varchar
                                      ,nivel integer
                                      ,nom_conta varchar
-                                     ,num_orgao integer
-                                     ,cod_unidade integer
+                                     ,num_orgao text
+                                     ,cod_unidade text
                                      ,vl_saldo_anterior numeric
                                      ,vl_saldo_debitos  numeric
                                      ,vl_saldo_creditos numeric

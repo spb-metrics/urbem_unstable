@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Classe de mapeamento da tabela licitacao.publicacao_contrato
     * Data de Criação: 12/10/2006
 
@@ -84,7 +81,7 @@ class TLicitacaoPublicacaoContratoAditivos extends Persistente
         $stSql .= "	    ON sw_cgm.numcgm        = publicacao_contrato_aditivos.numcgm 	                    \n";
         $stSql .= "      WHERE num_contrato         = ".$this->getDado('num_contrato')."	                    \n";
         $stSql .= "        AND exercicio            = ".$this->getDado('exercicio')." 		                    \n";
-        $stSql .= "        AND exercicio_contrato   = '".$this->getDado('exercicio_contrato')."'                    \n";
+        $stSql .= "        AND exercicio_contrato   = ".$this->getDado('exercicio_contrato')."                    \n";
         $stSql .= "	   AND cod_entidade         = ".$this->getDado('cod_entidade')."                            \n";
 
         if ($this->getDado('num_aditivo') != '') {

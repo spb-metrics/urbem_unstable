@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterBem.php 60864 2014-11-19 17:50:29Z arthur $
+    * $Id: OCManterBem.php 61522 2015-01-29 18:33:35Z carlos.silva $
 
 */
 
@@ -1088,6 +1088,40 @@ case 'montaListaDepreciacoes':
            
         }
         
+    break;
+
+    case "montaObra":
+            include_once TTGO.'TTGOObras.class.php';
+            include_once TTGO.'TTGOPatrimonioBemObra.class.php';
+            
+            $obTTGOObras = new TTGOObras;
+            $obTTGOObras->recuperaTodos($rsObra);                
+            
+            $obCmbObra = new Select;
+            $obCmbObra->setTitle     ( "Selecione a Obra"        );
+            $obCmbObra->setName      ( "inCodObra"               );
+            $obCmbObra->setId        ( "inCodObra"               );
+            $obCmbObra->setRotulo    ( "Bens imóveis / Obra"     );
+            $obCmbObra->addOption    ( '', 'Selecione'           );
+            $obCmbObra->setCampoId   ( "[ano_obra]|[cod_obra]"   );
+            $obCmbObra->setCampoDesc ( "[ano_obra] - [cod_obra]" );
+            $obCmbObra->preencheCombo( $rsObra                   );
+            
+            if(isset($_REQUEST['inCodBem'])) {
+                $obTTGOPatrimonioBemObra = new TTGOPatrimonioBemObra;
+                $obTTGOPatrimonioBemObra->setDado('cod_bem', $_REQUEST['inCodBem']);
+                $obTTGOPatrimonioBemObra->recuperaPorChave($rsPatrimonioBemObra);
+                
+                $obCmbObra->setValue($rsPatrimonioBemObra->getCampo('ano_obra').'|'.$rsPatrimonioBemObra->getCampo('cod_obra'));
+            }
+        
+            $obFormulario = new Formulario;
+            $obFormulario->addTitulo	( 'Obra' );  
+            $obFormulario->addComponente( $obCmbObra );
+            $obFormulario->montaInnerHTML();
+            $stHtml = $obFormulario->getHTML();
+            
+            $stJs .= "document.getElementById('spnListaObra').innerHTML = '".$stHtml."'; \n";
     break;
 }
 

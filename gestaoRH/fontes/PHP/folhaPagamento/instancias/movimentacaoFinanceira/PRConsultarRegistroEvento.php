@@ -74,20 +74,20 @@ switch ($_POST["stTipoFiltro"]) {
         $stCodigos = substr($stCodigos,0,strlen($stCodigos)-1);
         break;
 }
-$stCodigos = ($stCodigos == "")?"null":$stCodigos;
+$stCodigos = ($stCodigos == "")?"0":$stCodigos;
 
 $preview = new PreviewBirt(4,27,30);
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setReturnURL( CAM_GRH_FOL_INSTANCIAS."movimentacaoFinanceira/FLConsultarRegistroEvento.php");
 $preview->setTitulo('Registros de Evento');
 $preview->setNomeArquivo('consultarRegistroEvento');
-$preview->addParametro("entidade", Sessao::getCodEntidade());
-$preview->addParametro("stEntidade", Sessao::getEntidade());
+$preview->addParametro("entidade"                , Sessao::getCodEntidade());
+$preview->addParametro("stEntidade"              , Sessao::getEntidade());
 $preview->addParametro("inCodPeriodoMovimentacao", $rsPeriodoMovimentaco->getCampo("cod_periodo_movimentacao"));
-$preview->addParametro("stTipoFiltro", $_POST["stTipoFiltro"]);
-$preview->addParametro("stCodigos", $stCodigos);
-$preview->addParametro("inCodConfiguracao", $_POST["inCodConfiguracao"]);
-$preview->addParametro("inCodComplementar", $_POST["inCodComplementar"]);
+$preview->addParametro("stTipoFiltro"            , $_POST["stTipoFiltro"]);
+$preview->addParametro("stCodigos"               , $stCodigos);
+$preview->addParametro("inCodConfiguracao"       , $_POST["inCodConfiguracao"]);
+$preview->addParametro("inCodComplementar"       , $_POST["inCodComplementar"]);
 $preview->preview();
 
 ?>

@@ -32,7 +32,7 @@
  * @author Analista: Lucas Stephanou
  * @author Desenvolvedor: Lucas Stephanou
  *
- * $Id: PreviewBirt.class.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: PreviewBirt.class.php 61606 2015-02-12 16:07:01Z diogo.zarpelon $
  * Casos de uso: uc-01.00.00
  *
  ***********************************************************************/
@@ -286,7 +286,7 @@ class PreviewBirt
         $this->arParametros = array();
         $this->setFormato("html");
         $this->setNomeArquivo(null);
-        $this->setVersaoBirt("2.1.1");
+        $this->setVersaoBirt("2.5.0");
         $this->addParametro("inCodGestao", $inCodGestao);
         $this->addParametro("inCodModulo", $inCodModulo);
         $this->addParametro("inCodRelatorio", $inCodRelatorio);
@@ -310,9 +310,9 @@ class PreviewBirt
 
     public function addParametro($stNome, $stValor)
     {
-        if ( mb_check_encoding($stValor, "UTF-8") ) {
-            $stValor = utf8_decode($stValor);
-        }
+        #if ( mb_check_encoding($stValor, "UTF-8") ) {
+        #    $stValor = utf8_decode($stValor);
+        #}
 
         if (in_array(array(
 
@@ -397,6 +397,10 @@ class PreviewBirt
 
     public function preview()
     {
+        # Aguardando testes para envio do novo Viewer.
+        # Todos os relatórios do Urbem serão exibidos no Viewer 4.4.0
+        # $this->setVersaoBirt('4.4.0');
+
         # Instancia da classe Conexao
         $obConexao = new Conexao();
 

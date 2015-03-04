@@ -56,7 +56,7 @@ $stDataHoje     = SistemaLegado::dataExtenso(date('Y-m-d'));
 
 $preview->addParametro("exercicio_inventario" , $_REQUEST['stExercicio']);
 $preview->addParametro("id_inventario"        , $_REQUEST['inIdInventario']);
-$preview->addParametro("nomMunicipio"         , utf8_encode($nomeMunicipio));
+$preview->addParametro("nomMunicipio"         , $nomeMunicipio);
 $preview->addParametro("dataHoje"             , $stDataHoje);
 
 $preview->preview();

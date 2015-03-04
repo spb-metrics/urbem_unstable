@@ -30,7 +30,7 @@
     * @author Desenvolvedor: Marcelo Boezzio Paulino
     * @ignore
 
-    $Id: LSDespesa.php 60900 2014-11-21 17:39:56Z michel $
+    $Id: LSDespesa.php 61756 2015-03-02 16:03:30Z michel $
 
     $Revision: 31725 $
     $Name$
@@ -247,7 +247,7 @@ $stAcao = "SELECIONAR";
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->setFuncao( true );
-$obLista->ultimaAcao->setLink( "JavaScript:insereDespesa();" );
+$obLista->ultimaAcao->setLink( "JavaScript:window.close();insereDespesa();" );
 $obLista->ultimaAcao->addCampo("1","cod_despesa");
 $obLista->ultimaAcao->addCampo("2","descricao");
 $obLista->commitAcao();

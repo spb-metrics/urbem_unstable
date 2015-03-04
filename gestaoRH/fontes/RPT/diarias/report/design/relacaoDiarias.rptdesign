@@ -432,7 +432,7 @@ this.queryText += "      , contrato.registro															   \n";
 this.queryText += "      , sw_cgm.nom_cgm																   \n";
 this.queryText += "      , norma.num_norma||'/'||norma.exercicio as ato_portaria						   \n";
 this.queryText += "      , norma.dt_publicacao 															   \n";
-this.queryText += "      , trim((select nom_municipio                                                      \n";
+this.queryText += "      , trim((select sem_acentos(nom_municipio)                                         \n";
 this.queryText += "           from sw_municipio                                                            \n";
 this.queryText += "          where cod_municipio = diaria.cod_municipio                                    \n";
 this.queryText += "            and cod_uf = diaria.cod_uf))||'/'||trim((select sigla_uf from sw_uf where cod_uf = diaria.cod_uf)) as destino \n";

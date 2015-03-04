@@ -64,12 +64,14 @@ $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 $pgJS      = "JS".$stPrograma.".js";
 
+ini_set('max_input_vars', '10000');
+
 $obRPrevisaoReceita                 = new ROrcamentoPrevisaoReceita;
 $obROrcamentoPrevisaoOrcamentaria   = new ROrcamentoPrevisaoOrcamentaria;
 $obRConfiguracaoOrcamento           = new ROrcamentoConfiguracao;
 $obROrcamentoReceita                = new ROrcamentoReceita;
-
-$obErro = new Erro;
+$obTransacao                        = new Transacao();
+$obErro                             = new Erro;
 
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
@@ -84,16 +86,17 @@ switch ($stAcao) {
             }
             return ($a<$b) ? -1 : 1;
         }
+        
         $obRPrevisaoReceita->setQtdColunas ( $_POST['inQtdCol'] );
         $obRPrevisaoReceita->setQtdLinhas  ( $_POST['inQtdLin'] );
         $obRPrevisaoReceita->setExercicio  ( Sessao::getExercicio() );
 
         $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->setExercicio( $obRPrevisaoReceita->getExercicio() );
-        $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->consultar( $rsPrevisaoOrcamentaria );
+        $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->consultar( $rsPrevisaoOrcamentaria, $boTransacao );
 
         if ( $obRPrevisaoReceita->getExercicio() != $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->getExercicio() ) {
             $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->setExercicio( $obRPrevisaoReceita->getExercicio() );
-            $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->salvar();
+            $obRPrevisaoReceita->obROrcamentoPrevisaoOrcamentaria->salvar($boTransacao);
         }
 
         $stFiltro = '&stCodReceita='.$_POST['stCodReceita'].'&inCodEntidade='.$_POST['inCodEntidade'];
@@ -116,10 +119,10 @@ switch ($stAcao) {
             if ($arTotal[ $inKey ] != '0,00') {
                 $arValorFuncaoCol[ $inKey ] = (float)$arValorFuncaoCol[ $inKey ];
                 
-                if(floatcmp($arTotal[ $inKey ], $arValorFuncaoCol[ $inKey ]) == 1){
-                //if (round($arTotal[ $inKey ]) > round($arValorFuncaoCol[ $inKey ])) {
+                if(floatcmp($arTotal[ $inKey ], $arValorFuncaoCol[ $inKey ]) == 1){                
                     $obErro->setDescricao( "Total da receita ".$arID[ $inKey ]." não deve ser maior que o valor orçado." );
                     $boSalvar++;
+                    SistemaLegado::LiberaFrames(true,false);
                     break;
                 }
             }
@@ -129,15 +132,17 @@ switch ($stAcao) {
             if ( count($arID) ) {
                 for ( $inContLinhas = 0; $inContLinhas < count($arID); $inContLinhas++) {
                     $obRPrevisaoReceita->setCodigoReceita   ( $arID[$inContLinhas] );
-                    $obErro = $obRPrevisaoReceita->limparDados();
+                    $obErro = $obRPrevisaoReceita->limparDados($boTransacao);
                 }
             }
 
+            $boFlagTransacao = false;
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao ); 
             for ($inContLinhas = 0; $inContLinhas < $_POST['inQtdLin']; $inContLinhas++) {
                 for ($inContColunas = 0; $inContColunas < $_POST['inQtdCol']; $inContColunas++) {
                     $obRPrevisaoReceita->setCodigoReceita   ( $arID[$inContLinhas] );
                     $obRPrevisaoReceita->setPeriodo         ( $inContColunas + 1 );
-                    $inValor = $_REQUEST["inCelula_".$arID[$inContLinhas]."_".$inContColunas."_".$inContLinhas];
+                    $inValor = $_REQUEST["inCelula_".$arID[$inContLinhas]."_".$inContColunas."_".$inContLinhas];                    
                     if ($inValor == "") {
                         $obRPrevisaoReceita->setValorPeriodo ( 0 );
                     } else {
@@ -145,15 +150,17 @@ switch ($stAcao) {
                         $valor = str_replace(',','.',$valor);
                         $obRPrevisaoReceita->setValorPeriodo ( $valor );
                     }
-                    $obErro = $obRPrevisaoReceita->salvar();
+                    $obErro = $obRPrevisaoReceita->salvar($boTransacao);
                     if ( $obErro->ocorreu() ) {
                         break 2;
                     }
                 }
             }
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPrevisaoReceita );
         }
+                
         if ( !$obErro->ocorreu() ) {
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId().$stFiltro, $obRPrevisaoReceita->getCodigoReceita()."/".$obRPrevisaoReceita->getExercicio(), "alterar", "aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId().$stFiltro, "Configuração realizada com sucesso.", "alterar", "aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
         }

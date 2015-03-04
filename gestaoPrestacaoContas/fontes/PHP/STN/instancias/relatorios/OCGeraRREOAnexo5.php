@@ -83,7 +83,7 @@ while (!$rsEntidade->eof()) {
     if ($stValor == "") {
         SistemaLegado::alertaAviso("FLModelosRREO.php?".Sessao::getId()."&stAcao=".$stAcao, $rsEntidade->getCampo('nom_cgm').' não é uma entidade RPPS',"","aviso", Sessao::getId(), "../");
     }
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
     $rsEntidade->proximo();
     $inCount++;
 }
@@ -107,7 +107,7 @@ switch ($request->get('stTipoRelatorio')) {
     case 'Bimestre':
         $preview->addParametro( 'bimestre', $request->get('cmbBimestre') );
         $preview->addParametro( 'periodicidade', "bimestre" );
-        $preview->addParametro( 'periodo_referencia', utf8_encode($request->get('cmbBimestre')."º BIMESTRE DE ".Sessao::getExercicio()) );
+        $preview->addParametro( 'periodo_referencia', $request->get('cmbBimestre')."º BIMESTRE DE ".Sessao::getExercicio() );
         
         $stDataInicial = Bimestre::getDataInicial($request->get('cmbBimestre'), Sessao::getExercicio());
         $stDataFinal = Bimestre::getDataFinal($request->get('cmbBimestre'), Sessao::getExercicio());
@@ -204,7 +204,7 @@ $dtHoraEmissao = date('H:i');
 //necessário codificar os caracteres especias em ascii para o birt interpretar corretamente
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo4novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

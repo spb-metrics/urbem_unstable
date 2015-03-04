@@ -120,7 +120,7 @@ $obFormulario->addTitulo            ( "Escala"                      );
 $obBuscaInnerEscala->geraFormulario($obFormulario);
 $obFormulario->addTitulo            ( "Seleção do Filtro"           );
 $obIFiltroComponentes->geraFormulario($obFormulario);
-$obIFiltroComponentes->getOnload(&$jsOnload);
+$obIFiltroComponentes->getOnload($jsOnload);
 
 $obBtnOk = new Ok();
 if($stAcao == "incluir")

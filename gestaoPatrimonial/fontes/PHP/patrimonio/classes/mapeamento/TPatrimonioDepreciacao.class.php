@@ -190,6 +190,7 @@ class TPatrimonioDepreciacao extends Persistente
 									   
                                                                            WHERE bem_plano_depreciacao.cod_bem   = bem_plano.cod_bem
 									     AND bem_plano_depreciacao.exercicio = bem_plano.exercicio
+                                                                             /*AND bem_plano_depreciacao.exercicio '".$this->getDado('exercicio')."'*/
 								        
                                                                         GROUP BY bem_plano.cod_bem
                                                                                , bem_plano.exercicio )
@@ -240,6 +241,14 @@ class TPatrimonioDepreciacao extends Persistente
         
         if ($this->getDado('cod_bem')) {
             $stSql .= " AND depreciacao.cod_bem = ".$this->getDado('cod_bem');
+        }
+        
+        if ($this->getDado('cod_plano_bem')) {
+            $stSql .= " AND bem_plano_depreciacao.cod_plano = ".$this->getDado('cod_plano_bem');
+        }
+        
+        if ($this->getDado('cod_plano_grupo')) {
+            $stSql .= " AND grupo_plano_depreciacao.cod_plano = ".$this->getDado('cod_plano_grupo');
         }
         
         return $stSql;

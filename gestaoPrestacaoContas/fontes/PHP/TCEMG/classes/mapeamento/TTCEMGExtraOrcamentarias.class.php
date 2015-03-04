@@ -269,9 +269,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao21()
     {
-        $stSql = "
-        
-       SELECT tipo_registro
+        $stSql = "SELECT tipo_registro
              , LPAD( (cod_ext::varchar || dt_lancamento ) ,15,'0') AS cod_reduzido_mov
              , cod_ext
              , cod_font_recurso
@@ -328,7 +326,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                            AND valor_lancamento.cod_entidade = lote.cod_entidade
                            AND valor_lancamento.tipo = lote.tipo
                            AND valor_lancamento.cod_lote = lote.cod_lote
-			   AND valor_lancamento.tipo_valor = 'C'
+			                 AND valor_lancamento.tipo_valor = 'C'
 
                           JOIN contabilidade.conta_credito
                             ON conta_credito.exercicio = valor_lancamento.exercicio
@@ -346,14 +344,19 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                            ON lote.exercicio = plano_analitica.exercicio
                            AND lote.cod_plano = plano_analitica.cod_plano
                            AND lote.tipo = transferencia.tipo
-			    AND lote.cod_entidade =  transferencia.cod_entidade 
+			               AND lote.cod_entidade =  transferencia.cod_entidade 
                            AND lote.cod_lote = transferencia.cod_lote
-                
-                    JOIN contabilidade.plano_recurso
+            ";
+			if($this->getDado('exercicio')>'2014')
+				$stSql .= " LEFT JOIN contabilidade.plano_recurso ";
+			else
+				$stSql .= " INNER JOIN contabilidade.plano_recurso ";
+			
+			$stSql .= "
                          ON plano_recurso.cod_plano = lote.cod_plano
                         AND plano_recurso.exercicio = lote.exercicio 
                            
-                   WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+                    WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
                      AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
                     AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
                     AND transferencia.cod_tipo = 2
@@ -427,10 +430,10 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                            ON lote.exercicio = plano_analitica.exercicio
                            AND lote.cod_plano = plano_analitica.cod_plano
                            AND lote.tipo = transferencia.tipo
-			    AND lote.cod_entidade =  transferencia.cod_entidade 
+			              AND lote.cod_entidade =  transferencia.cod_entidade 
                            AND lote.cod_lote = transferencia.cod_lote
                            
-                    JOIN contabilidade.plano_recurso
+                    LEFT JOIN contabilidade.plano_recurso
                          ON plano_recurso.cod_plano = lote.cod_plano
                         AND plano_recurso.exercicio = lote.exercicio 
 
@@ -455,13 +458,12 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao22()
     {
-        $stSql = "
-            SELECT
+        $stSql = "SELECT
                     22 AS tipo_registro
                     , LPAD( (balancete_extmmaa.cod_plano::varchar || TO_CHAR(lote.dt_lote, 'ddmmyyyy') ) ,15,'0') AS cod_reduzido_mov
                     , COALESCE(lote.vl_lancamento,0.00) AS vl_op
                     , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar AS cod_reduzido_op
-		    , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar||balancete_extmmaa.cod_plano||TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS num_op
+		            , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar||balancete_extmmaa.cod_plano||TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS num_op
                     , COALESCE(documento.nro_documento::varchar,' ') AS num_documento_credor
                     , remove_acentos(plano_conta.nom_conta) AS especificacao_op
                     , documento.tipo AS tipo_documento_credor
@@ -500,11 +502,11 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                      AND conta_debito.sequencia = valor_lancamento.sequencia
                      AND valor_lancamento.tipo = 'T'
                      
-                    WHERE lote.exercicio = '2014' AND lote.tipo = 'T'
+                    WHERE lote.exercicio = '".$this->getDado('exercicio')."' AND lote.tipo = 'T'
                       AND lote.dt_lote BETWEEN TO_DATE ('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE ('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
                     GROUP BY 1,2,3,4,5,6,7
                     ORDER BY lote.cod_lote
-		) AS lote
+		    ) AS lote
               ON lote.exercicio = plano_analitica.exercicio
              AND lote.cod_plano = plano_analitica.cod_plano
              AND lote.tipo = transferencia.tipo
@@ -529,7 +531,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
              AND configuracao_entidade.cod_modulo = 55
              AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
              
-       LEFT JOIN (SELECT cpf
+            LEFT JOIN (SELECT cpf
                        , uniorcam.exercicio
                        
                     FROM sw_cgm_pessoa_fisica
@@ -538,52 +540,64 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                       ON uniorcam.cgm_ordenador = sw_cgm_pessoa_fisica.numcgm 
                      AND uniorcam.num_orgao = 02
                      AND uniorcam.num_unidade = 01
-                ) AS cpfrespop
+            ) AS cpfrespop
               ON cpfrespop.exercicio = balancete_extmmaa.exercicio
               
-       LEFT JOIN tesouraria.recibo_extra_transferencia AS RET
-              ON RET.exercicio = plano_analitica.exercicio
-	     AND RET.cod_lote= transferencia.cod_lote
-	     AND RET.tipo = transferencia.tipo
-             
-            JOIN tesouraria.recibo_extra AS RE
-              ON RE.exercicio = RET.exercicio
-             AND RE.cod_entidade= RET.cod_entidade
-             AND RE.cod_recibo_extra = RET.cod_recibo_extra
-	     AND RE.tipo_recibo = 'D'
-             
-       LEFT JOIN tesouraria.recibo_extra_credor AS REC
+            LEFT JOIN tesouraria.recibo_extra_transferencia AS RET
+                ON RET.exercicio = plano_analitica.exercicio
+	           AND RET.cod_lote= transferencia.cod_lote
+	           AND RET.tipo = transferencia.tipo
+	           AND RET.cod_entidade = transferencia.cod_entidade ";
+        
+		if($this->getDado('exercicio') <= '2014'){
+			$stSql .= "
+				JOIN tesouraria.recibo_extra AS RE
+				  ON RE.exercicio 			= RET.exercicio
+				 AND RE.cod_entidade		= RET.cod_entidade
+				 AND RE.cod_recibo_extra 	= RET.cod_recibo_extra
+				 AND RE.tipo_recibo 		= 'D'
+			";
+		}else{
+			$stSql .= " 
+           LEFT JOIN tesouraria.recibo_extra AS RE
+                  ON plano_analitica.cod_plano	= RE.cod_plano
+                 AND plano_analitica.exercicio  = RE.exercicio
+                 AND RE.tipo_recibo = 'D'
+				";
+		}
+
+		$stSql .= "
+            LEFT JOIN tesouraria.recibo_extra_credor AS REC
               ON REC.exercicio = RE.exercicio
              AND REC.cod_entidade= RE.cod_entidade
              AND REC.cod_recibo_extra = RE.cod_recibo_extra 
              AND REC.tipo_recibo = 'D'
              
-       LEFT JOIN (SELECT sw_cgm.numcgm
-	   	       , CASE WHEN (sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm) THEN 1
-             	              WHEN (sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm) THEN 2	
-            	              WHEN (sw_cgm.cod_pais != sw_pais.cod_pais) THEN 3
-		       END as tipo
-                       , CASE WHEN (sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm) THEN sw_cgm_pessoa_fisica.cpf
-                   	      WHEN (sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm) THEN sw_cgm_pessoa_juridica.cnpj	
-                   	      WHEN (sw_cgm.cod_pais != sw_pais.cod_pais) THEN 0000000000::TEXT
-		       END AS nro_documento
-                       
+            LEFT JOIN (SELECT   sw_cgm.numcgm
+	   	                       , CASE  WHEN (sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm) THEN 1
+             	                       WHEN (sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm) THEN 2	
+            	                       WHEN (sw_cgm.cod_pais != sw_pais.cod_pais) THEN 3
+		                        END as tipo
+                                , CASE  WHEN (sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm) THEN sw_cgm_pessoa_fisica.cpf
+                   	                    WHEN (sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm) THEN sw_cgm_pessoa_juridica.cnpj	
+                   	                    WHEN (sw_cgm.cod_pais != sw_pais.cod_pais) THEN 0000000000::TEXT
+		                          END AS nro_documento
                     FROM sw_cgm
-                    
+
                     JOIN sw_pais
                       ON sw_pais.cod_pais = sw_cgm.cod_pais
                       
-	       LEFT JOIN sw_cgm_pessoa_fisica
-		      ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+	               LEFT JOIN sw_cgm_pessoa_fisica
+		              ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
                       
-	       LEFT JOIN sw_cgm_pessoa_juridica 
-		      ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-                ) AS documento
-	      ON documento.numcgm = REC.numcgm
+	               LEFT JOIN sw_cgm_pessoa_juridica 
+		              ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+            ) AS documento
+	           ON documento.numcgm = REC.numcgm
               
-           WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
-             AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
-             AND transferencia.cod_tipo = 1
+            WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+            AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
+            AND transferencia.cod_tipo = 1
              
         GROUP BY tipo_registro, cod_reduzido_mov, vl_op, especificacao_op, cod_reduzido_op, num_op, num_documento_credor, especificacao_op, cpf_responsavel, dt_pagamento, tipo_documento_credor
         
@@ -685,12 +699,21 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
              
                     JOIN contabilidade.conta_debito
                         ON plano_analitica.exercicio = conta_debito.exercicio
-                        AND plano_analitica.cod_plano = conta_debito.cod_plano
+                        AND plano_analitica.cod_plano = conta_debito.cod_plano ";
 
-	               JOIN contabilidade.plano_recurso
-                        ON plano_recurso.exercicio = balancete_extmmaa.exercicio
-                        AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
-                
+		if($this->getDado('exercicio') <= '2014'){
+			$stSql .= " JOIN contabilidade.plano_recurso
+                          ON plano_recurso.exercicio = balancete_extmmaa.exercicio
+                         AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
+						";
+		}else{
+			$stSql .= "
+					LEFT JOIN contabilidade.plano_recurso
+						   ON plano_recurso.exercicio = balancete_extmmaa.exercicio
+                          AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
+						";
+		}
+		$stSql .= "                
                     LEFT JOIN (
                                 SELECT conta_debito.cod_lote
 			                         , conta_debito.tipo

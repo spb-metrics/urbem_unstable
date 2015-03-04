@@ -35,7 +35,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioRestosPagarAnuladoPagamentoEstorno.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioRestosPagarAnuladoPagamentoEstorno.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
     * Casos de uso : uc-02.03.08
 */
@@ -43,10 +43,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 
-function UTF8($valor)
-{
-    return utf8_encode($valor);
-}
 
 // Faz a verificação, caso a situacao seja 1,2,3, chama o relatorio = 3, senão chama o 4.
 $preview = new PreviewBirt(2, 10, ($_REQUEST['inSituacao'] < 4 ? 3 : 4));
@@ -63,7 +59,7 @@ if ($stIncluirAssinaturas == 'nao') {
 } else {
     $stIncluirAssinaturas = 'sim';
 }
-$preview->addParametro('incluir_assinaturas', UTF8($stIncluirAssinaturas));
+$preview->addParametro('incluir_assinaturas', $stIncluirAssinaturas);
 
 if (count($_REQUEST['inCodEntidade']) > 1) {
     $stWhere = "where exercicio='".Sessao::getExercicio()."' and parametro='cod_entidade_prefeitura'";
@@ -163,7 +159,7 @@ if ($_REQUEST['inCodFornecedor'] != "") {
     $RCGM = new RCGM;
     $RCGM->setNumCGM($_REQUEST["inCodFornecedor"]);
     $RCGM->listar($rsDadosCGM);
-    $stDescFornecedor = UTF8($rsDadosCGM->getCampo("nom_cgm"));
+    $stDescFornecedor = $rsDadosCGM->getCampo("nom_cgm");
     $preview->addParametro('cod_credor', $_REQUEST['inCodFornecedor']);
     $preview->addParametro('nome_credor',
                            $_REQUEST['inCodFornecedor'].' - '.$stDescFornecedor);
@@ -183,7 +179,7 @@ if (trim($_REQUEST['inCodDespesa']) != "") {
     $preview->addParametro('elemento_despesa_masc', $_REQUEST['inCodDespesa']);
 
     $stDespesaDescricao = $_REQUEST['inCodDespesa'].' - '. $stDescricao;
-    $preview->addParametro('despesa_descricao', UTF8($stDespesaDescricao));
+    $preview->addParametro('despesa_descricao', $stDespesaDescricao);
 } else {
     $preview->addParametro('elemento_despesa', '');
     $preview->addParametro('despesa_descricao', '');
@@ -199,7 +195,7 @@ if ($_REQUEST['inCodRecurso'] != "") {
     $stDescricaoRecurso .= ' - '.$rsLista->getCampo("nom_recurso");
 
     $preview->addParametro('cod_recurso'      , $_REQUEST['inCodRecurso']);
-    $preview->addParametro('recurso_descricao', UTF8($stDescricaoRecurso));
+    $preview->addParametro('recurso_descricao', $stDescricaoRecurso);
 } else {
     $preview->addParametro('cod_recurso'      , '');
     $preview->addParametro('recurso_descricao', '');

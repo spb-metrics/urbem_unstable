@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 61326 2015-01-07 11:02:55Z carolina $
+    $Id: TContabilidadePlanoConta.class.php 61473 2015-01-21 13:32:02Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1418,6 +1418,90 @@ function montaRecuperaCodEstrutural()
 
     return $stSql;
 }
+
+function recuperaDadosExportacaoBalVerificacaoEnceramento(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if(trim($stOrdem))
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    $stSql = $this->montaRecuperaDadosExportacaoBalVerificacaoEnceramento().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );    
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaDadosExportacaoBalVerificacaoEnceramento()
+{
+    $stSQL  = " SELECT
+                        replace(cod_estrutural,'.','') as cod_estrutural
+                        ,CASE WHEN vl_saldo_anterior >=0 THEN
+                                replace(vl_saldo_anterior::varchar,'-','')
+                            ELSE
+                                '0'
+                        END as  saldo_anterior_devedora
+                        ,CASE WHEN vl_saldo_anterior <0 THEN
+                                replace(vl_saldo_anterior::varchar,'-','')
+                            ELSE
+                                '0'
+                        END as  saldo_anterior_credora
+                        ,vl_saldo_debitos
+                        ,vl_saldo_creditos * -1 as vl_saldo_creditos
+                        ,CASE WHEN vl_saldo_atual >=0 THEN
+                                replace(vl_saldo_atual::varchar,'-','')
+                            ELSE
+                                '0'
+                        END as  saldo_atual_devedora
+                        ,CASE WHEN vl_saldo_atual <0 THEN
+                                replace(vl_saldo_atual::varchar,'-','')
+                            ELSE
+                                '0'
+                        END as  saldo_atual_credora
+                        ,nom_conta
+                        ,cod_entidade
+                        ,tipo_conta
+                        ,nivel
+                        ,substr(nom_sistema,1,1) as nom_sistema
+                        ,CASE WHEN trim(both ' ' from nom_sistema) = 'Não Informado' THEN
+                                ''
+                            ELSE nom_sistema
+                        END as natureza
+                        ,CASE WHEN escrituracao = 'analitica' THEN
+                                'S'
+                            WHEN escrituracao = 'sintetica' THEN
+                                'N'
+                        END as escrituracao
+                        ,CASE WHEN indicador_superavit = 'permanente' THEN
+                                'P'
+                            WHEN indicador_superavit = 'financeiro' THEN
+                                'F'
+                        END as indicador_superavit
+     FROM
+         contabilidade.fn_exportacao_balancete_verificacao('".$this->getDado("stExercicio")."'
+                                                            ,' cod_entidade IN (".$this->getDado("stCodEntidades").")'
+                                                            ,'".$this->getDado("dtInicial")."'
+                                                            ,'".$this->getDado("dtFinal")."') 
+     AS
+         tabela( cod_estrutural      VARCHAR,
+                 cod_entidade        INTEGER,
+                 nivel               INTEGER,
+                 nom_conta           VARCHAR,
+                 vl_saldo_anterior   NUMERIC,
+                 vl_saldo_debitos    NUMERIC,
+                 vl_saldo_creditos   NUMERIC,
+                 vl_saldo_atual      NUMERIC,
+                 tipo_conta          VARCHAR,
+                 nom_sistema         VARCHAR,
+                 escrituracao        CHAR(9),
+                 indicador_superavit CHAR(12))
+     WHERE (vl_saldo_debitos <> 0.00 or vl_saldo_creditos <> 0.00 or vl_saldo_anterior <> 0.00 ) 
+    ";
+    return $stSQL;
+}
+
 
 }
 ?>

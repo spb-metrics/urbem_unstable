@@ -35,7 +35,7 @@
 
     * Casos de uso : uc-03.05.18
 
-    * $Id: FMManterManutencaoParticipante.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterManutencaoParticipante.php 61786 2015-03-03 21:11:42Z arthur $
 
     */
 
@@ -59,35 +59,32 @@ $stAcao = $request->get('stAcao');
 
 if (empty($stAcao))
   $stAcao = 'manter';
-
+  
 $stLocation = $pgList . "?". Sessao::getId() . "&stAcao=" . $stAcao;
 
-/*
- * Definição dos componentes(objetos) que irão ser adicionados no formulário
- */
+// Recupera a licitação atraves do request
+$jsOnload = "executaFuncaoAjax('exibeLicitacao','"."&numEdital=".$request->get('stNumEdital').".&inCodModalidade=".$request->get('inCodModalidade')."&stExercicioLicitacao=".$request->get('stExercicioLicitacao')."&inCodLicitacao=".$request->get('inCodLicitacao')."&inCodEntidade=".$request->get('inCodEntidade')."');";
+
 //Define o form que será incluido no formulário (padrão no framework)
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
+
 //Define o Hidden de ação (padrão no framework)
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
+
 //Define o Hidde de controle (padrão no framework)
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
-include_once(CAM_GP_LIC_COMPONENTES."IMontaNumeroLicitacao.class.php");
+$obHdnEdital = new Hidden;
+$obHdnEdital->setName ("numEdital");
+$obHdnEdital->setId   ("numEdital");
+$obHdnEdital->setValue($request->get('stNumEdital'));
 
-$obPopUpNumeroEdital = new IPopUpNumeroEdital( $obForm );
-$obPopUpNumeroEdital->obCampoCod->setId("numEdital");
-$obPopUpNumeroEdital->obCampoCod->setName ( "numEdital" );
-$obPopUpNumeroEdital->setNull(false);
-$obPopUpNumeroEdital->setId('');
-$obPopUpNumeroEdital->obCampoCod->obEvento->setOnBlur("if (jQuery(this).val() != '') { ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&numEdital='+this.value,'exibeLicitacao'); }");
-
-//$obObjetoLic = new ILabelObjetoProcessoLicitatorio();
 $obObjetoLic = new Hidden;
 $obObjetoLic->setName("objetoLicitatorio");
 $obObjetoLic->setId("objetoLicitatorio");
@@ -114,13 +111,15 @@ $obSpnParticipante->setId( 'spnParticipante' );
  */
 $obFormulario = new Formulario;
 $obFormulario->addForm          ( $obForm                        );
+
 //Define o caminho de ajuda do Caso de uso (padrão no Framework)
 $obFormulario->setAjuda         ("UC-03.05.18"                   );
 $obFormulario->addHidden        ( $obHdnCtrl                     );
 $obFormulario->addHidden        ( $obHdnAcao                     );
+$obFormulario->addHidden        ( $obHdnEdital                   );
+
 
 $obFormulario->addTitulo        ( "Manutenção de Participantes da Licitação"  );
-$obFormulario->addComponente    ( $obPopUpNumeroEdital );
 $obFormulario->addHidden        ( $obObjetoLic );
 $obFormulario->addSpan          ( $obSpnEdital );
 
@@ -135,3 +134,5 @@ $obFormulario->Ok();
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

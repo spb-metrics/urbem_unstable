@@ -33,10 +33,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 61698 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: jean $
+    $Date: 2015-02-26 10:26:54 -0300 (Qui, 26 Fev 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -50,10 +50,17 @@ Inclusão uc-06.04.00
     include_once( CAM_GPC_TGO_MAPEAMENTO."TTGOREP.class.php" );
     $obTMapeamento = new TTGOREP();
     $obTMapeamento->setDado('stEntidades', $stEntidades );
-    $obTMapeamento->recuperaTodos($arRecordSet[$stArquivo]);
-    $i = 0;
-    foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
-        $arRecordSet[$stArquivo]->arElementos[$i]['numero_registro'] = $i++;
+    if ( Sessao::getExercicio() < '2015') {
+        $obTMapeamento->recuperaTodos($arRecordSet[$stArquivo]);
+    } else {
+        $obTMapeamento->recuperaTodos2015($arRecordSet[$stArquivo]);
+    }
+
+    $i = 1;
+    
+    foreach ($arRecordSet[$stArquivo]->arElementos as $stChave => $valor) {
+        $arRecordSet[$stArquivo]->arElementos[$stChave]['numero_registro'] = $i;
+        $i++;
     }
 
     $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
@@ -94,5 +101,23 @@ Inclusão uc-06.04.00
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+    $arTemp[0] = array( 'tipo_registro'=> '99', 'espacador'=> '', 'numero_sequencial' => $i );
+
+    $arRecordSet[$stArquivo] = new RecordSet();
+    $arRecordSet[$stArquivo]->preenche( $arTemp );
+
+    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(51);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);

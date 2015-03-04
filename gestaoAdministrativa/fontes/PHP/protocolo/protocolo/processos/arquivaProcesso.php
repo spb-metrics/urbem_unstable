@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: arquivaProcesso.php 60948 2014-11-26 11:28:25Z arthur $
+    $Id: arquivaProcesso.php 61785 2015-03-03 21:06:56Z evandro $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -602,7 +602,7 @@ case 2:
 
             <tr>
                 <td colspan='2' class='field'>
-                    <?geraBotaoOk(1,1,1,1);?>
+                    <?php geraBotaoOk(1,1,1,1); ?>
                 </td>
             </tr>
         </table>

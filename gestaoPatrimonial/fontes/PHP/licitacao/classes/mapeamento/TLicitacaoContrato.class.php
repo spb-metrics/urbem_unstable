@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Classe de mapeamento da tabela licitacao.contrato
     * Data de Criação: 15/09/2006
 
@@ -33,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TLicitacaoContrato.class.php 61465 2015-01-20 16:36:30Z carolina $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -727,12 +724,7 @@ function montaRecuperaNaoAnuladosContratadoCompraDireta()
                      AND contrato.cod_entidade = contrato_compra_direta.cod_entidade
                      AND contrato.exercicio    = contrato_compra_direta.exercicio
 
-               WHERE NOT EXISTS (SELECT 1
-                                   FROM licitacao.contrato_anulado
-                                  WHERE contrato_anulado.num_contrato = contrato.num_contrato
-                                    AND contrato_anulado.cod_entidade = contrato.cod_entidade
-                                    AND contrato_anulado.exercicio = contrato.exercicio
-                                )";
+              ";
 
     return $stSql;
 }

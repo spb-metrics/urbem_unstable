@@ -131,7 +131,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
   
   IF stContasConfiguracao <> '' THEN
@@ -168,7 +168,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
 
   IF stContasConfiguracao <> '' THEN
@@ -201,7 +201,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
 
   IF stContasConfiguracao <> '' THEN
@@ -234,7 +234,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
 
   IF stContasConfiguracao <> '' THEN
@@ -267,7 +267,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
 
   IF stContasConfiguracao <> '' THEN
@@ -281,11 +281,11 @@ BEGIN
 
   arFiltro[8] := ''; 
   arBoFiltroVazio[8] := TRUE;
-  arFiltro[9] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''' '''') LIKE ''''111%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[9] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''111%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
   arBoFiltroVazio[9] := FALSE;
-  arFiltro[10] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''' '''') LIKE ''''1211%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[10] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''1211%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
   arBoFiltroVazio[10] := FALSE;
-
+  
   -- PEGA CONFIGURAÇÃO PARA A LINHA Dívida Contratual Interna
   stContasConfiguracao := '';
   stSqlConfiguracao := '
@@ -307,7 +307,7 @@ BEGIN
 
   FOR reConfiguracao IN EXECUTE stSqlConfiguracao
   LOOP
-    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''.'','''') LIKE '''||reConfiguracao.estrutural||'%'' ';
+    stContasConfiguracao := stContasConfiguracao || ' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE '''''||reConfiguracao.estrutural||'%'''' ';
   END LOOP;
 
   IF stContasConfiguracao <> '' THEN

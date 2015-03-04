@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CVC.csv.inc.php 61369 2015-01-12 13:53:38Z arthur $
-  * $Date: 2015-01-12 11:53:38 -0200 (Seg, 12 Jan 2015) $
-  * $Author: arthur $
-  * $Rev: 61369 $
+  * $Id: CVC.csv.inc.php 61685 2015-02-25 17:21:05Z lisiane $
+  * $Date: 2015-02-25 14:21:05 -0300 (Qua, 25 Fev 2015) $
+  * $Author: lisiane $
+  * $Rev: 61685 $
   *
 */
 /**
@@ -57,15 +57,18 @@ $obTTCEMGArquivoMensalCVC->setDado('dt_final', $stDataFinal);
 
 //Tipo Registro 10
 $obTTCEMGArquivoMensalCVC->recuperaVeiculos($rsRecuperaVeiculosCVC10);
-
+$obTTCEMGArquivoMensalCVC->debug();
 //Tipo Registro 20
 $obTTCEMGArquivoMensalCVC->recuperaGastosVeiculos($rsRecuperaGastosVeiculosCVC20);
+$obTTCEMGArquivoMensalCVC->debug();
 
  //Tipo Registro 30
 $obTTCEMGArquivoMensalCVC->recuperaCVC30($rsRecuperaCVC30);
+$obTTCEMGArquivoMensalCVC->debug();
 
 //Tipo Registro 40
 $obTTCEMGArquivoMensalCVC->recuperaVeiculosBaixados($rsRecuperaVeiculosBaixadosCVC40);
+$obTTCEMGArquivoMensalCVC->debug();
 
  //Tipo Registro 99
 $arRecordSetCVC99 = array(

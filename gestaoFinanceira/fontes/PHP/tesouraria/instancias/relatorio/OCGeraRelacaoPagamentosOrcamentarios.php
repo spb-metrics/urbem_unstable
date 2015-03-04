@@ -55,19 +55,19 @@ if ( $ano == Sessao::getExercicio() ) {
     // filtro de periodicidade
     if (( $_REQUEST['stDataInicial'] ) && ( $_REQUEST['stDataFinal'] )) {
         $preview->addParametro( 'data_emissao', "and ordem_pagamento.dt_emissao between to_date('".$_REQUEST['stDataInicial']."', 'dd-mm-yyyy') and to_date('".$_REQUEST['stDataFinal']."', 'dd-mm-yyyy')" );
-        $preview->addParametro( 'f_data_emissao', $_REQUEST['stDataInicial'].utf8_encode(' até ').$_REQUEST['stDataFinal'] );
+        $preview->addParametro( 'f_data_emissao', $_REQUEST['stDataInicial'].' até '.$_REQUEST['stDataFinal'] );
     } elseif ($_REQUEST['stDataInicial']) {
         $preview->addParametro( 'data_emissao', " and ordem_pagamento.dt_emissao = to_date('".$_REQUEST['stDataInicial']."', 'dd-mm-yyyy')" );
         $preview->addParametro( 'f_data_emissao', 'A partir de '.$_REQUEST['stDataInicial'] );
     } elseif ($_REQUEST['stDataFinal']) {
         $preview->addParametro( 'data_emissao', " and ordem_pagamento.dt_emissao = to_date('".$_REQUEST['stDataFinal']."', 'dd-mm-yyyy')" );
-        $preview->addParametro( 'f_data_emissao', utf8_encode('Até ').$_REQUEST['stDataFinal'] );
+        $preview->addParametro( 'f_data_emissao', 'Até '.$_REQUEST['stDataFinal'] );
     }
 
     // filtro de fornecedor
     if ($_REQUEST['inCGM']) {
         $preview->addParametro( 'num_cgm', 'and pre_empenho.cgm_beneficiario = '.$_REQUEST['inCGM'].' ');
-        $preview->addParametro( 'f_num_cgm' , $_REQUEST['inCGM'].' - '.utf8_encode($_REQUEST['stNomCGM']) );
+        $preview->addParametro( 'f_num_cgm' , $_REQUEST['inCGM'].' - '.$_REQUEST['stNomCGM'] );
     } else {
         $preview->addParametro( 'num_cgm', '' );
         $preview->addParametro( 'f_num_cgm', '' );
@@ -76,13 +76,13 @@ if ( $ano == Sessao::getExercicio() ) {
     // filtro de empenho
     if (( $_REQUEST['inCodEmpenhoInicial'] ) && ( $_REQUEST['inCodEmpenhoFinal'] )) {
         $preview->addParametro( 'empenho', ' and empenho.cod_empenho between '.$_REQUEST['inCodEmpenhoInicial'].' and '.$_REQUEST['inCodEmpenhoFinal'].' ');
-        $preview->addParametro( 'f_empenho', $_REQUEST['inCodEmpenhoInicial'].utf8_encode(' até ').$_REQUEST['inCodEmpenhoFinal'] );
+        $preview->addParametro( 'f_empenho', $_REQUEST['inCodEmpenhoInicial'].' até '.$_REQUEST['inCodEmpenhoFinal'] );
     } elseif ($_REQUEST['inCodEmpenhoInicial']) {
         $preview->addParametro( 'empenho', ' and empenho.cod_empenho = '.$_REQUEST['inCodEmpenhoInicial'].' ');
         $preview->addParametro( 'f_empenho', 'A partir de '.$_REQUEST['inCodEmpenhoInicial'] );
     } elseif ($_REQUEST['inCodEmpenhoFinal']) {
         $preview->addParametro( 'empenho', ' and empenho.cod_empenho = '.$_REQUEST['inCodEmpenhoFinal'].' ');
-        $preview->addParametro( 'f_empenho', utf8_encode('Até ').$_REQUEST['inCodEmpenhoFinal'] );
+        $preview->addParametro( 'f_empenho', 'Até '.$_REQUEST['inCodEmpenhoFinal'] );
     } else {
         $preview->addParametro( 'empenho', '' );
         $preview->addParametro( 'f_empenho', '' );
@@ -91,13 +91,13 @@ if ( $ano == Sessao::getExercicio() ) {
     // filtro de despesa
     if (( $_REQUEST['inCodDotacaoInicial'] ) && ( $_REQUEST['inCodDotacaoFinal'] )) {
         $preview->addParametro( 'despesa', ' and despesa.cod_despesa between '.$_REQUEST['inCodDotacaoInicial'].' and '.$_REQUEST['inCodDotacaoFinal'].' ');
-        $preview->addParametro( 'f_despesa', $_REQUEST['inCodDotacaoInicial'].utf8_encode(' até ').$_REQUEST['inCodDotacaoFinal'] );
+        $preview->addParametro( 'f_despesa', $_REQUEST['inCodDotacaoInicial'].' até '.$_REQUEST['inCodDotacaoFinal'] );
     } elseif ($_REQUEST['inCodDotacaoInicial']) {
         $preview->addParametro( 'despesa', ' and despesa.cod_despesa = '.$_REQUEST['inCodDotacaoInicial'].' ');
         $preview->addParametro( 'f_despesa', 'A partir de '.$_REQUEST['inCodDotacaoInicial'] );
     } elseif ($_REQUEST['inCodDotacaoFinal']) {
         $preview->addParametro( 'despesa', ' and despesa.cod_despesa = '.$_REQUEST['inCodDotacaoFinal'].' ');
-        $preview->addParametro( 'f_despesa', utf8_encode('Até ').$_REQUEST['inCodDotacaoFinal'] );
+        $preview->addParametro( 'f_despesa', 'Até '.$_REQUEST['inCodDotacaoFinal'] );
     } else {
         $preview->addParametro( 'despesa', '' );
         $preview->addParametro( 'f_despesa', '' );

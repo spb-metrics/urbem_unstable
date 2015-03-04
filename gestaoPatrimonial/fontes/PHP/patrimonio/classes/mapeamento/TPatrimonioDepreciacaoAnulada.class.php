@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TPatrimonioDepreciacaoAnulada.class.php 60865 2014-11-19 17:58:40Z arthur $
+  $Id: TPatrimonioDepreciacaoAnulada.class.php 61653 2015-02-20 19:35:15Z arthur $
   $Date: $
   $Author: $
   $Rev: $
@@ -141,6 +141,25 @@ class TPatrimonioDepreciacaoAnulada extends Persistente
         return $stSql;
     }
     
+    public function executaFuncao($stParametros, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+
+        $stSql  = $this->montaExecutaFuncao($stParametros);
+        $this->setDebug($stSql);
+        $obErro = $obConexao->executaSQL($rsRecordset, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaExecutaFuncao($stParametros)
+    {
+        $stSql  = " SELECT patrimonio.fn_depreciacao_anulacao(".$stParametros.") AS valor";
+
+        return $stSql;
+    }
+
 }
 
 ?>

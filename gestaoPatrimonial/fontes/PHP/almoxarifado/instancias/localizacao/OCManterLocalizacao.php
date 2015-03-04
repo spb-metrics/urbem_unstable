@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.03.14
 
-    $Id: OCManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterLocalizacao.php 61639 2015-02-19 13:05:36Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -56,9 +56,9 @@ $stCtrl = $_REQUEST['stCtrl'];
 $stAcao = $request->get('stAcao');
 
 $obRegra = new RAlmoxarifadoLocalizacao;
- if (isset($stCtrl)) {
-  if ($stCtrl != null) {
-   switch ($stCtrl) {
+if (isset($stCtrl) && $stCtrl != null) {
+    
+    switch ($stCtrl) {
 
     //Carrega dados do Arquivo FMManterLocalizacaoItem.php
     case "Localizacao" :
@@ -128,33 +128,19 @@ $obRegra = new RAlmoxarifadoLocalizacao;
             $obRegraAlmoxarifado->setCodigo( $inCodAlmoxarifado );
             $obRegraAlmoxarifado->consultar();
 
-            $obLblMascaraLocalizacao = new Label;
-            $obLblMascaraLocalizacao->setRotulo( "Máscara de Localização dos Itens no Almoxarifado" );
-            $obLblMascaraLocalizacao->setValue ( $obRegraAlmoxarifado->getMascara() );
-
-            if ($stAcao != "alterar") {
-                $obTxtCodLocalizacao = new TextBox;
-                $obTxtCodLocalizacao->setRotulo    ( "Localização"            );
-                $obTxtCodLocalizacao->setTitle     ( "Informe a localização." );
-                $obTxtCodLocalizacao->setName      ( "stLocalizacao"          );
-                $obTxtCodLocalizacao->setId        ( "stLocalizacao"          );
-                $obTxtCodLocalizacao->setValue     ( $HdnLocalizacao          );
-                $obTxtCodLocalizacao->setSize      ( 20                       );
-                $obTxtCodLocalizacao->setMaxLength ( 20                       );
-                $obTxtCodLocalizacao->setInteiro   ( false                    );
-                $obTxtCodLocalizacao->setNull      ( false                    );
-                $obTxtCodLocalizacao->obEvento->setOnBlur("VerificaLocalizacao(this,this.value,'".$obRegraAlmoxarifado->getMascara()."');goOculto('ValidaLocalizacao',false);");
-                $obTxtCodLocalizacao->setMascara   ( $obLblMascaraLocalizacao->getValue() );
-                $obTxtCodLocalizacao->obEvento->setOnKeyUp('toUpperCase(this);');
-            } else {
-                $obTxtCodLocalizacao = new Label;
-                $obTxtCodLocalizacao->setRotulo   ( "Localização"   );
-                $obTxtCodLocalizacao->setName     ( "stLocalizacao" );
-                $obTxtCodLocalizacao->setValue    ( $_REQUEST['HdnLocalizacao'] );
-            }
+            $obTxtCodLocalizacao = new TextBox;
+            $obTxtCodLocalizacao->setRotulo    ( "Localização"            );
+            $obTxtCodLocalizacao->setTitle     ( "Informe a localização." );
+            $obTxtCodLocalizacao->setName      ( "stLocalizacao"          );
+            $obTxtCodLocalizacao->setId        ( "stLocalizacao"          );
+            $obTxtCodLocalizacao->setValue     ( $_REQUEST['HdnLocalizacao'] );
+            $obTxtCodLocalizacao->setSize      ( 30                       );
+            $obTxtCodLocalizacao->setMaxLength ( 30                       );
+            $obTxtCodLocalizacao->setInteiro   ( false                    );
+            $obTxtCodLocalizacao->setNull      ( false                    );
+            $obTxtCodLocalizacao->obEvento->setOnBlur("VerificaLocalizacao(this,this.value,'');goOculto('ValidaLocalizacao',false);");
 
             $obFormulario = new Formulario();
-            $obFormulario->addComponente( $obLblMascaraLocalizacao );
             $obFormulario->addComponente( $obTxtCodLocalizacao );
 
             $obFormulario->montaInnerHTML();
@@ -163,13 +149,9 @@ $obRegra = new RAlmoxarifadoLocalizacao;
             $obFormulario->obJavaScript->montaJavaScript();
             $stValida = $obFormulario->obJavaScript->getInnerJavaScript();
 
-            if ( $obLblMascaraLocalizacao->getValue() == "" ) {
-                $stJs  = " alertaAviso('Este almoxarifado não tem máscara de localização definida.','form','aviso','".Sessao::getId()."');";
-                $stJs .= " d.getElementById('spnListaLocalizacao').innerHTML = '';";
-            } else {
-                $stJs  = "d.getElementById('spnListaLocalizacao').innerHTML = '" . $stHtml . "';";
-                $stJs .= "f.stEval.value = '" . $stValida . "';                                 ";
-            }
+            $stJs  = "d.getElementById('spnListaLocalizacao').innerHTML = '" . $stHtml . "';";
+            $stJs .= "f.stEval.value = '" . $stValida . "';                                 ";
+
             if ($_REQUEST['HdnLocalizacao'] != "") {
                 $obRAlmoxarifadoLocalizacao = new RAlmoxarifadoLocalizacao;
                 $obRAlmoxarifadoLocalizacao->setCodigo( $inCodLocalizacao );
@@ -196,6 +178,7 @@ $obRegra = new RAlmoxarifadoLocalizacao;
         } else {
             $stJs .= " d.getElementById('spnListaLocalizacao').innerHTML = '';";
         }
+
         SistemaLegado::executaFrameOculto($stJs);
     break;
 
@@ -203,12 +186,12 @@ $obRegra = new RAlmoxarifadoLocalizacao;
      //Carrega dados do Arquivo LSManterLocalizacao.php
      $obFormulario            = new Formulario();
      $rsAlmoxarifado          = new Recordset;
-     $obLblMascaraLocalizacao = new Label;
+
      $obRegraAlmoxarifado     = new RAlmoxarifadoAlmoxarifado;
 
      $obRegraAlmoxarifado->setCodigo($inCodAlmoxarifado);
      $obRegraAlmoxarifado->consultar();
-     $obLblMascaraLocalizacao->setValue ($obRegraAlmoxarifado->getMascara());
+
 
      $obTxtObservacao = new TextBox;
      $obTxtObservacao->setRotulo   ('Localização'         );
@@ -290,7 +273,7 @@ $obRegra = new RAlmoxarifadoLocalizacao;
             $stJs.= "d.getElementById('stUnidadeMedida').innerHTML = '&nbsp;'; ";
             $stJs.= "f.inCodMarca.value                            = '';       ";
             $stJs.= "d.getElementById('stNomMarca').innerHTML      = '&nbsp;'; ";
-            // SistemaLegado::exibeAviso(urlencode("Item:  ".$_REQUEST['inCodItem'].", marca: ".$_REQUEST['inCodMarca']." já estão cadastrados em outra Localização do mesmo almoxarifado."),"n_incluir","alerta");
+
         } else {
             $stJs = "alertaAviso('".$stErro."','form','erro','".Sessao::getId()."');\n";
         }
@@ -335,41 +318,39 @@ $obRegra = new RAlmoxarifadoLocalizacao;
 
     case 'ValidaLocalizacao':
 
-        include_once(TALM."TAlmoxarifadoLocalizacaoFisica.class.php"                                              );
+        include_once TALM."TAlmoxarifadoLocalizacaoFisica.class.php";
         $obTlocalizacao = new TAlmoxarifadoLocalizacaoFisica();
-        $stFiltro = " WHERE cod_almoxarifado=".$_REQUEST['inCodAlmoxarifado'];
+        $stFiltro = " WHERE cod_almoxarifado = ".$_REQUEST['inCodAlmoxarifado'];
         $obTlocalizacao->recuperaTodos( $rsLocalizacao , $stFiltro);
-        $obTlocalizacao->debug();
-        $boLocalizacao = 'false';
+        $boLocalizacao = false;
+
         while (!$rsLocalizacao->eof()) {
-            if ( $rsLocalizacao->getCampo('localizacao') == $_REQUEST['stLocalizacao'] ) {
-                $boLocalizacao = 'true';
+            if ( trim($rsLocalizacao->getCampo('localizacao')) == trim($_REQUEST['stLocalizacao']) ) {
+                $boLocalizacao = true;
                 break;
             }
             $rsLocalizacao->proximo();
         }
 
-        if ($boLocalizacao == 'true') {
+        if ($boLocalizacao == true) {
             SistemaLegado::exibeAviso(urlencode("Localização (".$_REQUEST['stLocalizacao'].") já está cadastrada, para incluir mais itens selecione a opção \"Alterar Localização Física\"."),"aviso","alerta");
-            $stJs = "f.stLocalizacao.value = '' ;\n";
-            $stJs .= "f.stLocalizacao.focus();\n";
+            $stJs = "f.stLocalizacao.value = ''; \n";
+            $stJs .= "f.stLocalizacao.focus();   \n";
         }
-         SistemaLegado::executaFrameOculto($stJs);
+        
+        SistemaLegado::executaFrameOculto($stJs);
     break;
 
-   }
-  }
- }
+    }
+}
 
- function montaListaDotacoes($arRecordSet , $boExecuta = true)
- {
+function montaListaDotacoes($arRecordSet , $boExecuta = true)
+{
   $rsDotacoes = new RecordSet;
   $rsDotacoes->preenche( $arRecordSet );
 
   $rsDotacoes->addFormatacao("item","HTML");
   $rsDotacoes->addFormatacao("marca","HTML");
-
-//$rsDotacoes->addFormatacao("marca","SLASHES");
 
   $obLista = new Lista;
 

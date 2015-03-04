@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: FMManterObra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterObra.php 61522 2015-01-29 18:33:35Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -258,11 +258,11 @@ $obTxtFiscal->setValue  ( $stFiscal  );
 $obTxtFiscal->setSize   ( 50 );
 $obTxtFiscal->setMaxLength ( 50 );
 
-$obExercicioEmpenho = new Exercicio;
-$obExercicioEmpenho->setObrigatorioBarra ( true );
-$obExercicioEmpenho->setName ( 'stExercicioEmpenho' );
-$obExercicioEmpenho->setId   ( 'stExercicioEmpenho' );
-$obExercicioEmpenho->setNull ( true );
+//$obExercicioEmpenho = new Exercicio;
+//$obExercicioEmpenho->setObrigatorioBarra ( true );
+//$obExercicioEmpenho->setName ( 'stExercicioEmpenho' );
+//$obExercicioEmpenho->setId   ( 'stExercicioEmpenho' );
+//$obExercicioEmpenho->setNull ( true );
 
 // Define Objeto BuscaInner para Empenho
 $obIPopUpEmpenho = new IPopUpEmpenho( $obForm );
@@ -270,7 +270,6 @@ $obIPopUpEmpenho->setObrigatorioBarra ( true         );
 $obIPopUpEmpenho->setTipoBusca        ( 'obra_tcmgo' );
 
 $arInclusao = array();
-$arInclusao[] = $obExercicioEmpenho;
 $arInclusao[] = $obIPopUpEmpenho;
 
 $spnEmpenhos = new Span;
@@ -290,7 +289,7 @@ if ($stAcao == 'alterar') {
     $obFormulario->addComponente ( $stExercicio           );
 }
 
-$obExercicioEmpenho->setNull ( true );
+//$obExercicioEmpenho->setNull ( true );
 $obFormulario->addComponente ( $obTxtDescricao               );
 $obFormulario->agrupaComponentes(array($obLblGrauLatitude, $obTxtGrauLatitude, $obLblMinuto, $obTxtMinutoLatitude, $obLblSegundo, $obTxtSegundoLatitude));
 $obFormulario->agrupaComponentes(array($obLblGrauLongitude, $obTxtGrauLongitude, $obLblMinuto, $obTxtMinutoLongitude, $obLblSegundo, $obTxtSegundoLongitude));
@@ -300,9 +299,10 @@ $obFormulario->addComponente ( $obTxtEndereco               );
 $obFormulario->addComponente ( $obTxtBairro                 );
 $obFormulario->addComponente ( $obTxtFiscal                 );
 $obFormulario->addTitulo     ( 'Dados dos empenhos da obra.' );
-$obFormulario->addComponente ( $obExercicioEmpenho           );
+//$obFormulario->addComponente ( $obExercicioEmpenho           );
+
 $obIPopUpEmpenho->geraFormulario($obFormulario);
-$obFormulario->Incluir( 'Empenho', $arInclusao,  true        );
+$obFormulario->Incluir( 'Empenho', $arInclusao,  true );
 $obFormulario->addSpan ( $spnEmpenhos );
 
 if ($stAcao == 'incluir') {
@@ -312,6 +312,7 @@ if ($stAcao == 'incluir') {
 }
 
 $obFormulario->show();
+
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 

@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TTCMGOLNC.class.php 59612 2014-09-02 12:00:51Z gelson $
-    * $Revision: 59612 $
-    * $Author: gelson $
-    * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    * $Id: TTCMGOLNC.class.php 61763 2015-03-02 20:20:08Z evandro $
+    * $Revision: 61763 $
+    * $Author: evandro $
+    * $Date: 2015-03-02 17:20:08 -0300 (Seg, 02 Mar 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -125,7 +125,7 @@ class TTCMGOLNC extends Persistente{
         $stSql = "
 -- CONTA CRÉDITO
 -- REGISTRO A
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta
@@ -221,7 +221,7 @@ SELECT '11' AS tipo_registro
 UNION
 
 -- REGISTRO S, E, L e P
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta
@@ -305,7 +305,7 @@ SELECT '11' AS tipo_registro
              AND tt.tipo         = lo.tipo
              AND tt.cod_entidade = lo.cod_entidade
 
-            INNER JOIN contabilidade.lancamento_empenho AS le
+            LEFT JOIN contabilidade.lancamento_empenho AS le
               ON le.cod_lote     = l.cod_lote
              AND le.exercicio    = l.exercicio
              AND le.tipo         = l.tipo
@@ -343,7 +343,7 @@ SELECT '11' AS tipo_registro
 UNION
 
 -- REGISTRO T
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta
@@ -447,7 +447,7 @@ UNION
 
 -- CONTA DÉBITO
 -- REGISTRO A
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta
@@ -543,7 +543,7 @@ SELECT '11' AS tipo_registro
 UNION
 
 -- REGISTRO S, E, L e P
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta
@@ -627,7 +627,7 @@ SELECT '11' AS tipo_registro
              AND tt.tipo         = lo.tipo
              AND tt.cod_entidade = lo.cod_entidade
 
-            INNER JOIN contabilidade.lancamento_empenho AS le
+            LEFT JOIN contabilidade.lancamento_empenho AS le
               ON le.cod_lote     = l.cod_lote
              AND le.exercicio    = l.exercicio
              AND le.tipo         = l.tipo
@@ -665,7 +665,7 @@ SELECT '11' AS tipo_registro
 UNION
 
 -- REGISTRO T
-SELECT '11' AS tipo_registro
+SELECT DISTINCT '11' AS tipo_registro
                , (SELECT cod_tipo FROM tcmgo.orgao WHERE exercicio = '".$this->getDado('exercicio')."')::INTEGER AS tipo_unidade
                , (LPAD(lo.cod_entidade::VARCHAR,2,'0')||LPAD(oa.num_letra::VARCHAR,2,'0')||LPAD(lo.cod_lote::VARCHAR, 9,'0')) AS num_controle
                , REPLACE(pc.cod_estrutural, '.','') AS cod_conta

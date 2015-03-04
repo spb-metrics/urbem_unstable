@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
-    <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>></property>
-    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
-    <html-property name="description">Creates a blank report with no predefined content.</html-property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
     <property name="units">in</property>
+    <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>></property>
+    <html-property name="description">Creates a blank report with no predefined content.</html-property>
     <text-property name="displayName">Blank Report</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="layoutPreference">auto layout</property>
@@ -17,9 +17,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,9 +28,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -39,9 +39,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -50,9 +50,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,9 +61,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -72,9 +72,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -83,9 +83,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -94,9 +94,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -105,9 +105,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -116,9 +116,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -127,9 +127,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -138,9 +138,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -149,9 +149,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -160,9 +160,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -171,13 +171,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -186,9 +186,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,10 +197,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -209,9 +209,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -220,12 +220,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1,2</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -238,9 +238,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -249,9 +249,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -259,9 +259,9 @@
         <scalar-parameter name="relatorio_novo" id="2602">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -270,9 +270,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -281,9 +281,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -292,9 +292,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -303,9 +303,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -314,9 +314,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -741,27 +741,27 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">vl_original</property>
-                    <text-property name="displayName">vl_original</text-property>
+                    <property name="displayName">vl_original</property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_suplementacoes</property>
-                    <text-property name="displayName">vl_suplementacoes</text-property>
+                    <property name="displayName">vl_suplementacoes</property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_empenhado_bimestre</property>
-                    <text-property name="displayName">vl_empenhado_bimestre</text-property>
+                    <property name="displayName">vl_empenhado_bimestre</property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_empenhado_ate_bimestre</property>
-                    <text-property name="displayName">vl_empenhado_ate_bimestre</text-property>
+                    <property name="displayName">vl_empenhado_ate_bimestre</property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_liquidado_bimestre</property>
-                    <text-property name="displayName">vl_liquidado_bimestre</text-property>
+                    <property name="displayName">vl_liquidado_bimestre</property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_liquidado_ate_bimestre</property>
-                    <text-property name="displayName">vl_liquidado_ate_bimestre</text-property>
+                    <property name="displayName">vl_liquidado_ate_bimestre</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -1238,6 +1238,7 @@ if (params["periodo"] == 6){
                 <property name="width">9%</property>
             </column>
             <column id="7489">
+                <property name="width">9%</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1248,7 +1249,6 @@ if (params["periodo"] == 6){
 }</expression>
                     </structure>
                 </list-property>
-                <property name="width">9%</property>
             </column>
             <header>
                 <row id="219">
@@ -1259,6 +1259,82 @@ if (params["periodo"] == 6){
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
                         <property name="verticalAlign">middle</property>
+                        <grid id="744">
+                            <property name="style">default</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="height">1.0666666667in</property>
+                            <property name="width">7.4in</property>
+                            <column id="745">
+                                <property name="width">159mm</property>
+                            </column>
+                            <column id="746">
+                                <property name="width">29mm</property>
+                            </column>
+                            <row id="747">
+                                <cell id="748">
+                                    <property name="colSpan">2</property>
+                                    <property name="rowSpan">1</property>
+                                    <text-data id="749">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="textAlign">center</property>
+                                        <expression name="valueExpr">"Poder "+params["poder"]</expression>
+                                        <property name="contentType">html</property>
+                                    </text-data>
+                                    <text-data id="750">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="textAlign">center</property>
+                                        <expression name="valueExpr">params["nom_entidade"]</expression>
+                                        <property name="contentType">html</property>
+                                    </text-data>
+                                    <text id="751">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[RELATÓRIO RESUMIDO DA EXECUÇÃO ORÇAMENTÁRIA<br>
+<B>DEMONSTRATIVO DA EXECUÇÃO DAS DESPESAS POR FUNÇÃO/SUBFUNÇÃO</B><br>
+ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL<br>]]></text-property>
+                                    </text>
+                                    <text-data id="6685">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="textAlign">center</property>
+                                        <expression name="valueExpr">params["titulo_periodo"]</expression>
+                                        <property name="contentType">html</property>
+                                    </text-data>
+                                </cell>
+                            </row>
+                            <row id="752">
+                                <property name="height">0.2761904762in</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">params["relatorio_novo"].value == 'nao'</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="753">
+                                    <property name="verticalAlign">bottom</property>
+                                    <label id="754">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="textAlign">left</property>
+                                        <text-property name="text">RREO - Anexo 2 (LRF, art. 52, inciso II, alínea "c")</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="755">
+                                    <property name="verticalAlign">bottom</property>
+                                    <label id="756">
+                                        <property name="fontFamily">sans-serif</property>
+                                        <property name="fontSize">6pt</property>
+                                        <property name="paddingRight">3pt</property>
+                                        <property name="textAlign">right</property>
+                                        <text-property name="text">R$ 1,00</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </grid>
                     </cell>
                 </row>
                 <row id="9">
@@ -1686,7 +1762,6 @@ PROCESSADOS
 "0,00%";
 }</expression>
                     <property name="dataType">string</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_3</property>
@@ -1696,7 +1771,6 @@ PROCESSADOS
 "0,00%";
 }</expression>
                     <property name="dataType">string</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_4</property>
@@ -1747,6 +1821,7 @@ if (params["periodo"] == 6){
                 <property name="width">9%</property>
             </column>
             <column id="7491">
+                <property name="width">9%</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1757,7 +1832,6 @@ if (params["periodo"] == 6){
 }</expression>
                     </structure>
                 </list-property>
-                <property name="width">9%</property>
             </column>
             <detail>
                 <row id="126">
@@ -1963,7 +2037,6 @@ if (params["periodo"] == 6){
 "0,00%";
 }</expression>
                     <property name="dataType">string</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_1</property>
@@ -1983,7 +2056,6 @@ if (params["periodo"] == 6){
 "0,00%";
 }</expression>
                     <property name="dataType">string</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_4</property>
@@ -2034,6 +2106,7 @@ if (params["periodo"] == 6){
                 <property name="width">9%</property>
             </column>
             <column id="7493">
+                <property name="width">9%</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2044,7 +2117,6 @@ if (params["periodo"] == 6){
 }</expression>
                     </structure>
                 </list-property>
-                <property name="width">9%</property>
             </column>
             <detail>
                 <row id="2406">
@@ -2245,7 +2317,7 @@ if (params["periodo"] == 6){
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <text-property name="displayName">data_extenso</text-property>
+                    <property name="displayName">data_extenso</property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

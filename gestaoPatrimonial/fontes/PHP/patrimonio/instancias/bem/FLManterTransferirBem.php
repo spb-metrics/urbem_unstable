@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FLManterTransferirBem.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterTransferirBem.php 61462 2015-01-20 13:17:23Z diogo.zarpelon $
 
     * Casos de uso: uc-03.01.06
 
@@ -40,6 +40,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once( CAM_GP_PAT_COMPONENTES."IPopUpBem.class.php");
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganogramaLocal.class.php";
+include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
 
 $stPrograma = "ManterTransferirBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -67,6 +68,21 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ("stCtrl" );
 $obHdnCtrl->setValue("");
 
+//instancia o componente IPopUpCGMVinculado para o responsavel anterior
+$obIPopUpCGMVinculadoResponsavelAnterior = new IPopUpCGMVinculado( $obForm );
+$obIPopUpCGMVinculadoResponsavelAnterior->setTabelaVinculo    ( 'patrimonio.bem_responsavel'        );
+$obIPopUpCGMVinculadoResponsavelAnterior->setCampoVinculo     ( 'numcgm'                            );
+$obIPopUpCGMVinculadoResponsavelAnterior->setNomeVinculo      ( 'ResponsavelAnterior'               );
+$obIPopUpCGMVinculadoResponsavelAnterior->setRotulo           ( 'Responsável Atual'              );
+$obIPopUpCGMVinculadoResponsavelAnterior->setTitle            ( 'Selecione o Responsável Atual.' );
+$obIPopUpCGMVinculadoResponsavelAnterior->setName             ( 'stNomResponsavelAtual'          );
+$obIPopUpCGMVinculadoResponsavelAnterior->setId               ( 'stNomResponsavelAtual'          );
+$obIPopUpCGMVinculadoResponsavelAnterior->obCampoCod->setName ( 'inNumResponsavelAtual'          );
+$obIPopUpCGMVinculadoResponsavelAnterior->obCampoCod->setId   ( 'inNumResponsavelAtual'          );
+$obIPopUpCGMVinculadoResponsavelAnterior->setNull             ( true                               );
+$obIPopUpCGMVinculadoResponsavelAnterior->obCampoCod->obEvento->setOnFocus  ( "montaParametrosGET( 'verificaResponsavelBem'); montaParametrosGET( 'verificaResponsavelDif');" );
+$obIPopUpCGMVinculadoResponsavelAnterior->obCampoCod->obEvento->setOnChange ( "montaParametrosGET( 'verificaResponsavelBem'); montaParametrosGET( 'verificaResponsavelDif');" );
+
 //instancia o componenete IMontaOrganograma
 $obIMontaOrganograma = new IMontaOrganograma(true);
 $obIMontaOrganograma->setCodOrgao($codOrgao);
@@ -86,6 +102,7 @@ $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 
 $obFormulario->addTitulo( 'Transferir Bem' );
+$obFormulario->addComponente( $obIPopUpCGMVinculadoResponsavelAnterior );
 $obIMontaOrganograma->geraFormulario( $obFormulario );
 $obIMontaOrganogramaLocal->geraFormulario( $obFormulario );
 

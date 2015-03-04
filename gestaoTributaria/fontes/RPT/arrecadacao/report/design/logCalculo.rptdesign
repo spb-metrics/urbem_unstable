@@ -512,33 +512,36 @@ INNER JOIN monetario.credito mc
                     </data>
                     <label id="1504"/>
                     <grid id="1430">
-                        <property name="width">100%</property>
+                        <property name="verticalAlign">middle</property>
+                        <property name="canShrink">true</property>
+                        <property name="width">7.864583333333333in</property>
                         <column id="1432">
-                            <property name="width">5%</property>
+                            <property name="width">0.5in</property>
                         </column>
                         <column id="1433">
-                            <property name="width">30%</property>
+                            <property name="width">2.6666666666666665in</property>
                         </column>
                         <column id="1471">
-                            <property name="width">30%</property>
+                            <property name="width">2.40625in</property>
                         </column>
                         <column id="1434">
-                            <property name="width">5%</property>
+                            <property name="width">0.4791666666666667in</property>
                         </column>
                         <column id="1435">
-                            <property name="width">10%</property>
+                            <property name="width">0.90625in</property>
                         </column>
                         <row id="1442">
                             <cell id="1444">
                                 <text id="1449">
                                     <property name="fontSize">medium</property>
                                     <property name="fontWeight">bold</property>
-                                    <property name="textAlign">center</property>
+                                    <property name="textAlign">left</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Código]]></text-property>
                                 </text>
                             </cell>
                             <cell id="1445">
+                                <property name="textAlign">left</property>
                                 <text id="1450">
                                     <property name="fontSize">medium</property>
                                     <property name="fontWeight">bold</property>
@@ -557,10 +560,11 @@ INNER JOIN monetario.credito mc
                                 </text>
                             </cell>
                             <cell id="1446">
+                                <property name="textAlign">right</property>
                                 <text id="1451">
                                     <property name="fontSize">medium</property>
                                     <property name="fontWeight">bold</property>
-                                    <property name="textAlign">center</property>
+                                    <property name="textAlign">right</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Estado]]></text-property>
                                 </text>
@@ -622,7 +626,7 @@ INNER JOIN monetario.credito mc
                         <cell id="1413">
                             <data id="1419">
                                 <property name="fontSize">smaller</property>
-                                <property name="textAlign">center</property>
+                                <property name="textAlign">left</property>
                                 <property name="resultSetColumn">status</property>
                             </data>
                         </cell>

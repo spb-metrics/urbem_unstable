@@ -36,30 +36,6 @@
     * Casos de uso: uc-03.03.14
 */
 
-/*
-$Log$
-Revision 1.20  2006/10/18 17:50:02  andre.almeida
-Bug #6874#
-Bug #6988#
-Bug #7146#
-Bug #7173#
-Bug #7254#
-Bug #6944#
-Bug #6987#
-Bug #6989#
-
-Revision 1.19  2006/07/27 12:12:16  leandro.zis
-Bug #6669#
-
-Revision 1.18  2006/07/25 20:44:42  fernando
-Bug #6654#
-
-Revision 1.17  2006/07/06 14:04:47  diego
-Retirada tag de log com erro.
-
-Revision 1.16  2006/07/06 12:09:31  diego
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/mascara/Mascara.class.php';
@@ -213,7 +189,7 @@ var $stLocalizacao;
      }
 
      $stOrdem = " ORDER BY localizacao_fisica.localizacao DESC                                                                \n";
-     $obErro  = $obTCatalogoFisicaItem->recuperaFisicaItem( &$rsRecordSet, $stFiltro, $stOrdem, $obTransacao );
+     $obErro  = $obTCatalogoFisicaItem->recuperaFisicaItem( $rsRecordSet, $stFiltro, $stOrdem, $obTransacao );
 
      return $obErro;
  }
@@ -275,11 +251,10 @@ var $stLocalizacao;
   return $obErro;
  }
 
- function alterar($boTransacao = "")
- {
+function alterar($boTransacao = "")
+{
   $boFlagTransacao = false;
   $rsRecordSetItem = new recordset();
-  $obMascara       = new Mascara();
 
   $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
   if (!($obErro->ocorreu())) {
@@ -303,12 +278,6 @@ var $stLocalizacao;
      $obErro = $this->obRAlmoxarifadoAlmoxarifado->consultar($boTransacao);
 
        if (!($obErro->ocorreu())) {
-
-           if (strlen($this->obRAlmoxarifadoAlmoxarifado->getMascara()) == strlen($this->stLocalizacao)) {
-             $MascaraExpReg = $obMascara->converterParaExpressaoRegular($this->obRAlmoxarifadoAlmoxarifado->getMascara());
-             $obRegExp      = new ExpReg($MascaraExpReg,$this->stLocalizacao);
-
-                if ($obRegExp->validarContexto()) {
 
                      if (!($obErro->ocorreu())) {
 
@@ -344,12 +313,7 @@ var $stLocalizacao;
                          }
                        }
 
-               } else {
-                $obErro->setDescricao( "O campo Localização não confere com a máscara : ".$this->obRAlmoxarifadoAlmoxarifado->getMascara());
-               }
-            } else {
-              $obErro->setDescricao( "O tamanho do campo Localização não confere com o tamanho da máscara : ".$this->stLocalizacao);
-            }
+        
        }
    }
     $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTAlmoxarifadoCatalogo );
@@ -362,40 +326,37 @@ var $stLocalizacao;
  {
   $boFlagTransacao = false;
   $rsRecordSetItem = new recordset();
-  $obMascara       = new Mascara();
+
 
   $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-  if ( !$obErro->ocorreu()) {
-   $obErro = $this->checarArrayItem();
-   if (!$obErro->ocorreu()) {
-    $obErro = $this->obTAlmoxarifadoLocalizacaoFisica->proximoCod( $this->inCodigo, $boTransacao );
-    if (!$obErro->ocorreu()) {
+    if ( !$obErro->ocorreu()) {
+        $obErro = $this->checarArrayItem();
+        
+        if (!$obErro->ocorreu()) {
+            $obErro = $this->obTAlmoxarifadoLocalizacaoFisica->proximoCod( $this->inCodigo, $boTransacao );
+            
+            if (!$obErro->ocorreu()) {
+             $this->obRAlmoxarifadoAlmoxarifado->setCodigo($this->obRAlmoxarifadoAlmoxarifado->getCodigo());
+             $obErro = $this->obRAlmoxarifadoAlmoxarifado->consultar($boTransacao);
 
-     $this->obRAlmoxarifadoAlmoxarifado->setCodigo($this->obRAlmoxarifadoAlmoxarifado->getCodigo());
-     $obErro = $this->obRAlmoxarifadoAlmoxarifado->consultar($boTransacao);
-     if (!$obErro->ocorreu()) {
+                if (!$obErro->ocorreu()) {
+                    
+                        for ($i=0;$i<count($this->arLocalizacaoItem);$i++) {
+                           $obRAlmoxarifadoItemMarca = $this->arLocalizacaoItem[$i];
+                           $ItemMarca = $obRAlmoxarifadoItemMarca->listar($rsRecordSetItem);
 
-        if (strlen($this->obRAlmoxarifadoAlmoxarifado->getMascara()) == strlen($this->stLocalizacao)) {
-          $MascaraExpReg = $obMascara->converterParaExpressaoRegular($this->obRAlmoxarifadoAlmoxarifado->getMascara());
-          $obRegExp      = new ExpReg($MascaraExpReg,$this->stLocalizacao);
-
-                if ($obRegExp->validarContexto()) {
-                    for ($i=0;$i<count($this->arLocalizacaoItem);$i++) {
-                       $obRAlmoxarifadoItemMarca = $this->arLocalizacaoItem[$i];
-                       $ItemMarca = $obRAlmoxarifadoItemMarca->listar($rsRecordSetItem);
-
-                          if ($rsRecordSetItem->getNumLinhas() < 1) {
-                            $obErro = $obRAlmoxarifadoItemMarca->incluir($boTransacao);
-                          }
-                          if ($obErro->ocorreu()) {
-                           break;
-                          }
-                     }
+                            if ($rsRecordSetItem->getNumLinhas() < 1) {
+                                $obErro = $obRAlmoxarifadoItemMarca->incluir($boTransacao);
+                            }
+                              if ($obErro->ocorreu()) {
+                               break;
+                              }
+                         }
 
                      if (!($obErro->ocorreu())) {
                        $this->obTAlmoxarifadoLocalizacaoFisica->setDado("cod_localizacao" , $this->inCodigo);
                        $this->obTAlmoxarifadoLocalizacaoFisica->setDado("cod_almoxarifado", $this->obRAlmoxarifadoAlmoxarifado->getCodigo());
-                       $this->obTAlmoxarifadoLocalizacaoFisica->setDado("localizacao"     , strtoupper($this->stLocalizacao));
+                       $this->obTAlmoxarifadoLocalizacaoFisica->setDado("localizacao"     , $this->stLocalizacao);
 
                        $obErro = $this->obTAlmoxarifadoLocalizacaoFisica->inclusao($boTransacao);
 
@@ -418,15 +379,12 @@ var $stLocalizacao;
                                $obErro->setDescricao( "Não pode haver mais de um item da mesma marca nesta localização. Item :".$this->roLocalizacaoItem->obRCatalogoItem->getCodigo()." Marca : ".$this->roLocalizacaoItem->obRMarca->getCodigo() );
                            }
                       } else {
-                          $obErro->setDescricao( "Essa localização já foi cadastrada.Localização : ".$this->stLocalizacao);
+                          $obErro->setDescricao( "Essa localização já foi cadastrada. Localização : ".$this->stLocalizacao);
                       }
-                    }
-                 } else {
-                   $obErro->setDescricao( "O campo Localização não confere com a máscara : ".$this->obRAlmoxarifadoAlmoxarifado->getMascara());
-                 }
-         } else {
-           $obErro->setDescricao( "O tamanho do campo Localização não confere com o tamanho da máscara : ".$this->stLocalizacao);
+                    
+                 
          }
+
        }
      }
    } else {

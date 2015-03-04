@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCGeraRelatorioAbastecimento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioAbastecimento.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
     * Casos de uso: uc-03.02.18
 */
@@ -107,7 +107,7 @@ if ($_REQUEST['inCodCombustivelSelecionados'] != '') {
         $stCombustivel .= $rsCombustivel->getCampo('nom_combustivel').', ';
         $rsCombustivel->proximo();
     }
-    $preview->addParametro( 'stFiltroCombustivel', utf8_encode(substr($stCombustivel,0,-2)) );
+    $preview->addParametro( 'stFiltroCombustivel', substr($stCombustivel,0,-2) );
 } else {
     $preview->addParametro( 'inCodCombustivel', null );
     $preview->addParametro( 'stFiltroCombustivel', null );

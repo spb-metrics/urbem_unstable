@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FLManterBem.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterBem.php 61613 2015-02-13 18:36:56Z jean $
 
     * Casos de uso: uc-03.01.06
 */
@@ -51,6 +51,8 @@ include_once( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
 include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganogramaLocal.class.php";
+include_once(CAM_GA_PROT_COMPONENTES.'IPopUpProcesso.class.php');
+include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php");
 
 $stPrograma = "ManterBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -107,6 +109,12 @@ $obTxtDescricaoBem->setName( 'stDescricaoBem' );
 $obTxtDescricaoBem->setSize( 60 );
 $obTxtDescricaoBem->setMaxLength( 60 );
 $obTxtDescricaoBem->setNull( true );
+
+//instancia a informação do processo que deu origem a aquisição do bem
+$obPopUpProcesso = new IPopUpProcesso($obForm);
+$obPopUpProcesso->setRotulo("Processo Administrativo");
+$obPopUpProcesso->setValidar(true);
+$obPopUpProcesso->setNull(true);
 
 //instancia um tipobusca
 $obTipoBuscaDescricaoBem = new TipoBusca( $obTxtDescricaoBem );
@@ -399,6 +407,7 @@ $obFormulario->addSpan      ( $obSpnAtributos );
 
 $obFormulario->addTitulo    ( 'Informações Básicas' );
 $obFormulario->addComponente( $obTipoBuscaDescricaoBem );
+$obFormulario->addComponente( $obPopUpProcesso );
 $obFormulario->addComponente( $obTipoBuscaDetalhamentoBem );
 $obFormulario->addComponente( $obBscMarca );
 $obFormulario->addComponente( $obIPopUpFornecedor );

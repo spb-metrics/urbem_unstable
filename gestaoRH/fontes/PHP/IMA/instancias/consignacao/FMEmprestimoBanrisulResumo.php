@@ -95,10 +95,17 @@ $obLblQuantidade->setValue($_REQUEST['inQuantidade']);
 $obBtnArquivo = new Button;
 $obBtnArquivo->setValue('Download do Arquivo');
 $obBtnArquivo->obEvento->setOnclick("javascript: EnviarArquivo();");
+if ($_REQUEST['inQuantidade'] < 1) {
+    $obBtnArquivo->setDisabled(true);
+}
 
 $obBtnRelatorio = new Button;
 $obBtnRelatorio->setValue('Relatório de Conferência');
 $obBtnRelatorio->obEvento->setOnclick("javascript: EnviarRelatorio();");
+if ($_REQUEST['inQuantidade'] < 1) {
+    $obBtnRelatorio->setDisabled(true);
+}
+
 $obForm = new Form;
 $obForm->setTarget('oculto');
 

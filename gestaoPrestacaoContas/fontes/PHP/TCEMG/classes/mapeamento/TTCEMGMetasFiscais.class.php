@@ -33,12 +33,12 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGMetasFiscais.class.php 59719 2014-09-08 15:00:53Z franver $
+    * $Id: TTCEMGMetasFiscais.class.php 61464 2015-01-20 13:38:33Z jean $
     *
     * $Name: $
-    * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-    * $Author: franver $
-    * $Rev: 59719 $
+    * $Date: 2015-01-20 11:38:33 -0200 (Ter, 20 Jan 2015) $
+    * $Author: jean $
+    * $Rev: 61464 $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -119,6 +119,7 @@ class TTCEMGMetasFiscais extends Persistente
              , REPLACE(percentual_pib_divida_consolidada_liquida::VARCHAR, '.', ',') AS percentual_pib_divida_consolidada_liquida
           FROM tcemg.metas_fiscais
          WHERE exercicio::INTEGER IN (".$this->getDado('exercicio').")
+         ORDER BY exercicio
         ";
 
         return $stSql;

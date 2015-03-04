@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: FMManterProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
 
     */
 
@@ -224,6 +224,9 @@ $obISelectClassificacaoAssunto->obCmbAssunto->obEvento->setOnChange("document.ge
 $obIChkDocumentoProcesso = new IChkDocumentoProcesso();
 $obIChkDocumentoProcesso->setCodigoClassificacao($_GET['inCodigoClassificacao']);
 $obIChkDocumentoProcesso->setCodigoAssunto($_GET['inCodigoAssunto']);
+$obIChkDocumentoProcesso->setCodProcesso($_REQUEST['inCodigoProcesso']);
+$obIChkDocumentoProcesso->setAnoProcesso($_REQUEST['inAnoExercicio']);
+
 $obFormulario = new Formulario();
 $obIChkDocumentoProcesso->geraFormulario($obFormulario);
 $obFormulario->montaInnerHTML();

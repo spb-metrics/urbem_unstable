@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: LSManterCobrancaParcelas.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCobrancaParcelas.php 61643 2015-02-20 10:45:39Z evandro $
 
   Caso de uso: uc-05.04.04
 **/
@@ -244,7 +244,7 @@ foreach ($request as $valor => $key) {
                 $arDados[$inPosicao]["inscricao_tipo"]              = $arKey[10];
                 $arDados[$inPosicao]["dt_vencimento_original"]      = $arKey[8];
                 $arDados[$inPosicao]["origem"]                      = $arKey[15].'<br>';
-        $arFilters = explode('.', preg_replace('/([\d\.]+) (.*)/', '$1', $arKey[15]));
+                $arFilters = explode('.', preg_replace('/([\d\.]+) (.*)/', '$1', $arKey[15]));
                 $descricao_monetario = SistemaLegado::pegaDado('descricao_credito', 'monetario.credito', 'WHERE cod_credito = '.$arFilters[0].' AND cod_especie = '.$arFilters[1].' AND cod_genero = '.$arFilters[2].' AND cod_natureza = '.$arFilters[3].'');
                 $arDados[$inPosicao]["descricao_credito"]			= $descricao_monetario;
                 $arDados[$inPosicao]["grupo_original"]              = $arKey[16];
@@ -255,8 +255,8 @@ foreach ($request as $valor => $key) {
                     $arDados[$inPosicao]["exercicio_original"] = $rsRecuperaExercicio->getCampo("exercicio_original");
                 }
 
-                $arDados[$inPosicao]["reducao"] = 0;
-                $arDados[$inPosicao]["vlr_reducao"] = 0;
+                $arDados[$inPosicao]["reducao"] = 0.00;
+                $arDados[$inPosicao]["vlr_reducao"] = 0.00;
 
                 $inTipoCobranca = Sessao::read("cobrancaJudicial")?1:0;
                 unset( $rsListaJurosMulta );
@@ -614,6 +614,10 @@ for ($inQtdParcelas=0; $inQtdParcelas < $inTotalParcelas; $inQtdParcelas++) {
 
 #============================================= DADOS
 
+for ($i=0; $i <count($arDados) ; $i++) { 
+    $arDados[$i]["vlr_reducao"] = number_format($arDados[$i]["vlr_reducao"],2,',','.');
+}
+
 $rsDados = new RecordSet;
 $rsDados->preenche( $arDados );
 $rsDados->addFormatacao ('vlr_final', 'NUMERIC_BR');
@@ -634,8 +638,6 @@ if ( count($arDados) <=  $limite ) {
     $tableDados = new Table();
     $tableDados->setRecordset( $rsDados );
     $tableDados->setSummary('Relatório de Cobrança Detalhado');
-
-   // $tableDados->setConditional( true , "#efefef" );
 
     $tableDados->Head->addCabecalho( 'Crédito/Descrição/Grupo de Crédito' , 30 );
     $tableDados->Head->addCabecalho( 'Vencimento' , 10 );

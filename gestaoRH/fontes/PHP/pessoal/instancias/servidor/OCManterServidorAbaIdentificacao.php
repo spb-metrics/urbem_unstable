@@ -93,16 +93,27 @@ function incluirFoto()
                 $largura = $tam_x;
                 $altura = $tam_y;
             }
-
-            $fhandler = fopen($_FILES['stCaminhoFoto']['tmp_name'],"r");
-            $stCaminhoFotoHandler = fread ($fhandler, $_FILES['stCaminhoFoto']['size']);
-            fclose($fhandler);
+            
+            $uploaddir  = '../../../../../../gestaoAdministrativa/fontes/PHP/framework/tmp/';
+            $nome_foto  = date('YmdHisu') . session_id();
+            $uploadfile = $uploaddir . $nome_foto;
+            
+            if (move_uploaded_file($_FILES['stCaminhoFoto']['tmp_name'], $uploadfile)) {
+                $stJs .= "alertaAviso('Download efetuado com sucesso', 'form', 'erro', '".Sessao::getId()."');";
+            } else {
+                $stJs .= "alertaAviso('Erro ao efetuar download', 'form', 'erro', '".Sessao::getId()."');";
+            }
+            
+            //$fhandler = fopen($_FILES['stCaminhoFoto']['tmp_name'],"r");
+            //$stCaminhoFotoHandler = fread ($fhandler, $_FILES['stCaminhoFoto']['size']);
+            //fclose($fhandler);
             #$_SESSION['FOTO_BIN'] = $stCaminhoFotoHandler;
-            Sessao::write('FOTO_BIN',$stCaminhoFotoHandler);
-            Sessao::write('FOTO_NAME',$_FILES['stCaminhoFoto']['name']);
-            Sessao::write('FOTO_ARQ',$stCaminhoFoto);
-            Sessao::write('FOTO_X',$largura);
-            Sessao::write('FOTO_Y',$altura);
+            Sessao::write('FOTO_BIN' ,$stCaminhoFotoHandler);
+            Sessao::write('FOTO_URL' , $uploadfile);
+            Sessao::write('FOTO_NAME', $nome_foto);
+            Sessao::write('FOTO_ARQ' ,$stCaminhoFoto);
+            Sessao::write('FOTO_X'   ,$largura);
+            Sessao::write('FOTO_Y'   ,$altura);
 
             $obImgFoto = new Img;
             $obImgFoto->setRotulo           ( "Foto"    );
@@ -110,7 +121,7 @@ function incluirFoto()
             $obImgFoto->setWidth            ( $largura  );
             $obImgFoto->setHeight           ( $altura  );
             $obImgFoto->setNull             ( true      );
-            $obImgFoto->setCaminho          ( "OCManterServidorMostraFoto.php?random=".rand(0,10000)."&".Sessao::getId());
+            $obImgFoto->setCaminho          ( $uploadfile );
 
             $obFilFoto = new FileBox;
             $obFilFoto->setRotulo        ( "Caminho" );

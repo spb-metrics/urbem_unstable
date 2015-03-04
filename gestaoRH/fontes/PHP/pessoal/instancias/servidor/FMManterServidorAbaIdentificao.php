@@ -44,40 +44,52 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once($pgOculIdentificacao);
 
-$obImgFoto = new Img;
-$obImgFoto->setRotulo           ( "Foto" 	);
-$obImgFoto->setId               ( "stFoto" 	);
-$obImgFoto->setNull             ( true		);
-if ($stNomeFoto!='no_foto.jpeg' and $stNomeFoto) {
-    $tam = getimagesize(CAM_GRH_PES_ANEXOS.$stNomeFoto);
-    $tam_x = $tam[0];
-    $tam_y = $tam[1];
-    //DEFINE OS PARÂMETROS DA MINIATURA
-    if ($tam_x > 85 || $tam_y > 112) {
-        if ( ($tam_x-85)/3 > ($tam_y - 112)/4 ) {
-            //DIMINUI PELO X
-            $porcentagem = 85 / $tam_x;
-            $largura = round($tam_x * $porcentagem);
-            $altura = round($tam_y * $porcentagem);
+if( (integer)substr(sprintf('%o', fileperms(CAM_GRH_PES_ANEXOS)), -4) >= 755) {
+    if( (integer)substr(sprintf('%o', fileperms(CAM_GRH_PES_ANEXOS.$stNomeFoto)), -4) >= 644) {
+        $obImgFoto = new Img;
+        $obImgFoto->setRotulo           ( "Foto" 	);
+        $obImgFoto->setId               ( "stFoto" 	);
+        $obImgFoto->setNull             ( true		);
+        
+        if ($stNomeFoto!='no_foto.jpeg' and $stNomeFoto) {
+            $tam = getimagesize(CAM_GRH_PES_ANEXOS.$stNomeFoto);
+            $tam_x = $tam[0];
+            $tam_y = $tam[1];
+            //DEFINE OS PARÂMETROS DA MINIATURA
+            if ($tam_x > 85 || $tam_y > 112) {
+                if ( ($tam_x-85)/3 > ($tam_y - 112)/4 ) {
+                    //DIMINUI PELO X
+                    $porcentagem = 85 / $tam_x;
+                    $largura = round($tam_x * $porcentagem);
+                    $altura = round($tam_y * $porcentagem);
+                } else {
+                    //DIMINUI PELO Y
+                    $porcentagem = 112 / $tam_y;
+                    $largura = round($tam_x * $porcentagem);
+                    $altura = round($tam_y * $porcentagem);
+                }
+            } else {
+                $largura = $tam_x;
+                $altura = $tam_y;
+            }
+            $obImgFoto->setWidth            ( $largura  );
+            $obImgFoto->setHeight           ( $altura  );
+            $obImgFoto->setCaminho       	( CAM_GRH_PES_ANEXOS.$stNomeFoto);
         } else {
-            //DIMINUI PELO Y
-            $porcentagem = 112 / $tam_y;
-            $largura = round($tam_x * $porcentagem);
-            $altura = round($tam_y * $porcentagem);
+            $obImgFoto->setWidth            ( "60" );
+            $obImgFoto->setHeight           ( "80"	);
+            $obImgFoto->setCaminho       	( CAM_FW_IMAGENS."no_foto.jpeg" );
         }
     } else {
-        $largura = $tam_x;
-        $altura = $tam_y;
+        $obLblFoto = new Label();
+        $obLblFoto->setRotulo("Fotos");
+        $obLblFoto->setValue("Falha ao carregar foto, problema de permissão. Contactar administrador do sistema.");
     }
-    $obImgFoto->setWidth            ( $largura  );
-    $obImgFoto->setHeight           ( $altura  );
-    $obImgFoto->setCaminho       	( CAM_GRH_PES_ANEXOS.$stNomeFoto);
 } else {
-    $obImgFoto->setWidth            ( "60" );
-    $obImgFoto->setHeight           ( "80"	);
-    $obImgFoto->setCaminho       	( CAM_FW_IMAGENS."no_foto.jpeg" );
+    $obLblFoto = new Label();
+    $obLblFoto->setRotulo("Fotos");
+    $obLblFoto->setValue("Falha ao carregar foto, problema de permissão. Contactar administrador do sistema.");
 }
-
 $obFilFoto = new FileBox;
 $obFilFoto->setRotulo        ( "Caminho" );
 $obFilFoto->setName          ( "stCaminhoFoto" );
@@ -99,7 +111,14 @@ $obBtnFotoExcluir->setStyle ( "width: 80px" );
 $obBtnFotoExcluir->obEvento->setOnClick("excluirFoto();");
 
 $obFormularioFoto = new Formulario;
-$obFormularioFoto->addComponente( $obImgFoto );
+if( (integer)substr(sprintf('%o', fileperms(CAM_GRH_PES_ANEXOS)), -4) >= 755) {
+if( (integer)substr(sprintf('%o', fileperms(CAM_GRH_PES_ANEXOS.$stNomeFoto)), -4) >= 644)
+    $obFormularioFoto->addComponente( $obImgFoto );
+else
+    $obFormularioFoto->addComponente( $obLblFoto );
+} else
+    $obFormularioFoto->addComponente( $obLblFoto );
+    
 if ($stNomeFoto != 'no_foto.jpeg' and $stNomeFoto) {
     $obFormularioFoto->agrupaComponentes( array($obFilFoto,$obBtnFoto,$obBtnFotoExcluir) );
 } else {

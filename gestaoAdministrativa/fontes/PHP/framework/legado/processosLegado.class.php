@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: processosLegado.class.php 60298 2014-10-10 21:01:01Z arthur $
+ $Id: processosLegado.class.php 61760 2015-03-02 17:50:02Z evandro $
 
  */
 
@@ -589,20 +589,30 @@ class processosLegado
                                     if ($fileDoc == '.' || $fileDoc == '..') {
                                         continue;
                                     }
+                                    
                                     $extensao = explode(".", $fileDoc);
+                                    $oldFile = explode("§", $fileDoc);
+
                                     if ($extensao[1] == "jpg") {
                                         $imagem = "t";
                                     } else {
                                         $imagem = "f";
                                     }
                                     
-                                    $dirAnexo = pegaConfiguracao("diretorio")."/anexos/".$codDocumentoProcesso."_".$val."_".$codProcesso."_".$anoExercicio.".".$extensao[1];
-                                    $dirAnexo = CAM_PROTOCOLO."anexos/".$codDocumentoProcesso."_".$val."_".$codProcesso."_".$anoExercicio.".".$extensao[1];
-                                    $nomeArquivo =   $codDocumentoProcesso."_".$val."_".$codProcesso."_".$anoExercicio.".".$extensao[1];
+                                    $dirAnexo = pegaConfiguracao("diretorio")."/anexos/".$codDocumentoProcesso."_".$val."_".$codProcesso."_".$anoExercicio."_".$oldFile[1];
+                                    $dirAnexo = CAM_PROTOCOLO."anexos/".$codDocumentoProcesso."_".$val."_".$codProcesso."_".$anoExercicio."_".$oldFile[1];
+
+                                    # Nome do arquivo formatado para ser único
+                                    $stNomeArquivo = $codDocumentoProcesso.'_'.$val.'_'.$codProcesso.'_'.$anoExercicio."_".$oldFile[1];
+
                                     $fileDoc = $dirDoc."/".$fileDoc;
+                                    
+                                    # Copia o arquivo para o diretório protocolo/tmp
+                                    $stDirTmp = CAM_PROTOCOLO."tmp/".$stNomeArquivo;
+                                    copy($fileDoc, $stDirTmp);
+                                   
+                                    # Copia para o diretório anexos, usado para exibir os anexos.
                                     copy($fileDoc, $dirAnexo);
-                                    echo "$codDocumentoProcesso - $val - $codProcesso - $anoExercicio 
-                                    $imagem - $dirAnexo";
                                     
                                     if ($teste_erro==0) {
                                         if ( !$obErro->ocorreu() ) {
@@ -621,7 +631,7 @@ class processosLegado
                                         $obTProtocoloCopiaDigital->setDado( "cod_processo"  , $codProcesso          );
                                         $obTProtocoloCopiaDigital->setDado( "exercicio"     , $anoExercicio         );
                                         $obTProtocoloCopiaDigital->setDado( "imagem"        , $imagem               );
-                                        $obTProtocoloCopiaDigital->setDado( "anexo"         , $nomeArquivo          );
+                                        $obTProtocoloCopiaDigital->setDado( "anexo"         , $stNomeArquivo        );
                                         $obErro = $obTProtocoloCopiaDigital->inclusao( $obTransacao );
                                     }
                                     $codDocumentoProcesso = $codDocumentoProcesso + 1;
@@ -1351,6 +1361,8 @@ Método para  editar um processo
                                     continue;
                                 }
                                 $extensao = explode(".", $arqDoc);
+                                $oldFile = explode("§", $fileDoc);
+
                                 if ($extensao[1] == "jpg") {
                                     $tipoAn = "t";
                                 } else {
@@ -1619,7 +1631,7 @@ function encaminhaProcessoLote($arProcessos, $orgao, $codUsuario)
         $conn->abreBD();
         $conn->abreSelecao($stSql);
         $conn->vaiPrimeiro();
-        $registros = $conn->numeroDeLinhas;
+        $registros = $conn->numeroDeLinhas;        
         if ($registros > 0) {
             for ($i = 1; $i <= $registros; $i++) {
                 $codProcesso_pai   = $conn->pegaCampo("cod_processo_pai");
@@ -1630,7 +1642,7 @@ function encaminhaProcessoLote($arProcessos, $orgao, $codUsuario)
                 $stFiltro = "Where cod_processo = '$codProcesso_filho' And ano_exercicio = '".$exercicio_filho."'";
 
                 $codAndamento = pegaID("cod_andamento","sw_andamento", $stFiltro );
-        $codSituacao = pegaID("cod_situacao","sw_andamento", $stFiltro );
+                $codSituacao = pegaID("cod_situacao","sw_andamento", $stFiltro );
 
                 $sql .= " INSERT INTO sw_andamento (                                                 \n";
                 $sql .= "     cod_andamento, cod_processo, ano_exercicio,                            \n";
@@ -1651,8 +1663,9 @@ function encaminhaProcessoLote($arProcessos, $orgao, $codUsuario)
         //Insere um novo andamento para o processo que deve ser o setor para o qual o processo está sendo encaminhado
         $stFiltro = " WHERE cod_processo = '$codProcesso' AND ano_exercicio = '".$anoExercicio."'";
 
-        $codAndamento = pegaID("cod_andamento","sw_andamento",$stFiltro);
-    $codSituacao = pegaID("cod_situacao","sw_andamento", $stFiltro );
+        $codAndamento = pegaID("cod_andamento","sw_andamento",$stFiltro);        
+        $codSituacao = pegaValor("  SELECT MAX(cod_situacao) as cod_situacao 
+                                    FROM sw_andamento ". $stFiltro, "cod_situacao" );
 
         $sql .= " INSERT INTO sw_andamento (                                        \n";
         $sql .= "     cod_andamento, cod_processo, ano_exercicio,                   \n";

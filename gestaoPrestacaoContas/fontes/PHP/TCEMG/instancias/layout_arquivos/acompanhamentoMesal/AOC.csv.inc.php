@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: AOC.csv.inc.php 61373 2015-01-12 17:26:51Z evandro $
-  * $Date: 2015-01-12 15:26:51 -0200 (Seg, 12 Jan 2015) $
+  * $Id: AOC.csv.inc.php 61458 2015-01-19 16:42:50Z evandro $
+  * $Date: 2015-01-19 14:42:50 -0200 (Seg, 19 Jan 2015) $
   * $Author: evandro $
-  * $Rev: 61373 $
+  * $Rev: 61458 $
   *
 */
 /**
@@ -291,7 +291,7 @@ if (count($rsRecordSetAOC10->getElementos()) > 0) {
                                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);
         
                                 if ( Sessao::getExercicio() >= '2015' ) {
-                                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("origemrecAlteracao");
+                                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("origemrecalteracao");
                                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);    

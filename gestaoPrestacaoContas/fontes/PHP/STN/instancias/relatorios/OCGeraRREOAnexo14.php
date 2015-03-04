@@ -86,13 +86,13 @@ $preview->addParametro ( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade']
 $preview->addParametro ( 'cod_recurso', $stcodRecurso );
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $rsEntidade->setPrimeiroElemento();
 
     while ( !$rsEntidade->eof() ) {
         if (preg_match("/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ))) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')));
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm'));
             break;
         }
         $rsEntidade->proximo();
@@ -158,7 +158,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo11novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

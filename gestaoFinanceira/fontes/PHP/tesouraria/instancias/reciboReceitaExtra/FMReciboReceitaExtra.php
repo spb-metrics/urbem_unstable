@@ -167,12 +167,21 @@ $obFormulario->addComponente ( $obPopUpContaReceita    );
 $obFormulario->addComponente ( $obTextValor            );
 $obFormulario->addComponente ( $obTextHistorico        );
 
+$stOnclickOkJs = " if ( Valida() ){
+                        document.frm.Ok.disabled = true;
+                        BloqueiaFrames(true,false);
+                        document.frm.submit();
+                   } ";
+
 $obOk  = new Ok;
-$obOk->setId ("Ok");
-$obOk->obEvento->setOnClick("Salvar(); ");
+$obOk->setId   ("Ok");
+$obOk->setName ("Ok");
+$obOk->obEvento->setOnClick($stOnclickOkJs);
 
 $obLimpar = new Button;
 $obLimpar->setValue( "Limpar" );
+$obLimpar->setId   ( "limpar" );
+$obLimpar->setName ( "limpar" );
 $obLimpar->obEvento->setOnClick( "frm.reset(); frm.inCodEntidade.focus(); document.frm.Ok.disabled = false;" );
 
 $obMontaAssinaturas->geraFormulario( $obFormulario );

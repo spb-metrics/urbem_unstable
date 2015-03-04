@@ -33,7 +33,7 @@
 
     * Casos de uso :
 
-    $Id: OCGeraRREOAnexo9.php 61114 2014-12-09 17:41:12Z michel $
+    $Id: OCGeraRREOAnexo9.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -54,12 +54,12 @@ $preview->addParametro ( 'exercicio', Sessao::getExercicio() );
 $preview->addParametro ( 'entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-     $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+     $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $inCodEntidadePrefeitura = SistemaLegado::pegaDado('valor','administracao.configuracao'," WHERE parametro = 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."' AND cod_modulo = 8 ");
     while ( !$rsEntidade->eof() ) {
       if ( $rsEntidade->getCampo('cod_entidade') == $inCodEntidadePrefeitura ) {
-        $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+        $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
       }
       $rsEntidade->proximo();
     }
@@ -157,7 +157,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo7novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );
@@ -168,6 +168,6 @@ if ($_REQUEST['stAcao'] == 'anexo7novo') {
 
 $preview->addParametro( 'bimestre', $_REQUEST['cmbBimestre'] );
 $preview->addParametro( 'dt_final', $stDtFinal );
-$preview->addParametro( 'descricao', utf8_encode($descricaoPeriodo) );
+$preview->addParametro( 'descricao', $descricaoPeriodo );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 $preview->preview();

@@ -105,13 +105,14 @@ define( "CAM_GPC_TCERN_POPUPS",           CAM_GPC_TCERN."popups/"       );
 define( "TTRN",                           CAM_GPC_TCERN_MAPEAMENTO               );
 
 //TRIBUNAL DE CONTAS DE GOIAS
-define( "CAM_GPC_TGO_CLASSES",          CAM_GPC_TGO."classes/"      );
+define( "CAM_GPC_TGO_CLASSES",          CAM_GPC_TGO."classes/"             );
 define( "CAM_GPC_TGO_MAPEAMENTO",       CAM_GPC_TGO_CLASSES."mapeamento/"  );
 define( "CAM_GPC_TGO_NEGOCIO",          CAM_GPC_TGO_CLASSES."negocio/"     );
-define( "CAM_GPC_TGO_CONTROLE",         CAM_GPC_TGO_CLASSES."controle/"     );
-define( "CAM_GPC_TGO_INSTANCIAS",       CAM_GPC_TGO."instancias/"   );
-define( "CAM_GPC_TGO_POPUPS",           CAM_GPC_TGO."popups/"       );
-define( "TTGO",                         CAM_GPC_TGO_MAPEAMENTO               );
+define( "CAM_GPC_TGO_CONTROLE",         CAM_GPC_TGO_CLASSES."controle/"    );
+define( "CAM_GPC_TGO_COMPONENTES",      CAM_GPC_TGO_CLASSES."componentes/" );
+define( "CAM_GPC_TGO_INSTANCIAS",       CAM_GPC_TGO."instancias/"          );
+define( "CAM_GPC_TGO_POPUPS",           CAM_GPC_TGO."popups/"              );
+define( "TTGO",                         CAM_GPC_TGO_MAPEAMENTO             );
 
 //TRIBUNAL DE CONTAS DO RS
 define( "CAM_GPC_TCERS_CLASSES",          CAM_GPC_TCERS."classes/"      );

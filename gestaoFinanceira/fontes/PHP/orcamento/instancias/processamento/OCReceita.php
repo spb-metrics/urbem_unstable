@@ -30,7 +30,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
 
-    $Id: OCReceita.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCReceita.php 61612 2015-02-13 16:47:23Z lisiane $
 
     Casos de uso: uc-02.01.06
 */
@@ -58,7 +58,12 @@ function buscaReceitaCod()
                 if ($rsReceita->getNumLinhas() > 0) {
                     $stDescricao = $rsReceita->getCampo ('descricao');
                 } else {
-                    $stJs .= "alertaAviso('Receita inválida para a entidade selecionada.','frm','erro','".Sessao::getId()."'); \n";
+                    $boVerificador = verificaReceitaLancamento();
+                    if ( $boVerificador ) {
+                        $stJs .= "alertaAviso('Necessário configurar o Lançamento de Receita da Conta ". $_GET[$_GET['stNomCampoCod']]."','frm','erro','".Sessao::getId()."'); \n";
+                    }else{
+                        $stJs .= "alertaAviso('Receita inválida para a entidade selecionada.','frm','erro','".Sessao::getId()."'); \n";
+                    }
                 }
             }
        } else {
@@ -77,6 +82,25 @@ function buscaReceitaCod()
     $stJs .= "retornaValorBscInner( '".$_GET['stNomCampoCod']."', '".$_GET['stIdCampoDesc']."', 'frm', '".$stDescricao."')";
 
     return $stJs;
+}
+
+function verificaReceitaLancamento() {
+    #Verifica se o problema é nao estar configurado o lancamento de receita
+    #tabela contabilidade.configuracao_lançamento_receita
+    $obMapeamento = new TOrcamentoReceita();
+    $boVerificador = false;
+    $stFiltro  = " AND RECEITA.exercicio = '".Sessao::getExercicio()."'";
+    $stFiltro .= " AND RECEITA.cod_receita = ". $_GET[$_GET['stNomCampoCod']];
+    if($stEntidades)
+        $stFiltro .= " AND RECEITA.cod_entidade in (".$stEntidades.") ";
+    $stFiltro .= " AND NOT EXISTS (  SELECT dr.cod_receita_secundaria
+                  FROM contabilidade.desdobramento_receita as dr
+                 WHERE   receita.cod_receita = dr.cod_receita_secundaria
+                   AND receita.exercicio   = dr.exercicio ) ";
+    $obMapeamento->recuperaLancamentoReceita($rsLancamentoReceita, $stFiltro);
+    if ($rsLancamentoReceita->getNumLinhas() > 0)
+        $boVerificador = true;
+    return $boVerificador;  
 }
 
 function buscaReceita($stTipoBusca, $stEntidades = "")

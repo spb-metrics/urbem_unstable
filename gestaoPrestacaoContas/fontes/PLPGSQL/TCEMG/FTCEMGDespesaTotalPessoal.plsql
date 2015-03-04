@@ -419,7 +419,7 @@ BEGIN
                     ) AS vencimentos_vantagens_1';
                     
         EXECUTE stSql;
-        
+       
         -- Calculando os valores referente as contas 3.1.90.11.07, 3.1.90.11.08, 3.1.90.11.09
         stSql := '
                  INSERT INTO tmp_vencimentos_vantagens_2
@@ -545,7 +545,7 @@ BEGIN
                 ) AS vencimentos_vantagens_2 ';
                     
         EXECUTE stSql;
-        
+ 
         /* OBS.: O calculo está sendo feito apartir das contas 3.1.90.04.00.00 + 3.1.90.11.00.00 + 3.1.90.16.00.00 + 3.1.90.94.00.00 - 3.1.90.11.07 - 3.1.90.11.08 - 3.1.90.11.09 */
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal    
@@ -573,7 +573,7 @@ BEGIN
                    AND tmp_vencimentos_vantagens_2.cod_conta      = tmp_vencimentos_vantagens_1.cod_conta; ';
         
         EXECUTE stSql;
-        
+            
         -- Calculando os valores referente a conta 3.1.90.01.00.00  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -612,7 +612,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+
         -- Calculando os valores referente a conta 3.1.90.03.00.00  Nível 6 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -651,7 +651,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+
         -- Calculando os valores referente a conta 3.1.90.05.00.00 Nível 6 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -729,7 +729,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+    
         -- Calculando os valores referente a conta 3.1.90.11.08  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -768,7 +768,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+       
         -- Calculando os valores referente a conta 3.1.90.11.09  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -807,7 +807,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+       
         -- Calculando os valores referente a conta 3.1.90.13.03  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -846,7 +846,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+    
         -- Calculando os valores referente as contas 3.1.90.13.02 + 3.1.91.13.02  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -937,7 +937,7 @@ BEGIN
                         ) AS repasse_patronal';
             
         EXECUTE stSql;
-        
+       
         -- Calculando os valores referente a conta 3.1.90.91.00.00  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -999,7 +999,7 @@ BEGIN
                         , 0.00
                        )';
         EXECUTE stSql;
-        
+  
         -- Calculando os valores referente a conta 3.1.90.92.00.00  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -1038,7 +1038,7 @@ BEGIN
                                           , mes_12         NUMERIC
                                           , total          NUMERIC );';
         EXECUTE stSql;
-        
+   
         -- Valores a serem conferidos
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -1084,7 +1084,7 @@ BEGIN
                         , 0.00
                        )';
         EXECUTE stSql;
-    
+ 
     ------ EXCLUSÕES 
     ELSIF inTipoDados = 2 THEN
         
@@ -1208,7 +1208,12 @@ BEGIN
                          , mes_11
                          , mes_12
                          , total
-                      FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.01'', 6, '||quote_literal(stTipoSituacao)||')
+                      FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','''||
+                                                                                                                                (SELECT valor FROM administracao.configuracao
+                                                                                                                                              WHERE cod_modulo = 8 
+														                              AND parametro ilike 'cod_entidade_rpps'
+                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.01'',6,'
+                                                                                                                     ||quote_literal(stTipoSituacao)||')
                         AS retorno ( cod_conta      VARCHAR
                                    , nom_conta      VARCHAR
                                    , cod_estrutural VARCHAR
@@ -1242,7 +1247,11 @@ BEGIN
                          , mes_11
                          , mes_12
                          , total
-                      FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.03'', 6, '||quote_literal(stTipoSituacao)||')
+                      FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','''
+                                                                                                                    ||(select valor from administracao.configuracao
+                                                                                                                        WHERE cod_modulo = 8 
+														     AND parametro ilike 'cod_entidade_rpps'
+                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.03'', 6, '||quote_literal(stTipoSituacao)||')
                         AS retorno ( cod_conta      VARCHAR
                                    , nom_conta      VARCHAR
                                    , cod_estrutural VARCHAR
@@ -1262,7 +1271,7 @@ BEGIN
                 ) AS Inativos_pensionistas ';
         
         EXECUTE stSql;
-        
+
          -- Valores a serem conferidos
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal

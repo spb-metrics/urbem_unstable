@@ -32,18 +32,20 @@
  * @author      Desenvolvedor   Henrique Boaventura <henrique.boaventura@cnm.org.br>
  * $Id:$
  */
-include CAM_GF_TES_MAPEAMENTO . 'TTesourariaBancoChequeLayout.class.php';
-include CAM_GF_TES_MAPEAMENTO . 'TTesourariaChequeImpressoraTerminal.class.php';
-include_once CAM_GF_TES_NEGOCIO    . 'RTesourariaTerminal.class.php';
-include CAM_GA_ADM_MAPEAMENTO . 'TAdministracaoImpressora.class.php';
+include_once ( CAM_GF_TES_MAPEAMENTO.'TTesourariaBancoChequeLayout.class.php'        );
+include_once ( CAM_GF_TES_MAPEAMENTO.'TTesourariaChequeImpressoraTerminal.class.php' );
+include_once ( CAM_GF_TES_NEGOCIO.'RTesourariaTerminal.class.php'                    );
+include_once ( CAM_GA_ADM_MAPEAMENTO.'TAdministracaoImpressora.class.php'            );
+include_once ( CAM_GF_TES_MAPEAMENTO.'TTesourariaUsuarioTerminal.class.php'          );
 
 class RTesourariaImpressoraCheque
 {
     public $obTTesourariaBancoChequeLayout,
-        $obRTesourariaTerminal,
-        $obTTesourariaChequeImpressoraTerminal,
-        $inCodImpressora,
-        $stFilaImpressao;
+           $obRTesourariaTerminal,
+           $obTTesourariaChequeImpressoraTerminal,
+           $obTTesourariaUsuarioTerminal,
+           $inCodImpressora,
+           $stFilaImpressao;
 
     /**
      * Método contrutor, instancia as classes necessarias.
@@ -58,6 +60,7 @@ class RTesourariaImpressoraCheque
         $this->obTTesourariaBancoChequeLayout        = new TTesourariaBancoChequeLayout();
         $this->obRTesourariaTerminal                 = new RTesourariaTerminal();
         $this->obTTesourariaChequeImpressoraTerminal = new TTesourariaChequeImpressoraTerminal();
+        $this->obTTesourariaUsuarioTerminal          = new TTesourariaUsuarioTerminal();
     }
 
     /**
@@ -248,7 +251,7 @@ class RTesourariaImpressoraCheque
     {
         $obTAdministracaoImpressora = new TAdministracaoImpressora();
         $obErro = $obTAdministracaoImpressora->recuperaTodos($rsImpressora);
-
+        
         return $obErro;
     }
 
@@ -277,6 +280,7 @@ class RTesourariaImpressoraCheque
         }
 
         $obErro = $this->obTTesourariaChequeImpressoraTerminal->findImpressoraTerminal($rsImpressora,$stFiltro);
+        
         $this->stFilaImpressao = $rsImpressora->getCampo('fila_impressao');
         $this->inCodImpressora = $rsImpressora->getCampo('cod_impressora');
 
@@ -300,6 +304,7 @@ class RTesourariaImpressoraCheque
         $this->obTTesourariaChequeImpressoraTerminal->setDado ('cod_impressora'     , $this->inCodImpressora                           );
 
         $obErro = $this->removeImpressoraTerminal();
+        
         if (!$obErro->ocorreu()) {
             $obErro = $this->obTTesourariaChequeImpressoraTerminal->inclusao();
         }
@@ -328,6 +333,26 @@ class RTesourariaImpressoraCheque
         $obErro = $this->obTTesourariaChequeImpressoraTerminal->exclusao();
 
         $this->obTTesourariaChequeImpressoraTerminal->setComplementoChave($stComplementoChave);
+
+        return $obErro;
+    }
+    
+    /**
+     * Método que seta os valores de codigo e timestamp do terminal para vincular uma impressora ao terminal
+     *
+     * @author      Analista        
+     * @author      Desenvolvedor   Arthur Cruz <arthur.cruz@cnm.org.br>
+     *
+     * @return object $obErro
+     */
+    public function recuperaCodigoTimestampTerminal($inCGM)
+    {
+        $this->obTTesourariaUsuarioTerminal->setDado('cgm_usuario', $inCGM);
+        
+        $obErro = $this->obTTesourariaUsuarioTerminal->recuperaCodigoTimestamp($rsCodigoTimestamp);
+        
+        $this->obRTesourariaTerminal->inCodTerminal       = $rsCodigoTimestamp->getCampo('cod_terminal');
+        $this->obRTesourariaTerminal->stTimestampTerminal = $rsCodigoTimestamp->getCampo('timestamp_terminal');
 
         return $obErro;
     }

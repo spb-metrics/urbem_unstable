@@ -72,7 +72,7 @@ if ($stNomeEntidade == '') {
 }
 
 if ( count($_REQUEST['inCodEntidade']) > 0 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($stNomeEntidade) );
+    $preview->addParametro( 'nom_entidade', $stNomeEntidade );
 } else {
     $preview->addParametro( 'nom_entidade', '' );
 }
@@ -169,7 +169,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 $preview->addParametro( 'dt_inicio' , $stDtInicio );
 $preview->addParametro( 'dt_final'  , $stDtFinal );
 $preview->addAssinaturas(Sessao::read('assinaturas'));

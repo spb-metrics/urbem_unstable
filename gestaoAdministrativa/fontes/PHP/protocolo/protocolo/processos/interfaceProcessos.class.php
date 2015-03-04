@@ -32,7 +32,7 @@
 
      * Casos de uso: uc-01.06.98
 
-    $Id: interfaceProcessos.class.php 60640 2014-11-05 12:37:03Z franver $
+    $Id: interfaceProcessos.class.php 61760 2015-03-02 17:50:02Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -541,11 +541,18 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
 
             function copiaDigital(cod)
             {
+                //var x = 200;
+                //var y = 140;
+                //var sArq = '<?=CAM_GA_PROT_POPUPS."documento/FMDocumentoProcesso.php";?>?<?=Sessao::getId();?>&codDoc='+cod+'&acao='+acao+'&inCodProcesso='+codProcesso+'&stAnoProcesso='+anoExercicio;
+                //var wVolta=false;
+                //tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=550px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+
                 var x = 200;
                 var y = 140;
                 var sArq = '<?=CAM_FW_LEGADO."imagens/copiaDigitalLegado.php";?>?<?=Sessao::getId();?>&codDoc='+cod;
                 var wVolta=false;
                 tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=450px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+                window.tela.focus();
             }
 
             function ValidaProcesso()
@@ -1498,7 +1505,7 @@ if (!empty($codClassificacao)) {
 <?php
 
     break;
-    }
+    
 
     $arInteressados = Sessao::getRequestProtocolo();
 

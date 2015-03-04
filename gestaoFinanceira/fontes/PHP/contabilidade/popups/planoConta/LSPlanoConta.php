@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 61128 2014-12-10 16:58:44Z silvia $
+    * $Id: LSPlanoConta.php 61653 2015-02-20 19:35:15Z arthur $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -713,7 +713,7 @@ if ($_REQUEST['tipoBusca']) {
             if ($_REQUEST['stCodEstrutural']) {
                 $inCodEstrutural= $_REQUEST['stCodEstrutural'];
             }else{
-                $inCodEstrutural = SistemaLegado::pegaDado('valor','administracao.configuracao',"WHERE exercicio = '".Sessao::getExercicio()."' AND cod_modulo = 6 AND parametro = 'grupo_contas_permanente'");
+                $inCodEstrutural = '1.2';
             }
             $obRegra->setCodEstrutural($inCodEstrutural);
             $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");

@@ -31,7 +31,7 @@
 
     * Casos de uso : uc-02.01.40
 
-    * $Id: OCGeraDespesasSIOPE.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraDespesasSIOPE.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
 */
 
@@ -52,7 +52,7 @@ $preview->addParametro('cod_entidade', implode(',', $_REQUEST['inCodEntidade']))
 
 $preview->addParametro('orgao'  , $_REQUEST['inCodOrgao']);
 $preview->addParametro('recurso', $_REQUEST['inCodRecurso']);
-$preview->addParametro('descricao_recurso', utf8_encode($_REQUEST['stDescricaoRecurso']));
+$preview->addParametro('descricao_recurso', $_REQUEST['stDescricaoRecurso']);
 
 switch ($_REQUEST['inPeriodicidade']) {
 case '1':

@@ -31,10 +31,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 61679 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: evandro $
+    $Date: 2015-02-25 10:07:38 -0300 (Qua, 25 Fev 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -59,19 +59,20 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obTMapeamento = new TTCMGOAtivoPermanenteCreditos;
         $obTMapeamento->setDado ('exercicio'  , Sessao::getExercicio() );
         $obTMapeamento->setDado ('stEntidades',  $stEntidades  );
-        $obTMapeamento->recuperaTodos($arRecordSet[$stArquivo]);
+        $obTMapeamento->recuperaTodos($rsRegistro10);
+        $obTMapeamento->debug();die();
 
         $i = 1;
-        foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
-            $arRecordSet[$stArquivo]->arElementos[$i]['numero_registro']    = $i;
-            $arRecordSet[$stArquivo]->arElementos[$i]['tipo_registro']      = 10;
-            $arRecordSet[$stArquivo]->arElementos[$i]['vl_cancelamento']    = 0;
-            $arRecordSet[$stArquivo]->arElementos[$i]['vl_encampacao']      = 0;
-
+        foreach ($rsRegistro10->arElementos as $stChave) {
+            $rsRegistro10->arElementos[$i]['numero_registro']    = $i;
+            $rsRegistro10->arElementos[$i]['tipo_registro']      = 10;
+            $rsRegistro10->arElementos[$i]['vl_cancelamento']    = 0;
+            $rsRegistro10->arElementos[$i]['vl_encampacao']      = 0;
             $i++;
         }
-
-        $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
+       
+  
+        $obExportador->roUltimoArquivo->addBloco($rsRegistro10);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -86,7 +87,7 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
@@ -95,7 +96,7 @@ Revision 1.1  2007/05/18 16:02:16  bruce
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_lancamento" );
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 3 );
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 2 );
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_anterior");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
@@ -125,6 +126,7 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
+        
         $rsRecordSetRodape = new RecordSet;
 
         $arRegistro = array();
@@ -141,8 +143,11 @@ Revision 1.1  2007/05/18 16:02:16  bruce
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 244 );
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 288 );
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+
+?>
+        

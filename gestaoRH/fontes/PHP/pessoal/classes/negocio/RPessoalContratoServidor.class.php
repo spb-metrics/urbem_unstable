@@ -1626,7 +1626,7 @@ function alterarContrato($boTransacao = "")
         $obTPessoalContratoServidor->setDado("cod_categoria",         $this->obRPessoalCategoria->getCodCategoria()           );
         $obTPessoalContratoServidor->setDado("cod_sub_divisao",       $this->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->getCodSubDivisao());
         $obTPessoalContratoServidor->setDado("cod_grade",             $this->obRPessoalGradeHorario->getCodGrade()           );
-        $obErro = $obTPessoalContratoServidor->alteracao( $boTransacao );
+        $obErro = $obTPessoalContratoServidor->alteracao( $boTransacao );        
     }
     if ( !$obErro->ocorreu() ) {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorSindicato.class.php");

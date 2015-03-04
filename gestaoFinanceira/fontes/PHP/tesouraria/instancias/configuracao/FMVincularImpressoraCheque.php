@@ -41,9 +41,17 @@ $stAcao = $request->get('stAcao');
 
 $pgOcul = 'OCVincularImpressoraCheque.php';
 
+$stPrograma = "VincularImpressoraCheque";
+$pgFilt = "FL".$stPrograma.".php";
+$pgList = "LS".$stPrograma.".php";
+$pgForm = "FM".$stPrograma.".php";
+$pgProc = "PR".$stPrograma.".php";
+$pgOcul = "OC".$stPrograma.".php";
+$pgJs   = "JS".$stPrograma.".js";
+
 //Instancia um objeto Form
 $obForm = new Form;
-$obForm->setAction('PRVincularImpressoraCheque.php');
+$obForm->setAction( $pgProc );
 $obForm->setTarget('oculto');
 
 //Instancia um objeto hidden da acao
@@ -58,7 +66,8 @@ $obLblUsuario->setValue  (Sessao::read('numCgm') . ' - ' . Sessao::read('nomCgm'
 
 //Recupera as impressoras do sistema
 $obRTesourariaImpressoraCheque = new RTesourariaImpressoraCheque();
-$obRTesourariaImpressoraCheque->listImpressorasSistema          ($rsImpressoras);
+$obRTesourariaImpressoraCheque->listImpressorasSistema ($rsImpressoras);
+
 //Instancia um select para as impressoras
 $obCmbImpressora = new Select  ();
 $obCmbImpressora->setRotulo    ('Impressora'     );

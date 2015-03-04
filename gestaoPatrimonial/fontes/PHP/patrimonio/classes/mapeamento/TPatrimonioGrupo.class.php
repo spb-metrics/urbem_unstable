@@ -32,7 +32,7 @@
 
     Caso de uso: uc-03.01.04
 
-    $Id: TPatrimonioGrupo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TPatrimonioGrupo.class.php 61653 2015-02-20 19:35:15Z arthur $
 
   */
 
@@ -216,7 +216,64 @@ class TPatrimonioGrupo extends Persistente
 
         return $stSql;
     }
+    
+    public function recuperaGrupoPlanoDepreciacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaGrupoPlanoDepreciacao().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
 
+        return $obErro;
+    }
+
+    public function montaRecuperaGrupoPlanoDepreciacao()
+    {
+        $stSql  = "
+                   SELECT grupo_plano_depreciacao.cod_plano
+		        , bem.cod_bem
+		        , grupo_plano_depreciacao.exercicio
+                 
+                     FROM patrimonio.grupo_plano_depreciacao
+        
+               INNER JOIN patrimonio.grupo
+                       ON grupo.cod_natureza = grupo_plano_depreciacao.cod_natureza
+                      AND grupo.cod_grupo    = grupo_plano_depreciacao.cod_grupo
+               
+               INNER JOIN patrimonio.especie
+                       ON especie.cod_grupo    = grupo.cod_grupo
+                      AND especie.cod_natureza = grupo.cod_natureza
+               
+               INNER JOIN patrimonio.bem
+                       ON bem.cod_especie  = especie.cod_especie
+                      AND bem.cod_grupo    = especie.cod_grupo
+                      AND bem.cod_natureza = especie.cod_natureza
+                      
+               INNER JOIN patrimonio.depreciacao
+                       ON depreciacao.cod_bem = bem.cod_bem
+
+                   WHERE NOT EXISTS ( SELECT 1 
+                                 FROM patrimonio.depreciacao_anulada
+                                WHERE depreciacao_anulada.cod_depreciacao = depreciacao.cod_depreciacao
+                                  AND depreciacao_anulada.cod_bem         = depreciacao.cod_bem
+                                  AND depreciacao_anulada.timestamp       = depreciacao.timestamp
+                             )
+                     AND grupo_plano_depreciacao.exercicio        = '".Sessao::getExercicio()."'
+                     AND substring(depreciacao.competencia, 1,4 ) = '".Sessao::getExercicio()."' \n";
+                     
+        if ($this->getDado('cod_bem')) {
+            $stSql .= " AND depreciacao.cod_bem = ".$this->getDado('cod_bem');
+        }
+        
+        if ($this->getDado('cod_plano_grupo')) {
+            $stSql .= " AND grupo_plano_depreciacao.cod_plano = ".$this->getDado('cod_plano_grupo');
+        }
+        
+        return $stSql;
+    }
+    
 }
 
 ?>

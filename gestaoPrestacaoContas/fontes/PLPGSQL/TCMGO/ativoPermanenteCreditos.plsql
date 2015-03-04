@@ -26,10 +26,10 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 59612 $
+* $Revision: 61679 $
 * $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Author: evandro $
+* $Date: 2015-02-25 10:07:38 -0300 (Qua, 25 Fev 2015) $
 *
 * Casos de uso: uc-02.02.11
 */
@@ -58,22 +58,18 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (varchar, varchar, varchar, varchar, bpchar) RETURNS SETOF RECORD AS
-'
+CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stFiltro            ALIAS FOR $2;
     stDtInicial         ALIAS FOR $3;
-    stDtFinal           ALIAS FOR $4;
-    chEstilo            ALIAS FOR $5;
-    stSql               VARCHAR   := '''';
-    stSqlComplemento    VARCHAR   := '''';
+    stDtFinal           ALIAS FOR $4;    
+    stSql               VARCHAR   := '';
+    stSqlComplemento    VARCHAR   := '';
     reRegistro          RECORD;
     arRetorno           NUMERIC[];
-
 BEGIN
-
-    stSql := ''CREATE TEMPORARY TABLE tmp_debito AS
+    stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
                 FROM (
                     SELECT
@@ -110,19 +106,19 @@ BEGIN
                     AND     vl.sequencia    = la.sequencia
                     AND     vl.exercicio    = la.exercicio
                     AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''''D''''
+                    AND     vl.tipo_valor   = ''D''
                     AND     la.cod_lote     = lo.cod_lote
                     AND     la.exercicio    = lo.exercicio
                     AND     la.tipo         = lo.tipo
                     AND     la.cod_entidade = lo.cod_entidade
-                    AND     pa.exercicio = '' || stExercicio || ''
+                    AND     pa.exercicio = ' || quote_literal(stExercicio) || '
                     ORDER BY pc.cod_estrutural
                   ) as tabela
                  WHERE
-                '' || stFiltro ;
+                ' || stFiltro ;
     EXECUTE stSql;
 
-    stSql := ''CREATE TEMPORARY TABLE tmp_credito AS
+    stSql := 'CREATE TEMPORARY TABLE tmp_credito AS
                 SELECT *
                 FROM (
                     SELECT
@@ -159,16 +155,16 @@ BEGIN
                     AND     vl.sequencia    = la.sequencia
                     AND     vl.exercicio    = la.exercicio
                     AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''''C''''
+                    AND     vl.tipo_valor   = ''C''
                     AND     la.cod_lote     = lo.cod_lote
                     AND     la.exercicio    = lo.exercicio
                     AND     la.tipo         = lo.tipo
                     AND     la.cod_entidade = lo.cod_entidade
-                    AND     pa.exercicio = '' || stExercicio || ''
+                    AND     pa.exercicio = ' || quote_literal(stExercicio) || '
                     ORDER BY pc.cod_estrutural
                   ) as tabela
                  WHERE
-                '' || stFiltro ;
+                ' || stFiltro ;
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_debito              ON tmp_debito           (cod_estrutural varchar_pattern_ops, oid_temp);
@@ -177,44 +173,51 @@ BEGIN
     CREATE TEMPORARY TABLE tmp_totaliza_debito AS
         SELECT *
         FROM  tmp_debito
-        WHERE dt_lote BETWEEN to_date( stDtInicial , ''dd/mm/yyyy'' ) AND   to_date( stDtFinal , ''dd/mm/yyyy'' )
-        AND   tipo <> ''I'';
+        WHERE dt_lote BETWEEN to_date( stDtInicial , 'dd/mm/yyyy' ) AND   to_date( stDtFinal , 'dd/mm/yyyy' )
+        AND   tipo <> 'I';
 
     CREATE TEMPORARY TABLE tmp_totaliza_credito AS
         SELECT *
         FROM  tmp_credito
-        WHERE dt_lote BETWEEN to_date( stDtInicial , ''dd/mm/yyyy'' ) AND   to_date( stDtFinal , ''dd/mm/yyyy'' )
-        AND   tipo <> ''I'';
+        WHERE dt_lote BETWEEN to_date( stDtInicial , 'dd/mm/yyyy' ) AND   to_date( stDtFinal , 'dd/mm/yyyy' )
+        AND   tipo <> 'I';
 
     CREATE UNIQUE INDEX unq_totaliza_credito ON tmp_totaliza_credito (cod_estrutural varchar_pattern_ops, oid_temp);
     CREATE UNIQUE INDEX unq_totaliza_debito  ON tmp_totaliza_debito  (cod_estrutural varchar_pattern_ops, oid_temp);
 
-    IF substr(stDtInicial,1,5) = ''01/01'' THEN
-        stSqlComplemento := '' dt_lote = to_date( '' || quote_literal(stDtInicial) || '','' || quote_literal(''dd/mm/yyyy'') || '') '';
-        stSqlComplemento := stSqlComplemento || '' AND tipo = ''||quote_literal(''I'')||'' '';
-    ELSE
-        stSqlComplemento := '' dt_lote <= to_date( '' || quote_literal(stDtInicial) || '','' || quote_literal(''dd/mm/yyyy'') || '')-1 '';
-    END IF;
-
-    stSql := ''CREATE TEMPORARY TABLE tmp_totaliza AS
-        SELECT * FROM tmp_debito
-        WHERE
-             '' || stSqlComplemento || ''
-       UNION
-        SELECT * FROM tmp_credito
-        WHERE
-             '' || stSqlComplemento || ''
-    '';
+    stSql := 'CREATE TEMPORARY TABLE tmp_totaliza AS
+                    SELECT * 
+                    FROM tmp_debito
+                    WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
+                    AND tipo = ''I''
+                UNION
+                    SELECT * 
+                    FROM tmp_credito
+                    WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
+                    AND tipo = ''I''
+        ';
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
 
-    stSql := '' SELECT
+    stSql :=' SELECT
                      pc.cod_estrutural
                     ,publico.fn_nivel(pc.cod_estrutural) as nivel
                     ,pc.nom_conta
-                    ,org.num_orgao
-                    ,ou.cod_unidade
+                    , ( SELECT LPAD(tcmgo.orgao.num_orgao::VARCHAR, 2, ''0'') AS cod_orgao
+                        FROM orcamento.orgao
+                        INNER JOIN tcmgo.orgao
+                             ON tcmgo.orgao.num_orgao = orcamento.orgao.num_orgao
+                            AND tcmgo.orgao.exercicio = orcamento.orgao.exercicio
+                        WHERE tcmgo.orgao.exercicio = ' || quote_literal(stExercicio) || '
+                    ) AS num_orgao
+                    , ( SELECT LPAD(unidade.num_unidade::VARCHAR, 2, ''0'') AS cod_orgao
+                        FROM orcamento.unidade
+                        INNER JOIN tcmgo.orgao
+                             ON tcmgo.orgao.num_orgao = orcamento.unidade.num_orgao
+                            AND tcmgo.orgao.exercicio = orcamento.unidade.exercicio
+                        WHERE tcmgo.orgao.exercicio = ' || quote_literal(stExercicio) || '
+                    ) AS cod_unidade
                     ,0.00 as vl_saldo_anterior
                     ,0.00 as vl_saldo_debitos
                     ,0.00 as vl_saldo_creditos
@@ -222,26 +225,24 @@ BEGIN
                     ,sc.nom_sistema
                     ,ba.tipo_lancamento
                 FROM
-                     contabilidade.plano_conta      as pc
-                    ,contabilidade.sistema_contabil as sc
-                    ,contabilidade.plano_analitica  as c_pa
-                    ,tcmgo.orgao_plano_banco        as org
-                    ,tcmgo.balanco_apcaaaa          as ba
-                    ,orcamento.unidade              as ou
-                WHERE
-                    pc.exercicio = '' || stExercicio || ''
-                    AND pc.cod_sistema = sc.cod_sistema
-                    AND pc.exercicio   = sc.exercicio
-                    AND c_pa.cod_conta = pc.cod_conta
-                    AND c_pa.exercicio = pc.exercicio
-                    AND org.exercicio  = c_pa.exercicio
-                    AND org.cod_plano  = c_pa.exercicio
-                    AND ba.cod_plano   = c_pa.cod_plano
-                    AND ba.exercicio   = c_pa.exercicio
-                    AND org.exercicio  = ou.exercicio
-                    AND org.num_orgao  = ou.num_orgao
-               ORDER BY sc.nom_sistema, pc.cod_estrutural '';
+                    contabilidade.plano_conta      as pc
 
+                INNER JOIN contabilidade.sistema_contabil as sc
+                     ON pc.cod_sistema = sc.cod_sistema
+                    AND pc.exercicio   = sc.exercicio
+
+                INNER JOIN contabilidade.plano_analitica  as c_pa
+                     ON c_pa.cod_conta = pc.cod_conta
+                    AND c_pa.exercicio = pc.exercicio
+
+                INNER JOIN tcmgo.balanco_apcaaaa          as ba
+                     ON ba.cod_plano   = c_pa.cod_plano
+                    AND ba.exercicio   = c_pa.exercicio
+                
+                WHERE pc.exercicio = ' || quote_literal(stExercicio) || '
+                    
+               ORDER BY sc.nom_sistema, pc.cod_estrutural 
+            ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -272,4 +273,4 @@ BEGIN
 
     RETURN;
 END;
-' LANGUAGE 'plpgsql'
+$$ LANGUAGE 'plpgsql'

@@ -269,11 +269,11 @@ if ($stAcao == 'alterarCD') {
     $obTLicitacaoPublicacaoContrato->setDado('exercicio', "'".Sessao::getExercicio()."'");
     $obTLicitacaoPublicacaoContrato->setDado('exercicio_contrato', "'".$_REQUEST["stExercicioContrato"]."'");
     $obTLicitacaoPublicacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-    $obTLicitacaoPublicacaoContrato->setDado('num_aditivo', $_REQUEST['inNumAditivo']);
+    $obTLicitacaoPublicacaoContrato->setDado('num_aditivo', $_REQUEST['inNumeroAditivo']);
 
     $inCount = 0;
     $arValores = array();
-
+    
     $obTLicitacaoPublicacaoContrato->recuperaVeiculosPublicacao( $rsVeiculosPublicacao );
 
     while ( !$rsVeiculosPublicacao->eof() ) {

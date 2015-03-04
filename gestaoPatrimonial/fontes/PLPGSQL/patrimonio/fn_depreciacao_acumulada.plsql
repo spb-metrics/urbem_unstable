@@ -52,13 +52,17 @@ BEGIN
 				       , competencia_depreciado.max_competencia
 				   FROM patrimonio.bem
 
-			      -- Recupera o valor do bem.
+			      -- Recupera o valor do bem, para calcular vl_acumumlado e quota das proximas inserções.
+                              -- Quando o bem possuir reavaliação, é desconsiderado as deprecaiações antigas e feitas novas a partir so novo valor.
 	                      LEFT JOIN (
 					       SELECT depreciacao.cod_bem
 						    , depreciacao.cod_depreciacao
 						    , depreciacao.timestamp
 						    , depreciacao.competencia
-						    , depreciacao.vl_depreciado
+                                                    , CASE WHEN (SELECT COUNT(cod_depreciacao) FROM patrimonio.depreciacao_reavaliacao WHERE cod_bem = '||inCodBem||') = 0
+						           THEN 0.00
+						           ELSE depreciacao.vl_depreciado
+						      END vl_depreciado
 						    , CASE
 							WHEN depreciacao_anulada.cod_bem         IS NOT NULL
 							 AND depreciacao_anulada.cod_depreciacao IS NOT NULL
@@ -66,23 +70,34 @@ BEGIN
 								''anulada''
 							ELSE
 								''depreciado''
-						      END AS situacao
-						 FROM patrimonio.depreciacao
+						     END AS situacao
+                                                      
+						FROM patrimonio.depreciacao
 						
 					   LEFT JOIN patrimonio.depreciacao_anulada
 						  ON depreciacao_anulada.cod_bem         = depreciacao.cod_bem
 						 AND depreciacao_anulada.cod_depreciacao = depreciacao.cod_depreciacao
 						 AND depreciacao_anulada.timestamp       = depreciacao.timestamp
+                                            
+                                          INNER JOIN patrimonio.depreciacao_reavaliacao
+					 	  ON depreciacao.cod_depreciacao = depreciacao_reavaliacao.cod_depreciacao 
+					         AND depreciacao.cod_bem         = depreciacao_reavaliacao.cod_bem  
+					         AND depreciacao.timestamp       = depreciacao_reavaliacao.timestamp
 				 
 			                ) AS depreciado
 		                      ON depreciado.cod_bem = bem.cod_bem
                             
-                            -- Recupera as competências minima e máxima que ainda não foram anuladas.
+                            -- Recupera as competências minima e máxima reavaliadas e que ainda não foram anuladas.
 		               LEFT JOIN (        
 		                           SELECT depreciacao.cod_bem
 					        , MIN(depreciacao.competencia) AS min_competencia
 					        , MAX(depreciacao.competencia) AS max_competencia
 					     FROM patrimonio.depreciacao
+                                        
+                                        INNER JOIN patrimonio.depreciacao_reavaliacao
+						ON depreciacao.cod_depreciacao = depreciacao_reavaliacao.cod_depreciacao 
+					       AND depreciacao.cod_bem         = depreciacao_reavaliacao.cod_bem  
+					       AND depreciacao.timestamp       = depreciacao_reavaliacao.timestamp
 	 
 				        LEFT JOIN patrimonio.depreciacao_anulada
 					       ON depreciacao_anulada.cod_depreciacao = depreciacao.cod_depreciacao
@@ -92,6 +107,10 @@ BEGIN
 					    WHERE depreciacao_anulada.cod_bem         IS NULL
 					      AND depreciacao_anulada.cod_depreciacao IS NULL
 					      AND depreciacao_anulada.timestamp       IS NULL
+
+                                              AND depreciacao_reavaliacao.cod_reavaliacao = (SELECT MAX(cod_reavaliacao)
+                                                                                               FROM patrimonio.reavaliacao
+                                                                                              WHERE cod_bem = '||inCodBem||' )
 	 
 				         GROUP BY depreciacao.cod_bem
                                          
@@ -121,13 +140,7 @@ BEGIN
 				    AND depreciado.cod_depreciacao  = depreciacao_reavaliacao.cod_depreciacao
 
 			          WHERE bem.cod_bem = '||inCodBem||'
-
-                               GROUP BY bem.cod_bem
-                                      , depreciado.situacao
-                                      , depreciado.vl_depreciado
-                                      , reavaliacao.vl_reavaliacao
-			              , competencia_depreciado.min_competencia
-			              , competencia_depreciado.max_competencia
+  
                             )AS reavaliacao
                           ON reavaliacao.cod_bem = bem.cod_bem
                     
@@ -203,13 +216,7 @@ BEGIN
                                      ON competencia_depreciado.cod_bem = bem.cod_bem
                                         
                                   WHERE bem.cod_bem = '||inCodBem||'
-           
-                               GROUP BY bem.cod_bem
-                                      , depreciado.situacao
-                                      , depreciado.vl_depreciado
-                                      , competencia_depreciado.min_competencia
-                                      , competencia_depreciado.max_competencia
-           
+
                           ) AS depreciacao
                          ON depreciacao.cod_bem = bem.cod_bem       
            

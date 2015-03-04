@@ -34,6 +34,8 @@ include_once ( CAM_GP_PAT_MAPEAMENTO."TPatrimonioDepreciacaoAnulada.class.php"  
 $stProg = 'DepreciacaoAutomatica';
 $pgFilt = 'FL'.$stProg.'.php';
 
+SistemaLegado::BloqueiaFrames(true,true);
+
 $boTransacao = new Transacao;
 $obErro      = new Erro;
 $obTContabilidadeLancamentoDepreciacao  = new TContabilidadeLancamentoDepreciacao();
@@ -52,7 +54,7 @@ switch ($stAcao) {
 
             $stFiltroDepreciacao = "\n WHERE competencia = '".$inMesCompetenciaFiltro."'";
             $obErro = $obTPatrimonioDepreciacao->recuperaTodos($rsPatrimonioDepreciacao, $stFiltroDepreciacao, " ORDER BY cod_depreciacao DESC ");
-            
+	    
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCompetenciaDepreciada($rsMaxCompetenciaDepreciada);
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCodDepreciacao($rsMaxDepreciacao, $stFiltroDepreciacao);
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCodDepreciacaoAnulada($rsMaxAnulada, $stFiltroDepreciacao);
@@ -85,36 +87,28 @@ switch ($stAcao) {
                     $obErro->setDescricao("Deve anular última competência depreciada - ".$rsMaxCompetenciaDepreciada->getCampo('max_competencia_formatada'));
                     
                 } else {            
-                    $obTPatrimonioDepreciacaoAnulada = new TPatrimonioDepreciacaoAnulada();
-    
-                    foreach ($rsPatrimonioDepreciacao->getElementos() as $arDepreciacao) {
-                        $obTPatrimonioDepreciacaoAnulada->setDado("cod_depreciacao"    , $arDepreciacao["cod_depreciacao"]);
-                        $obTPatrimonioDepreciacaoAnulada->setDado("cod_bem"            , $arDepreciacao["cod_bem"]        );
-                        $obTPatrimonioDepreciacaoAnulada->setDado("timestamp"          , $arDepreciacao["timestamp"]      );
-                        $obTPatrimonioDepreciacaoAnulada->setDado("timestamp_anulacao" , date('Y-m-d G:i:s')              );
-                        $obTPatrimonioDepreciacaoAnulada->setDado("motivo"             , $request->get("stMotivo")        );
-                        
-                        $obTPatrimonioDepreciacaoAnulada->RecuperaPorChave($rsDepreciacaoAnulada);
-                        
-                        if($rsDepreciacaoAnulada->getNumLinhas() <= 0){
-                            $obErro = $obTPatrimonioDepreciacaoAnulada->inclusao($boTransacao);    
-                        }
-                    }
+		    //SistemaLegado::BloqueiaFrames(true,true);
+		    $obTPatrimonioDepreciacaoAnulada = new TPatrimonioDepreciacaoAnulada();
+                    $stParametros  = "'".$inMesCompetenciaFiltro."' ,";
+		    $stParametros .= '\''.($_REQUEST['stMotivo'] ? $_REQUEST['stMotivo'] : '').'\'';
+	    
+		    $obErro = $obTPatrimonioDepreciacaoAnulada->executaFuncao($stParametros, $boTransacao);
+		    
                 }
                 
                 if (!$obErro->ocorreu()) {
-                    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens anulados com sucesso até a competência: ".str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
+		    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens anulados com sucesso até a competência: ".str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
                 } else {
                     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
                 }
-                
+		
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
         
         }else{             
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCompetenciaDepreciada($rsMaxCompetenciaDepreciada);
-                                            
+	    
             $stFiltroDepreciacao = "\n WHERE competencia = '".$inMesCompetenciaFiltro."'";
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCodDepreciacao($rsMaxDepreciacao, $stFiltroDepreciacao );
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCodDepreciacaoAnulada($rsMaxAnulada, $stFiltroDepreciacao );
@@ -124,8 +118,8 @@ switch ($stAcao) {
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCodDepreciacaoAnulada($rsMaxAnuladaAnterior, $stFiltroAnterior);
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCompetenciaAnulada($rsMxCompetenciaAnterior, $stFiltroAnterior);
             
-            $stProximaCompetencia = ($rsMaxCompetenciaDepreciada->getCampo('max_competencia') != "201412") ? substr(($rsMaxCompetenciaDepreciada->getCampo('max_competencia') + 1), 4, 6)."/".substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'),0,4) : substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'), 4, 6)."/".substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'),0,4);
-            
+	    $stProximaCompetencia = ($rsMaxCompetenciaDepreciada->getCampo('max_competencia') != $request->get("inExercicio")."12") ? substr(($rsMaxCompetenciaDepreciada->getCampo('max_competencia') + 1), 4, 6)."/".substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'),0,4) : substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'), 4, 6)."/".substr($rsMaxCompetenciaDepreciada->getCampo('max_competencia'),0,4);
+	    
             if (!$obErro->ocorreu()) {
             
                 // Verifica se a competência anterior possui anulação, não pode depreciar a atual sem antes depreciar novamente a anterior.
@@ -146,10 +140,10 @@ switch ($stAcao) {
                 
                 // Não pode ser maior que a competência logada do sistema.
                 } elseif (((int) $_REQUEST['inExercicio'] == date('Y') && (int) $_REQUEST['inCompetencia'] > date('m')) || ((int) $_REQUEST['inExercicio'] != date('Y'))) {
-                    $obErro->setDescricao("A competência selecionada não pode ser maior que a atual do sistema!");
+		    $obErro->setDescricao("A competência selecionada não pode ser maior que a atual do sistema!");
     
                 } else {
-                    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica;
+		    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica;
     
                     $stParametros  = '\''.$_REQUEST['inExercicio'].'\',';
                     $stParametros .= '\''.str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'\',';
@@ -173,5 +167,7 @@ switch ($stAcao) {
         
     break;
 }
+
+SistemaLegado::LiberaFrames(true,true);
 
 ?>

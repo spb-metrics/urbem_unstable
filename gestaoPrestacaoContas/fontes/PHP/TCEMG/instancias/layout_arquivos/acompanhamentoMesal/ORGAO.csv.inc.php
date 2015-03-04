@@ -31,16 +31,19 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ORGAO.csv.inc.php 61325 2015-01-06 19:40:31Z lisiane $
-  * $Date: 2015-01-06 17:40:31 -0200 (Ter, 06 Jan 2015) $
-  * $Author: lisiane $
-  * $Rev: 61325 $
+  * $Id: ORGAO.csv.inc.php 61575 2015-02-10 12:53:21Z franver $
+  * $Date: 2015-02-10 10:53:21 -0200 (Ter, 10 Fev 2015) $
+  * $Author: franver $
+  * $Rev: 61575 $
   *
 */
+
 /**
 * ORGAO.csv | Autor : Michel Teixeira
 */
+
 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoOrgao.class.php";
+
 $rsRecordSetORGAO10 = new RecordSet();
 $rsRecordSetORGAO11 = new RecordSet();
 $stVersao = 'Versão: '.Sessao::getVersao();
@@ -48,6 +51,7 @@ $stVersao = 'Versão: '.Sessao::getVersao();
 $obTTCEMGConfiguracaoOrgao               = new TTCEMGConfiguracaoOrgao;
 $obTTCEMGConfiguracaoOrgao->setDado('exercicio',Sessao::getExercicio());
 $obTTCEMGConfiguracaoOrgao->setDado('entidade',$stEntidades);
+
 if(Sessao::getExercicio() >= 2015){
     $obTTCEMGConfiguracaoOrgao->setDado('versao',$stVersao);
     $obTTCEMGConfiguracaoOrgao->recuperaOrgao2015($rsRecordSetORGAO10);
@@ -55,8 +59,10 @@ if(Sessao::getExercicio() >= 2015){
     $obTTCEMGConfiguracaoOrgao->recuperaOrgao($rsRecordSetORGAO10);
 }
 
-$obTTCEMGConfiguracaoOrgao->setDado('exercicio',Sessao::getExercicio());
-$obTTCEMGConfiguracaoOrgao->setDado('entidade',$stEntidades);
+$obTTCEMGConfiguracaoOrgao->setDado('dt_inicial', $stDataInicial);
+$obTTCEMGConfiguracaoOrgao->setDado('dt_final'  , $stDataFinal);
+$obTTCEMGConfiguracaoOrgao->setDado('exercicio' , Sessao::getExercicio());
+$obTTCEMGConfiguracaoOrgao->setDado('entidade'  , $stEntidades);
 $obTTCEMGConfiguracaoOrgao->recuperaOrgaoResponsavel($rsRecordSetORGAO11);
 
 //Tipo Registro 99
@@ -68,7 +74,6 @@ $arRecordSetORGAO99 = array(
 
 $rsRecuperaORGAO99 = new RecordSet();
 $rsRecuperaORGAO99->preenche($arRecordSetORGAO99);
-
 
 if (count($rsRecordSetORGAO10->getElementos()) > 0) {
     $inCount=0;
@@ -113,12 +118,12 @@ if (count($rsRecordSetORGAO10->getElementos()) > 0) {
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_documento");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("versao");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(50);
         }
  
         if (count($rsRecordSetORGAO11->getElementos()) > 0) {
@@ -175,12 +180,12 @@ if (count($rsRecordSetORGAO10->getElementos()) > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(50);
       
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dtinicio");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
       
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dtfinal");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
       
@@ -199,8 +204,10 @@ if (count($rsRecordSetORGAO10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 }
+
 $rsRecordSetORGAO10 = null;
 $rsRecordSetORGAO11 = null;
 $obTTCEMGConfiguracaoOrgao = null;
-$rsRecuperaORGAO99 = null;
+$rsRecuperaORGAO99  = null;
+
 ?>

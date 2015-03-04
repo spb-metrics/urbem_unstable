@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_aplica_juro.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_aplica_juro.plsql 61622 2015-02-18 15:50:46Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
@@ -53,8 +53,8 @@ adicionado trecho de log do CVS
 
 */
 
-CREATE OR REPLACE FUNCTION aplica_juro(varchar,integer,integer,date) returns numeric as '
-declare
+CREATE OR REPLACE FUNCTION aplica_juro(varchar,integer,integer,date) returns numeric as $$
+DECLARE
     stNumeracao     ALIAS FOR $1;
     inExercicio     ALIAS FOR $2;
     inCodParcela    ALIAS FOR $3;
@@ -69,15 +69,15 @@ declare
     reRecordFuncoes RECORD;
     reRecordExecuta RECORD;
 begin
-    stFuncao := '''';
+    stFuncao := '';
    -- pegar calculos/creditos para o lancamento da parcela
-    stSqlCreditos := ''
+    stSqlCreditos := '
                       SELECT  CAL.cod_calculo
                             , CAL.cod_credito
                             , CAL.cod_especie
                             , CAL.cod_genero
                             , CAL.cod_natureza
-                            , CASE WHEN arrecadacao.fn_atualiza_data_vencimento ( COALESCE( PARREE.vencimento, PAR.vencimento ) ) = '' || quote_literal(dtDataBase) || '' THEN
+                            , CASE WHEN arrecadacao.fn_atualiza_data_vencimento ( COALESCE( PARREE.vencimento, PAR.vencimento ) ) = ' || quote_literal(dtDataBase) || ' THEN
                                 arrecadacao.fn_atualiza_data_vencimento ( COALESCE( PARREE.vencimento, PAR.vencimento ) )
                               ELSE
                                 COALESCE( PARREE.vencimento, PAR.vencimento )
@@ -89,16 +89,16 @@ begin
                             INNER JOIN arrecadacao.calculo CAL ON CAL.cod_calculo = LC.cod_calculo
                             LEFT JOIN ( SELECT * 
                                     FROM arrecadacao.parcela_reemissao
-                                    WHERE cod_parcela = ''||inCodParcela||''
+                                    WHERE cod_parcela = '||inCodParcela||'
                                 ORDER BY timestamp ASC limit 1
                             ) PARREE
                             ON PARREE.cod_parcela = PAR.cod_parcela
                        WHERE 
-                         PAR.cod_parcela = ''||inCodParcela||''      
-   '';
+                         PAR.cod_parcela = '||inCodParcela||'
+   ';
 
     FOR reRecord IN EXECUTE stSqlCreditos LOOP
-        stSqlFuncoes := ''                                       
+        stSqlFuncoes := '               
              SELECT
                 FUNC.nom_funcao as funcao ,
                 ACRE.cod_acrescimo ,
@@ -129,12 +129,12 @@ begin
 
                 
              WHERE
-             CRED.cod_credito = ''||reRecord.cod_credito||''
-             AND    CRED.cod_especie = ''||reRecord.cod_especie||''
-             AND    CRED.cod_natureza = ''||reRecord.cod_natureza||''
-             AND    CRED.cod_genero = ''||reRecord.cod_genero||''
+             CRED.cod_credito = '||reRecord.cod_credito||'
+             AND    CRED.cod_especie = '||reRecord.cod_especie||'
+             AND    CRED.cod_natureza = '||reRecord.cod_natureza||'
+             AND    CRED.cod_genero = '||reRecord.cod_genero||'
              AND    ACRE.cod_tipo = 2
-                      '';
+        ';
         -- executa
         FOR reRecordFuncoes IN EXECUTE stSqlFuncoes LOOP
             SELECT
@@ -144,7 +144,7 @@ begin
 
             nuProp := nuProp * reRecord.valor;
 
-            stExecuta :=  ''SELECT ''||reRecordFuncoes.funcao||''(''''''||reRecord.vencimento||'''''',''''''||dtDataBase||'''''',''||nuProp||'', ''||reRecordFuncoes.cod_acrescimo||'' , ''||reRecordFuncoes.cod_tipo||'') as valor '';     
+            stExecuta :=  'SELECT '||reRecordFuncoes.funcao||'('''||reRecord.vencimento||''','''||dtDataBase||''','||nuProp||', '||reRecordFuncoes.cod_acrescimo||' , '||reRecordFuncoes.cod_tipo||') as valor ';                 
             FOR reRecordExecuta IN EXECUTE stExecuta LOOP                
                 nuRetorno := nuRetorno + reRecordExecuta.valor;               
             END LOOP;           
@@ -158,4 +158,4 @@ begin
 
    return nuRetorno::numeric(14,2);
 end;
-'language 'plpgsql';
+$$ language 'plpgsql';

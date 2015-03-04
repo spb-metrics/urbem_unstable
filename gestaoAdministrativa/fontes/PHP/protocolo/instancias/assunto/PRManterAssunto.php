@@ -57,6 +57,7 @@ $pgJs   = "JS".$stPrograma.".js";
 $obTPROClassificacao = new TPROClassificacao();
 $obTPROAssunto 	     = new TPROAssunto();
 $obTPROAssuntoAcao   = new TPROAssuntoAcao();
+$obErro              = new Erro;
 $obTPROAssunto->obTPROClassificacao = &$obTPROClassificacao;
 
 $inCodigoClassificacao = $_POST['inCmbCodigoClassificacao'] ? $_POST['inCmbCodigoClassificacao'] : $_POST['inCodigoClassificacao'];
@@ -88,28 +89,52 @@ if (is_array($_POST['inAtributo'])) {
 switch ($_REQUEST['stAcao']) {
     case "incluir":
         Sessao::setTrataExcecao(true);
-                //Sessao::getTransacao()->setMapeamento( $obTPROAssunto );
-        $obTPROAssunto->proximoCod($inCodigoAssunto);
-        $obTPROAssunto->setDado('cod_assunto',$inCodigoAssunto);
-        $obTPROAssunto->inclusao();
-        foreach ($arDocumentos as $obDocumento) {
-            $obDocumento->inclusao();
+
+        $boGeraCodigo = SistemaLegado::pegaConfiguracao("tipo_numeracao_classificacao_assunto", 5);
+
+        if (!empty($boGeraCodigo) && $boGeraCodigo == 'automatico') {
+            $obTPROAssunto->proximoCod($inCodigoAssunto);
+        } else {
+            $inCodigoAssunto = $_POST['inCodigoAssunto'];
+            $inValidaCod = SistemaLegado::pegaDado('cod_assunto', 'sw_assunto', ' WHERE cod_assunto = '.$inCodigoAssunto.' AND cod_classificacao = '.$inCodigoClassificacao );
+
+            if ($inCodigoAssunto == $inValidaCod) {
+                $obErro->setDescricao('O código informado já está sendo utilizado.');
+            }
         }
-        foreach ($arAtributos as $obAtributo) {
-            $obAtributo->inclusao();
-        }
-                //pega os dados da sessao
-                $arAcaoSessao = Sessao::read('acaoSessao');
-                $obTPROAssuntoAcao->obTPROAssunto = &$obTPROAssunto;
-                    if ( is_array($arAcaoSessao) ) {
-                        foreach ($arAcaoSessao as $arAcao) {
-                                 $obTPROAssuntoAcao->setDado('cod_acao',$arAcao['cod_acao']);
-                                 $obTPROAssuntoAcao->inclusao();
-                        }
+
+        if (!$obErro->ocorreu()) {
+
+            $obTPROAssunto->setDado('cod_assunto',$inCodigoAssunto);
+            $obTPROAssunto->inclusao();
+
+            foreach ($arDocumentos as $obDocumento) {
+                $obDocumento->inclusao();
+            }
+    
+            foreach ($arAtributos as $obAtributo) {
+                $obAtributo->inclusao();
+            }
+
+            //pega os dados da sessao
+            $arAcaoSessao = Sessao::read('acaoSessao');
+            $obTPROAssuntoAcao->obTPROAssunto = &$obTPROAssunto;
+                if ( is_array($arAcaoSessao) ) {
+                    foreach ($arAcaoSessao as $arAcao) {
+                             $obTPROAssuntoAcao->setDado('cod_acao',$arAcao['cod_acao']);
+                             $obTPROAssuntoAcao->inclusao();
                     }
-        $stMensagem = "Assunto: ".$inCodigoAssunto." - ".$_POST['stDescricao'];
+                }
+            $stMensagem = "Assunto: ".$inCodigoAssunto." - ".$_POST['stDescricao'];
+        } 
         Sessao::encerraExcecao();
-        sistemaLegado::alertaAviso($pgForm,$stMensagem ,"incluir","aviso", Sessao::getId(), "../");
+
+        if (!$obErro->ocorreu()) {
+            SistemaLegado::alertaAviso($pgForm."?stAcao=".$stAcao, $stMensagem ,"incluir","aviso", Sessao::getId(), "../");
+        } else {
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+        }
+
     break;
     case "alterar":
         Sessao::setTrataExcecao(true);

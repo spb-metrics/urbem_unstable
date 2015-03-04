@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: PRManterCobranca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterCobranca.php 61651 2015-02-20 18:47:10Z evandro $
 
     Caso de uso: uc-05.04.04
 **/
@@ -165,7 +165,7 @@ switch ($stAcao) {
                 //busca os valores originais das parcelas
                 $obTDATDividaParcelaOrigem->setDado('cod_inscricao',$arDadosSessao[$inX]["cod_inscricao"]);
                 $obTDATDividaParcelaOrigem->setDado('exercicio',$arDadosSessao[$inX]["exercicio"]);
-                $obTDATDividaParcelaOrigem->recuperaParcelaOrigemPorIscricao($rsParcelasOrigem,'','ORDER BY parcela_origem.cod_parcela');
+                $obTDATDividaParcelaOrigem->recuperaParcelaOrigemPorIscricao($rsParcelasOrigem,'','ORDER BY parcela_origem.cod_parcela');                
 
                 //busca a situação atual da inscrição
                 $obFDATBuscaSaldoDivida = new FDATBuscaSaldoDivida;
@@ -255,9 +255,9 @@ switch ($stAcao) {
                             }
                         }
 
-                        $flValorTotalAcrescimo[2] = round( $arDadosSessao[$inX]["juros"] - $flValorTotalAcrescimo[2], 2);
-                        $flValorTotalAcrescimo[3] = round( $arDadosSessao[$inX]["multa"] - $flValorTotalAcrescimo[3], 2);
-                        $flValorTotalAcrescimo[1] = round( $arDadosSessao[$inX]["correcao"] - $flValorTotalAcrescimo[1], 2);
+                        $flValorTotalAcrescimo[2] = $arDadosSessao[$inX]["juros"] - $flValorTotalAcrescimo[2];
+                        $flValorTotalAcrescimo[3] = $arDadosSessao[$inX]["multa"] - $flValorTotalAcrescimo[3];
+                        $flValorTotalAcrescimo[1] = $arDadosSessao[$inX]["correcao"] - $flValorTotalAcrescimo[1];
 
                         $inTotalAcrescimos = 0;
                         for ($inS=0; $inS<3; $inS++) {
@@ -283,7 +283,7 @@ switch ($stAcao) {
                         $arDadosSessao[$inX]["creditos_agrupados"][$inA]["total_acrescimos_creditos_agrupados"] = $inTotalAcrescimos;
 
                         //arredondamento da reducao
-                        $flValorTotalReducaoCA = round( $arDadosSessao[$inX]["vlr_reducao"] - $flValorTotalReducaoCA, 2);
+                        $flValorTotalReducaoCA = $arDadosSessao[$inX]["vlr_reducao"] - $flValorTotalReducaoCA;
                         $arDadosSessao[$inX]["creditos_agrupados"][$inA]["total_reducao_creditos_agrupados"] = $flValorTotalReducaoCA;
 
                     } else {
@@ -571,22 +571,22 @@ switch ($stAcao) {
             }
 
                 //criando parcelas novas
-                $obTDATParcelamento->recuperaNumeroParcelamento ( $rsNumParcelamento );
+                $obTDATParcelamento->recuperaNumeroParcelamento ( $rsNumParcelamento );                
                 $inNumParcelamento = $rsNumParcelamento->getCampo('valor');
 
                 $stNumeroParcelamento = $rsNumeroParcelamentoExercicio->getCampo("valor")."/".Sessao::getExercicio();
-                $obTDATParcelamento->setDado( "num_parcelamento", $inNumParcelamento );
-                $obTDATParcelamento->setDado( 'cod_modalidade', $_REQUEST["inCodModalidade"] );
+                $obTDATParcelamento->setDado( "num_parcelamento"    , $inNumParcelamento );
+                $obTDATParcelamento->setDado( 'cod_modalidade'      , $_REQUEST["inCodModalidade"] );
                 $obTDATParcelamento->setDado( 'timestamp_modalidade', $rsListaModalidade->getCampo("ultimo_timestamp") );
-                $obTDATParcelamento->setDado( 'numcgm_usuario', Sessao::read('numCgm') );
-                $obTDATParcelamento->setDado( "numero_parcelamento", $rsNumeroParcelamentoExercicio->getCampo("valor") );
-                $obTDATParcelamento->setDado( 'exercicio', Sessao::getExercicio() );
+                $obTDATParcelamento->setDado( 'numcgm_usuario'      , Sessao::read('numCgm') );
+                $obTDATParcelamento->setDado( "numero_parcelamento" , $rsNumeroParcelamentoExercicio->getCampo("valor") );
+                $obTDATParcelamento->setDado( 'exercicio'           , Sessao::getExercicio() );
                 if ($arCobrancaJudicial) {
                     $obTDATParcelamento->setDado( 'judicial', TRUE );
                 } else {
                     $obTDATParcelamento->setDado( 'judicial', FALSE );
                 }
-                $obTDATParcelamento->inclusao( );
+                $obTDATParcelamento->inclusao( );                
 
                 for ($inT=0; $inT<$inTotalDados; $inT++) {
                     $obTDATDividaParcelamento->setDado( "cod_inscricao", $arDadosSessao[$inT]["cod_inscricao"] );
@@ -612,19 +612,19 @@ switch ($stAcao) {
 
                 for ( $inT=0; $inT < count($arInscricoesAgrupadasSessao["creditos_separados"]); $inT++ ) {
                     $obTDATDividaParcelaOrigem = new TDATDividaParcelaOrigem;
-                    $obTDATDividaParcelaOrigem->setDado( "cod_parcela", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_parcela"] );
-                    $obTDATDividaParcelaOrigem->setDado( "cod_credito", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_credito"] );
-                    $obTDATDividaParcelaOrigem->setDado( "cod_especie", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_especie"] );
-                    $obTDATDividaParcelaOrigem->setDado( "cod_genero", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_genero"] );
-                    $obTDATDividaParcelaOrigem->setDado( "cod_natureza", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_natureza"] );
-                    $obTDATDividaParcelaOrigem->setDado( "valor", $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["valor"] );
-                    $obTDATDividaParcelaOrigem->setDado( "num_parcelamento", $inNumParcelamento );
-                    $obTDATDividaParcelaOrigem->inclusao(  );
+                    $obTDATDividaParcelaOrigem->setDado( "cod_parcela"      , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_parcela"] );
+                    $obTDATDividaParcelaOrigem->setDado( "cod_credito"      , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_credito"] );
+                    $obTDATDividaParcelaOrigem->setDado( "cod_especie"      , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_especie"] );
+                    $obTDATDividaParcelaOrigem->setDado( "cod_genero"       , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_genero"] );
+                    $obTDATDividaParcelaOrigem->setDado( "cod_natureza"     , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["cod_natureza"] );
+                    $obTDATDividaParcelaOrigem->setDado( "valor"            , $arInscricoesAgrupadasSessao["creditos_separados"][$inT]["valor"] );
+                    $obTDATDividaParcelaOrigem->setDado( "num_parcelamento" , $inNumParcelamento );
+                    $obTDATDividaParcelaOrigem->inclusao(  );                    
                 }
 
             $inTotaldeParcelas = count( $arParcelasSessao );
 
-            $flValorPrimeiraParcelaOriginal = $flValorPorParcelaOriginal = round( $flValorTotalOriginal / $inTotaldeParcelas, 2 );
+            $flValorPrimeiraParcelaOriginal = $flValorPorParcelaOriginal = ($flValorTotalOriginal / $inTotaldeParcelas) ;
             $flDiferencaParcelas = $flValorTotalOriginal - ( $flValorPorParcelaOriginal * $inTotaldeParcelas );
             if ( $flDiferencaParcelas != 0 )
                 $flValorPrimeiraParcelaOriginal += $flDiferencaParcelas;
@@ -632,16 +632,16 @@ switch ($stAcao) {
             $stDataAtual = date ("Y-m-d");
 
             $obTARRLancamento->proximoCod( $inCodLancamento );
-            $obTARRLancamento->setDado( "cod_lancamento", $inCodLancamento );
-            $obTARRLancamento->setDado( "vencimento", $arParcelasSessao[0]["data_vencimento"] ); //eh a data de vencimento da primeira parcela
-            $obTARRLancamento->setDado( "total_parcelas", $inTotaldeParcelas );
-            $obTARRLancamento->setDado( "ativo", true );
-            $obTARRLancamento->setDado( "observacao", "" );
+            $obTARRLancamento->setDado( "cod_lancamento"    , $inCodLancamento );
+            $obTARRLancamento->setDado( "vencimento"        , $arParcelasSessao[0]["data_vencimento"] ); //eh a data de vencimento da primeira parcela
+            $obTARRLancamento->setDado( "total_parcelas"    , $inTotaldeParcelas );
+            $obTARRLancamento->setDado( "ativo"             , true );
+            $obTARRLancamento->setDado( "observacao"        , "" );
             $obTARRLancamento->setDado( "observacao_sistema", "" );
-            $obTARRLancamento->setDado( "valor", $flValorTotalFinal );
-            $obTARRLancamento->setDado( "divida", true );
-
+            $obTARRLancamento->setDado( "valor"             , $flValorTotalFinal );
+            $obTARRLancamento->setDado( "divida"            , true );
             $obTARRLancamento->inclusao(  );
+            
             for ($inA=0; $inA<$arInscricoesAgrupadasSessao["total_creditos_agrupados"]; $inA++) { //inserindo os calculo (1 calculo por credito)
                 $obTARRCalculo->proximoCod( $inCodCalculoTMP );
                 $arInscricoesAgrupadasSessao["creditos_agrupados_classificados"][$inA]["cod_calculo"] = $inCodCalculoTMP;
@@ -720,7 +720,7 @@ switch ($stAcao) {
             $rsListaModalidade->setPrimeiroElemento();
 
             //esquema para dividir o valor da reducao pelo numero de parcelas
-            $flValorPrimeiraParcelaReducao = $flTotalPorParcelaReducao = round($flValorTotalReducao / $inTotaldeParcelas, 2);
+            $flValorPrimeiraParcelaReducao = $flTotalPorParcelaReducao = ($flValorTotalReducao / $inTotaldeParcelas);
             $flDiferencaParcelas = $flValorTotalReducao - ( $flTotalPorParcelaReducao * $inTotaldeParcelas );
             if ( $flDiferencaParcelas != 0 )
                 $flValorPrimeiraParcelaReducao += $flDiferencaParcelas;
@@ -744,14 +744,14 @@ switch ($stAcao) {
                 }
 
                 $obTARRParcela->proximoCod( $inCodParcela );
-                $obTARRParcela->setDado( "cod_parcela", $inCodParcela );
-                $obTARRParcela->setDado( "cod_lancamento", $inCodLancamento );
-                $obTARRParcela->setDado( "nr_parcela", $arParcelasSessao[$inT]["nr_parcela"] );
-                $obTARRParcela->setDado( "vencimento", $arParcelasSessao[$inT]["data_vencimento"] );
-                $obTARRParcela->setDado( "valor", $arParcelasSessao[$inT]["vlr_parcela"] );
+                $obTARRParcela->setDado( "cod_parcela"      , $inCodParcela );
+                $obTARRParcela->setDado( "cod_lancamento"   , $inCodLancamento );
+                $obTARRParcela->setDado( "nr_parcela"       , $arParcelasSessao[$inT]["nr_parcela"] );
+                $obTARRParcela->setDado( "vencimento"       , $arParcelasSessao[$inT]["data_vencimento"] );
+                $obTARRParcela->setDado( "valor"            , $arParcelasSessao[$inT]["vlr_parcela"] );
                 $obTARRParcela->inclusao();
 
-                //incluir no carnets aqui
+                //incluir no carnes aqui
                 //------------------------------------------------------
                 $stFiltro = " WHERE c.cod_convenio = -1 ";
                 $obTMONConvenio->recuperaTodos( $rsListaFuncao, $stFiltro );
@@ -819,7 +819,7 @@ switch ($stAcao) {
                 //inserindo acrescimos
                 for ($inL=0; $inL<$arInscricoesAgrupadasSessao["total_acrescimos_agrupados"]; $inL++) {
                     $flValorAcrescimo = $arInscricoesAgrupadasSessao["acrescimos_agrupados"][$inL]["valor_acrescimo"];
-                    $flValorPrimeiraParcelaAcrescimo = $flTotalPorParcelaAcrescimo = round( $flValorAcrescimo / $inTotaldeParcelas, 2 );
+                    $flValorPrimeiraParcelaAcrescimo = $flTotalPorParcelaAcrescimo = ($flValorAcrescimo / $inTotaldeParcelas);
                     $flDiferencaParcelas =  $flValorAcrescimo - ( $flTotalPorParcelaAcrescimo * $inTotaldeParcelas );
                     if ( $flDiferencaParcelas != 0 )
                         $flValorPrimeiraParcelaAcrescimo += $flDiferencaParcelas;
@@ -940,14 +940,14 @@ switch ($stAcao) {
                     $nuParcelaAcrescimos      = 0;
 
                     // Divide o valor da redução entre redução de crédito e redução de acrescimo
-                    $nuPrimeiraParcelaCredito = round($nuTotalReducaoCredito / $inTotaldeParcelas, 2);
+                    $nuPrimeiraParcelaCredito = ($nuTotalReducaoCredito / $inTotaldeParcelas);
                     $nuDiferencaCredito = $flTotalReducaoCredito - ($nuPrimeiraParcelaCredito * $inTotaldeParcelas);
 
                     if ($nuDiferencaCredito > 0) {
                         $nuPrimeiraParcelaCredito = $nuPrimeiraParcelaCredito + $nuDiferencaCredito;
                     }
 
-                    $nuOutrasParcelasCredito = round(($nuTotalReducaoCredito - $nuPrimeiraParcelaCredito), 2);
+                    $nuOutrasParcelasCredito = ($nuTotalReducaoCredito - $nuPrimeiraParcelaCredito);
                     for ($inT=0; $inT<$inTotaldeParcelas; $inT++) {
                         if ($inT == 0) {
                             $nuParcelaAcrescimos = $arValoresFinaisReducao[$inT] - $nuPrimeiraParcelaCredito;
@@ -983,7 +983,7 @@ switch ($stAcao) {
 
         //$boExec = false;
         if ($_REQUEST["emissao_carnes"] == "local") {
-            $stNomPdfSessao   =  ini_get("session.save_path")."/"."PdfEmissaoUrbem-".date("dmYHis").".pdf";
+            $stNomPdfSessao   =  ini_get("session.save_path")."/"."PdfEmissaoUrbem-".date("dmYHi").".pdf";
             $stParamPdfSessao = "F";
 
             Sessao::write('stNomPdf'   , $stNomPdfSessao);
@@ -995,9 +995,10 @@ switch ($stAcao) {
 
             include_once( CAM_GT_ARR_CLASSES."boletos/".$stArquivoModelo );
             $obRModeloCarne = new $stObjModelo( $arEmissao );
+            $obRModeloCarne->setCobranca(true);
             $obRModeloCarne->imprimirCarne();
-            //$boExec = true;
-
+            
+            
             echo "<script language=\"javaScript\">\r\n";
             echo "    var sAux = window.open('OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
             echo "    eval(sAux)\r\n";

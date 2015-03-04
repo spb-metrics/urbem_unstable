@@ -79,7 +79,7 @@ $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in ("
 
 // Adiciona o parametro do nome da entidade
 if ( count($request->get('inCodEntidade')) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $inCodEntidadePrefeitura = SistemaLegado::pegaDado('valor','administracao.configuracao'," WHERE exercicio = '".Sessao::getExercicio()."' AND parametro = 'cod_entidade_prefeitura' ");
 
@@ -162,7 +162,7 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
         break;
     endswitch;
     $preview->addParametro( 'periodo', $request->get('cmbBimestre') );
-    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio()) );
+    $preview->addParametro( 'descricaoPeriodo', $request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio() );
         
 } elseif ( $request->get('stTipoRelatorio') == 'Quadrimestre' ) {
     
@@ -182,7 +182,7 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
     endswitch;
 
     $preview->addParametro( 'periodo', $request->get('cmbQuadrimestre') );
-    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbQuadrimestre')."º Quadrimestre de ".Sessao::getExercicio()) );
+    $preview->addParametro( 'descricaoPeriodo', $request->get('cmbQuadrimestre')."º Quadrimestre de ".Sessao::getExercicio() );
     
 } elseif ( $request->get('stTipoRelatorio') == 'Semestre' ) {
 
@@ -198,7 +198,7 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
     endswitch;
     
     $preview->addParametro( 'periodo', $request->get('cmbSemestre') );
-    $preview->addParametro( 'descricaoPeriodo', utf8_encode($request->get('cmbSemestre')."º Semestre de ".Sessao::getExercicio()) );
+    $preview->addParametro( 'descricaoPeriodo', $request->get('cmbSemestre')."º Semestre de ".Sessao::getExercicio() );
     
 } elseif ( $request->get('stTipoRelatorio') == 'Mes' ) {
     
@@ -226,7 +226,7 @@ if ( $request->get('stTipoRelatorio') == 'Bimestre') {
      $codUF = SistemaLegado::pegaConfiguracao( 'cod_uf', 2, Sessao::getExercicio());
      $preview->addParametro( 'cod_uf', $codUF );
      $preview->addParametro( 'tipo_relatorio', $request->get('stTipoRelatorio')  );
-     $preview->addParametro( 'descricaoPeriodo', utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio()));
+     $preview->addParametro( 'descricaoPeriodo', sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio());
 }
 
 #############################Modificações do tce para o novo layout##############################
@@ -243,7 +243,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($request->get('stAcao') == 'anexo5novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

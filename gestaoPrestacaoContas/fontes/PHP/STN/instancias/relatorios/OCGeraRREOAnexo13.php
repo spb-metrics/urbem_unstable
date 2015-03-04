@@ -67,7 +67,7 @@ $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade = " .
 
 $preview->addParametro ( 'cod_entidade', $inCodEntidadeRPPS );
 
-$preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+$preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 
 #############################Modificações do tce para o novo layout##############################
@@ -84,7 +84,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 #################################################################################################
 
 $preview->preview();

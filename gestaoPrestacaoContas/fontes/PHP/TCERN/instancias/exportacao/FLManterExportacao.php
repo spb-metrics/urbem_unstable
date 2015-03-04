@@ -92,11 +92,11 @@ $arNomeArquivos = array(
                 ,'ANEXO23.TXT'
                 ,'ANEXO26.TXT'
                 ,'ANEXO27FUNDEFBBAAS.TXT'
+                ,'ANEXO28.TXT'
                 ,'ANEXO42.TXT'
                 ,'ANEXO02DESPESAFUNCAO.TXT'
                 ,'EMPBBAA.TXT'
                 ,'LICBBAA.TXT'
-                //,'QDD.TXT'
                 ,'RECBBAAS.TXT'
         );
 

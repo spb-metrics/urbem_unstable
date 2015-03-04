@@ -30,7 +30,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: OCGeraRelacaoEmpenho.php 60092 2014-09-29 20:12:10Z evandro $
+* $Id: OCGeraRelacaoEmpenho.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 *
 */
 
@@ -50,7 +50,7 @@ $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in ("
 
 $preview->addParametro( 'entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     while ( !$rsEntidade->eof() ) {
         if ( preg_match( "/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) ) {

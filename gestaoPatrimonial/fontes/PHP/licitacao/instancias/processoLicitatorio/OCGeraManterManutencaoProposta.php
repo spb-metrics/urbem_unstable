@@ -141,5 +141,5 @@ $preview->addParametro( 'cod_tipo_objeto'    , $inCodTipoObjeto    );
 $preview->addParametro( 'data_emissao'       , $stDataManutencao   );
 $preview->addParametro( 'cod_objeto'         , $inCodObjeto        );
 $preview->addParametro( 'cod_tipo_licitacao' , $inCodTipoLicitacao );
-$preview->addParametro( 'st_header'          , utf8_encode($stHeader)           );
+$preview->addParametro( 'st_header'          , $stHeader           );
 $preview->preview();

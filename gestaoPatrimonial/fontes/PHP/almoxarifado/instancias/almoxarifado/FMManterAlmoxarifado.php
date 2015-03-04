@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterAlmoxarifado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterAlmoxarifado.php 61639 2015-02-19 13:05:36Z diogo.zarpelon $
 
     * Casos de uso: uc-03.03.01
 */
@@ -167,16 +167,6 @@ if ($stAcao == "alterar") {
             $stTelefone .= $arCGM['fone_celular'];
         }
 
-        if ($ob->getMascara() != "") {
-            $obErro = $ob->consultarLocalizacao($rsLocalizacao);
-            $possuiLocalizacao = false;
-
-            if (!($obErro->ocorreu())) {
-                if (!($rsLocalizacao->EOF())) {
-                    $possuiLocalizacao = true;
-                }
-            }
-        }
     }
 }
 
@@ -189,39 +179,6 @@ $obLblTelefone= new Label;
 $obLblTelefone->setRotulo('Telefone');
 $obLblTelefone->setId    ('stTelefone');
 $obLblTelefone->setValue ($stTelefone);
-
-if ($stAcao == "alterar") {
-    if ($possuiLocalizacao) {
-        $obLblMascaraLocalizacao = new Label;
-        $obLblMascaraLocalizacao->setRotulo("Máscara de Localização dos Itens no Almoxarifado");
-        $obLblMascaraLocalizacao->setValue ($ob->getMascara());
-        $obLblMascaraLocalizacao->setTitle( 'Informe a máscara de localização dos itens no almoxarifado');
-        $obHdnMascaraLocalizacao = new Hidden;
-        $obHdnMascaraLocalizacao->setName("stLocalizacao");
-        $obHdnMascaraLocalizacao->setValue($ob->getMascara());
-    } else {
-        $obTxtCodLocalizacao = new TextBox;
-        $obTxtCodLocalizacao->setRotulo   ("Máscara de Localização dos Itens no Almoxarifado");
-        $obTxtCodLocalizacao->setTitle    ('Informe a máscara de localização dos itens no almoxarifado');
-        $obTxtCodLocalizacao->setName     ("stLocalizacao"                                   );
-        $obTxtCodLocalizacao->setValue    ($ob->getMascara()                                 );
-        $obTxtCodLocalizacao->setSize     (20                                                );
-        $obTxtCodLocalizacao->setMaxLength(20                                                );
-        $obTxtCodLocalizacao->setInteiro  (false                                             );
-        $obTxtCodLocalizacao->setAlfaNumerico(true);
-        $obTxtCodLocalizacao->setToUpperCase(true);
-    }
-} else {
-    $obTxtCodLocalizacao = new TextBox;
-    $obTxtCodLocalizacao->setRotulo   ("Máscara de Localização dos Itens no Almoxarifado");
-    $obTxtCodLocalizacao->setTitle    ('Informe a máscara de localização dos itens no almoxarifado');
-    $obTxtCodLocalizacao->setName     ("stLocalizacao"                                   );
-    $obTxtCodLocalizacao->setSize     (20                                                );
-    $obTxtCodLocalizacao->setMaxLength(20                                                );
-    $obTxtCodLocalizacao->setInteiro  (false                                             );
-    $obTxtCodLocalizacao->setAlfaNumerico(true);
-    $obTxtCodLocalizacao->setToUpperCase(true);
-}
 
 //DEFINICAO DOS COMPONENTES
 $obFormulario = new Formulario();
@@ -244,17 +201,6 @@ $obFormulario->addComponente        ( $obBscCGMAlmoxarifado    );
 $obFormulario->addComponente        ( $obLblEndereco           );
 $obFormulario->addComponente        ( $obLblTelefone           );
 $obFormulario->addComponente        ( $obBscCGMResponsavel     );
-
-if ($stAcao == "alterar") {
-  if ($possuiLocalizacao) {
-    $obFormulario->addComponente    ( $obLblMascaraLocalizacao );
-    $obFormulario->addHidden        ( $obHdnMascaraLocalizacao );
-  } else {
-    $obFormulario->addComponente    ( $obTxtCodLocalizacao     );
-  }
-} else {
-  $obFormulario->addComponente      ( $obTxtCodLocalizacao     );
-}
 
 if ($stAcao=="incluir") {
     $obFormulario->OK      ();

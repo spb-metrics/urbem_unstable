@@ -26,7 +26,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterBem.php 60864 2014-11-19 17:50:29Z arthur $
+    $Id: FMManterBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
 
     * Casos de uso: uc-03.01.06
 
@@ -54,6 +54,9 @@ include_once CAM_GA_ORGAN_MAPEAMENTO."TOrganogramaOrgao.class.php";
 include_once CAM_GF_ORC_NEGOCIO."ROrcamentoOrgaoOrcamentario.class.php";
 //include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioGrupoPlanoDepreciacao.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemPlanoDepreciacao.class.php";
+include_once(CAM_GA_PROT_COMPONENTES.'IPopUpProcesso.class.php');
+include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php");
+include_once(CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemProcesso.class.php");
 
 $stPrograma = "ManterBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -91,6 +94,7 @@ if ($stAcao == 'alterar') {
     $obTPatrimonioBem = new TPatrimonioBem();
     $obTPatrimonioBem->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
     $obTPatrimonioBem->recuperaRelacionamento( $rsBem );
+    
     $obTPatrimonioBem->recuperaSaldoBem( $rsSaldoBem );
 
     $obTPatrimonioReavaliacao = new TPatrimonioReavaliacao();
@@ -115,6 +119,10 @@ if ($stAcao == 'alterar') {
     $obTAdministracaoConfiguracao->setDado( 'cod_modulo', 6 );
     $obTAdministracaoConfiguracao->pegaConfiguracao( $boAltera, 'alterar_bens_exercicio_anterior' );
 
+    $obTPatrimonioBemProcesso = new TPatrimonioBemProcesso();
+    $obTPatrimonioBemProcesso->setDado('cod_bem', $_REQUEST['inCodBem']);
+    $obTPatrimonioBemProcesso->recuperaPorChave($rsPatrimonioBemProcesso);
+    
     //verifica e se necessário aplica o filtro
     if ( $boAltera == 'false' AND substr($rsBem->getCampo('dt_aquisicao'),6,11) < Sessao::getExercicio()) {
         SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao."&pg=".Sessao::read('pg')."&pos=".Sessao::read('pos'),'Permissão negada para excluir/alterar bem de exercício anterior. Verificar Configuração.',"incluir","aviso", Sessao::getId(), "../");
@@ -224,6 +232,7 @@ if ($stAcao == 'alterar') {
 $obForm = new Form;
 $obForm->setAction ($pgProc);
 $obForm->setTarget ("oculto");
+$obForm->setEncType( "multipart/form-data" );
 
 //Cria o hidden da acao
 $obHdnAcao = new Hidden;
@@ -257,6 +266,21 @@ $obTxtDescricaoBem->setMaxLength( 100 );
 $obTxtDescricaoBem->setSize( 100 );
 $obTxtDescricaoBem->setNull( false );
 $obTxtDescricaoBem->setValue( $rsBem->getCampo( 'descricao' ) );
+
+if ( $rsPatrimonioBemProcesso->getNumLinhas > 0 ){
+    $stProcesso = str_pad($rsPatrimonioBemProcesso->getCampo('cod_processo')."/".$rsPatrimonioBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT);$stProcesso = str_pad($rsPatrimonioBemProcesso->getCampo('cod_processo')."/".$rsPatrimonioBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT);    
+    $inCodProcesso = $rsPatrimonioBemProcesso->getCampo('cod_processo');
+} else {
+    $stProcesso = "";
+}
+
+//instancia a informação do processo que deu origem a aquisição do bem
+$obPopUpProcesso = new IPopUpProcesso($obForm);
+$obPopUpProcesso->setRotulo("Processo Administrativo");
+$obPopUpProcesso->setValue ( $inCodProcesso );
+$obPopUpProcesso->obCampoCod->setValue($stProcesso);
+$obPopUpProcesso->setValidar(true);
+$obPopUpProcesso->setNull   (true);
 
 //instancia um text para o detalhamento do bem
 $obTxtDetalhamentoBem = new TextArea();
@@ -494,7 +518,7 @@ $obCmbUnidade->setId       ("inCodUnidade");
 $obCmbUnidade->setValue    ($rsBem->getCampo('num_unidade'));
 $obCmbUnidade->setStyle    ("width: 200px");
 $obCmbUnidade->setCampoID  ("cod_unidade");
-$obCmbUnidade->setCampoDesc("descricao");                
+$obCmbUnidade->setCampoDesc("descricao");
 $obCmbUnidade->addOption   ('', 'Selecione');
                
 //instancia componente TextBox para o ano do empenho
@@ -531,6 +555,24 @@ $obDataNotaFiscal->setName( 'dataNotaFiscal' );
 $obDataNotaFiscal->setNull( true );
 $obDataNotaFiscal->setValue( $rsBem->getCampo( 'data_nota_fiscal' ) );
 
+$obFileArquivoNF = new FileBox;
+$obFileArquivoNF->setNull   ( true                           );
+$obFileArquivoNF->setRotulo ( "Arquivo Nota Fiscal"          );
+$obFileArquivoNF->setTitle  ( "Informe o caminho do arquivo" );
+$obFileArquivoNF->setName   ( "fileArquivoNF"                );
+$obFileArquivoNF->setId     ( "fileArquivoNF"                );
+$obFileArquivoNF->setSize   ( 35                             );
+$obFileArquivoNF->setValue  ( ""  );
+
+$obLocalizacao = new Link;
+$obLocalizacao->setRotulo("Download da Nota Fiscal");
+$obLocalizacao->setHref( CAM_GP_PAT_ANEXOS.$rsBem->getCampo( 'caminho_nf' ));
+if($rsBem->getCampo( 'caminho_nf' ) != '') {
+    $obLocalizacao->setValue ($rsBem->getCampo( 'caminho_nf' ));
+}
+$obLocalizacao->setTarget("oculto");
+
+
 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02) {
     include_once CAM_GPC_TCEAL_MAPEAMENTO.'TTCEALTipoDocumentoFiscal.class.php';
 
@@ -542,7 +584,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02) 
     $obCmbTipoDocFiscal->setName( 'inCodTipoDocFiscal'                             );
     $obCmbTipoDocFiscal->setId( 'inCodTipoDocFiscal'                               );
     $obCmbTipoDocFiscal->setTitle( 'Informe o tipo do documento fiscal.'           );
-    $obCmbTipoDocFiscal->setValue( $rsBem->getCampo( 'cod_tipo_documento_fiscal')  ); 
+    $obCmbTipoDocFiscal->setValue( $rsBem->getCampo( 'cod_tipo_documento_fiscal')  );
     $obCmbTipoDocFiscal->setNull(true                                              );
     $obCmbTipoDocFiscal->setCampoId( 'cod_tipo_documento_fiscal'                   );
     $obCmbTipoDocFiscal->setCampoDesc  ("[cod_tipo_documento_fiscal] - [descricao]");
@@ -810,6 +852,7 @@ $obIMontaClassificacao->geraFormulario( $obFormulario );
 
 $obFormulario->addTitulo    ( 'Informações Básicas' );
 $obFormulario->addComponente( $obTxtDescricaoBem );
+$obFormulario->addComponente( $obPopUpProcesso );
 $obFormulario->addComponente( $obTxtDetalhamentoBem );
 $obFormulario->addComponente( $obBscMarca );
 $obFormulario->addComponente( $obIPopUpCGMFornecedor );
@@ -838,6 +881,12 @@ $obFormulario->addComponente( $obDtIncorporacao );
 $obFormulario->addComponente( $obNumEmpenho );
 $obFormulario->addComponente( $obNumNotaFiscal );
 $obFormulario->addComponente( $obDataNotaFiscal );
+$obFormulario->addComponente( $obFileArquivoNF );
+
+if (($stAcao == 'alterar') && ($rsBem->getCampo('caminho_nf') != '')) {
+    $obFormulario->addComponente( $obLocalizacao );
+}
+
 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02) {
     $obFormulario->addComponente( $obCmbTipoDocFiscal );
 }
@@ -872,6 +921,32 @@ $obFormulario->addComponente( $obTxtDescricaoSituacao );
 $obFormulario->addTitulo	( 'Apólice' );
 $obFormulario->agrupaComponentes( array( $obRdApoliceSim, $obRdApoliceNao ) );
 $obFormulario->addSpan 		( $obSpnApolice );
+
+
+// Se TCM-GO apresenta campo Obra
+$obAdministracaoConfiguracao = new TAdministracaoConfiguracao;
+$obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'");
+$inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
+$stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."");
+
+if ($stSiglaUf == "GO") {
+    $stJs.= " jq('#inCodNatureza').change(function(){
+        if(jq(this).val() == '2') {
+            montaParametrosGET( 'montaObra', 'inCodNatureza' );
+        } else {
+            jq('#spnListaObra').html('');
+        }
+    });";
+    
+    $obSpnListaObra = new Span;
+    $obSpnListaObra->setId('spnListaObra');
+    $obFormulario->addSpan( $obSpnListaObra );
+    
+    if($stAcao = 'alterar') {
+        $stJs.= "jq(document).ready(function(){ montaParametrosGET('montaObra', 'inCodNatureza,inCodBem'); });";
+    }
+}
+
 
 //se a acao for "lote", demonstra os campos no formulário
 if ($stAcao == 'lote') {
@@ -946,10 +1021,11 @@ if ($stAcao == 'incluir') {
     if ($rsReavaliacao->getCampo('cod_reavaliacao') != '') {
         $jsOnLoad .= "montaParametrosGET( 'montaListaReavaliacoes', 'inCodBem' );";
     }
-    $jsOnLoad .="montaParametrosGET('MontaUnidade');";
+    $jsOnLoad .= "montaParametrosGET('MontaUnidade');";
     $jsOnLoad .= "montaParametrosGET( 'montaDepreciacao', 'stAcao,boDepreciavel,inVlBem,flDepreciacaoAcelerada,inVlQuotaDepreciacaoAnual,inVlAtualizadoDepreciacao,inVlDepreciacaoAcumulada,inPlanoContaAnalitica,stNomePlanoConta,inCodBem' );montaParametrosGET( 'montaDepreciacaoAcelerada', 'boDepreciacaoAcelerada,flDepreciacaoAcelerada' );";
 }
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
-?>
+SistemaLegado::executaFrameOculto($stJs);
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

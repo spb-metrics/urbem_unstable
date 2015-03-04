@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: tonismar R. Bernardo
 
-    * $Id: FLEmitirCarne.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLEmitirCarne.php 61735 2015-02-27 18:27:50Z evandro $
 
   Caso de uso: uc-05.03.11
 **/
@@ -129,89 +129,84 @@ $obBscCredito->obCampoCod->obEvento->setOnChange("buscaValor('buscaCredito');");
 $obBscCredito->setFuncaoBusca("abrePopUp('".CAM_GT_MON_POPUPS."credito/FLProcurarCredito.php','frm','inCodCredito','stCredito','todos','".Sessao::getId()."','800','550');" );
 
 $obBscGrupoCredito = new BuscaInner;
-$obBscGrupoCredito->setRotulo    ( "Grupo de Créditos"          );
-$obBscGrupoCredito->setTitle     ( "Busca Grupo de Créditos"    );
-$obBscGrupoCredito->setId        ( "stGrupo"        );
-$obBscGrupoCredito->obCampoCod->setName      ("inCodGrupo"      );
+$obBscGrupoCredito->setRotulo                ( "Grupo de Créditos"          );
+$obBscGrupoCredito->setTitle                 ( "Busca Grupo de Créditos"    );
+$obBscGrupoCredito->setId                    ( "stGrupo"        );
+$obBscGrupoCredito->obCampoCod->setName      ( "inCodGrupo"      );
 if (isset($inCodGrupo)) {
-    $obBscGrupoCredito->obCampoCod->setValue     ($inCodGrupo       );
+    $obBscGrupoCredito->obCampoCod->setValue ( $inCodGrupo       );
 }
 $obBscGrupoCredito->obCampoCod->obEvento->setOnChange("buscaValor('buscaGrupo');");
 $obBscGrupoCredito->setFuncaoBusca( "abrePopUp('".CAM_GT_ARR_POPUPS."grupoCreditos/FLProcurarGrupo.php','frm','inCodGrupo','stGrupo','todos','".Sessao::getId()."','800','350');" );
 
 $obBscContribuinte = new BuscaInnerIntervalo;
-$obBscContribuinte->setRotulo           ( "Contribuinte"    );
-$obBscContribuinte->obLabelIntervalo->setValue ( "até"          );
-$obBscContribuinte->obCampoCod->setName     ("inCodContribuinteInicial"  );
-if (isset($inCodContribuinteInicio)) {
-    $obBscContribuinte->obCampoCod->setValue        ( $inCodContribuinteInicio );
-}
-$obBscContribuinte->obCampoCod->obEvento->setOnChange("buscaValor('buscaContribuinteInicio');");
-$obBscContribuinte->setFuncaoBusca( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteInicial','stNome','','".Sessao::getId()."','800','450');" ));
-$obBscContribuinte->obCampoCod2->setName        ("inCodContribuinteFinal"  );
-if (isset($inCodContribuinteFinal)) {
-    $obBscContribuinte->obCampoCod2->setValue       ( $inCodContribuinteFinal );
-}
-$obBscContribuinte->obCampoCod2->obEvento->setOnChange("buscaValor('buscaContribuinteFinal');");
-$obBscContribuinte->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteFinal','stNome','','".Sessao::getId()."','800','450');" ));
+$obBscContribuinte->setRotulo                           ( "Contribuinte"    );
+$obBscContribuinte->obLabelIntervalo->setValue          ( "até"          );
+$obBscContribuinte->obCampoCod->setName                 ( "inCodContribuinteInicial"  );
+if (isset($inCodContribuinteInicio))
+    $obBscContribuinte->obCampoCod->setValue            ( $inCodContribuinteInicio );
+$obBscContribuinte->obCampoCod->obEvento->setOnChange   ( "buscaValor('buscaContribuinteInicio');");
+$obBscContribuinte->setFuncaoBusca                      ( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteInicial','stNome','','".Sessao::getId()."','800','450');" ));
+$obBscContribuinte->obCampoCod2->setName                ( "inCodContribuinteFinal"  );
+if (isset($inCodContribuinteFinal)) 
+    $obBscContribuinte->obCampoCod2->setValue           ( $inCodContribuinteFinal );
+$obBscContribuinte->obCampoCod2->obEvento->setOnChange  ("buscaValor('buscaContribuinteFinal');");
+$obBscContribuinte->setFuncaoBusca2                     ( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteFinal','stNome','','".Sessao::getId()."','800','450');" ));
 
 $obBscInscricaoImobiliaria = new BuscaInnerIntervalo;
-$obBscInscricaoImobiliaria->setRotulo           ( "Inscrição Imobiliária"   );
-$obBscInscricaoImobiliaria->obLabelIntervalo->setValue ( "até"          );
-$obBscInscricaoImobiliaria->obCampoCod->setName     ("inNumInscricaoImobiliariaInicial"  );
-if (isset($inNumInscricaoImobiliariaInicial) ) {
-    $obBscInscricaoImobiliaria->obCampoCod->setValue        ( $inNumInscricaoImobiliariaInicial  );
-}
-$obBscInscricaoImobiliaria->obCampoCod->obEvento->setOnChange("buscaValor('buscaIImobiliariaInicio');");
-$obBscInscricaoImobiliaria->setFuncaoBusca      ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."imovel/FLProcurarImovel.php','frm','inNumInscricaoImobiliariaInicial','stNumeroDomicilio','todos','".Sessao::getId()."','800','550');"));
-$obBscInscricaoImobiliaria->obCampoCod2->setName        ( "inNumInscricaoImobiliariaFinal" );
-if (isset($inNumInscricaoImobiliariaFinal ) ) {
-    $obBscInscricaoImobiliaria->obCampoCod2->setValue       ( $inNumInscricaoImobiliariaFinal  );
-}
-$obBscInscricaoImobiliaria->obCampoCod2->obEvento->setOnChange("buscaValor('buscaIImobiliariaFinal');");
-$obBscInscricaoImobiliaria->setFuncaoBusca2     ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."imovel/FLProcurarImovel.php','frm','inNumInscricaoImobiliariaFinal','stNumeroDomicilio','todos','".Sessao::getId()."','800','550');"));
+$obBscInscricaoImobiliaria->setRotulo                           ( "Inscrição Imobiliária"   );
+$obBscInscricaoImobiliaria->obLabelIntervalo->setValue          ( "até"          );
+$obBscInscricaoImobiliaria->obCampoCod->setName                 ("inNumInscricaoImobiliariaInicial"  );
+$obBscInscricaoImobiliaria->obCampoCod->setMaxLength            ( 8 );
+if (isset($inNumInscricaoImobiliariaInicial) )
+    $obBscInscricaoImobiliaria->obCampoCod->setValue            ( $inNumInscricaoImobiliariaInicial  );
+$obBscInscricaoImobiliaria->obCampoCod->obEvento->setOnChange   ("buscaValor('buscaIImobiliariaInicio');");
+$obBscInscricaoImobiliaria->setFuncaoBusca                      ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."imovel/FLProcurarImovel.php','frm','inNumInscricaoImobiliariaInicial','stNumeroDomicilio','todos','".Sessao::getId()."','800','550');"));
+$obBscInscricaoImobiliaria->obCampoCod2->setName                ( "inNumInscricaoImobiliariaFinal" );
+$obBscInscricaoImobiliaria->obCampoCod2->setMaxLength           ( 8 );
+if (isset($inNumInscricaoImobiliariaFinal ) )
+    $obBscInscricaoImobiliaria->obCampoCod2->setValue           ( $inNumInscricaoImobiliariaFinal  );
+$obBscInscricaoImobiliaria->obCampoCod2->obEvento->setOnChange  ("buscaValor('buscaIImobiliariaFinal');");
+$obBscInscricaoImobiliaria->setFuncaoBusca2                     ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."imovel/FLProcurarImovel.php','frm','inNumInscricaoImobiliariaFinal','stNumeroDomicilio','todos','".Sessao::getId()."','800','550');"));
 
 $obBscInscricaoEconomica = new BuscaInnerIntervalo;
-$obBscInscricaoEconomica->setRotulo         ( "Inscrição Econômica"    );
-$obBscInscricaoEconomica->obLabelIntervalo->setValue ( "até"            );
-$obBscInscricaoEconomica->obCampoCod->setName       ("inNumInscricaoEconomicaInicial"  );
-if ( isset($inNumInscricaoEconomicaInicial) ) {
-    $obBscInscricaoEconomica->obCampoCod->setValue      ( $inNumInscricaoEconomicaInicial  );
-}
-$obBscInscricaoEconomica->obCampoCod->obEvento->setOnChange("buscaValor('buscaIEconomicaInicio');");
-$obBscInscricaoEconomica->setFuncaoBusca("abrePopUp(&quot;".CAM_GT_CEM_POPUPS."inscricaoeconomica/FLProcurarInscricaoEconomica.php&quot;,&quot;frm&quot;,&quot;inNumInscricaoEconomicaInicial&quot;,&quot;stCampo&quot;,&quot;todos&quot;,&quot;".Sessao::getId()."&quot;,&quot;800&quot;,&quot;550&quot;);");
-$obBscInscricaoEconomica->obCampoCod2->setName          ( "inNumInscricaoEconomicaFinal" );
-if ( isset($inNumInscricaoEconomicaFinal) ) {
+$obBscInscricaoEconomica->setRotulo                         ( "Inscrição Econômica"    );
+$obBscInscricaoEconomica->obLabelIntervalo->setValue        ( "até"            );
+$obBscInscricaoEconomica->obCampoCod->setName               ("inNumInscricaoEconomicaInicial"  );
+$obBscInscricaoEconomica->obCampoCod->setMaxLength          ( 8 );
+if ( isset($inNumInscricaoEconomicaInicial) )
+    $obBscInscricaoEconomica->obCampoCod->setValue          ( $inNumInscricaoEconomicaInicial  );
+$obBscInscricaoEconomica->obCampoCod->obEvento->setOnChange ("buscaValor('buscaIEconomicaInicio');");
+$obBscInscricaoEconomica->setFuncaoBusca                    ("abrePopUp(&quot;".CAM_GT_CEM_POPUPS."inscricaoeconomica/FLProcurarInscricaoEconomica.php&quot;,&quot;frm&quot;,&quot;inNumInscricaoEconomicaInicial&quot;,&quot;stCampo&quot;,&quot;todos&quot;,&quot;".Sessao::getId()."&quot;,&quot;800&quot;,&quot;550&quot;);");
+$obBscInscricaoEconomica->obCampoCod2->setName              ( "inNumInscricaoEconomicaFinal" );
+$obBscInscricaoEconomica->obCampoCod2->setMaxLength         ( 8 );
+if ( isset($inNumInscricaoEconomicaFinal) )
     $obBscInscricaoEconomica->obCampoCod2->setValue         ( $inNumInscricaoEconomicaFinal  );
-}
 $obBscInscricaoEconomica->obCampoCod2->obEvento->setOnChange("buscaValor('buscaIEconomicaFinal');");
-$obBscInscricaoEconomica->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GT_CEM_POPUPS."inscricaoeconomica/FLProcurarInscricaoEconomica.php','frm','inNumInscricaoEconomicaFinal','stCampo','todos','".Sessao::getId()."','800','550');"));
+$obBscInscricaoEconomica->setFuncaoBusca2                   ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CEM_POPUPS."inscricaoeconomica/FLProcurarInscricaoEconomica.php','frm','inNumInscricaoEconomicaFinal','stCampo','todos','".Sessao::getId()."','800','550');"));
 
 $obRCIMNivel = new RCIMNivel;
 $obRCIMNivel->mascaraNivelVigenciaAtual($stMascara);
 
 $obBscLocalizacao = new BuscaInnerIntervalo;
-$obBscLocalizacao->setRotulo         ( "Localização"    );
-$obBscLocalizacao->obLabelIntervalo->setValue ( "até"            );
-$obBscLocalizacao->obCampoCod->setId        ( "stLocal1"        );
-$obBscLocalizacao->obCampoCod->setName       ("inCodLocalizacaoInicial"  );
-if ( isset($inCodLocalizacaoInicial) ) {
+$obBscLocalizacao->setRotulo                            ( "Localização"    );
+$obBscLocalizacao->obLabelIntervalo->setValue           ( "até"            );
+$obBscLocalizacao->obCampoCod->setId                    ( "stLocal1"        );
+$obBscLocalizacao->obCampoCod->setName                  ("inCodLocalizacaoInicial"  );
+if ( isset($inCodLocalizacaoInicial) ) 
     $obBscInscricaoEconomica->obCampoCod->setValue      ( $inCodLocalizacaoInicial );
-}
-$obBscLocalizacao->obCampoCod->setMaxLength( strlen($stMascara)      );
-$obBscLocalizacao->obCampoCod->obEvento->setOnKeyUp("mascaraDinamico(&quot;".$stMascara."&quot;,this,event)");
-$obBscLocalizacao->obCampoCod->obEvento->setOnChange("buscaValor('buscaLocalizacaoInicio');");
-$obBscLocalizacao->setFuncaoBusca("abrePopUp(&quot;".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php&quot;,&quot;&quotfrm&quot;,&quot;inCodLocalizacaoInicial&quot;,&quot;stLocal1&quot;,&quot;todos&quot;,&quot;".Sessao::getId()."&quot;,&quot;800&quot;,&quot;550&quot;);");
-
-$obBscLocalizacao->obCampoCod2->setId        ( "stLocal2"        );
-$obBscLocalizacao->obCampoCod2->setName          ( "inCodLocalizacaoFinal" );
-if ( isset($inCodLocalizacaoFinal) ) {
+$obBscLocalizacao->obCampoCod->setMaxLength             ( strlen($stMascara)      );
+$obBscLocalizacao->obCampoCod->obEvento->setOnKeyUp     ("mascaraDinamico(&quot;".$stMascara."&quot;,this,event)");
+$obBscLocalizacao->obCampoCod->obEvento->setOnChange    ("buscaValor('buscaLocalizacaoInicio');");
+$obBscLocalizacao->setFuncaoBusca                       ("abrePopUp(&quot;".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php&quot;,&quot;&quotfrm&quot;,&quot;inCodLocalizacaoInicial&quot;,&quot;stLocal1&quot;,&quot;todos&quot;,&quot;".Sessao::getId()."&quot;,&quot;800&quot;,&quot;550&quot;);");
+$obBscLocalizacao->obCampoCod2->setId                   ( "stLocal2"        );
+$obBscLocalizacao->obCampoCod2->setName                 ( "inCodLocalizacaoFinal" );
+if ( isset($inCodLocalizacaoFinal) )
     $obBscInscricaoEconomica->obCampoCod->setValue      ( $inCodLocalizacaoFinal);
-}
-$obBscLocalizacao->obCampoCod2->setMaxLength( strlen($stMascara)      );
-$obBscLocalizacao->obCampoCod2->obEvento->setOnKeyUp("mascaraDinamico(&quot;".$stMascara."&quot;,this,event)");
-$obBscLocalizacao->obCampoCod2->obEvento->setOnChange("buscaValor('buscaLocalizacaoFim');");
-$obBscLocalizacao->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php','frm','inCodLocalizacaoFinal','stLocal2','todos','".Sessao::getId()."','800','550');"));
+$obBscLocalizacao->obCampoCod2->setMaxLength            ( strlen($stMascara)      );
+$obBscLocalizacao->obCampoCod2->obEvento->setOnKeyUp    ("mascaraDinamico(&quot;".$stMascara."&quot;,this,event)");
+$obBscLocalizacao->obCampoCod2->obEvento->setOnChange   ("buscaValor('buscaLocalizacaoFim');");
+$obBscLocalizacao->setFuncaoBusca2                      ( str_replace("'","&quot;","abrePopUp('".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php','frm','inCodLocalizacaoFinal','stLocal2','todos','".Sessao::getId()."','800','550');"));
 
 $obRdbTipoParcelasUnica = new Radio;
 $obRdbTipoParcelasUnica->setRotulo   ( "Tipo de Parcelas" );

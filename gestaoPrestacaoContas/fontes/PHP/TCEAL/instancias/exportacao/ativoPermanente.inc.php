@@ -30,7 +30,7 @@
     *
     * @author: Lisiane Morais
     *
-    $Id:$
+    $Id: ativoPermanente.inc.php 61572 2015-02-09 16:23:27Z michel $
     *
     * @ignore
     *
@@ -63,29 +63,29 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
     $arResult = array();
     
     while (!$rsRecordSet->eof()) {
-        $arResult[$idCount]['CodUndGestora']          = $rsRecordSet->getCampo('cod_und_gestora');
-        $arResult[$idCount]['CodigoUA']               = $rsRecordSet->getCampo('codigo_ua');
-        $arResult[$idCount]['Bimestre']               = $rsRecordSet->getCampo('bimestre');
-        $arResult[$idCount]['Exercicio']              = $rsRecordSet->getCampo('exercicio');
-        $arResult[$idCount]['CodOrgao']               = $rsRecordSet->getCampo('cod_orgao');
-        $arResult[$idCount]['CodUndOrcamentaria']     = $rsRecordSet->getCampo('cod_und_orcamentaria');
-        $arResult[$idCount]['NumBem']                 = $rsRecordSet->getCampo('num_bem');
-        $arResult[$idCount]['Descricao']              = $rsRecordSet->getCampo('descricao');
-        $arResult[$idCount]['DataInscricao']          = $rsRecordSet->getCampo('data_inscricao');
-        $arResult[$idCount]['NumEmpenho']             = $rsRecordSet->getCampo('num_empenho');
-        $arResult[$idCount]['NumeroDocumentoFiscal']  = $rsRecordSet->getCampo('numero_documento_fiscal');
-        $arResult[$idCount]['DataDocumentoFiscal']    = $rsRecordSet->getCampo('data_doc_fiscal');
-        $arResult[$idCount]['TipoDocumentoFiscal']    = $rsRecordSet->getCampo('tipo_documento_fiscal');
-        $arResult[$idCount]['ValorBem']               = $rsRecordSet->getCampo('valor_bem');
-        $arResult[$idCount]['Quantidade']             = $rsRecordSet->getCampo('quantidade');
-        $arResult[$idCount]['Setor']                  = $rsRecordSet->getCampo('setor');
-        $arResult[$idCount]['NumTombamento']          = $rsRecordSet->getCampo('num_tombamento');
-        $arResult[$idCount]['CodEstrutural']          = $rsRecordSet->getCampo('cod_estrutural');
-        $arResult[$idCount]['EstadoBem']              = $rsRecordSet->getCampo('estado_bem');
-        $arResult[$idCount]['AlteracaoBem']           = $rsRecordSet->getCampo('alteracao_bem');
-        $arResult[$idCount]['DataAlteracao']          = $rsRecordSet->getCampo('dt_alteracao');
-        $arResult[$idCount]['ValorAlteracao']         = $rsRecordSet->getCampo('vl_alteracao');
-        $arResult[$idCount]['Percentual']             = $rsRecordSet->getCampo('percentual');
+        $arResult[$idCount]['CodUndGestora']                = $rsRecordSet->getCampo('cod_und_gestora');
+        $arResult[$idCount]['CodigoUA']                     = $rsRecordSet->getCampo('codigo_ua');
+        $arResult[$idCount]['Bimestre']                     = $rsRecordSet->getCampo('bimestre');
+        $arResult[$idCount]['Exercicio']                    = $rsRecordSet->getCampo('exercicio');
+        $arResult[$idCount]['CodOrgao']                     = $rsRecordSet->getCampo('cod_orgao');
+        $arResult[$idCount]['CodUndOrcamentaria']           = $rsRecordSet->getCampo('cod_und_orcamentaria');
+        $arResult[$idCount]['NumBem']                       = $rsRecordSet->getCampo('num_bem');
+        $arResult[$idCount]['Descricao']                    = $rsRecordSet->getCampo('descricao');
+        $arResult[$idCount]['DataInscricao']                = $rsRecordSet->getCampo('data_inscricao');
+        $arResult[$idCount]['NumEmpenho']                   = $rsRecordSet->getCampo('num_empenho');
+        $arResult[$idCount]['NumDocumentoFiscal']           = $rsRecordSet->getCampo('numero_documento_fiscal'); 
+        $arResult[$idCount]['DataDocumentoFiscal']          = $rsRecordSet->getCampo('data_doc_fiscal');
+        $arResult[$idCount]['TipoDocumentoFiscal']          = $rsRecordSet->getCampo('tipo_documento_fiscal');
+        $arResult[$idCount]['ValorBem']                     = $rsRecordSet->getCampo('valor_bem');
+        $arResult[$idCount]['Quantidade']                   = $rsRecordSet->getCampo('quantidade');
+        $arResult[$idCount]['Setor']                        = $rsRecordSet->getCampo('setor');
+        $arResult[$idCount]['NumTombamento']                = $rsRecordSet->getCampo('num_tombamento');
+        $arResult[$idCount]['CodContaContabil']             = $rsRecordSet->getCampo('cod_estrutural');
+        $arResult[$idCount]['EstadoBem']                    = $rsRecordSet->getCampo('estado_bem');
+        $arResult[$idCount]['AlteracaoBemAtivoPermanente']  = $rsRecordSet->getCampo('alteracao_bem');
+        $arResult[$idCount]['DataAlteracao']                = $rsRecordSet->getCampo('dt_alteracao');
+        $arResult[$idCount]['ValorAlteracao']               = $rsRecordSet->getCampo('vl_alteracao');
+        $arResult[$idCount]['Percentual']                   = $rsRecordSet->getCampo('percentual');
         
         $idCount++;
         

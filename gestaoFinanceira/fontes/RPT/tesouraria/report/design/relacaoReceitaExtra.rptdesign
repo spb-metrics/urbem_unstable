@@ -313,12 +313,12 @@ extensionProperties.odaPassword = params["db_password"].value;
 
 if( params["cod_plano"] != "")
 {
-	this.queryText = this.queryText + " AND relacao.cod_plano " + params["cod_plano"] + " "
+	this.queryText = this.queryText + " AND ( relacao.cod_plano " + params["cod_plano"] + " ) "
 }
 
 if( params["conta_banco"] != "")
 {
-	this.queryText = this.queryText + " AND relacao.cod_plano_credito " + params["conta_banco"] + " "
+	this.queryText = this.queryText + " AND ( relacao.cod_plano_banco " + params["conta_banco"] + " ) "
 }
 
 if( params["recurso"] != "")
@@ -356,7 +356,7 @@ params["query"] = this.queryText]]></method>
      ,  nom_entidade
      ,  nom_conta
      ,  cod_estrutural
-     ,  cod_recurso
+     ,  cod_recurso::text
      ,  nom_recurso
      ,  masc_recurso_red
      ,  cod_detalhamento
@@ -378,10 +378,7 @@ params["query"] = this.queryText]]></method>
              ,  entidade_cgm.nom_cgm as nom_entidade
              ,  plano_conta.nom_conta
              ,  plano_conta.cod_estrutural
-             ,  CASE WHEN plano_recurso.cod_recurso  IS NULL
-                    THEN '9999999999'
-                    ELSE TO_CHAR(plano_recurso.cod_recurso,'9999999999')
-                END as cod_recurso
+             ,  coalesce(plano_recurso.cod_recurso,9999999999) as cod_recurso
              ,  recurso.nom_recurso
              ,  recurso.masc_recurso_red
     		 ,  recurso.cod_detalhamento
@@ -464,10 +461,7 @@ params["query"] = this.queryText]]></method>
              ,  entidade_cgm.nom_cgm as nom_entidade
              ,  plano_conta.nom_conta
              ,  plano_conta.cod_estrutural
-             ,  CASE WHEN plano_recurso.cod_recurso  IS NULL
-                    THEN '9999999999'
-                    ELSE TO_CHAR(plano_recurso.cod_recurso,'9999999999')
-                END as cod_recurso
+             ,  coalesce(plano_recurso.cod_recurso,9999999999) as cod_recurso
              ,  recurso.nom_recurso
              ,  recurso.masc_recurso_red
    			 ,  recurso.cod_detalhamento

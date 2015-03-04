@@ -27,7 +27,7 @@
   * @author Analista:
   * @author Programador: Fernando Zank Correa Evangelista
 
-  $Id: TPatrimonioBem.class.php 60624 2014-11-04 17:04:51Z jean $
+  $Id: TPatrimonioBem.class.php 61776 2015-03-03 17:41:03Z carlos.silva $
 
   Caso de uso: uc-03.01.09
   Caso de uso: uc-03.01.21
@@ -834,6 +834,7 @@ class TPatrimonioBem extends Persistente
                  , bem_comprado.num_orgao
                  , bem_comprado.num_unidade
                  , TO_CHAR(bem_comprado.data_nota_fiscal,'dd/mm/yyyy') AS data_nota_fiscal
+                 , bem_comprado.caminho_nf
                  , bem_responsavel.numcgm as num_responsavel
                  , bem_responsavel.nom_cgm as nom_responsavel
                  , bem.depreciavel
@@ -1088,6 +1089,24 @@ class TPatrimonioBem extends Persistente
                 ON historico_bem.cod_bem = bem.cod_bem
          LEFT JOIN patrimonio.bem_baixado
                 ON bem_baixado.cod_bem = bem.cod_bem
+
+         LEFT JOIN ( SELECT bem_responsavel.cod_bem
+                          , bem_responsavel.numcgm
+                          , bem_responsavel.dt_inicio AS dt_inicio
+                          , sw_cgm.nom_cgm
+                       FROM patrimonio.bem_responsavel
+                 INNER JOIN ( SELECT cod_bem
+                                   , MAX(timestamp) AS timestamp
+                                FROM patrimonio.bem_responsavel
+                            GROUP BY cod_bem
+                            ) AS bem_responsavel_max
+                         ON bem_responsavel_max.cod_bem = bem_responsavel.cod_bem
+                        AND bem_responsavel_max.timestamp = bem_responsavel.timestamp
+                 INNER JOIN sw_cgm
+                         ON sw_cgm.numcgm = bem_responsavel.numcgm
+                   ) AS bem_responsavel
+                ON bem_responsavel.cod_bem = bem.cod_bem
+
         ";
 
         return $stSql;
@@ -1130,6 +1149,7 @@ class TPatrimonioBem extends Persistente
                  , unidade.nom_unidade AS nom_unidade_a
                  , bem_comprado.cod_empenho
                  , bem_comprado.nota_fiscal
+                 , bem_comprado.caminho_nf
                  , bem_responsavel.numcgm as num_responsavel
                  , bem_responsavel.nom_cgm as nom_responsavel
                  , TO_CHAR(bem_responsavel.dt_inicio,'dd/mm/yyyy') AS dt_inicio

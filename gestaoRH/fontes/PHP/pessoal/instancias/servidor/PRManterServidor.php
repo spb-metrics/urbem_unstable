@@ -89,13 +89,14 @@ switch ($stAcao) {
         $nomeFoto = Sessao::read('FOTO_NAME');
         if ($nomeFoto) {
             //NOME DO ARQUIVO DA MINIATURA
-            $imagem_gerada = explode(".", $nomeFoto);
-            $nome_foto = sistemaLegado::getmicrotime() . "_" . $imagem_gerada[0];
+            $nome_foto = sistemaLegado::getmicrotime() . "_" . rand(0, getrandmax());
             $imagem_gerada = CAM_GRH_PES_ANEXOS. $nome_foto . "_mini.jpg";
             $nome_foto = $nome_foto ."_mini.jpg";
-            $stFoto = fopen($imagem_gerada,"w+");
-            fwrite ($stFoto, Sessao::read('FOTO_BIN'));
-            fclose($stFoto);
+            
+            if(!copy(Sessao::read('FOTO_URL'), $imagem_gerada)){
+                $obErro->setDescricao("Erro ao gravar foto. Contactar o administrador do sistema.");
+            }
+            
         }
 
         $obRPessoalServidor->recuperaTodosRaca( $rsRaca, $boTransacao );
@@ -320,18 +321,19 @@ switch ($stAcao) {
     case "alterar_servidor":
         
         $obErro = new Erro;
-        if (Sessao::read('FOTO_NAME') and Sessao::read('FOTO_NAME') != "no_foto.jpeg") {
+        
+        $nomeFoto = Sessao::read('FOTO_NAME');
+        if ($nomeFoto) {
             //NOME DO ARQUIVO DA MINIATURA
-            $imagem_gerada = explode(".", Sessao::read('FOTO_NAME'));
-            $nome_foto = sistemaLegado::getmicrotime() . "_" . $imagem_gerada[0];
+            $nome_foto = sistemaLegado::getmicrotime() . "_" . rand(0, getrandmax());
             $imagem_gerada = CAM_GRH_PES_ANEXOS. $nome_foto . "_mini.jpg";
             $nome_foto = $nome_foto ."_mini.jpg";
-            $stFoto = fopen($imagem_gerada,"w+");
-            fwrite ($stFoto, Sessao::read('FOTO_BIN'));
-            fclose($stFoto);
-        } elseif (Sessao::read('FOTO_NAME') and Sessao::read('FOTO_NAME') == "no_foto.jpeg") {
-            $nome_foto = Sessao::read('FOTO_NAME');
+            
+            if (!copy(Sessao::read('FOTO_URL'), $imagem_gerada)){
+                $obErro->setDescricao("Erro ao gravar foto. Contactar o administrador do sistema.");
+            }
         }
+        
         $obRPessoalServidor->setCodServidor                    ( $_REQUEST['inCodServidor']);
         $obRPessoalServidor->setCodUF                          ( $_POST['inCodUF']);
         $obRPessoalServidor->setCodMunicipio                   ( $_POST['inCodMunicipio'] );

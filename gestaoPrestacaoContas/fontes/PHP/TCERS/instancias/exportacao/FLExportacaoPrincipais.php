@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLExportacaoPrincipais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLExportacaoPrincipais.php 61473 2015-01-21 13:32:02Z evandro $
 
     * Casos de uso: uc-02.08.01
 */
@@ -87,7 +87,7 @@ $obTxtPeriodoExport = new Select();
 $obTxtPeriodoExport->setRotulo              ("Periodo");
 $obTxtPeriodoExport->setName                ("inPeriodo");
 $obTxtPeriodoExport->setId                  ("inPeriodo");
-$obTxtPeriodoExport->obEvento->setOnChange  ('rd_extra();');
+$obTxtPeriodoExport->obEvento->setOnChange  ("add_arquivos_extras(".Sessao::getExercicio().");");
 $obTxtPeriodoExport->addOption              ('','Selecione');
 $obTxtPeriodoExport->setNull                (false);
 /*

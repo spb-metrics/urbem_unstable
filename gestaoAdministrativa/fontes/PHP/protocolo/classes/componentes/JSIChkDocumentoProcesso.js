@@ -39,14 +39,23 @@ $Date: 2006-11-08 14:43:54 -0200 (Qua, 08 Nov 2006) $
 Casos de uso: uc-01.06.98
 */
 ?>
-<script language="JavaScript">
-function copiaDigital(cod){
+<script type="text/javascript">
+function copiaDigital(cod, cod_processo, ano_processo){
     var x = 200;
     var y = 140;
-//    var sArq = '<?=CAM_FW_LEGADO."imagens/copiaDigitalLegado.php";?>?<?=Sessao::getId();?>&codDoc='+cod;
     var sArq = '<?=CAM_GA_PROT_POPUPS."documento/FMDocumentoProcesso.php";?>?<?=Sessao::getId();?>&codDoc='+cod;
+
+    if (cod_processo) {
+        sArq += '&inCodProcesso='+cod_processo;
+    }
+
+    if (ano_processo) {
+        sArq += '&stAnoProcesso='+ano_processo;
+    }
+
     var wVolta=false;
-    tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=450px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+    tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=550px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
     window.tela.focus();
 }
+
 </script>

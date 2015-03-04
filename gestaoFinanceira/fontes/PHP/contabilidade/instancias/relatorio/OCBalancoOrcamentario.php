@@ -36,7 +36,7 @@ $obTOrcamentoEntidade->setDado( 'exercicio'   , Sessao::getExercicio()  );
 $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")" );
 
 if (count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
     if (preg_match( "/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) || $boConfirmaFundo > 0) {
         $preview->addParametro( 'poder' , 'Executivo' );
     } else {
@@ -101,7 +101,7 @@ if ( isset($_POST['stMes']) ) {
 }
 
 $preview->addParametro('exercicio'      , Sessao::getExercicio());
-$preview->addParametro("periodo"        , utf8_encode($stPeriodo) );
+$preview->addParametro("periodo"        , $stPeriodo );
 $preview->addParametro('cod_entidade'   , implode(',', $_REQUEST['inCodEntidade']));
 $preview->addParametro('dt_inicial'     , $_REQUEST['stDataInicial']);
 $preview->addParametro('dt_final'       , $_REQUEST['stDataFinal']);

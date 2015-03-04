@@ -30,7 +30,7 @@
 * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
 * @author Documentor: Cassiano de Vasconcellos Ferreira
 
-  $Id: ArquivoExportador.class.php 60030 2014-09-25 19:20:35Z michel $
+  $Id: ArquivoExportador.class.php 61661 2015-02-23 17:39:34Z jean $
 
 * @package framework
 * @subpackage componentes
@@ -366,6 +366,10 @@ function FormataTipoDocumento()
                     $inTamanhoColuna = 151;
                     break;
                 case "ANEXO27FUNDEFBBAAS":
+                    $inTamanhoColuna = 160;
+                    break;
+                case "ANEXO28":
+                    $arCabecalho[0]['nome_arquivo'] = 'ANEXO28';
                     $inTamanhoColuna = 160;
                     break;
             }

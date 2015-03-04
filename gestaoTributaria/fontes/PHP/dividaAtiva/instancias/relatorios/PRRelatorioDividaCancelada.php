@@ -198,7 +198,7 @@ if ($_REQUEST["dtInicio"] && $_REQUEST["dtFinal"]) {
     $arDataIni = explode( "/", $_REQUEST["dtInicio"] );
     $arDataFim = explode( "/", $_REQUEST["dtFinal"] );
     $stFiltro = $stFiltro." divida_cancelada.timestamp::date BETWEEN '".$arDataIni[2]."-".$arDataIni[1]."-".$arDataIni[0]."' AND '".$arDataFim[2]."-".$arDataFim[1]."-".$arDataFim[0]."'";
-    $preview->addParametro( 'stPeriodo', utf8_encode($_REQUEST["dtInicio"]." até ".$_REQUEST["dtFinal"]));
+    $preview->addParametro( 'stPeriodo', $_REQUEST["dtInicio"]." até ".$_REQUEST["dtFinal"]);
 }else
     if ($_REQUEST["dtInicio"] && !$_REQUEST["dtFinal"]) {
         if ($stFiltro) {

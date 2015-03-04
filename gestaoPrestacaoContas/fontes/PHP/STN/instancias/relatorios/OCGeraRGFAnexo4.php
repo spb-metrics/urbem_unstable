@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.23
 
-    $Id: OCGeraRGFAnexo4.php 61130 2014-12-10 17:25:29Z michel $
+    $Id: OCGeraRGFAnexo4.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -65,7 +65,7 @@ if ( count($_REQUEST['inCodEntidade']) == 1 ) {
 } else {
     while ( !$rsEntidade->eof() ) {
         if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo('nom_cgm')) ) {
-            $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
             break;
         }
         $rsEntidade->proximo();
@@ -158,7 +158,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo3novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

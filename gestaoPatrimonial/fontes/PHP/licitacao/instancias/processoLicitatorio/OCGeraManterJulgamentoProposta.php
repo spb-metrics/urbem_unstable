@@ -110,10 +110,10 @@ $preview->addParametro('cod_cotacao'       , $inCodCotacao);
 $preview->addParametro('exercicio_cotacao' , $stExercicioCotacao);
 $preview->addParametro('data_emissao'      , (($stDtEmissao != '') ? $stDtEmissao : ''));
 $preview->addParametro('hora_emissao'      , (($stHrEmissao != '') ? $stHrEmissao : ''));
-$preview->addParametro('prm_modalidade'    , utf8_encode($stModalidade) );
-$preview->addParametro('prm_tipo_objeto'   , utf8_encode($stTipoObjeto) );
-$preview->addParametro('prm_objeto'        , utf8_encode($stObjeto)     );
-$preview->addParametro('prm_entidade'      , utf8_encode($stEntidade)   );
+$preview->addParametro('prm_modalidade'    , $stModalidade );
+$preview->addParametro('prm_tipo_objeto'   , $stTipoObjeto );
+$preview->addParametro('prm_objeto'        , $stObjeto     );
+$preview->addParametro('prm_entidade'      , $stEntidade   );
 
 $stIncluirAssinaturas = $_REQUEST['stIncluirAssinaturas'];
 if ($stIncluirAssinaturas == 'sim') {
@@ -122,7 +122,7 @@ if ($stIncluirAssinaturas == 'sim') {
     $stIncluirAssinaturas = 'não';
 }
 
-$preview->addParametro('incluir_assinaturas', utf8_encode($stIncluirAssinaturas) );
+$preview->addParametro('incluir_assinaturas', $stIncluirAssinaturas );
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 
 $preview->preview();

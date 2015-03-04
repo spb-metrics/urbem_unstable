@@ -462,26 +462,28 @@ from ]]></xml-property>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="rsAnexoII" id="1300">
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[
-this.queryText  = " SELECT descricao ";
-this.queryText += "     , ordem ";
-this.queryText += "     , valor_exercicio_anterior ";
-this.queryText += "     , valor_quadrimestre_1 ";
-this.queryText += "     , valor_quadrimestre_2 ";
-this.queryText += "     , valor_quadrimestre_3 ";
+this.queryText  = " SELECT descricao \n";
+this.queryText += "     , ordem  \n";
+this.queryText += "     , valor_exercicio_anterior  \n";
+this.queryText += "     , valor_quadrimestre_1  \n";
+this.queryText += "     , valor_quadrimestre_2  \n";
+this.queryText += "     , valor_quadrimestre_3  \n";
 this.queryText += "     , nivel ";
 if (params['exercicio'] > 2012) {
-	this.queryText += "  FROM stn.fn_rgf_anexo2_novo('"+params['exercicio']+"','"+params['tipo_periodo']+"',"+params['periodo']+",'"+params['entidade']+"') AS tbl ";
+	this.queryText += "  FROM stn.fn_rgf_anexo2_novo('"+params['exercicio']+"','"+params['tipo_periodo']+"',"+params['periodo']+",'"+params['entidade']+"') AS tbl  \n";
 } else {
-	this.queryText += "  FROM stn.fn_rgf_anexo2('"+params['exercicio']+"','"+params['tipo_periodo']+"',"+params['periodo']+",'"+params['entidade']+"') AS tbl ";
+	this.queryText += "  FROM stn.fn_rgf_anexo2('"+params['exercicio']+"','"+params['tipo_periodo']+"',"+params['periodo']+",'"+params['entidade']+"') AS tbl  \n";
 }
-this.queryText += "       (  descricao varchar ";
-this.queryText += "        , ordem integer ";
-this.queryText += "        , valor_exercicio_anterior numeric ";
-this.queryText += "        , valor_quadrimestre_1 numeric ";
-this.queryText += "        , valor_quadrimestre_2 numeric ";
-this.queryText += "        , valor_quadrimestre_3 numeric ";
-this.queryText += "        , nivel integer ";
-this.queryText += "       ) ";]]></method>
+this.queryText += "       (  descricao varchar  \n";
+this.queryText += "        , ordem integer  \n";
+this.queryText += "        , valor_exercicio_anterior numeric  \n";
+this.queryText += "        , valor_quadrimestre_1 numeric  \n";
+this.queryText += "        , valor_quadrimestre_2 numeric  \n";
+this.queryText += "        , valor_quadrimestre_3 numeric  \n";
+this.queryText += "        , nivel integer  \n";
+this.queryText += "       )  \n";
+
+//params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>

@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: consultaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: consultaProcesso.php 61785 2015-03-03 21:06:56Z evandro $
 
     */
 
@@ -441,6 +441,19 @@ function Valida()
         document.frm.action = "imprimeRelatorioDespachos.php?<?=Sessao::getId()?>&ctrl=2&codProcesso<?=$codProcesso?>&anoExercicio<?=$anoExercicio?>";
         document.frm.submit();
     }
+
+    function ImprimeProcesoArquivado(cod_historico)
+    {
+        if (cod_historico != '') {
+            document.frm.action = "arquivaProcessoDefinitivo.php?<?=Sessao::getId()?>&historicoArquivamento="+cod_historico+" ";
+            document.frm.submit();   
+        }else{
+            document.frm.action = "arquivaProcessoTemporario.php?<?=Sessao::getId()?>";
+            document.frm.submit();   
+        }
+        
+    }
+
 
     function Salvar()
     {
@@ -1639,6 +1652,20 @@ a.timestamp        = p.timestamp;
             #$_REQUEST['anoExercicioSetor'] = $processo["anoExercicioSetor"];
 
             $botoesPDF  = new botoesPdfLegado;
+            
+            if ( $processo["codSituacao"] == 5 || $processo["codSituacao"] == 9){                
+                
+                $stTextComplementar = SistemaLegado::pegaDado("texto_complementar","sw_processo_arquivado","WHERE ano_exercicio = '".$anoExercicio."' AND cod_processo = ".$processo["codProcesso"]."");
+                Sessao::write("texto_complementar",$stTextComplementar);
+
+                if ($processo["codSituacao"] == 9) {
+                    $historicoArquivamento = SistemaLegado::pegaDado("cod_historico","sw_processo_arquivado","WHERE ano_exercicio = '".$anoExercicio."' AND cod_processo = ".$processo["codProcesso"]." ");
+                }                
+                $stImprimeProcessoArquivado = '<td class="show_dados" title="Imprimir Carta de Arquivamento de Processo">
+                                            <a href="javascript:ImprimeProcesoArquivado('.$historicoArquivamento.');"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>';
+            }else{
+                $stImprimeProcessoArquivado = '';
+            }
 
             print '
             <table width="300" cellspacing=0>
@@ -1648,7 +1675,8 @@ a.timestamp        = p.timestamp;
                     <td class="show_dados" title="Imprimir Etiqueta">
                     <a href="javascript:ImprimeEtiqueta();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
                     <td class="show_dados" title="Imprimir Despachos do Processo">
-                    <a href="javascript:ImprimeDespachos();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
+                    <a href="javascript:ImprimeDespachos();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>                    
+                    '.$stImprimeProcessoArquivado.'
                 </tr>
             </table>
                 ';

@@ -67,11 +67,11 @@ if ($_REQUEST['stTipoRelatorio'] == "Mes") {
 
 $preview->addParametro( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nome_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nome_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     while ( !$rsEntidade->eof() ) {
         if ( preg_match( "/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) ) {
-            $preview->addParametro( 'nome_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+            $preview->addParametro( 'nome_entidade', $rsEntidade->getCampo('nom_cgm') );
             break;
         }
         $rsEntidade->proximo();
@@ -150,7 +150,7 @@ $dtHoraEmissao = date('H:i');
 //necessário codificar os caracteres especias em ascii para o birt interpretar corretamente
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 #################################################################################################
 
 if( !$obErro->ocorreu() )

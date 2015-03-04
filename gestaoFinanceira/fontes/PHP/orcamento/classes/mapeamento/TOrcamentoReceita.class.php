@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 61338 2015-01-08 16:56:57Z evandro $
+    $Id: TOrcamentoReceita.class.php 61612 2015-02-13 16:47:23Z lisiane $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -319,7 +319,7 @@ function recuperaReceitaAnaliticaTCE(&$rsRecordSet, $stCondicao = "" , $stOrdem 
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    $stSql = $this->montaRecuperaReceitaAnaliticaTCE().$stCondicao.$stOrdem;
+    $stSql = $this->montaRecuperaReceitaAnaliticaTCE().$stCondicao.$stOrdem; 
     $this->setDebug( $stSql);
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -348,6 +348,39 @@ function montaRecuperaReceitaAnaliticaTCE()
     $stSql .= "      AND CR.cod_conta          = CLR.cod_conta_receita      ".$stQuebra;
 
     return $stSql;
+}
+
+function recuperaLancamentoReceita(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaLancamentoReceita().$stCondicao.$stOrdem; 
+    $this->setDebug( $stSql);
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+function montaRecuperaLancamentoReceita(){
+    
+    $stQuebra = "\n";
+    $stSql  = "      SELECT                                                      ".$stQuebra;
+    $stSql .= "          CLASSIFICACAO.mascara_classificacao,                    ".$stQuebra;
+    $stSql .= "          CLASSIFICACAO.descricao,                                ".$stQuebra;
+    $stSql .= "          RECEITA.*                                               ".$stQuebra;
+    $stSql .= "      FROM                                                        ".$stQuebra;
+    $stSql .= "          orcamento.VW_CLASSIFICACAO_RECEITA  AS CLASSIFICACAO,   ".$stQuebra;
+    $stSql .= "          ORCAMENTO.RECEITA                   AS RECEITA,         ".$stQuebra;
+    $stSql .= "          ORCAMENTO.CONTA_RECEITA             AS CR               ".$stQuebra;
+    $stSql .= "     WHERE                                                        ".$stQuebra;
+    $stSql .= "           CLASSIFICACAO.exercicio IS NOT NULL                    ".$stQuebra;
+    $stSql .= "       AND RECEITA.cod_conta     = CLASSIFICACAO.cod_conta        ".$stQuebra;
+    $stSql .= "       AND RECEITA.exercicio     = CLASSIFICACAO.exercicio        ".$stQuebra;
+    $stSql .= "       AND RECEITA.exercicio     = CR.exercicio                   ".$stQuebra;
+    $stSql .= "       AND RECEITA.cod_conta     = CR.cod_conta                   ".$stQuebra;
+
+    return $stSql;
+    
 }
 
 function recuperaReceitaDedutora(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -1398,9 +1431,11 @@ function montaRecuperaReceitaExportacaoPlanejamento10()
                     arrecadado_periodo  numeric,                                           
                     arrecadado_ano      numeric,                                           
                     diferenca           numeric                                           
-                ) ON detalhamento_receitas.cod_estrutural = conta_receita.cod_estrutural
-                 AND SUBSTR(detalhamento_receitas.cod_estrutural, 1, 1) != '9'
-
+                ) ON detalhamento_receitas.cod_estrutural = conta_receita.cod_estrutural \n";
+    if ( Sessao::getExercicio() == '2014' ) {
+        $stSql .= "    AND SUBSTR(detalhamento_receitas.cod_estrutural, 1, 1) != '9' \n";
+    }
+    $stSql .= "
             LEFT JOIN tcemg.receita_indentificadores_peculiar_receita
                    ON receita_indentificadores_peculiar_receita.exercicio = receita.exercicio
                   AND receita_indentificadores_peculiar_receita.cod_receita = receita.cod_receita
@@ -1419,7 +1454,11 @@ function montaRecuperaReceitaExportacaoPlanejamento10()
                      , cod_orgao
                      , identificador_deducao
                      , detalhamento_receitas.valor_previsto
-                     , rec.masc_recurso_red
+                     , rec.masc_recurso_red \n";
+    
+    if ( Sessao::getExercicio() == '2014' ) {
+        $stSql .= "    
+    
              UNION
 
                SELECT
@@ -1475,7 +1514,9 @@ function montaRecuperaReceitaExportacaoPlanejamento10()
                      , indentificador_deducao
                      , natureza_receita
                      , especificacao
-                     , rec.masc_recurso_red
+                     , rec.masc_recurso_red \n ";
+    }
+    $stSql .= "    
                ) AS tabela
              WHERE tabela.vl_previsto<>0.00
               GROUP BY tipo_registro, cod_orgao, deducao_receita, identificador_deducao, natureza_receita, cod_receita, especificacao
@@ -1535,9 +1576,11 @@ function montaRecuperaReceitaExportacaoPlanejamento11()
                                  arrecadado_periodo  numeric,                                           
                                  arrecadado_ano      numeric,                                           
                                  diferenca           numeric                                           
-                               )
-                           WHERE SUBSTR(cod_estrutural, 1, 1) != '9'
-        
+                               ) \n";
+if ( Sessao::getExercicio() == '2014' ) {
+               $stSql .= "   WHERE SUBSTR(cod_estrutural, 1, 1) != '9'
+
+    
                            UNION 
                         
                           SELECT conta_receita.cod_estrutural::varchar AS cod_estrutural
@@ -1585,8 +1628,9 @@ function montaRecuperaReceitaExportacaoPlanejamento11()
                                , receita.exercicio
                                , cod_estrutural
                                , conta_receita.descricao
-                               , rec.masc_recurso_red
-                    )
+                               , rec.masc_recurso_red \n";
+            }
+    $stSql .= "       )
                    AS detalhamento 
              GROUP BY cod_estrutural
                     , receita

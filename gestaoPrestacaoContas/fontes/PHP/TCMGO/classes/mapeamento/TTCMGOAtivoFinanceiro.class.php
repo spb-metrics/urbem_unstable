@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoFinanceiro.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTCMGOAtivoFinanceiro.class.php 61525 2015-01-29 19:21:26Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -49,15 +49,21 @@ class TTCMGOAtivoFinanceiro extends TContabilidadeBalancoFinanceiro
         $this->setDado('exercicio', Sessao::getExercicio() );
     }
 
-    public function montaRecuperaTodos()
+    public function recuperaArquivoExportacao10(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaArquivoExportacao10",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    public function montaRecuperaArquivoExportacao10()
     {
         $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
         $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
-        $stSql = "
-                    SELECT
-                         *
+        $stSql = "SELECT
+                            *
+                            , '' AS brancos
+                            , 10 as tipo_registro
                      FROM
-                       tcmgo.fn_rl_balanco_patrimonial( '" .$this->getDado( 'exercicio' ) .  "'
+                        tcmgo.arquivo_afr_exportacao10( '" .$this->getDado( 'exercicio' ) .  "'
                                                      , 'cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." )
                                                     and tipo <> ''I''
                                                     and cod_estrutural like ''1.%''
@@ -73,6 +79,45 @@ class TTCMGOAtivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                      ,vl_saldo_atual    numeric
                                      ,nom_sistema varchar
                                      ,tipo_lancamento integer
+                                    )
+                    where vl_saldo_anterior <> 0
+                       or vl_saldo_debitos <> 0
+                       or vl_saldo_creditos <> 0
+                    ORDER BY cod_estrutural ";
+
+        return $stSql;
+    }
+
+    public function recuperaArquivoExportacao11(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaArquivoExportacao11",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    public function montaRecuperaArquivoExportacao11()
+    {
+        $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
+        $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
+        $stSql = "SELECT
+                            *
+                            , 11 as tipo_registro                 
+                     FROM
+                        tcmgo.arquivo_afr_exportacao11( '" .$this->getDado( 'exercicio' ) .  "'
+                                                     , 'cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." )
+                                                    and tipo <> ''I''
+                                                    and cod_estrutural like ''1.%''
+                                                    ' ,'$stDataIni','$stDataFim','')
+                         as retorno (  cod_estrutural varchar
+                                     ,nivel integer
+                                     ,nom_conta varchar
+                                     ,num_orgao integer
+                                     ,num_unidade integer
+                                     ,vl_saldo_anterior numeric
+                                     ,vl_saldo_debitos  numeric
+                                     ,vl_saldo_creditos numeric
+                                     ,vl_saldo_atual    numeric
+                                     ,nom_sistema varchar
+                                     ,tipo_lancamento integer
+                                     ,cod_fonte VARCHAR(13)
                                     )
                     where vl_saldo_anterior <> 0
                        or vl_saldo_debitos <> 0

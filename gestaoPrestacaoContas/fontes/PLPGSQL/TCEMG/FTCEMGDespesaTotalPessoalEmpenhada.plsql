@@ -64,28 +64,13 @@ BEGIN
         AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
         AND pre_empenho.exercicio       = empenho.exercicio
 
-        AND NOT EXISTS
-        (
-            SELECT
-                1
-            FROM empenho.nota_liquidacao
-               , empenho.nota_liquidacao_paga
-              WHERE nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio
-                AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
-                AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
-                
-                AND nota_liquidacao.exercicio    = empenho.exercicio
-                AND nota_liquidacao.cod_entidade = empenho.cod_entidade
-                AND nota_liquidacao.cod_empenho  = empenho.cod_empenho
-        )
-
         AND pre_empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
         AND pre_empenho.exercicio       = item_pre_empenho.exercicio
 
         AND dt_empenho between to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''', ''dd/mm/yyyy'')
         AND ' || stCondicao || '
 	AND empenho.cod_entidade IN (' || stEntidades || ') ';
-		
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
         nuTotal := reRegistro.vl_final;

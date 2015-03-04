@@ -31,7 +31,7 @@
 
  * Casos de uso: uc-06.01.15
 
- $Id: OCGeraRREOAnexo18.php 61131 2014-12-10 17:56:24Z arthur $
+ $Id: OCGeraRREOAnexo18.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
  */
 
@@ -58,13 +58,13 @@ $preview->addParametro ( 'porcentagem', $request->get('flPct') );
 $preview->addParametro ( 'cod_entidade', implode(',', $request->get('inCodEntidade')) );
 
 if (count($request->get('inCodEntidade')) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $inCodEntidadePrefeitura = SistemaLegado::pegaDado('valor','administracao.configuracao'," WHERE parametro = 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."' AND cod_modulo = 8 ");
     $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade = ".$inCodEntidadePrefeitura );
 
     while ( !$rsEntidade->eof() ) {
-        $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+        $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
         $rsEntidade->proximo();
     }
 }
@@ -104,7 +104,7 @@ $dtHoraEmissao = date('H:i');
 //necessário codificar os caracteres especias em ascii para o birt interpretar corretamente
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao);
 
 if ($_REQUEST['stAcao'] == 'anexo14novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

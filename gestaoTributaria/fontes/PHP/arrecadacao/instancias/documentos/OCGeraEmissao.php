@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: OCGeraEmissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraEmissao.php 61651 2015-02-20 18:47:10Z evandro $
 
   Caso de uso: uc-05.03.11
 **/
@@ -72,15 +72,15 @@ if ($passo == 1) {
     echo $stHTML;
 } elseif ($passo==2) {
     $stNomPdf = Sessao::read( 'stNomPdf' );
-
+    
     $arq = fopen( $stNomPdf, "r" );
     $tam = filesize( $stNomPdf );
     $buffer = fread($arq,$tam);
     $boFecha = fclose($arq);
 
-    header('Content-Type: application/octet-stream');
-    header('Content-Length: '.$tam);
-    header('Content-disposition: attachment; filename="'.$stNomPdf.'"');
+    header("Content-Type: application/octet-stream");
+    header("Content-Length: ".$tam);
+    header("Content-disposition: attachment; filename=EmissaoUrbem-".date("dmYHi").".pdf");
 
     Sessao::remove('stNomPdf');
 

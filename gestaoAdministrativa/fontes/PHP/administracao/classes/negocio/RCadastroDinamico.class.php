@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: RCadastroDinamico.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: RCadastroDinamico.class.php 61695 2015-02-26 12:13:37Z franver $
 
 $Revision: 20901 $
 $Name$
@@ -478,7 +478,7 @@ function recuperaAtributosSelecionados(&$rsRecordSet, $stOrder = "", $boTransaca
 */
 function recuperaAtributosSelecionadosValores(&$rsRecordSet, $stFiltro="" ,$stOrder="" ,$boTransacao = "")
 {
-    return $this->_recuperaAtributosSelecionadosValores( true, $rsRecordSet, $stFiltro="" ,$stOrder="" ,$boTransacao);
+    return $this->_recuperaAtributosSelecionadosValores( true, $rsRecordSet, $stFiltro ,$stOrder ,$boTransacao);
 }
 
 /**
@@ -491,7 +491,7 @@ function recuperaAtributosSelecionadosValores(&$rsRecordSet, $stFiltro="" ,$stOr
 */
 function consultaAtributosSelecionadosValores(&$rsRecordSet, $stFiltro="" ,$stOrder="" ,$boTransacao = "")
 {
-    return $this->_recuperaAtributosSelecionadosValores( false, $rsRecordSet, $stFiltro="" ,$stOrder="" ,$boTransacao);
+    return $this->_recuperaAtributosSelecionadosValores( false, $rsRecordSet, $stFiltro ,$stOrder ,$boTransacao);
 }
 
 function _recuperaAtributosSelecionadosValores($boAtivos, &$rsRecordSet, $stFiltro="" ,$stOrder="" ,$boTransacao)

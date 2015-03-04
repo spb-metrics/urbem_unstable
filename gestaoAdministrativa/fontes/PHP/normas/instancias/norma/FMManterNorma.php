@@ -68,6 +68,9 @@ if ( (empty($stAcao)) || ($stAcao == "incluir")) {
 
     $obRNorma->obRTipoNorma->listar( $rsTipoNorma );
     
+    $obRNorma->obTNorma->recuperaUltimoCodNorma($rsUltimoCodNorma, $boTransacao);    
+    Sessao::write('inCodNorma',$rsUltimoCodNorma->getCampo('ultimo_cod_norma'));
+    
     $stNomeNorma      = "";
     $inNumNorma       = "";
     $stExercicio      = "";
@@ -399,7 +402,7 @@ $obBtnLink->setTitle  ( "Informe o caminho do arquivo" );
 $obBtnLink->setName   ( "btnIncluirLink"               );
 $obBtnLink->setId     ( "btnIncluirLink"               );
 $obBtnLink->setSize   ( 35                             );
-$obBtnLink->setValue ( $btnIncluirLink  );
+$obBtnLink->setValue  ( $btnIncluirLink  );
 
 $obSpan = new Span;
 $obSpan->setId ( "spanAtributos" );

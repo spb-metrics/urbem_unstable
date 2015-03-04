@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: FMManterGeracaoAssentamento.php 60911 2014-11-24 16:26:04Z evandro $
+ $Id: FMManterGeracaoAssentamento.php 61724 2015-02-27 16:26:44Z evandro $
 
  * Casos de uso: uc-04.04.14
  */
@@ -265,7 +265,7 @@ if ($stAcao == "incluir" or $stAcao == "alterar") {
     $obTxtCodAssentamento->setMaxLength             ( 10                                                  );
     $obTxtCodAssentamento->setInteiro               ( true                                                );
     $obTxtCodAssentamento->setValue                 ( isset($inCodAssentamento) ? $inCodAssentamento : '' );
-    $obTxtCodAssentamento->obEvento->setOnChange    ( "buscaValor('processarQuantDiasAssentamento');"     );
+    $obTxtCodAssentamento->obEvento->setOnChange    ( "BloqueiaFrames(true,false); buscaValor('processarQuantDiasAssentamento');"     );
     $obTxtCodAssentamento->obEvento->setOnBlur      ( "validaObrigatorios();"                             );
 
     //Define objeto SELECT para listar a DESCRIÇÂO do motivo
@@ -277,7 +277,7 @@ if ($stAcao == "incluir" or $stAcao == "alterar") {
     $obCmbAssentamento->setStyle                    ( "width: 200px"                                      );
     $obCmbAssentamento->addOption                   ( "", "Selecione"                                     );
     $obCmbAssentamento->setValue                    ( isset($inCodAssentamento) ? $inCodAssentamento : '' );
-    $obCmbAssentamento->obEvento->setOnChange       ( "buscaValor('processarQuantDiasAssentamento');"     );
+    $obCmbAssentamento->obEvento->setOnChange       ( "BloqueiaFrames(true,false); buscaValor('processarQuantDiasAssentamento');"     );
     $obCmbAssentamento->obEvento->setOnBlur         ( "validaObrigatorios();"                             );
 
     //Define objeto TEXTBOX para armazenar a DESCRICAO do modelo
@@ -290,7 +290,7 @@ if ($stAcao == "incluir" or $stAcao == "alterar") {
     $obTxtQuantidadeDias->setSize                   ( 4                                                 );
     $obTxtQuantidadeDias->setMaxLength              ( 8                                                 );
     $obTxtQuantidadeDias->setInteiro                ( true                                              );
-    $obTxtQuantidadeDias->obEvento->setOnBlur       ( "buscaValor('processarTriadi1');"                 );
+    $obTxtQuantidadeDias->obEvento->setOnChange     ( "buscaValor('processarTriadi1');"                 );
 
     $obDataInicial = new Data;
     $obDataInicial->setName               ( "stDataInicial" );
@@ -356,7 +356,6 @@ switch ($stAcao) {
         $obSpanCargoFuncaoSalario = new Span();
         $obSpanCargoFuncaoSalario->setId('spnCargoFuncaoSalario');
 
-
         $obFormulario->addHidden             ( $obHdnCodAssentamentoGerado                      );
         $obFormulario->addHidden             ( $obHdnModoGeracao                                );
         $obFormulario->addTitulo             ( "Geração do Assentamento"                        );
@@ -385,6 +384,14 @@ switch ($stAcao) {
         $obHdnModoGeracao = new Hidden;
         $obHdnModoGeracao->setName  ( "hdnModoGeracao"  );
         $obHdnModoGeracao->setValue ( "contrato"        );
+        
+        $obHdnCodContrato = new Hidden;
+        $obHdnCodContrato->setName  ( "inCodContrato"  );
+        $obHdnCodContrato->setValue ( ""               );
+        
+        $obHdnCodMatricula = new Hidden;
+        $obHdnCodMatricula->setName  ( "inCodMatricula" );
+        $obHdnCodMatricula->setValue ( ""               );
 
         $obSpanCargoFuncaoSalario = new Span();
         $obSpanCargoFuncaoSalario->setId('spnCargoFuncaoSalario');
@@ -431,6 +438,8 @@ switch ($stAcao) {
 
         $obFormulario->addHidden              ( $obHdnEval , true                                 );
         $obFormulario->addHidden              ( $obHdnModoGeracao                                 );
+        $obFormulario->addHidden              ( $obHdnCodContrato                                 );        
+        $obFormulario->addHidden              ( $obHdnCodMatricula                                );
         $obFormulario->addTitulo              ( "Geração do Assentamento"                         );
         $obFormulario->addComponente          ( $obCmbModoGeracao                                 );
         $obFormulario->addSpan                ( $obSpan1                                          );

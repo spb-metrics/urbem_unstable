@@ -59,8 +59,9 @@ function TPatrimonioBemComprado()
     $this->AddCampo('cod_empenho'      ,'integer',false,''    ,false,false);
     $this->AddCampo('num_orgao'        ,'integer',false,''    ,false,false);
     $this->AddCampo('num_unidade'      ,'integer',false,''    ,false,false);
-    $this->AddCampo('nota_fiscal'      ,'char'   ,false,'30.0',false,false);
+    $this->AddCampo('nota_fiscal'      ,'varchar',false,'30'  ,false,false);
     $this->AddCampo('data_nota_fiscal' ,'date'   ,true ,''    ,false,false);
+    $this->AddCampo('caminho_nf'       ,'varchar',true ,'100' ,false,false);
     
 }
 

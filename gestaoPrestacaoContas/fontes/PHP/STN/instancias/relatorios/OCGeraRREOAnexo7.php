@@ -81,12 +81,12 @@ $preview->addParametro ( 'exercicio', Sessao::getExercicio() );
 $preview->addParametro ( 'entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $obTAdministracaoConfiguracao->recuperaTodos($rsPrefeitura, " WHERE exercicio = '".Sessao::getExercicio()."' AND parametro = 'cod_entidade_prefeitura'");
     foreach ($rsEntidade->arElementos as $key => $field) {
       if ($rsPrefeitura->getCampo('valor') == $field['cod_entidade']) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($field['nom_cgm']) );
+    $preview->addParametro( 'nom_entidade', $field['nom_cgm'] );
       }
     }
 }
@@ -148,7 +148,7 @@ switch ($_REQUEST['cmbBimestre']) {
 if ($request->get('cmbBimestre')) {
     $descricaoPeriodo = $request->get('cmbBimestre')."º Bimestre de ".Sessao::getExercicio();
 } else if ($request->get('cmbMes')) {
-    $descricaoPeriodo = utf8_encode(sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio());
+    $descricaoPeriodo = sistemaLegado::mesExtensoBR(intval($_REQUEST['cmbMes']))." de ".Sessao::getExercicio();
 }
 
 if ($request->get('cmbMes')) {
@@ -171,7 +171,7 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo6novo') {
     $preview->addParametro( 'relatorio_novo', 'sim' );

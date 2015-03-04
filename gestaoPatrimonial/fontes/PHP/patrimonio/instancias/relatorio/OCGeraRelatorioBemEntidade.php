@@ -109,8 +109,10 @@ if ($_REQUEST['boBemBaixado'] != '' ) {
 if ($_REQUEST['inCodOrganogramaAtivo'] != '') {
     if ($_REQUEST['inCodOrganogramaClassificacao'] != '') {
 
+        if($_REQUEST['inCodOrganogramaAtivo'] != '')
         $boPermissaoHierarquica = SistemaLegado::pegaDado('permissao_hierarquica', 'organograma.organograma', ' WHERE cod_organograma = '.$_REQUEST['inCodOrganogramaAtivo']);
-        
+
+        if($_REQUEST['hdnUltimoOrgaoSelecionado'] != '')        
         $stOrgaoReduzido = SistemaLegado::pegaDado('orgao_reduzido', 'organograma.vw_orgao_nivel', ' WHERE cod_orgao = '.$_REQUEST['hdnUltimoOrgaoSelecionado']);
         
         if ($boPermissaoHierarquica == 't'){

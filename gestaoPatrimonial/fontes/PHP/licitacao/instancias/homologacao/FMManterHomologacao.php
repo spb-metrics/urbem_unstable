@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: FMManterHomologacao.php 60662 2014-11-06 18:19:55Z jean $
+    $Id: FMManterHomologacao.php 61615 2015-02-13 19:33:09Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -134,7 +134,7 @@ $obTxtJustificativa->setName   ( 'stJustificativa' );
 $obTxtJustificativa->setId     ( 'stJustificativa' );
 $obTxtJustificativa->setRotulo ( "Justificativa"   );
 $obTxtJustificativa->setTitle  ( "Justificativa e fundamentação legal para contratação mediante dispensa ou inexigibilidade." );
-$obTxtJustificativa->setNull   ( true              );
+$obTxtJustificativa->setNull   ( false              );
 $obTxtJustificativa->setRows   ( 2                 );
 $obTxtJustificativa->setCols   ( 100               );
 $obTxtJustificativa->setMaxCaracteres( 250         );
@@ -144,7 +144,7 @@ $obTxtRazao->setName   ( 'stRazao' );
 $obTxtRazao->setId     ( 'stRazao' );
 $obTxtRazao->setRotulo ( "Razão"   );
 $obTxtRazao->setTitle  ( "Razão da escolha do fornecedor ou executante." );
-$obTxtRazao->setNull   ( true              );
+$obTxtRazao->setNull   ( false              );
 $obTxtRazao->setRows   ( 2                 );
 $obTxtRazao->setCols   ( 100               );
 $obTxtRazao->setMaxCaracteres( 250         );

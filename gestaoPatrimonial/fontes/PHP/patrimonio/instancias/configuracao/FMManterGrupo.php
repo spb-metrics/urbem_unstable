@@ -64,7 +64,7 @@ if ($stAcao == 'alterar') {
             AND grupo.cod_grupo      = ".$_REQUEST['inCodGrupo'];
 
     $obTPatrimonioGrupo->recuperaGrupo( $rsGrupo, $stFiltro );
-    
+        
     $inCodNatureza         = $rsGrupo->getCampo( 'cod_natureza' );
     $inCodPlano            = $rsGrupo->getCampo( 'cod_plano' );
     $stNomConta            = $rsGrupo->getCampo( 'nom_conta' );
@@ -85,7 +85,12 @@ if ($stAcao == 'alterar') {
     $obHdnCodNatureza = new Hidden();
     $obHdnCodNatureza->setName 	  ( 'inCodNatureza' );
     $obHdnCodNatureza->setValue   ( $rsGrupo->getCampo('cod_natureza') );
-
+    
+    //cria um objeto hidden para passar o valor do codigo do plano de depreciação acumulada
+    $obHdnCodPlanoDeprecicao = new Hidden();
+    $obHdnCodPlanoDeprecicao->setName  ( 'inCodPlanoDepreciacao' );
+    $obHdnCodPlanoDeprecicao->setValue ( $rsGrupo->getCampo( 'cod_plano_depreciacao' ) );
+    
     //cria um label para demonstrar o nome da natureza
     $obLblNatureza = new Label();
     $obLblNatureza->setRotulo( 'Natureza' );
@@ -176,6 +181,7 @@ $obFormulario->addTitulo    ( "Dados do Grupo" );
 if ($stAcao == 'alterar') {
     $obFormulario->addHidden( $obHdnCodNatureza );
     $obFormulario->addHidden( $obHdnCodGrupo );
+    $obFormulario->addHidden( $obHdnCodPlanoDeprecicao );
     $obFormulario->addComponente( $obLblNatureza );
     $obFormulario->addComponente( $obLblCodGrupo );
 } else {

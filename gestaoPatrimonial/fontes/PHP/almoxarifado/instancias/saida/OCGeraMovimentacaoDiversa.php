@@ -47,7 +47,7 @@ $obBirtPreview->setVersaoBirt( '2.5.0' );
 
 $obBirtPreview->setTitulo     ( 'Relatório de Saídas Diversas' );
 
-$obBirtPreview->addParametro( 'prRequisitante', utf8_encode(Sessao::read('nomCgm')) );
+$obBirtPreview->addParametro( 'prRequisitante', Sessao::read('nomCgm') );
 
 $obBirtPreview->addParametro( 'prNumLancamento', $_REQUEST['inNumLancamento'] );
 

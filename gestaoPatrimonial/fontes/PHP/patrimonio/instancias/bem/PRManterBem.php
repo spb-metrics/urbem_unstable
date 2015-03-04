@@ -26,7 +26,7 @@
  * @author Analista: Gelson W. Gonçalves
  * @author Desenvolvedor: Henrique Boaventura
 
- * $Id: PRManterBem.php 60864 2014-11-19 17:50:29Z arthur $
+ * $Id: PRManterBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
 
  * Casos de uso: uc-03.01.06
  */
@@ -53,7 +53,11 @@ include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioHistoricoBem.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioManutencao.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioManutencaoPaga.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioGrupoPlanoDepreciacao.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioDepreciacaoAnulada.class.php";
 include_once CAM_GPC_TCEAL_MAPEAMENTO.'TTCEALBemCompradoTipoDocumentoFiscal.class.php';
+include_once TTGO.'TTGOPatrimonioBemObra.class.php';
+include_once(CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemProcesso.class.php");
+
 
 $stPrograma = "ManterBem";
 $pgFilt	    = "FL".$stPrograma.".php";
@@ -80,6 +84,7 @@ $obTAdministracaoConfiguracao          = new TAdministracaoConfiguracao;
 $obTPatrimonioBemMarca                 = new TPatrimonioBemMarca();
 $obTPatrimonioInventarioHistoricoBem   = new TPatrimonioInventarioHistoricoBem();
 $obTPatrimonioBemPlanoDepreciacao      = new TPatrimonioBemPlanoDepreciacao();
+$obTPatrimonioBemProcesso              = new TPatrimonioBemProcesso();
 
 Sessao::setTrataExcecao(true);
 Sessao::getTransacao()->setMapeamento( $obTPatrimonioBem );
@@ -212,6 +217,15 @@ switch ($stAcao) {
                 $inCodContaDepreciacao  = $_REQUEST['inCodContaDepreciacao'];
                 $inExercicio            = Sessao::getExercicio();
 
+                if (!empty($_REQUEST['stChaveProcesso'])) {
+                    $arProcesso = array();
+                    $arProcesso = explode("/", $_REQUEST['stChaveProcesso']);
+                    $inCodProcesso = $arProcesso[0];
+                    $stAnoProcesso = $arProcesso[1];    
+                } else {
+                    $arProcesso = "";
+                }
+
                 if ($boDepreciavel === 'true') {
                     $obTPatrimonioBem->setDado( 'depreciavel', true);
                     $obTPatrimonioBem->setDado( 'quota_depreciacao_anual', $_REQUEST['flQuotaDepreciacaoAnual'] );
@@ -231,6 +245,13 @@ switch ($stAcao) {
                 }
                 
                 $obTPatrimonioBem->inclusao();
+                
+                if(!empty($_REQUEST['stChaveProcesso'])){
+                    $obTPatrimonioBemProcesso->setDado('cod_bem', $inCodBem);
+                    $obTPatrimonioBemProcesso->setDado('ano_exercicio', $stAnoProcesso);
+                    $obTPatrimonioBemProcesso->setDado('cod_processo', $inCodProcesso);
+                    $obTPatrimonioBemProcesso->inclusao();
+                }
                 
                 if(!empty($inCodContaDepreciacao)){
                     $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_bem'  , $inCodBem );
@@ -296,14 +317,34 @@ switch ($stAcao) {
                 $arMontaCodOrgaoM = explode("-", $_REQUEST['inMontaCodOrgaoM']);
                 $arMontaCodUnidadeM = explode("-", $_REQUEST['inMontaCodUnidadeM']);
                 $obTPatrimonioBemComprado->setDado( 'cod_bem'         , $inCodBem );
-                $obTPatrimonioBemComprado->setDado( 'exercicio'       , $_REQUEST['stExercicio']       );
-                $obTPatrimonioBemComprado->setDado( 'cod_entidade'    , $_REQUEST['inCodEntidade']     );
-                $obTPatrimonioBemComprado->setDado( 'cod_empenho'     , $_REQUEST['inNumEmpenho']      );
-                $obTPatrimonioBemComprado->setDado( 'nota_fiscal'     , $_REQUEST['stNumNotaFiscal']   );
-                $obTPatrimonioBemComprado->setDado( 'num_orgao'       , $_REQUEST['inCodOrgao']        );
-                $obTPatrimonioBemComprado->setDado( 'num_unidade'     , $_REQUEST['inCodUnidade']      );
-                $obTPatrimonioBemComprado->setDado( 'data_nota_fiscal' , $_REQUEST['dataNotaFiscal']   );
+                $obTPatrimonioBemComprado->setDado( 'exercicio'       , $_REQUEST['stExercicio']     );
+                $obTPatrimonioBemComprado->setDado( 'cod_entidade'    , $_REQUEST['inCodEntidade']   );
+                $obTPatrimonioBemComprado->setDado( 'cod_empenho'     , $_REQUEST['inNumEmpenho']    );
+                $obTPatrimonioBemComprado->setDado( 'nota_fiscal'     , $_REQUEST['stNumNotaFiscal'] );
+                $obTPatrimonioBemComprado->setDado( 'num_orgao'       , $_REQUEST['inCodOrgao']      );
+                $obTPatrimonioBemComprado->setDado( 'num_unidade'     , $_REQUEST['inCodUnidade']    );
+                $obTPatrimonioBemComprado->setDado( 'data_nota_fiscal', $_REQUEST['dataNotaFiscal'] );
                 
+                if ( $_FILES['fileArquivoNF']['name'] != '' ) {
+                    $stDestinoAnexo    = CAM_GP_PAT_ANEXOS;
+                    $stEnderecoArquivo = $_FILES['fileArquivoNF']['tmp_name'];
+                    $stNomeArquivo	   = $_FILES['fileArquivoNF']['name'] ;
+                    if (file_exists($stDestinoAnexo.$stNomeArquivo)) {
+                        $stMensagem = 'Arquivo já existente, informe um arquivo com outro nome.';
+                    } else {
+                        if ($_FILES['fileArquivoNF']['size'] < 10485760) {
+                            //Seta campo com nome do arquivo
+                            $obTPatrimonioBemComprado->setDado( 'caminho_nf' , $_FILES['fileArquivoNF']['name']);
+                            
+                            $boMoveArquivo = move_uploaded_file( $stEnderecoArquivo, $stDestinoAnexo.$stNomeArquivo );
+                            if (!$boMoveArquivo) {
+                                $stMensagem = 'Erro ao incluir arquivo.';
+                            }
+                        } else {
+                            $stMensagem = 'Arquivo excede tamanho máximo de 10MB.';
+                        }
+                    }
+                }
                 
                 $obTPatrimonioBemComprado->inclusao();
                 
@@ -376,7 +417,16 @@ switch ($stAcao) {
             if ($boDepreciavel == true && ($_REQUEST['flQuotaDepreciacaoAnual'] == "0.00" || empty($_REQUEST['flQuotaDepreciacaoAnual'])) && $rsGrupo->getCampo('depreciacao') == '0.00') {
                 $stMsg .= ". O bem não pode ser depreciado pois não existem quotas definidas.";
             }
-
+            
+            if($_REQUEST['inCodObra'] != '') {
+                $inCodObra = explode('|', $_REQUEST['inCodObra']);
+                $obTTGOPatrimonioBemObra = new TTGOPatrimonioBemObra;
+                $obTTGOPatrimonioBemObra->setDado('cod_bem'  , $inCodBem);
+                $obTTGOPatrimonioBemObra->setDado('ano_obra' , $inCodObra[0]);
+                $obTTGOPatrimonioBemObra->setDado('cod_obra' , $inCodObra[1]);
+                $obTTGOPatrimonioBemObra->inclusao();
+            }
+            
             $stMensagem = "Incluir Bem concluído com sucesso! ($stMsg)";
 
             $stJs .= "jQuery('#stNumeroPlaca', window.parent.frames['telaPrincipal'].document).val('".$numeroPlaca."');";
@@ -489,6 +539,15 @@ switch ($stAcao) {
         $inCodContaDepreciacao  = $_REQUEST['inCodContaDepreciacao'];
         $inExercicio            = Sessao::getExercicio();
 
+        if (!empty($_REQUEST['stChaveProcesso'])) {
+            $arProcesso = array();
+            $arProcesso = explode("/", $_REQUEST['stChaveProcesso']);
+            $inCodProcesso = $arProcesso[0];
+            $stAnoProcesso = $arProcesso[1];    
+        } else {
+            $arProcesso = "";
+        }
+        
         if ($boDepreciavel === 'true') {
 
             if (!empty($inCodPlano)) {
@@ -545,6 +604,50 @@ switch ($stAcao) {
         //verifica se o numero da placa já existe
         $stFiltro = " WHERE num_placa = '".$_REQUEST['stNumeroPlaca']."' AND cod_bem  <> ".$_REQUEST['inCodBem'];
         $obTPatrimonioBem->recuperaTodos($rsBem, $stFiltro);
+        
+        $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_bem'   , $inCodBem );
+        $obTPatrimonioBemPlanoDepreciacao->setDado( 'exercicio' , $inExercicio);
+        $obTPatrimonioBemPlanoDepreciacao->recuperaBemPlanoDepreciacao( $rsBemPlanoDepreciacao );
+        
+        $obTPatrimonioGrupo = new TPatrimonioGrupo();
+        $obTPatrimonioGrupo->setDado('cod_bem' , $inCodBem);
+        $obTPatrimonioGrupo->recuperaGrupoPlanoDepreciacao( $rsGrupoPlanoDepreciacao );
+        
+        if(!empty($inCodContaDepreciacao)){
+            
+            if (($rsBemPlanoDepreciacao->getNumLinhas() >= 1 && $rsBemPlanoDepreciacao->getCampo("cod_plano") != $inCodContaDepreciacao )
+                 || ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo("cod_plano") != $inCodContaDepreciacao)) {
+                $stMensagem = "Já existem depreciações lançadas para este bem. Anule-as para alterar a Conta Contábil de Depreciação.";
+            } else {
+                $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_plano' , $inCodContaDepreciacao );
+                $obTPatrimonioBemPlanoDepreciacao->inclusao();    
+            }
+                            
+        }else{
+            
+            if ($rsBemPlanoDepreciacao->getNumLinhas() >= 1 || $rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 ) {
+                $stMensagem = "Já existem depreciações lançadas para este bem. Anule-as para alterar a Conta Contábil de Depreciação.";
+            } else {
+                
+                $obTPatrimonioDepreciacaoAnulada = new TPatrimonioDepreciacaoAnulada();
+                $obTPatrimonioDepreciacao->recuperaTodos($rsBemDepreciado, ' WHERE cod_bem = '.$inCodBem.' ' );
+                
+                while ( !$rsBemDepreciado->eof() ) {
+                    
+                    $obTPatrimonioDepreciacaoAnulada->setDado( 'cod_depreciacao', $rsBemDepreciado->getCampo('cod_depreciacao'));
+                    $obTPatrimonioDepreciacaoAnulada->setDado( 'cod_bem', $inCodBem );
+                    $obTPatrimonioDepreciacaoAnulada->exclusao();
+
+                    $obTPatrimonioDepreciacao->setDado( 'cod_depreciacao', $rsBemDepreciado->getCampo('cod_depreciacao'));
+                    $obTPatrimonioDepreciacao->setDado( 'cod_bem', $inCodBem );
+                    $obTPatrimonioDepreciacao->exclusao();
+                    
+                    $rsBemDepreciado->proximo();
+                }
+                
+                $obTPatrimonioBemPlanoDepreciacao->exclusao();
+            }
+        }
        
         //verifica a integridade dos valores
         if ($_REQUEST['inValorBem'] == '0,00') {
@@ -604,24 +707,6 @@ switch ($stAcao) {
 
         if (!$stMensagem) {
             
-            $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_bem'   , $inCodBem );
-            $obTPatrimonioBemPlanoDepreciacao->setDado( 'exercicio' , $inExercicio);
-            if(!empty($inCodContaDepreciacao)){
-                $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_plano' , $inCodContaDepreciacao );
-                $obTPatrimonioBemPlanoDepreciacao->inclusao();
-            }else{
-                $obTPatrimonioDepreciacao = new TPatrimonioDepreciacao;
-                $obTPatrimonioDepreciacao->recuperaTodos($rsBemDepreciado, ' WHERE cod_bem = '.$inCodBem.' ' );
-                while ( !$rsBemDepreciado->eof() ) {
-                    $obTPatrimonioDepreciacao->setDado( 'cod_depreciacao', $rsBemDepreciado->getCampo('cod_depreciacao'));
-                    $obTPatrimonioDepreciacao->setDado( 'cod_bem', $inCodBem );
-                    $obTPatrimonioDepreciacao->exclusao();
-                    $rsBemDepreciado->proximo();
-                }
-                
-                $obTPatrimonioBemPlanoDepreciacao->exclusao();
-            }
-            
             //altera a table patrimonio.bem
             $obTPatrimonioBem->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
             $obTPatrimonioBem->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
@@ -636,10 +721,13 @@ switch ($stAcao) {
             $obTPatrimonioBem->setDado( 'dt_depreciacao', $_REQUEST['dtDepreciacao'] );
             $obTPatrimonioBem->setDado( 'dt_garantia', $_REQUEST['dtVencimento'] );
             $obTPatrimonioBem->setDado( 'vl_bem', str_replace(',','.',str_replace('.','',$_REQUEST['inValorBem'])) );
-            if ($_REQUEST['inValorDepreciacao'] != '')
+            
+            if ($_REQUEST['inValorDepreciacao'] != '') {
                 $obTPatrimonioBem->setDado( 'vl_depreciacao', str_replace(',','.',str_replace('.','',$_REQUEST['inValorDepreciacao'])) );
-            else
+            } else {
                 $obTPatrimonioBem->setDado( 'vl_depreciacao', 0.00);
+            }
+            
             $obTPatrimonioBem->setDado( 'identificacao', ( $_REQUEST['stPlacaIdentificacao'] == 'sim' ) ? true : false );
 
             if ($_REQUEST['stPlacaIdentificacao'] == 'sim') {
@@ -660,6 +748,19 @@ switch ($stAcao) {
             }
 
             $obTPatrimonioBem->alteracao();
+            
+            if (!empty($_REQUEST['stChaveProcesso'])) {
+                $obTPatrimonioBemProcesso->setDado('cod_bem', $inCodBem);
+                $obTPatrimonioBemProcesso->setDado('ano_exercicio', $stAnoProcesso);
+                $obTPatrimonioBemProcesso->setDado('cod_processo', $inCodProcesso);
+                $obTPatrimonioBemProcesso->recuperaPorChave($rsProcesso);
+
+                if ($rsProcesso->getNumLinhas > 0) {
+                    $obTPatrimonioBemProcesso->alteracao();
+                }  else {
+                    $obTPatrimonioBemProcesso->inclusao();
+                }
+            }
               
             $obTPatrimonioBemComprado->recuperaTodos($rsBemComprado, ' WHERE cod_bem = '.$_REQUEST['inCodBem'].' ' );
             if ( $rsBemComprado->getNumLinhas() > 0) {
@@ -675,6 +776,27 @@ switch ($stAcao) {
                 $obTPatrimonioBemComprado->setDado( 'num_orgao'        , $_REQUEST['inCodOrgao'     ]);
                 $obTPatrimonioBemComprado->setDado( 'num_unidade'      , $_REQUEST['inCodUnidade'   ]);
                 $obTPatrimonioBemComprado->setDado( 'data_nota_fiscal' , $_REQUEST['dataNotaFiscal' ]);
+                
+                if ( $_FILES['fileArquivoNF']['name'] != '' ) {
+                    $stDestinoAnexo    = CAM_GP_PAT_ANEXOS;
+                    $stEnderecoArquivo = $_FILES['fileArquivoNF']['tmp_name'];
+                    $stNomeArquivo	   = $_FILES['fileArquivoNF']['name'] ;
+                    if (file_exists($stDestinoAnexo.$stNomeArquivo)) {
+                        $stMensagem = 'Arquivo já existente, informe um arquivo com outro nome.';
+                    } else {
+                        if ($_FILES['fileArquivoNF']['size'] < 10485760) {
+                            //Seta campo com nome do arquivo
+                            $obTPatrimonioBemComprado->setDado( 'caminho_nf' , $_FILES['fileArquivoNF']['name']);
+                            
+                            $boMoveArquivo = move_uploaded_file( $stEnderecoArquivo, $stDestinoAnexo.$stNomeArquivo );
+                            if (!$boMoveArquivo) {
+                                $stMensagem = 'Erro ao incluir arquivo.';
+                            }
+                        } else {
+                            $stMensagem = 'Arquivo excede tamanho máximo de 10MB.';
+                        }
+                    }
+                }
 
                 $obTPatrimonioBemComprado->alteracao();
                
@@ -747,7 +869,7 @@ switch ($stAcao) {
                     //altera a table patrimonio.bem_responsavel
                     //coloca a data de fim do último responsável e inclui o novo
                     $obTPatrimonioBemResponsavel->setDado( 'cod_bem'  , $_REQUEST['inCodBem'] );
-                      $obTPatrimonioBemResponsavel->setDado( 'timestamp', $rsBemResponsavel->getCampo( 'timestamp' ) );
+                    $obTPatrimonioBemResponsavel->setDado( 'timestamp', $rsBemResponsavel->getCampo( 'timestamp' ) );
                     $obTPatrimonioBemResponsavel->setDado( 'dt_inicio', $rsBemResponsavel->getCampo( 'dt_inicio' ) );
                     $obTPatrimonioBemResponsavel->setDado( 'dt_fim'   , $_REQUEST['dtInicioResponsavel'] );
                     $obTPatrimonioBemResponsavel->setDado( 'numcgm'   , $rsBemResponsavel->getCampo( 'numcgm' ) );
@@ -809,6 +931,24 @@ switch ($stAcao) {
                 $stMsg .= ". O bem não pode ser depreciado pois não existem quotas definidas.";
             }
 
+            $obTTGOPatrimonioBemObra = new TTGOPatrimonioBemObra;
+            $obTTGOPatrimonioBemObra->setDado('cod_bem', $_REQUEST['inCodBem']);
+                        
+            $obTTGOPatrimonioBemObra->recuperaPorChave($rsBemObra);
+            
+            if( $rsBemObra->getNumLinhas() > 0) {
+                $obTTGOPatrimonioBemObra->exclusao();
+            }
+                        
+            if($_REQUEST['inCodObra'] != '') {
+                $inCodObra = explode('|', $_REQUEST['inCodObra']);
+                $obTTGOPatrimonioBemObra = new TTGOPatrimonioBemObra;
+                $obTTGOPatrimonioBemObra->setDado('cod_bem'  , $_REQUEST['inCodBem']);
+                $obTTGOPatrimonioBemObra->setDado('ano_obra' , $inCodObra[0]);
+                $obTTGOPatrimonioBemObra->setDado('cod_obra' , $inCodObra[1]);
+                $obTTGOPatrimonioBemObra->inclusao();
+            }
+            
             foreach ($_POST as $stKey => $stValue) {
                 if (strstr( $stKey, 'Atributo_' ) AND $stValue != '' ) {
                     $arAtributo = explode( '_', $stKey );
@@ -934,6 +1074,13 @@ switch ($stAcao) {
             $rsBemPlanoAnalitica->proximo();
         }
 
+        $obTTGOPatrimonioBemObra = new TTGOPatrimonioBemObra;
+        $obTTGOPatrimonioBemObra->setDado('cod_bem', $_REQUEST['inCodBem']);
+        $obTTGOPatrimonioBemObra->exclusao();
+
+        $obTPatrimonioBemProcesso->setDado('cod_bem', $inCodBem);
+        $obTPatrimonioBemProcesso->exclusao();
+        
         $obTPatrimonioBem->setDado( 'cod_bem', $inCodBem );
         $obTPatrimonioBem->recuperaPorChave( $rsBem );
         $obTPatrimonioBem->exclusao();
@@ -944,4 +1091,3 @@ switch ($stAcao) {
 }
 
 Sessao::encerraExcecao();
-?>

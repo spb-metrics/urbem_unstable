@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.01.06
 
-    $Id: FMManterConsultarBem.php 60719 2014-11-11 17:09:19Z diogo.zarpelon $
+    $Id: FMManterConsultarBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
 
     */
 
@@ -45,6 +45,7 @@ include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioEspecieAtributo.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemAtributoEspecie.class.php";
 include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
 include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemProcesso.class.php";
 
 $stPrograma = "ManterConsultarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -62,6 +63,10 @@ $stAcao = $request->get('stAcao');
 $obTPatrimonioBem = new TPatrimonioBem();
 $obTPatrimonioBem->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
 $obTPatrimonioBem->recuperaRelacionamentoAnalitico( $rsBem );
+
+$obTPatrimonioBemProcesso = new TPatrimonioBemProcesso();
+$obTPatrimonioBemProcesso->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
+$obTPatrimonioBemProcesso->recuperaPorChave( $rsBemProcesso );
 
 //cria um novo formulario
 $obForm = new Form;
@@ -101,6 +106,12 @@ $obLblEspecie->setValue( $rsBem->getCampo( 'cod_especie' ).' - '.$rsBem->getCamp
 $obLblDescricaoBem = new Label();
 $obLblDescricaoBem->setRotulo( 'Descrição' );
 $obLblDescricaoBem->setValue( $rsBem->getCampo( 'descricao' ) );
+
+//label para o detalhamento do processo administrativo
+$obProcessoLicitatorio = new Label();
+$obProcessoLicitatorio->setId( 'stProcesso' );
+$obProcessoLicitatorio->setValue( str_pad($rsBemProcesso->getCampo('cod_processo')."/".$rsBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT));
+$obProcessoLicitatorio->setRotulo( 'Processo Administrativo' );
 
 //label para a detalhamento do bem
 $obLblDetalhamentoBem = new Label();
@@ -195,6 +206,14 @@ $obLblEmpenho->setValue( $rsBem->getCampo('cod_empenho') );
 $obLblNumNotaFiscal = new Label();
 $obLblNumNotaFiscal->setRotulo( 'Número da Nota Fiscal' );
 $obLblNumNotaFiscal->setValue( $rsBem->getCampo('nota_fiscal') );
+
+$obLocalizacao = new Link;
+$obLocalizacao->setRotulo("Download da Nota Fiscal");
+$obLocalizacao->setHref( CAM_GP_PAT_ANEXOS.$rsBem->getCampo( 'caminho_nf' ));
+if($rsBem->getCampo( 'caminho_nf' ) != '') {
+    $obLocalizacao->setValue ($rsBem->getCampo( 'caminho_nf' ));
+}
+$obLocalizacao->setTarget("oculto");
 
 //label para o responsavel
 $obLblResponsavel = new Label();
@@ -294,6 +313,7 @@ $obFormulario->addComponente( $obLblEspecie );
 
 $obFormulario->addTitulo    ( 'Informações Básicas' );
 $obFormulario->addComponente( $obLblDescricaoBem );
+$obFormulario->addComponente( $obProcessoLicitatorio );
 $obFormulario->addComponente( $obLblDetalhamentoBem );
 $obFormulario->addComponente( $obLblFornecedor );
 $obFormulario->addComponente( $obLblValorBem );
@@ -313,6 +333,7 @@ $obFormulario->addComponente( $obLblUnidadeA );
 $obFormulario->addComponente( $obLblDataIncorporacao );
 $obFormulario->addComponente( $obLblEmpenho );
 $obFormulario->addComponente( $obLblNumNotaFiscal );
+$obFormulario->addComponente( $obLocalizacao );
 
 switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
     case 02:

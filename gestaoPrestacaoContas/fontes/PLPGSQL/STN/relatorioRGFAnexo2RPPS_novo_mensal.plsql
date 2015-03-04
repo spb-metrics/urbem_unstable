@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatorioRGFAnexo2RPPS_novo_mensal.plsql 61101 2014-12-08 19:27:45Z evandro $
+* $Id: relatorioRGFAnexo2RPPS_novo_mensal.plsql 61691 2015-02-25 19:48:43Z franver $
 
 * Casos de uso: uc-06.01.02
 */
@@ -331,7 +331,7 @@ BEGIN
     INSERT INTO tmp_valores VALUES (arDescricao[10]
                                , 10
                                , ( (SELECT valor_exercicio_anterior FROM tmp_valores WHERE ordem = 1) - (SELECT valor_exercicio_anterior FROM tmp_valores WHERE ordem = 4) )
-                               , ( (SELECT valor_1 FROM tmp_valores WHERE ordem = 1) - (SELECT valor_1 FROM tmp_valores WHERE ordem = 4) )
+                               , ( (SELECT valor_mes FROM tmp_valores WHERE ordem = 1) - (SELECT valor_mes FROM tmp_valores WHERE ordem = 4) )
                                  );
 
   END If;

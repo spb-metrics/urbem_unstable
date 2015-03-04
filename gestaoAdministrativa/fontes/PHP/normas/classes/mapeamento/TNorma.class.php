@@ -60,7 +60,7 @@ function TNorma()
     $this->setTabela('normas.norma');
 
     $this->setCampoCod('cod_norma');
-    $this->setComplementoChave('');
+    $this->setComplementoChave('exercicio, cod_tipo_norma, num_norma');
 
     $this->AddCampo('cod_norma'     ,'integer' ,true ,''   ,true  ,false);
     $this->AddCampo('cod_tipo_norma','integer' ,true ,''   ,false ,true );
@@ -68,9 +68,9 @@ function TNorma()
     $this->AddCampo('nom_norma'     ,'varchar' ,true ,'40' ,false ,false);
     $this->AddCampo('descricao'     ,'text'    ,true ,''   ,false ,false);
     $this->AddCampo('link'          ,'varchar' ,true ,'80' ,false ,false);
-    $this->AddCampo('exercicio'     ,'varchar' ,true ,'4'  ,false ,false);
+    $this->AddCampo('exercicio'     ,'varchar' ,true ,'4'  ,true ,false);
     $this->AddCampo('num_norma'     ,'varchar' ,true ,''   ,true  ,false);
-    $this->AddCampo('dt_assinatura' ,'date'    ,true ,''   ,false ,true );
+    $this->AddCampo('dt_assinatura' ,'date'    ,true ,''   ,false ,false );
 }
 
 function recuperaNormas(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
@@ -397,4 +397,29 @@ function montaRecuperaDadosExportacaoLDO()
 
     return $stSql;
 }
+
+function recuperaUltimoCodNorma(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql  = $this->montaRecuperaUltimoCodNorma();
+
+    $this->setDebug( $stSql );
+
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaUltimoCodNorma()
+{
+    $stSql = "  SELECT MAX(cod_norma) as ultimo_cod_norma
+                FROM normas.norma
+            ";
+    return $stSql;
+}
+
+
+
 }

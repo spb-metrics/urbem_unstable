@@ -31,15 +31,14 @@
 
     * @ignore
 
-    $Id: PRManterDividaFundada.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterDividaFundada.php 61697 2015-02-26 12:46:40Z evandro $
 
     * Casos de uso : uc-06.04.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(TTGO.'TTGOGrupoPlanoAnalitica.class.php');
-include_once(TTGO.'TTGOGrupoPlanoAnaliticaLei.class.php');
+include_once( CAM_GPC_TGO_MAPEAMENTO."TTCMGODividaFundada.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterDividaFundada";
@@ -49,46 +48,104 @@ $pgForm    = "FM".$stPrograma.".php";
 $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 
-Sessao::setTrataExcecao ( true );
 $stAcao = $request->get('stAcao');
-$arContas = Sessao::read('arContas');
 
-switch ($_REQUEST['stAcao']) {
+$obErro = new Erro;
+
+$boFlagTransacao = false;
+$obTransacao = new Transacao;
+$obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
+switch ($stAcao) {
     case 'incluir' :
 
-        if ($arContas > 0) {
+        $obTTCMGODividaFundada = new TTCMGODividaFundada;
+        $obTTCMGODividaFundada->setDado('exercicio'             , $request->get('stExercicio'));
+        $obTTCMGODividaFundada->setDado('cod_entidade'          , $request->get('inCodEntidade'));
+        $obTTCMGODividaFundada->setDado('num_unidade'           , $request->get('inNumUnidade'));
+        $obTTCMGODividaFundada->setDado('num_orgao'             , $request->get('inNumOrgao'));
+        $obTTCMGODividaFundada->setDado('cod_norma'             , $request->get('inCodLeiAutorizacao'));
+        $obTTCMGODividaFundada->setDado('numcgm'                , $request->get('inCGM'));
+        $obTTCMGODividaFundada->setDado('cod_tipo_lancamento'   , $request->get('inTipoLancamento'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_anterior'  , $request->get('flValorSaldoAnterior'));
+        $obTTCMGODividaFundada->setDado('valor_contratacao'     , $request->get('flValorContratacao'));
+        $obTTCMGODividaFundada->setDado('valor_amortizacao'     , $request->get('flValorAmortizacao'));
+        $obTTCMGODividaFundada->setDado('valor_cancelamento'    , $request->get('flValorCancelamento'));
+        $obTTCMGODividaFundada->setDado('valor_encampacao'      , $request->get('flValorEncampacao'));
+        $obTTCMGODividaFundada->setDado('valor_correcao'        , $request->get('flValorCorrecao'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_atual'     , $request->get('flValorSaldoAtual'));
 
-            $obTTGOGrupoPlanoAnalitica = new TTGOGrupoPlanoAnalitica();
-            $obTTGOGrupoPlanoAnaliticaLei = new TTGOGrupoPlanoAnaliticaLei();
+        $obErro = $obTTCMGODividaFundada->inclusao($boTransacao);
 
-            $obTTGOGrupoPlanoAnalitica->setDado('exercicio',Sessao::getExercicio());
-            $obTTGOGrupoPlanoAnalitica->setDado('cod_tipo_lancamento','2');
-            $obTTGOGrupoPlanoAnalitica->setDado('cod_tipo',$_REQUEST['inTipoLancamento']);
-            $obTTGOGrupoPlanoAnalitica->recuperaGrupoPlanoAnalitica( $rsContas );
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTCMGODividaFundada );
 
-            while ( !$rsContas->eof() ) {
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'exercicio', Sessao::getExercicio() );
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'cod_plano', $rsContas->getCampo('cod_plano') );
-                $obTTGOGrupoPlanoAnaliticaLei->exclusao();
-                $obTTGOGrupoPlanoAnalitica->setDado('cod_plano',$rsContas->getCampo('cod_plano'));
-                $obTTGOGrupoPlanoAnalitica->exclusao();
-                $rsContas->proximo();
-            }
-
-            foreach ($arContas as $arAux) {
-                $obTTGOGrupoPlanoAnalitica->setDado('cod_plano',$arAux['cod_plano']);
-                $obTTGOGrupoPlanoAnalitica->inclusao();
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'cod_plano', $arAux['cod_plano'] );
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'exercicio', Sessao::getExercicio() );
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'nro_lei', $arAux['lei_autorizacao'] );
-                $obTTGOGrupoPlanoAnaliticaLei->setDado( 'data_lei', $arAux['data_autorizacao'] );
-                $obTTGOGrupoPlanoAnaliticaLei->inclusao();
-            }
-
-            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
+        if (!$obErro->ocorreu()) {
+            SistemaLegado::alertaAviso($pgForm,"Dívida Fundada".$request->get('cod_norma'),"alterar","aviso", Sessao::getId(), "../");
         } else {
-            sistemaLegado::exibeAviso(urlencode('É necessário cadastrar pelo uma conta!'),"n_incluir","erro");
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
         }
+
+    break;
+
+    case 'alterar':
+        $obTTCMGODividaFundada = new TTCMGODividaFundada;
+        $obTTCMGODividaFundada->setDado('exercicio'             , $request->get('stExercicio'));
+        $obTTCMGODividaFundada->setDado('cod_entidade'          , $request->get('inCodEntidade'));
+        $obTTCMGODividaFundada->setDado('num_unidade'           , $request->get('inNumUnidade'));
+        $obTTCMGODividaFundada->setDado('num_orgao'             , $request->get('inNumOrgao'));
+        $obTTCMGODividaFundada->setDado('cod_norma'             , $request->get('inCodLeiAutorizacao'));
+        $obTTCMGODividaFundada->setDado('numcgm'                , $request->get('inCGM'));
+        $obTTCMGODividaFundada->setDado('cod_tipo_lancamento'   , $request->get('inTipoLancamento'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_anterior'  , $request->get('flValorSaldoAnterior'));
+        $obTTCMGODividaFundada->setDado('valor_contratacao'     , $request->get('flValorContratacao'));
+        $obTTCMGODividaFundada->setDado('valor_amortizacao'     , $request->get('flValorAmortizacao'));
+        $obTTCMGODividaFundada->setDado('valor_cancelamento'    , $request->get('flValorCancelamento'));
+        $obTTCMGODividaFundada->setDado('valor_encampacao'      , $request->get('flValorEncampacao'));
+        $obTTCMGODividaFundada->setDado('valor_correcao'        , $request->get('flValorCorrecao'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_atual'     , $request->get('flValorSaldoAtual'));
+
+        $obErro = $obTTCMGODividaFundada->alteracao($boTransacao);
+
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTCMGODividaFundada );
+
+        if (!$obErro->ocorreu()) {
+            SistemaLegado::alertaAviso($pgFilt,"Dívida Fundada".$request->get('cod_norma'),"alterar","aviso", Sessao::getId(), "../");
+        } else {
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
+        }
+
+    break;
+
+    case 'excluir':
+        $obTTCMGODividaFundada = new TTCMGODividaFundada;
+        $obTTCMGODividaFundada->setDado('exercicio'             ,$request->get('inExercicio'));
+        $obTTCMGODividaFundada->setDado('cod_entidade'          ,$request->get('inCodEntidade'));
+        $obTTCMGODividaFundada->setDado('num_unidade'           ,$request->get('inNumUnidade'));
+        $obTTCMGODividaFundada->setDado('num_orgao'             ,$request->get('inNumOrgao'));
+        $obTTCMGODividaFundada->setDado('cod_norma'             ,$request->get('inCodNorma'));
+        $obTTCMGODividaFundada->setDado('numcgm'                ,$request->get('inNumCgm'));
+        $obTTCMGODividaFundada->setDado('cod_tipo_lancamento'   ,$request->get('inCodTipoLancamento'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_anterior'  ,$request->get('vlSaldoAnterior'));
+        $obTTCMGODividaFundada->setDado('valor_contratacao'     ,$request->get('vlContratacao'));
+        $obTTCMGODividaFundada->setDado('valor_amortizacao'     ,$request->get('vlAmortizacao'));
+        $obTTCMGODividaFundada->setDado('valor_cancelamento'    ,$request->get('vlCancelamento'));
+        $obTTCMGODividaFundada->setDado('valor_encampacao'      ,$request->get('vlEncampacao'));
+        $obTTCMGODividaFundada->setDado('valor_correcao'        ,$request->get('vlCorrecao'));
+        $obTTCMGODividaFundada->setDado('valor_saldo_atual'     ,$request->get('vlSaldoAtual'));
+
+        $obErro = $obTTCMGODividaFundada->exclusao($boTransacao);
+
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTCMGODividaFundada );
+
+        if (!$obErro->ocorreu()) {
+            SistemaLegado::alertaAviso($pgFilt,"Dívida Fundada".$request->get('cod_norma'),"alterar","aviso", Sessao::getId(), "../");
+        } else {
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
+        }
+
+    break;
 }
 
-Sessao::encerraExcecao();
+//Sessao::encerraExcecao();
+
+?>

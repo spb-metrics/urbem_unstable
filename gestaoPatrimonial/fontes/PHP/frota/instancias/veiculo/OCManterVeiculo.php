@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterVeiculo.php 59920 2014-09-22 14:27:58Z arthur $
+    * $Id: OCManterVeiculo.php 61654 2015-02-20 20:34:48Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -43,12 +43,16 @@ include_once '../../../../../../gestaoFinanceira/fontes/PHP/empenho/classes/nego
 include_once ( CAM_GP_PAT_MAPEAMENTO.'TPatrimonioBem.class.php' );
 include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoDocumento.class.php' );
 include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaTipoVeiculo.class.php' );
-include_once ( CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeUsuario.class.php' );
 include_once ( CAM_GP_PAT_COMPONENTES.'IPopUpBem.class.php' );
 include_once ( CAM_GA_ADM_COMPONENTES.'IMontaLocalizacao.class.php' );
 include_once ( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
 include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaInfracao.class.php' );
 include_once( CAM_GF_ORC_MAPEAMENTO.'TOrcamentoEntidade.class.php' );
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php";
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
+include_once(CAM_GA_PROT_COMPONENTES.'IPopUpProcesso.class.php');
+include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoLocacao.class.php' );
+
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterVeiculo";
 $pgFilt = "FL".$stPrograma.".php";
@@ -89,6 +93,46 @@ function montaListaDocumentos($arDocumentos)
     $obTable->montaHTML( true );
 
     return "$('spnDocumentos').innerHTML = '".$obTable->getHtml()."';";
+
+}
+
+function montaListaLocacoes($arLocacoes)
+{
+    global $pgOcul;
+
+    if ( !is_array($arLocacoes) ) {
+        $arLocacoes = array();
+    }
+
+    $rsLocacoes = new RecordSet();
+    $rsLocacoes->preenche( $arLocacoes );
+
+    $obTable = new Table();
+    $obTable->setRecordset( $rsLocacoes );
+    $obTable->setSummary( 'Lista de Locações do Veículo' );
+
+    $obTable->Head->addCabecalho( 'Processo', 10 );
+    $obTable->Head->addCabecalho( 'Locatário', 30 );
+    $obTable->Head->addCabecalho( 'Empenho', 10 );
+    $obTable->Head->addCabecalho( 'Data do Contrato', 10 );
+    $obTable->Head->addCabecalho( 'Início', 10 );
+    $obTable->Head->addCabecalho( 'Término', 10 );
+    $obTable->Head->addCabecalho( 'Valor da Locação', 10 );
+
+    $obTable->Body->addCampo( 'stProcessoLocacao', 'C' );
+    $obTable->Body->addCampo( '[inCodLocatario] - [stNomLocatario]', 'C' );
+    $obTable->Body->addCampo( 'inNumEmpenhoLocacao', 'C' );
+    $obTable->Body->addCampo( 'dtContrato', 'C' );
+    $obTable->Body->addCampo( 'dtIniLocacao', 'C' );
+    $obTable->Body->addCampo( 'dtFimLocacao', 'C' );
+    $obTable->Body->addCampo( 'inValorLocacao', 'C' );
+
+    $obTable->Body->addAcao( 'alterar', "JavaScript:ajaxJavaScript(  '".CAM_GP_FRO_INSTANCIAS."veiculo/".$pgOcul."?".Sessao::getId()."&id=%s', 'montaAlteracaoLocacoes' );", array( 'id'));
+    $obTable->Body->addAcao( 'excluir', "JavaScript:ajaxJavaScript(  '".CAM_GP_FRO_INSTANCIAS."veiculo/".$pgOcul."?".Sessao::getId()."&id=%s', 'excluirLocacoes' );", array( 'id',));
+
+    $obTable->montaHTML( true );
+
+    return "$('spnLocacaoDados').innerHTML = '".$obTable->getHtml()."';";
 
 }
 
@@ -483,6 +527,165 @@ switch ($stCtrl) {
                 if ($obIMontaOrganograma->getScript()) {
                     $stEval = $stEval.$obIMontaOrganograma->getScript();
                 }
+
+                 //cria um form
+                $obFormLocacao = new Form();
+                $obFormLocacao->setAction ($pgProc);
+                $obFormLocacao->setTarget ("oculto");
+
+                $obFormularioLocacao = new Formulario();
+
+                // LOCAÇÃO -----------------------------------------
+
+                //if (is_array(Sessao::read('arLocacoes'))) {
+                    $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao;
+                    $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacoes, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']." AND exercicio = '".Sessao::getExercicio()."'");
+                //}
+
+                //id da locacao
+                $obHdnIdLocacao = new Hidden;
+                $obHdnIdLocacao->setId('hdnIdLocacao');
+                $obHdnIdLocacao->setName('hdnIdLocacao');
+
+                //processo
+                $obPopUpProcesso = new IPopUpProcesso($obFormLocacao);
+                $obPopUpProcesso->setRotulo("Processo");
+                $obPopUpProcesso->obCampoCod->setId('stProcessoLocacao');
+                $obPopUpProcesso->obCampoCod->setName('stProcessoLocacao');
+                $obPopUpProcesso->setValidar(true);
+                $obPopUpProcesso->setNull(true);
+
+                //data do contrato
+                $obDtContrato = new Data();
+                $obDtContrato->setRotulo( 'Data do Contrato' );
+                $obDtContrato->setTitle( 'Informe a data do contrato de locação.' );
+                $obDtContrato->setName( 'dtContrato' );
+                $obDtContrato->setId( 'dtContrato' );
+                $obDtContrato->setNull( true );
+
+                //data inicial
+                $obDtIniLocacao = new Data();
+                $obDtIniLocacao->setRotulo( 'Data de Início' );
+                $obDtIniLocacao->setTitle( 'Informe a data de início da locação.' );
+                $obDtIniLocacao->setName( 'dtIniLocacao' );
+                $obDtIniLocacao->setId( 'dtIniLocacao' );
+                $obDtIniLocacao->setNull( true );
+
+                //data final
+                $obDtFimLocacao = new Data();
+                $obDtFimLocacao->setRotulo( 'Data de Término' );
+                $obDtFimLocacao->setTitle( 'Informe a data de término da locação.' );
+                $obDtFimLocacao->setName( 'dtFimLocacao' );
+                $obDtFimLocacao->setId( 'dtFimLocacao' );
+                $obDtFimLocacao->setNull( true );
+
+                //exercicio da locacao
+                $obExercicioLocacao = new Exercicio();
+                $obExercicioLocacao->setRotulo( 'Exercício' );
+                $obExercicioLocacao->setNull( true );
+                $obExercicioLocacao->setId( 'stExercicioLocacao' );
+                $obExercicioLocacao->setName( 'stExercicioLocacao' );
+
+                // entidade
+                $obISelectEntidadeLocacao = new ITextBoxSelectEntidadeGeral();
+                $obISelectEntidadeLocacao->obTextBox->setName ('inCodEntidadeLocacao');
+                $obISelectEntidadeLocacao->obTextBox->setId ('inCodEntidadeLocacao');
+                $obISelectEntidadeLocacao->obSelect->setName ('stNomEntidadeLocacao');
+                $obISelectEntidadeLocacao->obSelect->setId ('stNomEntidadeLocacao');
+
+                //instancia o componente Inteiro para o empenho
+                $obNumEmpenhoLocacao = new Inteiro();
+                $obNumEmpenhoLocacao->setRotulo( 'Número do Empenho' );
+                $obNumEmpenhoLocacao->setTitle ( 'Informe o número do empenho da locação.' );
+                $obNumEmpenhoLocacao->setName  ( 'inNumEmpenhoLocacao' );
+                $obNumEmpenhoLocacao->setId    ( 'inNumEmpenhoLocacao' );
+                $obNumEmpenhoLocacao->setNull  ( true );
+
+                //Valor da depreciação inicial.
+                $obInValorLocacao = new Moeda();
+                $obInValorLocacao->setRotulo('Valor da Locação');
+                $obInValorLocacao->setTitle ('Informe o valor da locação.');
+                $obInValorLocacao->setName  ('inValorLocacao');
+                $obInValorLocacao->setId  ('inValorLocacao');
+                $obInValorLocacao->setNull  ( true );
+
+                //instancia o componente IPopUpCGMVinculado para o responsavel
+                $obIPopUpLocatario = new IPopUpCGMVinculado( $obFormLocacao );
+                $obIPopUpLocatario->setTabelaVinculo    ( 'sw_cgm_pessoa_juridica' );
+                $obIPopUpLocatario->setCampoVinculo     ( 'numcgm' );
+                $obIPopUpLocatario->setNomeVinculo      ( 'locatário' );
+                $obIPopUpLocatario->setRotulo           ( 'Locatário' );
+                $obIPopUpLocatario->setTitle            ( 'Informe o locatário do veículo.' );
+                $obIPopUpLocatario->setName             ( 'stNomLocatario' );
+                $obIPopUpLocatario->setId               ( 'stNomLocatario' );
+                $obIPopUpLocatario->obCampoCod->setName ( 'inCodLocatario' );
+                $obIPopUpLocatario->obCampoCod->setId   ( 'inCodLocatario' );
+                $obIPopUpLocatario->setNull             ( true );
+
+                //define objeto buttion para incluir dados da locação
+                $obBtnIncluirLocacao = new Button;
+                $obBtnIncluirLocacao->setValue             ( "Incluir" );
+                $obBtnIncluirLocacao->setId                ( "incluiDadosLocacao" );
+                $obBtnIncluirLocacao->obEvento->setOnClick ( "montaParametrosGET('incluirDadosLocacao',
+                                                                                 'stProcessoLocacao,
+                                                                                 dtContrato,
+                                                                                 dtIniLocacao,
+                                                                                 dtFimLocacao,
+                                                                                 stExercicioLocacao,
+                                                                                 inCodEntidadeLocacao,
+                                                                                 inNumEmpenho,
+                                                                                 inValorLocacao,
+                                                                                 inCodLocatario,
+                                                                                 inNumEmpenhoLocacao,
+                                                                                 stNomLocatario'
+                                                                                );"
+                                                            );
+                
+                //Define Objeto Button para Limpar dados da locação
+                $obBtnLimparLocacao = new Button;
+                $obBtnLimparLocacao->setValue             ( "Limpar" );
+                $obBtnLimparLocacao->obEvento->setOnClick ( "montaParametrosGET('limparDadosLocacao');" );
+                
+                //cria um span para os dados da locação
+                $obSpnLocacaoDados = new Span();
+                $obSpnLocacaoDados->setId( 'spnLocacaoDados' );
+
+                $obFormularioLocacao->addTitulo ( 'Locação' );
+                $obFormularioLocacao->addHidden($obHdnIdLocacao);
+                $obFormularioLocacao->addComponente($obPopUpProcesso);
+                $obFormularioLocacao->addComponente($obIPopUpLocatario);
+                $obFormularioLocacao->addComponente($obDtContrato);
+                $obFormularioLocacao->addComponente($obDtIniLocacao);
+                $obFormularioLocacao->addComponente($obDtFimLocacao);
+                $obFormularioLocacao->addComponente($obExercicioLocacao);
+                $obFormularioLocacao->addComponente($obISelectEntidadeLocacao);
+                $obFormularioLocacao->addComponente($obNumEmpenhoLocacao);
+                $obFormularioLocacao->addComponente($obInValorLocacao);
+
+                $obFormularioLocacao->defineBarra ( array( $obBtnIncluirLocacao, $obBtnLimparLocacao ) );
+                $obFormularioLocacao->addSpan ( $obSpnLocacaoDados );
+
+                $obFormularioLocacao->montaInnerHTML();
+                
+                $stJs .= "$('spnLocacao').innerHTML = '".$obFormularioLocacao->getHTML()."'; ";
+                if ($rsVeiculoLocacoes->getNumLinhas() > 0) {
+                    $arVeiculoLocacoes = array();
+                    foreach ($rsVeiculoLocacoes->getElementos() as $i => $valor) {
+                        $arVeiculoLocacoes[$i]['id']                   = $valor['id'];
+                        $arVeiculoLocacoes[$i]['stProcessoLocacao']    = str_pad($valor['cod_processo'],5,'0',STR_PAD_LEFT)."/".$valor['ano_exercicio'];
+                        $arVeiculoLocacoes[$i]['stExercicioLocacao']   = $valor['exercicio'];
+                        $arVeiculoLocacoes[$i]['dtIniLocacao']         = $valor['dt_inicio'];
+                        $arVeiculoLocacoes[$i]['dtFimLocacao']         = $valor['dt_termino'];
+                        $arVeiculoLocacoes[$i]['inCodEntidadeLocacao'] = $valor['cod_entidade'];
+                        $arVeiculoLocacoes[$i]['dtContrato']           = $valor['dt_contrato'];
+                        $arVeiculoLocacoes[$i]['inCodLocatario']       = $valor['cgm_locatario'];
+                        $arVeiculoLocacoes[$i]['inNumEmpenhoLocacao']  = $valor['cod_empenho'];
+                        $arVeiculoLocacoes[$i]['inValorLocacao']       = $valor['vl_locacao'];
+                        $arVeiculoLocacoes[$i]['stNomLocatario']       = SistemaLegado::pegaDado('nom_cgm','sw_cgm',' WHERE numcgm = '.$valor['cgm_locatario'].'');
+                    }
+                    Sessao::write('arLocacoes',$arVeiculoLocacoes);
+                    $stJs .= montaListaLocacoes($arVeiculoLocacoes);
+                }
             }
 
             $obFormulario->montaInnerHTML();
@@ -501,7 +704,9 @@ switch ($stCtrl) {
             $stJs .= "$('spnOrigem').innerHTML = '';";
             $stJs .= "$('hdnOrigem').value = ''; ";
         }
-        break;
+        //SistemaLegado::mostravar($stJs);die;
+    break;
+
    case "MontaUnidade":
         $stJs .= "if(f.inCodUnidade){ limpaSelect(f.inCodUnidade,0); } \n";
         $stJs .= "jq('#inCodUnidadeTxt').value = ''; \n";
@@ -587,29 +792,110 @@ switch ($stCtrl) {
                 $stJs .= "$('stNomFornecedor').innerHTML = '&nbsp;';";
         }
         break;
-    case 'incluirDocumento' :
+    case 'incluirDadosLocacao' :
         $stJs = isset($stJs) ? $stJs : null;
-    
-    if ($_REQUEST['stDocumento'] == '') {
-            $stMensagem = 'Selecione um documento.';
-        } elseif ($_REQUEST['stExercicio'] == '') {
-            $stMensagem = 'Selecione o ano de vencimento.';
-        } elseif ( $_REQUEST['stExercicio'] != '' AND $_REQUEST['stExercicio'] > Sessao::getExercicio() ) {
+
+    if ($_REQUEST['stProcessoLocacao'] == '') {
+            $stMensagem = 'Selecione um processo.';
+        } elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
+            $stMensagem = 'Informe o empenho da locação.';
+        } elseif ($_REQUEST['stExercicioLocacao'] == '') {
+            $stMensagem = 'Selecione o ano da locação.';
+        } elseif ( $_REQUEST['stExercicioLocacao'] != '' AND $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
             $stMensagem = 'O ano do vencimento deve ser menor ou igual ao ano atual.';
-        } elseif ($_REQUEST['inMes'] == '') {
-            $stMensagem = 'Selecione o mês de vencimento.';
-        } elseif ($_REQUEST['stSituacao'] == '') {
-            $stMensagem = 'Selecione a situação do documento.';
-        } elseif ($_REQUEST['stSituacao'] == 'pago') {
-            if ($_REQUEST['stExercicioEmpenho'] == '') {
-                $stMensagem = 'Informe o exercícío do empenho.';
-            } elseif ($_REQUEST['inCodEntidadeOculto'] == '') {
-                $stMensagem = 'Informe a entidade do empenho.';
-            }
-            if ($_REQUEST['inCodigoEmpenho'] == '') {
-                $stMensagem = 'Informe o código do empenho.';
+        } elseif ($_REQUEST['dtIniLocacao'] == '') {
+            $stMensagem = 'Informe a data de início da locação.';
+        } elseif ($_REQUEST['dtIniLocacao'] != '' && $_REQUEST['dtIniLocacao'] < '01/01/'.Sessao::getExercicio()) {
+            $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
+        } elseif ($_REQUEST['dtFimLocacao'] == '') {
+            $stMensagem = 'Informe a data de término da locação.';
+        } elseif ($_REQUEST['dtFimLocacao'] != '' && $_REQUEST['dtFimLocacao'] <= $_REQUEST['dtIniLocacao']) {
+            $stMensagem = 'A data de término da locação não pode ser menor ou igual que a data de início da locação.';
+        } elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
+            $stMensagem = 'Selecione a entidade para a locação.';
+        } elseif ($_REQUEST['dtContrato'] == '') {
+            $stMensagem = 'Informe a data do contrato de locação.';
+        } elseif ($_REQUEST['dtContrato'] != '' && ($_REQUEST['dtContrato'] < $_REQUEST['dtIniLocacao'] || $_REQUEST['dtContrato'] > $_REQUEST['dtFimLocacao'])) {
+            $stMensagem = 'A data do contrato ser igual ou maior que a data de início e menor ou igual que a data de término da locação.';
+        } elseif ($_REQUEST['inCodLocatario'] == '') {
+            $stMensagem = 'Selecione o locatário.';
+        } elseif ($_REQUEST['inValorLocacao'] == '') {
+            $stMensagem = 'Informe o valor da locação.';
+        }
+
+        if ( count( Sessao::read('arLocacoes') ) > 0 ) {
+           foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
+                if ( ($arTemp['stProcessoLocacao'] == $_REQUEST['stProcessoLocacao'])
+                     && ($arTemp['stExercicioLocacao'] == $_REQUEST['stExercicioLocacao'])
+                     && ($arTemp['dtIniLocacao']."&&".$arTemp['dtFimLocacao'] == $_REQUEST['dtIniLocacao']."&&".$_REQUEST['dtFimLocacao'])
+                     && ($arTemp['inCodEntidadeLocacao'] == $_REQUEST['inCodEntidadeLocacao'])
+                     && ($arTemp['dtContrato'] == $_REQUEST['dtContrato'])
+                     && ($arTemp['inCodLocatario'] == $_REQUEST['inCodLocatario'])
+                     && ($arTemp['inValorLocacao'] == $_REQUEST['inValorLocacao'])
+                     && ($arTemp['inNumEmpenhoLocacao'] == $_REQUEST['inNumEmpenhoLocacao'])
+                   ) {
+                    $stMensagem = 'Esta locação já está na lista.';
+                    break;
+                }
             }
         }
+
+        if (!$stMensagem) {
+            $arLocacoes = Sessao::read('arLocacoes');
+            $inCount = count($arLocacoes);
+            $arLocacoes[$inCount]['id']                   = $inCount + 1;
+            $arLocacoes[$inCount]['stProcessoLocacao']    = $_REQUEST['stProcessoLocacao'];
+            $arLocacoes[$inCount]['stExercicioLocacao']   = $_REQUEST['stExercicioLocacao'];
+            $arLocacoes[$inCount]['dtIniLocacao']         = $_REQUEST['dtIniLocacao'];
+            $arLocacoes[$inCount]['dtFimLocacao']         = $_REQUEST['dtFimLocacao'];
+            $arLocacoes[$inCount]['inCodEntidadeLocacao'] = $_REQUEST['inCodEntidadeLocacao'];
+            $arLocacoes[$inCount]['dtContrato']           = $_REQUEST['dtContrato'];
+            $arLocacoes[$inCount]['inCodLocatario']       = $_REQUEST['inCodLocatario'];
+            $arLocacoes[$inCount]['inNumEmpenhoLocacao']  = $_REQUEST['inNumEmpenhoLocacao'];
+            $arLocacoes[$inCount]['inValorLocacao']       = $_REQUEST['inValorLocacao'];
+            $arLocacoes[$inCount]['stNomLocatario']       = $_REQUEST['stNomLocatario'];
+
+            $stJs .= montaListaLocacoes( $arLocacoes );
+            $stJs .= "jq('#stProcessoLocacao').val('');";
+            $stJs .= "jq('#stExercicioLocacao').val('".Sessao::getExercicio()."');";
+            $stJs .= "jq('#dtIniLocacao').val('');";
+            $stJs .= "jq('#dtFimLocacao').val('');";
+            $stJs .= "jq('#dtContrato').val('');";
+            $stJs .= "jq('#inCodLocatario').val('');";
+            $stJs .= "jq('#stNomLocatario').html('&nbsp;');";
+            $stJs .= "jq('#inValorLocacao').val('');";
+            $stJs .= "jq('#inCodEntidadeLocacao').val('');";
+            $stJs .= "jq('#stNomEntidadeLocacao').val('');";
+            $stJs .= "jq('#inNumEmpenhoLocacao').val('');";
+
+            Sessao::write('arLocacoes' , $arLocacoes);
+        } else {
+            $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
+        }
+        break;
+
+    case 'incluirDocumento' :
+        $stJs = isset($stJs) ? $stJs : null;
+        if ($_REQUEST['stDocumento'] == '') {
+                $stMensagem = 'Selecione um documento.';
+            } elseif ($_REQUEST['stExercicio'] == '') {
+                $stMensagem = 'Selecione o ano de vencimento.';
+            } elseif ( $_REQUEST['stExercicio'] != '' AND $_REQUEST['stExercicio'] > Sessao::getExercicio() ) {
+                $stMensagem = 'O ano do vencimento deve ser menor ou igual ao ano atual.';
+            } elseif ($_REQUEST['inMes'] == '') {
+                $stMensagem = 'Selecione o mês de vencimento.';
+            } elseif ($_REQUEST['stSituacao'] == '') {
+                $stMensagem = 'Selecione a situação do documento.';
+            } elseif ($_REQUEST['stSituacao'] == 'pago') {
+                if ($_REQUEST['stExercicioEmpenho'] == '') {
+                    $stMensagem = 'Informe o exercícío do empenho.';
+                } elseif ($_REQUEST['inCodEntidadeOculto'] == '') {
+                    $stMensagem = 'Informe a entidade do empenho.';
+                }
+                if ($_REQUEST['inCodigoEmpenho'] == '') {
+                    $stMensagem = 'Informe o código do empenho.';
+                }
+            }
         if ( count( Sessao::read('arDocumentos') ) > 0 ) {
            foreach ( Sessao::read('arDocumentos') AS $arTemp ) {
                 if ( ($arTemp['cod_documento'] == $_REQUEST['stDocumento']) AND ($arTemp['ano_documento'] == $_REQUEST['stExercicio']) ) {
@@ -647,7 +933,7 @@ switch ($stCtrl) {
         } else {
             $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
         }
-        break;
+    break;
 
     case 'montaAlteracaoDocumento' :
 
@@ -673,6 +959,27 @@ switch ($stCtrl) {
         }
         $stJs .= "$('incluiDocumento').value = 'Alterar';";
         $stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'alterarDocumento\',\'stDocumento,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidadeOculto,inCodigoEmpenho,stNomFornecedor,hdnId\');');";
+        break;
+
+    case 'montaAlteracaoLocacoes' :
+        $arLocacoes = Sessao::read('arLocacoes');
+        $inCount = $_REQUEST['id'];
+        $inCount = $inCount - 1;
+
+        $stJs .= "jq('#hdnIdLocacao').val ('".$_REQUEST['id']."');";
+        $stJs .= "jq('#stProcessoLocacao').val ('".$arLocacoes[$inCount]['stProcessoLocacao']."');";
+        $stJs .= "jq('#stExercicioLocacao').val ('".$arLocacoes[$inCount]['stExercicioLocacao']."');";
+        $stJs .= "jq('#dtIniLocacao').val ('".$arLocacoes[$inCount]['dtIniLocacao']."');";
+        $stJs .= "jq('#dtFimLocacao').val ('".$arLocacoes[$inCount]['dtFimLocacao']."');";
+        $stJs .= "jq('#dtContrato').val ('".$arLocacoes[$inCount]['dtContrato']."');";
+        $stJs .= "jq('#inCodEntidadeLocacao').val ('".$arLocacoes[$inCount]['inCodEntidadeLocacao']."');";
+        $stJs .= "jq('#inCodLocatario').val ('".$arLocacoes[$inCount]['inCodLocatario']."');";
+        $stJs .= "jq('#stNomLocatario').html ('".$arLocacoes[$inCount]['stNomLocatario']."');";
+        $stJs .= "jq('#inNumEmpenhoLocacao').val ('".$arLocacoes[$inCount]['inNumEmpenhoLocacao']."');";
+        $stJs .= "jq('#inValorLocacao').val ('".$arLocacoes[$inCount]['inValorLocacao']."');";
+
+        $stJs .= "$('incluiDadosLocacao').value = 'Alterar';";
+        $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'alterarLocacao\',\'hdnIdLocacao,stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodEntidadeLocacao,inCodLocatario,stNomLocatario,inNumEmpenhoLocacao,inValorLocacao\');');";
         break;
 
     case 'alterarDocumento' :
@@ -755,6 +1062,113 @@ switch ($stCtrl) {
 
         break;
 
+    case 'alterarLocacao' :
+        if ($_REQUEST['stProcessoLocacao'] == '') {
+            $stMensagem = 'Selecione um processo.';
+        } elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
+            $stMensagem = 'Informe o empenho da locação.';
+        } elseif ($_REQUEST['stExercicioLocacao'] == '') {
+            $stMensagem = 'Selecione o ano da locação.';
+        } elseif ( $_REQUEST['stExercicioLocacao'] != '' AND $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
+            $stMensagem = 'O ano do vencimento deve ser menor ou igual ao ano atual.';
+        } elseif ($_REQUEST['dtIniLocacao'] == '') {
+            $stMensagem = 'Informe a data de início da locação.';
+        } elseif ($_REQUEST['dtIniLocacao'] != '' && $_REQUEST['dtIniLocacao'] < '01/01/'.Sessao::getExercicio()) {
+            $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
+        } elseif ($_REQUEST['dtFimLocacao'] == '') {
+            $stMensagem = 'Informe a data de término da locação.';
+        } elseif ($_REQUEST['dtFimLocacao'] != '' && $_REQUEST['dtFimLocacao'] <= $_REQUEST['dtIniLocacao']) {
+            $stMensagem = 'A data de término da locação não pode ser menor ou igual que a data de início da locação.';
+        } elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
+            $stMensagem = 'Selecione a entidade para a locação.';
+        } elseif ($_REQUEST['dtContrato'] == '') {
+            $stMensagem = 'Informe a data do contrato de locação.';
+        } elseif ($_REQUEST['dtContrato'] != '' && ($_REQUEST['dtContrato'] < $_REQUEST['dtIniLocacao'] || $_REQUEST['dtContrato'] > $_REQUEST['dtFimLocacao'])) {
+            $stMensagem = 'A data do contrato ser igual ou maior que a data de início e menor ou igual que a data de término da locação.';
+        } elseif ($_REQUEST['inCodLocatario'] == '') {
+            $stMensagem = 'Selecione o locatário.';
+        } elseif ($_REQUEST['inValorLocacao'] == '') {
+            $stMensagem = 'Informe o valor da locação.';
+        }
+
+        if ( count( Sessao::read('arLocacoes') ) > 0 ) {
+           foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
+                if ( ($arTemp['stProcessoLocacao'] == $_REQUEST['stProcessoLocacao'])
+                     && ($arTemp['stExercicioLocacao'] == $_REQUEST['stExercicioLocacao'])
+                     && ($arTemp['dtIniLocacao']."&&".$arTemp['dtFimLocacao'] == $_REQUEST['dtIniLocacao']."&&".$_REQUEST['dtFimLocacao'])
+                     && ($arTemp['inCodEntidadeLocacao'] == $_REQUEST['inCodEntidadeLocacao'])
+                     && ($arTemp['dtContrato'] == $_REQUEST['dtContrato'])
+                     && ($arTemp['inCodLocatario'] == $_REQUEST['inCodLocatario'])
+                     && ($arTemp['inValorLocacao'] == $_REQUEST['inValorLocacao'])
+                     && ($arTemp['inNumEmpenhoLocacao'] == $_REQUEST['inNumEmpenhoLocacao'])
+                   ) {
+                    $stMensagem = 'Esta locação já está na lista.';
+                    break;
+                }
+            }
+        }
+
+        if (!$stMensagem) {
+            $arLocacoes = Sessao::read('arLocacoes');
+
+            $inCount = $_REQUEST['hdnIdLocacao'];
+            $inCount = $inCount - 1;
+            $arLocacoes[$inCount]['id']                   = $_REQUEST['hdnIdLocacao'];
+            $arLocacoes[$inCount]['stProcessoLocacao']    = $_REQUEST['stProcessoLocacao'];
+            $arLocacoes[$inCount]['stExercicioLocacao']   = $_REQUEST['stExercicioLocacao'];
+            $arLocacoes[$inCount]['dtIniLocacao']         = $_REQUEST['dtIniLocacao'];
+            $arLocacoes[$inCount]['dtFimLocacao']         = $_REQUEST['dtFimLocacao'];
+            $arLocacoes[$inCount]['inCodEntidadeLocacao'] = $_REQUEST['inCodEntidadeLocacao'];
+            $arLocacoes[$inCount]['dtContrato']           = $_REQUEST['dtContrato'];
+            $arLocacoes[$inCount]['inCodLocatario']       = $_REQUEST['inCodLocatario'];
+            $arLocacoes[$inCount]['inNumEmpenhoLocacao']  = $_REQUEST['inNumEmpenhoLocacao'];
+            $arLocacoes[$inCount]['inValorLocacao']       = $_REQUEST['inValorLocacao'];
+            $arLocacoes[$inCount]['stNomLocatario']       = $_REQUEST['stNomLocatario'];
+
+            $stJs .= montaListaLocacoes( $arLocacoes );
+            $stJs .= "jq('#hdnId').val ('');";
+            $stJs .= "jq('#stProcessoLocacao').val('');";
+            $stJs .= "jq('#stExercicioLocacao').val('".Sessao::getExercicio()."');";
+            $stJs .= "jq('#dtIniLocacao').val('');";
+            $stJs .= "jq('#dtFimLocacao').val('');";
+            $stJs .= "jq('#dtContrato').val('');";
+            $stJs .= "jq('#inCodLocatario').val('');";
+            $stJs .= "jq('#stNomLocatario').html('&nbsp;');";
+            $stJs .= "jq('#inValorLocacao').val('');";
+            $stJs .= "jq('#inCodEntidadeLocacao').val('');";
+            $stJs .= "jq('#stNomEntidadeLocacao').val('');";
+            $stJs .= "jq('#inNumEmpenhoLocacao').val('');";
+
+            $stJs .= "$('incluiDadosLocacao').value = 'Incluir';";
+            $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodLocatario,stNomLocatario,inValorLocacao,inCodEntidadeLocacao,stNomEntidadeLocacao,inNumEmpenhoLocacao\');');";
+            Sessao::write('arLocacoes' , $arLocacoes);
+
+            //se estivesse excluido, remove das excluidas
+            if ( count( Sessao::read('arLocacoesExcluidas') ) > 0 ) {
+                foreach ( Sessao::read('arLocacoesExcluidas') AS $arTemp ) {
+                    if (($arTemp['stProcessoLocacao']    != $_REQUEST['stProcessoLocacao']   ) &&
+                        ($arTemp['stExercicioLocacao']   != $_REQUEST['stExercicioLocacao']  ) &&
+                        ($arTemp['dtIniLocacao']         != $_REQUEST['dtIniLocacao']        ) &&
+                        ($arTemp['dtFimLocacao']         != $_REQUEST['dtFimLocacao']        ) &&
+                        ($arTemp['inCodEntidadeLocacao'] != $_REQUEST['inCodEntidadeLocacao']) &&
+                        ($arTemp['dtContrato']           != $_REQUEST['dtContrato']          ) &&
+                        ($arTemp['inCodLocatario']       != $_REQUEST['inCodLocatario']      ) &&
+                        ($arTemp['inNumEmpenhoLocacao']  != $_REQUEST['inNumEmpenhoLocacao'] ) &&
+                        ($arTemp['inValorLocacao']       != $_REQUEST['inValorLocacao']      ) &&
+                        ($arTemp['stNomLocatario']       != $_REQUEST['stNomLocatario']      )
+                       ) {
+                        $arAux[] = $arTemp;
+                    }
+                }
+            }
+
+            Sessao::write('arLocacoesExcluidas' , $arAux);
+        } else {
+            $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
+        }
+
+    break;
+
     case 'excluirDocumento' :
         $arAux = array();
         $arDocumentosExcluidos = Sessao::read('arDocumentosExcluidos');
@@ -772,6 +1186,32 @@ switch ($stCtrl) {
         $stJs .= montaListaDocumentos( Sessao::read('arDocumentos') );
         break;
 
+    case 'excluirLocacoes' :
+        $arAux = array();
+        $arLocacoesExcluidas = Sessao::read('arLocacoesExcluidas');
+
+        foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
+            if ($arTemp['id'] !=  $_REQUEST['id']) {
+                $arAux[] = $arTemp;
+            } else {
+                $inCount = count($arLocacoesExcluidas);
+                $arLocacoesExcluidas[$inCount]['stProcessoLocacao']    = $arTemp['stProcessoLocacao'];
+                $arLocacoesExcluidas[$inCount]['stExercicioLocacao']   = $arTemp['stExercicioLocacao'];
+                $arLocacoesExcluidas[$inCount]['dtIniLocacao']         = $arTemp['dtIniLocacao'];
+                $arLocacoesExcluidas[$inCount]['dtFimLocacao']         = $arTemp['dtFimLocacao'];
+                $arLocacoesExcluidas[$inCount]['inCodEntidadeLocacao'] = $arTemp['inCodEntidadeLocacao'];
+                $arLocacoesExcluidas[$inCount]['dtContrato']           = $arTemp['dtContrato'];
+                $arLocacoesExcluidas[$inCount]['inCodLocatario']       = $arTemp['inCodLocatario'];
+                $arLocacoesExcluidas[$inCount]['inNumEmpenhoLocacao']  = $arTemp['inNumEmpenhoLocacao'];
+                $arLocacoesExcluidas[$inCount]['inValorLocacao']       = $arTemp['inValorLocacao'];
+                $arLocacoesExcluidas[$inCount]['stNomLocatario']       = $arTemp['stNomLocatario'];
+            }
+        }
+        Sessao::write('arLocacoesExcluidas' , $arLocacoesExcluidas);
+        Sessao::write('arLocacoes' , $arAux);
+        $stJs .= montaListaLocacoes( Sessao::read('arLocacoes') );
+    break;
+
     case 'limparDocumentos' :
 
         $stJs .= "$('hdnId').value = '';";
@@ -786,6 +1226,26 @@ switch ($stCtrl) {
         $stJs .= "$('spnEmpenho').innerHTML = ''; ";
 
         break;
+
+    case 'limparDadosLocacao' :
+
+        $stJs .= "jq('#hdnId').val('');";
+        $stJs .= "jq('#stProcessoLocacao').val ('');";
+        $stJs .= "jq('#stExercicioLocacao').val ('".Sessao::getExercicio()."');";
+        $stJs .= "jq('#dtIniLocacao').val ('');";
+        $stJs .= "jq('#dtFimLocacao').val ('');";
+        $stJs .= "jq('#dtContrato').val ('');";
+        $stJs .= "jq('#inCodLocatario').val ('');";
+        $stJs .= "jq('#stNomLocatario').html ('');";
+        $stJs .= "jq('#inNumEmpenhoLocacao').val ('');";
+        $stJs .= "jq('#inValorLocacao').val ('');";
+        $stJs .= "jq('#inCodEntidadeLocacao').val ('');";
+        $stJs .= "jq('#stNomEntidadeLocacao').html ('');";
+
+        $stJs .= "$('incluiDadosLocacao').value = 'Incluir';";
+        $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'hdnId,stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodEntidadeLocacao,inCodLocatario,stNomLocatario,inNumEmpenhoLocacao,inValorLocacao\');');";
+
+    break;
 
     case 'montaAlterar' :
 

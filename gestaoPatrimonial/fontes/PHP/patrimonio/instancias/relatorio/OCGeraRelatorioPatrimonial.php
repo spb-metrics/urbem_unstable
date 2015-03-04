@@ -74,7 +74,7 @@ if ($natureza!=0) {
     $where = "WHERE natureza.cod_natureza =".$natureza;
     $stNatureza = SistemaLegado::pegaDado('nom_natureza', 'patrimonio.natureza', $where);
 }
-$preview->addParametro( 'nom_natureza', utf8_encode($stNatureza) );
+$preview->addParametro( 'nom_natureza', $stNatureza );
 
 //seta o grupo
 $grupo = ($request->get('inCodGrupo')!='') ? $request->get('inCodGrupo') : 0;

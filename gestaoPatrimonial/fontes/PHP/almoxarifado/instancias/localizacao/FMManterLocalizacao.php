@@ -34,15 +34,15 @@
 
     * Casos de uso: uc-03.03.14
 
-    $Id: FMManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterLocalizacao.php 61639 2015-02-19 13:05:36Z diogo.zarpelon $
 **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GP_ALM_NEGOCIO ."RAlmoxarifadoLocalizacao.class.php"                               );
-include_once(CAM_GP_ALM_NEGOCIO ."RAlmoxarifadoAlmoxarifado.class.php"                              );
-include_once( CAM_GP_ALM_COMPONENTES."IMontaItemUnidade.class.php");
-include_once( CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php"                                        );
+include_once CAM_GP_ALM_NEGOCIO ."RAlmoxarifadoLocalizacao.class.php";
+include_once CAM_GP_ALM_NEGOCIO ."RAlmoxarifadoAlmoxarifado.class.php";
+include_once CAM_GP_ALM_COMPONENTES."IMontaItemUnidade.class.php";
+include_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
 
 $stPrograma = "ManterLocalizacao";
 
@@ -54,8 +54,8 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 $stAcao = $request->get('stAcao');
-
-Sessao::write('transf3', array());
+$inCodLocalizacao = $request->get('inCodLocalizacao');
+$stLocalizacao = $request->get('stLocalizacao');
 
 include_once($pgJs);
 
@@ -93,12 +93,12 @@ $stLocalizacao = $_REQUEST['stLocalizacao'];
 
 $obHdnLocalizacao = new Hidden;
 $obHdnLocalizacao->setName("HdnLocalizacao");
-$obHdnLocalizacao->setValue(($stAcao == "alterar")?$stLocalizacao:null);
+$obHdnLocalizacao->setValue(($stAcao == "alterar") ? $stLocalizacao : null);
 $obHdnLocalizacao->setNull(false);
 
 $obHdnCodLocalizacao = new Hidden;
 $obHdnCodLocalizacao->setName("inCodLocalizacao");
-$obHdnCodLocalizacao->setValue(($stAcao == "alterar")?$inCodLocalizacao:null);
+$obHdnCodLocalizacao->setValue(($stAcao == "alterar") ? $inCodLocalizacao : null);
 
 $obHdnNomeUnidade = new Hidden;
 $obHdnNomeUnidade->setName("HdnNomUnidade");
@@ -113,31 +113,31 @@ $obHdnNomeMarca->setName("HdnNomMarca");
 $obHdnNomeMarca->setValue("");
 
 if ($stAcao != "alterar") {
-  $obCmbCodAlmoxarifado = new Select();
-  $obCmbCodAlmoxarifado->setRotulo            ("Almoxarifado"                        );
-  $obCmbCodAlmoxarifado->setTitle             ("Selecione os almoxarifados.");
-  $obCmbCodAlmoxarifado->setName              ("inCodAlmoxarifado"                   );
-  $obCmbCodAlmoxarifado->setId                ("inCodAlmoxarifado"                   );
-  $obCmbCodAlmoxarifado->setNull              (false                                 );
-  $obCmbCodAlmoxarifado->setCampoID           ("codigo"                              );
-  $obCmbCodAlmoxarifado->addOption            ("","Selecione"                        );
-  $obCmbCodAlmoxarifado->obEvento->setOnChange("goOculto('FMontaLocalizacao',false);");
-  $obCmbCodAlmoxarifado->setCampoDesc         ("[codigo] - [nom_a]");
-  $obCmbCodAlmoxarifado->preencheCombo        ($rsAlmoxarifado                       );
-  $obCmbCodAlmoxarifado->setValue             ($codAlmoxarifadoPadrao                );
+    $obCmbCodAlmoxarifado = new Select();
+    $obCmbCodAlmoxarifado->setRotulo            ("Almoxarifado"                        );
+    $obCmbCodAlmoxarifado->setTitle             ("Selecione os almoxarifados.");
+    $obCmbCodAlmoxarifado->setName              ("inCodAlmoxarifado"                   );
+    $obCmbCodAlmoxarifado->setId                ("inCodAlmoxarifado"                   );
+    $obCmbCodAlmoxarifado->setNull              (false                                 );
+    $obCmbCodAlmoxarifado->setCampoID           ("codigo"                              );
+    $obCmbCodAlmoxarifado->addOption            ("","Selecione"                        );
+    $obCmbCodAlmoxarifado->obEvento->setOnChange("goOculto('FMontaLocalizacao',false);");
+    $obCmbCodAlmoxarifado->setCampoDesc         ("[codigo] - [nom_a]");
+    $obCmbCodAlmoxarifado->preencheCombo        ($rsAlmoxarifado                       );
+    $obCmbCodAlmoxarifado->setValue             ($codAlmoxarifadoPadrao                );
 } else {
-  $inCodAlmoxarifado = $_REQUEST['inCodAlmoxarifado'];
-  $obCmbCodAlmoxarifado = new Hidden;
-  $obCmbCodAlmoxarifado->setName("inCodAlmoxarifado");
-  $obCmbCodAlmoxarifado->setId  ("inCodAlmoxarifado");
-  $obCmbCodAlmoxarifado->setValue($inCodAlmoxarifado);
+    $inCodAlmoxarifado = $_REQUEST['inCodAlmoxarifado'];
+    $obCmbCodAlmoxarifado = new Hidden;
+    $obCmbCodAlmoxarifado->setName("inCodAlmoxarifado");
+    $obCmbCodAlmoxarifado->setId  ("inCodAlmoxarifado");
+    $obCmbCodAlmoxarifado->setValue($inCodAlmoxarifado);
 
-  $obLblLocalizacao = new Label;
-  $obLblLocalizacao->setRotulo("Almoxarifado");
-  $obLblLocalizacao->setValue ($inCodAlmoxarifado." - ".$obAlmoxarifadoLocalizacao->obRAlmoxarifadoAlmoxarifado->obRCGMAlmoxarifado->getNomCGM());
+    $obLblLocalizacao = new Label;
+    $obLblLocalizacao->setRotulo("Almoxarifado");
+    $obLblLocalizacao->setValue ($inCodAlmoxarifado." - ".$obAlmoxarifadoLocalizacao->obRAlmoxarifadoAlmoxarifado->obRCGMAlmoxarifado->getNomCGM());
 
-  Sessao::write('inCodAlmoxarifado', $inCodAlmoxarifado);
-  Sessao::write('inNomAlmoxarifado', $obAlmoxarifadoLocalizacao->obRAlmoxarifadoAlmoxarifado->obRCGMAlmoxarifado->getNomCGM());
+    Sessao::write('inCodAlmoxarifado', $inCodAlmoxarifado);
+    Sessao::write('inNomAlmoxarifado', $obAlmoxarifadoLocalizacao->obRAlmoxarifadoAlmoxarifado->obRCGMAlmoxarifado->getNomCGM());
 }
 
 if ( (!($codAlmoxarifadoPadrao == "")) || ($stAcao == "alterar") ) {
@@ -176,12 +176,12 @@ $obFormulario->addTitulo("Dados da Localização" );
 $obFormulario->addForm  ($obForm                );
 $obFormulario->setAjuda ("UC-03.03.14");
 
- if ($stAcao != "alterar") {
-   $obFormulario->addComponente($obCmbCodAlmoxarifado);
- } else {
-   $obFormulario->addHidden($obCmbCodAlmoxarifado);
-   $obFormulario->addComponente($obLblLocalizacao);
- }
+if ($stAcao != "alterar") {
+    $obFormulario->addComponente($obCmbCodAlmoxarifado);
+} else {
+    $obFormulario->addHidden($obCmbCodAlmoxarifado);
+    $obFormulario->addComponente($obLblLocalizacao);
+}
 
 $obFormulario->addSpan      ($obSpnListaLocalizacao );
 $obFormulario->addTitulo    ("Dados do Item"        );
@@ -207,9 +207,10 @@ if ($stAcao == "incluir") {
 
     $obFormulario->defineBarra( array( $obBtnOk, $obBtnLimparGeral) );
 } else {
- $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao;
- $obFormulario->Cancelar( $stLocation );
+    $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao;
+    $obFormulario->Cancelar( $stLocation );
 }
 
 $obFormulario->show();
+
 ?>

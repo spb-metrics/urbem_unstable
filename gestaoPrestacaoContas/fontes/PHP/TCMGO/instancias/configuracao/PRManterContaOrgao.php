@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: PRManterContaOrgao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterContaOrgao.php 61678 2015-02-24 19:28:14Z jean $
 
     * Casos de uso : uc-06.04.00
 */
@@ -39,6 +39,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(TTGO.'TTGOOrgaoPlanoBanco.class.php');
+include_once(TTGO.'TTGOOrgao.class.php');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterContaOrgao";
@@ -57,13 +58,30 @@ switch ($_REQUEST['stAcao']) {
             $obTTGOOrgaoPlanoBanco->setDado('exercicio', Sessao::getExercicio());
             $obTTGOOrgaoPlanoBanco->setDado('num_orgao', Sessao::read('inOrgao'));
             $obTTGOOrgaoPlanoBanco->exclusao();
+
+            $obTTGOOrgao = new TTGOOrgao();
+
             if ( is_array($arContas)  ) {
                 foreach ($arContas as $arAux) {
-                    $obTTGOOrgaoPlanoBanco->setDado('num_orgao',$arAux['num_orgao']);
-                    $obTTGOOrgaoPlanoBanco->setDado('cod_plano',$arAux['cod_plano']);
-                    $obTTGOOrgaoPlanoBanco->inclusao();
+                    $obTTGOOrgao->setDado('num_orgao', $arAux['num_orgao']);
+                    $obTTGOOrgao->setDado('exercicio', Sessao::getExercicio());
+                    $obTTGOOrgao->recuperaPorChave($rsRecordSet);
+
+                    if ($rsRecordSet->getNumLinhas() > 0) {
+                        $obTTGOOrgaoPlanoBanco->setDado('num_orgao',$arAux['num_orgao']);
+                        $obTTGOOrgaoPlanoBanco->setDado('cod_plano',$arAux['cod_plano']);
+                        $obTTGOOrgaoPlanoBanco->inclusao();
+                    } else {
+                        $stMensagem = "Deve ser configurado o orgão ".$arAux['num_orgao']." - ".$arAux['nom_orgao']." antes!";
+                        break;
+                    }
                 }
-                SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
+
+                if (!$stMensagem) {
+                    SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
+                } else {
+                    sistemaLegado::exibeAviso(urlencode($stMensagem),"n_incluir","erro");
+                }
             } else {
                 sistemaLegado::exibeAviso(urlencode('É necessário cadastrar pelo uma conta!'),"n_incluir","erro");
             }

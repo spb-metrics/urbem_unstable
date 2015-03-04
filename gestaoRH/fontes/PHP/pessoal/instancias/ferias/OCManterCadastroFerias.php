@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 60071 2014-09-26 19:29:05Z evandro $
+    $Id: OCManterCadastroFerias.php 61557 2015-02-04 18:53:54Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -1024,7 +1024,7 @@ function alterarPost()
             $stJs .= "ajaxJavaScript('".CAM_GRH_PES_PROCESSAMENTO."OCIFiltroComponentes.php?".Sessao::getId()."&stTipoFiltro='+f.stTipoFiltro.value+'&boQuebrarDisabled='+document.frm.boQuebrarDisabled.value,'gerarSpan' ); \n";
         }
         if ($_GET["stAcao"] == "excluir") {
-            $stJs .= "f.stTipoFiltro.value = '';\n";
+            $stJs .= "f.stTipoFiltro.value = 'contrato';\n";
             $stJs .= "f.stTipoFiltro.disabled = false;\n";
         }
     }

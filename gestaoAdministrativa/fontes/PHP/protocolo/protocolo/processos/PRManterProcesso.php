@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: PRManterProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
 
     */
 
@@ -55,7 +55,6 @@ switch ($stAcao) {
     case 'alterar':
         include_once(CAM_GA_PROT_MAPEAMENTO."TPRODocumentoAssunto.class.php");
         include_once(CAM_GA_PROT_MAPEAMENTO."TPRODocumentoProcesso.class.php" );
-        include_once(CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php" );
         include_once(CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php" );
 
         Sessao::setTrataExcecao(true);

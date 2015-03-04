@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.13
 
-    $Id: PRExportarRAIS.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarRAIS.php 61583 2015-02-10 18:40:32Z dagiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -361,7 +361,7 @@ $arRegistroTipoUm[0]["sigla_uf"]                        = $rsUF->getCampo("sigla
 $arRegistroTipoUm[0]["ddd"]                             = substr($rsConfiguracao->getCampo("telefone"),0,2);
 $arRegistroTipoUm[0]["telefone"]                        = substr($rsConfiguracao->getCampo("telefone"),2,strlen($rsConfiguracao->getCampo("telefone")));
 $arRegistroTipoUm[0]["email_estabelecimento"]           = $rsCGM->getCampo("e_mail");
-$arRegistroTipoUm[0]["cnae"]                            = preg_replace("/[A-Za-z\-]/","",$rsCnaeFiscal->getCampo("valor_composto"));
+$arRegistroTipoUm[0]["cnae"]                            = str_replace(" ","",preg_replace("/[A-Za-z\-\/\.]/","",$rsCnaeFiscal->getCampo("valor_composto")));
 $arRegistroTipoUm[0]["natureza_juridica"]               = $rsConfiguracao->getCampo("natureza_juridica");
 $arRegistroTipoUm[0]["numero_proprietarios"]            = "00";
 $arRegistroTipoUm[0]["data_base"]                       = $rsConfiguracao->getCampo("dt_base_categoria");

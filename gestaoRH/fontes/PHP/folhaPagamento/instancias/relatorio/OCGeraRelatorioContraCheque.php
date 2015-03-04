@@ -227,8 +227,8 @@ $preview->addParametro("registroReemissao"   , $inContratoReemissao );
 $preview->addParametro("duplicar"            , $boDuplicar );
 $preview->addParametro("situacao"            , $stSituacao );
 $preview->addParametro("st_Folha"            , $stFolha );
-$preview->addParametro("mensagem_aniversario", utf8_encode($stMensagemAniversario) );
-$preview->addParametro("mensagem"            , utf8_encode($stMensagem) );
+$preview->addParametro("mensagem_aniversario", $stMensagemAniversario );
+$preview->addParametro("mensagem"            , $stMensagem );
 $preview->addParametro("inMes"               , $inMes );
 $preview->addParametro("desdobramento"       , ($stDesdobramento) ? $stDesdobramento : "");
 

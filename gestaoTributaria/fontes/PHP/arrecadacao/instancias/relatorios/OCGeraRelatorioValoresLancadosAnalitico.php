@@ -140,17 +140,17 @@ $preview = new PreviewBirt( 5, 25, 4 );
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setFormato( 'pdf' );
 $preview->setTitulo( 'Relatório de Arrecadacação' );
-$preview->addParametro( 'stFiltroValor'     , utf8_encode($stFiltroValor)      );
-$preview->addParametro( 'stFiltroInscImob'  , utf8_encode($stFiltroImovel)     );
-$preview->addParametro( 'stFiltroInscEco'   , utf8_encode($stFiltroEco)        );
-$preview->addParametro( 'stFiltroSituacao'  , utf8_encode($stFiltroSituacao)   );
-$preview->addParametro( 'stFiltroGrupo'     , utf8_encode($stFiltroGrupo)      );
-$preview->addParametro( 'stFiltroCredito'   , utf8_encode($stFiltroCredito)    );
+$preview->addParametro( 'stFiltroValor'     , $stFiltroValor      );
+$preview->addParametro( 'stFiltroInscImob'  , $stFiltroImovel     );
+$preview->addParametro( 'stFiltroInscEco'   , $stFiltroEco        );
+$preview->addParametro( 'stFiltroSituacao'  , $stFiltroSituacao   );
+$preview->addParametro( 'stFiltroGrupo'     , $stFiltroGrupo      );
+$preview->addParametro( 'stFiltroCredito'   , $stFiltroCredito    );
 $preview->addParametro( 'stFiltroExerc'     , $stFiltroExercicio               );
-$preview->addParametro( 'stFiltroContrib'   , utf8_encode($stFiltroContrib)    );
-$preview->addParametro( 'stFiltroLograd'    , utf8_encode($stFiltroLograd)     );
-$preview->addParametro( 'stFiltroAtividade' , utf8_encode($stFiltroAtividade)  );
-$preview->addParametro( 'stFiltroCond'      , utf8_encode($stFiltroCondominio) );
+$preview->addParametro( 'stFiltroContrib'   , $stFiltroContrib    );
+$preview->addParametro( 'stFiltroLograd'    , $stFiltroLograd     );
+$preview->addParametro( 'stFiltroAtividade' , $stFiltroAtividade  );
+$preview->addParametro( 'stFiltroCond'      , $stFiltroCondominio );
 $preview->preview();
 
 ?>

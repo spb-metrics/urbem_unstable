@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-06.01.15
 
-    $Id: OCGeraRREOAnexo16.php 61256 2014-12-22 13:22:19Z michel $
+    $Id: OCGeraRREOAnexo16.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
 
 */
 
@@ -91,13 +91,13 @@ $preview->addParametro ( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade']
 $preview->addParametro ( 'cod_recurso', substr($stCodRecurso,0,-1) );
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-     $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+     $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     $inCodEntidadePrefeitura = SistemaLegado::pegaDado('valor','administracao.configuracao'," WHERE parametro = 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."' AND cod_modulo = 8 ");
     $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade = ".$inCodEntidadePrefeitura );
     while ( !$rsEntidade->eof() ) {
      if ( $rsEntidade->getCampo('cod_entidade') == $inCodEntidadePrefeitura ) {
-        $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+        $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
      }
       $rsEntidade->proximo();
     }
@@ -124,21 +124,21 @@ $dtDataEmissao = date('d/m/Y');
 $dtHoraEmissao = date('H:i');
 $stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
 
-$preview->addParametro( 'data_emissao', utf8_encode($stDataEmissao) );
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
 if ($_REQUEST['stAcao'] == 'anexo12novo') {
     switch ($_REQUEST['stTipoRelatorio']) {
         case 'Mes':
-            $preview->addParametro( 'descricaoPeriodo',utf8_encode(SistemaLegado::mesExtensoBR((intval($_REQUEST['cmbMes'])))." de ". Sessao::getExercicio()));
-            $preview->addParametro( 'periodo_extenso',utf8_encode('Mês'));
+            $preview->addParametro( 'descricaoPeriodo', SistemaLegado::mesExtensoBR((intval($_REQUEST['cmbMes'])))." de ". Sessao::getExercicio());
+            $preview->addParametro( 'periodo_extenso','Mês');
             $preview->addParametro( 'periodo'  , $_REQUEST['cmbMes'] );
             $preview->addParametro( 'data_inicial', '01/'.$_REQUEST['cmbMes'].'/'.Sessao::getExercicio() );
             $preview->addParametro( 'data_final', SistemaLegado::retornaUltimoDiaMes($_REQUEST['cmbMes'],Sessao::getExercicio()));
         break;
         case 'Bimestre':
             SistemaLegado::periodoInicialFinalBimestre($stDataInicial,$stDataFinal,$_REQUEST['cmbBimestre'],Sessao::getExercicio());
-            $preview->addParametro( 'descricaoPeriodo', utf8_encode($_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio()) );
-            $preview->addParametro( 'periodo_extenso',utf8_encode('Bimestre'));
+            $preview->addParametro( 'descricaoPeriodo', $_REQUEST['cmbBimestre']."º Bimestre de ".Sessao::getExercicio() );
+            $preview->addParametro( 'periodo_extenso', 'Bimestre');
             $preview->addParametro( 'periodo', $_REQUEST['cmbBimestre'] );
             $preview->addParametro( 'data_inicial', '01/01/'.Sessao::getExercicio() );
             $preview->addParametro( 'data_final'  , $stDataFinal );

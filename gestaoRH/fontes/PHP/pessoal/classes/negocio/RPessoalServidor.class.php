@@ -31,7 +31,7 @@
 
     * Caso de uso: uc-04.04.07
 
-    $Id: RPessoalServidor.class.php 60993 2014-11-27 17:32:39Z gelson $
+    $Id: RPessoalServidor.class.php 61570 2015-02-09 13:24:30Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1008,8 +1008,8 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
         include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoContratoServidor.class.php"    );
         include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGerado.class.php"                    );
         include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorContaSalarioHistorico.class.php" );
-        
-        
+        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoNorma.class.php"               );
+        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoExcluido.class.php"            );        
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoConcessaoDecimo.class.php"              );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorComplementar.class.php" );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php"      );
@@ -1021,7 +1021,13 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
         $stMensagem = "Exclusão não permitida, servidor possui histórico de dados no sistema.";
         $stFiltro = " WHERE cod_contrato = ".$this->roUltimoContratoServidor->getCodContrato();
 
-        $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGerado;
+        $obTPessoalAssentamentoGeradoNorma = new TPessoalAssentamentoGeradoNorma();
+        $obTPessoalAssentamentoGeradoNorma->excluirAssentamentoGeradoNorma($stFiltro, $boTransacao);
+
+        $obTPessoalAssentamentoGeradoExcluido = new TPessoalAssentamentoGeradoExcluido();
+        $obTPessoalAssentamentoGeradoExcluido->excluirAssentamentoGeradoExcluido($stFiltro, $boTransacao);
+
+        $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGerado();
         $obTPessoalAssentamentoGeradoContratoServidor->excluirAssentamentoGerado($stFiltro, $boTransacao);
         
         $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGeradoContratoServidor;

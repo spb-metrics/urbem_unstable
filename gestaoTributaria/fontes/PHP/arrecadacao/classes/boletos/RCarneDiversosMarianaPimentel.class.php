@@ -32,7 +32,7 @@
 
   * @package URBEM
 
-    * $Id: RCarneDiversosMarianaPimentel.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCarneDiversosMarianaPimentel.class.php 61620 2015-02-18 12:14:10Z franver $
 
   Caso de uso: uc-05.03.11
 */
@@ -677,6 +677,9 @@ class RCarneDiversosPetropolis extends RProtocolo
     public function setObservacaoL3($valor) { $this->stObservacaoL3   = $valor; }
     public function setObsVencimento($valor) { $this->stObsVencimento  = $valor; }
     public function setNumeracao($valor) { $this->stNumeracao      = $valor; }
+    public function setValorMulta($valor) { $this->flValorMulta = $valor; }
+    public function setValorJuros($valor) { $this->flValorJuros = $valor; }
+    public function setValorOutros($valor) { $this->flValorOutros = $valor; }
     public function setValorTotal($valor) { $this->flValorTotal     = $valor; }
 
     /* getters */
@@ -1396,7 +1399,7 @@ var $stLocal;
 var $boConsolidacao;
 var $stNumeracaoConsolidacao;
 var $dtVencimentoConsolidacao;
-
+var $obRCarneMarianaPimentel;
 /* setters */
 function setHorizontal($valor) { $this->inHorizontal = $valor; }
 function setVertical($valor) { $this->inVertical   = $valor; }
@@ -1617,8 +1620,8 @@ function imprimirCarne($diffBaixa = FALSE)
                 $this->obRCarneMarianaPimentel->setObservacaoL1 ( 'Não receber após o vencimento. ' );
                 $this->obRCarneMarianaPimentel->setParcela ( "1/1" );
                 $this->obRCarneMarianaPimentel->setVencimento  ( $this->getVencimentoConsolidacao() );
-                $this->obRCarneMarianaPimentel->flValorJuros = ( number_format(round($nuValorJuroNormal,2),2,',',''));
-                $this->obRCarneMarianaPimentel->flValorMulta = ( number_format(round($nuValorMultaNormal,2),2,',',''));
+                $this->obRCarneMarianaPimentel->setValorJuros( number_format(round($nuValorJuroNormal,2),2,',',''));
+                $this->obRCarneMarianaPimentel->setValorMulta( number_format(round($nuValorMultaNormal,2),2,',',''));
                 $this->obRCarneMarianaPimentel->setValor       ( number_format(round($nuValorNormal,2),2,',',''));
                 $this->obRCarneMarianaPimentel->setValorTotal(number_format(round($nuValorTotal,2),2,',',''));
 
@@ -1634,7 +1637,6 @@ function imprimirCarne($diffBaixa = FALSE)
             $inCountTemp ++;
 
         } else {
-
             foreach ($chave as $parcela) { // impressao das parcelas selecionadas para cada codigo de lancamento
                 $inParcela++;
                 $this->obRCarneMarianaPimentel->setImagemCarne( CAM_FW_TEMAS."imagens/".$stNomeImagem );
@@ -1711,6 +1713,7 @@ function imprimirCarne($diffBaixa = FALSE)
                 if ( $obErro->ocorreu() ) {
                     break;
                 }
+                
                 if ($diffBaixa) {
                     $this->arBarra['tipo_moeda'] = 6;
                     $this->obRCarneMarianaPimentel->setParcelaUnica ( true );
@@ -1720,12 +1723,16 @@ function imprimirCarne($diffBaixa = FALSE)
                     $this->obRCarneMarianaPimentel->setValor        ( number_format($nuValorNormal,2,',','.') );
                     $this->obRCarneMarianaPimentel->setParcela ( $rsParcela->getCampo( 'info' ) );
                 } else {
+                    
                     if ( $rsParcela->getCampo( 'nr_parcela' ) == 0 ) {
                         $this->arBarra['tipo_moeda'] = 6;
                         $this->obRCarneMarianaPimentel->setParcelaUnica ( true );
                         $this->obRCarneMarianaPimentel->setVencimento   ( $rsParcela->getCampo( 'vencimento' ) );
                         //$this->obRCarneMarianaPimentel->setValor        ( number_format($rsParcela->getCampo( 'valor' ),2,',','') );
                         $this->obRCarneMarianaPimentel->setValor        ( number_format($nuValorNormal,2,',','.') );
+                        $this->obRCarneMarianaPimentel->setValorJuros(number_format($stJuroNormal,2,',','.'));
+                        // % de multa
+                        $this->obRCarneMarianaPimentel->setValorMulta(number_format($stMultaNormal,2,',','.'));
                         /**
                         * Recuperar Desconto
                         */
@@ -1786,13 +1793,13 @@ function imprimirCarne($diffBaixa = FALSE)
                             $stParametro2 = $stParametro.$dtVencimento1."'";
                             $stParametro3 = $stParametro.$dtVencimento2."'";
                             $stParametro4 = $stParametro.$dtVencimento3."'";
-
-                            $this->obRCarneMarianaPimentel->flValorJuros = number_format($stJuroNormal,2,',','.');
+                            
+                            $this->obRCarneMarianaPimentel->setValorJuros(number_format($stJuroNormal,2,',','.'));
 
                             // % de multa
-                            $this->obRCarneMarianaPimentel->flValorMulta = number_format($stMultaNormal,2,',','.');
-                            //-----------------------------------------------------------------------
+                            $this->obRCarneMarianaPimentel->setValorMulta(number_format($stMultaNormal,2,',','.'));
 
+                            //-----------------------------------------------------------------------
                             // valor, % de juro, % de multa para valor vencimento 1 do carne --------------
                             // valor
                             if ($boVenc1 == true) {

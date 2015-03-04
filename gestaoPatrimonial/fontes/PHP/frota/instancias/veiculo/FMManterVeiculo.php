@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterVeiculo.php 59967 2014-09-24 12:57:36Z diogo.zarpelon $
+    $Id: FMManterVeiculo.php 61654 2015-02-20 20:34:48Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -44,6 +44,8 @@ include_once( CAM_GP_FRO_MAPEAMENTO.'TFrotaCategoriaHabilitacao.class.php' );
 include_once( CAM_GP_FRO_MAPEAMENTO.'TFrotaDocumento.class.php' );
 include_once( CAM_GP_FRO_MAPEAMENTO."TFrotaControleInterno.class.php" );
 include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
+include_once( CAM_GPC_TCERN_MAPEAMENTO."TTCERNCategoriaVeiculoTCE.class.php" );
+include_once( CAM_GPC_TCERN_MAPEAMENTO."TTCERNVeiculoCategoriaVinculo.class.php" );
 
 $stPrograma = "ManterVeiculo";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -332,6 +334,47 @@ $obRdControleInternoNao->setValue    ( "false" );
 $obRdControleInternoNao->setChecked  (($boControleInterno == 'f'));
 $obRdControleInternoNao->setNull     ( false   );
 
+// TCERN - select para as categorias necessárias
+
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == '20') {
+
+    $obTTCERNCategoriaVeiculoTCE = new TTCERNCategoriaVeiculoTCE();
+    $obTTCERNCategoriaVeiculoTCE->recuperaTodos($rsCategoriaVeiculo);
+
+    if ($stAcao == 'alterar') {
+        $obTTCERNVeiculoCategoriaVinculo = new TTCERNVeiculoCategoriaVinculo();
+        $obTTCERNVeiculoCategoriaVinculo->recuperaTodos($rsCategoriaVinculo, " WHERE cod_veiculo = ".$rsVeiculo->getCampo('cod_veiculo'));
+    }
+
+    $obCmbCategoriaVeiculo = new Select();
+    $obCmbCategoriaVeiculo->setRotulo    ( 'Categoria do Veículo' );
+    $obCmbCategoriaVeiculo->setTitle     ( 'Selecione a categoria do veículo.' );
+    $obCmbCategoriaVeiculo->setName      ( 'inCategoriaVeiculo' );
+    $obCmbCategoriaVeiculo->setId        ( 'inCategoriaVeiculo' );
+    $obCmbCategoriaVeiculo->addOption    ( '','Selecione'  );
+    $obCmbCategoriaVeiculo->setCampoId   ( 'cod_categoria' );
+    $obCmbCategoriaVeiculo->setCampoDesc ( 'nom_categoria' );
+    $obCmbCategoriaVeiculo->preencheCombo( $rsCategoriaVeiculo );
+    
+    if ($rsCategoriaVinculo) {
+        $obCmbCategoriaVeiculo->setValue     ( $rsCategoriaVinculo->getCampo('cod_categoria') );
+    }
+
+    $obCmbCategoriaVeiculo->setNull      ( false );
+}
+
+$obSelectHabilitacao = new Select();
+$obSelectHabilitacao->setRotulo    ( 'Habilitação Exigida' );
+$obSelectHabilitacao->setTitle     ( 'Selecione a habilitação exigida pelo veículo.' );
+$obSelectHabilitacao->setName      ( 'slHabilitacao' );
+$obSelectHabilitacao->setId        ( 'slHabilitacao' );
+$obSelectHabilitacao->addOption    ( '','Selecione'  );
+$obSelectHabilitacao->setCampoId   ( 'cod_categoria' );
+$obSelectHabilitacao->setCampoDesc ( 'nom_categoria' );
+$obSelectHabilitacao->preencheCombo( $rsCategoriaHabilitacao );
+$obSelectHabilitacao->setValue     ( $rsVeiculo->getCampo('cod_categoria') );
+$obSelectHabilitacao->setNull      ( false );
+
 //instancia um textbox para a potencia
 $obTxtNumPassageiro = new Inteiro();
 $obTxtNumPassageiro->setRotulo( 'Número de Passageiros' );
@@ -354,6 +397,11 @@ $obTxtCapacidadeTanque->setValue( $rsVeiculo->getCampo('capacidade_tanque') );
 
 $obSpnResponsavel = new Span();
 $obSpnResponsavel->setId( 'spnResponsavel' );
+
+//span para a Locação de Veículos
+$obSpnLocacao = new Span();
+$obSpnLocacao->setId ( 'spnLocacao' );
+//$obSpnLocacao->setName ( 'spnLocacao' );
 
 /****
  * Controle de documentos
@@ -485,6 +533,14 @@ $obFormulario->addComponente( $obTxtCor );
 $obFormulario->addComponente( $obDtAquisicao );
 $obFormulario->addComponente( $obSelectHabilitacao );
 $obFormulario->agrupaComponentes( array( $obRdControleInternoSim, $obRdControleInternoNao) );
+$obFormulario->addSpan ( $obSpnLocacao );
+
+if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == '20') {
+
+    $obFormulario->addTitulo    ( 'Dados TCE-RN' );
+    $obFormulario->addComponente( $obCmbCategoriaVeiculo );
+
+}
 
 $obFormulario->addSpan      ( $obSpnResponsavel );
 
@@ -513,12 +569,12 @@ if ($stAcao == 'alterar') {
         $stOrigem = 'terceiro';
     }
     $jsOnLoad  = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodVeiculo=".$_REQUEST['inCodVeiculo']."&inCodMarca=".$rsVeiculo->getCampo('cod_marca')."&inCodModelo=".$rsVeiculo->getCampo('cod_modelo')."&stOrigem=".$rsVeiculo->getCampo('proprio')."&inCodEntidade=".$rsVeiculo->getCampo('cod_entidade')."&inCodUnidade=".$rsVeiculo->getCampo('num_unidade')."','montaAlterar');";
-    $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem=".$stOrigem."&inCodPropriedade=".$rsVeiculo->getCampo('cod_propriedade')."&stNomPropriedade=".$rsVeiculo->getCampo('nom_propriedade')."&stLocalizacao=".$rsVeiculo->getCampo('localizacao')."','montaOrigem' );";
+    $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem=".$stOrigem."&inCodPropriedade=".$rsVeiculo->getCampo('cod_propriedade')."&stNomPropriedade=".$rsVeiculo->getCampo('nom_propriedade')."&stLocalizacao=".$rsVeiculo->getCampo('localizacao')."&inCodVeiculo=".$rsVeiculo->getCampo('cod_veiculo')."','montaOrigem' );";
     $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem=".$stOrigem."&inCodResponsavel=".$rsVeiculo->getCampo('cod_responsavel')."&stNomResponsavel=".$rsVeiculo->getCampo('nom_responsavel')."&dtInicio=".$rsVeiculo->getCampo('dt_inicio')."','montaResponsavel');";
     if ( $rsVeiculo->getCampo('proprio') == 't' ) {
         $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodBem=".$rsVeiculo->getCampo('cod_propriedade')."','preencheDetalheBem');";
     } else { 
-        $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem=".$stOrigem."&inCodPropriedade=".$rsVeiculo->getCampo('cod_propriedade')."&stNomPropriedade=".$rsVeiculo->getCampo('nom_propriedade')."&stLocalizacao=".$rsVeiculo->getCampo('localizacao')."&stExercicioEntidade=".$rsVeiculo->getCampo('exercicio_entidade')."&inCodEntidade=".$rsVeiculo->getCampo('cod_entidade')."&inCodEntidade=".$rsVeiculo->getCampo('cod_entidade')."&inCodOrgao=".$rsVeiculo->getCampo('num_orgao')."&inCodUnidade=".$rsVeiculo->getCampo('num_unidade')."','montaOrigem' );";
+        $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem=".$stOrigem."&inCodPropriedade=".$rsVeiculo->getCampo('cod_propriedade')."&stNomPropriedade=".$rsVeiculo->getCampo('nom_propriedade')."&stLocalizacao=".$rsVeiculo->getCampo('localizacao')."&stExercicioEntidade=".$rsVeiculo->getCampo('exercicio_entidade')."&inCodEntidade=".$rsVeiculo->getCampo('cod_entidade')."&inCodEntidade=".$rsVeiculo->getCampo('cod_entidade')."&inCodOrgao=".$rsVeiculo->getCampo('num_orgao')."&inCodUnidade=".$rsVeiculo->getCampo('num_unidade')."&inCodVeiculo=".$rsVeiculo->getCampo('cod_veiculo')."','montaOrigem' );";
     }
     
     $jsOnLoad .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&slTipoVeiculo=".$rsVeiculo->getCampo('cod_tipo_veiculo')."&stNumPlaca=".$rsVeiculo->getCampo('placa_masc')."&stPrefixo=".$rsVeiculo->getCampo('prefixo')."','montaPrefixoPlaca');";

@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: RSP.csv.inc.php 61345 2015-01-08 19:26:58Z lisiane $
-  * $Date: 2015-01-08 17:26:58 -0200 (Qui, 08 Jan 2015) $
-  * $Author: lisiane $
-  * $Rev: 61345 $
+  * $Id: RSP.csv.inc.php 61577 2015-02-10 16:27:09Z franver $
+  * $Date: 2015-02-10 14:27:09 -0200 (Ter, 10 Fev 2015) $
+  * $Author: franver $
+  * $Rev: 61577 $
   *
 */
 /**
@@ -57,7 +57,7 @@ $obTTCEMGRestosPagar->setDado('dt_final'  , SistemaLegado::dataToSql($stDataFina
 
 //Tipo Registro 10
 $obTTCEMGRestosPagar->recuperaExportacao10($rsRecordSetRSP10);
-$obTTCEMGRestosPagar->debug();
+
 //Tipo Registro 11
 $obTTCEMGRestosPagar->recuperaExportacao11($rsRecordSetRSP11);
 

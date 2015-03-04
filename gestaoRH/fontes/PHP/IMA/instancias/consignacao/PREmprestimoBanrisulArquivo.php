@@ -55,8 +55,8 @@ $pgFormImp  = "FMImportar".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js";
 
 $stAcao = $request->get('stAcao');
-
 Sessao::setTrataExcecao(true);
+$obErro = new Erro();
 $obTIMAConsignacaoEmprestimoBanrisul = new TIMAConsignacaoEmprestimoBanrisul;
 $obTIMAConsignacaoEmprestimoBanrisulConfiguracao = new TIMAConsignacaoEmprestimoBanrisulConfiguracao;
 
@@ -161,7 +161,10 @@ if ($rsRodape->getNumLinhas() > 0) {
     }
     $obArquivo->addLinha($stRodape);
     $obErro = $obArquivo->Gravar();
+}else{
+    $obErro->setDescricao("Nenhum registro encontrado!");
 }
+
 if (!$obErro->ocorreu()) {
     $obArquivo->Show();
 } else {

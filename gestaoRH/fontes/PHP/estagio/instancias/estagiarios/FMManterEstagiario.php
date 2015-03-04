@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.07.01
 
-    $Id: FMManterEstagiario.php 60993 2014-11-27 17:32:39Z gelson $
+    $Id: FMManterEstagiario.php 61562 2015-02-05 13:03:54Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -482,7 +482,7 @@ $obMontaAtributos->setName       ( "Atributo_"  );
 $obMontaAtributos->setRecordSet  ( $rsAtributos );
 
 $obBtnOk = new Ok();
-$obBtnOk->obEvento->setOnClick("montaParametrosGET('_Salvar','inCodBancoTxt,stNumAgenciaTxt',true);");
+$obBtnOk->obEvento->setOnClick("montaParametrosGET('_Salvar','',true);");
 
 $obBtnLimpar = new Limpar();
 
@@ -549,8 +549,8 @@ $obIBuscaInnerLocal->geraFormulario($obFormulario);
 $obFormulario->addTitulo("Quadro de Horários");
 $obFormulario->addComponente($obCmbGradeHorario);
 $obFormulario->addSpan($obSpnTurnos);
-$obFormulario->addAba("Dados de Benefícios");
 
+$obFormulario->addAba("Dados de Benefícios");
 $obFormulario->addTitulo("Vale-Transporte");
 $obFormulario->agrupaComponentes(array($obRdoVTSim,$obRdoVTNao));
 $obFormulario->addSpan($obSpnVT);

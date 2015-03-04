@@ -109,8 +109,9 @@ function carregaItensBanco()
     $obTCompraDiretaHomologacao->setDado( "cod_entidade"  , $_REQUEST["inCodEntidade"]        );
     $obTCompraDiretaHomologacao->setDado( "exercicio", $_REQUEST["stExercicioCompraDireta"] );
 
-    $obTCompraDiretaHomologacao->recuperaItensComStatus( $rsItens );
-    
+    $stFiltro = "and julgamento_item.ordem = 1 \n";
+    $obTCompraDiretaHomologacao->recuperaItensComStatus( $rsItens, $stFiltro );
+
     $inId = $inHomologados = $inAutorizados = 0;
     $itensHomologacao = array();
 

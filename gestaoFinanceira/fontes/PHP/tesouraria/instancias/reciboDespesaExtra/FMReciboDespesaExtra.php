@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMReciboDespesaExtra.php 61419 2015-01-15 13:48:46Z lisiane $
+    $Id: FMReciboDespesaExtra.php 61703 2015-02-26 14:35:46Z arthur $
 
     * Casos de uso: uc-02.04.30
 */
@@ -149,12 +149,21 @@ $obFormulario->addComponente ( $obPopUpContaDespesa    );
 $obFormulario->addComponente ( $obTextValor            );
 $obFormulario->addComponente ( $obTextHistorico        );
 
+$stOnclickOkJs = " if ( Valida() ){
+                        document.frm.Ok.disabled = true;
+                        BloqueiaFrames(true,false);
+                        document.frm.submit();
+                   }";
+
 $obOk  = new Ok;
-$obOk->setId ("Ok");
-$obOk->obEvento->setOnClick("Salvar(); ");
+$obOk->setId   ("Ok");
+$obOk->setName ("Ok");
+$obOk->obEvento->setOnClick($stOnclickOkJs);
 
 $obLimpar = new Button;
 $obLimpar->setValue( "Limpar" );
+$obLimpar->setId   ( "limpar" );
+$obLimpar->setName ( "limpar" );
 $obLimpar->obEvento->setOnClick( "frm.reset(); frm.inCodEntidade.focus(); document.frm.Ok.disabled = false;" );
 
 $obMontaAssinaturas->geraFormulario ( $obFormulario );

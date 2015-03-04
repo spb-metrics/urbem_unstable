@@ -30,6 +30,8 @@
  * @author Analista: Heleno Santos
  * @author Desenvolvedor: Fellipe Esteves dos Santos
 
+ * $Id: TPPA.class.php 61668 2015-02-24 13:48:38Z michel $
+
  * Casos de uso: uc-02.09.01
  */
 
@@ -208,6 +210,46 @@ class TPPA extends TPPAUtils
         $stSQL .= "         ON acao.cod_programa = programa.cod_programa                \n";
 
         return $stSQL;
+    }
+    
+    function recuperaPPAHomolagacaoNorma(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stOrdem = ($stOrdem != "") ? " ORDER BY ".$stOrdem : $stOrdem;
+        $stSql = $this->montaRecuperaPPAHomolagacaoNorma().$stFiltro.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+    public function montaRecuperaPPAHomolagacaoNorma()
+    {
+        $stSql = "SELECT ppa.cod_ppa								                                                                                            \n";					    
+		$stSql.= "     , ppa.ano_inicio						                                                                                                    \n";						    
+		$stSql.= "     , ppa.ano_final    				                                                                                                        \n";      						    
+		$stSql.= "     , ppa.timestamp                                                                                                                          \n";   						    
+		$stSql.= "     , ppa.ano_inicio||' a '||ppa.ano_final AS periodo					                                                                    \n";
+		$stSql.= "     , ppa_publicacao.timestamp AS dt_homologacao				                                                                                \n";
+		$stSql.= "     , ppa_publicacao.cod_norma 				                                                                                                \n";
+		$stSql.= "     , tipo_norma.nom_tipo_norma||' '||LPAD(norma.num_norma, 6, '0')||'/'||norma.exercicio||' - '||norma.nom_norma AS descricao_norma 		\n";
+	    $stSql.= "  FROM ppa.ppa       							                                                                                                \n";		                
+	    $stSql.= "  JOIN ppa.ppa_publicacao						                                                                                                \n";					    
+ 		$stSql.= "    ON ppa_publicacao.cod_ppa = ppa.cod_ppa				                                                                                    \n";
+ 		$stSql.= "   AND ppa_publicacao.timestamp = (SELECT MAX(ppa_publicacao.timestamp) FROM ppa.ppa_publicacao WHERE ppa_publicacao.cod_ppa = ppa.cod_ppa)   \n";
+        if($this->getDado('exercicio'))
+            $stSql.= "   AND ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ppa.ano_final::INTEGER				                            \n";
+        else
+            $stSql.= "   AND ".Sessao::getExercicio()." BETWEEN ppa.ano_inicio::INTEGER AND ppa.ano_final::INTEGER				                                \n";
+	    $stSql.= "  JOIN normas.norma				                                                                                                            \n";
+ 		$stSql.= "    ON norma.cod_norma = ppa_publicacao.cod_norma				                                                                                \n";
+	    $stSql.= "  JOIN normas.tipo_norma				                                                                                                        \n";
+		$stSql.= "    ON tipo_norma.cod_tipo_norma = norma.cod_tipo_norma				                                                                        \n";
+ 		$stSql.= " WHERE ppa.fn_verifica_homologacao(ppa.cod_ppa) = TRUE          			                                                                    \n";
+
+        return $stSql;
     }
 
 }

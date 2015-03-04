@@ -65,7 +65,7 @@ $obTOrcamentoEntidade->setDado( 'exercicio'   , Sessao::getExercicio() );
 $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade = ".$_REQUEST['inCodEntidade'] );
 
 if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $preview->addParametro( 'nom_entidade', utf8_encode($rsEntidade->getCampo('nom_cgm')) );
+    $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 }
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));

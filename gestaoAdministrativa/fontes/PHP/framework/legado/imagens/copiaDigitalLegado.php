@@ -81,7 +81,7 @@ $dbEmp->fechaBD();
 <meta http-eqiv='Expires' content='10 mar 1967 09:00:00 GMT'>
 <script language="JavaScript1.2" type="text/javascript">
     var flag=false;
-    public function alertaAvisos(objeto,tipo,chamada)
+    function alertaAvisos(objeto,tipo,chamada)
     {
         var x = 400;
         var y = 300;
@@ -93,7 +93,7 @@ $dbEmp->fechaBD();
         eval(sAux);
     }
 
-    public function alertaQuestao(pagina,chave,valor,objeto,tipo)
+    function alertaQuestao(pagina,chave,valor,objeto,tipo)
     {
         var x = 400;
         var y = 300;
@@ -104,7 +104,8 @@ $dbEmp->fechaBD();
         var sAux = "window.open(sArq,'msga"+ sessaoid +"','width=300px,height=200px,resizable=1,scrollbars=0,left="+x+",top="+y+"');";
         eval(sAux);
     }
-    public function removeSelecionados()
+    
+    function removeSelecionados()
     {
         var combo = document.frm.arquivosAnexos;
         newList = new Array ( combo.options.length );
@@ -118,14 +119,14 @@ $dbEmp->fechaBD();
         document.frm.submit();
     }
 
-    public function submeter()
+    function submeter()
     {
         flag = true;
         document.frm.action = "<?=CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php';?>?<?=Sessao::getId()?>&ctrl=1&codDoc=<?=$codDoc;?>&acao=<?=Sessao::read('acao')?>";
         document.frm.submit();
     }
 
-    public function exclusao(arq)
+    function exclusao(arq)
     {
         flag = true;
         document.frm.action = "<?=CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php';?>?<?=Sessao::getId()?>&ctrl=2&file="+arq+"&codDoc=<?=$codDoc;?>";
@@ -133,7 +134,7 @@ $dbEmp->fechaBD();
         document.frm.submit();
     }
 
-    public function finalizar()
+    function finalizar()
     {
         flag = true;
         document.frm.action = "<?=CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php';?>?<?=Sessao::getId()?>&ctrl=3&codDoc=<?=$codDoc?>";
@@ -254,12 +255,12 @@ switch ($ctrl) {
                 $arqName = explode(".", $arquivo_modificado);
 
                 $arq = substr(Sessao::getId(),10,6);
-                $docDigital['name'] = $codDoc."_".$arq."_".$arqName[0]."_".date("d-m-Y-H-i-s", time()).".jpg";
+                $docDigital['name'] = $codDoc."_".$arq."_".date("d-m-Y-H-i-s", time())."§".$arqName[0].".jpg";
 
-                 if ($docDigital['type'] <> 'image/jpeg') {
+                if ($docDigital['type'] <> 'image/jpeg') {
                     $erros++;
                     $errors = $errors."O Arquivo precisa ser JPG";
-                  }
+                }
 
                 if ($docDigital['size'] > 1000000) {
                     $erros++;
@@ -274,11 +275,17 @@ switch ($ctrl) {
                 if ($erros == 0) {
 
                     $pasta = CAM_PROTOCOLO."tmp/".$dirSession;
-                    mkdir($pasta, 0777);
-
+                    
+                    if (!is_dir($pasta)) {
+                        mkdir($pasta, 0777);
+                    }
+                    
                     $pasta = CAM_PROTOCOLO."tmp/".$dirSession."/".$codDoc;
-                    mkdir($pasta,0777);
 
+                    if (!is_dir($pasta)) {
+                        mkdir($pasta,0777);
+                    }
+                    
                     $pasta = $pasta."/".$docDigital['name'];
 
                     copy($docDigital['tmp_name'], $pasta);
@@ -297,6 +304,8 @@ switch ($ctrl) {
                         </script>';
                 }
             }
+
+            # No images
             if ($imagem == "f") {
                 $arqName = explode(".", $docDigital['name']);
 
@@ -308,7 +317,7 @@ switch ($ctrl) {
                 $arqName = explode(".", $arquivo_modificado);
 
                 $arq = substr(Sessao::getId(),10,6);
-                $docDigital['name'] = $codDoc."_".$arq."_".$arqName[0]."_".date("d-m-Y-H-i-s", time()).".".$arqName[1];
+                $docDigital['name'] = $codDoc."_".$arq."_".date("d-m-Y-H-i-s", time())."§".$arqName[0].".".$arqName[1];
 
                 if ($docDigital['size'] > 1000000) {
                     $erros++;
@@ -322,14 +331,19 @@ switch ($ctrl) {
 
                 if ($erros == 0) {
                     $pasta = CAM_PROTOCOLO."tmp/".$dirSession;
-                                        if (!file_exists ( $pasta )) {
-                                            mkdir($pasta, 0777);
-                                        }
+
+                    if (!file_exists ( $pasta )) {
+                        mkdir($pasta, 0777);
+                    }
+
                     $pasta = CAM_PROTOCOLO."tmp/".$dirSession."/".$codDoc;
-                                        if (!file_exists ( $pasta )) {
-                                            mkdir($pasta, 0777);
-                                        }
+
+                    if (!file_exists ( $pasta )) {
+                        mkdir($pasta, 0777);
+                    }
+
                     $pasta = $pasta."/".$docDigital['name'];
+
                     copy($docDigital['tmp_name'], $pasta);
                     $controlaTumb = 1 ;
                     unset($ctrl);

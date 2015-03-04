@@ -282,84 +282,150 @@ class TTCEMGAOC extends Persistente
 
     public function montaRecuperaDadosAOC12()
     {
-        $stSql  = " SELECT
-                        '12' AS tiporegistro
-                        ,LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto
-                        ,(SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 103) AS nroleialteracao
-                        ,REPLACE((SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 104), '/', '') AS dataleialteracao
-                        , SUBSTR(descricao,0,4) as tpleiorigdecreto
-                        , tipo_lei_alteracao_orcamentaria as tipoleialteracao
-                        , valor as valorabertolei
-                    FROM (                                                                      
-                       SELECT
-                            TO_CHAR(norma.dt_assinatura,'ddmmyyyy') as data
-                            ,norma.num_norma
-                            ,norma.cod_norma
-                            ,tipo_transferencia.nom_tipo as tipo_suplementacao
-                            ,tipo_transferencia.cod_tipo                                 
-                            ,suplementacao_suplementada.valor
-                            ,despesa.cod_entidade
-                            ,suplementacao.cod_suplementacao
-                            ,suplementacao.exercicio
-                            ,CASE                                                               
-                               WHEN suplementacao_anulada.cod_suplementacao IS NOT NULL THEN 'anulada'          
-                               ELSE 'valida'                                                   
-                            END as situacao
-                            ,tipo_lei_origem_decreto.descricao
-                            ,norma_detalhe.tipo_lei_alteracao_orcamentaria
-                                                                                
-                        FROM orcamento.suplementacao 
-                        
-                    LEFT JOIN orcamento.suplementacao_anulada
-                          ON suplementacao.exercicio          = suplementacao_anulada.exercicio                         
-                         AND suplementacao.cod_suplementacao  = suplementacao_anulada.cod_suplementacao                        
+        
+        if(Sessao::getExercicio() >= 2015) {
+            $stSql  = " SELECT
+                            '12' AS tiporegistro
+                            ,LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto
+                            ,(SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 103) AS nroleialteracao
+                            ,REPLACE((SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 104), '/', '') AS dataleialteracao
+                            , SUBSTR(descricao,0,4) as tpleiorigdecreto
+                            , tipo_lei_alteracao_orcamentaria as tipoleialteracao
+                            , SUM(valor) as valorabertolei
+                        FROM (                                                                      
+                           SELECT
+                                TO_CHAR(norma.dt_assinatura,'ddmmyyyy') as data
+                                ,norma.num_norma
+                                ,norma.cod_norma
+                                ,tipo_transferencia.nom_tipo as tipo_suplementacao
+                                ,tipo_transferencia.cod_tipo                                 
+                                ,suplementacao_suplementada.valor
+                                ,despesa.cod_entidade
+                                ,suplementacao.cod_suplementacao
+                                ,suplementacao.exercicio
+                                ,CASE                                                               
+                                   WHEN suplementacao_anulada.cod_suplementacao IS NOT NULL THEN 'anulada'          
+                                   ELSE 'valida'                                                   
+                                END as situacao
+                                ,tipo_lei_origem_decreto.descricao
+                                ,norma_detalhe.tipo_lei_alteracao_orcamentaria
+                                                                                    
+                            FROM orcamento.suplementacao 
                             
-                    JOIN contabilidade.tipo_transferencia
-                           ON tipo_transferencia.cod_tipo  = suplementacao.cod_tipo                              
-                          AND tipo_transferencia.exercicio = suplementacao.exercicio                             
-                  
-                    JOIN orcamento.suplementacao_suplementada                                                                       
-                          ON suplementacao.cod_suplementacao  = suplementacao_suplementada.cod_suplementacao                     
-                         AND suplementacao.exercicio          = suplementacao_suplementada.exercicio                             
-                  
-                    JOIN orcamento.despesa                                                                    
-                          ON suplementacao_suplementada.cod_despesa = despesa.cod_despesa                           
-                         AND suplementacao_suplementada.exercicio   = despesa.exercicio                             
-                  
-                    JOIN contabilidade.transferencia_despesa                                   
-                         ON transferencia_despesa.cod_tipo          = suplementacao.cod_tipo
-                        AND transferencia_despesa.cod_suplementacao = suplementacao.cod_suplementacao
-                        AND transferencia_despesa.exercicio         = suplementacao.exercicio
-                        AND transferencia_despesa.cod_tipo          <> 16                   
-                  
-                    JOIN normas.norma                                                          
-                         ON suplementacao.cod_norma = norma.cod_norma
-                  
-                    LEFT JOIN tcemg.norma_detalhe
-                        ON norma_detalhe.cod_norma = norma.cod_norma
-
-                    LEFT JOIN tcemg.tipo_lei_origem_decreto
-                        ON  tipo_lei_origem_decreto.cod_tipo_lei = norma_detalhe.tipo_lei_origem_decreto
-
-                    WHERE suplementacao.exercicio          = '".$this->getDado('exercicio')."'        
-                    AND suplementacao.dt_suplementacao >= to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')                  
-                    AND suplementacao.dt_suplementacao <= to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')                    
-                    AND transferencia_despesa.cod_entidade IN (".$this->getDado('entidade').")
-                ) AS tabela
-                  
-                WHERE
-                    tabela.situacao = 'valida'                      
-                GROUP BY
-                    tabela.num_norma
-                    ,nroleialteracao
-                    ,dataleialteracao
-                    ,codreduzidodecreto
-                    ,descricao 
-                    ,tipo_lei_alteracao_orcamentaria 
-                    ,valor
-                ORDER BY                                                                   
-                    tabela.num_norma
-        ";
+                        LEFT JOIN orcamento.suplementacao_anulada
+                              ON suplementacao.exercicio          = suplementacao_anulada.exercicio                         
+                             AND suplementacao.cod_suplementacao  = suplementacao_anulada.cod_suplementacao                        
+                                
+                        JOIN contabilidade.tipo_transferencia
+                               ON tipo_transferencia.cod_tipo  = suplementacao.cod_tipo                              
+                              AND tipo_transferencia.exercicio = suplementacao.exercicio                             
+                      
+                        JOIN orcamento.suplementacao_suplementada                                                                       
+                              ON suplementacao.cod_suplementacao  = suplementacao_suplementada.cod_suplementacao                     
+                             AND suplementacao.exercicio          = suplementacao_suplementada.exercicio                             
+                      
+                        JOIN orcamento.despesa                                                                    
+                              ON suplementacao_suplementada.cod_despesa = despesa.cod_despesa                           
+                             AND suplementacao_suplementada.exercicio   = despesa.exercicio                             
+                      
+                        JOIN contabilidade.transferencia_despesa                                   
+                             ON transferencia_despesa.cod_tipo          = suplementacao.cod_tipo
+                            AND transferencia_despesa.cod_suplementacao = suplementacao.cod_suplementacao
+                            AND transferencia_despesa.exercicio         = suplementacao.exercicio
+                            AND transferencia_despesa.cod_tipo          <> 16                   
+                      
+                        JOIN normas.norma                                                          
+                             ON suplementacao.cod_norma = norma.cod_norma
+                      
+                        JOIN tcemg.norma_detalhe
+                            ON norma_detalhe.cod_norma = norma.cod_norma
+    
+                        LEFT JOIN tcemg.tipo_lei_origem_decreto
+                            ON  tipo_lei_origem_decreto.cod_tipo_lei = norma_detalhe.tipo_lei_origem_decreto
+    
+                        WHERE suplementacao.exercicio          = '".$this->getDado('exercicio')."'        
+                        AND suplementacao.dt_suplementacao >= to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')                  
+                        AND suplementacao.dt_suplementacao <= to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')                    
+                        AND transferencia_despesa.cod_entidade IN (".$this->getDado('entidade').")
+                    ) AS tabela
+                      
+                    WHERE
+                        tabela.situacao = 'valida'                      
+                    GROUP BY
+                        tabela.num_norma
+                        ,nroleialteracao
+                        ,dataleialteracao
+                        ,codreduzidodecreto
+                        ,descricao 
+                        ,tipo_lei_alteracao_orcamentaria                     
+                    ORDER BY                                                                   
+                        tabela.num_norma";
+        } else {
+             $stSql  = " SELECT
+                            '12' AS tiporegistro,
+                            LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto,
+                            (SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 103) AS nroleialteracao,
+                            REPLACE((SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 104), '/', '') AS dataleialteracao
+                              
+                           FROM (                                                                      
+                               SELECT
+                                TO_CHAR(norma.dt_assinatura,'ddmmyyyy') as data,                
+                                norma.num_norma,
+                                norma.cod_norma,
+                                tipo_transferencia.nom_tipo as tipo_suplementacao,
+                                tipo_transferencia.cod_tipo,                                                      
+                                suplementacao_suplementada.valor,                      
+                                despesa.cod_entidade,
+                                suplementacao.cod_suplementacao, 
+                                suplementacao.exercicio,
+                                CASE                                                               
+                                   WHEN suplementacao_anulada.cod_suplementacao IS NOT NULL THEN 'anulada'          
+                                   ELSE 'valida'                                                   
+                                END as situacao
+                                                        
+                            FROM orcamento.suplementacao 
+                            
+                           LEFT JOIN orcamento.suplementacao_anulada
+                              ON suplementacao.exercicio          = suplementacao_anulada.exercicio                         
+                             AND suplementacao.cod_suplementacao  = suplementacao_anulada.cod_suplementacao                        
+                                
+                           INNER JOIN contabilidade.tipo_transferencia
+                               ON tipo_transferencia.cod_tipo  = suplementacao.cod_tipo                              
+                              AND tipo_transferencia.exercicio = suplementacao.exercicio                             
+                          
+                          INNER JOIN orcamento.suplementacao_suplementada                                                                       
+                              ON suplementacao.cod_suplementacao  = suplementacao_suplementada.cod_suplementacao                     
+                             AND suplementacao.exercicio          = suplementacao_suplementada.exercicio                             
+                          
+                          INNER JOIN orcamento.despesa                                                                    
+                              ON suplementacao_suplementada.cod_despesa = despesa.cod_despesa                           
+                             AND suplementacao_suplementada.exercicio   = despesa.exercicio                             
+                          
+                          INNER JOIN contabilidade.transferencia_despesa                                   
+                             ON transferencia_despesa.cod_tipo          = suplementacao.cod_tipo
+                            AND transferencia_despesa.cod_suplementacao = suplementacao.cod_suplementacao
+                            AND transferencia_despesa.exercicio         = suplementacao.exercicio
+                            AND transferencia_despesa.cod_tipo          <> 16                   
+                          
+                          INNER JOIN normas.norma                                                          
+                             ON suplementacao.cod_norma = norma.cod_norma
+    
+                        WHERE suplementacao.exercicio          = '".$this->getDado('exercicio')."'        
+                        AND suplementacao.dt_suplementacao >= to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')                  
+                        AND suplementacao.dt_suplementacao <= to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')                    
+                        AND transferencia_despesa.cod_entidade IN (".$this->getDado('entidade').")
+                    ) AS tabela
+                      
+                      WHERE
+                            tabela.situacao = 'valida'                      
+                   GROUP BY                                                                                                                            
+                         tabela.num_norma,
+                         nroleialteracao,
+                         dataleialteracao,
+                         codreduzidodecreto
+                   ORDER BY                                                                   
+                         tabela.num_norma ";
+        }
         return $stSql;
     }
     
@@ -381,7 +447,7 @@ class TTCEMGAOC extends Persistente
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
         $stSql = $this->montaRecuperaDadosAOC13().$stCondicao.$stOrdem;
-        $this->setDebug( $stSql );
+        $this->setDebug( $stSql );        
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;
@@ -488,7 +554,7 @@ class TTCEMGAOC extends Persistente
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
         $stSql = $this->montaRecuperaDadosAOC14().$stCondicao.$stOrdem;
-        $this->setDebug( $stSql );
+        $this->setDebug( $stSql );        
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;
@@ -500,7 +566,7 @@ class TTCEMGAOC extends Persistente
                             tabela.dt_suplementacao
                             ,'14' AS tiporegistro
                             ,LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto
-                            , origemRecAlteracao as origemrecAlteracao
+                            , origemrecalteracao as origemrecalteracao
                             ,LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = tabela.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0') AS codorgao
                             ,LPAD(lpad(tabela.num_orgao::VARCHAR, 2, '0')||LPAD(tabela.num_unidade::VARCHAR, 2, '0'),5,'0') AS codunidadesub
                             ,tabela.cod_funcao AS codfuncao
@@ -539,7 +605,8 @@ class TTCEMGAOC extends Persistente
                                 WHEN 13 THEN '03'
                                 WHEN 14 THEN '03'
                                 WHEN 15 THEN '03'
-                            END AS origemRecAlteracao
+                                ELSE '98'                                
+                            END AS origemrecalteracao
                             ,uniorcam.num_orgao
                             ,uniorcam.num_unidade
                             ,funcao.cod_funcao
@@ -657,7 +724,7 @@ class TTCEMGAOC extends Persistente
                         tabela.dt_suplementacao
                         ,'14' AS tiporegistro
                         ,LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto
-                        , origemRecAlteracao as origemeecalteracao
+                        , origemrecalteracao as origemrecalteracao
                         ,LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = tabela.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0') AS codorgao
                         ,LPAD(lpad(tabela.num_orgao::VARCHAR, 2, '0')||LPAD(tabela.num_unidade::VARCHAR, 2, '0'),5,'0') AS codunidadesub
                         ,tabela.cod_funcao AS codfuncao
@@ -696,7 +763,8 @@ class TTCEMGAOC extends Persistente
                                 WHEN 13 THEN '03'
                                 WHEN 14 THEN '03'
                                 WHEN 15 THEN '03'
-                            END AS origemRecAlteracao
+                                ELSE '98'
+                            END AS origemrecalteracao
                             ,uniorcam.num_orgao
                             ,uniorcam.num_unidade
                             ,funcao.cod_funcao

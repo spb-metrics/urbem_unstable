@@ -27,7 +27,7 @@
     *
     * @author: Lisiane Morais
     *
-    * $Id:$
+    * $Id: TTCEALAtivoPermanente.class.php 61572 2015-02-09 16:23:27Z michel $
     *
     * @ignore
     *
@@ -97,37 +97,49 @@ class TTCEALAtivoPermanente extends Persistente
                             , bem.descricao
                             , bem.num_placa AS num_tombamento
                             , CASE WHEN bem_comprado.cod_empenho::VARCHAR  <> '' THEN
-                                        TO_CHAR(dt_empenho,'yyyymm')||bem_comprado.cod_empenho::VARCHAR
+                                        COALESCE(TO_CHAR(empenho.dt_empenho,'yyyymm'),'')||bem_comprado.cod_empenho::VARCHAR
                                     ELSE 
-                                        ''::VARCHAR
+                                        '9999010000001'::VARCHAR
                               END AS num_empenho
                             , TO_CHAR(bem.dt_aquisicao,'dd/mm/yyyy') AS data_inscricao 
-			    , bem_comprado.nota_fiscal AS numero_documento_fiscal
-			    , TO_CHAR(bem_comprado.data_nota_fiscal,'dd/mm/yyyy') AS data_doc_fiscal
-			    , CASE WHEN (bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal IS NOT NULL) THEN
-			                bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal
-			           ELSE 4
-			       END AS tipo_documento_fiscal
-			    , bem.vl_bem AS valor_bem
-			    , local.descricao AS setor
-			    , REPLACE(estrutural.cod_estrutural, '.','') AS  cod_estrutural
+                            , CASE WHEN TRIM(bem_comprado.nota_fiscal) <> '' THEN
+                                        bem_comprado.nota_fiscal
+                                    ELSE
+                                        '00'
+                              END AS numero_documento_fiscal
+                            , CASE WHEN TO_CHAR(bem_comprado.data_nota_fiscal,'dd/mm/yyyy') <> '' THEN
+                                        TO_CHAR(bem_comprado.data_nota_fiscal,'dd/mm/yyyy')
+                                    ELSE
+                                        '01/01/9999'
+                              END AS data_doc_fiscal
+                            , CASE WHEN (bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal IS NOT NULL) THEN
+                                        bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal
+                                    ELSE 4
+                              END AS tipo_documento_fiscal
+                            , bem.vl_bem AS valor_bem
+                            , local.descricao AS setor
+                            , CASE WHEN TRIM(estrutural.cod_estrutural) <> '' THEN
+                                        REPLACE(estrutural.cod_estrutural, '.','')
+                                    ELSE
+                                        '00000000000000000'
+                              END AS cod_estrutural
                             , historico_bem.cod_situacao AS estado_bem
 			    , CASE 
 			         WHEN (depreciacao.cod_bem = bem_comprado.cod_bem) THEN 2
+                     WHEN (reavaliacao.cod_bem = bem_comprado.cod_bem) THEN 6
+                     WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa = 1 OR tipo_baixa = 2) THEN 10
+                     WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa != 1 OR tipo_baixa != 2) THEN 11
 			         WHEN (bem.dt_incorporacao BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
                                                                        AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy') ) THEN 5
-			         WHEN (reavaliacao.cod_bem = bem_comprado.cod_bem) THEN 6 
-			         WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa = 1 OR tipo_baixa = 2) THEN 10
-			         WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa != 1 OR tipo_baixa != 2) THEN 11
 			         ELSE 01
 			     END AS alteracao_bem
 		            , CASE 
 			         WHEN (depreciacao.cod_bem = bem_comprado.cod_bem) THEN depreciacao.dt_depreciacao
-			         WHEN (bem.dt_incorporacao BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
-                                                                       AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy' )) THEN bem.dt_incorporacao
-			         WHEN (reavaliacao.cod_bem = bem_comprado.cod_bem) THEN reavaliacao.dt_reavaliacao
+                     WHEN (reavaliacao.cod_bem = bem_comprado.cod_bem) THEN reavaliacao.dt_reavaliacao
 			         WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa = 1 OR tipo_baixa = 2) THEN dt_baixa
 			         WHEN (bem_baixado.cod_bem = bem_comprado.cod_bem AND tipo_baixa != 1 OR tipo_baixa != 2) THEN dt_baixa
+			         WHEN (bem.dt_incorporacao BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                                       AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy' )) THEN bem.dt_incorporacao
 			      END AS dt_alteracao
 			    , CASE 
 			         WHEN (depreciacao.cod_bem = bem_comprado.cod_bem) THEN depreciacao.vl_depreciado			    
@@ -239,10 +251,10 @@ class TTCEALAtivoPermanente extends Persistente
                                 FROM patrimonio.reavaliacao
                                WHERE reavaliacao.dt_reavaliacao BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
                                                                        AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                                 AND reavaliacao.cod_reavaliacao = (SELECT max(cod_reavaliacao) 
+                                 /*AND reavaliacao.cod_reavaliacao = (SELECT max(cod_reavaliacao) 
                                                                       FROM patrimonio.reavaliacao AS PR 
                                                                      WHERE PR.dt_reavaliacao BETWEEN to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
-                                                                       AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy') ) 
+                                                                       AND to_date('".$this->getDado('dt_final')."','dd/mm/yyyy') ) */
                             ) AS reavaliacao
                           ON reavaliacao.cod_bem = bem.cod_bem
                           

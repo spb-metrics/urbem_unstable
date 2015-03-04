@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: LSManterProcessoLicitatorio.php 60189 2014-10-06 13:31:59Z carolina $
+    $Id: LSManterProcessoLicitatorio.php 61721 2015-02-27 16:19:16Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -111,7 +111,7 @@ if ($_REQUEST['stExercicioLicitacao'])
 if ($_REQUEST['stChaveProcesso']) {
     $arProcesso = explode ('/',$_REQUEST['stChaveProcesso']);
     $obTLicitacaoLicitacao->setDado('cod_processo',$arProcesso[0]);
-    $obTLicitacaoLicitacao->setDado('exercicio_processo', "'".$arProcesso[1]."'");
+    $obTLicitacaoLicitacao->setDado('exercicio_processo', $arProcesso[1]);
 }
 
 if ($_REQUEST['inPeriodicidade'] != "") {
@@ -163,7 +163,6 @@ if ($stAcao == 'consultar') {
 }
 
 $obTLicitacaoLicitacao->recuperaLicitacao($rsLicitacao,$stFiltro, $stOrder);
-
 $stFiltro = $stLink = "";
 
 $stLink .= "&stAcao=".$stAcao;

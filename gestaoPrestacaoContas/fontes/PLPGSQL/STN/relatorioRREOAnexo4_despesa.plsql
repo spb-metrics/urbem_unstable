@@ -35,7 +35,7 @@
 
     * Casos de uso : uc-06.01.04
 
-    $Id: relatorioRREOAnexo4_despesa.plsql 61129 2014-12-10 17:04:54Z evandro $
+    $Id: relatorioRREOAnexo4_despesa.plsql 61499 2015-01-26 19:45:57Z evandro $
 */
 
 CREATE OR REPLACE FUNCTION stn.fn_rreo_anexo4_despesas(varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
@@ -160,12 +160,12 @@ BEGIN
                   , conta_despesa.cod_estrutural
                   , sum(tmp_despesa_lib.vl_original) as vl_original
                   , (coalesce(sum(tmp_despesa_lib.vl_original),0.00)) + (coalesce(sum(tmp_despesa_lib.vl_credito_adicional),0.00))  as vl_suplementacoes 
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(stDataInicial)       || ', ' || quote_literal(stDataFinal)     || ', false )), 0.00) AS vl_empenhado_bimestre
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAno)         || ', ' || quote_literal(stDataFinal)     || ', false )), 0.00) AS vl_empenhado_ate_bimestre
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicioAnterior) || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAnoAnterior) || ', ' || quote_literal(dtFinalAnterior) || ', false )), 0.00) AS vl_empenhado_ate_bimestre_anterior
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(stDataInicial)       || ', ' || quote_literal(stDataFinal)     || ', false )), 0.00) AS vl_liquidado_bimestre
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAno)         || ', ' || quote_literal(stDataFinal)     || ', false )), 0.00) AS vl_liquidado_ate_bimestre
-                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicioAnterior) || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAnoAnterior) || ', ' || quote_literal(dtFinalAnterior) || ', false )), 0.00) AS vl_liquidado_ate_bimestre_anterior
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(stDataInicial)       || ', ' || quote_literal(stDataFinal)     || ', true )), 0.00) AS vl_empenhado_bimestre
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAno)         || ', ' || quote_literal(stDataFinal)     || ', true )), 0.00) AS vl_empenhado_ate_bimestre
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicioAnterior) || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAnoAnterior) || ', ' || quote_literal(dtFinalAnterior) || ', true )), 0.00) AS vl_empenhado_ate_bimestre_anterior
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(stDataInicial)       || ', ' || quote_literal(stDataFinal)     || ', true )), 0.00) AS vl_liquidado_bimestre
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicio)         || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAno)         || ', ' || quote_literal(stDataFinal)     || ', true )), 0.00) AS vl_liquidado_ate_bimestre
+                  , COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada( publico.fn_mascarareduzida(conta_despesa.cod_estrutural), ' || quote_literal(stExercicioAnterior) || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(dtInicioAnoAnterior) || ', ' || quote_literal(dtFinalAnterior) || ', true )), 0.00) AS vl_liquidado_ate_bimestre_anterior
                   
                   --Calcula os restos nao processados do exercicio anterior
                   , COALESCE((SELECT * FROM stn.fn_rreo_anexo4_despesas_restos_nao_processados(' || quote_literal(stExercicio) || ', ' || quote_literal(stCodEntidades) || ', ' || quote_literal(stDataFinal) || ', conta_despesa.cod_estrutural, ''nao_processados_exercicio_anterior'')),0.00) AS vl_restos_nao_processados_exercicio_anterior
@@ -176,24 +176,21 @@ BEGIN
             LEFT JOIN   orcamento.conta_despesa
                     ON  conta_despesa.cod_conta = despesa.cod_conta
                     AND conta_despesa.exercicio = despesa.exercicio
-            LEFT JOIN orcamento.funcao
-                   ON   funcao.exercicio = despesa.exercicio 
-                   AND  funcao.cod_funcao = despesa.cod_funcao
+            
             
             LEFT JOIN tmp_despesa_lib
                    ON tmp_despesa_lib.exercicio    = despesa.exercicio 
                   AND tmp_despesa_lib.cod_despesa  = despesa.cod_despesa 
                        
             where despesa.exercicio = ' || quote_literal(stExercicio) || '
-                and despesa.cod_entidade IN (' || stCodEntidades || ') 
-                --and despesa.cod_funcao IN (4,9)
-                and (conta_despesa.cod_estrutural ilike ''3.%''
-                     or conta_despesa.cod_estrutural ilike ''4.%''
-                     or conta_despesa.cod_estrutural ilike ''9.%''
-                     or conta_despesa.cod_estrutural ilike ''7.%'')
-                --and conta_despesa.cod_estrutural not ilike ''%.9.1.%''
-            group by    funcao.descricao, conta_despesa.cod_estrutural, conta_despesa.descricao
-            order by    funcao.descricao, conta_despesa.cod_estrutural    
+                and despesa.cod_entidade IN (' || stCodEntidades || ')                 
+                -- and (conta_despesa.cod_estrutural ilike ''3.%''
+                --      or conta_despesa.cod_estrutural ilike ''4.%''
+                --      or conta_despesa.cod_estrutural ilike ''9.%''
+                --      or conta_despesa.cod_estrutural ilike ''7.%'')
+                
+            group by    conta_despesa.cod_estrutural, conta_despesa.descricao
+            order by    conta_despesa.cod_estrutural    
         ) '; 
 
         EXECUTE stSql;

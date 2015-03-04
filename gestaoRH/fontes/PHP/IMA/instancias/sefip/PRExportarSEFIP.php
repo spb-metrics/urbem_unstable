@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.03
 
-    $Id: PRExportarSEFIP.php 61106 2014-12-09 13:25:55Z dagiane $
+    $Id: PRExportarSEFIP.php 61727 2015-02-27 17:00:59Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -70,7 +70,8 @@ $obTCGMPessoaJuridica                           = new TCGMPessoaJuridica();
 
 $stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
 $arSessaoLink = Sessao::read('link');
-$stLink = "&pg=".$arSessaoLink["pg"]."&pos=".$arSessaoLink["pos"];
+if ( !empty($arSessaoLink) )
+    $stLink = "&pg=".$arSessaoLink["pg"]."&pos=".$arSessaoLink["pos"];
 
 foreach ($_POST as $key=>$value) {
     $stLink .= $key."=".$value."&";
@@ -595,7 +596,7 @@ switch ($stAcao) {
             }
 
             if (Sessao::getEntidade() == '') {
-                $obTPessoalContratoServidor->setDado("entidade","''" );
+                $obTPessoalContratoServidor->setDado("entidade","" );
             } else {
                 $obTPessoalContratoServidor->setDado("entidade",Sessao::getEntidade() );
             }

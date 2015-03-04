@@ -70,13 +70,13 @@ default:
             //Consulta
 
             $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
-            $stFiltro .= " AND e.exercicio    = ".$stExercicio.              "\n";
+            $stFiltro .= " AND e.exercicio    = '".$stExercicio."'  \n";
 
             if ($_REQUEST['inCodEntidadeEmpenho'] != "") {
                 $stFiltro .= " AND e.cod_entidade = ".$_REQUEST['inCodEntidadeEmpenho']. "\n";
             }
             if ($_REQUEST['inCodEmpenho']) {
-                $stFiltro .= " AND e.cod_empenho = " . $inCodEmpenho . "\n";
+                $stFiltro .= " AND e.cod_empenho = ".$inCodEmpenho." \n";
             }
 
             $stFiltro .= " AND  pe.cod_estrutural LIKE '4.4.9.0.51.%' ";
@@ -84,6 +84,7 @@ default:
             $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenhoObras($rsEmpenho, $stFiltro);
 
             break;
+        
         default:
             require_once( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php" );
             $obRegra = new REmpenhoEmpenho;

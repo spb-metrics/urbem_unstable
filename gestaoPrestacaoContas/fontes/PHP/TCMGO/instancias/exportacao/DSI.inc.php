@@ -30,20 +30,18 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
     
     $obTMapeamento = new TTGODSI();
     
-    $obTMapeamento->setDado('exercicio', Sessao::getExercicio());
-    $obTMapeamento->setDado('dtInicio', $arFiltroRelatorio['stDataInicial']);
-    $obTMapeamento->setDado('dtFim', $arFiltroRelatorio['stDataFinal']);
-    $obTMapeamento->setDado('entidades',$stEntidades);
+    $obTMapeamento->setDado('exercicio' , Sessao::getExercicio());
+    $obTMapeamento->setDado('dtInicio'  , $arFiltroRelatorio['stDataInicial']);
+    $obTMapeamento->setDado('dtFim'     , $arFiltroRelatorio['stDataFinal']);
+    $obTMapeamento->setDado('entidades' , $stEntidades);
     
     $obTMapeamento->recuperaDetalhamento10($rsDetalhamento);
     $obTMapeamento->recuperaDetalhamento11($rsResponsaveis);
     $obTMapeamento->recuperaDetalhamento12($rsPesquisa);
     $obTMapeamento->recuperaDetalhamento13($rsRecurso);
     $obTMapeamento->recuperaDetalhamento14($rsFornecedor);
+    $obTMapeamento->recuperaDetalhamento15($rsCredenciado);
     
-    // O Registro 15 ainda não existe
-    //$obTMapeamento->recuperaDetalhamento15($rsCredenciado);
-
     $inCount = 0;
     
     // Registro 10 - Detalhamento da Dispensa ou da Inexigibilidade
@@ -272,7 +270,7 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
             $stKey13 = $stChaveRecurso['cod_orgao'] . $stChaveRecurso['cod_unidade'] . $stChaveRecurso['num_processo'] . $stChaveRecurso['ano_exercicio_processo'] . $stChaveRecurso['tipo_processo']; //. $stChaveRecurso['cod_funcao'] . $stChaveRecurso['cod_subfuncao'] . $stChaveRecurso['cod_programa'] . $stChaveRecurso['natureza_acao'] . $stChaveRecurso['num_proj_ativ'] . $stChaveRecurso['elemento_despesa'] . $stChaveRecurso['subelemento'] . $stChaveRecurso['cod_fonte_recurso'];
             
             if ($stKey13 === $stKey) {
-                $arEmpenhoContrato['numero_sequencial'] = ++$inCount;
+                $stChaveRecurso['numero_sequencial'] = ++$inCount;
                 $rsBloco = 'rsBloco_' . $inCount;
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
@@ -355,8 +353,8 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
         foreach ($rsFornecedor->arElementos as $stChaveFornecedor) {
             $stKey14 = $stChaveFornecedor['cod_orgao'] . $stChaveFornecedor['cod_unidade'] . $stChaveFornecedor['num_processo'] . $stChaveFornecedor['ano_exercicio_processo'] . $stChaveFornecedor['tipo_processo']; //. $stChaveFornecedor['tipo_documento'] . $stChaveFornecedor['num_documento'] . $stChaveFornecedor['num_lote'] . $stChaveFornecedor['num_item'];
             
-            if ($stKey13 === $stKey) {
-                $arEmpenhoContrato['numero_sequencial'] = ++$inCount;
+            if ($stKey14 === $stKey) {
+                $stChaveFornecedor['numero_sequencial'] = ++$inCount;
                 $rsBloco = 'rsBloco_' . $inCount;
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
@@ -470,11 +468,9 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
             }
         }
         
-        // O registro 15 tem apenas sua estrutura criada, pois ainda nõa há dados ainda
-        // Registro 15 - Detalhamento do Credenciado Preencher este detalhamento somente para processos de inexigibilidade por credenciamento / chamada pública ou dispensa por chamada pública.
-        /*
+        //Registro 15 - Detalhamento do Credenciado Preencher este detalhamento somente para processos de inexigibilidade por credenciamento / chamada pública ou dispensa por chamada pública.
         foreach ($rsCredenciado->arElementos as $stChaveCredenciado) {
-            $stKey15 = $stChaveCredenciado['cod_orgao'] . $stChaveCredenciado['cod_unidade'] . $stChaveCredenciado['num_processo'] . $stChaveCredenciado['ano_exercicio_processo'] . $stChaveCredenciado['tipo_processo'] . $stChaveCredenciado['tipo_documento'] . $stChaveCredenciado['num_documento'] . $stChaveCredenciado['dt_credenciamento'] . $stChaveCredenciado['num_lote'] . $stChaveCredenciado['num_item'];
+            $stKey15 = $stChaveCredenciado['cod_orgao'] . $stChaveCredenciado['cod_unidade'] . $stChaveCredenciado['num_processo'] . $stChaveCredenciado['ano_exercicio_processo'] . $stChaveCredenciado['tipo_processo']; // . $stChaveCredenciado['tipo_documento'] . $stChaveCredenciado['num_documento'] . $stChaveCredenciado['dt_credenciamento'] . $stChaveCredenciado['num_lote'] . $stChaveCredenciado['num_item'];
             
             if ($stKey15 === $stKey) {
                 $arEmpenhoContrato['numero_sequencial'] = ++$inCount;
@@ -585,7 +581,7 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
             }
-        }*/
+        }
     }
 
     $arTemp[0] = array('tipo_registro'=> '99', 'brancos'=> '', 'numero_sequencial' => ++$inCount);

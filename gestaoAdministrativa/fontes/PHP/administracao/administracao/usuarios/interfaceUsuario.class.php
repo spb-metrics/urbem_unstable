@@ -139,22 +139,22 @@ class interfaceUsuario
                 <input type="text" class="field" name="numCgm" size="10" maxlength="10" value="" onKeyPress="return(isValido(this, event, '0123456789'));">
             </td>
         </tr>
-        <?if ($ctrl=='altera') {?>
+        <?php if ($ctrl=='altera') { ?>
         <tr>
             <td class="label" >Username</td>
         <td class="field"><input type="text" name="username" size="10" maxlength="15" value="" ></td>
         </tr>
-                  <?} else {?>
+                  <?php } else { ?>
         <tr>
             <td class="label">Nome</td>
             <td class="field"><input type="text" name="nomCgm" size="30" maxlength="60" value=""></td>
         </tr>
-        <?} if ($ctrl=='consulta') { ?>
+        <?php } if ($ctrl=='consulta') { ?>
         <tr>
             <td class="label" >Username</td>
             <td class="field"><input type="text" name="username" size="10" maxlength="15" value="" ></td>
         </tr>
-        <?php } else {?>
+        <?php } else { ?>
         <tr>
             <td class="label">CNPJ</td>
             <td class="field">

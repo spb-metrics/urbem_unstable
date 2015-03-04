@@ -196,7 +196,10 @@ switch ($stCtrl) {
 
         $obTBeneficioBeneficiario = new TBeneficioBeneficiario();
         $inCodContrato = SistemaLegado::pegaDado('cod_contrato', 'pessoal.contrato', 'WHERE registro = '.$_REQUEST['inContrato']);
-        $obTBeneficioBeneficiario->recuperaTodos($rsBeneficiario, ' WHERE cod_contrato ='.$inCodContrato. 'AND timestamp_excluido is NULL' );
+        $stFiltro = " WHERE cod_contrato =".$inCodContrato."\n";
+        $stFiltro .= " AND timestamp = (SELECT MAX(timestamp) FROM beneficio.beneficiario AS BB WHERE BB.cod_contrato=beneficiario.cod_contrato AND BB.codigo_usuario=beneficiario.codigo_usuario ) \n";
+        $stFiltro .= " AND timestamp_excluido is NULL \n";
+        $obTBeneficioBeneficiario->recuperaTodos($rsBeneficiario, $stFiltro );
 
         foreach ($rsBeneficiario->arElementos as $arValue) {
                 $arBeneficiario[$inCount]['id']                = $inCount;

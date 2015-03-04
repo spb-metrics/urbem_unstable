@@ -55,6 +55,7 @@ switch ($ctrl) {
         $caminhoRecibo	 = pegaConfiguracao("caminho_recibo_processo",      5);
         $txtRecibo       = pegaConfiguracao("mensagem_recibo_processo",     5);
         $tipoNumeracao	 = pegaConfiguracao("tipo_numeracao_processo",      5);
+        $boNumeracaoClassificaoAssunto = pegaConfiguracao("tipo_numeracao_classificacao_assunto", 5);
         $numeroCopias	 = pegaConfiguracao("copias_recibo_processo",       5);
         $mascaraProcesso = pegaConfiguracao("mascara_processo",             5);
         $mascaraAssunto  = pegaConfiguracao("mascara_assunto",              5);
@@ -125,6 +126,7 @@ switch ($ctrl) {
                     if (erro) alertaAviso(mensagem,'form','erro','<?=Sessao::getId()?>');
                     return !(erro);
             }
+
             function Salvar()
             {
                 if (Valida()) {
@@ -240,10 +242,34 @@ switch ($ctrl) {
 
                 <tr>
                     <td class=alt_dados colspan="2">
-                        Dados para classificação/assunto
+                        Dados para Classificação/Assunto
                     </td>
                 </tr>
 
+                <tr>
+                    <td class="label" title="Forma de geração do código de processo">
+                        *Geração do código
+                    </td>
+                    <td class=field>
+                        <select name="tipoNumeracaoClassificacaoAssunto">
+                            <?php
+                                if ($boNumeracaoClassificaoAssunto == "")
+                                    echo "<option value=xxx SELECTED>Selecione</option>";
+                                else
+                                    echo "<option value=xxx>Selecione</option>";
+                                if ($boNumeracaoClassificaoAssunto == 'automatico')
+                                    echo "<option value='automatico' SELECTED>Automático</option>";
+                                else
+                                    echo "<option value='automatico'>Automático</option>";
+                                if ($boNumeracaoClassificaoAssunto == 'manual')
+                                    echo "<option value='manual' SELECTED>Manual</option>";
+                                else
+                                    echo "<option value='manual'>Manual</option>";
+                            ?>
+                        </select>
+                        <input type="hidden" name="tipoNumeracaoClassificacaoAssuntoHdn" value="<?=$boNumeracaoClassificaoAssunto?>">
+                    </td>
+                </tr>
                 <tr>
                     <td class=label title="Máscara para formatação de código de classificação e assunto">
                         *Máscara do código
@@ -281,6 +307,15 @@ document.frm.caminhoRecibo.focus();
                             cod_modulo = 5;";
             $audit .= "Tipo de numeração de processo<br>\n";
         }
+
+        if ($_REQUEST["tipoNumeracaoClassificacaoAssuntoHdn"] != $_REQUEST["tipoNumeracaoClassificacaoAssunto"]) {
+            $sql   .=   "UPDATE administracao.configuracao
+                            SET valor = '".$_REQUEST["tipoNumeracaoClassificacaoAssunto"]."'
+                          WHERE parametro  = 'tipo_numeracao_classificacao_assunto'
+                            AND cod_modulo = 5;";
+            $audit .= "Tipo de numeração de processo<br>\n";
+        }
+
         if ($_REQUEST["numeroCopiasHdn"] != $_REQUEST["numeroCopias"]) {
             $sql   .= 	"UPDATE
                             administracao.configuracao

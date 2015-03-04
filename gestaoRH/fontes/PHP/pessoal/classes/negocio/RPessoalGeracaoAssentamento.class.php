@@ -291,12 +291,12 @@ function incluirGeracaoAssentamento($boTransacao = "")
                 $obErro = $obTPessoalAssentamentoGerado->inclusao( $boTransacao );
             }
             if ( !$obErro->ocorreu() AND $this->getCodNorma() != "") {
-                $obTPessoalAssentamentoGeradoNorma = new TPessoalAssentamentoGeradoNorma();
+                $obTPessoalAssentamentoGeradoNorma = new TPessoalAssentamentoGeradoNorma();                
                 if (is_array($this->getCodNorma())) {
                     foreach ($this->getCodNorma() as $arNormas) {
-                        $obTPessoalAssentamentoGeradoNorma->setDado( "cod_assentamento_gerado" , $this->getCodAssentamentoGerado()                   );
-                        $obTPessoalAssentamentoGeradoNorma->setDado( "timestamp"               , $stTimestamp                   );
-                        $obTPessoalAssentamentoGeradoNorma->setDado( "cod_norma"        , $arNormas['inCodNorma'] );
+                        $obTPessoalAssentamentoGeradoNorma->setDado( "cod_assentamento_gerado"  , $this->getCodAssentamentoGerado() );
+                        $obTPessoalAssentamentoGeradoNorma->setDado( "timestamp"                , $stTimestamp                      );
+                        $obTPessoalAssentamentoGeradoNorma->setDado( "cod_norma"                , $arNormas['inCodNorma']           );
                         $obErro = $obTPessoalAssentamentoGeradoNorma->inclusao( $boTransacao );
                     }
                 }
