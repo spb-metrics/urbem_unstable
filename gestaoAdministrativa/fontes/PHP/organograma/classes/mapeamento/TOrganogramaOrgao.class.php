@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.05.01, uc-01.05.02, uc-01.05.03, uc-04.05.40
 
-    $Id: TOrganogramaOrgao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TOrganogramaOrgao.class.php 62319 2015-04-22 18:27:59Z evandro $
 
     */
 
@@ -573,5 +573,52 @@ function recuperaOrgaosServidores(&$rsRecordSet, $stFiltro = "", $stOrdem = "", 
     
     return $this->executaRecuperaSql($stSql, $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
 }
+
+function recuperaOrgaosInventario(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro = $this->executaRecupera("montaRecuperaOrgaosInventario",$rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
+
+    return $obErro;
+}
+
+function montaRecuperaOrgaosInventario()
+{
+    $stSql  = " SELECT  DISTINCT 
+                        orgao_nivel.cod_estrutural                                                                
+                        , recuperaDescricaoOrgao(orgao.cod_orgao,'".$this->getDado("vigencia")."') as descricao     
+                        , orgao.cod_orgao                                                                           
+                FROM organograma.orgao                                                                         
+                
+                INNER JOIN (SELECT  orgao_nivel.*                                                                     
+                                    , organograma.fn_consulta_orgao(orgao_nivel.cod_organograma, orgao_nivel.cod_orgao) AS cod_estrutural
+                            FROM organograma.orgao_nivel
+                ) AS orgao_nivel                                           
+                    ON orgao_nivel.cod_orgao = orgao.cod_orgao                                                   
+                    AND orgao_nivel.cod_nivel = publico.fn_nivel(cod_estrutural)                                  
+                
+                INNER JOIN (SELECT  MAX(TIMESTAMP)
+                                    ,cod_orgao
+                                    ,cod_bem                               
+                            FROM patrimonio.historico_bem
+                            GROUP BY cod_orgao, cod_bem
+                ) as historico_bem
+                    ON historico_bem.cod_orgao = orgao.cod_orgao                                  
+
+                LEFT JOIN patrimonio.inventario_historico_bem
+                    ON  inventario_historico_bem.cod_bem = historico_bem.cod_bem
+
+                WHERE (orgao.inativacao > '".$this->getDado("vigencia")."' OR orgao.inativacao IS NULL)         
+                AND  EXISTS
+                 (
+                    SELECT  1
+                      FROM  organograma.organograma
+                     WHERE  organograma.cod_organograma = orgao_nivel.cod_organograma
+                       AND  organograma.ativo = true
+                 )
+            ";
+
+    return $stSql;
+}
+
 
 }

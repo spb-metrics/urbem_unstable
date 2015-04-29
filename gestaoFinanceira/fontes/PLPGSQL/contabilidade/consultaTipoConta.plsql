@@ -43,27 +43,30 @@ Adicionada tag Log aos arquivos
 
 CREATE OR REPLACE FUNCTION contabilidade.fn_tipo_conta_plano(varchar,varchar) RETURNS VARCHAR AS $$
 DECLARE
-    stExercicio         ALIAS FOR $1        ;
-    stMask              ALIAS FOR $2        ;
-    stMascaraReduzida   VARCHAR   := ''   ;
-    stSql               VARCHAR   := ''   ;
-    inOut               INTEGER   := 0      ;
-    stRetorno           VARCHAR   := ''   ;
+    stExercicio         ALIAS FOR $1;
+    stMask              ALIAS FOR $2;
+    stMascaraReduzida   VARCHAR := '';
+    stSql               VARCHAR := '';
+    inOut               INTEGER := 0 ;
+    stRetorno           VARCHAR := '';
 BEGIN
+
  stMascaraReduzida := publico.fn_mascarareduzida(stMask);
 
- SELECT count(*) into inOut
-        FROM    contabilidade.plano_conta
-        WHERE   cod_estrutural like stMascaraReduzida ||'%'
-        AND     cod_estrutural  <>  stMask
-        AND     exercicio       =   stExercicio;
+       SELECT count(*) into inOut
+         FROM contabilidade.plano_conta
+   INNER JOIN contabilidade.plano_analitica
+           ON plano_analitica.cod_conta = plano_conta.cod_conta
+          AND plano_analitica.exercicio = plano_conta.exercicio
+        WHERE plano_conta.cod_estrutural  =  stMask
+          AND plano_conta.exercicio       =  stExercicio;
+        
+    IF inOut > 0 THEN
+     stRetorno := 'A';
+    ELSE
+     stRetorno := 'S';
+    END IF;
+    RETURN stRetorno;
 
- IF inOut = 0 THEN
-  stRetorno := 'A';
- ELSE
-  stRetorno := 'S';
- END IF;
- RETURN stRetorno;
 END;
 $$ LANGUAGE 'plpgsql';
-

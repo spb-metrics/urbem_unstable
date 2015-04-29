@@ -194,46 +194,64 @@ function recuperaLocalizacao(&$rsRecordSet,$stFiltro="",$stOrder="ORDER BY local
         return $stSql;
     }
 
-function recuperaTodosTotalizado(&$rsRecordSet, $stFiltro = "", $stFiltroTotalizador = "", $stOrdem ="", $boTransacao = "")
+function recuperaTodosTotalizado(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    $stSql  = $this->montaRecuperaTodosTotalizado($stFiltroTotalizador).$stFiltro.$stOrdem;
+    $stGroup =" GROUP BY local.cod_local
+                        ,cod_logradouro
+                        ,numero
+                        ,fone
+                        ,ramal
+                        ,dificil_acesso
+                        ,insalubre
+                        ,local.descricao
+                ";
+    $stSql  = $this->montaRecuperaTodosTotalizado().$stFiltro.$stGroup.$stOrdem;
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 }
 
-function montaRecuperaTodosTotalizado($stFiltroTotalizador)
+function montaRecuperaTodosTotalizado()
 {
-    $stSQL .= "SELECT
-                    cod_local,
-                    cod_logradouro,
-                    numero,
-                    fone,
-                    ramal,
-                    dificil_acesso,
-                    insalubre,
-                    descricao,
-                    (   SELECT  COUNT(historico_bem.cod_bem) as total
-                          FROM  patrimonio.historico_bem
+    $stSQL .= " SELECT  DISTINCT
+                    local.cod_local
+                    ,cod_logradouro
+                    ,numero
+                    ,fone
+                    ,ramal
+                    ,dificil_acesso
+                    ,insalubre
+                    ,local.descricao
+                    ,COUNT(historico_bem.cod_bem) as total
+                    
+                FROM organograma.local
 
-                    INNER JOIN ( SELECT cod_bem, MAX(timestamp) AS timestamp FROM patrimonio.historico_bem GROUP BY cod_bem ) as resumo
-                            ON  resumo.cod_bem   = historico_bem.cod_bem
-                           AND  resumo.timestamp = historico_bem.timestamp
+                INNER JOIN (SELECT  MAX(TIMESTAMP) as TIMESTAMP
+                                    ,cod_bem
+                                    ,cod_local
+                                    ,cod_orgao                                    
+                                FROM patrimonio.historico_bem
+                                GROUP BY cod_bem, cod_local, cod_orgao
+                ) as historico_bem
+                    ON historico_bem.cod_local = local.cod_local
+                                
+                INNER JOIN patrimonio.bem
+                    ON bem.cod_bem = historico_bem.cod_bem
 
-                    INNER JOIN patrimonio.inventario_historico_bem
-                            ON inventario_historico_bem.cod_bem = resumo.cod_bem
+                LEFT JOIN patrimonio.bem_baixado
+                    ON bem_baixado.cod_bem = bem.cod_bem
+            ";
 
-                    ".$stFiltroTotalizador."
-
-                    ) as total
-
-               FROM
-                    organograma.local";
-
+            if ($this->getDado('acao') == 'alterar') {
+                $stSQL .= " LEFT JOIN patrimonio.inventario_historico_bem
+                                ON inventario_historico_bem.cod_bem     = historico_bem.cod_bem
+                            ";
+            }
+    
     return $stSQL;
 }
 

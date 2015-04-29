@@ -52,10 +52,10 @@ function FTCEMGDespesaTotalPessoalPL()
 
 function montaRecuperaRelacionamento()
 {
-    $stSql = "select stn.fn_rgf_despesa_liquidada_anexo1('".$this->getDado("dt_inicial")."'
-                                                       , '".$this->getDado("dt_final")."'
-                                                       , '".$this->getDado("cod_entidade")."'
-                                                       , '".$this->getDado("filtro")."') as valor";
+    $stSql = "SELECT REPLACE(valor::VARCHAR, '.', '') AS valor FROM (SELECT stn.fn_rgf_despesa_liquidada_anexo1('".$this->getDado("dt_inicial")."'
+                                                                                                              , '".$this->getDado("dt_final")."'
+                                                                                                              , '".$this->getDado("cod_entidade")."'
+                                                                                                              , '".$this->getDado("filtro")."') AS valor) AS tabela";
 
     return $stSql;
 }

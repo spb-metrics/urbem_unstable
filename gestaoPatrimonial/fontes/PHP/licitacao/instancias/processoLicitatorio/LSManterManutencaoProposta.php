@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: LSManterManutencaoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterManutencaoProposta.php 62270 2015-04-15 20:13:46Z arthur $
 
     */
 
@@ -233,7 +233,7 @@ $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("DIREITA");
-$obLista->ultimoDado->setCampo( "[num_edital]/[exercicio]" );
+$obLista->ultimoDado->setCampo( "[num_edital_lista]" );
 $obLista->commitDado();
 
 $obLista->addDado();
@@ -249,26 +249,26 @@ $obLista->commitDado();
 $obLista->addAcao();
 
 if ($_REQUEST['stAcao'] != 'reemitir' && $_REQUEST['stAcao'] != '') {
-    $obLista->ultimaAcao->addCampo("&inCodMapa" , "cod_mapa" );
-    $obLista->ultimaAcao->addCampo("&stExercicio" , "exercicio"  );
-    $obLista->ultimaAcao->addCampo("&inCodLicitacao" , "num_licitacao"  );
+    $obLista->ultimaAcao->addCampo("&inCodMapa"       , "cod_mapa" );
+    $obLista->ultimaAcao->addCampo("&stExercicio"     , "exercicio"  );
+    $obLista->ultimaAcao->addCampo("&inCodLicitacao"  , "num_licitacao"  );
     $obLista->ultimaAcao->addCampo("&inCodModalidade" , "cod_modalidade"  );
-    $obLista->ultimaAcao->addCampo("&stExercicio" , "exercicio"  );
-    $obLista->ultimaAcao->addCampo("&inCodEntidade", "cod_entidade");
+    $obLista->ultimaAcao->addCampo("&stExercicio"     , "exercicio"  );
+    $obLista->ultimaAcao->addCampo("&inCodEntidade"   , "cod_entidade");
 
     $obLista->ultimaAcao->setAcao( 'selecionar' );
     $obLista->ultimaAcao->setLink( $stCaminho.$pgForm."?".Sessao::getId().$stLink );
 } else {
-    $obLista->ultimaAcao->addCampo("&inNumEdital" , "num_edital");
-    $obLista->ultimaAcao->addCampo("&stExercicioEdital" , "exercicio_edital");
-    $obLista->ultimaAcao->addCampo("&inCodMapa" , "cod_mapa");
-    $obLista->ultimaAcao->addCampo("&stExercicioMapa" , "exercicio_mapa");
-    $obLista->ultimaAcao->addCampo("&inCodLicitacao" , "num_licitacao");
-    $obLista->ultimaAcao->addCampo("&inCodModalidade" , "cod_modalidade");
-    $obLista->ultimaAcao->addCampo("&inCodEntidade", "cod_entidade");
+    $obLista->ultimaAcao->addCampo("&inNumEdital"         , "num_edital");
+    $obLista->ultimaAcao->addCampo("&stExercicioEdital"   , "exercicio_edital");
+    $obLista->ultimaAcao->addCampo("&inCodMapa"           , "cod_mapa");
+    $obLista->ultimaAcao->addCampo("&stExercicioMapa"     , "exercicio_mapa");
+    $obLista->ultimaAcao->addCampo("&inCodLicitacao"      , "num_licitacao");
+    $obLista->ultimaAcao->addCampo("&inCodModalidade"     , "cod_modalidade");
+    $obLista->ultimaAcao->addCampo("&inCodEntidade"       , "cod_entidade");
     $obLista->ultimaAcao->addCampo("&stExercicioEntidade" , "exercicio");
-    $obLista->ultimaAcao->addCampo("&stNomEntidade", "entidade");
-    $obLista->ultimaAcao->addCampo("&inCodTipoLicitacao", "cod_tipo_licitacao");
+    $obLista->ultimaAcao->addCampo("&stNomEntidade"       , "entidade");
+    $obLista->ultimaAcao->addCampo("&inCodTipoLicitacao"  , "cod_tipo_licitacao");
 
     $obLista->ultimaAcao->setAcao( 'imprimir' );
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProc."?".Sessao::getId().$stLink );

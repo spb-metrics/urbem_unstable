@@ -35,11 +35,12 @@
 
     * @ignore
 
-    $Id: FLManterNotasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterNotasFiscais.php 62088 2015-03-28 18:44:40Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once '../../../../../../gestaoFinanceira/fontes/PHP/orcamento/classes/componentes/ITextBoxSelectEntidadeUsuario.class.php';
 
 $stPrograma = "ManterNotasFiscais";
 $pgFilt = "FL".$stPrograma.".php";
@@ -109,6 +110,9 @@ $obExercicio->setDefinicao     ( "stExercicioEmpenho"  );
 $obExercicio->setNull          ( FALSE                 );
 $obExercicio->setValue         ( Sessao::getExercicio());
 
+$obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario;
+$obEntidadeUsuario->setNull(false);
+
 $obBscEmpenho = new BuscaInner;
 $obBscEmpenho->setTitle            ( "Informe o número do empenho."  );
 $obBscEmpenho->setRotulo           ( "Número do Empenho"             );
@@ -134,6 +138,7 @@ $obFormulario->addComponente      ( $obTxtSerieNota );
 $obFormulario->addComponente      ( $obDtEmissao    );
 $obFormulario->addComponente      ( $obExercicioNota);
 $obFormulario->addComponente      ( $obExercicio    );
+$obFormulario->addComponente      ( $obEntidadeUsuario );
 $obFormulario->addComponente      ( $obBscEmpenho   );
 
 $obFormulario->OK();

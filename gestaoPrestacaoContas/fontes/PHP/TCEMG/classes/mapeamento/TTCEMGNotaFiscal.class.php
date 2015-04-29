@@ -36,7 +36,7 @@
 
     * @ignore
 
-    $Id: TTCEMGNotaFiscal.class.php 61365 2015-01-12 11:41:35Z evandro $
+    $Id: TTCEMGNotaFiscal.class.php 62223 2015-04-09 14:08:10Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -134,9 +134,10 @@ function recuperaNTF10(&$rsRecordSet, $stFiltro="", $stOrdem="", $boTransacao=""
 
 function montaRecuperaNTF10()
 {
-    $stSql  = " SELECT DISTINCT ON (NF.cod_nota, NF.exercicio)  
+    $stSql  = " SELECT DISTINCT ON (NF.nro_nota::NUMERIC, NF.exercicio)  
             10 AS tiporegistro
-            , RPAD((NF.cod_nota||''||NF.cod_entidade||''||to_char(data_emissao, 'ddmmyyyy')), 15, '0') AS codnotafiscal
+            , RPAD((NF.cod_nota||''||NF.nro_nota||''||to_char(data_emissao, 'ddmmyyyy')), 15, '0') AS codnotafiscal
+            
             , (SELECT valor::INTEGER
                     FROM administracao.configuracao_entidade
                     WHERE exercicio=NF.exercicio
@@ -163,24 +164,28 @@ function montaRecuperaNTF10()
                 ELSE
                     ' '
               END AS nfserie
-            , CASE WHEN CGMPJ.cnpj!='' THEN
+            
+            , CASE WHEN CGMPJ_empenho.cnpj!='' THEN
                 2
               ELSE
-                CASE WHEN CGMPF.cpf!='' THEN
+                CASE WHEN CGMPF_empenho.cpf!='' THEN
                     1
                 ELSE
                     3
                 END
               END AS tipodocumento
-            , CASE WHEN CGMPJ.cnpj!='' THEN
-                CGMPJ.cnpj
+
+            , CASE WHEN CGMPJ_empenho.cnpj!='' THEN
+                CGMPJ_empenho.cnpj
               ELSE
-                CASE WHEN CGMPF.cpf!='' THEN
-                    CGMPF.cpf
+                CASE WHEN CGMPF_empenho.cpf!='' THEN
+                    CGMPF_empenho.cpf
                 ELSE
                     ''
                 END
               END AS nrodocumento
+              
+              
             , NF.inscricao_estadual AS nroinscestadual
             , NF.inscricao_municipal  AS nroinscmunicipal
             , CGMMUN.nom_municipio as nomemunicipio
@@ -219,12 +224,13 @@ function montaRecuperaNTF10()
             , NF.chave_acesso_municipal AS chaveacessomunicipal
             , NF.aidf AS nfaidf
             , to_char(data_emissao, 'ddmmyyyy') as dtemissaonf
-            , CASE WHEN ENL.dt_vencimento IS NOT NULL THEN
-                to_char(ENL.dt_vencimento, 'ddmmyyyy')
-              ELSE
-                to_char(EE.dt_vencimento, 'ddmmyyyy')
-              END
-              AS dtvencimentonf
+            , CASE WHEN ENL.dt_vencimento < NF.data_emissao OR EE.dt_vencimento < NF.data_emissao
+                   THEN to_char(data_emissao, 'ddmmyyyy')
+                   ELSE CASE WHEN ENL.dt_vencimento IS NOT NULL
+                             THEN to_char(ENL.dt_vencimento, 'ddmmyyyy')
+                             ELSE to_char(EE.dt_vencimento, 'ddmmyyyy')
+                         END
+                    END AS dtvencimentonf
             , REPLACE(NF.vl_total::VARCHAR,'.',',') as nfvalortotal
             , REPLACE(NF.vl_desconto::VARCHAR,'.',',') as nfvalordesconto
             , REPLACE(NF.vl_total_liquido::VARCHAR,'.',',') as nfvalorliquido
@@ -258,16 +264,31 @@ function montaRecuperaNTF10()
                 ON  ENL.exercicio=NFEL.exercicio_liquidacao
                 AND ENL.cod_nota=NFEL.cod_nota_liquidacao
                 AND ENL.cod_entidade=NFEL.cod_entidade
+                
             LEFT JOIN empenho.empenho AS EE
                 ON  EE.exercicio=NFEL.exercicio_empenho
                 AND EE.cod_empenho=NFEL.cod_empenho
                 AND EE.cod_entidade=NFEL.cod_entidade
+                
+            LEFT JOIN empenho.pre_empenho AS EP
+                ON  EP.exercicio        = EE.exercicio
+                AND EP.cod_pre_empenho  = EE.cod_pre_empenho
+
+            LEFT JOIN sw_cgm AS CGM_empenho
+                ON  CGM_empenho.numcgm = EP.cgm_beneficiario
+                
+            LEFT JOIN sw_cgm_pessoa_juridica AS CGMPJ_empenho
+                ON  CGMPJ_empenho.numcgm = CGM_empenho.numcgm
+
+            LEFT JOIN sw_cgm_pessoa_fisica AS CGMPF_empenho
+                ON  CGMPF_empenho.numcgm = CGM_empenho.numcgm
 
             WHERE NF.exercicio='".$this->getDado('exercicio')."'
                 AND NF.cod_entidade IN (".$this->getDado('cod_entidade').")
+                AND (NF.nro_nota IS NOT NULL OR TRIM(NF.nro_nota) <> '' )
                 AND ENL.dt_liquidacao BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
                 ";
-
+                
     return $stSql;
 }
 
@@ -314,7 +335,13 @@ function montaRecuperaNTF20()
                  END AS nrodocumento
                 , nota_fiscal.chave_acesso AS chaveacesso
                 , to_char(data_emissao, 'ddmmyyyy') as dtemissaonf
-                , LPAD((LPAD(''||OD.num_orgao,2, '0')||LPAD(''||OD.num_unidade,2, '0')), 5, '0') AS codunidadesub
+                , CASE WHEN restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                       THEN CASE WHEN uniorcam.num_orgao_atual IS NOT NULL
+                                 THEN LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')
+                                 ELSE LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')
+                             END
+                       ELSE LPAD((LPAD(''||OD.num_orgao,2, '0')||LPAD(''||OD.num_unidade,2, '0')), 5, '0')
+                   END AS codunidadesub
                 , to_char(EE.dt_empenho, 'ddmmyyyy') AS dtempenho
                 , NFEL.cod_empenho AS nroempenho
                 , to_char(ENL.dt_liquidacao, 'ddmmyyyy') AS dtliquidacao                                
@@ -324,7 +351,6 @@ function montaRecuperaNTF20()
                                                                  ENL.exercicio_empenho,
                                                                  EE.cod_empenho
                                                                 ) AS nroliquidacao
-                                
                 FROM tcemg.nota_fiscal_empenho_liquidacao AS NFEL
                 LEFT JOIN tcemg.nota_fiscal
                      ON nota_fiscal.cod_nota        = NFEL.cod_nota
@@ -353,6 +379,17 @@ function montaRecuperaNTF20()
                 LEFT JOIN orcamento.despesa AS OD
                      ON  OD.exercicio    = EPED.exercicio
                     AND OD.cod_despesa   = EPED.cod_despesa
+                LEFT JOIN empenho.pre_empenho
+                     ON pre_empenho.cod_pre_empenho = ee.cod_pre_empenho
+                    AND pre_empenho.exercicio = ee.exercicio
+                LEFT JOIN empenho.restos_pre_empenho
+                     ON pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho
+                    AND pre_empenho.exercicio = restos_pre_empenho.exercicio 
+               LEFT JOIN tcemg.uniorcam
+                      ON uniorcam.num_unidade = restos_pre_empenho.num_unidade
+					 AND uniorcam.num_orgao   = restos_pre_empenho.num_orgao
+                     AND uniorcam.exercicio   = restos_pre_empenho.exercicio
+                     AND uniorcam.num_orgao_atual IS NOT NULL
 
                 WHERE NFEL.exercicio    ='".$this->getDado('exercicio')."'
                 AND NFEL.cod_nota       =".$this->getDado('cod_nota')."

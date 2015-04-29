@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: LSManterNotasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterNotasFiscais.php 62088 2015-03-28 18:44:40Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -118,9 +118,14 @@ if ( $request->get('numEmpenho') ) {
     $arFiltro[] = " NFEL.cod_empenho = ".$request->get('numEmpenho');
     $stFiltroAux .= "&numEmpenho=".$request->get('numEmpenho');
 }
+if ( $request->get('inCodEntidade') ) {
+    $arFiltro[] = " NF.cod_entidade = ".$request->get('inCodEntidade');
+    $stFiltroAux .= "&inCodEntidade=".$request->get('inCodEntidade');
+}
 
 if ( count( $arFiltro ) > 0 ) {
     $stFiltro = " WHERE " .implode ( ' AND ' , $arFiltro );
+    $stFiltro = Sessao::write('stFiltro',$stFiltro);
 }
 
 if (!Sessao::read('filtroAux')) {
@@ -134,7 +139,7 @@ $obTTCEMGNotaFiscal = new TTCEMGNotaFiscal;
 
 $stOrdem = "";
 
-$obTTCEMGNotaFiscal->recuperaNotasFiscais($rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
+$obTTCEMGNotaFiscal->recuperaNotasFiscais($rsRecordSet, Sessao::read('stFiltro'), $stOrdem, $boTransacao);
 
 $rsRecordSet->addFormatacao( 'vl_nota', 'NUMERIC_BR' );
 
@@ -215,9 +220,12 @@ if ($_REQUEST['stAcao'] == "alterar") {
     $obLista->ultimaAcao->setAcao( "excluir" );
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProc."?stAcao=$stAcao".Sessao::getId().$stFiltroAux );
 }
+
 $obLista->ultimaAcao->addCampo("&inCodNota"             , "cod_nota"                   );
 $obLista->ultimaAcao->addCampo("inNumNota"              , "nro_nota"                   );
 $obLista->ultimaAcao->addCampo("cod_entidade"           , "cod_entidade"               );
 $obLista->ultimaAcao->addCampo("exercicio"              , "exercicio"                  );
 $obLista->commitAcao();
 $obLista->show();
+
+?>

@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: PRManterProcessoLicitatorio.php 61490 2015-01-23 18:50:21Z evandro $
+    $Id: PRManterProcessoLicitatorio.php 62228 2015-04-10 13:01:15Z evandro $
 
 */
 
@@ -211,14 +211,16 @@ switch ($stAcao) {
 
                     if (Sessao::read('arMembro')) {
                         include_once(TLIC."TLicitacaoMembroAdicional.class.php");
-                        $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional();
+                        $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional();                        
                         foreach (Sessao::read('arMembro') as $value) {
                             if (trim($value['adicional']) == 'Sim') {
-                                $obTLicitacaoMembroAdicional->setDado('numcgm'          , $value['num_cgm']);
-                                $obTLicitacaoMembroAdicional->setDado('cod_licitacao'   , $obTLicitacaoLicitacao->getDado('cod_licitacao'));
-                                $obTLicitacaoMembroAdicional->setDado('exercicio'       , Sessao::getExercicio());
-                                $obTLicitacaoMembroAdicional->setDado('cod_modalidade'  , $_REQUEST['inCodModalidade']);
-                                $obTLicitacaoMembroAdicional->setDado('cod_entidade'    , $_REQUEST['inCodEntidade']);
+                                $obTLicitacaoMembroAdicional->setDado('numcgm'          , $value['num_cgm'] );
+                                $obTLicitacaoMembroAdicional->setDado('cod_licitacao'   , $obTLicitacaoLicitacao->getDado('cod_licitacao') );
+                                $obTLicitacaoMembroAdicional->setDado('exercicio'       , Sessao::getExercicio() );
+                                $obTLicitacaoMembroAdicional->setDado('cod_modalidade'  , $_REQUEST['inCodModalidade'] );
+                                $obTLicitacaoMembroAdicional->setDado('cod_entidade'    , $_REQUEST['inCodEntidade'] );
+                                $obTLicitacaoMembroAdicional->setDado('cargo'           , $value['cargo_membro'] );
+                                $obTLicitacaoMembroAdicional->setDado('natureza_cargo'  , $value['cod_natureza_cargo'] );
                                 $obTLicitacaoMembroAdicional->inclusao();
                             }
                         }
@@ -357,7 +359,7 @@ switch ($stAcao) {
                     $obTLicitacaoComissaoLicitacaoMembros->inclusao();
                 }
 
-                # Controle de Membros Adicionais
+                # Controle de Membros Adicionais                
                 if (is_array($arMembrosAdicionais) && count($arMembrosAdicionais) > 0) {
 
                     # Exclusão de todos os Membros Adicionais para posteriormente serem inseridos corretamente.
@@ -369,7 +371,9 @@ switch ($stAcao) {
 
                     foreach ($arMembrosAdicionais as $key => $value) {
                         # Inclusão de todos os Membros Adicionais atualizados.
-                        $obTLicitacaoMembroAdicional->setDado('numcgm' , $value['num_cgm']);
+                        $obTLicitacaoMembroAdicional->setDado('numcgm'          , $value['num_cgm'] );
+                        $obTLicitacaoMembroAdicional->setDado('cargo'           , $value['cargo_membro'] );
+                        $obTLicitacaoMembroAdicional->setDado('natureza_cargo'  , $value['cod_natureza_cargo'] );                         
                         $obTLicitacaoMembroAdicional->inclusao();
                     }
                 }

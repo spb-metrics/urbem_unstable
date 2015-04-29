@@ -32,7 +32,7 @@
 
      * Casos de uso: uc-01.06.98
 
-    $Id: interfaceProcessos.class.php 61760 2015-03-02 17:50:02Z evandro $
+    $Id: interfaceProcessos.class.php 62345 2015-04-27 18:46:06Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -385,7 +385,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
 
     $arInteressados = Sessao::getRequestProtocolo();
 
-   if (!$arInteressados['interessados']) {
+    if (!$arInteressados['interessados']) {
         $arInteressados['interessados'] = array();
         Sessao::write('arRequestProtocolo', $arInteressados);
     }
@@ -463,7 +463,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
 
     switch ($ctrl) {
         case 0:
-    $proc = new processosLegado;
+            $proc = new processosLegado;
             //Grava os campos do vetor como variáveis
             if (is_array($dadosForm)) {
                 foreach ($dadosForm as $chave=>$valor) {
@@ -495,1018 +495,986 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                 }
             }
 
-?>
-        <script language="JavaScript1.2" type="text/javascript">
-            boSugerido = false;
-            if ( document.getElementById('link_volta') ) {
-                document.getElementById('link_volta').style.visibility = 'hidden';
-            }
-
-            function validaCodigo(processo)
-            {
-                var x = 350;
-                var y = 200;
-                var sArq = 'validaCodigo.php?<?=Sessao::getId();?>&especieProcesso='+processo;
-                var wVolta=false;
-                tela = window.open(sArq,'tela','width=300px,height=120px,resizable=1,scrollbars=1,left='+x+',top='+y);
-            }
-            function incluiProcesso()
-            {
-                var x = 350;
-                var y = 200;
-                var sArq = 'anexaProcesso.php?<?=Sessao::getId();?>';
-                var wVolta=false;
-                tela = window.open(sArq,'tela','width=300px,height=120px,resizable=1,scrollbars=0,left='+x+',top='+y);
-            }
-            function removeSelecionados()
-            {
-                var combo = document.frm.processosAnexos;
-                newList = new Array ( combo.options.length );
-                    for (var i = combo.options.length - 1; i >= 0; i--) {
-                        if (combo.options[i].selected == true) {
-                            combo.options[i] = null;
-                        }
-                    }
-            }
-
-            function desabilitar(cod)
-            {
-                eval ("var x = document.frm.codDocumentos"+cod+".checked");
-                if (x == false) {
-                    eval ("document.frm.btnCopia"+cod+".disabled = true");
-                } else {
-                    eval ("document.frm.btnCopia"+cod+".disabled = false");
-                }
-            }
-
-            function copiaDigital(cod)
-            {
-                //var x = 200;
-                //var y = 140;
-                //var sArq = '<?=CAM_GA_PROT_POPUPS."documento/FMDocumentoProcesso.php";?>?<?=Sessao::getId();?>&codDoc='+cod+'&acao='+acao+'&inCodProcesso='+codProcesso+'&stAnoProcesso='+anoExercicio;
-                //var wVolta=false;
-                //tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=550px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
-
-                var x = 200;
-                var y = 140;
-                var sArq = '<?=CAM_FW_LEGADO."imagens/copiaDigitalLegado.php";?>?<?=Sessao::getId();?>&codDoc='+cod;
-                var wVolta=false;
-                tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=450px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
-                window.tela.focus();
-            }
-
-            function ValidaProcesso()
-            {
-                var mensagem = "";
-                var erro = false;
-                var campo;
-                var campoaux;
-
-        <?php if ($vinculo=="imobiliaria") { ?>
-                    campo = trim( document.frm.numMatricula.value );
-                    if (campo== "") {
-                        mensagem += "@O campo Inscrição Imobiliária é obrigatório";
-                        erro = true;
-                    }
-        <?php } else if ($vinculo=="inscricao") { ?>
-                    campo = trim( document.frm.numInscricao.value );
-                    if (campo== "") {
-                        mensagem += "@O campo Inscrição Econômica é obrigatório";
-                        erro = true;
-                    }
-        <?php } ?>
-
-        <?php if ($tipoNumeracao == 2) { ?>
-                    campo = trim( document.frm.codProcesso.value );
-                    if (campo== "") {
-                        mensagem += "@O campo Número do processo é obrigatório";
-                        erro = true;
-                    }
-
-        <?php } ?>
-
-                var expReg = /\n/g;
-                campo = document.frm.observacoes.value.replace( expReg, "");
-                campo = trim(campo);
-
-                if (campo=="") {
-                    mensagem += "@O campo Observações é obrigatório";
-                    erro = true;
-                }
-
-                campo = document.frm.codClassificacao.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Classificação é obrigatória";
-                    erro = true;
-                }
-
-                campo = document.frm.codAssunto.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Assunto é obrigatória";
-                    erro = true;
-                }
-/*
-                campo = document.frm.codOrgao.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Órgão é obrigatória";
-                    erro = true;
-                }
-
-                campo = document.frm.codUnidade.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Unidade é obrigatória";
-                    erro = true;
-                }
-
-                campo = document.frm.codDepartamento.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Departamento é obrigatória";
-                    erro = true;
-                }
-
-                campo = document.frm.codSetor.value;
-                if (campo=="xxx") {
-                    mensagem += "@A combo Setor é obrigatória";
-                    erro = true;
-                }
-                */
-
-                if (erro) {
-                    document.frm.btnOK.disabled = false;
-                    alertaAviso(mensagem,'form','erro','<?=Sessao::getId()?>');
-                }
-
-                return !(erro);
-
-            }// Fim da function Valida
-
-            //A função salvar testa a validação, e se tudo ocorrer certo, envia o form
-            function SalvarProcesso()
-            {
-                BloqueiaFrames(true,false);
-                if (Valida()) {
-                    if (ValidaProcesso()) {
-                        document.frm.action = "<?=$action;?>?<?=Sessao::getId();?>&controle=<?=$controle+1;?>";
-                        document.frm.submit();
-                    }
-                }
-                BloqueiaFrames(false,false);
-                document.getElementById('botaoOk').disabled = false;
-                document.getElementById('botaoLimpar').disabled = false;
-            }
-
-            // funcao que busca Conta de Débito no frame oculto
-            function busca_cgm(cod)
-            {
-                if (document.frm.numCgm.value != "") {
-                    document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>";
-                    var f = document.frm;
-                    f.target = 'oculto';
-                    f.ctrl_frm.value = cod;
-                    f.submit();
-                } else {
-                    document.frm.numCgm.value = "";
-                    document.frm.HdnnumCgm.value = "";
-                    document.getElementById('nomCGM').innerHTML = "&nbsp;";
-                }
-            }
-
-            function submitVinculo()
-            {
-                var stOut;
-                <?if ($vinculo) { ?>
-                    for (var inCount=0; inCount<document.frm.elements.length; inCount++) {
-                        if (document.frm.elements[inCount].name != 'vinculo') {
-                            if(document.frm.elements[inCount].type != 'select-one')
-                                document.frm.elements[inCount].value = '';
-                            else
-                                document.frm.elements[inCount].options[0].value = '';
-                        }
-                    }
-                <?php } ?>
-                document.frm.submit();
-            }
-            function selecionarAcao(inCodigoAcao)
-            {
-                var stActionTmp = document.frm.action;
-                var stTargetTmp = document.frm.target;
-                document.frm.action = "<?=CAM_GA_PROT_INSTANCIAS?>processo/OCManterProcesso.php?<?=Sessao::getId();?>";
-                document.frm.action += "&stCtrl=selecionarAcao&inCodigoAcao=" + inCodigoAcao;
-                document.frm.target = "oculto";
-                document.frm.submit();
-                document.frm.action = stActionTmp;
-                document.frm.target = stTargetTmp;
-            }
-
-            function alteraSugerido(campo)
-            {
-                if (campo.value.length == "") {
-                    boSugerido=false;
-                } else {
-                    boSugerido=true;
-                }
-            }
-
-            function buscaInscricao(vinculo)
-            {
-                var inscricao;
-                if (document.frm.numMatricula) {
-                    inscricao = document.frm.numMatricula;
-                } else if (document.frm.numInscricao) {
-                    inscricao = document.frm.numInscricao;
-                }
-                if (inscricao.value.length > 0 && boSugerido == false) {
-                    var stLink = "<?=CAM_PROTOCOLO."protocolo/processos/OCIncluiProcesso.php?";?>";
-                    stLink += '<?=Sessao::getId();?>&inInscricao=' + inscricao.value;
-                    ajaxJavaScript( stLink, vinculo );
-                } else if (inscricao.value.length == 0  && boSugerido == false) {
-                    document.frm.HdnnumCgm.value='';
-                    document.frm.numCgm.value='';
-                    document.getElementById('nomCGM').innerHTML='&nbsp;';
-                }
-            }
-
-        </script>
-
-        <script language='javaScript' >
-            function setarFoco()
-            {
-                combo = document.getElementById('comboVinculo');
-                var elementos = document.frm.elements.length;
-                var setaProximoFoco = false;
-
-                if (combo.value !='xxx') {
-                    for (var i = 0 ; i<=elementos; i++) {
-                        if (setaProximoFoco == true) {
-                            document.frm.elements[i].focus();
-
-                            return;
-                        }
-
-                        if (document.frm.elements[i].name == 'vinculo') {
-                            setaProximoFoco = true;
-                        }
-                    }
-                }
-            }
-        </script>
-     
-        <form name='frm' method='post' action='<?=$action;?>?<?=Sessao::getId()?>'>
-
-            <input type="hidden" name="ctrl_frm" value=''>
-            <input type="hidden" name="acao" value='<?=$acao;?>'>
-            <input type="hidden" name="ctrl" value='<?=$ctrl;?>'>
-
-        <table width="100%">
-        <tr>
-            <td class=alt_dados colspan=2>
-                Vínculos de processo
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label" width="30%" title="Vínculo do processo">
-                *Vínculo
-            </td>
-<?php
-        if (!empty($vinculo) && $vinculo != "xxx") {
-?>
-            <td class="field" width="70%">
-                <input type="hidden" name="vinculo" value="<?=$vinculo;?>" />
-            <?php
-                switch ($vinculo) {
-                    case "cgm" :
-                        $lblVinculo = "CGM";
-                    break;
-
-                    case "imobiliaria" :
-                        $lblVinculo = "Cadastro Imobiliário";
-                    break;
-
-                    case "inscricao" :
-                        $lblVinculo = "Cadastro Econômico";
-                    break;
-
-                    case "funcionario" :
-                        $lblVinculo = "Cadastro de RH";
-                    break;
-
-                    case "licitacao" :
-                        $lblVinculo = "Cadastro da Licitação";
-                    break;
-                }
-
-                echo $lblVinculo;
-            ?>
-            </td>
-<?php
-        } else {
-            $arInteressados['interessados'] = array();
-            Sessao::write('arRequestProtocolo', $arInteressados);
-?>
-            <td class="field" width="70%">
-                <?php echo $this->comboVinculo("vinculo",$vinculo,"onChange='submitVinculo();'"); ?>
-            </td>
-
-<?php
-        }
-?>
-        </tr>
-        </table>
-
-        <table width="100%">
-<?php
-        if (isset($vinculo) and ($vinculo!='xxx')) {
-      
-?>
-        <tr>
-            <td colspan='2' class='alt_dados'>
-                Dados de interessado
-            </td>
-        </tr>
-<?php
-        if ($vinculo=="imobiliaria") {
-            $ro = " readonly='' ";
-            $disable = true;
-            $idCampo = 'numMatricula';
-
-?>
-            <tr>
-                <td class="label" width="30%" title="Número de inscrição de cadastro imobiliário">
-                    *Inscrição Imobiliária
-                </td>
-                <td class="field" width="70%">
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                        <tr>
-                            <td class="field" width="13%" id="tdLblnumMatricula" style="display:none;">
-                                <?=$numMatricula;?>
-                            </td>
-                            <td class="field" width="13%" id="tdFrmnumMatricula">
-                                <input name="numMatricula" id="numMatricula" onblur="JavaScript:buscaInscricao('imobiliaria');validaMinLength(this,1);" onkeypress="JavaScript:return inteiro( event );"  maxlength="10" size="11" align="left" type="text" value="<?=$numMatricula;?>">
-                            </td>
-                            <td class="fieldleft" valign="top">&nbsp;
-                                <input type="hidden" id="stNumeroDomicilio">
-                                <a href="JavaScript: abrePopUp('../../../../../../gestaoTributaria/fontes/PHP/cadastroImobiliario/popups/imovel/FLProcurarImovel.php','frm','numMatricula','stNumeroDomicilio','todos','PHPSESSID=<?=$PHPSESSID;?>&iURLRandomica=20050705100644463','800','550');;" title="Buscar inscrição imobiliária">
-                                <img src="<?=CAM_FW_IMAGENS."botao_popup.png" ?>" id="imgnumMatricula" align="middle" border="" height="" width=""></a>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-<?php
-        } elseif ($vinculo=="inscricao") {
-            $ro = " readonly='' ";
-            $disable = true;
-?>
-            <tr>
-                <td class="label" width="30%">
-                    *Inscrição Econômica
-                </td>
-                <td class="field" width="13%">
-                    <table border=0><tr>
-                        <td class="field" width="13%" id="tdLblnumInscricao" style="display:none;">
-                            <?=$numMatricula;?>
-                        </td>
-                        <td id="tdFrmnumInscricao">
-                            <input id="numInscricao" name="numInscricao" onblur="JavaScript:buscaInscricao('inscricao');validaMinLength(this,1);" onkeypress="JavaScript:return inteiro( event );" align="left" type="text" value="<?=$numInscricao;?>">
-                            <input type="hidden" id='hdnNumInscricao' name='hdnNumInscricao' value=''>
-                        </td>
-                        <td class="fieldleft" valign="top">
-                            &nbsp;<a href="JavaScript: abrePopUp('../../../../../../gestaoTributaria/fontes/PHP/cadastroEconomico/popups/inscricaoeconomica/FLProcurarInscricaoEconomica.php','frm','numInscricao','hdnNumInscricao','todos','<?=Sessao::getId();?>&<?=$_REQUEST['iURLRandomica'];?>','800','550');;" title="Buscar inscrição econômica"><img src="<?=CAM_FW_IMAGENS."botao_popup.png" ?>" id="imgnumInscricao" align="middle" border="" height="" width=""></a>
-                        </td>
-                    </tr></table>
-                </td>
-            </tr>
-<?php
-        }
-?>
-        <tr>
-            <td class="label" width="30%" title="Número CGM do interessado">
-                *Interessado
-            </td>
-            <td class="field" width="70%">
-                <table border=0>
-                <tr>
-                    <td class="field" width="13%">
-                         <input name="numCgm" id="numCgm" onKeyUp="if (this.value != '') { document.getElementById('inserirCgm').disabled = true; } else { document.getElementById('inserirCgm').disabled = false; } " onkeypress="JavaScript:return inteiro( event );" onBlur="JavaScript:busca_cgm(1);alteraSugerido(this);" maxlength="10" size="11" align="left" type="text" value="<?=$numCgm;?>">
-                         <input type='hidden' id="HdnnumCgm" name='HdnnumCgm' value='' >
-                         <input type='hidden' name='nomCgm' id='nomCgm' value='' >
-                    </td>
-                    <td id="nomCGM" class="fakefield" height="20" width="60%">
-                        &nbsp;
-                    </td>
-                    <td class="fieldleft" valign="top">
-                        &nbsp;<a href="JavaScript: document.getElementById('inserirCgm').disabled = true; abrePopUp('../../../CGM/popups/cgm/FLProcurarCgm.php','frm','numCgm','nomCgm','todos','PHPSESSID=<?=$PHPSESSID;?>&iURLRandomica=<?=$REQUEST['iURLRandomica'];?>','800','550');;" title="Buscar cgm"><img src="<?=CAM_FW_IMAGENS."botao_popup.png" ?>" align="middle" border="" height="" width=""></a>
-                    </td>
-                </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td class="label" valign="top">&nbsp;</td>
-            <td class="field" style="text-align:left;">
-                <input type="button" id="inserirCgm" name="Inserir" value="Incluir" onclick="ajaxJavaScript( 'OCIncluiProcesso.php?numCgm='+document.frm.numCgm.value+'&nomCgm='+document.frm.nomCgm.value+'&vinculo=<?=$vinculo;?>', 'incluiInteressado');" >
-                <input type="button" name="Limpar" value="Limpar" onclick="$('nomCGM').innerHTML = '&nbsp;'; $('numCgm').value = ''; " >
-            </td>
-            
-<?php
-            // PREENCHE O CAMPO INNER CASO EXISTA O NUMCGM
-            if ($numCgm) {
-                echo "<script>";
-                
-                echo "document.getElementById('nomCGM').innerHTML = '".stripslashes($nomCgm)."';";
-                echo "</script>";
-            }
-?>
-        </tr>
-        <!-- Listagem de Interessados - Código Legado -->
-        <tr>
-            <td colspan='2' width="100%">
-                <span id="spnInteressados"></span>
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan='2' class='alt_dados'>
-                Dados de processo
-            </td>
-        </tr>
-<!-- Numeração Manual -->
-<?php
-        $arr = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
-        if ($arr[0] != 0 && $arr[1] != 0 && $arr[0] != "" && $arr[1] != "") {
-            $_POST["codClassificacao"] = $arr[0];
-            $_POST["codAssunto"]       = $arr[1];
-            $codClassificacao = $_POST["codClassificacao"];
-            $codAssunto       = $_POST["codAssunto"];
-        }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-    $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
-?>
-    <script language="javascript">
-        function preenche_combos(campo_a, campo_b)
-        {
-            var res = campo_b.split(".");
-
-            if(res[1]=='' || res[1]=='000'){
-                document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>&controle=<?=$ctrl;?>";
-                document.frm.target = 'oculto';
-                document.frm.codClassificacao.value = res[0];
-                document.frm.change_ClassifAssunto2.value = '1';
-                preencheCA (campo_a, campo_b);
-                document.frm.submit();            
-            } else {
-                document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>&controle=<?=$ctrl;?>";
-                document.frm.target = 'telaPrincipal';
-                document.frm.codClassificacao.value = res[0];
-                document.frm.change_ClassifAssunto2.value = '1';             
-                verifica_valores();
-                document.frm.submit();
-            }
-                
-        }
-
-        function verifica_valores()
-        {
-            if ((document.frm.codClassificacao.value != 'xxx') && (document.frm.codAssunto.value != 'xxx')) {
-                document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>&controle=<?=$ctrl;?>&boVerificaValores=true";
-                document.frm.target = 'telaPrincipal';
-                document.frm.change_ClassifAssunto.value = '1';
-                document.frm.submit();
-            }
-        }
-        window.onload = function() {
-            document.frm.observacoes.focus();
-        }
-    </script>
-<?php
-        // se codAssunto e codClassficacao estado setados...
-        // monta a variavel $codClassifAssunto
-        if ($codAssunto and $codClassificacao and
-            $codClassificacao != 'xxx' and $codAssunto != 'xxx' and
-            $change_ClassifAssunto == 1
-          ) {
-            $arCodClassifAssunto =  validaMascaraDinamica($mascaraAssunto, $codClassificacao."-".$codAssunto);
-            $codClassifAssunto   = $arCodClassifAssunto[1];
-        }
-
-        // quando a operacao for inclusao de processo utiliza a verificaca de valores para submeter o form
-        if (Sessao::read('acao') == 57) {
-            $submit = "verifica_valores()";
-        } else {
-            $submit = "";
-        }
-
-?>
-    <tr>
-        <td class=label width=30% rowspan=3 title="Classificação e assunto de processo">*Classificação/Assunto</td>
-        <td class=field>
-            <input type="hidden" size="2" name="change_ClassifAssunto" >
-            <input type="hidden" size="2" name="change_ClassifAssunto2">
-
-<?php
-            
-            if (!empty($codClassificacao) && !empty($codAssunto)) {
-            echo"$codClassifAssunto";
-            echo"<input type=\"hidden\" name =\"codClassifAssunto\" id=\"codClassifAssunto\" size=\"25\" maxlength=\"20\" value=\"$codClassifAssunto\">";    
-                if (strlen($codClassifAssunto) < 3 && strlen($codClassifAssunto) > 0) {
-                    echo ('
-                        <script language="JavaScript1.2" type="text/javascript">
-                            alertaAviso("Classificação/Assunto Inválido","unica","erro","'.Sessao::getId().'");
-                            mudaTelaPrincipal("incluiProcesso.php?'.Sessao::getId().'");
-                        </script>');
-                }
-                $arrClassifAssunto = explode(".",$codClassifAssunto);
-                if (($arrClassifAssunto[0] == '000') or ($arrClassifAssunto[1] == '000')) {
-                    echo ('
-                        <script language="JavaScript1.2" type="text/javascript">
-                            alertaAviso("Classificação/Assunto Inválido","unica","erro","'.Sessao::getId().'");
-                            mudaTelaPrincipal("incluiProcesso.php?'.Sessao::getId().'");
-                        </script>');
-                }
-                
-            } else {
-            $mascaraAssunto_size=strlen($mascaraAssunto);
-  if ($controle==5) {$codClassifAssunto='';}       
             echo"
-            <input type=text name=codClassifAssunto size=$mascaraAssunto_size maxlength=$mascaraAssunto_size value=\"$codClassifAssunto\"
-                onKeyUp=\"JavaScript: mascaraDinamico('$mascaraAssunto', this, event);\"
-                onChange=\"JavaScript:preenche_combos( 'codClassifAssunto', this.value );\">
-            ";
-            }
-?>
-
-        </td>
-    </tr>
-    <tr>
-        <td class=field>
-
-<?php
-if (!empty($codClassificacao)) {
-            $codClassificacao = ($codClassificacao==='xxx') ? '000' : $codClassificacao;
-            $sSQL = "SELECT * FROM sw_classificacao where cod_classificacao=$codClassificacao";
-            $dbEmp = new dataBaseLegado;
-            $dbEmp->abreBD();
-            $dbEmp->abreSelecao($sSQL);
-            $dbEmp->vaiPrimeiro();
-            while (!$dbEmp->eof()) {
-            $codClassificacaof  = trim($dbEmp->pegaCampo("cod_classificacao"));
-            $nomClassificacaof  = trim($dbEmp->pegaCampo("nom_classificacao"));
-            $dbEmp->vaiProximo();
-            }
-            $dbEmp->limpaSelecao();
-            $dbEmp->fechaBD();
-            if (!$codClassificacaof) {
-                echo ('
-                    <script language="JavaScript1.2" type="text/javascript">
-                        alertaAviso("Classificação/Assunto Inválido","unica","erro","'.Sessao::getId().'");
-                        mudaTelaPrincipal("incluiProcesso.php?'.Sessao::getId().'");
-                    </script>');
-            }
-            echo"<input type=\"hidden\" name=\"codClassificacao\" size=\"25\" maxlength=\"20\" value=\"$codClassificacao\">";
-            echo"$nomClassificacaof";
-        }
-        if (empty($codClassificacao)) {
-        echo" <select name=\"codClassificacao\" onChange=\"JavaScript: preencheCA( 'codClassificacao', this.value ); $submit";
-        }
-
-        if (empty($codClassificacao)) {
-            echo"\" style=\"width: auto\"><option value=\"xxx\">Selecione classificação</option>";
-            $sSQL = "SELECT * FROM sw_classificacao ORDER by nom_classificacao";
-            $dbEmp = new dataBaseLegado;
-            $dbEmp->abreBD();
-            $dbEmp->abreSelecao($sSQL);
-            $dbEmp->vaiPrimeiro();
-            $comboCla = "";
-            while (!$dbEmp->eof()) {
-                $codClassificacaof  = trim($dbEmp->pegaCampo("cod_classificacao"));
-                $nomClassificacaof  = trim($dbEmp->pegaCampo("nom_classificacao"));
-                $dbEmp->vaiProximo();
-                $comboCla .= "         <option value=".$codClassificacaof;
-                if (isset($codClassificacao)) {
-                    if ($codClassificacaof == $codClassificacao)
-                        $comboCla .= " SELECTED";
+            <script language='JavaScript1.2' type='text/javascript'>
+                boSugerido = false;
+                if ( document.getElementById('link_volta') ) {
+                    document.getElementById('link_volta').style.visibility = 'hidden';
                 }
-                $comboCla .= ">".$nomClassificacaof."</option>\n";
-            }
-            $dbEmp->limpaSelecao();
-            $dbEmp->fechaBD();
-            echo $comboCla;
-            echo"</select>";
-        }
-?>
-
-        </td>
-    </tr>
-    <tr>
-        <td class=field>
-<?php
-    if (!empty($codAssunto)) {
-        $codAssunto = ($codAssunto==='xxx') ? '000' : $codAssunto;
-        $sSQL = "SELECT * FROM sw_assunto WHERE cod_assunto = ".$codAssunto." AND cod_classificacao = ".$codClassificacao."";
-        $dbEmp = new dataBaseLegado;
-        $dbEmp->abreBD();
-        $dbEmp->abreSelecao($sSQL);
-        $dbEmp->vaiPrimeiro();
-        while (!$dbEmp->eof()) {
-            $codAssuntof  = trim($dbEmp->pegaCampo("cod_assunto"));
-            $nomAssuntof  = trim($dbEmp->pegaCampo("nom_assunto"));
-            $dbEmp->vaiProximo();
-        }
-        $dbEmp->limpaSelecao();
-        $dbEmp->fechaBD();
-        if (!$codAssuntof) {
-            echo ('
-                <script language="JavaScript1.2" type="text/javascript">
-                    alertaAviso("Classificação/Assunto Inválido","unica","erro","'.Sessao::getId().'");
-                    mudaTelaPrincipal("incluiProcesso.php?'.Sessao::getId().'");
-                </script>');
-        }
-        echo"<input type=\"hidden\" name=\"codAssunto\" size=\"25\" maxlength=\"20\" value=\"$codAssunto\">";
-        echo"$nomAssuntof";
-    } else {
-        echo"<select name=\"codAssunto\" onChange=\"JavaScript: preencheCA( 'codAssunto', this.value ); verifica_valores()";
-        echo"\"style=\"width: auto\"><option value=\"xxx\" SELECTED>Selecione assunto</option>";
-
-        if (($codClassificacao > 0) AND ($codClassificacao != "xxx")) {
-            $sSQL = "SELECT * FROM sw_assunto WHERE cod_classificacao = ".$codClassificacao." ORDER by nom_assunto";
-            $dbEmp = new dataBaseLegado;
-            $dbEmp->abreBD();
-            $dbEmp->abreSelecao($sSQL);
-            $dbEmp->vaiPrimeiro();
-            $comboAss = "";
-            while (!$dbEmp->eof()) {
-                $codAssuntof  = trim($dbEmp->pegaCampo("cod_assunto"));
-                $nomAssuntof  = trim($dbEmp->pegaCampo("nom_assunto"));
-                $dbEmp->vaiProximo();
-                $comboAss .= "         <option value=".$codAssuntof;
-                if (isset($codAssunto)) {
-                    if ($codAssuntof == $codAssunto)
-                        $comboAss .= " SELECTED";
+                function validaCodigo(processo)
+                {
+                    var x = 350;
+                    var y = 200;
+                    var sArq = 'validaCodigo.php?".Sessao::getId()."&especieProcesso='+processo;
+                    var wVolta=false;
+                    tela = window.open(sArq,'tela','width=300px,height=120px,resizable=1,scrollbars=1,left='+x+',top='+y);
                 }
-                $comboAss .= ">".$nomAssuntof."</option>\n";
-            }
-            $dbEmp->limpaSelecao();
-            $dbEmp->fechaBD();
-            echo $comboAss;
-            echo"</select>";
-        }
-    }
-    ?>
-
-        </td>
-    </tr>
-    <?php //if(!isset($_REQUEST['boVerificaValores'])) { ?>
-  <!--  <tr>
-         <td style='text-align:left;' class=label></td>
-          <td style='text-align:left;' class='field'>
-              <input type="button" value="Incluir" style='width: 60px;' name='btnOK' id='botaoOk' onClick="verifica_valores();">
-             
-             </td>
-          </tr> -->
-    <?php
-   // }
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    }
-        $varClassifAssunto = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
-
-        if ( ($varClassifAssunto[0] != 0
-              and $varClassifAssunto[1] != 0
-             )
-           or ($codAssunto != ""
-                and $codAssunto != "xxx"
-                and $codAssunto != 0
-                and $codClassificacao != ""
-                and $codClassificacao != "xxx"
-                and $codClassificacao != 0
-              )
-           ){
-
-            if ($codClassifAssunto) {
-                $aux = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
-                $codAssunto = $aux[1];
-                $codClassificacao = $aux[0];
-            }
-
-            if ($tipoNumeracao == 2) {
-
-                $sSQL = "SELECT * FROM administracao.configuracao where cod_modulo = 5 AND parametro = 'mascara_processo'";
-                $dbEmp = new dataBaseLegado;
-                $dbEmp->abreBD();
-                $dbEmp->abreSelecao($sSQL);
-                $dbEmp->vaiPrimeiro();
-                while (!$dbEmp->eof()) {
-                    $mascProcesso  = trim($dbEmp->pegaCampo("valor"));
-                    $dbEmp->vaiProximo();
+                function incluiProcesso()
+                {
+                    var x = 350;
+                    var y = 200;
+                    var sArq = 'anexaProcesso.php?".Sessao::getId()."';
+                    var wVolta=false;
+                    tela = window.open(sArq,'tela','width=300px,height=120px,resizable=1,scrollbars=0,left='+x+',top='+y);
                 }
-                $dbEmp->limpaSelecao();
-                $dbEmp->fechaBD();
-                $arMascProc = preg_split("/[^a-zA-Z0-9]/", $mascProcesso);
-                $mascara_processo_size=strlen($arMascProc[0]);
-?>
-                <tr>
-                    <td class="label">
-                        *Número do Processo
-                    </td>
-                    <td class="field">
-                        <input type='text' name='codProcesso' size="<?=$mascara_processo_size?>" maxlength="<?=$mascara_processo_size?>" value="<?=$codProcesso;?>" >
-                        <b>/</b>                       
-                        <input type='text' name='anoExercicioManual' value="<?=$anoExercicioManual;?>" size='5' maxlength='4' readonly="">
-                    </td>
-                </tr>
-<?php
-                $anoExercicio=$anoExercicioManual;
-            }
-?>
-            <tr>
-                <td class="label" title="Informações adicionais do processo">
-                    *Observações
-                </td>
-                <td class="field">
-                    
-                    <textarea autofocus name='observacoes' cols='40' rows='4' ><?=$observacoes?></textarea>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class="label" title="Descrição rápida do assunto do processo">
-                    Assunto Reduzido
-                </td>
-                <td class="field">
-                    <input type="text" name='resumo' size="80" maxlength="80" value="<?=$resumo;?>">
-                </td>
-            </tr>
-<?php
-            if ($codAssunto != "" && $codAssunto != "xxx") {
-?>
-                <tr>
-                    <td class=label title="Define se o processo é confidencial">
-                        Confidencial
-                    </td>
-<?php
-                    $dbConfig = new dataBaseLegado;
-                    $dbConfig->abreBd();
-                    $select = "select confidencial from sw_assunto where cod_assunto = $codAssunto";
-                    $dbConfig->abreSelecao($select);
-                    $confidencial = $dbConfig->pegaCampo("confidencial");
-                    $dbConfig->limpaSelecao();
-                    $dbConfig->fechaBd();
-                    if ($confidencial == 't')
-                        echo "<td class=\"field\">
-                                <input type='radio' name='conf' value='t' checked>
-                                    Sim
-                                <input type='radio' name='conf' value='f'>
-                                    Não
-                            </td>
-                        </tr>";
-                    else
-                        echo "<td class=\"field\">
-                                <input type='radio' name='conf' value='t'>
-                                    Sim
-                                <input type='radio' name='conf' value='f' checked>
-                                    Não
-                                </td>
-                            </tr>";
-            }
-?>
-            </tr>
-            <tr>
-                <td class=alt_dados colspan="2">
-                    Atributos de processo
-                </td>
-            </tr>
-<?php
-
-            $select = 	"
-                SELECT
-                    AP.cod_atributo,
-                    AP.nom_atributo,
-                    AP.tipo,
-                    AP.valor_padrao
-                FROM
-                    sw_atributo_protocolo AS AP,
-                    sw_assunto_atributo   AS AT
-                WHERE
-                    AP.cod_atributo      = AT.cod_atributo AND
-                    AT.cod_classificacao = ".$codClassificacao." AND
-                    AT.cod_assunto       = ".$codAssunto."
-                ORDER BY
-                    AP.nom_atributo";
-
-            $dbConfig = new dataBaseLegado;
-            $dbConfig->abreBd();
-            $dbConfig->abreSelecao($select);
-
-            while (!($dbConfig->eof())) {
-                $codAtributo = $dbConfig->pegaCampo("cod_atributo");
-                $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
-                $tipo        = $dbConfig->pegaCampo("tipo");
-
-                if (!(isset($valorAtributo[$codAtributo]))) {
-                    $valorPadrao = $dbConfig->pegaCampo("valor_padrao");
-                } else {
-                    $valorPadrao = $valorAtributo[$codAtributo];
-                }
-
-                $valorLista = $dbConfig->pegaCampo("valor_padrao");
-
-                if ($tipo == "t") {
-                    echo "<tr>\n";
-                    echo "	<td class=\"label\">\n";
-                    echo $nomAtributo;
-                    echo "	</td>\n";
-                    echo "	<td class=\"field\">\n";
-                    echo "		<input type='text' size='60' name=valorAtributo[".$codAtributo."] value='".$valorPadrao."'>";
-                }
-
-                if ($tipo == "n") {
-                    echo "<tr>\n";
-                    echo "	<td class=\"label\">\n";
-                    echo $nomAtributo;
-                    echo "	</td>\n";
-                    echo "	<td class=\"field\">\n";
-                    echo "		<input type='text' size='60' name=valorAtributo[".$codAtributo."] value='".$valorPadrao."' onKeyPress=return(isValido(this,event,'0123456789'))>";
-                }
-
-                if ($tipo == "l") {
-                    echo "<tr>\n";
-                    echo "	<td class=\"label\">\n";
-                    echo $nomAtributo;
-                    echo "	</td>\n";
-                    echo "	<td class=\"field\">\n";
-                    $lista = explode("\n", $valorLista);
-                    $selected = "";
-                    echo "	<select name='valorAtributo[".$codAtributo."]' style='width: 200px'><option value=\"xxx\">Selecione</option> \n";
-
-                    while (list($key, $val) = each($lista)) {
-                        $val = trim($val);
-                        if ($valorAtributo[$codAtributo] == $val) {
-                            $selected = "selected";
+                function removeSelecionados()
+                {
+                    var combo = document.frm.processosAnexos;
+                    newList = new Array ( combo.options.length );
+                        for (var i = combo.options.length - 1; i >= 0; i--) {
+                            if (combo.options[i].selected == true) {
+                                combo.options[i] = null;
+                            }
                         }
-                        echo "		<option value='".$val."' ".$selected.">".$val."</option>\n";
-                        $selected = "";
-                    }
-                    echo "	</select>\n";
                 }
-                $dbConfig->vaiProximo();
-            }
-?>
-                </td>
-            </tr>
-            <tr>
-                <td class=alt_dados colspan="2">
-                    Documentos de processo
-                </td>
-            </tr>
-            <tr>
-                <td class="label">
-                    Nome do documento
-                </td>
-                <td class="field">
-<?php
-                    if (((isset($_REQUEST['codAssunto'])) and $_REQUEST['codAssunto'] != '' and ($_REQUEST['codAssunto']!='xxx') and (isset($_REQUEST['codClassificacao'])) and $_REQUEST['codClassificacao'] != '' and ($_REQUEST['codClassificacao']!='xxx') and $_REQUEST['codClassificacao'] != '') or (isset($_REQUEST['codClassifAssunto']) and $_REQUEST['codClassifAssunto'] != '') ) {
-                        if ($_REQUEST['tipoProcesso']!='xxx') {
-                            $aux = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
-                            $codAssunto = $aux[1];
-                            $codClassificacao = $aux[0];
-                            if ($codAssunto == '') {
-                                $codAssunto = $_REQUEST['codAssunto'];
-                            }
-                            if ($codClassificacao == '') {
-                                $codClassificacao = $_REQUEST['codClassificacao'];
-                            }
-                            echo $this->checkDocumentos($codClassificacao,$codAssunto);
+                function desabilitar(cod)
+                {
+                    eval ('var x = document.frm.codDocumentos'+cod+'.checked');
+                    if (x == false) {
+                        eval ('document.frm.btnCopia'+cod+'.disabled = true');
+                    } else {
+                        eval ('document.frm.btnCopia'+cod+'.disabled = false');
+                    }
+                }
+                function copiaDigital(cod)
+                {
+                    var x = 200;
+                    var y = 140;
+                    var sArq = '".CAM_FW_LEGADO."imagens/copiaDigitalLegado.php?".Sessao::getId()."&codDoc='+cod;
+                    var wVolta=false;
+                    tela = window.open(sArq,'tela','titlebar=no,hotkeys=no,width=450px,height=320px,resizable=1,scrollbars=1,left='+x+',top='+y);
+                    window.tela.focus();
+                }
+                function ValidaProcesso()
+                {
+                    var mensagem = '';
+                    var erro = false;
+                    var campo;
+                    var campoaux;
+
+                    "; if ($vinculo == 'imobiliaria') { echo"
+                        campo = trim( document.frm.numMatricula.value );
+                        if (campo== '') {
+                            mensagem += '@O campo Inscrição Imobiliária é obrigatório';
+                            erro = true;
+                        }
+                    "; } else if ($vinculo == 'inscricao') { echo"
+                        campo = trim( document.frm.numInscricao.value );
+                        if (campo== '') {
+                            mensagem += '@O campo Inscrição Econômica é obrigatório';
+                            erro = true;
+                        }
+                    "; } 
+                    
+                        if ($tipoNumeracao == 2) { echo"
+                        campo = trim( document.frm.codProcesso.value );
+                        if (campo== '') {
+                            mensagem += '@O campo Número do processo é obrigatório';
+                            erro = true;
+                        }
+                    "; } echo"
+
+                    var expReg = /\\n/g;
+                    campo = document.frm.observacoes.value.replace( expReg, '');
+                    campo = trim(campo);
+
+                    if (campo=='') {
+                        mensagem += '@O campo Observações é obrigatório';
+                        erro = true;
+                    }
+
+                    campo = document.frm.codClassificacao.value;
+                    if (campo=='xxx') {
+                        mensagem += '@A combo Classificação é obrigatória';
+                        erro = true;
+                    }
+
+                    campo = document.frm.codAssunto.value;
+                    if (campo=='xxx') {
+                        mensagem += '@A combo Assunto é obrigatória';
+                        erro = true;
+                    }
+
+                    if (erro) {
+                        jq('#botaoOk').attr('disabled','disabled');
+                        alertaAviso(mensagem,'form','erro','".Sessao::getId()."');
+                    }
+
+                    return !(erro);
+
+                }// Fim da function Valida
+
+                //A função salvar testa a validação, e se tudo ocorrer certo, envia o form
+                function SalvarProcesso()
+                {
+                    BloqueiaFrames(true,false);
+                    if (Valida()) {
+                        if (ValidaProcesso()) {
+                            document.frm.action = '".$action."?".Sessao::getId()."&controle=".($controle+1)."';
+                            document.frm.submit();
                         }
                     }
-?>
-                </td>
-            </tr>
+                    BloqueiaFrames(false,false);
+                    document.getElementById('botaoOk').disabled = false;
+                    document.getElementById('botaoLimpar').disabled = false;
+                }
 
-            <tr>
-                <td class=alt_dados colspan="2">
-                    Encaminhamento de processo
-                </td>
-            </tr>
+                // funcao que busca Conta de Débito no frame oculto
+                function busca_cgm(cod)
+                {
+                    if (document.frm.numCgm.value != '') {
+                        document.frm.action = '".$action."?".Sessao::getId()."';
+                        var f = document.frm;
+                        f.target = 'oculto';
+                        f.ctrl_frm.value = cod;
+                        f.submit();
+                    } else {
+                        document.frm.numCgm.value = '';
+                        document.frm.HdnnumCgm.value = '';
+                        document.getElementById('nomCGM').innerHTML = '&nbsp;';
+                    }
+                }
 
-<?php
-      if ($_REQUEST['codClassificacao'] != "xxx" && $_REQUEST['codAssunto'] != "xxx") {
-        # Verifica se o processo possui algum andamento padrão.
-        $andamentoPadrao = new processosLegado;
-        $andamentoPadrao->verificaAndamentoPadrao($_REQUEST['codClassificacao'], $_REQUEST['codAssunto']);
+                function submitVinculo()
+                {
+                    var stOut;
+                    "; if ($vinculo) { echo"
+                        for (var inCount=0; inCount<document.frm.elements.length; inCount++) {
+                            if (document.frm.elements[inCount].name != 'vinculo') {
+                                if(document.frm.elements[inCount].type != 'select-one')
+                                    document.frm.elements[inCount].value = '';
+                                else
+                                    document.frm.elements[inCount].options[0].value = '';
+                            }
+                        }
+                    "; } echo" 
+                    document.frm.submit();
+                }
+                function selecionarAcao(inCodigoAcao)
+                {
+                    var stActionTmp = document.frm.action;
+                    var stTargetTmp = document.frm.target;
+                    document.frm.action = '".CAM_GA_PROT_INSTANCIAS."processo/OCManterProcesso.php?".Sessao::getId()."';
+                    document.frm.action += '&stCtrl=selecionarAcao&inCodigoAcao=' + inCodigoAcao;
+                    document.frm.target = 'oculto';
+                    document.frm.submit();
+                    document.frm.action = stActionTmp;
+                    document.frm.target = stTargetTmp;
+                }
 
-        if (!isset($codMasSetor)) {
-            $select = "
-            SELECT
-                *
-            FROM
-                sw_andamento_padrao
-            WHERE
-                cod_classificacao = ".$_REQUEST['codClassificacao']." AND
-                cod_assunto       = ".$_REQUEST['codAssunto']." AND
-                ordem             = 1";
+                function alteraSugerido(campo)
+                {
+                    if (campo.value.length == '') {
+                        boSugerido=false;
+                    } else {
+                        boSugerido=true;
+                    }
+                }
 
-            $conn = new dataBaseLegado;
-            $conn->abreBd();
-            $conn->abreSelecao($select);
+                function buscaInscricao(vinculo)
+                {
+                    var inscricao;
+                    if (document.frm.numMatricula) {
+                        inscricao = document.frm.numMatricula;
+                    } else if (document.frm.numInscricao) {
+                        inscricao = document.frm.numInscricao;
+                    }
+                    if (inscricao.value.length > 0 && boSugerido == false) {
+                        var stLink = ' ".CAM_PROTOCOLO."protocolo/processos/OCIncluiProcesso.php? ';
+                        stLink += '".Sessao::getId()."&inInscricao=' + inscricao.value;
+                        ajaxJavaScript( stLink, vinculo );
+                    } else if (inscricao.value.length == 0  && boSugerido == false) {
+                        document.frm.HdnnumCgm.value='';
+                        document.frm.numCgm.value='';
+                        document.getElementById('nomCGM').innerHTML='&nbsp;';
+                    }
+                }
+            
+                function setarFoco()
+                {
+                    combo = document.getElementById('comboVinculo');
+                    var elementos = document.frm.elements.length;
+                    var setaProximoFoco = false;
 
-            if ($conn->numeroDeLinhas > 0) {
-             $inCodOrganogramaAtivo = SistemaLegado::pegaDado("cod_organograma", "organograma.organograma", "WHERE ativo = true");
-             $inCodOrganogramaAtual = SistemaLegado::pegaDado("cod_organograma", "organograma.orgao_nivel", "WHERE cod_orgao = ".$conn->pegaCampo('cod_orgao')." LIMIT 1");
+                    if (combo.value !='xxx') {
+                        for (var i = 0 ; i<=elementos; i++) {
+                            if (setaProximoFoco == true) {
+                                document.frm.elements[i].focus();
 
-            # Validação para só permitir que seja sugerido o andamento padrão caso ele faça parte do organograma ativo.
-             if ($inCodOrganogramaAtual == $inCodOrganogramaAtivo) {
-                  $codAssuntoPadrao       = $conn->pegaCampo('cod_assunto');
-                  $codClassificacaoPadrao = $conn->pegaCampo('cod_classificacao');
-                  $codOrgaoPadrao         = $conn->pegaCampo('cod_orgao');
-                  $numPassagensPadrao     = $conn->pegaCampo('num_passagens');
-                  $descricaoPadrao        = $conn->pegaCampo('descricao');
-                  $ordemPadrao            = $conn->pegaCampo('ordem');
-                  $numDiaPadrao           = $conn->pegaCampo('num_dia');
-                  $codMasSetor            = $codOrgaoPadrao;
+                                return;
+                            }
 
-             }
-            }
-
-            $conn->limpaSelecao();
-            $conn->fechaBd();
-           }
-      }
-
-        $obFormulario = new Formulario;
-        $obFormulario->setLarguraRotulo(0);
-        $obFormulario->setForm(null);
-
-        # Instancia para o novo objeto Organograma
-        $obIMontaOrganograma = new IMontaOrganograma;
-        $obIMontaOrganograma->setNivelObrigatorio(1);
-
-        if (!empty($codOrgaoPadrao))
-            $obIMontaOrganograma->setCodOrgao($codOrgaoPadrao);
-
-        $obIMontaOrganograma->geraFormulario($obFormulario);
-
-        $obFormulario->montaHtml();
-        echo $obFormulario->getHTML();
-
-?>
-
-        <script language="javascript">
-
-            if (document.frm.codOrgao.value == "xxx") {
-                window.scrollTo(0,200);
-            }
-          
-        </script>
-
-<?php      }
-    if ($codClassificacao and $codAssunto) {
-        $this->montaLinksAssuntoAcao($codClassificacao, $codAssunto);
-    }
-?>
-    <script language="javascript">
-        function LimpaTela()
-        {
-            ajaxJavaScript('OCIncluiProcesso.php?', 'limpaListaInteressados');
-            document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>&controle=0&ctrl=0&acao=57";
-            document.frm.target = 'telaPrincipal';
-            window.location = "incluiProcesso.php?<?=Sessao::getId();?>&acao=57";
-        }
-    </script>
-
-<?php
-        if
-        (  (isset($codAssunto)) and ($codAssunto!='xxx') and
-           (isset($codClassificacao)) and ($codClassificacao!='xxx') and
-           (isset($vinculo)) and ($vinculo!='xxx')){
-?>
-        <table class='table' width="100%" cellspacing="2" cellpadding="2" border="0">
-            <tr>
-                <td style='text-align:left;' class='field'>
-                    <input type="button" value="OK" style='width: 60px;' name='btnOK' id='botaoOk' onClick="SalvarProcesso();">
-                    &nbsp;<input type="button" value="Limpar" id= 'botaoLimpar' style='width: 60px;' onClick="LimpaTela();">
-                </td>
-            </tr>
-<?php
-
-        }
-?>
-        </table>
-            <script language="javascript">
-                if (document.frm.inCodOrganograma) {
-                    if (document.frm.inCodOrganograma.value == "xxx") {
-                        document.getElementById('botaoOk').disabled = true;
+                            if (document.frm.elements[i].name == 'vinculo') {
+                                setaProximoFoco = true;
+                            }
+                        }
                     }
                 }
             </script>
+        ";
+        echo"
 
-        </form>
-<?php
+            <form name=\"frm\" method=\"post\" action=\"".$action."?".Sessao::getId()."\">
 
-    break;
+                <input type=\"hidden\" name=\"ctrl_frm\" value=\"\">
+                <input type=\"hidden\" name=\"acao\" value=\"".$acao."\">
+                <input type=\"hidden\" name=\"ctrl\" value=\"".$ctrl."\">
+
+                <table width=\"100%\">
+                <tr>
+                    <td class=alt_dados colspan=2>
+                        Vínculos de processo
+                    </td>
+                </tr>
+
+                <tr>
+                <td class=\"label\" width=\"30%\" title=\"Vínculo do processo\">
+                    *Vínculo
+                </td>
+        ";
+          
+                if (!empty($vinculo) && $vinculo != "xxx") {
+                    echo"
+                    <td class=\"field\" width=\"70%\">
+                        <input type=\"hidden\" name=\"vinculo\" value=\"".$vinculo."\"/>
+                    ";
+                    switch ($vinculo) {
+                        case "cgm" :
+                            $lblVinculo = "CGM";
+                        break;
+
+                        case "imobiliaria" :
+                            $lblVinculo = "Cadastro Imobiliário";
+                        break;
+
+                        case "inscricao" :
+                            $lblVinculo = "Cadastro Econômico";
+                        break;
+
+                        case "funcionario" :
+                            $lblVinculo = "Cadastro de RH";
+                        break;
+
+                        case "licitacao" :
+                            $lblVinculo = "Cadastro da Licitação";
+                        break;
+                    }
+                    echo $lblVinculo;
+                echo"
+                </td>
+                ";
+                } else {
+                    $arInteressados['interessados'] = array();
+                    Sessao::write('arRequestProtocolo', $arInteressados);
+                echo"
+                    <td class=\"field\" width=\"70%\">
+                ";
+                
+                echo $this->comboVinculo("vinculo",$vinculo,"onChange='submitVinculo();'"); 
+                echo"
+                    </td>
+                ";
+                
+                }
+                echo"
+                </tr>
+                </table>
+
+                <table width=\"100%\">
+                ";
+                
+                if (isset($vinculo) and ($vinculo!='xxx')) {
+                    echo"
+                    <tr>
+                        <td colspan=\"2\" class=\"alt_dados\">
+                            Dados de interessado
+                        </td>
+                    </tr>
+                    ";
+                
+                    if ($vinculo=="imobiliaria") {
+                        $ro = " readonly='' ";
+                        $disable = true;
+                        $idCampo = 'numMatricula';
+                        echo"
+                        <tr>
+                        <td class=\"label\" width=\"30%\" title=\"Número de inscrição de cadastro imobiliário\">
+                            *Inscrição Imobiliária
+                        </td>
+                        <td class=\"field\" width=\"70%\">
+                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">
+                                <tr>
+                                    <td class=\"field\" width=\"13%\" id=\"tdLblnumMatricula\" style=\"display:none;\">
+                                        ".$numMatricula."
+                                    </td>
+                                    <td class=\"field\" width=\"13%\" id=\"tdFrmnumMatricula\">
+                                        <input name=\"numMatricula\" id=\"numMatricula\" onblur=\"JavaScript:buscaInscricao('imobiliaria');validaMinLength(this,1);\" onkeypress=\"JavaScript:return inteiro( event );\"  maxlength=\"10\" size=\"11\" align=\"left\" type=\"text\" value=\"".$numMatricula."\">
+                                    </td>
+                                    <td class=\"fieldleft\" valign=\"top\">&nbsp;
+                                        <input type=\"hidden\" id=\"stNumeroDomicilio\">
+                                        <a href=\"JavaScript: abrePopUp('../../../../../../gestaoTributaria/fontes/PHP/cadastroImobiliario/popups/imovel/FLProcurarImovel.php','frm','numMatricula','stNumeroDomicilio','todos','PHPSESSID=".$PHPSESSID."&iURLRandomica=20050705100644463','800','550');;\" title=\"Buscar inscrição imobiliária\">
+                                        <img src=\"".CAM_FW_IMAGENS."botao_popup.png\" id=\"imgnumMatricula\" align=\"middle\" border=\"\" height=\"\" width=\"\"></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        </tr>
+                    ";
+                
+                    } elseif ($vinculo=="inscricao") {
+                        $ro = " readonly='' ";
+                        $disable = true;
+                        echo"
+                        <tr>
+                            <td class=\"label\" width=\"30%\">
+                                *Inscrição Econômica
+                            </td>
+                            <td class=\"field\" width=\"13%\">
+                                <table border=0><tr>
+                                    <td class=\"field\" width=\"13%\" id=\"tdLblnumInscricao\" style=\"display:none;\">
+                                        ".$numMatricula."
+                                    </td>
+                                    <td id=\"tdFrmnumInscricao\">
+                                        <input id=\"numInscricao\" name=\"numInscricao\" onblur=\"JavaScript:buscaInscricao('inscricao');validaMinLength(this,1);\" onkeypress=\"JavaScript:return inteiro( event );\" align=\"left\" type=\"text\" value=\"".$numInscricao."\">
+                                        <input type=\"hidden\" id='hdnNumInscricao' name='hdnNumInscricao' value=''>
+                                    </td>
+                                    <td class=\"fieldleft\" valign=\"top\">
+                                        &nbsp;
+                                        <a href=\"JavaScript: abrePopUp('../../../../../../gestaoTributaria/fontes/PHP/cadastroEconomico/popups/inscricaoeconomica/FLProcurarInscricaoEconomica.php','frm','numInscricao','hdnNumInscricao','todos','".Sessao::getId()."&".$_REQUEST['iURLRandomica']."','800','550');;\" title=\"Buscar inscrição econômica\">
+                                            <img src=\"".CAM_FW_IMAGENS."botao_popup.png\" id=\"imgnumInscricao\" align=\"middle\" border=\"\" height=\"\" width=\"\"></a>
+                                    </td>
+                                </tr></table>
+                            </td>
+                        </tr>
+                        ";
+                    }
+                    echo"
+                    <tr>
+                    <td class=\"label\" width=\"30%\" title=\"Número CGM do interessado\">
+                        *Interessado
+                    </td>
+                    <td class=\"field\" width=\"70%\">
+                        <table border=0>
+                        <tr>
+                            <td class=\"field\" width=\"13%\">
+                                 <input name=\"numCgm\" id=\"numCgm\" onKeyUp=\"if (this.value != '') { document.getElementById('inserirCgm').disabled = true; } else { document.getElementById('inserirCgm').disabled = false; } \" onkeypress=\"JavaScript:return inteiro( event );\" onBlur=\"JavaScript:busca_cgm(1);alteraSugerido(this);\" maxlength=\"10\" size=\"11\" align=\"left\" type=\"text\" value=\"".$numCgm."\">
+                                 <input type='hidden' id=\"HdnnumCgm\" name='HdnnumCgm' value='' >
+                                 <input type='hidden' name='nomCgm' id='nomCgm' value='' >
+                            </td>
+                            <td id=\"nomCGM\" class=\"fakefield\" height=\"20\" width=\"60%\">
+                                &nbsp;
+                            </td>
+                            <td class=\"fieldleft\" valign=\"top\">
+                                &nbsp;<a href=\"JavaScript: document.getElementById('inserirCgm').disabled = true; abrePopUp('../../../CGM/popups/cgm/FLProcurarCgm.php','frm','numCgm','nomCgm','todos','PHPSESSID=".$PHPSESSID."&iURLRandomica=".$REQUEST['iURLRandomica']."','800','550');;\" title=\"Buscar cgm\">
+                                        <img src=\"".CAM_FW_IMAGENS."botao_popup.png\" align=\"middle\" border=\"\" height=\"\" width=\"\"></a>
+                            </td>
+                        </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class=\"label\" valign=\"top\">&nbsp;</td>
+                        <td class=\"field\" style=\"text-align:left;\">
+                            <input type=\"button\" id=\"inserirCgm\" name=\"Inserir\" value=\"Incluir\" onclick=\"ajaxJavaScript( 'OCIncluiProcesso.php?numCgm='+document.frm.numCgm.value+'&nomCgm='+document.frm.nomCgm.value+'&vinculo=".$vinculo."', 'incluiInteressado');\" >
+                            <input type=\"button\" name=\"Limpar\" value=\"Limpar\" onclick=\"$('nomCGM').innerHTML = '&nbsp;'; $('numCgm').value = ''; \" >
+                        </td>
+                    ";
+                    // PREENCHE O CAMPO INNER CASO EXISTA O NUMCGM
+                    if ($numCgm) {
+                        echo "<script>";                        
+                        echo "document.getElementById('nomCGM').innerHTML = '".stripslashes($nomCgm)."';";
+                        echo "</script>";
+                    }
+                    echo"
+                    </tr>
+                    <!-- Listagem de Interessados - Código Legado -->
+                    <tr>
+                        <td colspan='2' width=\"100%\">
+                            <span id=\"spnInteressados\"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='2' class='alt_dados'>
+                            Dados de processo
+                        </td>
+                    </tr>
+                    <!-- Numeração Manual -->
+                    ";
+
+                    $arr = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
+                    if ($arr[0] != 0 && $arr[1] != 0 && $arr[0] != "" && $arr[1] != "") {
+                        $_POST["codClassificacao"] = $arr[0];
+                        $_POST["codAssunto"]       = $arr[1];
+                        $codClassificacao = $_POST["codClassificacao"];
+                        $codAssunto       = $_POST["codAssunto"];
+                    }
+            
+                    $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
+                    echo"
+                    <script language=\"javascript\">
+                        function preenche_combos(campo_a, campo_b)
+                        {
+                            var res = campo_b.split(\".\");
+                            if(res[1]=='' || res[1]=='000'){
+                                document.frm.action = \"".$action."?".Sessao::getId()."&controle=".$ctrl."\";
+                                document.frm.target = 'oculto';
+                                document.frm.codClassificacao.value = res[0];
+                                document.frm.change_ClassifAssunto2.value = '1';
+                                preencheCA (campo_a, campo_b);
+                                document.frm.submit();            
+                            } else {
+                                document.frm.action = \"".$action."?".Sessao::getId()."&controle=".$ctrl."\";
+                                document.frm.target = 'telaPrincipal';
+                                document.frm.codClassificacao.value = res[0];
+                                document.frm.change_ClassifAssunto2.value = '1';             
+                                verifica_valores();
+                                document.frm.submit();
+                            }
+                        }
+
+                        function verifica_valores()
+                        {
+                            if ((document.frm.codClassificacao.value != 'xxx') && (document.frm.codAssunto.value != 'xxx')) {
+                                document.frm.action = \"".$action."?".Sessao::getId()."&controle=".$ctrl."&boVerificaValores=true\";
+                                document.frm.target = 'telaPrincipal';
+                                document.frm.change_ClassifAssunto.value = '1';
+                                document.frm.submit();
+                            }
+                        }
+                        window.onload = function() {
+                            document.frm.observacoes.focus();
+                        }
+                    </script>
+                    ";
+
+                    // se codAssunto e codClassficacao estado setados...
+                    // monta a variavel $codClassifAssunto
+                    if ($codAssunto and $codClassificacao and
+                        $codClassificacao != 'xxx' and $codAssunto != 'xxx' and
+                        $change_ClassifAssunto == 1) {
+                        $arCodClassifAssunto =  validaMascaraDinamica($mascaraAssunto, $codClassificacao."-".$codAssunto);
+                        $codClassifAssunto   = $arCodClassifAssunto[1];
+                    }
+
+                    // quando a operacao for inclusao de processo utiliza a verificaca de valores para submeter o form
+                    if (Sessao::read('acao') == 57) {
+                        $submit = "verifica_valores();";
+                    } else {
+                        $submit = "";
+                    }
+                    echo"
+                    <tr>
+                        <td class=label width=30% rowspan=3 title=\"Classificação e assunto de processo\">*Classificação/Assunto</td>
+                        <td class=field>
+                            <input type=\"hidden\" size=\"2\" name=\"change_ClassifAssunto\" >
+                            <input type=\"hidden\" size=\"2\" name=\"change_ClassifAssunto2\">
+                    ";
+                    if (!empty($codClassificacao) && !empty($codAssunto)) {
+                        echo $codClassifAssunto;
+                        echo "<input type=\"hidden\" name =\"codClassifAssunto\" id=\"codClassifAssunto\" size=\"25\" maxlength=\"20\" value=\"".$codClassifAssunto."\">";    
+                        if (strlen($codClassifAssunto) < 3 && strlen($codClassifAssunto) > 0) {
+                            echo "
+                                <script language='JavaScript1.2' type='text/javascript'>
+                                    alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
+                                    mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
+                                </script>
+                            ";
+                        }
+                        $arrClassifAssunto = explode(".",$codClassifAssunto);
+                        if (($arrClassifAssunto[0] == '000') or ($arrClassifAssunto[1] == '000')) {
+                            echo "
+                                <script language='JavaScript1.2' type='text/javascript'>
+                                    alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
+                                    mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
+                                </script>
+                            ";
+                        }
+                    } else {
+                        $mascaraAssunto_size=strlen($mascaraAssunto);
+                        if ($controle==5) {
+                            $codClassifAssunto='';
+                        }
+                        echo"
+                        <input type='text' name='codClassifAssunto' size=".$mascaraAssunto_size." maxlength=".$mascaraAssunto_size." value='".$codClassifAssunto."'
+                            onKeyUp=\"JavaScript: mascaraDinamico('".$mascaraAssunto."', this, event);\"
+                            onChange=\"JavaScript:preenche_combos( 'codClassifAssunto', this.value );\">
+                        ";
+                    }
+                    echo"
+                        </td>
+                    </tr>
+                    <tr>
+                    <td class=field>
+                    ";
+                
+                    if (!empty($codClassificacao)) {
+                        $codClassificacao = ($codClassificacao==='xxx') ? '000' : $codClassificacao;
+                        $sSQL = "SELECT * FROM sw_classificacao where cod_classificacao=$codClassificacao";
+                        $dbEmp = new dataBaseLegado;
+                        $dbEmp->abreBD();
+                        $dbEmp->abreSelecao($sSQL);
+                        $dbEmp->vaiPrimeiro();
+                        while (!$dbEmp->eof()) {
+                            $codClassificacaof  = trim($dbEmp->pegaCampo("cod_classificacao"));
+                            $nomClassificacaof  = trim($dbEmp->pegaCampo("nom_classificacao"));
+                            $dbEmp->vaiProximo();
+                        }
+                        $dbEmp->limpaSelecao();
+                        $dbEmp->fechaBD();
+                        if (!$codClassificacaof) {
+                            echo"
+                                <script language='JavaScript1.2' type='text/javascript'>
+                                    alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
+                                    mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
+                                </script>
+                            ";
+                        }
+                        echo"<input type=\"hidden\" name=\"codClassificacao\" size=\"25\" maxlength=\"20\" value=\"".$codClassificacao."\">";
+                        echo $nomClassificacaof;
+                    }
+                    if (empty($codClassificacao)) {
+                        echo" <select name=\"codClassificacao\" onChange=\"JavaScript: preencheCA( 'codClassificacao', this.value ); ".$submit."\"";
+                    }
+
+                    if (empty($codClassificacao)) {
+                        echo" style=\"width: auto\"><option value=\"xxx\">Selecione classificação</option>";
+                        $sSQL = "SELECT * FROM sw_classificacao ORDER by nom_classificacao";
+                        $dbEmp = new dataBaseLegado;
+                        $dbEmp->abreBD();
+                        $dbEmp->abreSelecao($sSQL);
+                        $dbEmp->vaiPrimeiro();
+                        $comboCla = "";
+                        while (!$dbEmp->eof()) {
+                            $codClassificacaof  = trim($dbEmp->pegaCampo("cod_classificacao"));
+                            $nomClassificacaof  = trim($dbEmp->pegaCampo("nom_classificacao"));
+                            $dbEmp->vaiProximo();
+                            $comboCla .= "         <option value=".$codClassificacaof;
+                            if (isset($codClassificacao)) {
+                                if ($codClassificacaof == $codClassificacao)
+                                    $comboCla .= " SELECTED";
+                            }
+                            $comboCla .= ">".$nomClassificacaof."</option>\n";
+                        }
+                        $dbEmp->limpaSelecao();
+                        $dbEmp->fechaBD();
+                        echo $comboCla;
+                        echo"</select>";
+                    }
+                    echo"
+                    </td>
+                    </tr>
+                    <tr>
+                    <td class=field>
+                    ";
+                
+                    if (!empty($codAssunto)) {
+                        $codAssunto = ($codAssunto==='xxx') ? '000' : $codAssunto;
+                        $sSQL = "SELECT * FROM sw_assunto WHERE cod_assunto = ".$codAssunto." AND cod_classificacao = ".$codClassificacao."";
+                        $dbEmp = new dataBaseLegado;
+                        $dbEmp->abreBD();
+                        $dbEmp->abreSelecao($sSQL);
+                        $dbEmp->vaiPrimeiro();
+                        while (!$dbEmp->eof()) {
+                            $codAssuntof  = trim($dbEmp->pegaCampo("cod_assunto"));
+                            $nomAssuntof  = trim($dbEmp->pegaCampo("nom_assunto"));
+                            $dbEmp->vaiProximo();
+                        }
+                        $dbEmp->limpaSelecao();
+                        $dbEmp->fechaBD();
+                        if (!$codAssuntof) {
+                            echo "
+                                <script language='JavaScript1.2' type='text/javascript'>
+                                    alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
+                                    mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
+                                </script>
+                            ";
+                        }
+                        echo"<input type=\"hidden\" name=\"codAssunto\" size=\"25\" maxlength=\"20\" value=\"".$codAssunto."\">";
+                        echo $nomAssuntof;
+                    } else {
+                        echo"<select name=\"codAssunto\" onChange=\"JavaScript: preencheCA( 'codAssunto', this.value ); verifica_valores();\" ";
+                        echo"\"style=\"width: auto\"><option value=\"xxx\" SELECTED>Selecione assunto</option>";
+                        if (($codClassificacao > 0) AND ($codClassificacao != "xxx")) {
+                            $sSQL = "SELECT * FROM sw_assunto WHERE cod_classificacao = ".$codClassificacao." ORDER by nom_assunto";
+                            $dbEmp = new dataBaseLegado;
+                            $dbEmp->abreBD();
+                            $dbEmp->abreSelecao($sSQL);
+                            $dbEmp->vaiPrimeiro();
+                            $comboAss = "";
+                            while (!$dbEmp->eof()) {
+                                $codAssuntof  = trim($dbEmp->pegaCampo("cod_assunto"));
+                                $nomAssuntof  = trim($dbEmp->pegaCampo("nom_assunto"));
+                                $dbEmp->vaiProximo();
+                                $comboAss .= "         <option value=".$codAssuntof;
+                                if (isset($codAssunto)) {
+                                    if ($codAssuntof == $codAssunto)
+                                        $comboAss .= " SELECTED";
+                                }
+                                $comboAss .= ">".$nomAssuntof."</option>\n";
+                            }
+                            $dbEmp->limpaSelecao();
+                            $dbEmp->fechaBD();
+                            echo $comboAss;
+                            echo"</select>";
+                        }
+                    }
+                    echo"
+                    </td>
+                    </tr>
+                    ";                
+                }
+                
+                $varClassifAssunto = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
+                //if CLASSIFICACAO ASSUNTO
+                if ( ($varClassifAssunto[0] != 0 and $varClassifAssunto[1] != 0)
+                    or ($codAssunto != ""
+                    and $codAssunto != "xxx"
+                    and $codAssunto != 0
+                    and $codClassificacao != ""
+                    and $codClassificacao != "xxx"
+                    and $codClassificacao != 0)
+                ){
+
+                    if ($codClassifAssunto) {
+                        $aux = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
+                        $codAssunto = $aux[1];
+                        $codClassificacao = $aux[0];
+                    }
+
+                    if ($tipoNumeracao == 2) {
+
+                        $sSQL = "SELECT * FROM administracao.configuracao where cod_modulo = 5 AND parametro = 'mascara_processo'";
+                        $dbEmp = new dataBaseLegado;
+                        $dbEmp->abreBD();
+                        $dbEmp->abreSelecao($sSQL);
+                        $dbEmp->vaiPrimeiro();
+                        while (!$dbEmp->eof()) {
+                            $mascProcesso  = trim($dbEmp->pegaCampo("valor"));
+                            $dbEmp->vaiProximo();
+                        }
+                        $dbEmp->limpaSelecao();
+                        $dbEmp->fechaBD();
+                        $arMascProc = preg_split("/[^a-zA-Z0-9]/", $mascProcesso);
+                        $mascara_processo_size=strlen($arMascProc[0]);
+                        echo"
+                        <tr>
+                            <td class=\"label\">
+                                *Número do Processo
+                            </td>
+                            <td class=\"field\">
+                                <input type='text' name='codProcesso' size=\"".$mascara_processo_size."\" maxlength=\"".$mascara_processo_size."\" value=\"".$codProcesso."\" >
+                                <b>/</b>                       
+                                <input type='text' name='anoExercicioManual' value=\"".$anoExercicioManual."\" size='5' maxlength='4' readonly=\"\">
+                            </td>
+                        </tr>
+                        ";
+                        $anoExercicio=$anoExercicioManual;
+                    }
+                    echo"
+                    <tr>
+                        <td class=\"label\" title=\"Informações adicionais do processo\">
+                            *Observações
+                        </td>
+                        <td class=\"field\">                            
+                            <textarea autofocus name='observacoes' cols='40' rows='4' >".$observacoes."</textarea>                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=\"label\" title=\"Descrição rápida do assunto do processo\">
+                            Assunto Reduzido
+                        </td>
+                        <td class=\"field\">
+                            <input type=\"text\" name='resumo' size=\"80\" maxlength=\"80\" value=\"".$resumo."\">
+                        </td>
+                    </tr>
+                    ";
+                    if ($codAssunto != "" && $codAssunto != "xxx") {
+                        echo"
+                        <tr>
+                            <td class=label title=\"Define se o processo é confidencial\">
+                                Confidencial
+                            </td>
+                        ";
+                        $dbConfig = new dataBaseLegado;
+                        $dbConfig->abreBd();
+                        $select = "select confidencial from sw_assunto where cod_assunto = $codAssunto";
+                        $dbConfig->abreSelecao($select);
+                        $confidencial = $dbConfig->pegaCampo("confidencial");
+                        $dbConfig->limpaSelecao();
+                        $dbConfig->fechaBd();
+                        if ($confidencial == 't'){
+                            echo "<td class=\"field\">
+                                    <input type='radio' name='conf' value='t' checked>
+                                        Sim
+                                    <input type='radio' name='conf' value='f'>
+                                        Não
+                                </td>
+                            </tr>";
+                        }else{
+                            echo "<td class=\"field\">
+                                    <input type='radio' name='conf' value='t'>
+                                        Sim
+                                    <input type='radio' name='conf' value='f' checked>
+                                        Não
+                                    </td>
+                                </tr>";
+                        }
+                    }
+                    echo"
+                    </tr>
+                    <tr>
+                        <td class=alt_dados colspan=\"2\">
+                            Atributos de processo
+                        </td>
+                    </tr>
+                    ";
+
+                    $select = 	"
+                        SELECT
+                            AP.cod_atributo,
+                            AP.nom_atributo,
+                            AP.tipo,
+                            AP.valor_padrao
+                        FROM
+                            sw_atributo_protocolo AS AP,
+                            sw_assunto_atributo   AS AT
+                        WHERE
+                            AP.cod_atributo      = AT.cod_atributo AND
+                            AT.cod_classificacao = ".$codClassificacao." AND
+                            AT.cod_assunto       = ".$codAssunto."
+                        ORDER BY
+                            AP.nom_atributo";
+
+                    $dbConfig = new dataBaseLegado;
+                    $dbConfig->abreBd();
+                    $dbConfig->abreSelecao($select);
+
+                    while (!($dbConfig->eof())) {
+                        $codAtributo = $dbConfig->pegaCampo("cod_atributo");
+                        $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
+                        $tipo        = $dbConfig->pegaCampo("tipo");
+
+                        if (!(isset($valorAtributo[$codAtributo]))) {
+                            $valorPadrao = $dbConfig->pegaCampo("valor_padrao");
+                        } else {
+                            $valorPadrao = $valorAtributo[$codAtributo];
+                        }
+
+                        $valorLista = $dbConfig->pegaCampo("valor_padrao");
+
+                        if ($tipo == "t") {
+                            echo "<tr>\n";
+                            echo "	<td class=\"label\">\n";
+                            echo $nomAtributo;
+                            echo "	</td>\n";
+                            echo "	<td class=\"field\">\n";
+                            echo "		<input type='text' size='60' name=valorAtributo[".$codAtributo."] value='".$valorPadrao."'>";
+                        }
+
+                        if ($tipo == "n") {
+                            echo "<tr>\n";
+                            echo "	<td class=\"label\">\n";
+                            echo $nomAtributo;
+                            echo "	</td>\n";
+                            echo "	<td class=\"field\">\n";
+                            echo "		<input type='text' size='60' name=valorAtributo[".$codAtributo."] value='".$valorPadrao."' onKeyPress=return(isValido(this,event,'0123456789'))>";
+                        }
+
+                        if ($tipo == "l") {
+                            echo "<tr>\n";
+                            echo "	<td class=\"label\">\n";
+                            echo $nomAtributo;
+                            echo "	</td>\n";
+                            echo "	<td class=\"field\">\n";
+                            $lista = explode("\n", $valorLista);
+                            $selected = "";
+                            echo "	<select name='valorAtributo[".$codAtributo."]' style='width: 200px'><option value=\"xxx\">Selecione</option> \n";
+
+                            while (list($key, $val) = each($lista)) {
+                                $val = trim($val);
+                                if ($valorAtributo[$codAtributo] == $val) {
+                                    $selected = "selected";
+                                }
+                                echo "		<option value='".$val."' ".$selected.">".$val."</option>\n";
+                                $selected = "";
+                            }
+                            echo "	</select>\n";
+                        }
+                        $dbConfig->vaiProximo();
+                    }
+                    echo"
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class=alt_dados colspan=\"2\">
+                            Documentos de processo
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=\"label\">
+                            Nome do documento
+                        </td>
+                        <td class=\"field\">
+                    ";
+                            if (((isset($_REQUEST['codAssunto'])) and $_REQUEST['codAssunto'] != '' and ($_REQUEST['codAssunto']!='xxx') and (isset($_REQUEST['codClassificacao'])) and $_REQUEST['codClassificacao'] != '' and ($_REQUEST['codClassificacao']!='xxx') and $_REQUEST['codClassificacao'] != '') or (isset($_REQUEST['codClassifAssunto']) and $_REQUEST['codClassifAssunto'] != '') ) {
+                                if ($_REQUEST['tipoProcesso']!='xxx') {
+                                    $aux = preg_split("/[^a-zA-Z0-9]/", $codClassifAssunto);
+                                    $codAssunto = $aux[1];
+                                    $codClassificacao = $aux[0];
+                                    if ($codAssunto == '') {
+                                        $codAssunto = $_REQUEST['codAssunto'];
+                                    }
+                                    if ($codClassificacao == '') {
+                                        $codClassificacao = $_REQUEST['codClassificacao'];
+                                    }
+                                    echo $this->checkDocumentos($codClassificacao,$codAssunto);
+                                }
+                            }
+                    echo"                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=alt_dados colspan=\"2\">
+                            Encaminhamento de processo
+                        </td>
+                    </tr>
+                    ";
+                    if ($_REQUEST['codClassificacao'] != "xxx" && $_REQUEST['codAssunto'] != "xxx") {
+                        # Verifica se o processo possui algum andamento padrão.
+                        $andamentoPadrao = new processosLegado;
+                        $andamentoPadrao->verificaAndamentoPadrao($_REQUEST['codClassificacao'], $_REQUEST['codAssunto']);
+
+                        if (!isset($codMasSetor)) {
+                            $select = "
+                            SELECT
+                                *
+                            FROM
+                                sw_andamento_padrao
+                            WHERE
+                                cod_classificacao = ".$_REQUEST['codClassificacao']." AND
+                                cod_assunto       = ".$_REQUEST['codAssunto']." AND
+                                ordem             = 1";
+
+                            $conn = new dataBaseLegado;
+                            $conn->abreBd();
+                            $conn->abreSelecao($select);
+
+                            if ($conn->numeroDeLinhas > 0) {
+                                $inCodOrganogramaAtivo = SistemaLegado::pegaDado("cod_organograma", "organograma.organograma", "WHERE ativo = true");
+                                $inCodOrganogramaAtual = SistemaLegado::pegaDado("cod_organograma", "organograma.orgao_nivel", "WHERE cod_orgao = ".$conn->pegaCampo('cod_orgao')." LIMIT 1");
+                                # Validação para só permitir que seja sugerido o andamento padrão caso ele faça parte do organograma ativo.
+                                 if ($inCodOrganogramaAtual == $inCodOrganogramaAtivo) {
+                                      $codAssuntoPadrao       = $conn->pegaCampo('cod_assunto');
+                                      $codClassificacaoPadrao = $conn->pegaCampo('cod_classificacao');
+                                      $codOrgaoPadrao         = $conn->pegaCampo('cod_orgao');
+                                      $numPassagensPadrao     = $conn->pegaCampo('num_passagens');
+                                      $descricaoPadrao        = $conn->pegaCampo('descricao');
+                                      $ordemPadrao            = $conn->pegaCampo('ordem');
+                                      $numDiaPadrao           = $conn->pegaCampo('num_dia');
+                                      $codMasSetor            = $codOrgaoPadrao;
+                                }
+                            }
+
+                            $conn->limpaSelecao();
+                            $conn->fechaBd();
+                        }
+                    }
+
+                    $obFormulario = new Formulario;
+                    $obFormulario->setLarguraRotulo(0);
+                    $obFormulario->setForm(null);
+
+                    # Instancia para o novo objeto Organograma
+                    $obIMontaOrganograma = new IMontaOrganograma;
+                    $obIMontaOrganograma->setNivelObrigatorio(1);
+
+                    if (!empty($codOrgaoPadrao))
+                        $obIMontaOrganograma->setCodOrgao($codOrgaoPadrao);
+
+                    $obIMontaOrganograma->geraFormulario($obFormulario);
+
+                    $obFormulario->montaHtml();
+                    echo $obFormulario->getHTML();
+                    echo"
+                    <script language=\"javascript\">
+                        if (document.frm.codOrgao.value == \"xxx\") {
+                            window.scrollTo(0,200);
+                        }
+                    </script>
+                    ";
+                }//FIM IF CLASSIFICACAO ASSUNTO
+                if ($codClassificacao and $codAssunto) {
+                    $this->montaLinksAssuntoAcao($codClassificacao, $codAssunto);
+                }
+                echo"
+                <script language=\"javascript\">
+                    function LimpaTela()
+                    {
+                        ajaxJavaScript('OCIncluiProcesso.php?', 'limpaListaInteressados');
+                        document.frm.action = \"".$action."?".Sessao::getId()."&controle=0&ctrl=0&acao=57\";
+                        document.frm.target = 'telaPrincipal';
+                        window.location = 'incluiProcesso.php?".Sessao::getId()."&acao=57';
+                    }
+                </script>
+                ";
+                echo"
+                </table>
+                <script language=\"javascript\">
+                    if (document.frm.inCodOrganograma) {
+                        if (document.frm.inCodOrganograma.value == \"xxx\") {
+                            document.getElementById('botaoOk').disabled = true;
+                        }
+                    }
+                </script>
+                </form>
+                ";
+
+                if (isset($vinculo) and ($vinculo!='xxx')) {
+                    $obFormAssinaturas = new Formulario;
+                    $obForm = new Form;
+                    $obForm->setName('frmAssinatura');
+                    $obForm->setId('frmAssinatura');
+
+                    include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
+                    $obMontaAssinaturas = new IMontaAssinaturas;
+                    $obMontaAssinaturas->setOpcaoAssinaturas( false );
+                    $obMontaAssinaturas->obRadioAssinaturasSim->obEvento->setOnClick("ajaxJavaScript('OCIncluiProcesso.php?".Sessao::getId()."&stIncluirAssinaturas='+this.value, 'montaEntidade');");
+                    $obMontaAssinaturas->obRadioAssinaturasNao->obEvento->setOnCLick("ajaxJavaScript('OCIncluiProcesso.php?".Sessao::getId()."&stIncluirAssinaturas='+this.value, 'montaEntidade');");
+
+                    $obSpnEntidade = new Span();
+                    $obSpnEntidade->setId('spnEntidade');
+
+                    $obFormAssinaturas->addForm ( $obForm );
+                    $obFormAssinaturas->setLarguraRotulo(30);
+                    $obFormAssinaturas->addSpan($obSpnEntidade);
+                    $obMontaAssinaturas->geraFormulario($obFormAssinaturas);
+                    $obFormAssinaturas->montaHtml();
     
+                    echo $obFormAssinaturas->getHTML();
+                }
 
+                if
+                (  (isset($codAssunto)) and ($codAssunto!='xxx') and
+                (isset($codClassificacao)) and ($codClassificacao!='xxx') and
+                (isset($vinculo)) and ($vinculo!='xxx')){
+                echo"
+                    <table class='table' width=\"100%\" cellspacing=\"2\" cellpadding=\"2\" border=\"0\">
+                    <tr>
+                        <td style='text-align:left;' class='field'>
+                            <input type=\"button\" value=\"OK\" style='width: 60px;' name='botaoOk' id='botaoOk' onClick=\"SalvarProcesso();\">
+                            &nbsp;
+                            <input type=\"button\" value=\"Limpar\" id= 'botaoLimpar' style='width: 60px;' onClick=\"LimpaTela();\">
+                        </td>
+                    </tr>
+                ";
+
+                echo "<script> jq('#botaoOK').val(); </script>";
+
+                }
+        break;
+    }
+
+    //Checar se o tipo de proceesso selecionado possui andamento padrão
     $arInteressados = Sessao::getRequestProtocolo();
 
     if (count($arInteressados['interessados']) > 0) {
@@ -1515,9 +1483,8 @@ if (!empty($codClassificacao)) {
         echo "</script>";
     }
 
-        //Checar se o tipo de proceesso selecionado possui andamento padrão
 
-    }// Fim da function formIncluiProcesso
+}// Fim da function formIncluiProcesso
 
 function montaLinksAssuntoAcao($inCodigoClassificacao, $inCodigoAssunto)
 {
@@ -2165,7 +2132,7 @@ Exibe os dados de um processo
                     Texto Complementar
                 </td>
                 <td class=field colspan="<?=$colspan?>">
-                    <?=utf8_encode($textoComplementar)?>
+                    <?= $textoComplementar ?>
                 </td>
             </tr>
 <?php

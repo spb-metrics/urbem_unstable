@@ -68,15 +68,15 @@ class TTCMGOJulgamentoLicitacao extends Persistente
     {
         $stSql = "  SELECT
                           10 AS tipo_registro
-                        , LPAD(licitacao.num_orgao::VARCHAR,2,'0') AS cod_orgao
-                        , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
+                        , despesa.num_orgao AS cod_orgao
+                        , despesa.num_unidade AS cod_unidade
                         , licitacao.exercicio AS exercicio_licitacao
                         , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
                         , documento_pessoa.tipo_documento AS tipo_documento
                         , documento_pessoa.num_documento AS num_documento
                         , mapa_item.lote AS num_lote
                         , mapa_item.cod_item AS cod_item
-                        , catalogo_item.descricao::VARCHAR(250) AS dsc_produto_servico
+                        , remove_acentos(SUBSTRING(REPLACE(REPLACE(REPLACE(catalogo_item.descricao::VARCHAR,Chr('8221'),'\"'),Chr('216'),'diametro'),Chr('8211'),'-'),1,250))::VARCHAR AS dsc_produto_servico
                         , (mapa_item.vl_total / mapa_item.quantidade)::numeric(14,2) AS vl_unitario
                         , mapa_item.quantidade::numeric(14,2) AS quantidade
                         , CASE CONCAT(unidade_medida.cod_unidade,unidade_medida.cod_grandeza)
@@ -122,6 +122,24 @@ class TTCMGOJulgamentoLicitacao extends Persistente
                         AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                         AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                         AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                    
+                    JOIN compras.solicitacao_item
+                        ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
+                        AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+                        AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+                        AND solicitacao_item.cod_centro         = mapa_item.cod_centro
+                        AND solicitacao_item.cod_item           = mapa_item.cod_item
+
+                    JOIN compras.solicitacao_item_dotacao
+                        ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
+                        AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
+                        AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
+                        AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
+                        AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
+                                            
+                    JOIN orcamento.despesa
+                        ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
+                        AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                     
                     JOIN compras.mapa_cotacao
                          ON mapa_cotacao.exercicio_mapa = mapa.exercicio
@@ -172,9 +190,6 @@ class TTCMGOJulgamentoLicitacao extends Persistente
                                     
                     JOIN sw_cgm AS responsavel
                       ON responsavel.numcgm = participante.numcgm_representante
-
-                    LEFT JOIN tcmgo.orgao
-                        ON orgao.numcgm_contador = responsavel.numcgm
                       
                     JOIN ( SELECT num_documento, numcgm, tipo_documento
                             FROM (
@@ -208,7 +223,7 @@ class TTCMGOJulgamentoLicitacao extends Persistente
                         )
                       
                  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
-                 ORDER BY num_processo_licitatorio
+                 ORDER BY num_processo_licitatorio,cod_item
         ";
         return $stSql;
     }
@@ -229,93 +244,131 @@ class TTCMGOJulgamentoLicitacao extends Persistente
                             , documento_pessoa.tipo_documento AS tipo_documento
                             , documento_pessoa.num_documento AS num_documento
                             , mapa_item.lote AS num_lote
-                            , mapa_item.cod_item AS cod_item
+                            , mapa_item.cod_item AS cod_item                            
                             , 0.00 AS perc_desconto
                             , '' as brancos
                   
                     FROM licitacao.licitacao
-                            
+                    
                     JOIN licitacao.participante
-                      ON participante.cod_licitacao = licitacao.cod_licitacao
-                     AND participante.cod_modalidade = licitacao.cod_modalidade
-                     AND participante.cod_entidade = licitacao.cod_entidade
-                     AND participante.exercicio = licitacao.exercicio
+                         ON participante.cod_licitacao  = licitacao.cod_licitacao
+                        AND participante.cod_modalidade = licitacao.cod_modalidade
+                        AND participante.cod_entidade   = licitacao.cod_entidade 
+                        AND participante.exercicio      = licitacao.exercicio
                     
                     JOIN compras.mapa
-                      ON mapa.exercicio = licitacao.exercicio_mapa
-                     AND mapa.cod_mapa = licitacao.cod_mapa
+                         ON mapa.exercicio = licitacao.exercicio_mapa
+                        AND mapa.cod_mapa  = licitacao.cod_mapa
                      
                     JOIN compras.mapa_solicitacao
-                      ON mapa_solicitacao.exercicio = mapa.exercicio
-                     AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
+                         ON mapa_solicitacao.exercicio = mapa.exercicio
+                        AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
                      
                     JOIN compras.mapa_item
-                      ON mapa_item.exercicio = mapa_solicitacao.exercicio
-                     AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
-                     AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
-                     AND mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
-                     AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                         ON mapa_item.exercicio             = mapa_solicitacao.exercicio
+                        AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
+                        AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
+                        AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
+                        AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                    
+                    JOIN compras.solicitacao_item
+                        ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
+                        AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+                        AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+                        AND solicitacao_item.cod_centro         = mapa_item.cod_centro
+                        AND solicitacao_item.cod_item           = mapa_item.cod_item
+
+                    JOIN compras.solicitacao_item_dotacao
+                        ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
+                        AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
+                        AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
+                        AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
+                        AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
+                                            
+                    JOIN orcamento.despesa
+                        ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
+                        AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                     
                     JOIN compras.mapa_cotacao
-                      ON mapa_cotacao.exercicio_mapa = mapa.exercicio
-                     AND mapa_cotacao.cod_mapa = mapa.cod_mapa
+                         ON mapa_cotacao.exercicio_mapa = mapa.exercicio
+                        AND mapa_cotacao.cod_mapa       = mapa.cod_mapa
                      
                     JOIN compras.cotacao
-                      ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-                     AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-                    
+                         ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
+                        AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+
+                    JOIN compras.cotacao_item
+                         ON cotacao_item.exercicio   = cotacao.exercicio
+                        AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
+                        AND cotacao_item.cod_item    = mapa_item.cod_item
+
+                    JOIN almoxarifado.catalogo_item
+                        ON catalogo_item.cod_item = cotacao_item.cod_item
+
+                    JOIN administracao.unidade_medida
+                         ON unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
+                        AND unidade_medida.cod_unidade  = catalogo_item.cod_unidade
+
                     JOIN compras.julgamento
-                      ON julgamento.exercicio = cotacao.exercicio
-                     AND julgamento.cod_cotacao = cotacao.cod_cotacao
+                         ON julgamento.exercicio    = cotacao.exercicio
+                        AND julgamento.cod_cotacao  = cotacao.cod_cotacao
                      
-                    JOIN compras.mapa_item_dotacao
-                      ON mapa_item_dotacao.exercicio = mapa_item.exercicio
-                     AND mapa_item_dotacao.cod_entidade = mapa_item.cod_entidade
-                     AND mapa_item_dotacao.cod_solicitacao = mapa_item.cod_solicitacao
-                     AND mapa_item_dotacao.cod_mapa = mapa_item.cod_mapa
-                     AND mapa_item_dotacao.cod_centro = mapa_item.cod_centro
-                     AND mapa_item_dotacao.cod_item = mapa_item.cod_item
-                     AND mapa_item_dotacao.lote = mapa_item.lote
-                     AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
-                     AND mapa_item_dotacao.cod_entidade = mapa_item.cod_entidade
-                     
-                    JOIN compras.solicitacao_item_dotacao
-                      ON solicitacao_item_dotacao.exercicio = mapa_item_dotacao.exercicio_solicitacao
-                     AND solicitacao_item_dotacao.cod_entidade = mapa_item_dotacao.cod_entidade
-                     AND solicitacao_item_dotacao.cod_solicitacao = mapa_item_dotacao.cod_solicitacao
-                     AND solicitacao_item_dotacao.cod_centro = mapa_item_dotacao.cod_centro
-                     AND solicitacao_item_dotacao.cod_item = mapa_item_dotacao.cod_item
-                     AND solicitacao_item_dotacao.cod_conta = mapa_item_dotacao.cod_conta
-                     AND solicitacao_item_dotacao.cod_despesa = mapa_item_dotacao.cod_despesa
-             
-                    JOIN orcamento.despesa
-                      ON despesa.exercicio = solicitacao_item_dotacao.exercicio
-                     AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
-                          
+                    JOIN compras.julgamento_item
+                         ON julgamento_item.exercicio   = julgamento.exercicio
+                        AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
+                        AND julgamento_item.cod_item    = mapa_item.cod_item 
+
+                    JOIN licitacao.homologacao
+                         ON homologacao.cod_licitacao       = licitacao.cod_licitacao
+                        AND homologacao.cod_modalidade      = licitacao.cod_modalidade
+                        AND homologacao.cod_entidade        = licitacao.cod_entidade
+                        AND homologacao.exercicio_licitacao = licitacao.exercicio
+                        AND homologacao.cod_item            = julgamento_item.cod_item
+                        AND homologacao.lote                = julgamento_item.lote
+                        AND (   SELECT homologacao_anulada.num_homologacao 
+                                FROM licitacao.homologacao_anulada
+                                WHERE homologacao_anulada.cod_licitacao     = licitacao.cod_licitacao
+                                AND homologacao_anulada.cod_modalidade      = licitacao.cod_modalidade
+                                AND homologacao_anulada.cod_entidade        = licitacao.cod_entidade
+                                AND homologacao_anulada.exercicio_licitacao = licitacao.exercicio
+                                AND homologacao.num_homologacao             = homologacao_anulada.num_homologacao
+                                AND homologacao.cod_item                    = homologacao_anulada.cod_item
+                                AND homologacao.lote                        = homologacao_anulada.lote
+                         ) IS NULL
+                                    
                     JOIN sw_cgm AS responsavel
                       ON responsavel.numcgm = participante.numcgm_representante
-                    
-                    LEFT JOIN tcmgo.orgao
-                        ON orgao.numcgm_contador = responsavel.numcgm
-                    
+                      
                     JOIN ( SELECT num_documento, numcgm, tipo_documento
-                             FROM (
-                                    SELECT cpf AS num_documento, numcgm, 1 AS tipo_documento
-                                      FROM sw_cgm_pessoa_fisica
+                            FROM (
+                                    SELECT  cpf AS num_documento
+                                            , numcgm
+                                            , 1 AS tipo_documento
+                                    FROM sw_cgm_pessoa_fisica
                                       
-                                     UNION
+                                    UNION
                                      
-                                    SELECT cnpj AS num_documento, numcgm, 2 AS tipo_documento
-                                      FROM sw_cgm_pessoa_juridica
+                                    SELECT  cnpj AS num_documento
+                                            , numcgm
+                                            , 2 AS tipo_documento
+                                    FROM sw_cgm_pessoa_juridica
                                 ) AS tabela
                             GROUP BY numcgm, num_documento, tipo_documento
                         ) AS documento_pessoa
-                      ON documento_pessoa.numcgm = responsavel.numcgm
-              
-                    WHERE TO_DATE(TO_CHAR(licitacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                      ON documento_pessoa.numcgm = julgamento_item.cgm_fornecedor
+                                        
+                    WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
                     AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
                     AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
                     AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+                    AND licitacao.cod_modalidade NOT IN (8,9)
+                    AND NOT EXISTS ( SELECT 1
+                                     FROM licitacao.licitacao_anulada
+                                     WHERE licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
+                                     AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                     AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
+                                     AND licitacao_anulada.exercicio = licitacao.exercicio
+                        )
                     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
         ";
         return $stSql;
@@ -330,8 +383,8 @@ class TTCMGOJulgamentoLicitacao extends Persistente
     {
         $stSql = "  SELECT
                             30 AS tipo_registro
-                            , LPAD(licitacao.num_orgao::VARCHAR,2,'0') AS cod_orgao
-                            , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
+                            , LPAD(despesa.num_orgao::VARCHAR,2,'0') AS cod_orgao
+                            , LPAD(despesa.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                             , licitacao.exercicio AS exercicio_licitacao
                             , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
                             , TO_CHAR(julgamento.timestamp,'ddmmyyyy') AS dt_julgamento
@@ -365,6 +418,24 @@ class TTCMGOJulgamentoLicitacao extends Persistente
                      AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
                      AND mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
                      AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                    
+                    JOIN compras.solicitacao_item
+                        ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
+                        AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+                        AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+                        AND solicitacao_item.cod_centro         = mapa_item.cod_centro
+                        AND solicitacao_item.cod_item           = mapa_item.cod_item
+
+                    JOIN compras.solicitacao_item_dotacao
+                        ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
+                        AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
+                        AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
+                        AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
+                        AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
+                                            
+                    JOIN orcamento.despesa
+                        ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
+                        AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                     
                     JOIN compras.mapa_cotacao
                       ON mapa_cotacao.exercicio_mapa = mapa.exercicio

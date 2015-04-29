@@ -43,10 +43,10 @@ class VPPAManterPPA
         $this->obNegocio = $obNegocio;
     }
 
-    public function verificaHomologacao($_REQUEST)
+    public function verificaHomologacao($arParametros)
     {
         if ($_REQUEST['boArredondamento']) {
-            $boHomologado = $this->obNegocio->verificaHomologacaoImportacao($_REQUEST);
+            $boHomologado = $this->obNegocio->verificaHomologacaoImportacao($arParametros);
             if ($boHomologado == false) {
                 $stMensagem  = 'O PPA que vai ser importado não está homologado';
                 $stMensagem .= ' Deseja continuar?';
@@ -65,22 +65,22 @@ class VPPAManterPPA
         SistemaLegado::executaFrameOculto($stJS);
     }
 
-    public function incluir($_REQUEST)
+    public function incluir($arParametros)
     {
-        $this->obNegocio->incluir($_REQUEST);
+        $this->obNegocio->incluir($arParametros);
     }
 
-    public function excluir($_REQUEST)
+    public function excluir($arParametros)
     {
-        $this->obNegocio->excluir($_REQUEST);
+        $this->obNegocio->excluir($arParametros);
     }
 
-    public function listar($_REQUEST)
+    public function listar($arParametros)
     {
-        return $this->obNegocio->listar($_REQUEST);
+        return $this->obNegocio->listar($arParametros);
     }
 
-    public function importar($_REQUEST)
+    public function importar($arParametros)
     {
         $arParametros = array();
 

@@ -20,6 +20,18 @@
     *                                                                                *
     **********************************************************************************
 */
+/**
+    * Arquivo para a função que busca os dados do arquivo especifPrev
+    * Data de Criação   : 03/02/2009
+
+    * @author Analista      Tonismar Regis Bernardo
+    * @author Desenvolvedor André Machado
+
+    * @package URBEM
+    * @subpackage
+
+    $Id: especifPrev.plsql 61835 2015-03-09 14:28:12Z michel $
+*/
 CREATE OR REPLACE FUNCTION tcemg.especifPrev(stExercicio varchar, dtInicio varchar, dtFinal varchar, stEntidades varchar, stRpps varchar) returns RECORD AS $$
 DECLARE
 	stSql varchar;
@@ -28,33 +40,24 @@ BEGIN
 	stSql := 'SELECT  stn.pl_saldo_contas (   '|| quote_literal(stExercicio) ||'
                             , '|| quote_literal(dtInicio) ||'
                             , '|| quote_literal(dtFinal) ||'
-                            , plano_conta.cod_estrutural like ''1.1.1.1.3%'' 
+                            , '' ( plano_conta.cod_estrutural like ''''1.1.1.1.1.50%'''' OR plano_conta.cod_estrutural like ''''1.1.4%'''' )''
                             , '|| quote_literal(stEntidades) ||'
                             , '|| quote_literal(stRpps) ||'
 		    ) as aplicacoes_financeiras
 			,      stn.pl_saldo_contas (     '|| quote_literal(stExercicio) ||'
                             , '|| quote_literal(dtInicio) ||'
                             , '|| quote_literal(dtFinal) ||'
-                            , plano_conta.cod_estrutural like ''1.1.1.1.1%''
+                            , '' plano_conta.cod_estrutural like ''''1.1.1.1.1%'''' ''
                             , '|| quote_literal(stEntidades) ||'
                             , '|| quote_literal(stRpps) ||'
-		    ) as caixa 
-	
-			,  stn.pl_saldo_contas (      '|| quote_literal(stExercicio) ||'
+		    ) as caixa
+            ,      stn.pl_saldo_contas (     '|| quote_literal(stExercicio) ||'
                             , '|| quote_literal(dtInicio) ||'
                             , '|| quote_literal(dtFinal) ||'
-                            , plano_conta.cod_estrutural like ''1.1.1.1.2%'' AND recurso_direto.tipo = ''L''
+                            , '' plano_conta.cod_estrutural like ''''1.1.1.1.1.06%'''' ''
                             , '|| quote_literal(stEntidades) ||'
                             , '|| quote_literal(stRpps) ||'
-		    ) as conta_movimento 
-
-		,     stn.pl_saldo_contas (      '|| quote_literal(stExercicio) ||'
-                            , '|| quote_literal(dtInicio) ||'
-                            , '|| quote_literal(dtFinal) ||'
-                            ,  plano_conta.cod_estrutural like ''1.1.1.1.2%'' AND recurso_direto.tipo = ''V''
-                            , '|| quote_literal(stEntidades) ||'
-                            , '|| quote_literal(stRpps) ||'
-		    ) as contas_vinculadas';
+		    ) as banco';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP

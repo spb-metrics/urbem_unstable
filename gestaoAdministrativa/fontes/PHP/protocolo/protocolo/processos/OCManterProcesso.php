@@ -32,10 +32,12 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: OCManterProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterProcesso.php 61966 2015-03-18 21:54:54Z jean $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once( CAM_FW_HTML.'MontaOrgUniDepSet.class.php' );
+
+$stJs = "";
 
 $obMontaOrgUniDepSet = new MontaOrgUniDepSet;
 switch ($_REQUEST['stCtrl']) {
@@ -98,6 +100,24 @@ switch ($_REQUEST['stCtrl']) {
         $obMontaOrgUniDepSet->setChaveSetor( $_POST['stChaveSetorTxt'] );
         $obMontaOrgUniDepSet->obRSetor->setNomSetor( $_POST['stChaveNomSetor'] );
         $obMontaOrgUniDepSet->montarPorChave();
+    break;
+    case 'montaEntidade':
+        if ($_REQUEST['stIncluirAssinaturas'] == 'sim') {
+            include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
+            $obISelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
+            $obISelectEntidadeUsuario->setNull(false);
+            $obISelectEntidadeUsuario->obSelect->obEvento->setOnChange('getIMontaAssinaturas();');
+
+            $obFormulario = new Formulario();
+            $obFormulario->addComponente($obISelectEntidadeUsuario);
+            $obFormulario->montaInnerHTML();
+            $stHTML = $obFormulario->getHTML();
+            $stJs .= "jQuery('#spnEntidade').html('".$stHTML."');\n";
+            echo $stJs;
+        } else {
+            $stJs .= "jQuery('#spnEntidade').html('');\n";
+            echo $stJs;
+        }
     break;
 }
 ?>

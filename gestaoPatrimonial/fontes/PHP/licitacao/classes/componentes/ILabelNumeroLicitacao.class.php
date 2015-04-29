@@ -41,6 +41,7 @@ class  ILabelNumeroLicitacao extends Objeto
     public $stExercicio;
     public $inNumEdital;
     public $inNumLicitacao;
+    public $inModalidade;
     public $obLblExercico;
     public $obLblEntidade;
     public $obLblModalidade;
@@ -51,23 +52,25 @@ class  ILabelNumeroLicitacao extends Objeto
     public $boMostrarDataHoraLic;
     public $boFiltro = "true";
     
-    public function setExercicio($valor) { $this->stExercicio = $valor; }
-    public function setNumEdital($valor) { $this->inNumEdital = $valor; }
-    public function setNumLicitacao($valor) { $this->inNumLicitacao = $valor; }
+    public function setExercicio($valor)     { $this->stExercicio = $valor; }
+    public function setNumEdital($valor)     { $this->inNumEdital = $valor; }
+    public function setNumLicitacao($valor)  { $this->inNumLicitacao = $valor; }
+    public function setModalidade($valor)    { $this->inModalidade = $valor; }
     public function setCodPreEmpenho($valor) { $this->inCodPreEmpenho = $valor; }
-    public function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
+    public function setCodEntidade($valor)   { $this->inCodEntidade = $valor; }
     public function setMostrarObjeto($valor) { $this->boMostrarObjeto = $valor; }
     public function setMostrarDataHoraLic($valor) { $this->boMostrarDataHoraLic = $valor; }
-    public function setBoFiltro($valor) { $this->boFiltro = $valor; }
+    public function setBoFiltro($valor)      { $this->boFiltro = $valor; }
 
-    public function getExercicio() { return $this->stExercicio; }
-    public function getNumEdital() { return $this->inNumEdital; }
-    public function getNumLicitacao() { return $this->inNumLicitacao; }
+    public function getExercicio()     { return $this->stExercicio; }
+    public function getNumEdital()     { return $this->inNumEdital; }
+    public function getNumLicitacao()  { return $this->inNumLicitacao; }
+    public function getModalidade()    { return $this->inModalidade; }
     public function getCodPreEmpenho() { return $this->inCodPreEmpenho; }
-    public function getCodEntidade() { return $this->inCodEntidade; }
+    public function getCodEntidade()   { return $this->inCodEntidade; }
     public function getMostrarObjeto() { return $this->boMostrarObjeto; }
     public function getMostrarDataHoraLic() { return $this->boMostrarDataHoraLic; }    
-    public function getBoFiltro() { return $this->boFiltro; }
+    public function getBoFiltro()      { return $this->boFiltro; }
 
     public function ILabelNumeroLicitacao(&$obForm)
     {
@@ -129,14 +132,14 @@ class  ILabelNumeroLicitacao extends Objeto
 
         $obTLicitacaoEdital->setDado( 'exercicio', $this->getExercicio() );
         $obTLicitacaoEdital->setDado( 'num_edital', $this->getNumEdital() );
-        
+                
         if($this->boFiltro == "true"){
             $stFiltro = " and lh.num_homologacao is null ";
         }else{
             $stFiltro = "";
         }
         
-        if ($this->boMostrarObjeto) {
+        if ($this->boMostrarObjeto) { 
             $obTLicitacaoEdital->recuperaEditalObjeto( $rsRecordSet, $stFiltro );
         } else {
            $obTLicitacaoEdital->recuperaEdital( $rsRecordSet, $stFiltro );
@@ -193,6 +196,78 @@ class  ILabelNumeroLicitacao extends Objeto
             $obFormulario->addComponente( $this->obLblModalidade );
         }
     }
+    
+    public function geraFormularioManutencaoParticipante(&$obFormulario)
+    {
+        include_once(TLIC."TLicitacaoLicitacao.class.php");
+        
+        $obTLicitacao = new TLicitacaoLicitacao();
+        $obTLicitacao->setDado('exercicio'      , $this->getExercicio()    );
+        $obTLicitacao->setDado('cod_licitacao'  , $this->getNumLicitacao() );
+        $obTLicitacao->setDado('cod_modalidade' , $this->getModalidade()   );
+        $obTLicitacao->setDado('cod_entidade'   , $this->getCodEntidade()  );
+        $obTLicitacao->setDado('num_edital'     , $this->getNumEdital()    );
+        
+        $stFiltro = "
+            -- A Licitação não pode estar anulada.
+            AND NOT EXISTS (
+                                SELECT	1
+                                  FROM	licitacao.licitacao_anulada
+                                 WHERE	licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
+                                   AND  licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                   AND  licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                                   AND  licitacao_anulada.exercicio      = licitacao.exercicio
+                            )
+            -- O Edital não pode estar anulado.
+            AND NOT EXISTS (
+                                SELECT	1
+                                  FROM	licitacao.edital_anulado
+                                 WHERE  edital_anulado.num_edital = edital.num_edital
+                                   AND 	edital_anulado.exercicio  = edital.exercicio
+                            )
+            
+            -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                    edital.cod_licitacao IS NOT NULL
+               AND edital.cod_modalidade IS NOT NULL
+               AND edital.cod_entidade   IS NOT NULL 
+               AND edital.exercicio      IS NOT NULL 
 
+              -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN licitacao.cod_modalidade in (8,9) THEN
+                    
+                    edital.cod_licitacao  IS NULL
+                 OR edital.cod_modalidade IS NULL
+                 OR edital.cod_entidade   IS NULL 
+                 OR edital.exercicio      IS NULL 
+
+	         OR edital.cod_licitacao  IS NOT NULL
+	         OR edital.cod_modalidade IS NOT NULL
+	         OR edital.cod_entidade   IS NOT NULL 
+	         OR edital.exercicio      IS NOT NULL 
+            END  \n ";
+        
+        if($this->boFiltro == "true"){
+            $stFiltro .= " AND homologacao.num_homologacao IS NULL \n ";
+        }
+        
+        $obTLicitacao->recuperaManutencaoParticipanteLicitacaoLabel( $rsRecordSet, $stFiltro );
+
+        $this->obLblLicitacao->setValue ( $rsRecordSet->getCampo( 'cod_licitacao' ) );
+        $this->obLblExercicio->setValue ( $rsRecordSet->getCampo( 'exercicio_licitacao' ) );
+        $this->obLblEntidade->setValue  ( $rsRecordSet->getCampo( 'cod_entidade' ).'-'.$rsRecordSet->getCampo( 'nom_entidade' ) );
+        $this->obLblModalidade->setValue( $rsRecordSet->getCampo( 'cod_modalidade' ).'-'.$rsRecordSet->getCampo( 'nom_modalidade' ) );
+        $this->obLblProcesso->setValue  ( str_pad($rsRecordSet->getCampo( 'cod_processo' ), 5, '0', STR_PAD_LEFT).'/'.$rsRecordSet->getCampo( 'exercicio_processo' ) );
+
+        $obFormulario->addComponente( $this->obLblLicitacao  );
+        $obFormulario->addComponente( $this->obLblExercicio  );
+        $obFormulario->addComponente( $this->obLblEntidade   );
+        $obFormulario->addComponente( $this->obLblModalidade );
+        $obFormulario->addComponente( $this->obLblProcesso   );
+
+    }
+    
 }
+
 ?>

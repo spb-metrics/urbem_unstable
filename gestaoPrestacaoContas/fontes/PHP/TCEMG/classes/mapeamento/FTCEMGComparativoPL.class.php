@@ -66,7 +66,7 @@ function montaRecuperaTodos()
                                      , ".$this->getDado("mes")."
                                      ) AS retorno(
                                                   mes       INTEGER,
-                                                  valor     NUMERIC(14,2)
+                                                  valor     NUMERIC
                                                  )";
 
     return $stSql;

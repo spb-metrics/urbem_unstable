@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterConfiguracaoEMP.php 61710 2015-02-26 19:17:13Z carlos.silva $
+  * $Id: OCManterConfiguracaoEMP.php 61800 2015-03-04 20:16:20Z arthur $
   * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
   * $Author: gelson $
   * $Rev: 59612 $
@@ -347,7 +347,7 @@ function limparFormEmpenhoEntidade() {
 
 function alterarItem() {
     $arListaEmpenho = Sessao::read('arListaEmpenho');
-    
+        
     foreach ($arListaEmpenho as $arEmpenho) {
         
         if ($arEmpenho['inId'] == $_GET['inId']) {
@@ -367,6 +367,22 @@ function alterarItem() {
             $stJs .= "jQuery('#inCodModalidade').val('".$arEmpenho['inCodModalidade']."');           \n";
             $stJs .= "jQuery('#stExercicio').focus();                                                \n";
             
+            $obTTCEMGConfiguracaoEMP = new TTCEMGConfiguracaoEMP;
+            $obTTCEMGConfiguracaoEMP->setDado('exercicio_licitacao' , $arEmpenho['stExercicioLicitacao']);
+            $obTTCEMGConfiguracaoEMP->setDado('cod_licitacao'       , $arEmpenho['inCodLicitacao']);
+            $obTTCEMGConfiguracaoEMP->setDado('cod_modalidade'      , $arEmpenho['inCodModalidade']);
+            $obTTCEMGConfiguracaoEMP->setDado('cod_empenho'         , $arEmpenho['inCodEmpenho']);
+            $obTTCEMGConfiguracaoEMP->recuperaComprasLicitacao($rComprasLicitacao);
+            
+            // Verifica se determinada licitação nao está na consulta devido a compras, caso nao esteja desabilita, nao permitindo o usuario alterar.
+            if ($rComprasLicitacao->getNumLinhas() <= 0){
+                $stJs .= "jQuery('#stExercicioLicitacao').attr('readonly', true); \n";
+                $stJs .= "jQuery('#inCodLicitacao').attr('readonly', true); \n";
+            } else {
+                $stJs .= "jQuery('#stExercicioLicitacao').attr('readonly', false); \n";
+                $stJs .= "jQuery('#inCodLicitacao').attr('readonly', false); \n";
+            }
+
             break;
         }
     }
@@ -408,7 +424,6 @@ switch ($request->get('stCtrl')) {
         $arListaEmpenho = array();
         $obTTCEMGConfiguracaoEMP = new TTCEMGConfiguracaoEMP;
         $obTTCEMGConfiguracaoEMP->recuperaTodos($rsConfigEmpenho);
-        
         
         foreach($rsConfigEmpenho->getElementos() as $empenho) {
 

@@ -45,18 +45,18 @@ include_once CAM_GA_NORMAS_MAPEAMENTO."TNorma.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php';
 include_once CAM_GPC_STN_MAPEAMENTO.'TSTNRiscosFiscais.class.php';
 include_once CAM_GPC_STN_MAPEAMENTO.'TSTNProvidencias.class.php';
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoLOA.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfigurarIDE.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TExportacaoTCEMGItem.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConfiguracaoLOA.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConfigurarIDE.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TExportacaoTCEMGItem.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConfiguracaoPERC.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGMetasFiscais.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGRegistrosArquivoPrograma.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGAMP.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoAMP.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoUOC.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGORGAO.class.php";
 include_once CAM_GF_EXP_MAPEAMENTO."TExportacaoTCEMGUniOrcam.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoPERC.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGMetasFiscais.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRegistrosArquivoPrograma.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracao.class.php';
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGAMP.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGArquivoAMP.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGArquivoUOC.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoOrgao.class.php";
 
 /**
     * Classe de Regra para geração de arquivo de planejamento para o ExportacaoTCE-MG
@@ -83,7 +83,7 @@ class RTCEMGExportacaoArquivosPlanejamento
     public $obTTCEMGRegistrosArquivoPrograma;
     public $obTTCEMGArquivoAMP;
     public $obTTCEMGArquivoUOC;
-    public $obTTCEMGConfiguracaoOrgao;
+    public $obTTCEMGORGAO;
     
     
     /**
@@ -110,7 +110,7 @@ class RTCEMGExportacaoArquivosPlanejamento
         $this->obTTCEMGArquivoAMP                   = new TTCEMGArquivoAMP;
         $this->obTTCEMGArquivoUOC                   = new TTCEMGArquivoUOC;
         $this->obTTCEMGRegistrosArquivoPrograma     = new TTCEMGRegistrosArquivoPrograma;
-        $this->obTTCEMGConfiguracaoOrgao            = new TTCEMGConfiguracaoOrgao;
+        $this->obTTCEMGORGAO                        = new TTCEMGORGAO;
     }
 
     // SETANDO
@@ -273,8 +273,8 @@ class RTCEMGExportacaoArquivosPlanejamento
         }
 
         if (in_array("ORGAO.csv",$this->getArquivos())) {
-            $this->obTTCEMGConfiguracaoOrgao->setDado('entidade', $this->getCodEntidades());
-            $this->obTTCEMGConfiguracaoOrgao->recuperaExportacaoOrgaoPlanejamento($rsRecordSet);
+            $this->obTTCEMGORGAO->setDado('entidade', $this->getCodEntidades());
+            $this->obTTCEMGORGAO->recuperaExportacaoOrgaoPlanejamento($rsRecordSet);
             
             $arRecordSetArquivos["ORGAO.csv"] = $rsRecordSet;
         }

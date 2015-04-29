@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: OCManterMembroAdicional.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterMembroAdicional.php 62332 2015-04-24 14:43:32Z jean $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -58,13 +58,12 @@ $arMembrosAdicionais = Sessao::read('arMembrosAdicionais');
 
 switch ($stCtrl) {
 case 'montaAcoes':
-    $anoAtual  = date("Y");
     $stFiltro  = " AND MA.cod_licitacao  = ".$_REQUEST['cod_licitacao'];
     $stFiltro .= " AND MA.cod_modalidade = ".$_REQUEST['cod_modalidade'];
     $stOrder   = " ORDER BY cgm.nom_cgm";
 
     $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional;
-    $obTLicitacaoMembroAdicional->setDado('exercicio', $anoAtual);
+    $obTLicitacaoMembroAdicional->setDado('exercicio', $_REQUEST['exercicio']);
     $obTLicitacaoMembroAdicional->recuperaMembroAdicional($rsMembrosAdicionais, $stFiltro, $stOrder);
 
     //Validar se existe mais o mesmo membro para varias licitacoes

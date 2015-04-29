@@ -41,9 +41,13 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 if ($_REQUEST['stAcao'] == 'encerramento') {
     $preview = new PreviewBirt(3,6,8);
     $preview->setNomeArquivo('encerramentoInventario');
+    $stDataHoje     = SistemaLegado::dataExtenso(date('Y-m-d'));
+    $stDataCabecalho = $stDataHoje;
 } else {
     $preview = new PreviewBirt(3,6,7);
     $preview->setNomeArquivo('aberturaInventario');
+    $stDataHoje = SistemaLegado::dataExtenso( SistemaLegado::dataToSql( $_REQUEST['stDataInicial'] ) );
+    $stDataCabecalho = $_REQUEST['stDataInicial'];
 }
 
 $preview->setVersaoBirt('2.5.0');
@@ -52,12 +56,12 @@ $preview->setTitulo('Relatório do Birt');
 $inCodMunicipio = SistemaLegado::pegaConfiguracao('cod_municipio' , '2', $_REQUEST['stExercicio']);
 $inCodUf        = SistemaLegado::pegaConfiguracao('cod_uf'        , '2', $_REQUEST['stExercicio']);
 $nomeMunicipio  = SistemaLegado::pegaDado('nom_municipio','sw_municipio','where cod_municipio='.$inCodMunicipio.' and cod_uf='.$inCodUf);
-$stDataHoje     = SistemaLegado::dataExtenso(date('Y-m-d'));
 
 $preview->addParametro("exercicio_inventario" , $_REQUEST['stExercicio']);
 $preview->addParametro("id_inventario"        , $_REQUEST['inIdInventario']);
 $preview->addParametro("nomMunicipio"         , $nomeMunicipio);
 $preview->addParametro("dataHoje"             , $stDataHoje);
+$preview->addParametro("dataCabecalho"        , $stDataCabecalho);
 
 $preview->preview();
 

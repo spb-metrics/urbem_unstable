@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoPrincipais.php 61774 2015-03-03 16:24:44Z michel $
+    $Id: OCExportacaoPrincipais.php 62149 2015-03-31 19:56:33Z arthur $
 
     * Casos de uso: uc-02.08.01
 */
@@ -599,10 +599,16 @@ if (in_array("LIQUIDAC.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(165);
     }
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("zero");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(30);
+    
+    if (Sessao::getExercicio() >= '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codigo_operacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(30);
+    } else {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(30);
+    }
 
     if (Sessao::getExercicio() > '2012') {
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("observacao");
@@ -618,7 +624,7 @@ if (in_array("LIQUIDAC.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_contrato");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_contrato");

@@ -70,9 +70,8 @@ Bug #9169#
 
     $i = 0;
 
-    if (!$rsRegistro10->eof()) {
-        foreach ($rsRegistro10->arElementos as $stChave){
-            $obExportador->roUltimoArquivo->addBloco($rsRegistro10);
+    if ( $rsRegistro10->getNumLinhas() > 0 ) {
+        foreach ($rsRegistro10->getElementos() as $stChave){            
             $stChave['sequencial'] = ++$i;
 
             $rsBloco10 = 'rsBloco10_'.$inCount;
@@ -171,4 +170,8 @@ Bug #9169#
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+
+
+
+
 ?>

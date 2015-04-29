@@ -34,21 +34,21 @@
 * Casos de uso: uc-01.03.96
 */
 
-CREATE OR REPLACE FUNCTION administracao.valor_padrao(INTEGER,INTEGER ,INTEGER ,VARCHAR) RETURNS VARCHAR AS '
+CREATE OR REPLACE FUNCTION administracao.valor_padrao(INTEGER,INTEGER ,INTEGER ,VARCHAR) RETURNS VARCHAR AS $$
 DECLARE
     inCodAtributo       ALIAS FOR $1;
     inCodModulo         ALIAS FOR $2;
     inCodCadastro       ALIAS FOR $3;
     stValores           ALIAS FOR $4;
-    stSql               VARCHAR   := '''';
-    stSaida             VARCHAR   := '''';
-    stValor             VARCHAR   := '''';
+    stSql               VARCHAR   := '';
+    stSaida             VARCHAR   := '';
+    stValor             VARCHAR   := '';
     reRegistro          RECORD;
     inCodTipo           INTEGER;
     inCount             INTEGER := 1;
     inCount2            INTEGER := 1;
-    arValores           INTEGER[] := array[0];
-    arEntrada           INTEGER[] := array[0];
+    arValores           VARCHAR[] := array[0];
+    arEntrada           VARCHAR[] := array[0];
 
 BEGIN
         SELECT INTO 
@@ -76,7 +76,7 @@ BEGIN
                 END IF;
             END LOOP;
             inCount := 1;
-            arEntrada := string_to_array(trim(stValores),'','');
+            arEntrada := string_to_array(trim(stValores),',');
             WHILE true LOOP
                 IF arValores[inCount] IS NULL THEN 
                     EXIT; --Saida do Loop
@@ -93,7 +93,7 @@ BEGIN
                     inCount2 := inCount2 + 1;
                 END LOOP;
                 IF inCount2 <> 0 THEN
-                    stSaida := stSaida || '','' || arValores[inCount];
+                    stSaida := stSaida || ',' || arValores[inCount];
                 END IF;
                 inCount := inCount + 1;
             END LOOP;
@@ -112,4 +112,4 @@ BEGIN
 
     RETURN stSaida;
 END;
-'language 'plpgsql';
+$$ language 'plpgsql';

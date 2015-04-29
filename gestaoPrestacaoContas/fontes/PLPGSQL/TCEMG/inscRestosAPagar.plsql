@@ -98,7 +98,7 @@ INNER JOIN sw_cgm
 
     --Cria uma table temporaria para guardar os dados dos restos
     CREATE TEMPORARY TABLE tmp_restos AS
-        SELECT lpad(tb.cod_recurso,4,'0') as cod_recurso
+        SELECT lpad(tb.cod_recurso::VARCHAR,4,'0') as cod_recurso
              , CASE WHEN( recurso.tipo IS NULL)
                     THEN 'L'
                     ELSE recurso.tipo
@@ -125,7 +125,7 @@ INNER JOIN sw_cgm
 
     --Cria uma table temporaria para guardar os dados dos restos rpps
     CREATE TEMPORARY TABLE tmp_restos_rpps AS
-        SELECT lpad(tb.cod_recurso,4,'0') as cod_recurso
+        SELECT lpad(tb.cod_recurso::VARCHAR,4,'0') as cod_recurso
              , CASE WHEN( recurso.tipo IS NULL)
                     THEN 'L'
                     ELSE recurso.tipo
@@ -152,7 +152,7 @@ INNER JOIN sw_cgm
 
     --Cria uma table temporaria para guardar os dados dos restos do legislativo
     CREATE TEMPORARY TABLE tmp_restos_legislativo AS
-        SELECT lpad(tb.cod_recurso,4,'0') as cod_recurso
+        SELECT lpad(tb.cod_recurso::VARCHAR,4,'0') as cod_recurso
              , CASE WHEN( recurso.tipo IS NULL)
                     THEN 'L'
                     ELSE recurso.tipo

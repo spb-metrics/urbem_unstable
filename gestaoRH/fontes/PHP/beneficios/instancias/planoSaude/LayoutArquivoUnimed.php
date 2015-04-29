@@ -43,6 +43,12 @@ class LayoutArquivoUnimed
         //Valida formato e padroes do arquivo
         $boArquivoValido = $this->validarArquivo($coluna);
         if ( $boArquivoValido ) {
+            $obErro = new Erro();
+            $obTransacao = new Transacao();
+            $obTransacao->abreTransacao($boFlagTransacao, $boTransacao );
+            $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
+            $obTBeneficioBeneficiarioLancamento->recuperaNow3($stTimestamp , $boTransacao);
+            
             while (!feof($arquivo)) {
                 $linha  = fgets($arquivo);
                 $coluna = explode(';', $linha);
@@ -53,59 +59,54 @@ class LayoutArquivoUnimed
                     $stCondicao = " WHERE EXTRACT(YEAR FROM periodo_movimentacao.dt_final) = ".$coluna[0]."   \n";
                     $stCondicao.= "   AND EXTRACT(MONTH FROM periodo_movimentacao.dt_final) = ".$coluna[1]."; \n";
                 
-                    $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
-                    $obTBeneficioBeneficiarioLancamento->verificaPeriodoMovimentacao($rsPeriodo, $stCondicao);
-                
+                    # Pega o periodo de mivmentação da linha, apartir do mês e do ano;
+                    $obTBeneficioBeneficiarioLancamento->verificaPeriodoMovimentacao($rsPeriodo, $stCondicao, $stOrdem = "" , $boTransacao);
                     if ($rsPeriodo->getNumLinhas() > 0) {
                         // Verifica se o usuário está cadastrado como beneficiário
                         $stCondicao = " WHERE cgm_fornecedor    = ".$_REQUEST['inCGMFornecedor']." \n";
                         $stCondicao.= "  AND codigo_usuario     = ".$coluna[4]." \n";
                         $stCondicao.= "  AND cod_modalidade     = ".$coluna[2]." \n";
                         $stCondicao.= "  AND cod_tipo_convenio  = ".$coluna[3]." \n";
+                        $stCondicao.= "  AND cod_periodo_movimentacao = ".$rsPeriodo->getCampo('cod_periodo_movimentacao')." \n";
+                        $stCondicao.= "  AND timestamp = (SELECT MAX(timestamp) FROM beneficio.beneficiario AS BB WHERE BB.cod_contrato=beneficiario.cod_contrato AND BB.codigo_usuario=beneficiario.codigo_usuario ) ";
                         $stCondicao.= "  AND timestamp_excluido is null \n";
                     
                         $obTBeneficioBeneficiario = new TBeneficioBeneficiario();
-                        $obTBeneficioBeneficiario->recuperaTodos($rsBeneficioBeneficiario, $stCondicao);
-                    
+                        $obTBeneficioBeneficiario->recuperaTodos($rsBeneficioBeneficiario, $stCondicao, $stOrdem = "", $boTransacao);
+
                         // Verifica se já foi feito lançamento para o usuário
                         $stCondicao = " WHERE codigo_usuario          = ".$coluna[4]."                                       \n";
                         $stCondicao.= "  AND cod_modalidade           = ".$coluna[2]."                                       \n";
                         $stCondicao.= "  AND cod_tipo_convenio        = ".$coluna[3]."                                       \n";
                         $stCondicao.= "  AND cod_periodo_movimentacao = ".$rsPeriodo->getCampo('cod_periodo_movimentacao')." \n";
                     
-                        $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
-                        $obTBeneficioBeneficiarioLancamento->recuperaTodos($rsBeneficioBeneficiarioLancamento, $stCondicao);
+                        $obTBeneficioBeneficiarioLancamento->recuperaTodos($rsBeneficioBeneficiarioLancamento, $stCondicao, $stOrdem = "", $boTransacao);
 
-                        // Verifica se o usuário está cadastrado como beneficiário
                         if ($rsBeneficioBeneficiario->getNumLinhas() > 0) {
-                            $obTBeneficioBeneficiario = new TBeneficioBeneficiario();
-                            $obTBeneficioBeneficiario->setDado('cod_contrato'       , $rsBeneficioBeneficiario->getCampo('cod_contrato')        );
-                            $obTBeneficioBeneficiario->setDado('cgm_fornecedor'     , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor')      );
-                            $obTBeneficioBeneficiario->setDado('cod_modalidade'     , $rsBeneficioBeneficiario->getCampo('cod_modalidade')      );
-                            $obTBeneficioBeneficiario->setDado('cod_tipo_convenio'  , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio')   );
-                            $obTBeneficioBeneficiario->setDado('cgm_beneficiario'   , $rsBeneficioBeneficiario->getCampo('cgm_beneficiario')    );
-                            $obTBeneficioBeneficiario->setDado('grau_parentesco'    , $rsBeneficioBeneficiario->getCampo('grau_parentesco')     );
-                            $obTBeneficioBeneficiario->setDado('codigo_usuario'     , $rsBeneficioBeneficiario->getCampo('codigo_usuario')      );
-                            $obTBeneficioBeneficiario->setDado('dt_inicio'          , $rsBeneficioBeneficiario->getCampo('dt_inicio')           );
-                            $obTBeneficioBeneficiario->setDado('dt_fim'             , $rsBeneficioBeneficiario->getCampo('dt_fim')              );
-                            $obTBeneficioBeneficiario->setDado('timestamp'          , $timestamp                                                );
-                            $obTBeneficioBeneficiario->setDado('timestamp_excluido' , NULL                                                      );
-                            $obTBeneficioBeneficiario->setDado('valor'              , str_replace(',', '.', str_replace('.', '', $coluna[6]))   );                                
+                            $obTBeneficioBeneficiario->setDado('cod_contrato'             , $rsBeneficioBeneficiario->getCampo('cod_contrato')     );
+                            $obTBeneficioBeneficiario->setDado('cgm_fornecedor'           , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor')   );
+                            $obTBeneficioBeneficiario->setDado('cod_modalidade'           , $rsBeneficioBeneficiario->getCampo('cod_modalidade')   );
+                            $obTBeneficioBeneficiario->setDado('cod_tipo_convenio'        , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio'));
+                            $obTBeneficioBeneficiario->setDado('cgm_beneficiario'         , $rsBeneficioBeneficiario->getCampo('cgm_beneficiario') );
+                            $obTBeneficioBeneficiario->setDado('grau_parentesco'          , $rsBeneficioBeneficiario->getCampo('grau_parentesco')  );
+                            $obTBeneficioBeneficiario->setDado('codigo_usuario'           , $rsBeneficioBeneficiario->getCampo('codigo_usuario')   );
+                            $obTBeneficioBeneficiario->setDado('dt_inicio'                , $rsBeneficioBeneficiario->getCampo('dt_inicio')        );
+                            $obTBeneficioBeneficiario->setDado('dt_fim'                   , $rsBeneficioBeneficiario->getCampo('dt_fim')           );
+                            $obTBeneficioBeneficiario->setDado('cod_periodo_movimentacao' , $rsPeriodo->getCampo('cod_periodo_movimentacao')       );
+                            $obTBeneficioBeneficiario->setDado('timestamp'                , $stTimestamp                                           );
+                            $obTBeneficioBeneficiario->setDado('timestamp_excluido'       , NULL                                                   );
+                            $obTBeneficioBeneficiario->setDado('valor'                    , str_replace(',', '.', str_replace('.', '', $coluna[6])));                                
+                            $obErro = $obTBeneficioBeneficiario->inclusao($boTransacao);
                             
-                            $obTBeneficioBeneficiario->inclusao();
-                            
-                            $obTBeneficioBeneficiarioLancamento = new TBeneficioBeneficiarioLancamento();
                             $obTBeneficioBeneficiarioLancamento->setDado('cod_contrato'             , $rsBeneficioBeneficiario->getCampo('cod_contrato'));
                             $obTBeneficioBeneficiarioLancamento->setDado('cgm_fornecedor'           , $rsBeneficioBeneficiario->getCampo('cgm_fornecedor'));
                             $obTBeneficioBeneficiarioLancamento->setDado('cod_modalidade'           , $rsBeneficioBeneficiario->getCampo('cod_modalidade'));
                             $obTBeneficioBeneficiarioLancamento->setDado('cod_tipo_convenio'        , $rsBeneficioBeneficiario->getCampo('cod_tipo_convenio'));
                             $obTBeneficioBeneficiarioLancamento->setDado('codigo_usuario'           , $rsBeneficioBeneficiario->getCampo('codigo_usuario'));
-                            $obTBeneficioBeneficiarioLancamento->setDado('timestamp'                , $timestamp                                            );
+                            $obTBeneficioBeneficiarioLancamento->setDado('timestamp'                , $stTimestamp);
                             $obTBeneficioBeneficiarioLancamento->setDado('valor'                    , str_replace(',', '.', str_replace('.', '', $coluna[6])));
-                            $obTBeneficioBeneficiarioLancamento->setDado('timestamp_lancamento'     , date('Y-m-d H:i:s'));
                             $obTBeneficioBeneficiarioLancamento->setDado('cod_periodo_movimentacao' , $rsPeriodo->getCampo('cod_periodo_movimentacao'));
-                            $obTBeneficioBeneficiarioLancamento->inclusao();
-                            
+                            $obTBeneficioBeneficiarioLancamento->inclusao($boTransacao);
                             $beneficiarioCadastrado[] = $linha;
                         } else {
                             $beneficiarioNaoCadastrado[] = $linha;
@@ -115,6 +116,7 @@ class LayoutArquivoUnimed
                     }
                 }
             }//WHILE
+            $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $obTBeneficioBeneficiarioLancamento );
         }else{//else validacao arquivo
             $obErro->setDescricao('O arquivo está fora dos padrões do Layout Unimed.');
         }

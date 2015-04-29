@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
-    <property name="comments">Desenvolvedor: Carlos Adriano &lt;carlos.silva@cnm.org.br></property>
-    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
-    <html-property name="description">Template para o formato A4 paisagem</html-property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
     <property name="units">in</property>
+    <property name="comments">Desenvolvedor: Carlos Adriano &lt;carlos.silva@cnm.org.br></property>
+    <html-property name="description">Template para o formato A4 paisagem</html-property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -19,9 +19,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -30,12 +30,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -44,9 +44,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -55,9 +55,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -66,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -77,9 +77,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -88,9 +88,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -99,9 +99,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -110,12 +110,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -124,12 +124,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -138,12 +138,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -152,12 +152,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -166,12 +166,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -180,12 +180,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -194,12 +194,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,13 +208,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -223,13 +223,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -238,13 +237,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -253,13 +251,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -268,13 +265,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -283,13 +279,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -298,13 +293,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -313,10 +307,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -325,13 +318,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -340,13 +332,23 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="mes_extenso" id="6965">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -383,7 +385,6 @@
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ds_recurso" id="6692">
-            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -498,7 +499,6 @@
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[	SELECT lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
          , tb.tipo
          , rd.tipo AS tipo_rd
@@ -576,7 +576,6 @@ INNER JOIN orcamento.recurso_direto AS rd
          , tb.tipo]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ds_recurso_naovinculado" id="6732">
-            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -691,7 +690,6 @@ INNER JOIN orcamento.recurso_direto AS rd
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[	SELECT lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
          , tb.tipo
          , rd.tipo AS tipo_rd
@@ -771,7 +769,6 @@ INNER JOIN orcamento.recurso_direto AS rd
          , tb.tipo]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ds_recurso_rpps" id="6809">
-            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -875,7 +872,6 @@ INNER JOIN orcamento.recurso_direto AS rd
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT   lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
 	 , tb.tipo
 	 , rd.tipo AS tipo_rd
@@ -1153,7 +1149,6 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
 
 Total.sum(row['disponibilidade_caixa_bruta'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liquidados_nao_pagos_exercicios_anteriores</property>
@@ -1161,7 +1156,6 @@ Total.sum(row['disponibilidade_caixa_bruta'])</expression>
 
 Total.sum(row['liquidados_nao_pagos_exercicios_anteriores'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liquidados_nao_pagos</property>
@@ -1169,7 +1163,6 @@ Total.sum(row['liquidados_nao_pagos_exercicios_anteriores'])</expression>
 
 Total.sum(row['liquidados_nao_pagos'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados_exercicios_anteriores</property>
@@ -1177,7 +1170,6 @@ Total.sum(row['liquidados_nao_pagos'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados_exercicios_anteriores'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados</property>
@@ -1185,7 +1177,6 @@ Total.sum(row['empenhados_nao_liquidados_exercicios_anteriores'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_disponibilidade_caixa_liquida</property>
@@ -1193,7 +1184,6 @@ Total.sum(row['empenhados_nao_liquidados'])</expression>
 
 Total.sum(row['disponibilidade_caixa_liquida'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados_cancelados</property>
@@ -1201,7 +1191,6 @@ Total.sum(row['disponibilidade_caixa_liquida'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">obrigacoes_financeiras</property>
@@ -1214,23 +1203,20 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
 
  Total.sum(row['obrigacoes_financeiras'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <text-property name="displayName">total_liq</text-property>
+                    <property name="displayName">total_liq</property>
                     <expression name="expression" type="javascript">params['sum_total_liq'] = Total.sum(row['liq'])
 
  Total.sum(row['liq'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <text-property name="displayName">liq</text-property>
+                    <property name="displayName">liq</property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -1262,8 +1248,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </column>
             <header>
                 <row id="2391">
-                    <property name="backgroundColor">#FFFFFF</property>
                     <property name="height">0mm</property>
+                    <property name="backgroundColor">#FFFFFF</property>
                     <cell id="2392">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">3</property>
@@ -1412,8 +1398,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="2397">
-                    <property name="backgroundColor">#FFFFFF</property>
                     <property name="height">0mm</property>
+                    <property name="backgroundColor">#FFFFFF</property>
                     <cell id="2400">
                         <property name="colSpan">2</property>
                         <property name="rowSpan">1</property>
@@ -1495,12 +1481,12 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="2406">
+                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
                     <property name="verticalAlign">middle</property>
-                    <property name="height">0mm</property>
                     <cell id="6667">
                         <property name="backgroundColor">#E5E5E5</property>
                         <property name="borderBottomColor">#000000</property>
@@ -1549,12 +1535,12 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="6858">
+                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
                     <property name="verticalAlign">middle</property>
-                    <property name="height">0mm</property>
                     <cell id="6859">
                         <property name="backgroundColor">#E5E5E5</property>
                         <property name="fontWeight">bold</property>
@@ -1787,8 +1773,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </header>
             <detail>
                 <row id="2424">
-                    <property name="verticalAlign">middle</property>
                     <property name="height">0in</property>
+                    <property name="verticalAlign">middle</property>
                     <cell id="2425">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2012,7 +1998,6 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
 
 Total.sum(row['disponibilidade_caixa_bruta'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liquidados_nao_pagos_exercicios_anteriores</property>
@@ -2020,7 +2005,6 @@ Total.sum(row['disponibilidade_caixa_bruta'])</expression>
 
 Total.sum(row['liquidados_nao_pagos_exercicios_anteriores'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liquidados_nao_pagos</property>
@@ -2028,7 +2012,6 @@ Total.sum(row['liquidados_nao_pagos_exercicios_anteriores'])</expression>
 
 Total.sum(row['liquidados_nao_pagos'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados_exercicios_anteriores</property>
@@ -2036,7 +2019,6 @@ Total.sum(row['liquidados_nao_pagos'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados_exercicios_anteriores'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados</property>
@@ -2044,7 +2026,6 @@ Total.sum(row['empenhados_nao_liquidados_exercicios_anteriores'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_disponibilidade_caixa_liquida</property>
@@ -2052,7 +2033,6 @@ Total.sum(row['empenhados_nao_liquidados'])</expression>
 
 Total.sum(row['disponibilidade_caixa_liquida'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_empenhados_nao_liquidados_cancelados</property>
@@ -2060,7 +2040,6 @@ Total.sum(row['disponibilidade_caixa_liquida'])</expression>
 
 Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">obrigacoes_financeiras</property>
@@ -2073,23 +2052,20 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
 
  Total.sum(row['obrigacoes_financeiras'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <text-property name="displayName">total_liq</text-property>
+                    <property name="displayName">total_liq</property>
                     <expression name="expression" type="javascript">params['sum_total_liq'] =  params['sum_total_liq']  + Total.sum(row['liq'])
 
  Total.sum(row['liq'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <text-property name="displayName">liq</text-property>
+                    <property name="displayName">liq</property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -2291,8 +2267,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </header>
             <detail>
                 <row id="6759">
-                    <property name="verticalAlign">middle</property>
                     <property name="height">0in</property>
+                    <property name="verticalAlign">middle</property>
                     <cell id="6760">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2467,10 +2443,9 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">sum_total_liq</property>
-                    <text-property name="displayName">sum_total_liq</text-property>
+                    <property name="displayName">sum_total_liq</property>
                     <expression name="expression" type="javascript">params["sum_total_liq"]</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -2563,7 +2538,6 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                                     <property name="name">sum_liquidados_nao_pagos_exercicios_anteriores</property>
                                     <expression name="expression" type="javascript">params["sum_total_liquidados_nao_pagos_exercicios_anteriores"]</expression>
                                     <property name="dataType">decimal</property>
-                                    <property name="allowExport">true</property>
                                 </structure>
                             </list-property>
                             <property name="resultSetColumn">sum_liquidados_nao_pagos_exercicios_anteriores</property>
@@ -2835,17 +2809,15 @@ str.search("Instituto") &lt; 0</expression>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <text-property name="displayName">total_liq</text-property>
+                    <property name="displayName">total_liq</property>
                     <expression name="expression" type="javascript">Total.sum(row['liq'])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <text-property name="displayName">liq</text-property>
+                    <property name="displayName">liq</property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
-                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -3045,8 +3017,8 @@ str.search("Instituto") &lt; 0</expression>
             </header>
             <detail>
                 <row id="6811">
-                    <property name="verticalAlign">middle</property>
                     <property name="height">0in</property>
+                    <property name="verticalAlign">middle</property>
                     <cell id="6812">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>

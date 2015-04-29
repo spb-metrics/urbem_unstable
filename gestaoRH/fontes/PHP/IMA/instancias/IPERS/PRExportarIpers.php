@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRExportarIpers.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarIpers.php 62147 2015-03-31 19:14:32Z jean $
 
     * Casos de uso: uc-04.08.28
 */
@@ -213,8 +213,8 @@ switch ($stAcao) {
 
             $arExportador[$inIndex]["matricula_ipe"]                 = $rsContrato->getCampo("matricula_ipe");
             $arExportador[$inIndex]["situacao"]                      = $rsContrato->getCampo("situacao");
-            $arExportador[$inIndex]["nome"]                          = removeAcentuacao($rsContrato->getCampo("nom_cgm"));
-            $arExportador[$inIndex]["endereco"]                      = removeAcentuacao($rsContrato->getCampo("logradouro").(($rsContrato->getCampo("numero")!="")?", ".$rsContrato->getCampo("numero"):""));
+            $arExportador[$inIndex]["nome"]                          = preg_replace('[°]','',removeAcentuacao($rsContrato->getCampo("nom_cgm")));
+            $arExportador[$inIndex]["endereco"]                      = preg_replace('[°]','',removeAcentuacao($rsContrato->getCampo("logradouro").(($rsContrato->getCampo("numero")!="")?", ".$rsContrato->getCampo("numero"):"")));
             $arExportador[$inIndex]["cep"]                           = preg_replace( "/[^0-9A-Za-z]/i","",$rsContrato->getCampo("cep"));
 
             $arExportador[$inIndex]["data_ingresso"]                 = preg_replace( "/[^0-9]/i","",$rsContrato->getCampo("dt_ingresso"));

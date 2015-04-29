@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: PRManterMapaCompras.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRManterMapaCompras.php 61787 2015-03-04 13:26:46Z evandro $
 
  */
 
@@ -328,6 +328,7 @@ if ($stAcao == 'incluir') {
     $arSolicitacao = Sessao::read('solicitacoes');
 
     if (count($arSolicitacao) == 0) {
+        SistemaLegado::LiberaFrames(true,true);
         SistemaLegado::exibeAviso('É preciso incluir ao menos uma solicitação para salvar o mapa.', "n_incluir", "erro");
     } elseif (is_array($arSolicitacao) && count($arSolicitacao) > 0) {
 
@@ -632,6 +633,7 @@ if ($stAcao == 'incluir') {
 
     # Validação para o mapa ter ao mínimo uma solicitação vinculada.
     if (count(Sessao::read('solicitacoes')) == 0) {
+        SistemaLegado::LiberaFrames(true,true);
         SistemaLegado::exibeAviso( 'É preciso incluir ao menos uma solicitação para salvar o mapa.'   ,"n_incluir","erro");
     } else {
         Sessao::setTrataExcecao(true);
@@ -1207,7 +1209,7 @@ if ($stAcao == 'incluir') {
                         $obTComprasMapaSolicitacaoAnulacao->setDado('cod_solicitacao'       , $solicitacao['cod_solicitacao']);
                         $obTComprasMapaSolicitacaoAnulacao->setDado('timestamp'             , date('Y-m-d H:m:s.ms'));
                         $obTComprasMapaSolicitacaoAnulacao->setDado('motivo'                , stripslashes($stMotivo));
-                        $obTComprasMapaSolicitacaoAnulacao->inclusao();
+                        $obTComprasMapaSolicitacaoAnulacao->inclusao($boTransacao);
 
                         $arItem = Sessao::read('itens');
 
@@ -1233,7 +1235,7 @@ if ($stAcao == 'incluir') {
                                 $obTComprasMapaItemAnulacao->setDado('cod_conta'             , $item['cod_conta']);
                                 $obTComprasMapaItemAnulacao->setDado('cod_despesa'           , $item['cod_despesa']);
 
-                                $obTComprasMapaItemAnulacao->inclusao();
+                                $obTComprasMapaItemAnulacao->inclusao($boTransacao);
 
                                 # Verificar se tem reserva de saldos, se tiver altera a reserva
                                 # ou anula a reserva, dependendo do valor setado no programa.
@@ -1273,7 +1275,7 @@ if ($stAcao == 'incluir') {
 
                                             $obTOrcamentoReservaSaldosAnulada->setDado('dt_anulacao'     , date('d/m/Y'));
                                             $obTOrcamentoReservaSaldosAnulada->setDado('motivo_anulacao' , $stMsgReservaAnulada);
-                                            $obTOrcamentoReservaSaldosAnulada->inclusao();
+                                            $obTOrcamentoReservaSaldosAnulada->inclusao($boTransacao);
                                         }
                                     }
 
@@ -1297,7 +1299,7 @@ if ($stAcao == 'incluir') {
                                         if ($rsReservaSaldosAnulada->getNumLinhas() > 0) {
 
                                             # Exclui a anulação da reserva da Solicitação, pois nesse momento ela passará a ter saldo.
-                                            $obTOrcamentoReservaSaldosAnulada->exclusao();
+                                            $obTOrcamentoReservaSaldosAnulada->exclusao($boTransacao);
 
                                             # Altera a reserva da Solicitação com o valor anulado do Mapa.
                                             $obTOrcamentoReservaSaldos->setDado('vl_reserva' , $item['valorAnular']);
@@ -1335,7 +1337,7 @@ if ($stAcao == 'incluir') {
                         $obTComprasMapaItemReserva->setDado('cod_despesa'           , $rsExclusaoItensReserva->getCampo('cod_despesa'));
                         $obTComprasMapaItemReserva->setDado('cod_conta'             , $rsExclusaoItensReserva->getCampo('cod_conta'));
 
-                        $obTComprasMapaItemReserva->exclusao( );
+                        $obTComprasMapaItemReserva->exclusao( $boTransacao );
                     }
 
                     $rsExclusaoItensReserva->proximo();
@@ -1346,7 +1348,8 @@ if ($stAcao == 'incluir') {
                 if ($boAnulacao) {
                     SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=anular", $stMensagem,"anular","aviso", Sessao::getId(), "../");
                 } else {
-                    SistemaLegado::exibeAviso('É preciso anular ao  menos um item para salvar a anulação', "n_incluir", "erro");
+                    SistemaLegado::LiberaFrames(true,true);
+                    SistemaLegado::exibeAviso('É preciso anular ao menos um item para salvar a anulação', "n_incluir", "erro");
                 }
             }
 
@@ -1367,6 +1370,7 @@ if ($stAcao == 'incluir') {
 
             if ($rsRecordSet->getNumLinhas() > 0) {
                 $inCodCompraDireta = $rsRecordSet->getCampo('cod_compra_direta').'/'.Sessao::getExercicio();
+                SistemaLegado::LiberaFrames(true,true);
                 SistemaLegado::exibeAviso('Este mapa possui vínculo com a Compra Direta ('.$inCodCompraDireta.')', 'n_incluir', 'erro');
             } else {
                 $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
@@ -1384,6 +1388,7 @@ if ($stAcao == 'incluir') {
 
                 if ($rsRecordSet->getNumLinhas() > 0) {
                     $stLicitacao = $rsRecordSet->getCampo('cod_licitacao').'/'.$rsRecordSet->getCampo('exercicio');
+                    SistemaLegado::LiberaFrames(true,true);
                     SistemaLegado::exibeAviso('Este mapa possui vínculo com a Licitação ('.$stLicitacao.')', 'n_incluir', 'erro');
                 }
             }

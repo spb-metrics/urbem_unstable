@@ -73,16 +73,16 @@ function montaRecuperaTodos()
                                      , '".$this->getDado("cod_entidade")."'
                                      , ".$this->getDado("mes")."
                                      ) AS retorno (
-                                           mes                      INTEGER
-                                         , cod_vinculo              VARCHAR
-                                         , vl_inicial               NUMERIC(14,2)
-                                         , vl_atualizada            NUMERIC(14,2)
-                                         , vl_empenhado             NUMERIC(14,2)
-                                         , vl_liquidado             NUMERIC(14,2)
-                                         , vl_anulada               NUMERIC(14,2)
-                                         , cod_funcao               VARCHAR
-                                         , cod_subfuncao            VARCHAR
-                                         , cod_entidade_relacionada VARCHAR
+                                            mes INTEGER
+                                          , cod_vinculo              VARCHAR
+                                          , vl_inicial               NUMERIC
+                                          , vl_atualizada            NUMERIC
+                                          , vl_empenhado             NUMERIC
+                                          , vl_liquidado             NUMERIC
+                                          , vl_anulada               NUMERIC
+                                          , cod_funcao               VARCHAR
+                                          , cod_subfuncao            VARCHAR
+                                          , cod_entidade_relacionada VARCHAR
                                       ); ";
 
     return $stSql;

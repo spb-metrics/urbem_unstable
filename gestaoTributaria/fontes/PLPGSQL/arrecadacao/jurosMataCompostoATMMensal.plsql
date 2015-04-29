@@ -68,7 +68,7 @@ BEGIN
             inDiasAntes := diff_datas_em_dias(dtVencimento,dtDataCalculo);
             IF (inDiasAntes > 0) THEN
                 SELECT
-                    fn_atm_mensal_juros(dtVencimento, dtDataCalculo, nuValor, 3, 1)
+                    fn_acrescimo_indice_mata_composto(dtVencimento, dtDataCalculo, nuValor, 3, 1)
                 INTO
                     nuValorComAcrescimo;
 
@@ -105,7 +105,7 @@ BEGIN
                 dtCalculoTMP := inAno||'-'||inMes||'-'||01;
 
                 SELECT
-                    fn_atm_mensal_juros(dtVencimentoTMP, dtCalculoTMP, nuValor, 3, 1)
+                    fn_acrescimo_indice_mata_composto(dtVencimentoTMP, dtCalculoTMP, nuValor, 3, 1)
                 INTO
                     nuValorComAcrescimo;
 
@@ -128,7 +128,7 @@ BEGIN
                 dtCalculoTMP := inAno||'-'||inMes||'-'||01;
 
                 SELECT
-                    fn_atm_mensal_juros(dtVencimentoTMP, dtCalculoTMP, nuValor, 3, 1)
+                    fn_acrescimo_indice_mata_composto(dtVencimentoTMP, dtCalculoTMP, nuValor, 3, 1)
                 INTO
                     nuValorComAcrescimo;
 
@@ -153,7 +153,7 @@ BEGIN
                 dtCalculoTMP := inAno||'-'||inMes||'-'||01;
 
                 SELECT
-                    fn_atm_mensal_juros(dtVencimentoTMP, dtCalculoTMP, nuValorAtMonetaria, 3, 1)
+                    fn_acrescimo_indice_mata_composto(dtVencimentoTMP, dtCalculoTMP, nuValorAtMonetaria, 3, 1)
                 INTO
                     nuValorComAcrescimo;
 
@@ -178,7 +178,7 @@ BEGIN
 
             -- Calcula o juros do último mês
             SELECT
-                fn_atm_mensal_juros(dtVencimentoTMP, dtCalculoTMP, nuValorAtMonetaria, 3, 1)
+                fn_acrescimo_indice_mata_composto(dtVencimentoTMP, dtCalculoTMP, nuValorAtMonetaria, 3, 1)
             INTO
                 nuValorComAcrescimo;
 
@@ -195,11 +195,11 @@ BEGIN
             -- Subtrai também o valor total da atualização monetária do período
 
            SELECT
-               fn_atm_mensal_juros(dtVencimento, dtDataCalculo, nuValor, 3, 1)
+               fn_acrescimo_indice_mata_composto(dtVencimento, dtDataCalculo, nuValor, 3, 1)
            INTO
                nuValorComAcrescimo;
 
-            nuRetorno := ValorComJuros - nuValor - nuValorComAcrescimo;
+            nuRetorno := ValorComJuros - nuValor; -- - nuValorComAcrescimo;
         END IF;
     ELSE
         nuRetorno := 0;

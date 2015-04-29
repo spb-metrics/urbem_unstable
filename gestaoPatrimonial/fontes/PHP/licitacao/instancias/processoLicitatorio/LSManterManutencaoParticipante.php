@@ -136,14 +136,36 @@ $stFiltro = "
                                   FROM	licitacao.edital_anulado
                                  WHERE  edital_anulado.num_edital = edital.num_edital
                                    AND 	edital_anulado.exercicio  = edital.exercicio
-                            ) \n ";
+                            )
+            
+            -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                    edital.cod_licitacao IS NOT NULL
+               AND edital.cod_modalidade IS NOT NULL
+               AND edital.cod_entidade   IS NOT NULL 
+               AND edital.exercicio      IS NOT NULL 
+
+              -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN licitacao.cod_modalidade in (8,9) THEN
+                    
+                    edital.cod_licitacao  IS NULL
+                 OR edital.cod_modalidade IS NULL
+                 OR edital.cod_entidade   IS NULL 
+                 OR edital.exercicio      IS NULL 
+
+	         OR edital.cod_licitacao  IS NOT NULL
+	         OR edital.cod_modalidade IS NOT NULL
+	         OR edital.cod_entidade   IS NOT NULL 
+	         OR edital.exercicio      IS NOT NULL 
+            END  \n ";
 
 $stOrder = " ORDER BY licitacao.exercicio DESC
                     , licitacao.cod_entidade
                     , licitacao.cod_licitacao
                     , licitacao.cod_modalidade ";
 
-$obTLicitacaoLicitacao->recuperaLicitacaoParticipante( $rsLicitacaoParticipante,$stFiltro,$stOrder );
+$obTLicitacaoLicitacao->recuperaManutencaoParticipanteLicitacao( $rsLicitacaoParticipante,$stFiltro,$stOrder );
 
 $obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );

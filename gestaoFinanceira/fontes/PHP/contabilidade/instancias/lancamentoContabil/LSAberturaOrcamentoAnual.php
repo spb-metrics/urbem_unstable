@@ -68,34 +68,35 @@ $stNomEntidade = $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->o
 $obTContabilidadePlanoAnalitica->setDado( "exercicio"    , Sessao::getExercicio() );
 $obTContabilidadePlanoAnalitica->setDado( "cod_entidade" , $_POST['inCodEntidade'] );
 $obTContabilidadePlanoAnalitica->recuperaContasAberturaOrcamento($rsAberturaOrcamentos, $stFiltro, 'ORDER BY cod_historico', $boTransacao);
+
 //Busca os valores de cada conta para exibir na tela
 while (!$rsAberturaOrcamentos->eof()) {
     switch ($rsAberturaOrcamentos->getCampo('cod_estrutural')) {
 //Receita Bruta Orçada para o Exercício
-        case "6.2.1.1.0.00.00.00.00.00":
+        case "5.2.1.1.1.00.00.00.00.00":
             $nuValorReceita = $rsAberturaOrcamentos->getCampo('vl_lancamento');
-            $nuValorReceita = str_replace(".", ",", $nuValorReceita);
+            $nuValorReceita = str_replace(".", ",", abs($nuValorReceita));
         break;
 //Receita Dedutora Bruta Orçada para o Exercício 
     //FUNDEB            
         case "5.2.1.1.2.01.01.00.00.00":
             $nuValorFundeb = $rsAberturaOrcamentos->getCampo('vl_lancamento');
-            $nuValorFundeb = str_replace(".", ",", $nuValorFundeb);
+            $nuValorFundeb = str_replace(".", ",", abs($nuValorFundeb));
         break;
     //OUTRAS DEDUCOES
         case "5.2.1.1.2.99.00.00.00.00":
             $nuValorDeducoes = $rsAberturaOrcamentos->getCampo('vl_lancamento');
-            $nuValorDeducoes = str_replace(".", ",", $nuValorDeducoes);
+            $nuValorDeducoes = str_replace(".", ",", abs($nuValorDeducoes));
         break;
     //RENUNCIA
         case "5.2.1.1.2.02.00.00.00.00":
             $nuValorRenuncia = $rsAberturaOrcamentos->getCampo('vl_lancamento');
-            $nuValorRenuncia = str_replace(".", ",", $nuValorRenuncia);
+            $nuValorRenuncia = str_replace(".", ",", abs($nuValorRenuncia));
         break;
 //Despesa Prevista para o Exercício
-        case "6.2.2.1.1.00.00.00.00.00":
+        case "5.2.2.1.1.01.00.00.00.00":
             $nuValorDespesa = $rsAberturaOrcamentos->getCampo('vl_lancamento');
-            $nuValorDespesa = str_replace(".", ",", $nuValorDespesa);
+            $nuValorDespesa = str_replace(".", ",", abs($nuValorDespesa));
         break;
     }
     $rsAberturaOrcamentos->proximo();

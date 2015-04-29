@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGItemRegistroPrecos.class.php 59719 2014-09-08 15:00:53Z franver $
- * $Revision: 59719 $
+ * $Id: TTCEMGItemRegistroPrecos.class.php 61913 2015-03-13 18:55:57Z franver $
+ * $Revision: 61913 $
  * $Author: franver $
- * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
+ * $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
  * 
  */
 
@@ -52,22 +52,25 @@ class TTCEMGItemRegistroPrecos extends Persistente
         $this->setTabela('tcemg.item_registro_precos');
 
         $this->setCampoCod('');
-        $this->setComplementoChave('cod_entidade, numero_processo_adesao, exercicio_adesao, cod_lote, cod_item');
+        $this->setComplementoChave('cod_entidade, numero_registro_precos, exercicio, interno, numcgm_gerenciador, cod_lote, cod_item, cgm_fornecedor');
         
-        $this->addCampo('cod_entidade'              , 'integer' , true , ''     , true  , true);
-        $this->AddCampo('numero_processo_adesao'    , 'integer' , true , ''     , true  , true);
-        $this->AddCampo('exercicio_adesao'          , 'varchar' , true ,'4'     , true  , true);
-        $this->AddCampo('cod_lote'                  , 'integer' , true , ''     , true  , true);
-        $this->AddCampo('cod_item'                  , 'integer' , true , ''     , true  , true);
-        $this->AddCampo('num_item'                  , 'integer' , true , ''     , false , false);
-        $this->AddCampo('data_cotacao'              , 'date'    , true , ''     , false , false);
-        $this->AddCampo('vl_cotacao_preco_unitario' , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('quantidade_cotacao'        , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('preco_unitario'            , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('quantidade_licitada'       , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('quantidade_aderida'        , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('percentual_desconto'       , 'numeric' , true , '14.4' , false , false);
-        $this->AddCampo('cgm_vencedor'              , 'integer' , true , ''     , false , true);
+        $this->addCampo('cod_entidade'                  , 'integer' , true , ''    ,  true ,  true);
+        $this->AddCampo('numero_registro_precos'        , 'integer' , true , ''    ,  true ,  true);
+        $this->AddCampo('exercicio'                     , 'varchar' , true , '4'   ,  true ,  true);
+        $this->AddCampo('cod_lote'                      , 'integer' , true , ''    ,  true ,  true);
+        $this->AddCampo('cod_item'                      , 'integer' , true , ''    ,  true ,  true);
+        $this->AddCampo('num_item'                      , 'integer' , true , ''    , false , false);
+        $this->AddCampo('data_cotacao'                  , 'date'    , true , ''    , false , false);
+        $this->AddCampo('vl_cotacao_preco_unitario'     , 'numeric' , true , '14.4', false , false);
+        $this->AddCampo('quantidade_cotacao'            , 'numeric' , true , '14.4', false , false);
+        $this->AddCampo('preco_unitario'                , 'numeric' , true , '14.4', false , false);
+        $this->AddCampo('quantidade_licitada'           , 'numeric' , true , '14.4', false , false);
+        $this->AddCampo('quantidade_aderida'            , 'numeric' , true , '14.4', false , false);
+        $this->AddCampo('percentual_desconto'           , 'numeric' , true , '6.4' , false , false);
+        $this->AddCampo('cgm_fornecedor'                , 'integer' , true , ''    , false ,  true);
+        $this->AddCampo('interno'                       , 'boolean' , true , ''    ,  true ,  true);
+        $this->AddCampo('ordem_classificacao_fornecedor', 'integer' , true , ''    , false ,  true);
+        $this->AddCampo('numcgm_gerenciador'            , 'integer' , true , ''    ,  true ,  true);
     }
     
     public function recuperaListaItem(&$rsRecordSet)
@@ -98,8 +101,10 @@ class TTCEMGItemRegistroPrecos extends Persistente
 
     INNER JOIN tcemg.lote_registro_precos                  
             ON lote_registro_precos.cod_entidade           = irp.cod_entidade
-           AND lote_registro_precos.numero_processo_adesao = irp.numero_processo_adesao
-           AND lote_registro_precos.exercicio_adesao       = irp.exercicio_adesao
+           AND lote_registro_precos.numero_registro_precos = irp.numero_registro_precos
+           AND lote_registro_precos.exercicio              = irp.exercicio
+           AND lote_registro_precos.interno                = irp.interno
+           AND lote_registro_precos.numcgm_gerenciador     = irp.numcgm_gerenciador
            AND lote_registro_precos.cod_lote               = irp.cod_lote
           
     INNER JOIN almoxarifado.catalogo_item
@@ -110,12 +115,13 @@ class TTCEMGItemRegistroPrecos extends Persistente
            AND unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
 
     INNER JOIN sw_cgm
-            ON sw_cgm.numcgm = irp.cgm_vencedor
+            ON sw_cgm.numcgm = irp.cgm_fornecedor
 
-         WHERE irp.exercicio_adesao       = '".$this->getDado('exercicio_adesao')."'
-           AND irp.numero_processo_adesao = ".$this->getDado('numero_processo_adesao')."
+         WHERE irp.exercicio              = '".$this->getDado('exercicio')."'
+           AND irp.numero_registro_precos = ".$this->getDado('numero_registro_precos')."
            AND irp.cod_entidade           = ".$this->getDado('cod_entidade')."
-      
+           AND irp.interno                = ".$this->getDado('interno')."
+           AND irp.numcgm_gerenciador     = ".$this->getDado('numcgm_gerenciador')."
       ORDER BY irp.num_item";
 
         return $stSql;

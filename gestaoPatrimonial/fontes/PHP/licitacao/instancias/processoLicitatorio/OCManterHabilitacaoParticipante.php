@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterHabilitacaoParticipante.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterHabilitacaoParticipante.php 62136 2015-03-31 14:02:14Z michel $
 
     * Casos de uso: uc-03.05.19
 
@@ -62,13 +62,14 @@ function geraListaDocumentos($obj)
     if (!$arDocumentoParticipante) {
         include_once(TLIC."TLicitacaoLicitacaoDocumentos.class.php");
         include_once(TLIC."TLicitacaoParticipanteDocumentos.class.php");
-        include_once(TLIC."TLicitacaoEdital.class.php");
-
-        $obTLicitacaoEdital = new TLicitacaoEdital();
-        $obTLicitacaoEdital->setDado('num_edital',$obj->getDado('num_edital'));
-        $obTLicitacaoEdital->setDado('exercicio',$obj->getDado('exercicio'));
-        $obTLicitacaoEdital->recuperaPorChave( $rsLicitacaoEdital );
-
+        
+        $rsLicitacaoEdital = new RecordSet();
+        $rsLicitacaoEdital->setCampo('num_edital'    , $obj->getDado('num_edital')     );
+        $rsLicitacaoEdital->setCampo('exercicio'     , $obj->getDado('exercicio')      );
+        $rsLicitacaoEdital->setCampo('cod_licitacao' , $obj->getDado('cod_licitacao')  );
+        $rsLicitacaoEdital->setCampo('cod_modalidade', $obj->getDado('cod_modalidade') );
+        $rsLicitacaoEdital->setCampo('cod_entidade'  , $obj->getDado('cod_entidade')   );
+        
         $obTLicitacaoDocumentos = new TLicitacaoLicitacaoDocumentos();
 
         $obTLicitacaoDocumentos->setDado('cod_licitacao',$rsLicitacaoEdital->getCampo('cod_licitacao'));
@@ -115,21 +116,6 @@ function geraListaDocumentos($obj)
     return montaListaDocumentoParticipante( $arDocumentoParticipante );
 }
 
-function editalInvalido()
-{
-    //Limpa o span relacionado a este campo
-    $stJs = "parent.frames['telaPrincipal'].document.getElementById('spnNumeroLicitacao').innerHTML = '';";
-    //LIMPA o html no span de Lista de Participantes
-    $stJs.= "parent.frames['telaPrincipal'].document.getElementById('spnListaParticipante').innerHTML = '';";
-    //LIMPA o html no span de Lista de Documentos do Participante
-    $stJs.= "parent.frames['telaPrincipal'].document.getElementById('spnListaDocumentoParticipante').innerHTML = '';";
-    $stJs.= "parent.frames['telaPrincipal'].document.getElementById('num_edital').value = '';";
-    //Foco novamente no campo para ser digitado
-    $stJs.= "parent.frames['telaPrincipal'].document.getElementById('num_edital').focus();";
-
-    return $stJs;
-}
-
 function montaListaParticipante($arRecordSet ,$boExecuta = true)
 {
     global $pgOcul;
@@ -137,8 +123,6 @@ function montaListaParticipante($arRecordSet ,$boExecuta = true)
     $rsRecordSet = new RecordSet();
     $rsRecordSet->preenche($arRecordSet);
     $rsRecordSet->setPrimeiroElemento();
-
-    $arEdital = explode('/',$_REQUEST['num_edital']);
 
     $obListaParticipante = new Lista;
     $obListaParticipante->setTitulo('Participantes');
@@ -156,7 +140,6 @@ function montaListaParticipante($arRecordSet ,$boExecuta = true)
     $obListaParticipante->commitCabecalho();
     $obListaParticipante->addDado();
     $obListaParticipante->ultimoDado->setCampo( "nom_cgm" );
-    $obListaParticipante->ultimoDado->setAlinhamento( 'CENTRO' );
     $obListaParticipante->commitDadoComponente();
 
     $obListaParticipante->addCabecalho();
@@ -169,13 +152,15 @@ function montaListaParticipante($arRecordSet ,$boExecuta = true)
     $obChkListaParticipante->setName ('documentosParticipante');
     $obChkListaParticipante->setId('documentosParticipante');
     $obChkListaParticipante->setValue ('numcgm');
-    $obChkListaParticipante->obEvento->setOnClick("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&num_edital=".$arEdital[0]."&numcgm='+this.value,'validaPadrao');");
+    $obChkListaParticipante->obEvento->setOnClick("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&num_edital=".$arRecordSet[0]['num_edital']."&inCodLicitacao=".$arRecordSet[0]['cod_licitacao']."&inCodModalidade=".$arRecordSet[0]['cod_modalidade']."&inCodEntidade=".$arRecordSet[0]['cod_entidade']."&stExercicio=".$arRecordSet[0]['exercicio']."&numcgm='+this.value,'validaPadrao');");
+    
     $obListaParticipante->addDadoComponente( $obChkListaParticipante );
     $obListaParticipante->ultimoDado->setCampo( "padrao" );
     $obListaParticipante->ultimoDado->setNameSequencial(false);
     $obListaParticipante->ultimoDado->setAlinhamento('CENTRO');
     $obListaParticipante->commitDadoComponente();
     $obListaParticipante->setMostraPaginacao(false);
+    
     if ( count($arRecordSet) > 5 ) {
             $obListaParticipante->setMostraScroll(145);
     }
@@ -375,29 +360,18 @@ function sincronizaDiasValidosDocumento($inDataValidade, $inDataEmissao)
 
 switch ($stCtrl) {
     case 'exibeParticipante':
-        if (empty($_REQUEST['num_edital'])) {
-            $stJs .= editalInvalido();
-            break;
-        }
-
-        $arEdital = explode('/',$_REQUEST['num_edital']);
-        if ($arEdital[1] == '') {
-            $arEdital[1] = Sessao::getExercicio();
-        }
-
+        
         include_once(TLIC."TLicitacaoParticipante.class.php");
         $obTLicitacaoParticipante = new TLicitacaoParticipante();
-        $obTLicitacaoParticipante->setDado( 'num_edital',$arEdital[0] );
-        $obTLicitacaoParticipante->setDado( 'exercicio' ,$arEdital[1] );
+        
+        $obTLicitacaoParticipante->setDado('exercicio'      , $request->get('stExercicioLicitacao') );
+        $obTLicitacaoParticipante->setDado('cod_licitacao'  , $request->get('inCodLicitacao')       );
+        $obTLicitacaoParticipante->setDado('cod_modalidade' , $request->get('inCodModalidade')      );
+        $obTLicitacaoParticipante->setDado('cod_entidade'   , $request->get('inCodEntidade')        );
+        
+        
+            $obTLicitacaoParticipante->recuperaParticipanteLicitacaoHabilitacao($rsParticipante);
 
-        $obTLicitacaoParticipante->recuperaParticipanteLicitacao($rsParticipante);
-
-        if ($rsParticipante->getNumLinhas() < 0) {
-                //Aviso de que o edital nao existe
-                $stJs.= "alertaAviso('Edital ".$arEdital[0]."/".$arEdital[1]." não encontrado!', 'form','erro','".Sessao::getId()."');";
-                $stJs.= editalInvalido();
-        } else {
-            include_once(CAM_GP_COM_COMPONENTES."ILabelEditObjeto.class.php");
             $obSpnNumLicitacao = new Label();
             $obSpnNumLicitacao->setValue( $rsParticipante->getCampo('cod_licitacao').'/'.$rsParticipante->getCampo('exercicio') );
             $obSpnNumLicitacao->setRotulo('Número da Licitação');
@@ -410,6 +384,7 @@ switch ($stCtrl) {
             $obLblModalidade->setValue( $rsParticipante->getCampo('cod_modalidade').' - '.$rsParticipante->getCampo('nom_modalidade') );
             $obLblModalidade->setRotulo( 'Modalidade' );
 
+            include_once(CAM_GP_COM_COMPONENTES."ILabelEditObjeto.class.php");
             $obIlabelEditObjeto = new ILabelEditObjeto();
             $obIlabelEditObjeto->setCodObjeto($rsParticipante->getCampo('cod_objeto'));
             $obIlabelEditObjeto->setRotulo('Objeto');
@@ -421,10 +396,9 @@ switch ($stCtrl) {
             $obFormulario->addComponente($obLblModalidade);
             $obFormulario->montaInnerHTML();
             $stHTML = $obFormulario->getHTML();
+            
             $stJs.="d.getElementById('spnNumeroLicitacao').innerHTML = '".$stHTML."';           \n";
-
             $stJs.="f.cod_licitacao.value  = '".$rsParticipante->getCampo('cod_licitacao')."';  \n";
-            $stJs.="f.num_edital.value     = '" . $arEdital[0] .'/' . $arEdital[1]  . "';       \n";
             $stJs.="f.cod_modalidade.value = '".$rsParticipante->getCampo('cod_modalidade')."'; \n";
             $stJs.="f.cod_entidade.value   = '".$rsParticipante->getCampo('cod_entidade')."';   \n";
             $stJs.="f.exercicio.value      = '".$rsParticipante->getCampo('exercicio')."';      \n";
@@ -433,11 +407,15 @@ switch ($stCtrl) {
             $inCount = 0;
             $arParticipante = array();
             while (!$rsParticipante->eof()) {
-                    $arParticipante[$inCount]['nom_cgm'] = $rsParticipante->getCampo('nom_cgm');
-                    $arParticipante[$inCount]['numcgm'] = $rsParticipante->getCampo('numcgm');
+                    $arParticipante[$inCount]['nom_cgm']        = $rsParticipante->getCampo('numcgm').' - '.$rsParticipante->getCampo('nom_cgm');
+                    $arParticipante[$inCount]['numcgm']         = $rsParticipante->getCampo('numcgm');
                     $arParticipante[$inCount]['cod_modalidade'] = $rsParticipante->getCampo('cod_modalidade');
-                    $arParticipante[$inCount]['exercicio'] = $rsParticipante->getCampo('exercicio');
-                    $arParticipante[$inCount]['cod_licitacao'] = $rsParticipante->getCampo('cod_licitacao');
+                    $arParticipante[$inCount]['exercicio']      = $rsParticipante->getCampo('exercicio');
+                    $arParticipante[$inCount]['cod_licitacao']  = $rsParticipante->getCampo('cod_licitacao');
+                    $arParticipante[$inCount]['num_edital']     = $rsParticipante->getCampo('num_edital');
+                    $arParticipante[$inCount]['exercicio']      = $rsParticipante->getCampo('exercicio');
+                    $arParticipante[$inCount]['cod_entidade']   = $rsParticipante->getCampo('cod_entidade');
+
                     $inCount++;
                     Sessao::remove('arDocumentoParticipante_'.$rsParticipante->getCampo('numcgm'));
                     $rsParticipante->proximo();
@@ -453,12 +431,16 @@ switch ($stCtrl) {
             //mostra a lista de participantes
 
             $obTLicitacaoParticipante->setDado('numcgm',$arParticipante[0]['numcgm']);
-
+            $obTLicitacaoParticipante->setDado('cod_modalidade', $arParticipante[0]['cod_modalidade']);
+            $obTLicitacaoParticipante->setDado('cod_entidade'  , $arParticipante[0]['cod_entidade']);
+            $obTLicitacaoParticipante->setDado('exercicio'     , $arParticipante[0]['exercicio']);
+            $obTLicitacaoParticipante->setDado('cod_licitacao' , $arParticipante[0]['cod_licitacao']);
+            $obTLicitacaoParticipante->setDado('num_edital'    , $arParticipante[0]['num_edital']);
+            
             Sessao::write('arParticipante', $arParticipante);
 
             $stJs.= montaListaParticipante( $arParticipante );
             $stJs.= geraListaDocumentos($obTLicitacaoParticipante);
-        }//fim do else
 
     break;
 
@@ -484,12 +466,15 @@ switch ($stCtrl) {
             $stJs .="f.numcgm.value = '".$_REQUEST['numcgm']."';\n";
 
             include_once(TLIC."TLicitacaoParticipante.class.php");
-            $arEdital = explode('/',$_REQUEST['num_edital']);
             $obTLicitacaoParticipante = new TLicitacaoParticipante();
-            $obTLicitacaoParticipante->setDado('numcgm',$_REQUEST['numcgm']);
-            $obTLicitacaoParticipante->setDado('num_edital',$arEdital[0]);
-            $obTLicitacaoParticipante->setDado('exercicio',Sessao::getExercicio());
-
+            
+            $obTLicitacaoParticipante->setDado('numcgm'         , $_REQUEST['numcgm']);
+            $obTLicitacaoParticipante->setDado('num_edital'     , $_REQUEST['num_edital']);
+            $obTLicitacaoParticipante->setDado('exercicio'      , $_REQUEST['stExercicio']);
+            $obTLicitacaoParticipante->setDado('cod_entidade'   , $_REQUEST['inCodEntidade']);
+            $obTLicitacaoParticipante->setDado('cod_modalidade' , $_REQUEST['inCodModalidade']);
+            $obTLicitacaoParticipante->setDado('cod_licitacao'  , $_REQUEST['inCodLicitacao']);            
+            
             $stJs.=geraListaDocumentos($obTLicitacaoParticipante);
 
         break;
@@ -653,5 +638,7 @@ switch ($stCtrl) {
             Sessao::write('arDocumentoParticipante_'.$_REQUEST['numcgm'], $arDocumentoParticipante);
     break;
 }// fim do SWITCH
+
 echo $stJs;
+
 ?>

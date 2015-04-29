@@ -47,20 +47,19 @@ DECLARE
 
 BEGIN
 
-    stDtInicial := '01/'||LPAD(inMes, 2, 0)||'/'||stExercicio;
+    stDtInicial := '01/'||LPAD(inMes::varchar, 2, '0'::varchar)||'/'||stExercicio;
     SELECT last_day (TO_DATE(stDtInicial, 'dd/mm/yyyy')) INTO stDtFinalDate;
     stDtFinal := TO_CHAR(TO_DATE(stDtFinalDate, 'yyyy-mm-dd'), 'dd/mm/yyyy');
 
     stSql := '
     CREATE TEMPORARY TABLE tmp_arquivo AS (
         SELECT ' || inMes || ' AS mes
-             , CASE WHEN (sw_cgm.nom_cgm ILIKE ''%prefeitura%'') THEN
-                        CAST(''01'' AS VARCHAR)
-               ELSE 
-                        CAST(''02'' AS VARCHAR)
+             , CASE WHEN (sw_cgm.nom_cgm ILIKE ''%prefeitura%'') THEN CAST(''01'' AS VARCHAR)
+                    WHEN (sw_cgm.nom_cgm ILIKE ''%instituto%'')  THEN CAST(''02'' AS VARCHAR)
+                    WHEN (sw_cgm.nom_cgm ILIKE ''%câmara%'')     THEN CAST(''03'' AS VARCHAR)
                END AS cod_vinculo
-             , CAST(LPAD(despesa.cod_funcao, 2, 0) AS VARCHAR) AS cod_funcao
-             , CAST(LPAD(despesa.cod_subfuncao, 3, 0) AS VARCHAR) AS cod_subfuncao
+             , CAST(LPAD(despesa.cod_funcao::VARCHAR, 2, ''0'') AS VARCHAR) AS cod_funcao
+             , CAST(LPAD(despesa.cod_subfuncao::VARCHAR, 3, ''0'') AS VARCHAR) AS cod_subfuncao
              , COALESCE(sum(despesa.vl_original), 0.00) AS vl_inicial
              , COALESCE((sum(coalesce(despesa.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))), 0.00) as vl_atualizada
              , sum(COALESCE((SELECT * FROM tcemg.fn_desp_funcao_subfuncao_empenhada(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''' )), 0.00)) AS vl_empenhado
@@ -89,8 +88,7 @@ BEGIN
                       , orcamento.suplementacao_suplementada 
                   WHERE suplementacao.exercicio         = suplementacao_suplementada.exercicio
                     AND suplementacao.cod_suplementacao = suplementacao_suplementada.cod_suplementacao
-                    AND to_date(suplementacao.dt_suplementacao,''yyyy-mm-dd'') BETWEEN to_date(''01/01/'||stExercicio||''', ''dd/mm/yyyy'')
-                                                                                   AND to_date(''' || stDtFinal || ''', ''dd/mm/yyyy'')
+                    AND TO_DATE(suplementacao.dt_suplementacao::VARCHAR,''yyyy-mm-dd'') BETWEEN TO_DATE(''01/01/'||stExercicio||''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''', ''dd/mm/yyyy'')
                GROUP BY suplementacao_suplementada.exercicio
                       , suplementacao_suplementada.cod_despesa
                ORDER BY suplementacao_suplementada.cod_despesa ) AS suplementado
@@ -104,8 +102,7 @@ BEGIN
                   WHERE suplementacao.exercicio         = suplementacao_reducao.exercicio
                     AND suplementacao.cod_suplementacao = suplementacao_reducao.cod_suplementacao
                     AND suplementacao.exercicio         = ''' || stExercicio || '''
-                    AND to_date(suplementacao.dt_suplementacao,''yyyy-mm-dd'') BETWEEN to_date(''01/01/'||stExercicio||''' , ''dd/mm/yyyy'')
-                                                                                 AND to_date(''' || stDtFinal || ''', ''dd/mm/yyyy'')
+                    AND TO_DATE(suplementacao.dt_suplementacao::VARCHAR,''yyyy-mm-dd'') BETWEEN TO_DATE(''01/01/'||stExercicio||''' , ''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''', ''dd/mm/yyyy'')
                GROUP BY suplementacao_reducao.exercicio
                       , suplementacao_reducao.cod_despesa
                ORDER BY suplementacao_reducao.cod_despesa ) AS reduzido
@@ -120,9 +117,8 @@ BEGIN
              , sw_cgm.nom_cgm
       ORDER BY despesa.cod_entidade
              , despesa.cod_funcao
-             , despesa.cod_subfuncao );
-    ';
-
+             , despesa.cod_subfuncao )';
+    
     EXECUTE stSql;
 
     stSql := ' SELECT mes

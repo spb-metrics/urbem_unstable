@@ -67,7 +67,7 @@ switch ($stAcao) {
         $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodCentralizacao"] );
         $obTAdministracaoConfiguracao->alteracao();
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "codigo_outras_entidades_sefip".Sessao::getEntidade()        );
+        $obTAdministracaoConfiguracao->setDado( "parametro" , "codigo_outras_entidades_sefip".Sessao::getEntidade() );
         $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodigoOutrasEntidades"] );
         $obTAdministracaoConfiguracao->alteracao();
 
@@ -104,6 +104,13 @@ switch ($stAcao) {
         $obTAdministracaoConfiguracao->alteracao();
 
         $obTIMACategoriaSefip->excluirTodos();
+        
+        if(count(Sessao::read("arModalidades")) == 0) {
+            Sessao::encerraExcecao();
+            SistemaLegado::alertaAviso($pgForm,"É necessário inserir ao menos 1 (uma) Modalidades de Recolhimento!","incluir","aviso", Sessao::getId(), "../");
+            break;
+        }
+        
         foreach (Sessao::read("arModalidades") as $inIndex=>$arModalidade) {
             $obTIMACategoriaSefip->setDado("cod_modalidade",$arModalidade["inCodModalidadeRecolhimento"]);
             foreach ($arModalidade["categorias"] as $inCodCategoria) {
@@ -112,9 +119,8 @@ switch ($stAcao) {
             }
         }
 
-           Sessao::encerraExcecao();
-    sistemaLegado::alertaAviso($pgForm,"Configuração da SEFIP concluída com sucesso!","incluir","aviso", Sessao::getId(), "../");
+        Sessao::encerraExcecao();
+        SistemaLegado::alertaAviso($pgForm,"Configuração da SEFIP concluída com sucesso!","incluir","aviso", Sessao::getId(), "../");
     break;
 }
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
-?>

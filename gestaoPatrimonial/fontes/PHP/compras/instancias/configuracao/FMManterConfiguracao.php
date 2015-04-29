@@ -29,7 +29,7 @@
 
     * @author Fernando Zank Correa Evangelista
 
-    * $Id: FMManterConfiguracao.php 60668 2014-11-06 19:32:49Z evandro $
+    * $Id: FMManterConfiguracao.php 61893 2015-03-12 17:33:33Z carlos.silva $
 
     * Casos de uso : uc-03.04.08
     */
@@ -106,6 +106,11 @@ $obTLicitacao->recuperaTodos($rsLicitacao," where exercicio = '".Sessao::getExer
 
 $obTConfiguracao = new TComprasConfiguracao;
 $obTConfiguracao->setDado( "parametro" , "numeracao_automatica" );
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$boIdCompraAutomatica = $rsConfiguracao->getCampo('valor');
+
+$obTConfiguracao = new TComprasConfiguracao;
+$obTConfiguracao->setDado( "parametro" , "numeracao_automatica_licitacao" );
 $obTConfiguracao->recuperaPorChave($rsConfiguracao);
 $boIdLicitacaoAutomatica = $rsConfiguracao->getCampo('valor');
 
@@ -230,10 +235,25 @@ if ($rsLicitacao->getCampo('exercicio') != '') {
    $obHdnNumeracaoPorModalidade->setValue($obChkNumeracaoPorModalidade->getChecked()?'on':'');
 }
 
+// Configuração para setar se o número da Compra Direta será automática ou manual.
+$obRdbIdCompraAutomaticoSim = new Radio;
+$obRdbIdCompraAutomaticoSim->setRotulo  ( "Numeração Automática de Compra Direta" );
+$obRdbIdCompraAutomaticoSim->setTitle   ( "Informe se a numeração da Compra Direta deve ser gerada automática pelo sistema." );
+$obRdbIdCompraAutomaticoSim->setName    ( "boIdCompraAutomatica");
+$obRdbIdCompraAutomaticoSim->setLabel   ( "Sim"  );
+$obRdbIdCompraAutomaticoSim->setValue   ( "t" );
+$obRdbIdCompraAutomaticoSim->setChecked ( ($boIdCompraAutomatica == "t" ? true : false) );
+
+$obRdbIdCompraAutomaticoNao = new Radio;
+$obRdbIdCompraAutomaticoNao->setName    ( "boIdCompraAutomatica");
+$obRdbIdCompraAutomaticoNao->setLabel   ( "Não" );
+$obRdbIdCompraAutomaticoNao->setValue   ( "f" );
+$obRdbIdCompraAutomaticoNao->setChecked ( ($boIdCompraAutomatica == "f" ? true : false) );
+
 // Configuração para setar se o número da Licitação será automática ou manual.
 $obRdbIdLicitacaoAutomaticoSim = new Radio;
-$obRdbIdLicitacaoAutomaticoSim->setRotulo  ( "Numeração Automática de Licitação/Compra Direta" );
-$obRdbIdLicitacaoAutomaticoSim->setTitle   ( "Informe se a numeração da licitação/compra direta deve ser gerada automática pelo sistema." );
+$obRdbIdLicitacaoAutomaticoSim->setRotulo  ( "Numeração Automática de Licitação" );
+$obRdbIdLicitacaoAutomaticoSim->setTitle   ( "Informe se a numeração da licitação deve ser gerada automática pelo sistema." );
 $obRdbIdLicitacaoAutomaticoSim->setName    ( "boIdLicitacaoAutomatica");
 $obRdbIdLicitacaoAutomaticoSim->setLabel   ( "Sim"  );
 $obRdbIdLicitacaoAutomaticoSim->setValue   ( "t" );
@@ -328,6 +348,7 @@ if ($rsLicitacao->getCampo('exercicio') != '') {
    $obFormulario->addHidden ($obHdnNumeracaoPorModalidade);
 }
 $obFormulario->agrupaComponentes(array($obChkNumeracaoPorEntidade, $obChkNumeracaoPorModalidade));
+$obFormulario->agrupaComponentes(array($obRdbIdCompraAutomaticoSim, $obRdbIdCompraAutomaticoNao));
 $obFormulario->agrupaComponentes(array($obRdbIdLicitacaoAutomaticoSim, $obRdbIdLicitacaoAutomaticoNao));
 
 # Configuração para valor de referência.

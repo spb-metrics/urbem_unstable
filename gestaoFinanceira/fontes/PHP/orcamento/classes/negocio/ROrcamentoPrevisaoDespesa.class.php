@@ -383,16 +383,12 @@ class ROrcamentoPrevisaoDespesa
         include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoPrevisaoDespesa.class.php" );
         $obTOrcamentoPrevisaoDespesa      = new TOrcamentoPrevisaoDespesa;
 
-//        $boFlagTransacao = false;
-//        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-//        if ( !$obErro->ocorreu() ) {
-            $obTOrcamentoPrevisaoDespesa->setDado( "exercicio"   , $this->getExercicio()     );
-            $obTOrcamentoPrevisaoDespesa->setDado( "periodo"     , $this->getPeriodo()       );
-            $obTOrcamentoPrevisaoDespesa->setDado( "cod_despesa" , $this->getCodigoDespesa() );
-            $obTOrcamentoPrevisaoDespesa->setDado( "vl_previsto" , $this->getValorPrevisto() );
-            $obErro = $obTOrcamentoPrevisaoDespesa->inclusao( $boTransacao );
-//            $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTOrcamentoPrevisaoDespesa );
-//        }
+        $obTOrcamentoPrevisaoDespesa->setDado( "exercicio"   , $this->getExercicio()     );
+        $obTOrcamentoPrevisaoDespesa->setDado( "periodo"     , $this->getPeriodo()       );
+        $obTOrcamentoPrevisaoDespesa->setDado( "cod_despesa" , $this->getCodigoDespesa() );
+        $obTOrcamentoPrevisaoDespesa->setDado( "vl_previsto" , $this->getValorPrevisto() );
+        $obErro = $obTOrcamentoPrevisaoDespesa->inclusao( $boTransacao );
+            
         return $obErro;
     }
 
@@ -446,9 +442,7 @@ class ROrcamentoPrevisaoDespesa
         if ( $this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->getNumeroUnidade() ) {
             $stFiltro .= " AND O.num_unidade = ".$this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->getNumeroUnidade();
         }
-        /*if ($stFiltro) {
-            $stFiltro = substr( $stFiltro, 0, strlen( $stFiltro ) - 4 );
-        }*/
+
         $stOrdem = " cod_despesa ";
         $obErro = $obTOrcamentoPrevisaoDespesa->recuperaRelacionamento( $rsLista, $stFiltro ,$stOrdem ,$boTransacao );
 
@@ -490,18 +484,14 @@ class ROrcamentoPrevisaoDespesa
         * @param  Object $boTransacao Parâmetro Transação
         * @return Object Objeto Erro
     */
-    public function limparDados()
+    public function limparDados($boTransacao)
     {
         include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoPrevisaoDespesa.class.php" );
         $obTOrcamentoPrevisaoDespesa      = new TOrcamentoPrevisaoDespesa;
 
-//        $boFlagTransacao = false;
-//        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-//        if ( !$obErro->ocorreu() ) {
             $obTOrcamentoPrevisaoDespesa->setDado( "exercicio"   , $this->getExercicio()     );
             $obTOrcamentoPrevisaoDespesa->setDado( "cod_despesa" , $this->getCodigoDespesa() );
             $obErro = $obTOrcamentoPrevisaoDespesa->recuperaLimpaDespesa( $rsLista , "", "", $boTransacao );
-//            $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTOrcamentoPrevisaoDespesa );
 //        }
         return $obErro;
     }

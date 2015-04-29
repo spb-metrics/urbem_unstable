@@ -61,6 +61,7 @@ class TTCMGOAMP extends Persistente
                           , unidade_medida
                           , acao_reduzida
                           , produto
+                          , esfera_orcamentaria 
 
 
                     FROM ( SELECT
@@ -69,39 +70,42 @@ class TTCMGOAMP extends Persistente
                             , LPAD(programa_dados.num_unidade::varchar,4,'0') AS cod_unidade
                             , LPAD(programa.num_programa::varchar,4,'0') AS cod_programa
                             , LPAD(acao.num_acao::varchar,4,'0') AS nro_proj_ativ
-                            , Ano1.quantidade AS meta_fisica_1Ano
-                            , Ano2.quantidade AS meta_fisica_2Ano
-                            , Ano3.quantidade AS meta_fisica_3Ano
-                            , Ano4.quantidade AS meta_fisica_4Ano
-                            , Ano1.valor AS meta_financeira_1Ano    
-                            , Ano2.valor AS meta_financeira_2Ano
-                            , Ano3.valor AS meta_financeira_3Ano
-                            , Ano4.valor AS meta_financeira_4Ano
+                            , REPLACE(Ano1.quantidade::VARCHAR, '.', ',') AS meta_fisica_1Ano
+                            , REPLACE(Ano2.quantidade::VARCHAR, '.', ',') AS meta_fisica_2Ano
+                            , REPLACE(Ano3.quantidade::VARCHAR, '.', ',') AS meta_fisica_3Ano
+                            , REPLACE(Ano4.quantidade::VARCHAR, '.', ',') AS meta_fisica_4Ano
+                            , REPLACE(Ano1.valor::VARCHAR, '.', ',') AS meta_financeira_1Ano    
+                            , REPLACE(Ano2.valor::VARCHAR, '.', ',') AS meta_financeira_2Ano
+                            , REPLACE(Ano3.valor::VARCHAR, '.', ',') AS meta_financeira_3Ano
+                            , REPLACE(Ano4.valor::VARCHAR, '.', ',') AS meta_financeira_4Ano
                             , acao_dados.cod_subfuncao
                             , acao_dados.cod_funcao
-                            , acao_dados.cod_natureza
+                            , CASE WHEN acao_dados.cod_tipo = 3 THEN 9
+                                   ELSE acao_dados.cod_tipo
+                               END AS cod_natureza
                             , acao_dados.detalhamento AS acao_detalhada
                             , acao_dados.cod_unidade_medida AS unidade_medida
                             , acao_dados.descricao AS acao_reduzida
                             , produto.descricao AS produto
                             , programa_dados.publico_alvo
-                            , acao_dados.cod_tipo_orcamento AS esfera_orcamentaria 
+                            , CASE WHEN acao_dados.cod_tipo_orcamento != 1 AND acao_dados.cod_tipo_orcamento != 2 THEN 0 ELSE acao_dados.cod_tipo_orcamento END AS esfera_orcamentaria 
 
                         FROM ppa.programa
                
-                        JOIN ppa.acao
+                  INNER JOIN ppa.acao
                           ON programa.cod_programa = acao.cod_programa
 
-                        JOIN ppa.acao_quantidade
+                  INNER JOIN ppa.acao_quantidade
                           ON acao.cod_acao = acao_quantidade.cod_acao
 
-                        JOIN ppa.acao_dados
+                  INNER JOIN ppa.acao_dados
                           ON acao_dados.cod_acao = acao.cod_acao
+                         AND acao_dados.timestamp_acao_dados = acao.ultimo_timestamp_acao_dados
 
-                        JOIN ppa.produto
+                  INNER JOIN ppa.produto
                           ON produto.cod_produto = acao_dados.cod_produto
 
-                        JOIN (
+                  INNER JOIN (
                                 SELECT *
                                   FROM ppa.acao_quantidade AS Ano1
                                  WHERE Ano1.exercicio_recurso = ((SELECT ano_inicio::INTEGER FROM ppa.ppa WHERE ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ano_final::INTEGER)::VARCHAR)
@@ -114,7 +118,7 @@ class TTCMGOAMP extends Persistente
                                                          ORDER BY timestamp_acao_dados DESC LIMIT 1
                                                         )
 
-                        JOIN (
+                  INNER JOIN (
                                 SELECT *
                                   FROM ppa.acao_quantidade AS Ano2
                                  WHERE Ano2.exercicio_recurso = (((SELECT ano_inicio::INTEGER FROM ppa.ppa WHERE ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ano_final::INTEGER)+1)::VARCHAR)
@@ -127,7 +131,7 @@ class TTCMGOAMP extends Persistente
                                                          ORDER BY timestamp_acao_dados DESC LIMIT 1
                                                         )
 
-                        JOIN (
+                  INNER JOIN (
                                 SELECT *
                                   FROM ppa.acao_quantidade AS Ano3
                                  WHERE Ano3.exercicio_recurso = (((SELECT ano_inicio::INTEGER FROM ppa.ppa WHERE ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ano_final::INTEGER)+2)::VARCHAR)
@@ -140,7 +144,7 @@ class TTCMGOAMP extends Persistente
                                                          ORDER BY timestamp_acao_dados DESC LIMIT 1
                                                         )
 
-                        JOIN (
+                  INNER JOIN (
                                 SELECT *
                                   FROM ppa.acao_quantidade AS Ano4
                                  WHERE Ano4.exercicio_recurso = (((SELECT ano_inicio::INTEGER FROM ppa.ppa WHERE ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ano_final::INTEGER)+3)::VARCHAR)
@@ -153,11 +157,21 @@ class TTCMGOAMP extends Persistente
                                                          ORDER BY timestamp_acao_dados DESC LIMIT 1
                                                         )
 
-                        JOIN ppa.programa_dados
+                  INNER JOIN ppa.programa_dados
                           ON programa_dados.cod_programa = programa.cod_programa
 
+                  INNER JOIN ppa.programa_setorial
+                          ON programa.cod_setorial = programa_setorial.cod_setorial
+
+                  INNER JOIN ppa.macro_objetivo
+                          ON programa_setorial.cod_macro = macro_objetivo.cod_macro
+
+                  INNER JOIN ppa.ppa
+                          ON macro_objetivo.cod_ppa = ppa.cod_ppa
+
                        WHERE acao_quantidade.exercicio_recurso    = '".$this->getDado('exercicio')."'
-                         AND acao_quantidade.timestamp_acao_dados = Ano1.timestamp_acao_dados
+                         AND ppa.cod_ppa = ((SELECT cod_ppa::INTEGER FROM ppa.ppa WHERE ".$this->getDado('exercicio')." BETWEEN ppa.ano_inicio::INTEGER AND ano_final::INTEGER)::INTEGER)
+                         --AND acao_quantidade.timestamp_acao_dados = Ano1.timestamp_acao_dados
 
                     GROUP BY   programa.cod_programa 
                              , nro_proj_ativ
@@ -169,7 +183,7 @@ class TTCMGOAMP extends Persistente
                              , acao_dados.cod_unidade_medida
                              , acao_dados.cod_subfuncao
                              , acao_dados.cod_funcao
-                             , acao_dados.cod_natureza
+                             , acao_dados.cod_tipo
                              , produto.descricao
                              , Ano1.quantidade
                              , Ano2.quantidade

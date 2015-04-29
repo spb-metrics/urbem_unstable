@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: OCIPopUpProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCIPopUpProcesso.php 62215 2015-04-08 21:28:32Z jean $
 
     * Casos de uso: uc-01.06.98
 */
@@ -46,18 +46,23 @@ switch ($_REQUEST['stCtrl']) {
             if ( strlen($arProcesso[1]) != 4 ) {
                 $arProcesso[1] = Sessao::getExercicio();
             }
-
-            //verifica se o processo existe no banco
-            $obTProcesso = new TProcesso();
-            $obTProcesso->setDado( 'cod_processo', (int) $arProcesso[0] );
-            $obTProcesso->setDado( 'ano_exercicio', $arProcesso[1] );
-            $obTProcesso->recuperaPorChave( $rsProcesso );
-
-            if ( $rsProcesso->getNumLinhas() == -1 ) {
+            
+            if ($arProcesso[0] == '00000') {
                 $stJs .= "$('".$_REQUEST['stNomCampo']."').value = '';";
-                $stJs .= "alertaAviso('Código do processo inválido.','form','erro','".Sessao::getId()."');\n";
+                $stJs .= "$('stIDChaveProcesso').html = '';";
             } else {
-                $stJs .= "f.".$_REQUEST['stNomCampo'].".value = '".$arProcesso[0] . '/' . $arProcesso[1] ."';";
+                //verifica se o processo existe no banco
+                $obTProcesso = new TProcesso();
+                $obTProcesso->setDado( 'cod_processo', (int) $arProcesso[0] );
+                $obTProcesso->setDado( 'ano_exercicio', $arProcesso[1] );
+                $obTProcesso->recuperaPorChave( $rsProcesso );
+    
+                if ( $rsProcesso->getNumLinhas() == -1 ) {
+                    $stJs .= "$('".$_REQUEST['stNomCampo']."').value = '';";
+                    $stJs .= "alertaAviso('Código do processo inválido.','form','erro','".Sessao::getId()."');\n";
+                } else {
+                     $stJs .= "f.".$_REQUEST['stNomCampo'].".value = '".$arProcesso[0] . '/' . $arProcesso[1] ."';";
+                }
             }
         }
     break;

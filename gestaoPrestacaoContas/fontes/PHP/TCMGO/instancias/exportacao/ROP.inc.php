@@ -31,10 +31,10 @@
     * @author Analista: Gelson
     * @ignore
 
-    $Revision: 61551 $
+    $Revision: 62033 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-02-04 13:12:44 -0200 (Qua, 04 Fev 2015) $
+    $Author: jean $
+    $Date: 2015-03-26 14:30:22 -0300 (Qui, 26 Mar 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -50,9 +50,9 @@ $obTTGOROP = new TTGOROP();
 $obTTGOROP->setDado('stEntidades', $stEntidades );
 $obTTGOROP->recuperaTodos($rsRegistro10, $boTransacao);
 
-$i = 0;
-foreach ($rsRegistro10->arElementos as $stChave) {
-    $rsRegistro10->arElementos[$i]['numero_registro'] = ++$i;
+$i = 1;
+foreach ($rsRegistro10->arElementos as $stChave=> $valor) {
+    $rsRegistro10->arElementos[$stChave]['numero_registro'] = $i++;
 }
 
 $obExportador->roUltimoArquivo->addBloco($rsRegistro10);

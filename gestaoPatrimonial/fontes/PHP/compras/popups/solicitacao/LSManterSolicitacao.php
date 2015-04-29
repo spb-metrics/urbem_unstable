@@ -35,7 +35,7 @@
 
  * @ignore
 
- $Id: LSManterSolicitacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: LSManterSolicitacao.php 62339 2015-04-24 20:31:35Z arthur $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -112,12 +112,10 @@ if ($_REQUEST['stTipoBusca']) {
                 $stLink .= '&campoNum='.$_REQUEST['campoNum'];
             }
             if ($_REQUEST['inCodEntidade']) {
-                //$obTSolicitacao->setDado('inCodEntidade', $_REQUEST["inCodEntidade"] );
                 $stFiltro = " AND solicitacao.cod_entidade = ".$_REQUEST['inCodEntidade'];
                 $stLink   .= "&inCodEntidade=".$_REQUEST["inCodEntidade"];
             }
             if ($_REQUEST['stExercicio']) {
-                //$obTSolicitacao->setDado('stExercicio', $_REQUEST['stExercicio'] );
                 $stFiltro.= " AND solicitacao.exercicio = '".$_REQUEST['stExercicio']."'";
                 $stLink .= "&stExercicio=".$_REQUEST['stExercicio'];
             }

@@ -602,7 +602,6 @@ function pegaConfiguracao($sParametro,$iCodModulo=2,$sExercicio="")
         $sSQL .= " and exercicio <= '".Sessao::getExercicio()."'";
         $sSQL .= " order by exercicio desc limit 1 ";
     }
-
     $bdConf->abreSelecao($sSQL);
     $sValor = $sParametro." não encontrado para o módulo ".$iCodModulo;
     if (!$bdConf->eof()) {
@@ -979,6 +978,25 @@ function geraBotaoOk3($botaoOk=1,$botaoLimpar=1,$campos=1,$botaoCancelar=0)
         $html .= '<b>* Campos obrigatórios</b>';
     $html .= '</td></tr></table>';
     print $html;
+}
+
+function geraBotaoOk4($botaoOk=1,$botaoLimpar=1,$campos=1,$botaoCancelar=0)
+{
+    include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+    $obFormulario = new Formulario;
+
+    $obBtnOk = new OK;
+
+    $obBtnLimpar = new Button;
+    $obBtnLimpar->setName( "Limpar" );
+    $obBtnLimpar->setValue( "Limpar" );
+    $obBtnLimpar->obEvento->setOnClick( "location.reload(true);" );
+    
+    $obFormulario->defineBarra (array($obBtnOk, $obBtnLimpar));
+
+    $obFormulario->montaInnerHtml();
+    $html = $obFormulario->getHTML();
+    echo $html;
 }
 
 /***************************************************************************

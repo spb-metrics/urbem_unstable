@@ -44,29 +44,26 @@ class FTCEMGDespesaPrev extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT despPrevSocInatPens
-                 , despReservaContingencia
-                 , despOutrasReservas
-                 , codTipo
-                 , despesasPrevIntra
-                 , despCorrentes
-                 , despCapital
-                 , outrosBeneficios
-                 , contPrevidenciaria
-                 , outrasDespesas
-              FROM ".$this->getTabela()."('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."') as
-           retorno ( despPrevSocInatPens     numeric(14,2)
-                   , despReservaContingencia numeric(14,2)
-                   , despOutrasReservas      numeric(14,2)
-                   , codTipo                 integer
-                   , despesasPrevIntra       numeric(14,2)
-                   , despCorrentes           numeric(14,2)
-                   , despCapital             numeric(14,2)
-                   , outrosBeneficios        numeric(14,2)
-                   , contPrevidenciaria      numeric(14,2)
-                   , outrasDespesas          numeric(14,2) );
-        ";
 
+            SELECT *
+              FROM ".$this->getTabela()."('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."') as
+           retorno ( despAdmGeral               NUMERIC,
+                     despPrevSoci               NUMERIC,
+                     despPrevSocInatPens        NUMERIC,
+                     outrasDespCorrentes        NUMERIC, 
+                     despInvestimentos          NUMERIC,
+                     despInversoesFinanceiras   NUMERIC,
+                     despesasPrevIntra          NUMERIC,
+                     despReserva                NUMERIC,
+                     despOutrasReservas         NUMERIC,
+                     despCorrentes              NUMERIC,
+                     despCapital                NUMERIC,
+                     outrosBeneficios           NUMERIC,
+                     contPrevidenciaria         NUMERIC,
+                     outrasDespesas             NUMERIC,
+                     codTipo                    INTEGER
+                    );
+        ";
         return $stSql;
     }
 }

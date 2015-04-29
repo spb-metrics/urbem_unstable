@@ -44,31 +44,42 @@ switch ($stAcao) {
     case "incluir":
         Sessao::setTrataExcecao(true);
 
-        if (!empty($stNomeClassificacao)) {
-
-            $boGeraCodigo = SistemaLegado::pegaConfiguracao("tipo_numeracao_classificacao_assunto", 5);
-
-            if (!empty($boGeraCodigo) && $boGeraCodigo == 'automatico') {
-                $obTClassificacao->proximoCod($inCodClassificacao);
-            } else {
+        if (empty($stNomeClassificacao))
+            $obErro->setDescricao('Informe a descrição da classificação.');
+        
+        $boGeraCodigo = SistemaLegado::pegaConfiguracao("tipo_numeracao_classificacao_assunto", 5);
+        
+        if ( empty($boGeraCodigo) || $boGeraCodigo == "xxx" ){
+            
+            $obErro->setDescricao('Configure o modo de geração do codigo de classificação em Gestão Administrativa :: Protocolo :: Configuração :: Alterar Configuração');
+        
+        }elseif( $boGeraCodigo == "manual" ){
+        
+            if ( !empty($inCodClassificacao) ) {
+        
                 $inValidaCod = SistemaLegado::pegaDado('cod_classificacao', 'sw_classificacao', ' WHERE cod_classificacao = '.$inCodClassificacao);
-
+        
                 if ($inCodClassificacao == $inValidaCod) {
                     $obErro->setDescricao('O código informado já está sendo utilizado.');
                 } 
+        
+            }else{
+                $obErro->setDescricao('Informe o código da classificação.');
             }
-
-            if (!$obErro->ocorreu()) {
-                $obTClassificacao->setDado('cod_classificacao', $inCodClassificacao);
-                $obTClassificacao->setDado('nom_classificacao', $stNomeClassificacao);
-                $obTClassificacao->inclusao();
-
-                $stMensagem = "Classificação: ".$inCodClassificacao." - ".$stNomeClassificacao;
-            }
-            Sessao::encerraExcecao();
-        } else {
-            $obErro->setDescricao('Informe a descrição da classificação.');
+        
+        }elseif ( $boGeraCodigo == 'automatico' ) {
+            $obTClassificacao->proximoCod($inCodClassificacao);
         }
+
+        if (!$obErro->ocorreu()) {
+            $obTClassificacao->setDado('cod_classificacao', $inCodClassificacao);
+            $obTClassificacao->setDado('nom_classificacao', $stNomeClassificacao);
+            $obErro = $obTClassificacao->inclusao();
+
+            $stMensagem = "Classificação: ".$inCodClassificacao." - ".$stNomeClassificacao;
+        }
+
+        Sessao::encerraExcecao();
 
         if (!$obErro->ocorreu()) {
             SistemaLegado::alertaAviso($pgForm."?stAcao=".$stAcao, $stMensagem ,"incluir","aviso", Sessao::getId(), "../");

@@ -32,7 +32,7 @@
 
  Casos de uso: uc-01.06.99
 
- $Id: relatorioProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: relatorioProcesso.php 61944 2015-03-17 18:41:50Z jean $
 
  */
 
@@ -393,7 +393,7 @@ function zebra(id, classe)
                     </tr>
                     <tr>
                         <td class=field colspan="2">
-                            <?=geraBotaoOk();?>
+                            <?=geraBotaoOk4();?>
                         </td>
                     </tr>
                 </table>

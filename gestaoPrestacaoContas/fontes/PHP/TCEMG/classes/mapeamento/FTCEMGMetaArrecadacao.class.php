@@ -66,7 +66,7 @@ function montaRecuperaTodos()
                                      , ".$this->getDado("bimestre")."
                                      ) AS retorno(
                                                   bimestre       INTEGER,
-                                                  valor_meta     NUMERIC(14,2)
+                                                  valor_meta     NUMERIC
                                                  )";
 
     return $stSql;

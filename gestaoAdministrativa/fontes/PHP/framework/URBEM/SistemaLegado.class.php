@@ -38,7 +38,7 @@
  $Id: $
 
  */
-
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
 class SistemaLegado
 {
 public static function pegaConfiguracao($stParametro,$inCodModulo=2,$inExercicio="", $boTransacao = "")
@@ -1241,5 +1241,28 @@ public static function mesExtensoBR($inMes)
     
     return $arMes[$inMes-1];
 }
+
+/**************************************************************************
+ Informa a query que será executada e o campo a ser retornado
+ Exemplo:
+   $codMinimo = pegaValor("Select min(cod) as minimo From Tabela","minimo");
+/**************************************************************************/
+//Autor: Ricardo Lopes Qua Abr  9 13:41:44 UTC 2003
+public static function pegaValor($query,$campo)
+{
+    //Pega os dados encontrados em uma query
+    $conn = new dataBaseLegado;
+    $conn->abreBD();
+    $conn->abreSelecao($query);
+    $conn->fechaBD();
+    $conn->vaiPrimeiro();
+        if (!$conn->eof()) {
+            $res = $conn->pegaCampo($campo);
+        }
+    $conn->limpaSelecao();
+
+    return $res;
+}
+
 
 }

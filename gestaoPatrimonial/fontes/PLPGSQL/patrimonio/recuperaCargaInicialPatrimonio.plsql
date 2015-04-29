@@ -43,23 +43,8 @@ DECLARE
     idNumCgm      ALIAS FOR $3;
 
 BEGIN
-
-  INSERT INTO  patrimonio.inventario
-            (
-                   exercicio
-                ,  id_inventario
-                ,  dt_inicio
-                ,  numcgm
-            )
-      VALUES
-            (
-                   stExercicio
-                ,  idInventario
-                ,  NOW()::date
-                ,  idNumCgm
-            );  
   
-  INSERT INTO  patrimonio.inventario_historico_bem
+    INSERT INTO  patrimonio.inventario_historico_bem
             (
                   exercicio
                ,  id_inventario

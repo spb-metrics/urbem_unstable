@@ -130,8 +130,13 @@ class TCMGOConfiguracaoLOA extends Persistente
                     LEFT JOIN licitacao.tipo_veiculos_publicidade
                         ON tipo_veiculos_publicidade.cod_tipo_veiculos_publicidade = veiculos_publicidade.cod_tipo_veiculos_publicidade
 
-                    WHERE  configuracao_loa.exercicio = '".$this->getDado('exercicio')."'                    
-            ";
+                    WHERE  configuracao_loa.exercicio = '".$this->getDado('exercicio')."'
+                    
+        GROUP BY   tipo_registro
+                 , num_loa
+                 , meio_pub_loa
+                 , desc_meio_loa
+                 , dt_lei_loa";
 
         return $stSql;
     }

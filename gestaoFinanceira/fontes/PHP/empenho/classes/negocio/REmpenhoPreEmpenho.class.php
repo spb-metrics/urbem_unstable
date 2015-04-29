@@ -601,7 +601,7 @@ function consultarExistenciaDespesa($boTransacao = "")
                                                         
                                                         $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma($rsDespesa->getCampo( 'cod_programa' ));
                                                         $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio($rsDespesa->getCampo( 'exercicio' ));
-                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $obTransacao);
+                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $boTransacao);
                                                         if ( !$obErro->ocorreu() ) {
                                                             $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao($rsPrograma->getCampo( 'descricao' ));   
                                                         }

@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: encaminhaProcessoLote.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: encaminhaProcessoLote.php 61868 2015-03-11 14:38:11Z michel $
 
     */
 
@@ -474,7 +474,8 @@ case 2:
      *  os multi-requerentes na tela de listagem, sem precisar listar mais
      *  de uma vez o mesmo processo devido ao multi-requerentes.
      */
-    $stChaveProcessoCkb = array_unique($stChaveProcessoCkb);
+    if(is_array($stChaveProcessoCkb))
+        $stChaveProcessoCkb = array_unique($stChaveProcessoCkb);
 
     if ($_REQUEST['minProcesso']) {
         $arProcessos = Sessao::read('arProcessos');

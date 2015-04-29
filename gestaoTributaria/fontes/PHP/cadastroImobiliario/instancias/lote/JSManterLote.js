@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSManterLote.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterLote.js 62230 2015-04-10 17:35:05Z michel $
 
     * Casos de uso: uc-05.01.08
 */
@@ -340,15 +340,7 @@ function atualizaComponente(){
     HabilitaLayer("");
 }
 
-function montaConfrontacaoAlterar(linha,tipo, extensao, testada, descricao){
-    
-    /*
-    document.frm.stCtrl.value = 'alterarConfrontacao';
-    var stTraget        = document.frm.target;
-    var stAction        = document.frm.action;
-    document.frm.stAcaoConfrontacao.value = 'alterar';
-    */
-
+function montaConfrontacaoAlterar(linha,tipo, extensao, testada, stChaveTrecho, stTrecho){
     document.frm.inIndice.value = linha;
     document.frm.flExtensao.value = extensao;
     
@@ -365,41 +357,16 @@ function montaConfrontacaoAlterar(linha,tipo, extensao, testada, descricao){
         document.frm.stTipoConfrotacao[2].checked = true;
         tipo = 'outros';
     }
-    
-
-    /*  
-    document.frm.stTipoConfrotacao[0].disabled = true;
-    document.frm.stTipoConfrotacao[1].disabled = true;
-    document.frm.stTipoConfrotacao[2].disabled = true;
-    */
 
     document.frm.stCtrl.value = tipo;
-    //document.frm.stCtrl.value = 'alterarConfrontacao';
+
     var stTraget = document.frm.target;
     var stAction = document.frm.action;
     document.frm.target = "oculto";
-    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&testada='+testada+'&descricao='+descricao+'&Acao=alterarConfrontacao';
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&testada='+testada+'&stChaveTrecho='+stChaveTrecho+'&stTrecho='+stTrecho+'&Acao=alterarConfrontacao';
     document.frm.submit();
     document.frm.action = stAction;
     document.frm.target = stTraget;
-    
-    
-    
-    //montaConfrontacaoAlteracao( 'trecho', testada, descricao );
-    
-    /*document.frm.boTestada.value = 'N';
-    
-    
-    document.frm.target = "oculto";
-    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&tipo='+tipo+'&testada='+testada+'&descricao='+descricao;
-    document.frm.submit();
-    document.frm.action = stAction;
-    document.frm.target = stTraget;
-    */
-
 }
 
-
-
 </script>
-

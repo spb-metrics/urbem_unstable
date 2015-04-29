@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage 
 
-    $Id:$
+    $Id: despesaCapital.plsql 62056 2015-03-27 14:53:30Z michel $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.fn_despesa_capital(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
@@ -136,7 +136,7 @@ BEGIN
            And OD.cod_despesa           = EPED.cod_despesa
            AND OD.exercicio             = EPED.exercicio
            AND OCD.cod_estrutural LIKE ''4.%''
-           AND TO_DATE(EEAI.timestamp,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+           AND TO_DATE(EEAI.timestamp::varchar,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
 
     EXECUTE stSql;
 
@@ -184,7 +184,7 @@ BEGIN
             And ENL.cod_entidade         = ENLP.cod_entidade
             And ENL.exercicio            = ENLP.exercicio
             AND OCD.cod_estrutural LIKE ''4.%''
-            AND TO_DATE(ENLP.timestamp,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+            AND TO_DATE(ENLP.timestamp::varchar,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
 
     EXECUTE stSql; 
 
@@ -236,7 +236,7 @@ BEGIN
             And ENLP.exercicio           = ENLPA.exercicio
             And ENLP.timestamp           = ENLPA.timestamp
             AND OCD.cod_estrutural LIKE ''4.%''
-            AND TO_DATE(ENLPA.timestamp,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+            AND TO_DATE(ENLPA.timestamp::varchar,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
 
     EXECUTE stSql;
 
@@ -334,11 +334,12 @@ BEGIN
           And EPED.exercicio           = EPE.exercicio
           And EPED.cod_pre_empenho     = EPE.cod_pre_empenho
           AND OCD.cod_estrutural LIKE ''4.%''
-          AND TO_DATE(ENLIA.timestamp,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+          AND TO_DATE(ENLIA.timestamp::varchar,''yyyy-mm-dd'') BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')';
 
     EXECUTE stSql;
 
     --retorna os dados da dotacao para as despesas
+    stSql := '
     CREATE TEMPORARY TABLE tmp_dotacao AS
         SELECT conta_despesa.exercicio
              , conta_despesa.cod_conta
@@ -356,11 +357,29 @@ BEGIN
              INNER JOIN orcamento.suplementacao
                      ON suplementacao_suplementada.exercicio         = suplementacao.exercicio
                     AND suplementacao_suplementada.cod_suplementacao = suplementacao.cod_suplementacao
-                  WHERE suplementacao.dt_suplementacao BETWEEN TO_DATE(stDtInicial,'dd/mm/yyyy') AND TO_DATE(stDtFinal,'dd/mm/yyyy')
+                    AND suplementacao.cod_suplementacao || suplementacao.exercicio IN (
+                                                                                        SELECT
+                                                                                            cod_suplementacao || cl.exercicio
+                                                                                        FROM
+                                                                                            contabilidade.transferencia_despesa ctd,
+                                                                                            contabilidade.lote cl
+                                                                                        WHERE
+                                                                                            ctd.exercicio = cl.exercicio AND
+                                                                                            ctd.cod_lote  = cl.cod_lote AND
+                                                                                            ctd.tipo      = cl.tipo AND
+                                                                                            ctd.cod_entidade = cl.cod_entidade AND
+                                                                                            cl.dt_lote BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')
+                                                                                      )
+                  WHERE suplementacao.dt_suplementacao BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')
                     AND NOT EXISTS ( SELECT 1
                                        FROM orcamento.suplementacao_anulada
                                       WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio
-                                        AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao )
+                                        AND (
+                                                suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+                                             OR
+                                                suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
+                                            )
+                                   )
                GROUP BY suplementacao_suplementada.exercicio
                       , suplementacao_suplementada.cod_despesa
                ) AS suplementacao
@@ -373,27 +392,49 @@ BEGIN
              INNER JOIN orcamento.suplementacao
                      ON suplementacao_reducao.exercicio         = suplementacao.exercicio
                     AND suplementacao_reducao.cod_suplementacao = suplementacao.cod_suplementacao
-                  WHERE suplementacao.dt_suplementacao BETWEEN TO_DATE(stDtInicial,'dd/mm/yyyy') AND TO_DATE(stDtFinal,'dd/mm/yyyy')
+                    AND suplementacao.cod_suplementacao || suplementacao.exercicio IN (
+                                                                                        SELECT
+                                                                                            cod_suplementacao || cl.exercicio
+                                                                                        FROM
+                                                                                            contabilidade.transferencia_despesa ctd,
+                                                                                            contabilidade.lote cl
+                                                                                        WHERE
+                                                                                            ctd.exercicio = cl.exercicio AND
+                                                                                            ctd.cod_lote  = cl.cod_lote AND
+                                                                                            ctd.tipo      = cl.tipo AND
+                                                                                            ctd.cod_entidade = cl.cod_entidade AND
+                                                                                            cl.dt_lote BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')
+                                                                                      )
+                  WHERE suplementacao.dt_suplementacao BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'') AND TO_DATE(''' || stDtFinal || ''',''dd/mm/yyyy'')
                     AND NOT EXISTS ( SELECT 1
                                        FROM orcamento.suplementacao_anulada
                                       WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio
-                                        AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao )
+                                        AND (
+                                                suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+                                             OR
+                                                suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
+                                            )
+                                   )
                GROUP BY suplementacao_reducao.exercicio
                       , suplementacao_reducao.cod_despesa
                ) AS reducao
             ON reducao.exercicio   = despesa.exercicio
            AND reducao.cod_despesa = despesa.cod_despesa
-         WHERE conta_despesa.cod_estrutural LIKE '4%'
-           AND despesa.exercicio = stExercicio
+         WHERE conta_despesa.cod_estrutural LIKE ''4%''
+           AND despesa.exercicio = ''' || stExercicio || '''
+           AND despesa.cod_entidade IN (' || stCodEntidade || ')
       GROUP BY conta_despesa.exercicio
              , conta_despesa.cod_conta
-             , conta_despesa.cod_estrutural;
+             , conta_despesa.cod_estrutural;';
+
+    EXECUTE stSql;
 
     --insere os dados na tabela de retorno o tipo 1 - dotacao inicial
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , COALESCE((SELECT SUM(vl_original)
                                                   FROM tmp_dotacao
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                     , COALESCE((SELECT SUM(vl_original)
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.5%'
@@ -443,7 +484,8 @@ BEGIN
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , COALESCE((SELECT SUM(vl_atualizado)
                                                   FROM tmp_dotacao
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.5%'
@@ -493,7 +535,8 @@ BEGIN
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_empenhado 
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_empenhado
                                                  WHERE cod_estrutural LIKE '4.5%'
@@ -543,11 +586,13 @@ BEGIN
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , (COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_liquidado 
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                        -
                                        COALESCE((SELECT SUM(valor) 
                                                    FROM tmp_liquidado_estornado
-                                                  WHERE cod_estrutural LIKE '4.4%'),0.00))
+                                                  WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00))
                                     , (COALESCE((SELECT SUM(valor) 
                                                    FROM tmp_liquidado
                                                   WHERE cod_estrutural LIKE '4.5%'
@@ -647,7 +692,8 @@ BEGIN
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_anulado 
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_anulado
                                                  WHERE cod_estrutural LIKE '4.5%'
@@ -696,33 +742,52 @@ BEGIN
       --insere os dados na tabela de retorno o tipo 3 - dotacao saldo
     INSERT INTO tmp_retorno VALUES (  inMes
                                     , COALESCE((SELECT SUM(vl_atualizado) 
-                                                       + ( SELECT COALESCE(desp_invest,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_invest,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.4%'
+                                                                     AND cod_estrutural NOT LIKE '4.4.6%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.4%'
+                                                                     AND cod_estrutural NOT LIKE '4.4.6%'),0.00) )
                                                   FROM tmp_dotacao
-                                                 WHERE cod_estrutural LIKE '4.4%'),0.00)
+                                                 WHERE cod_estrutural LIKE '4.4%'
+                                                   AND cod_estrutural NOT LIKE '4.4.6%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(desp_inv_finan,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_inv_finan,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.5%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.63%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.64%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.5%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.63%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.64%'),0.00) )
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.5%'
                                                    AND cod_estrutural NOT LIKE '4.5.9.0.66%'
                                                    AND cod_estrutural NOT LIKE '4.5.9.0.63%'
                                                    AND cod_estrutural NOT LIKE '4.5.9.0.64%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(desp_amort_div_int,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_amort_div_int,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.6%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.71.03%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.77.03%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.72.01%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.74.01%' 
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.76.01%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.6%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.71.03%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.77.03%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.72.01%'
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.74.01%' 
+                                                                     AND cod_estrutural NOT LIKE '4.6.9.0.76.01%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural LIKE '4.6%'
                                                    AND cod_estrutural NOT LIKE '4.6.9.0.71.03%'
@@ -731,66 +796,86 @@ BEGIN
                                                    AND cod_estrutural NOT LIKE '4.6.9.0.74.01%' 
                                                    AND cod_estrutural NOT LIKE '4.6.9.0.76.01%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(desp_amort_div_ext,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_amort_div_ext,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.6.9.0.71.03%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.77.03%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.6.9.0.71.03%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.77.03%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural LIKE '4.6.9.0.71.03%'
                                                    AND cod_estrutural LIKE '4.6.9.0.77.03%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(desp_amort_div_mob,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_amort_div_mob,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.6.9.0.72.01%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.74.01%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.76.01%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.6.9.0.72.01%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.74.01%'
+                                                                     AND cod_estrutural LIKE '4.6.9.0.76.01%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural LIKE '4.6.9.0.72.01%'
                                                    AND cod_estrutural LIKE '4.6.9.0.74.01%' 
                                                    AND cod_estrutural LIKE '4.6.9.0.76.01%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(desp_out_desp_cap,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(desp_out_desp_cap,0.0)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4%'
+                                                                     AND cod_estrutural NOT LIKE '4.4%'
+                                                                     AND cod_estrutural NOT LIKE '4.5%'
+                                                                     AND cod_estrutural NOT LIKE '4.6%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4%'
+                                                                     AND cod_estrutural NOT LIKE '4.4%'
+                                                                     AND cod_estrutural NOT LIKE '4.5%'
+                                                                     AND cod_estrutural NOT LIKE '4.6%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural LIKE '4%'
                                                    AND cod_estrutural NOT LIKE '4.4%'
                                                    AND cod_estrutural NOT LIKE '4.5%'
                                                    AND cod_estrutural NOT LIKE '4.6%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(conc_emprestimos,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(conc_emprestimos,0.0)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.66%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66.01.01%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66.02.01%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.66%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66.01.01%'
+                                                                     AND cod_estrutural NOT LIKE '4.5.9.0.66.02.01%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural NOT LIKE '4.5.9.0.66.01.01%' 
                                                    AND cod_estrutural NOT LIKE '4.5.9.0.66.02.01%'
                                                    AND cod_estrutural LIKE '4.5.9.0.66%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(aquisicao_titulos,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(aquisicao_titulos,0.0)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.63%' 
+                                                                     AND cod_estrutural LIKE '4.5.9.0.64%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.63%' 
+                                                                     AND cod_estrutural LIKE '4.5.9.0.64%'),0.00) )
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.5.9.0.63%' 
                                                     OR cod_estrutural LIKE '4.5.9.0.64%'),0.00)
                                     , COALESCE((SELECT SUM(vl_atualizado)
-                                                       + ( SELECT COALESCE(incent_contrib,0.00)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 4 )
-                                                       - ( SELECT COALESCE(incent_contrib,0.0)
-                                                             FROM tmp_retorno
-                                                            WHERE cod_tipo = 6 )
+                                                       + ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_anulado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.66.01.01%'
+                                                                     AND cod_estrutural LIKE '4.5.9.0.66.02.01%'),0.00) )
+                                                       - ( COALESCE((SELECT SUM(valor) 
+                                                                    FROM tmp_empenhado 
+                                                                   WHERE cod_estrutural LIKE '4.5.9.0.66.01.01%'
+                                                                     AND cod_estrutural LIKE '4.5.9.0.66.02.01%'),0.00) )
                                                   FROM tmp_dotacao 
                                                  WHERE cod_estrutural LIKE '4.5.9.0.66.01.01%'
                                                     OR cod_estrutural LIKE '4.5.9.0.66.02.01%'),0.00)

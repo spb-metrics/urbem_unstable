@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: OCManterManutencaoParticipante.php 61786 2015-03-03 21:11:42Z arthur $
+    * $Id: OCManterManutencaoParticipante.php 62270 2015-04-15 20:13:46Z arthur $
 
     * Casos de uso : uc-03.05.18
 */
@@ -512,21 +512,13 @@ function insereParticipante()
 
 switch ($stCtrl) {
     case 'incluirParticipanteLicitacao':
-
+    
         if (Sessao::read('alterandoTransf7')) {
             //esta alterando, executa a alteracao
             $stJs.= executaAlteracao($_REQUEST['cgmRepLegal'],$_REQUEST['stNomRepLegal']);
             break;
         }
-
-        /// confere se foi digitado o número do edital
-        if (!$_REQUEST['numEdital']) {
-            $stJs.="alertaAviso('Informe o número do edital.','form','erro','".Sessao::getId()."');";
-            $stJs.= "document.getElementById('numEdital').focus();";
-            break;
-        }
         
-
         list($ano, $mes, $dia) = array_reverse(explode('/',$_REQUEST['dataInclusao']));
         $timestampInclusao = $ano.$mes.$dia;
 
@@ -596,65 +588,20 @@ switch ($stCtrl) {
     break;
 
     case 'exibeLicitacao':
-        
-        /*
-        //le o objeto da licitacao
-        //e monta a lista de participantes ja cadastrados
-        if (empty($_REQUEST['numEdital'])) {
-            $stJs .= "document.getElementById('objetoLicitatorio').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnEdital').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnListaParticipantesLic').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnParticipante').innerHTML = ''; ";
-            break;
-        }
-
-        if ( empty($exercicioEdital) ) { $exercicioEdital = Sessao::getExercicio(); }
-
-        //O usuario digitou algo, agora busca no BD
-        $objEdital = new TLicitacaoEdital;
-        $objEdital->setDado("num_edital",$numEdital);
-        $objEdital->setDado("exercicio_licitacao",$exercicioEdital );
-        $stFiltro = "   AND NOT EXISTS  (
-                                        SELECT  1
-                                          FROM  licitacao.edital_anulado
-                                         WHERE  edital_anulado.num_edital = edital.num_edital
-                                           AND  edital_anulado.exercicio = edital.exercicio
-                                        )";
-        $objEdital->recuperaLicitacao($rsLic,$stFiltro);
-
-        //licitacao nao encontrada
-        if ($rsLic->eof()) {
-            //Aviso de que o edital nao existe
-            $stJs .= "alertaAviso('Edital ".$numEdital."/".$exercicioEdital." não encontrado!', 'form','erro','".Sessao::getId()."');";
-            $stJs .= "document.getElementById('objetoLicitatorio').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnEdital').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnListaParticipantesLic').innerHTML = ''; ";
-            $stJs .= "document.getElementById('spnParticipante').innerHTML = ''; ";
-            break;
-        }
-        
-        $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
-        $obTLicitacaoLicitacao->setDado('exercicio'      , $rsLic->getCampo('exercicio')      );
-        $obTLicitacaoLicitacao->setDado('cod_licitacao'  , $rsLic->getCampo('cod_licitacao')  );
-        $obTLicitacaoLicitacao->setDado('cod_modalidade' , $rsLic->getCampo('cod_modalidade') );
-        $obTLicitacaoLicitacao->setDado('cod_entidade'   , $rsLic->getCampo('cod_entidade')   );
-        */
                 
         $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
         $obTLicitacaoLicitacao->setDado('exercicio'      , $request->get('stExercicioLicitacao') );
-        $obTLicitacaoLicitacao->setDado('cod_licitacao'  , $request->get('inCodLicitacao')               );
-        $obTLicitacaoLicitacao->setDado('cod_modalidade' , $request->get('inCodModalidade')              );
-        $obTLicitacaoLicitacao->setDado('cod_entidade'   , $request->get('inCodEntidade')                );
+        $obTLicitacaoLicitacao->setDado('cod_licitacao'  , $request->get('inCodLicitacao')       );
+        $obTLicitacaoLicitacao->setDado('cod_modalidade' , $request->get('inCodModalidade')      );
+        $obTLicitacaoLicitacao->setDado('cod_entidade'   , $request->get('inCodEntidade')        );
         
-        if($request->get('numEdital')){
-            $arEdital = explode('/', $request->get('numEdital') );
-            $numEdital       = $arEdital[0];
-            $exercicioEdital = $arEdital[1];
-            
-            $obTLicitacaoLicitacao->setDado('num_edital', $arEdital[0] );
-        }
-            
+        $arEdital = explode('/', $request->get('numEdital') );
+        $numEdital       = $arEdital[0];
+        $exercicioEdital = $arEdital[1];
+        $obTLicitacaoLicitacao->setDado('num_edital', $arEdital[0] );
         
+        
+        //muda filtro de acordo com o tipo
         $stFiltro = "
             -- A Licitação não pode estar anulada.
             AND NOT EXISTS (
@@ -665,20 +612,38 @@ switch ($stCtrl) {
                                    AND  licitacao_anulada.cod_entidade   = licitacao.cod_entidade
                                    AND  licitacao_anulada.exercicio      = licitacao.exercicio
                             )
+                            
             -- O Edital não pode estar anulado.
             AND NOT EXISTS (
                                 SELECT	1
                                   FROM	licitacao.edital_anulado
                                  WHERE  edital_anulado.num_edital = edital.num_edital
                                    AND 	edital_anulado.exercicio  = edital.exercicio
-                            ) \n ";
+                            )
+            
+            -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                    edital.cod_licitacao IS NOT NULL
+               AND edital.cod_modalidade IS NOT NULL
+               AND edital.cod_entidade   IS NOT NULL 
+               AND edital.exercicio      IS NOT NULL 
+
+              -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN licitacao.cod_modalidade in (8,9) THEN
+                    
+                    edital.cod_licitacao  IS NULL
+                 OR edital.cod_modalidade IS NULL
+                 OR edital.cod_entidade   IS NULL 
+                 OR edital.exercicio      IS NULL 
+
+	         OR edital.cod_licitacao  IS NOT NULL
+	         OR edital.cod_modalidade IS NOT NULL
+	         OR edital.cod_entidade   IS NOT NULL 
+	         OR edital.exercicio      IS NOT NULL 
+            END  \n ";
         
-        $obTLicitacaoLicitacao->recuperaLicitacaoParticipante( $rsLic, $stFiltro );
-        //$obTLicitacaoLicitacao->debug();
-    
-        # Verifica se a licitação pertencente ao edital não foi homologada.
-        $obTLicitacaoLicitacao->recuperaLicitacaoNaoHomologada($rsLicitacaoNaoHomologada);
-        //$obTLicitacaoLicitacao->debug();
+        $obTLicitacaoLicitacao->recuperaManutencaoParticipanteLicitacao( $rsLic, $stFiltro );
 
         # Verifica se a licitação pertencente ao edital não foi julgada.
         $obTLicitacaoLicitacao->recuperaLicitacaoNaoJulgada($rsLicitacaoNaoJulgada);
@@ -689,11 +654,6 @@ switch ($stCtrl) {
                 $stJs .= "alertaAviso('A licitação nº ".$rsLic->getCampo('cod_licitacao')." vinculada a esse Edital já foi julgada!', 'form','erro','".Sessao::getId()."'); window.location = '".$pgList."';" ;
                 $obErro = true;
             }
-        }
-
-        if ($rsLicitacaoNaoHomologada->getNumLinhas() <= 0) {
-            $stJs .= "alertaAviso('A licitação nº ".$rsLic->getCampo('cod_licitacao')." vinculada a esse Edital já foi homologada!', 'form','erro','".Sessao::getId()."'); window.location = '".$pgList."'; ";
-            $obErro = true;
         }
 
         if ($obErro) {
@@ -720,17 +680,18 @@ switch ($stCtrl) {
         include_once ( CAM_GP_LIC_COMPONENTES. "ILabelNumeroLicitacao.class.php" );
         $obForm = new Form;
         $stJs.= "document.getElementById('objetoLicitatorio').innerHTML = '".$objetoLicitatorio."';";
+        
         $obLblNumeroLicitacao = new ILabelNumeroLicitacao( $obForm );
-        $obLblNumeroLicitacao->setExercicio( $rsLic->getCampo('exercicio') );
-        $obLblNumeroLicitacao->setNumEdital( $numEdital );
-        $obLblNumeroLicitacao->setCodEntidade(Sessao::read('cod_entidade'));
-        $obLblNumeroLicitacao->setNumLicitacao(Sessao::read('cod_licitacao'));
-
+        $obLblNumeroLicitacao->setExercicio   ( $rsLic->getCampo('exercicio') );
+        $obLblNumeroLicitacao->setCodEntidade ( Sessao::read('cod_entidade')  );
+        $obLblNumeroLicitacao->setNumLicitacao( Sessao::read('cod_licitacao') );
+        $obLblNumeroLicitacao->setNumEdital   ( $numEdital );
+        
         $obFormulario = new Formulario($obForm);
-        $obLblNumeroLicitacao->geraFormulario( $obFormulario );
+        //$obLblNumeroLicitacao->geraFormulario( $obFormulario );
+        $obLblNumeroLicitacao->geraFormularioManutencaoParticipante( $obFormulario );
         $obFormulario->montaInnerHTML();
 
-        //$stJs .= "document.getElementById('numEdital').value = '".$numEdital."/".$exercicioEdital."';";
         $stJs.= "document.getElementById('spnEdital').innerHTML = '".$obFormulario->getHTML()."';";
 
         //coloca na sessao os valores da data de criacao e de adjudicacao da licitacao

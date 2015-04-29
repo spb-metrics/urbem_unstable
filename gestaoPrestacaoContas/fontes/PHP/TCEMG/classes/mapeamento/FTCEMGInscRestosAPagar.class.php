@@ -60,17 +60,23 @@ class FTCEMGInscRestosAPagar extends Persistente
     {
         $stSql  = "
             SELECT mes
-                 , ROUND(vl_processado,2) AS vl_processado
-                 , ROUND(vl_nao_processado,2) AS vl_nao_processado
-                 , ROUND(vl_despesa_nao_inscrita,2) AS vl_despesa_nao_inscrita
-                 , ROUND(vl_vinculado,2) AS vl_vinculado
-                 , ROUND(vl_nao_vinculado,2) AS vl_nao_vinculado
-                 , ROUND(vl_rpps_processado,2) AS vl_rpps_processado
-                 , ROUND(vl_rpps_nao_processado,2) AS vl_rpps_nao_processado
-                 , ROUND(vl_rpps_despesa_nao_inscrita,2) AS vl_rpps_despesa_nao_inscrita
-                 , ROUND(vl_rpps_vinculado,2) AS vl_rpps_vinculado
-                 , ROUND(vl_rpps_nao_vinculado,2) AS vl_rpps_nao_vinculado
-                 , ROUND(vl_processado_legislativo,2) AS vl_processado_legislativo
+                 , REPLACE( ROUND(vl_processado,2)::VARCHAR, '.', '' ) AS vl_processado
+                 , REPLACE( ROUND(vl_nao_processado,2)::VARCHAR, '.', '' ) AS vl_nao_processado
+                 , REPLACE( ROUND(vl_despesa_nao_inscrita,2)::VARCHAR, '.', '' ) AS vl_despesa_nao_inscrita
+                 , REPLACE( ROUND(vl_vinculado,2)::VARCHAR, '.', '' ) AS vl_vinculado
+                 , REPLACE( ROUND(vl_nao_vinculado,2)::VARCHAR, '.', '' ) AS vl_nao_vinculado
+                 , REPLACE( ROUND(vl_rpps_processado,2)::VARCHAR, '.', '' ) AS vl_rpps_processado
+                 , REPLACE( ROUND(vl_rpps_nao_processado,2)::VARCHAR, '.', '' ) AS vl_rpps_nao_processado
+                 , REPLACE( ROUND(vl_rpps_despesa_nao_inscrita,2)::VARCHAR, '.', '' ) AS vl_rpps_despesa_nao_inscrita
+                 , REPLACE( ROUND(vl_rpps_vinculado,2)::VARCHAR, '.', '' ) AS vl_rpps_vinculado
+                 , REPLACE( ROUND(vl_rpps_nao_vinculado,2)::VARCHAR, '.', '' ) AS vl_rpps_nao_vinculado
+                 , REPLACE( ROUND(vl_processado_legislativo,2)::VARCHAR, '.', '' ) AS vl_processado_legislativo
+                 , 'S' AS nada_declarar
+                 , 0 AS vl_rppsas_processado
+                 , 0 AS vl_rppsas_nao_processado
+                 , 0 AS vl_rppsas_despesa_nao_inscrita
+                 , 0 AS vl_rppsas_vinculado
+                 , 0 AS vl_rppsas_nao_vinculado
               FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
                                           ( mes                          INTEGER,
                                             vl_processado                NUMERIC,
@@ -90,3 +96,5 @@ class FTCEMGInscRestosAPagar extends Persistente
     }
 
 }
+
+?>

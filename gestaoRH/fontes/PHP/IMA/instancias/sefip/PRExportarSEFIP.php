@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.03
 
-    $Id: PRExportarSEFIP.php 61727 2015-02-27 17:00:59Z evandro $
+    $Id: PRExportarSEFIP.php 62307 2015-04-20 18:21:57Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -247,7 +247,7 @@ switch ($stAcao) {
             $obTAdministracaoConfiguracao->setDado( "parametro" , "tipo_inscricao"        );
             $obTAdministracaoConfiguracao->recuperaPorChave($rsTipoInscricao);
             $arHeaderArquivo[0]['tipo_inscricao_fornecedor']                     = $rsTipoInscricao->getCampo("valor");
-            $obTAdministracaoConfiguracao->setDado( "parametro" , "inscricao_fornecedor"        );
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "inscricao_fornecedor".Sessao::getEntidade() );
             $obTAdministracaoConfiguracao->recuperaPorChave($rsInscricao);
             switch ($rsTipoInscricao->getCampo("valor")) {
                 case 1:
@@ -1232,15 +1232,22 @@ switch ($stAcao) {
                     $obTFolhaPagamentoEventoRescisaoCalculado->recuperaEventoRescisaoCalculado($rsEventoRescisaoCalculado,$stFiltro);
                     $arEventoRescisaoCalculado = $rsEventoRescisaoCalculado->getSomaCampo("valor");
 
-                    $stFiltro  = " AND cod_contrato = ".$rsContratos->getCampo("cod_contrato");
-                    $stFiltro .= " AND evento_rescisao_calculado.cod_evento = ".$rsEventoPrevidencia->getCampo("cod_evento");
-                    $stFiltro .= " AND cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
-                    $stFiltro .= " AND evento_rescisao_calculado.desdobramento = 'D'";
-                    $obTFolhaPagamentoEventoRescisaoCalculado->recuperaEventoRescisaoCalculado($rsEventoRescisaoCalculado,$stFiltro);
-                    $arEventoRescisaoCalculadoDesDecimo = $rsEventoRescisaoCalculado->getSomaCampo("valor");
-                    $nuEventoRescisaoCalculadoDesDecimo = $arEventoRescisaoCalculadoDesDecimo["valor"];
-                    if ($nuEventoRescisaoCalculadoDesDecimo == '0' or $nuEventoRescisaoCalculadoDesDecimo == '0.00' or $nuEventoRescisaoCalculadoDesDecimo == "") {
-                        $nuEventoRescisaoCalculadoDesDecimo = "0.01";
+                    $stFiltro  = " WHERE cod_contrato = ".$rsContratos->getCampo("cod_contrato");
+                    $stFiltro .= " AND dt_rescisao BETWEEN to_date('".$rsPeriodoMovimentacao->getCampo("dt_inicial")."','dd-mm-yyyy') AND to_date('".$rsPeriodoMovimentacao->getCampo("dt_final")."','dd-mm-yyyy')";
+                    $obTPessoalContratoServidorCasoCausa->recuperaTodos($rsContratoRescisao,$stFiltro);
+                    
+                    while (!$rsContratoRescisao->eof()) {
+                        $stFiltro  = " AND cod_contrato = ".$rsContratos->getCampo("cod_contrato");
+                        $stFiltro .= " AND evento_rescisao_calculado.cod_evento = ".$rsEventoPrevidencia->getCampo("cod_evento");
+                        $stFiltro .= " AND cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
+                        $stFiltro .= " AND evento_rescisao_calculado.desdobramento = 'D'";
+                        $obTFolhaPagamentoEventoRescisaoCalculado->recuperaEventoRescisaoCalculado($rsEventoRescisaoCalculado,$stFiltro);
+                        $arEventoRescisaoCalculadoDesDecimo = $rsEventoRescisaoCalculado->getSomaCampo("valor");
+                        $nuEventoRescisaoCalculadoDesDecimo = $arEventoRescisaoCalculadoDesDecimo["valor"];
+                        if ($nuEventoRescisaoCalculadoDesDecimo == '0' or $nuEventoRescisaoCalculadoDesDecimo == '0.00' or $nuEventoRescisaoCalculadoDesDecimo == "") {
+                            $nuEventoRescisaoCalculadoDesDecimo = "0.01";
+                        }
+                        $rsContratoRescisao->proximo();
                     }
 
                     $stFiltro  = " AND cod_contrato = ".$rsContratos->getCampo("cod_contrato");
@@ -1789,24 +1796,19 @@ function separarDigito($stString)
     return array($inNumero,$inDigito);
 }
 
-function removeAcentos($stCampo)
+function removeAcentos($string)
 {
-    $Acentos = "áàãââÁÀÃÂéêÉÊíÍóõôÓÔÕúüÚÜçÇ";
-    $Traducao ="aaaaaAAAAeeeeiIoooOOOuuUUcC";
-    $TempLog = "";
-    for ($i=0; $i < strlen($stCampo); $i++) {
-        $Carac = $stCampo[$i];
-        $Posic  = strpos($Acentos,$Carac);
-        if ($Posic > -1) {
-            $TempLog .= $Traducao[$Posic];
-        } else {
-            $TempLog .= $stCampo[$i];
-        }
-    }
-    $TempLog = str_replace(".","",$TempLog);
-    $TempLog = preg_replace("[^0-9a-zA-Z ]","",$TempLog);
-
-    return $TempLog;
+    // assume $str esteja em UTF-8
+    $acentos    = "áàãâéêíóôõúüçÁÀÃÂÉÊÍÓÔÕÚÜÇ";
+    $semAcentos = "aaaaeeiooouucAAAAEEIOOOUUC";
+    
+    $keys = array();
+    $values = array();
+    preg_match_all('/./u', $acentos, $keys);
+    preg_match_all('/./u', $semAcentos, $values);
+    $mapping = array_combine($keys[0], $values[0]);
+    
+    return strtr($string, $mapping);
 }
 
 function processarFiltro(&$obTMapeamento)

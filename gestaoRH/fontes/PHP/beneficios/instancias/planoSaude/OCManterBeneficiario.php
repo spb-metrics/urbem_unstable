@@ -159,9 +159,10 @@ switch ($stCtrl) {
     break;
 
     case 'excluirListaItens':
-        $arTmp   = array();
+        $arTmp = $arTmpRemove = array();
+        $arBeneficiarioRemovidos = Sessao::read('arBeneficiarioRemovidos');
         $inCount = 0;
-
+        
         foreach ($arBeneficiario as $key => $value) {
             if ($value['id'] != $_REQUEST['id']) {
 
@@ -182,10 +183,28 @@ switch ($stCtrl) {
                 $arTmp[$inCount]['vlDesconto']        = $value['vlDesconto'];
 
                 $inCount++;
+            } else {
+                $arTmpRemove['id']                = $inCount;
+                $arTmpRemove['inContrato']        = $value['inContrato'];
+                $arTmpRemove['inCGMBeneficiario'] = $value['inCGMBeneficiario'];
+                $arTmpRemove['stCGMBeneficiario'] = SistemaLegado::pegaDado('nom_cgm', 'sw_cgm',  'WHERE numcgm ='.$value['inCGMBeneficiario']);
+                $arTmpRemove['inCGMFornecedor']   = $value['inCGMFornecedor'];
+                $arTmpRemove['stCGMFornecedor']   = SistemaLegado::pegaDado('nom_cgm', 'sw_cgm',  'WHERE numcgm ='.$value['inCGMFornecedor']);
+                $arTmpRemove['inModalidade']      = $value['inModalidade'];
+                $arTmpRemove['inTipo']            = $value['inTipo'];
+                $arTmpRemove['stTipo']            = SistemaLegado::pegaDado('descricao', 'beneficio.tipo_convenio_medico',  'WHERE cod_tipo_convenio ='.$value['inTipo']);
+                $arTmpRemove['inCodUsuario']      = $value['inCodUsuario'];
+                $arTmpRemove['inGrauParentesco']  = $value['inGrauParentesco'];
+                $arTmpRemove['stGrauParentesco']  = SistemaLegado::pegaDado('nom_grau', 'cse.grau_parentesco',  'WHERE cod_grau ='.$value['inGrauParentesco']);
+                $arTmpRemove['dtInicioBeneficio'] = $value['dtInicioBeneficio'];
+                $arTmpRemove['dtFimBeneficio']    = $value['dtFimBeneficio'];
+                $arTmpRemove['vlDesconto']        = $value['vlDesconto'];
             }
         }
+        $arBeneficiarioRemovidos[count($arBeneficiarioRemovidos)] = $arTmpRemove;
 
         Sessao::write('arBeneficiario', $arTmp);
+        Sessao::write('arBeneficiarioRemovidos', $arBeneficiarioRemovidos);
         echo montaLista( $arTmp );
     break;
 

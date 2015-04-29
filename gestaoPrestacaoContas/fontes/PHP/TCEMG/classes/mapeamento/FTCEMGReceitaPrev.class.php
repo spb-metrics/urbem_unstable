@@ -59,38 +59,42 @@ function FTCEMGReceitaPrev()
 function montaRecuperaTodos()
 {
     $stSql  = "
-        SELECT mes
-             , contrib_pat
-             , contrib_serv_ativo
-             , contrib_serv_inat_pens
-             , rec_patrimoniais
-             , alienacao_bens
-             , outras_rec_cap
-             , comp_prev
-             , outras_rec
-             , cod_tipo
-             , contrib_pat_anterior
-             , repasses_prev
-             , receitas_prev_intra
-          FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
-                                     ) AS retorno(
-                                                  mes                       INTEGER
-                                                , contrib_pat               NUMERIC(14,2)
-                                                , contrib_serv_ativo        NUMERIC(14,2)
-                                                , contrib_serv_inat_pens    NUMERIC(14,2)
-                                                , rec_patrimoniais          NUMERIC(14,2)
-                                                , alienacao_bens            NUMERIC(14,2)
-                                                , outras_rec_cap            NUMERIC(14,2)
-                                                , comp_prev                 NUMERIC(14,2)
-                                                , outras_rec                NUMERIC(14,2)
-                                                , cod_tipo                  VARCHAR
-                                                , contrib_pat_anterior      NUMERIC(14,2)
-                                                , repasses_prev             NUMERIC(14,2)
-                                                , receitas_prev_intra       NUMERIC(14,2)
-                                                 )";
-
+                SELECT  ".$this->getDado("mes")." as mes
+                        , cod_tipo
+                        , REPLACE(contrib_pat               ,'.','') as contrib_pat
+                        , REPLACE(contrib_serv_ativo        ,'.','') as contrib_serv_ativo
+                        , REPLACE(contrib_serv_inat_pens    ,'.','') as contrib_serv_inat_pens
+                        , REPLACE(rec_patrimoniais          ,'.','') as rec_patrimoniais
+                        , REPLACE(alienacao_bens            ,'.','') as alienacao_bens
+                        , REPLACE(outras_rec_cap            ,'.','') as outras_rec_cap
+                        , REPLACE(comp_prev                 ,'.','') as comp_prev
+                        , REPLACE(outras_rec                ,'.','') as outras_rec
+                        , REPLACE(deducoes_receita          ,'.','') as deducoes_receita
+                        , 0 as contrib_pat_anterior
+                        , 0 as repasses_prev
+                        , 0 as receitas_prev_intra
+                        , 0 as plano_fin_recursos_cobertura
+                        , 0 as plano_fin_repasse_pag_resp
+                        , 0 as plano_fin_rec_formacao_reserva
+                        , 0 as plano_fin_outros_aportes_rpps
+                        , 0 as plano_prev_rec_cob_def_fin
+                        , 0 as plano_prev_rec_cob_def_atuarial
+                        , 0 as plano_prev_outros_aportes_rpps
+                FROM tcemg.fn_receita_prev( '".$this->getDado("exercicio")."'
+                                            , '".$this->getDado("cod_entidade")."'
+                                            , ".$this->getDado("mes")."
+                ) AS retorno(
+                     cod_tipo                   VARCHAR
+                    , contrib_pat               VARCHAR
+                    , contrib_serv_ativo        VARCHAR
+                    , contrib_serv_inat_pens    VARCHAR
+                    , rec_patrimoniais          VARCHAR
+                    , alienacao_bens            VARCHAR
+                    , outras_rec_cap            VARCHAR
+                    , comp_prev                 VARCHAR
+                    , outras_rec                VARCHAR
+                    , deducoes_receita          VARCHAR
+                )";
     return $stSql;
 }
 

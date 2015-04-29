@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaPagamento.class.php 60844 2014-11-18 16:54:14Z franver $
+    $Id: RTesourariaPagamento.class.php 62324 2015-04-23 20:03:47Z diogo.zarpelon $
 
     $Revision: 32136 $
     $Name:  $
@@ -179,6 +179,7 @@ function pagar($boTransacao = "")
 {
     include_once ( CAM_FW_BANCO_DADOS    ."Transacao.class.php"            );
     include_once ( CAM_GF_TES_MAPEAMENTO ."TTesourariaPagamento.class.php" );
+    $obErro = new Erro;
     $this->obTransacao                     = new Transacao();
     $arNotasPagas = $this->obREmpenhoPagamentoLiquidacao->getValoresPagos();
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -733,7 +734,7 @@ function consultar($boTransacao = "")
     if ( !$obErro->ocorreu() and !$rsRecordSet->eof() ) {
         $this->obRContabilidadePlanoBanco->setCodPlano ( $rsRecordSet->getCampo("cod_plano") );
         $this->obRContabilidadePlanoBanco->setExercicio( $rsRecordSet->getCampo("exercicio_plano") );
-        $this->obRContabilidadePlanoBanco->consultar ();
+        $this->obRContabilidadePlanoBanco->consultar ($boTransacao);
         if ($this->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getRetencao()) {
             $obErro = $obTTesourariaPagamento->recuperaCodPlanoRetencao( $rsRetencao, $boTransacao );
             if (!$obErro->ocorreu() and !$rsRetencao->eof()) {

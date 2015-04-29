@@ -68,7 +68,7 @@ BEGIN
                 contabilidade.lote                  as lote
             WHERE
                     ore.cod_entidade    IN ('' || stCodEntidades || '')
-                AND ore.exercicio       = '' || stExercicio || ''
+                AND ore.exercicio       = '''' || stExercicio || ''''
 
                 AND ocr.cod_conta       = ore.cod_conta
                 AND ocr.exercicio       = ore.exercicio
@@ -118,7 +118,7 @@ BEGIN
 
             WHERE
                     ore.cod_entidade    IN('' || stCodEntidades || '')
-                AND ore.exercicio       = '' || stExercicio || ''
+                AND ore.exercicio       = '''' || stExercicio || ''''
                 AND ocr.cod_conta       = ore.cod_conta
                 AND ocr.exercicio       = ore.exercicio
 
@@ -187,13 +187,13 @@ BEGIN
                             ocr.exercicio = r.exercicio AND
                             ocr.cod_conta = r.cod_conta AND
                             r.cod_entidade    IN ('' || stCodEntidades || '') AND
-                            r.exercicio       = '' || stExercicio || ''
+                            r.exercicio       = '''''' || stExercicio || ''''''
                         LEFT JOIN orcamento.recurso('''''' || stExercicio || '''''') as rec ON
                             rec.cod_recurso = r.cod_recurso AND
                             rec.exercicio   = r.exercicio
                 WHERE
                     ocr.cod_conta = ocr.cod_conta
-                AND ocr.exercicio =  '' || stExercicio || ''
+                AND ocr.exercicio =  '''''' || stExercicio || ''''''
                     '';
 
                     if (stCodEstruturalInicial is not null and stCodEstruturalInicial <> '''') then
@@ -252,7 +252,7 @@ BEGIN
                     GROUP BY tbl.cod_estrutural, tbl.receita, tbl.recurso, tbl.descricao
 
                         '';
-
+RAISE NOTICE  ''%s'', stSql;
 
     FOR reRegistro IN EXECUTE stSql
     LOOP

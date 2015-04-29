@@ -28,7 +28,7 @@
     * Data de Criação   : 06/08/2004
     * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
     * @ignore
-    * $Id: FLRelatorioRazaoDespesa.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLRelatorioRazaoDespesa.php 62308 2015-04-20 19:41:57Z evandro $
     * Casos de uso: uc-02.01.22
 */
 
@@ -84,6 +84,7 @@ $rsOrgao->setPrimeiroElemento();
 $obRegra->obREntidade->obRCGM->setNumCGM     (Sessao::read('numCgm'));
 $obRegra->obREntidade->setExercicio          (Sessao::getExercicio());
 $obRegra->obREntidade->listarUsuariosEntidade($rsEntidades , " ORDER BY cod_entidade");
+
 while (!$rsEntidades->eof()) {
     $arNomFiltro['entidade'][$rsEntidades->getCampo('cod_entidade')] = $rsEntidades->getCampo('nom_cgm');
     $rsEntidades->proximo();
@@ -132,16 +133,19 @@ $obCmbEntidades->setCampoDesc2 ('nom_cgm');
 $obCmbEntidades->SetRecord2    ( $rsRecordset );
 
 $arTipoRelatorio = array(
-    '' => 'Selecione', # Campo inicial Selecione
-    'educacao_despesa_extra_orcamentaria' => 'Educação Despesa Extra Orçamentária',
-    'educacao_receita_extra_orcamentaria' => 'Educação Receita Extra Orçamentária',
-    'fundeb_60' => 'Fundeb 60%',
-    'fundeb_40' => 'Fundeb 40%',
-    'ensino_fundamental' => 'Ensino Fundamental',
-    'gasto_25' => 'Gasto 25%',
-    'saude' => 'Saúde',
-    'diversos' => 'Diversos',
-    'restos_pagar' => 'Restos a Pagar',
+                    '' => 'Selecione', # Campo inicial Selecione
+                    'educacao_despesa_extra_orcamentaria' => 'Educação Despesa Extra Orçamentária',
+                    'educacao_receita_extra_orcamentaria' => 'Educação Receita Extra Orçamentária',
+                    'fundeb_60' => 'Fundeb 60%',
+                    'fundeb_40' => 'Fundeb 40%',
+                    'ensino_fundamental' => 'Ensino Fundamental',
+                    'gasto_25' => 'Gasto 25%',
+                    'saude' => 'Saúde',
+                    'diversos' => 'Diversos',
+                    'restos_pagar' => 'Restos a Pagar',
+                    'empenhado' => 'Empenhado',
+                    'liquidado' => 'Liquidado',
+                    'pago' => 'Pago',
 );
 
 $obCmbTipoRelatorio = new Select;

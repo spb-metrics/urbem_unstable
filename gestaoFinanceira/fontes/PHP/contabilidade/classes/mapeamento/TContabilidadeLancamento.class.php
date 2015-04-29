@@ -380,30 +380,31 @@ function montaExcluiLancamentosAberturaAnteriores()
             DELETE from contabilidade.conta_debito
             where exercicio  = '".Sessao::getExercicio()."'
             and cod_entidade = ".$this->getDado("cod_entidade")."
-            and tipo = 'I'
+            and tipo = 'M'
             and cod_lote IN (".$this->getDado('cod_lote').");
 
     --CONTA CREDITO
             DELETE from contabilidade.conta_credito
             where exercicio  = '".Sessao::getExercicio()."'
             and cod_entidade = ".$this->getDado("cod_entidade")."
-            and tipo = 'I'
+            and tipo = 'M'
             and cod_lote IN (".$this->getDado('cod_lote').");
     
     --VALOR LANCAMENTO
             DELETE from contabilidade.valor_lancamento
             where exercicio  = '".Sessao::getExercicio()."'
             and cod_entidade = ".$this->getDado("cod_entidade")."
-            and tipo = 'I'
+            and tipo = 'M'
             and cod_lote IN (".$this->getDado('cod_lote').");
 
     --CONTABILIDADE LANCAMENTO
             DELETE  from contabilidade.lancamento
             where exercicio  = '".Sessao::getExercicio()."'
             and cod_entidade = ".$this->getDado("cod_entidade")."
-            and tipo = 'I'
+            and tipo = 'M'
             and cod_lote IN (".$this->getDado('cod_lote').");
     ";
+    
     return $stSql;
 }
 

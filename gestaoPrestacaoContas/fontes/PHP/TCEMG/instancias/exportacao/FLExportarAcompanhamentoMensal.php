@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLExportarAcompanhamentoMensal.php 61317 2015-01-06 12:47:58Z lisiane $
+ * $Id: FLExportarAcompanhamentoMensal.php 62288 2015-04-20 13:50:52Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -154,6 +154,9 @@ $arNomeArquivos = array(
     'RSP.csv'
 );
 
+if (Sessao::getExercicio() == '2015'){
+    $arNomeArquivos[] = 'SUPDEF.csv';
+}
 
 // Preenche array
 for ($inCounter=0;$inCounter < count($arNomeArquivos);$inCounter++) {

@@ -56,28 +56,28 @@ $inCodLoteReceitaBruta = SistemaLegado::pegaDado("cod_lote","contabilidade.lote"
                                                             ,"WHERE exercicio = '".Sessao::getExercicio()."'
                                                                 AND cod_lote = (SELECT max(cod_lote) FROM contabilidade.lote
                                                                                     WHERE  dt_lote = '".Sessao::getExercicio()."-01-02'
-                                                                                        and tipo = 'I'
+                                                                                        and tipo = 'M'
                                                                                         and cod_entidade = ".$_POST['inCodEntidade']."
                                                                                         and nom_lote = 'Abertura Orçamento Receita Bruta') ");
 $inCodLoteReceitaDedutora = SistemaLegado::pegaDado("cod_lote","contabilidade.lote"
                                                             ,"WHERE exercicio = '".Sessao::getExercicio()."'
                                                                 AND cod_lote = (SELECT max(cod_lote) FROM contabilidade.lote
                                                                                     WHERE  dt_lote = '".Sessao::getExercicio()."-01-02'
-                                                                                        and tipo = 'I'
+                                                                                        and tipo = 'M'
                                                                                         and cod_entidade = ".$_POST[ 'inCodEntidade']."
                                                                                         and nom_lote = 'Abertura Orçamento Receita Dedutora') ");
 $inCodLoteDespesa = SistemaLegado::pegaDado("cod_lote","contabilidade.lote"
                                                             ,"WHERE exercicio = '".Sessao::getExercicio()."'
                                                                 AND cod_lote = (SELECT max(cod_lote) FROM contabilidade.lote
                                                                                     WHERE  dt_lote = '".Sessao::getExercicio()."-01-02'
-                                                                                        and tipo = 'I'
+                                                                                        and tipo = 'M'
                                                                                         and cod_entidade = ".$_POST[ 'inCodEntidade']."
                                                                                         and nom_lote = 'Abertura Orçamento Despesa') ");
 $inCodLoteRecurso = SistemaLegado::pegaDado("cod_lote","contabilidade.lote"
                                                             ,"WHERE exercicio = '".Sessao::getExercicio()."'
                                                                 AND cod_lote = (SELECT max(cod_lote) FROM contabilidade.lote
                                                                                     WHERE  dt_lote = '".Sessao::getExercicio()."-01-02'
-                                                                                        and tipo = 'I'
+                                                                                        and tipo = 'M'
                                                                                         and cod_entidade = ".$_POST[ 'inCodEntidade']."
                                                                                         and nom_lote = 'Abertura Recursos/Fontes Orçamento') ");
 /*
@@ -89,11 +89,13 @@ $arCodLoteLancamentoAnterior = array($inCodLoteReceitaBruta
                                     ,$inCodLoteReceitaDedutora
                                     ,$inCodLoteDespesa
                                     ,$inCodLoteRecurso);
+
+                                    
 foreach ($arCodLoteLancamentoAnterior as $cod_lote) {
     if ($cod_lote != "") {
         $obTContabilidadeLancamento->setDado("cod_entidade" , $_POST['inCodEntidade']);
         $obTContabilidadeLancamento->setDado("cod_lote"     , $cod_lote );
-        $obTContabilidadeLancamento->excluiLancamentosAberturaAnteriores($boTransacao);            
+        $obTContabilidadeLancamento->excluiLancamentosAberturaAnteriores($boTransacao);
     }    
 }
 
@@ -105,20 +107,18 @@ $nuValor = 'nuValor_1';
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setExercicio    ( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST[ 'inCodEntidade' ] );
 
+//DEBITO
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "5.2.1.1.1.00.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaBruta );
-if ( trim($_POST[$nuValor]) != '' ) {
-    $nuValorImplantacao = str_replace('.','',$_POST[$nuValor]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $arAberturaOrcamento[$rsReceitaBruta->getCampo( "cod_plano" )."-".$rsReceitaBruta->getCampo( "sequencia" )]=$nuValorImplantacao;
-}
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaBruta_debito );
 
+//CREDITO
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "6.2.1.1.0.00.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaBruta );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaBruta_credito );
+
 if ( trim($_POST[$nuValor]) != '' ) {
     $nuValorImplantacao = str_replace('.','',$_POST[$nuValor]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $arAberturaOrcamento[$rsReceitaBruta->getCampo( "cod_plano" )."-".$rsReceitaBruta->getCampo( "sequencia" )]=$nuValorImplantacao;
+    $nuValorImplantacao = $nuValorImplantacaoReceitaBruta = str_replace(',','.',$nuValorImplantacao);
+    $arAberturaOrcamento[$rsReceitaBruta_debito->getCampo( "cod_plano" )."-".$rsReceitaBruta_credito->getCampo( "cod_plano" )]=$nuValorImplantacao;
 }
 
 //Monta consulta e operação de lancamento de acordo com o array de cod_plano e sequencia e valores
@@ -126,9 +126,10 @@ $obRContabilidadeLancamentoValor->setAberturaOrcamento($arAberturaOrcamento);
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "02/01/".Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('M');
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Abertura Orçamento Receita Bruta');
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(820);
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(220);
+
 //verifica se ja existe algum lote de abertura se não ele pega o proximo codigo de lote
 if ($inCodLoteReceitaBruta) {
     $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($inCodLoteReceitaBruta);
@@ -157,57 +158,58 @@ $arAberturaOrcamento = array();
 //Verifica o plano de contas selecionado e setas as contas para a consulta de cod_plano e sequencia para atribuir valor digito pelo usuario
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setExercicio    ( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST[ 'inCodEntidade' ] );
-//FUNDEB
+
+//DÉBITO
+$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "6.2.1.1.0.00.00.00.00.00" );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora_debito );
+
+//FUNDEB - CRÉDITO
 $nuValor2 = 'nuValor_3';
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "5.2.1.1.2.01.01.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora_credito );
 if ( trim($_POST[$nuValor2]) != '' ) {
     $nuSomaValor3       = $_POST[$nuValor2];
     $nuValorImplantacao = str_replace('.','',$_POST[$nuValor2]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $nuSomaValor3 = $nuValorImplantacao;
-    $arAberturaOrcamento[$rsReceitaDedutora->getCampo( "cod_plano" )."-".$rsReceitaDedutora->getCampo( "sequencia" )] = $nuValorImplantacao;
+    $nuValorImplantacao = $nuValorImplantacaoReceitaDedutora_1 = str_replace(',','.',$nuValorImplantacao);
+    $nuSomaValor3       = $nuValorImplantacao;
+   
+    $arAberturaOrcamento[$rsReceitaDedutora_debito->getCampo( "cod_plano" )."-".$rsReceitaDedutora_credito->getCampo( "cod_plano" )]=$nuValorImplantacao;
 }
-//RENUNCIA
+
+//RENUNCIA - CRÉDITO
 $nuValor3 = 'nuValor_4';
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "5.2.1.1.2.02.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora_credito );
 if ( trim($_POST[$nuValor3]) != '' ) {
     $nuSomaValor4       = $_POST[$nuValor3];
     $nuValorImplantacao = str_replace('.','',$_POST[$nuValor3]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
+    $nuValorImplantacao = $nuValorImplantacaoReceitaDedutora_2 = str_replace(',','.',$nuValorImplantacao);
     $nuSomaValor4 = $nuValorImplantacao;
-    $arAberturaOrcamento[$rsReceitaDedutora->getCampo( "cod_plano" )."-".$rsReceitaDedutora->getCampo( "sequencia" )] = $nuValorImplantacao;
+    
+    $arAberturaOrcamento[$rsReceitaDedutora_debito->getCampo( "cod_plano" )."-".$rsReceitaDedutora_credito->getCampo( "cod_plano" )]=$nuValorImplantacao;
 }
-//OUTRAS DEDUCOES
+
+//OUTRAS DEDUCOES - CRÉDITO
 $nuValor4 = 'nuValor_5';
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "5.2.1.1.2.99.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora_credito );
 if ( trim($_POST[$nuValor4]) != '' ) {
     $nuSomaValor5       = $_POST[$nuValor4];
     $nuValorImplantacao = str_replace('.','',$_POST[$nuValor4]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
+    $nuValorImplantacao = $nuValorImplantacaoReceitaDedutora_3 = str_replace(',','.',$nuValorImplantacao);
     $nuSomaValor5 = $nuValorImplantacao;
-    $arAberturaOrcamento[$rsReceitaDedutora->getCampo( "cod_plano" )."-".$rsReceitaDedutora->getCampo( "sequencia" )] = $nuValorImplantacao;
+    
+    $arAberturaOrcamento[$rsReceitaDedutora_debito->getCampo( "cod_plano" )."-".$rsReceitaDedutora_credito->getCampo( "cod_plano" )]=$nuValorImplantacao;
 }
-//RECEITA A DEDUTORA
-//somar os valores de cada um dos campos
-$nuValorReceitaDedutora = $nuSomaValor3 + $nuSomaValor4 + $nuSomaValor5;
-$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "6.2.1.1.0.00.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsReceitaDedutora );
-if ( trim($nuValorReceitaDedutora) != '' ) {
-    $nuValorImplantacao = str_replace('.','',$nuValorReceitaDedutora);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $arAberturaOrcamento[$rsReceitaDedutora->getCampo( "cod_plano" )."-".$rsReceitaDedutora->getCampo( "sequencia" )] = $nuValorImplantacao;
-}
+
 //Monta consulta e operação de lancamento de acordo com o array de cod_plano e sequencia e valores
 $obRContabilidadeLancamentoValor->setAberturaOrcamento($arAberturaOrcamento);
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "02/01/".Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('M');
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Abertura Orçamento Receita Dedutora');
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(822);
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(222);
 //verifica se ja existe algum lote de abertura se não ele pega o proximo codigo de lote
 if ($inCodLoteReceitaDedutora) {
     $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($inCodLoteReceitaDedutora);
@@ -220,8 +222,8 @@ if ($inCodLoteReceitaDedutora) {
 //Verifica se o valor for maior que zero ele faz o lancamento, se for 0.00 ele zera os lancamentos anteriores
 foreach ($arAberturaOrcamento as $inCodPlano_inCodSequencia => $nuValorLancamento) {
     $arTmp = explode( '-', $inCodPlano_inCodSequencia );
-    $inCodPlano     = $arTmp[0] ;
-    $inCodSequencia = $arTmp[1] ;
+    $inCodPlano     = $arTmp[0];
+    $inCodSequencia = $arTmp[2];
 
     if ($nuValorLancamento == 0.00) {
         //ZERAR QUALQUER LANCAMENTO QUANDO O USUARIO colocar valor = 0.00 deleta da base qualquer lancamento de abertura anterior
@@ -232,9 +234,9 @@ foreach ($arAberturaOrcamento as $inCodPlano_inCodSequencia => $nuValorLancament
     }
 }
 //se o valor for maior que zero ele faz o lancamento, se for 0.00 ele zera os lancamentos anteriores
-if ( $nuValorImplantacao > 0.00 ) {
+if ( ($nuSomaValor3+$nuSomaValor4+$nuSomaValor5) > 0) {
     $obErroReceitaDedutora = $obRContabilidadeLancamentoValor->aberturaOrcamento($boTransacao);        
-}elseif( $nuValorImplantacao == 0.00 ){
+}elseif( $nuValorImplantacao == 0 ){
     //verifica lote que ja foi aberto
     if ( $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote() ) {
         $obErroReceitaDedutora = $obRContabilidadeLancamentoValor->excluirLancamento($boTransacao);
@@ -245,6 +247,7 @@ if ( $nuValorImplantacao > 0.00 ) {
 //reset do array de dados
 $arAberturaOrcamento = array();
 
+
 //--------------------------------------------------------------/////////////////////////////////-----------------------------------------------------
 //--------------------------------------------------------------Despesa Prevista para o Exercício-----------------------------------------------------
 //--------------------------------------------------------------/////////////////////////////////-----------------------------------------------------
@@ -253,29 +256,29 @@ $nuValor = 'nuValor_6';
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setExercicio    ( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST[ 'inCodEntidade' ] );
 
+//DÉBITO
 $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "5.2.2.1.1.01.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsDespesaPrevista );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsDespesaPrevista_debito );
+
+//CRÉDITO
+$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "6.2.2.1.1.00.00.00.00.00" );
+$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsDespesaPrevista_credito );
+
 if ( trim($_POST[$nuValor]) != '' ) {
     $nuValorImplantacao = str_replace('.','',$_POST[$nuValor]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $arAberturaOrcamento[$rsDespesaPrevista->getCampo( "cod_plano" )."-".$rsDespesaPrevista->getCampo( "sequencia" )]=$nuValorImplantacao;
+    $nuValorImplantacao = $nuValorImplantacaoDespesaPrevista = str_replace(',','.',$nuValorImplantacao);
+    
+    $arAberturaOrcamento[$rsDespesaPrevista_debito->getCampo( "cod_plano" )."-".$rsDespesaPrevista_credito->getCampo( "cod_plano" )]=$nuValorImplantacao;
 }
 
-$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "6.2.2.1.1.00.00.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsDespesaPrevista );
-if ( trim($_POST[$nuValor]) != '' ) {
-    $nuValorImplantacao = str_replace('.','',$_POST[$nuValor]);
-    $nuValorImplantacao = str_replace(',','.',$nuValorImplantacao);
-    $arAberturaOrcamento[$rsDespesaPrevista->getCampo( "cod_plano" )."-".$rsDespesaPrevista->getCampo( "sequencia" )]=$nuValorImplantacao;
-}
 //Monta consulta e operação de lancamento de acordo com o array de cod_plano e sequencia e valores
 $obRContabilidadeLancamentoValor->setAberturaOrcamento($arAberturaOrcamento);
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "02/01/".Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('M');
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Abertura Orçamento Despesa');
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(821);
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(221);
 //verifica se ja existe algum lote de abertura se não ele pega o proximo codigo de lote
 if ( $inCodLoteDespesa ) {
     $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($inCodLoteDespesa);
@@ -302,36 +305,42 @@ $arAberturaOrcamento = array();
 //--------------------------------------------------------------LANÇAMENTOS DE ABERTURA DOS RECURSOS/FONTES-------------------------------------------
 //--------------------------------------------------------------///////////////////////////////////////////-------------------------------------------
 //LANÇAMENTOS DE ABERTURA DOS RECURSOS/FONTES
+//busca os saldos iniciais de recursos
 include_once CAM_GF_CONT_MAPEAMENTO.'TContabilidadePlanoBanco.class.php';
 $obTContabilidadePlanoBanco = new TContabilidadePlanoBanco;
 $obTContabilidadePlanoBanco->setDado( 'exercicio',Sessao::getExercicio() );
 $obTContabilidadePlanoBanco->recuperaSaldoInicialRecurso($rsRecursos);
-//busca os saldos iniciais de recursos e soma todos os valores
+
+$nuValorImplantacao=0;
+
 $rsRecursos->setPrimeiroElemento();
 while ( !$rsRecursos->eof() ) {
-    $nuValorSaldoRecurso += $rsRecursos->getCampo('saldo');
-    $rsRecursos->proximo();
-}
-$nuValorSaldoRecurso = str_replace(',','.',$nuValorSaldoRecurso);
 
-$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "7.2.1.1.1.00.01.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsRecursoFonte );
-if ( trim($nuValorSaldoRecurso) != '' ) {
-    $arAberturaOrcamento[$rsRecursoFonte->getCampo( "cod_plano" )."-".$rsRecursoFonte->getCampo( "sequencia" )]=$nuValorSaldoRecurso;
-}
-$obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "8.2.1.1.1.00.01.00.00.00" );
-$obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsRecursoFonte );
-if ( trim($nuValorSaldoRecurso) != '' ) {
-    $arAberturaOrcamento[$rsRecursoFonte->getCampo( "cod_plano" )."-".$rsRecursoFonte->getCampo( "sequencia" )]=$nuValorSaldoRecurso;
+    //DEBITO
+    $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "7.2.1.1.1" );
+    $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodRecurso($rsRecursos->getCampo('cod_recurso'));
+    $obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsRecursoFonte_debito );
+    
+    //CREDITO
+    $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodEstrutural( "8.2.1.1.1" );
+    $obRContabilidadeLancamentoValor->obRContabilidadePlanoContaAnalitica->setCodRecurso($rsRecursos->getCampo('cod_recurso'));
+    $obRContabilidadeLancamentoValor->listarLoteImplantacao( $rsRecursoFonte_credito );
+    
+    $arAberturaOrcamento[$rsRecursoFonte_debito->getCampo( "cod_plano" )."-".$rsRecursoFonte_credito->getCampo( "cod_plano" )] = $rsRecursos->getCampo('saldo');
+    
+    $nuValorImplantacao = $nuValorImplantacao + $rsRecursos->getCampo('saldo');
+    $rsRecursos->proximo();
+    $i++;
 }
 
 $obRContabilidadeLancamentoValor->setAberturaOrcamento($arAberturaOrcamento);
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( "02/01/".Sessao::getExercicio() );
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('I');
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setTipo('M');
 $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote('Abertura Recursos/Fontes Orçamento');
-$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(823);
+$obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico(223);
+
 //verifica se ja existe algum lote de abertura se não ele pega o proximo codigo de lote
 if ($inCodLoteRecurso) {
     $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($inCodLoteRecurso);
@@ -340,25 +349,26 @@ if ($inCodLoteRecurso) {
     $inCodLote = $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote();
     $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote($inCodLote);
 }
+
 //se o valor for maior que zero ele faz o lancamento, se for 0.00 ele zera os lancamentos anteriores
-if ( $nuValorImplantacao > 0.00 ) {
+if ( (($nuValorImplantacaoReceitaBruta+$nuValorImplantacaoReceitaDedutora_1+$nuValorImplantacaoReceitaDedutora_2+$nuValorImplantacaoReceitaDedutora_3+$nuValorImplantacaoDespesaPrevista) > 0 ) && ($nuValorImplantacao > 0)) {
     $obErroRecurso = $obRContabilidadeLancamentoValor->aberturaOrcamento($boTransacao);        
-}elseif( $nuValorImplantacao == 0.00 ){
+//}elseif( $nuValorImplantacao == 0.00 ){
+} else {
     //verifica lote que ja foi aberto
     if ( $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote() ) {
         $obErroRecurso = $obRContabilidadeLancamentoValor->excluirLancamento($boTransacao);
     }
 }
-    //verifica se ocorreu erro em todos os lancamentos
-    if( !$obErroRecurso->ocorreu()
-        && !$obErroDespesa->ocorreu()
-        && !$obErroReceitaBruta->ocorreu()
-        && !$obErroReceitaDedutora->ocorreu()
-        && !$obErro->ocorreu()
-        ){
-            SistemaLegado::alertaAviso($pgForm, "1 - ".($obRContabilidadeLancamentoValor->obRContabilidadeLancamento->getSequencia() ? $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->getSequencia() : "0")."", "incluir", "aviso", Sessao::getId(), "../");
-        } else {
-            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
-    }
 
-?>
+//verifica se ocorreu erro em todos os lancamentos
+if( !$obErroRecurso->ocorreu()
+    && !$obErroDespesa->ocorreu()
+    && !$obErroReceitaBruta->ocorreu()
+    && !$obErroReceitaDedutora->ocorreu()
+    && !$obErro->ocorreu()
+    ){
+        SistemaLegado::alertaAviso($pgForm, "1 - ".($obRContabilidadeLancamentoValor->obRContabilidadeLancamento->getSequencia() ? $obRContabilidadeLancamentoValor->obRContabilidadeLancamento->getSequencia() : "0")."", "incluir", "aviso", Sessao::getId(), "../");
+    } else {
+        SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+}

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterVeiculo.php 61654 2015-02-20 20:34:48Z jean $
+    * $Id: OCManterVeiculo.php 62248 2015-04-14 12:36:52Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -96,13 +96,29 @@ function montaListaDocumentos($arDocumentos)
 
 }
 
+function comparador($a, $b){
+    if ($a->dtIniLocacao == $b->dtIniLocacao){
+        return 0;
+    }
+    return ($a->dtIniLocacao < $b->obDtIniLocacao) ? -1 : 1;
+}
+
+
 function montaListaLocacoes($arLocacoes)
 {
     global $pgOcul;
 
     if ( !is_array($arLocacoes) ) {
-        $arLocacoes = array();
+        $arLocacoes = array();  
     }
+
+    foreach ($arLocacoes as $index => $val) {
+        $arAux = array_reverse(explode("/", $val['dtIniLocacao']));
+        $date = date('d/m/Y', strtotime(($arAux[0]."-".$arAux[1]."-".$arAux[2])));
+        $arLocacoes[$index]['dtIniLocacao'] = $date;
+    }
+    
+    usort($arLocacoes,"comparador");
 
     $rsLocacoes = new RecordSet();
     $rsLocacoes->preenche( $arLocacoes );
@@ -121,7 +137,7 @@ function montaListaLocacoes($arLocacoes)
 
     $obTable->Body->addCampo( 'stProcessoLocacao', 'C' );
     $obTable->Body->addCampo( '[inCodLocatario] - [stNomLocatario]', 'C' );
-    $obTable->Body->addCampo( 'inNumEmpenhoLocacao', 'C' );
+    $obTable->Body->addCampo( '[inNumEmpenhoLocacao]/[stExercicioLocacao]', 'C' );
     $obTable->Body->addCampo( 'dtContrato', 'C' );
     $obTable->Body->addCampo( 'dtIniLocacao', 'C' );
     $obTable->Body->addCampo( 'dtFimLocacao', 'C' );
@@ -537,10 +553,14 @@ switch ($stCtrl) {
 
                 // LOCAÇÃO -----------------------------------------
 
-                //if (is_array(Sessao::read('arLocacoes'))) {
-                    $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao;
-                    $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacoes, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']." AND exercicio = '".Sessao::getExercicio()."'");
-                //}
+                if ( $_REQUEST['inCodVeiculo'] ) {
+                    $stFiltroLocacao = " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']." AND exercicio = '".Sessao::getExercicio()."'";
+                }else{
+                    $stFiltroLocacao = " WHERE exercicio = '".Sessao::getExercicio()."'";
+                }
+                
+                $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao;
+                $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacoes, $stFiltroLocacao);
 
                 //id da locacao
                 $obHdnIdLocacao = new Hidden;
@@ -553,6 +573,7 @@ switch ($stCtrl) {
                 $obPopUpProcesso->obCampoCod->setId('stProcessoLocacao');
                 $obPopUpProcesso->obCampoCod->setName('stProcessoLocacao');
                 $obPopUpProcesso->setValidar(true);
+                $obPopUpProcesso->setObrigatorioBarra( true );
                 $obPopUpProcesso->setNull(true);
 
                 //data do contrato
@@ -561,6 +582,7 @@ switch ($stCtrl) {
                 $obDtContrato->setTitle( 'Informe a data do contrato de locação.' );
                 $obDtContrato->setName( 'dtContrato' );
                 $obDtContrato->setId( 'dtContrato' );
+                $obDtContrato->setObrigatorioBarra( true );
                 $obDtContrato->setNull( true );
 
                 //data inicial
@@ -569,6 +591,7 @@ switch ($stCtrl) {
                 $obDtIniLocacao->setTitle( 'Informe a data de início da locação.' );
                 $obDtIniLocacao->setName( 'dtIniLocacao' );
                 $obDtIniLocacao->setId( 'dtIniLocacao' );
+                $obDtIniLocacao->setObrigatorioBarra( true );
                 $obDtIniLocacao->setNull( true );
 
                 //data final
@@ -577,11 +600,13 @@ switch ($stCtrl) {
                 $obDtFimLocacao->setTitle( 'Informe a data de término da locação.' );
                 $obDtFimLocacao->setName( 'dtFimLocacao' );
                 $obDtFimLocacao->setId( 'dtFimLocacao' );
+                $obDtFimLocacao->setObrigatorioBarra( true );
                 $obDtFimLocacao->setNull( true );
 
                 //exercicio da locacao
                 $obExercicioLocacao = new Exercicio();
                 $obExercicioLocacao->setRotulo( 'Exercício' );
+                $obExercicioLocacao->setObrigatorioBarra( true );
                 $obExercicioLocacao->setNull( true );
                 $obExercicioLocacao->setId( 'stExercicioLocacao' );
                 $obExercicioLocacao->setName( 'stExercicioLocacao' );
@@ -592,13 +617,17 @@ switch ($stCtrl) {
                 $obISelectEntidadeLocacao->obTextBox->setId ('inCodEntidadeLocacao');
                 $obISelectEntidadeLocacao->obSelect->setName ('stNomEntidadeLocacao');
                 $obISelectEntidadeLocacao->obSelect->setId ('stNomEntidadeLocacao');
+                $obISelectEntidadeLocacao->setObrigatorioBarra( true );
+                $obISelectEntidadeLocacao->setNull  ( true );
 
-                //instancia o componente Inteiro para o empenho
+                //instancia o componente para o empenho
                 $obNumEmpenhoLocacao = new Inteiro();
-                $obNumEmpenhoLocacao->setRotulo( 'Número do Empenho' );
+                $obNumEmpenhoLocacao->setRotulo( 'Empenho' );
                 $obNumEmpenhoLocacao->setTitle ( 'Informe o número do empenho da locação.' );
                 $obNumEmpenhoLocacao->setName  ( 'inNumEmpenhoLocacao' );
                 $obNumEmpenhoLocacao->setId    ( 'inNumEmpenhoLocacao' );
+                $obNumEmpenhoLocacao->setMaxLength (8);
+                $obNumEmpenhoLocacao->setObrigatorioBarra( true );
                 $obNumEmpenhoLocacao->setNull  ( true );
 
                 //Valor da depreciação inicial.
@@ -607,6 +636,7 @@ switch ($stCtrl) {
                 $obInValorLocacao->setTitle ('Informe o valor da locação.');
                 $obInValorLocacao->setName  ('inValorLocacao');
                 $obInValorLocacao->setId  ('inValorLocacao');
+                $obInValorLocacao->setObrigatorioBarra( true );
                 $obInValorLocacao->setNull  ( true );
 
                 //instancia o componente IPopUpCGMVinculado para o responsavel
@@ -620,6 +650,7 @@ switch ($stCtrl) {
                 $obIPopUpLocatario->setId               ( 'stNomLocatario' );
                 $obIPopUpLocatario->obCampoCod->setName ( 'inCodLocatario' );
                 $obIPopUpLocatario->obCampoCod->setId   ( 'inCodLocatario' );
+                $obIPopUpLocatario->setObrigatorioBarra ( true );
                 $obIPopUpLocatario->setNull             ( true );
 
                 //define objeto buttion para incluir dados da locação
@@ -686,6 +717,7 @@ switch ($stCtrl) {
                     Sessao::write('arLocacoes',$arVeiculoLocacoes);
                     $stJs .= montaListaLocacoes($arVeiculoLocacoes);
                 }
+
             }
 
             $obFormulario->montaInnerHTML();
@@ -795,31 +827,59 @@ switch ($stCtrl) {
     case 'incluirDadosLocacao' :
         $stJs = isset($stJs) ? $stJs : null;
 
-    if ($_REQUEST['stProcessoLocacao'] == '') {
-            $stMensagem = 'Selecione um processo.';
-        } elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
+        if ($_REQUEST['stProcessoLocacao'] == '') {
+                $stMensagem = 'Selecione um processo.';
+        } 
+
+        elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
             $stMensagem = 'Informe o empenho da locação.';
-        } elseif ($_REQUEST['stExercicioLocacao'] == '') {
-            $stMensagem = 'Selecione o ano da locação.';
-        } elseif ( $_REQUEST['stExercicioLocacao'] != '' AND $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
-            $stMensagem = 'O ano do vencimento deve ser menor ou igual ao ano atual.';
-        } elseif ($_REQUEST['dtIniLocacao'] == '') {
+        }
+
+        elseif ($_REQUEST['stExercicioLocacao'] == '') {
+            $stMensagem = 'Selecione o exercício da locação.';
+        }
+
+        elseif ( $_REQUEST['stExercicioLocacao'] != '' && $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
+            $stMensagem = 'O exerício da locação deve ser menor ou igual ao ano atual.';
+        }
+
+        elseif ( $_REQUEST['stExercicioLocacao'] != '' && (substr($_REQUEST['dtContrato'],-4) > $_REQUEST['stExercicioLocacao'])) {
+            $stMensagem = 'O exercicio deve ser igual ou maior que o ano de contrato.';
+        }
+
+        elseif ($_REQUEST['dtIniLocacao'] == '') {
             $stMensagem = 'Informe a data de início da locação.';
-        } elseif ($_REQUEST['dtIniLocacao'] != '' && $_REQUEST['dtIniLocacao'] < '01/01/'.Sessao::getExercicio()) {
+        } 
+
+        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparadadatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
             $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
-        } elseif ($_REQUEST['dtFimLocacao'] == '') {
+        } 
+
+        elseif ($_REQUEST['dtFimLocacao'] == '') {
             $stMensagem = 'Informe a data de término da locação.';
-        } elseif ($_REQUEST['dtFimLocacao'] != '' && $_REQUEST['dtFimLocacao'] <= $_REQUEST['dtIniLocacao']) {
+        } 
+
+        elseif ($_REQUEST['dtFimLocacao'] != '' && SistemaLegado::comparadatas($_REQUEST['dtIniLocacao'], $_REQUEST['dtFimLocacao'],true) == 1) {
             $stMensagem = 'A data de término da locação não pode ser menor ou igual que a data de início da locação.';
-        } elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
+        }
+
+        elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
             $stMensagem = 'Selecione a entidade para a locação.';
-        } elseif ($_REQUEST['dtContrato'] == '') {
+        }
+
+        elseif ($_REQUEST['dtContrato'] == '') {
             $stMensagem = 'Informe a data do contrato de locação.';
-        } elseif ($_REQUEST['dtContrato'] != '' && ($_REQUEST['dtContrato'] < $_REQUEST['dtIniLocacao'] || $_REQUEST['dtContrato'] > $_REQUEST['dtFimLocacao'])) {
-            $stMensagem = 'A data do contrato ser igual ou maior que a data de início e menor ou igual que a data de término da locação.';
-        } elseif ($_REQUEST['inCodLocatario'] == '') {
+        }
+
+        elseif ($_REQUEST['dtContrato'] != '' && SistemaLegado::comparadatas($_REQUEST['dtContrato'],$_REQUEST['dtIniLocacao'],false) == 1) {
+            $stMensagem = 'A data do contrato deve ser igual ou inferior que a data de início.';
+        }
+
+        elseif ($_REQUEST['inCodLocatario'] == '') {
             $stMensagem = 'Selecione o locatário.';
-        } elseif ($_REQUEST['inValorLocacao'] == '') {
+        }
+
+        elseif ($_REQUEST['inValorLocacao'] == '') {
             $stMensagem = 'Informe o valor da locação.';
         }
 
@@ -835,6 +895,14 @@ switch ($stCtrl) {
                      && ($arTemp['inNumEmpenhoLocacao'] == $_REQUEST['inNumEmpenhoLocacao'])
                    ) {
                     $stMensagem = 'Esta locação já está na lista.';
+                    break;
+                }
+
+                if (SistemaLegado::comparadatas($arTemp['dtIniLocacao'],$_REQUEST['dtIniLocacao'],true) == 1) {
+                    $stMensagem = "A data de início deve ser posterior à ".$arTemp['dtIniLocacao']."";
+                    break;
+                } elseif (SistemaLegado::comparadatas($arTemp['dtFimLocacao'],$_REQUEST['dtFimLocacao'],true) == 1) {
+                    $stMensagem = "A data de término deve ser posterior à ".$arTemp['dtFimLocacao']."";
                     break;
                 }
             }
@@ -1063,31 +1131,59 @@ switch ($stCtrl) {
         break;
 
     case 'alterarLocacao' :
-        if ($_REQUEST['stProcessoLocacao'] == '') {
+       if ($_REQUEST['stProcessoLocacao'] == '') {
             $stMensagem = 'Selecione um processo.';
-        } elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
+        } 
+
+        elseif ($_REQUEST['inNumEmpenhoLocacao'] == '') {
             $stMensagem = 'Informe o empenho da locação.';
-        } elseif ($_REQUEST['stExercicioLocacao'] == '') {
-            $stMensagem = 'Selecione o ano da locação.';
-        } elseif ( $_REQUEST['stExercicioLocacao'] != '' AND $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
-            $stMensagem = 'O ano do vencimento deve ser menor ou igual ao ano atual.';
-        } elseif ($_REQUEST['dtIniLocacao'] == '') {
+        }
+    
+        elseif ($_REQUEST['stExercicioLocacao'] == '') {
+            $stMensagem = 'Selecione o exercício da locação.';
+        }
+
+        elseif ( $_REQUEST['stExercicioLocacao'] != '' && $_REQUEST['stExercicioLocacao'] > Sessao::getExercicio() ) {
+            $stMensagem = 'O exerício da locação deve ser menor ou igual ao ano atual.';
+        }
+
+        elseif ( $_REQUEST['stExercicioLocacao'] != '' && (substr($_REQUEST['dtContrato'],-4) > $_REQUEST['stExercicioLocacao'])) {
+            $stMensagem = 'O exercicio deve ser igual ou maior que o ano de contrato.';
+        }
+    
+        elseif ($_REQUEST['dtIniLocacao'] == '') {
             $stMensagem = 'Informe a data de início da locação.';
-        } elseif ($_REQUEST['dtIniLocacao'] != '' && $_REQUEST['dtIniLocacao'] < '01/01/'.Sessao::getExercicio()) {
+        } 
+    
+        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparadadatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
             $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
-        } elseif ($_REQUEST['dtFimLocacao'] == '') {
+        } 
+
+        elseif ($_REQUEST['dtFimLocacao'] == '') {
             $stMensagem = 'Informe a data de término da locação.';
-        } elseif ($_REQUEST['dtFimLocacao'] != '' && $_REQUEST['dtFimLocacao'] <= $_REQUEST['dtIniLocacao']) {
+        } 
+
+        elseif ($_REQUEST['dtFimLocacao'] != '' && SistemaLegado::comparadatas($_REQUEST['dtIniLocacao'], $_REQUEST['dtFimLocacao'],true) == 1) {
             $stMensagem = 'A data de término da locação não pode ser menor ou igual que a data de início da locação.';
-        } elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
+        }
+
+        elseif ($_REQUEST['inCodEntidadeLocacao'] == '') {
             $stMensagem = 'Selecione a entidade para a locação.';
-        } elseif ($_REQUEST['dtContrato'] == '') {
+        }
+
+        elseif ($_REQUEST['dtContrato'] == '') {
             $stMensagem = 'Informe a data do contrato de locação.';
-        } elseif ($_REQUEST['dtContrato'] != '' && ($_REQUEST['dtContrato'] < $_REQUEST['dtIniLocacao'] || $_REQUEST['dtContrato'] > $_REQUEST['dtFimLocacao'])) {
-            $stMensagem = 'A data do contrato ser igual ou maior que a data de início e menor ou igual que a data de término da locação.';
-        } elseif ($_REQUEST['inCodLocatario'] == '') {
+        }
+
+        elseif ($_REQUEST['dtContrato'] != '' && SistemaLegado::comparadatas($_REQUEST['dtContrato'],$_REQUEST['dtIniLocacao'],false) == 1) {
+            $stMensagem = 'A data do contrato deve ser igual ou inferior que a data de início.';
+        }
+
+        elseif ($_REQUEST['inCodLocatario'] == '') {
             $stMensagem = 'Selecione o locatário.';
-        } elseif ($_REQUEST['inValorLocacao'] == '') {
+        }
+
+        elseif ($_REQUEST['inValorLocacao'] == '') {
             $stMensagem = 'Informe o valor da locação.';
         }
 

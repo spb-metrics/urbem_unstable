@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCIMontaDotacaoDesdobramento.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCIMontaDotacaoDesdobramento.php 61949 2015-03-18 14:06:06Z evandro $
 
  */
 
@@ -68,7 +68,7 @@ switch ($_REQUEST['stCtrl']) {
                 $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
                 $obTEmpenhoPreEmpenho->setDado( 'exercicio'  ,Sessao::getExercicio() );
                 $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$_REQUEST["inCodDespesa"] );
-                $obTEmpenhoPreEmpenho->recuperaSaldoAnterior( $rsSaldoAnterior );
+                $obTEmpenhoPreEmpenho->recuperaSaldoDotacaoCompra( $rsSaldoAnterior );
 
                 $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
 

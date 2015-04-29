@@ -68,7 +68,7 @@ function montaRecuperaTodos()
                                      , '".$this->getDado("cod_entidade")."'
                                      ) AS retorno(
                                                   descricao VARCHAR,
-                                                  valor     NUMERIC(14,2)
+                                                  valor     NUMERIC
                                                  )";
 
     return $stSql;

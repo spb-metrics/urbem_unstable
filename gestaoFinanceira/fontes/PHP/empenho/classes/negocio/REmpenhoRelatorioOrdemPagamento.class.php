@@ -351,8 +351,7 @@ function geraRecordSet(&$arRecordSet , $stOrder = "")
     //Bloco6
     $arBloco6 = array();
     $stObservacao = str_replace( chr(10) , "", $rsRecordSet->getCampo('observacao') );
-    $stObservacao = wordwrap( utf8_decode($stObservacao) , 68, chr(13) );
-    $stObservacao = utf8_encode($stObservacao);
+    $stObservacao = wordwrap( ($stObservacao) , 68, chr(13) );
     $arObservacao = explode( chr(13), $stObservacao );
     foreach ($arObservacao as $stObservacao) {
         $arObs[1] = $stObservacao;

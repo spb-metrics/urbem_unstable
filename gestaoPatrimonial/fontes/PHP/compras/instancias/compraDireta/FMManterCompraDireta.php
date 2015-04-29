@@ -34,7 +34,7 @@
 
     * Casos de uso : uc-03.04.33
 
-    $Id: FMManterCompraDireta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterCompraDireta.php 61973 2015-03-19 18:38:46Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -444,14 +444,19 @@ if ($boAlteraAnula) {
     $obFormulario->addHidden( $obHdnEntidade );
     $obFormulario->addHidden( $obHdnModalidade );
 
+    $obFormulario->addComponente ( $obLblEntidade );
+    $obFormulario->addComponente ( $obLblCompraDireta );
+    $obFormulario->addComponente ( $obLblDtCompraDireta );
+    $obFormulario->addComponente ( $obLblModalidade );
+    
     if ($stAcao == 'alterar') {
-    $obFormulario->addComponente ( $obPopUpProcesso );
+        $obFormulario->addComponente ( $obPopUpProcesso );
         $obFormulario->addComponente ( $obMapaCompras );
         $obFormulario->addComponente ( $obTxtTotalMapa );
     }
 
     if ($_REQUEST['stAcao'] == "anular") {
-    $obFormulario->addComponente ( $obLblProcesso );
+        $obFormulario->addComponente ( $obLblProcesso );
     }
 
     $obFormulario->addHidden( $obHdnCompraDireta );
@@ -459,22 +464,17 @@ if ($boAlteraAnula) {
     $obFormulario->addHidden( $obHdnIdMapaCompras );
     $obFormulario->addHidden( $obHdnExercicioMapaCompras );
 
-    $obFormulario->addComponente ( $obLblEntidade );
-    $obFormulario->addComponente ( $obLblDtCompraDireta );
-    $obFormulario->addComponente ( $obLblModalidade );
-    $obFormulario->addComponente ( $obLblCompraDireta );
-
 } else {
+    if ($boIdCompraDiretaAutomatica != 't') {
+        $obFormulario->addComponente ( $obCodCompraDireta );
+    }
+    
     $obFormulario->addComponente ( $obPopUpProcesso );
     $obFormulario->addComponente ( $obMapaCompras );
     $obFormulario->addComponente ( $obTxtTotalMapa );
     $obFormulario->addComponente ( $obEntidadeUsuario );
     $obFormulario->addComponente ( $obDtCompraDireta );
     $obFormulario->addComponente ( $obISelectModalidade );
-
-    if ($boIdCompraDiretaAutomatica != 't') {
-    $obFormulario->addComponente ( $obCodCompraDireta );
-    }
 }
 
 if ($_REQUEST['stAcao'] == "anular") {

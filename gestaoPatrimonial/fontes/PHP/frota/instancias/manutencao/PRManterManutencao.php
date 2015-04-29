@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterManutencao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterManutencao.php 62009 2015-03-24 18:16:33Z evandro $
 
     * Casos de uso: uc-03.02.14
 */
@@ -54,12 +54,12 @@ $pgJs     = "JS".$stPrograma.".js";
 
 $stAcao = $request->get('stAcao');
 
-$obTFrotaManutencao = new TFrotaManutencao();
-$obTFrotaManutencaoEmpenho = new TFrotaManutencaoEmpenho();
+$obTFrotaManutencao         = new TFrotaManutencao();
+$obTFrotaManutencaoEmpenho  = new TFrotaManutencaoEmpenho();
 $obTFrotaManutencaoAnulacao = new TFrotaManutencaoAnulacao();
-$obTFrotaManutencaoItem = new TFrotaManutencaoItem();
-$obTFrotaEfetivacao = new TFrotaEfetivacao();
-$obTFrotaAutorizacao = new TFrotaAutorizacao();
+$obTFrotaManutencaoItem     = new TFrotaManutencaoItem();
+$obTFrotaEfetivacao         = new TFrotaEfetivacao();
+$obTFrotaAutorizacao        = new TFrotaAutorizacao();
 
 Sessao::setTrataExcecao( true );
 Sessao::getTransacao()->setMapeamento( $obTFrotaManutencao );
@@ -165,33 +165,49 @@ switch ($stAcao) {
             }
         }
         foreach ( Sessao::read('arItensAutorizacao') AS $arTemp ) {
+
             if ( ($arTemp['valor'] <= 0) OR ($arTemp['quantidade'] <= 0 ) ) {
                 $stMensagem = 'O item '.$arTemp['cod_item'].' está sem valor ou sem quantidade';
             }
+
+            if ( ($arTemp['tipo'] == 'Combustível' ) && ($_REQUEST['inCodAutorizacao'] == '') ) {                
+                $stMensagem = "Quando for tipo 'Combustível' deve existir um Código de Autorização, na qual está vazio";
+            }
         }
+
         if (!$stMensagem) {
             //altera a table frota.manutencao
-            $obTFrotaManutencao->setDado( 'exercicio',$arManutencao[1] );
-            $obTFrotaManutencao->setDado( 'cod_manutencao', $arManutencao[0] );
-            $obTFrotaManutencao->setDado( 'cod_veiculo', $_REQUEST['inCodVeiculo'] );
-            $obTFrotaManutencao->setDado( 'dt_manutencao', $_REQUEST['dtManutencao'] );
-            $obTFrotaManutencao->setDado( 'km', $_REQUEST['inQuilometragem'] );
-            $obTFrotaManutencao->setDado( 'observacao', $_REQUEST['stObservacao'] );
+            $obTFrotaManutencao->setDado( 'exercicio'       , $arManutencao[1] );
+            $obTFrotaManutencao->setDado( 'cod_manutencao'  , $arManutencao[0] );
+            $obTFrotaManutencao->setDado( 'cod_veiculo'     , $_REQUEST['inCodVeiculo'] );
+            $obTFrotaManutencao->setDado( 'dt_manutencao'   , $_REQUEST['dtManutencao'] );
+            $obTFrotaManutencao->setDado( 'km'              , $_REQUEST['inQuilometragem'] );
+            $obTFrotaManutencao->setDado( 'observacao'      , $_REQUEST['stObservacao'] );
             $obTFrotaManutencao->alteracao();
 
             if ($_REQUEST['inCodigoEmpenho'] != '' AND $_REQUEST['stExercicioEmpenho'] != '' AND $_REQUEST['inCodEntidade'] != '') {
-                //altera a table frota.manutencao_empenho
-                $obTFrotaManutencaoEmpenho->setDado( 'exercicio', $arManutencao[0] );
-                $obTFrotaManutencaoEmpenho->setDado( 'cod_manutencao', $arManutencao[1] );
-                $obTFrotaManutencaoEmpenho->setDado( 'cod_empenho', $_REQUEST['inCodigoEmpenho'] );
-                $obTFrotaManutencaoEmpenho->setDado( 'cod_entidade', $_REQUEST['inCodEntidade'] );
-                $obTFrotaManutencaoEmpenho->setDado( 'exercicio_empenho', $_REQUEST['stExercicioEmpenho'] );
-                $obTFrotaManutencaoEmpenho->alteracao();
-            }
-
+                $obTFrotaManutencaoEmpenho->setDado( 'exercicio'      , $arManutencao[1] );
+                $obTFrotaManutencaoEmpenho->setDado( 'cod_manutencao' , $arManutencao[0] );
+                $obTFrotaManutencaoEmpenho->recuperaPorChave( $rsManutencaoEmpenho );
+                    if ( $rsManutencaoEmpenho->getNumLinhas() > 0) { 
+                       //altera a table frota.manutencao_empenho
+                       $obTFrotaManutencaoEmpenho->setDado( 'cod_empenho'       , $_REQUEST['inCodigoEmpenho'] );
+                       $obTFrotaManutencaoEmpenho->setDado( 'cod_entidade'      , $_REQUEST['inCodEntidade'] );
+                       $obTFrotaManutencaoEmpenho->setDado( 'exercicio_empenho' , $_REQUEST['stExercicioEmpenho'] );
+                       $obTFrotaManutencaoEmpenho->alteracao();
+                    } else {
+                       $obTFrotaManutencaoEmpenho->setDado( 'cod_empenho'       , $_REQUEST['inCodigoEmpenho'] );
+                       $obTFrotaManutencaoEmpenho->setDado( 'cod_entidade'      , $_REQUEST['inCodEntidade'] );
+                       $obTFrotaManutencaoEmpenho->setDado( 'exercicio_empenho' , $_REQUEST['stExercicioEmpenho'] );
+                       $obTFrotaManutencaoEmpenho->inclusao();
+                    }
+            } else {
+               $obTFrotaManutencaoEmpenho->exclusao();
+            } 
+            
             //deleta todos os registros da table frota.manutencao_item
-            $obTFrotaManutencaoItem->setDado( 'cod_manutencao', $arManutencao[0] );
-            $obTFrotaManutencaoItem->setDado( 'exercicio', $arManutencao[1] );
+            $obTFrotaManutencaoItem->setDado( 'cod_manutencao' , $arManutencao[0] );
+            $obTFrotaManutencaoItem->setDado( 'exercicio'      , $arManutencao[1] );
             $obTFrotaManutencaoItem->exclusao();
 
             //recupera da table frota.efetivacao
@@ -199,33 +215,43 @@ switch ($stAcao) {
 
             //deleta os registros da table frota.efetivacao
             while ( !$rsEfetivacao->eof() ) {
-                $obTFrotaEfetivacao->setDado( 'cod_manutencao', $arManutencao[0] );
-                $obTFrotaEfetivacao->setDado( 'exercicio_manutencao', $arManutencao[1] );
-                $obTFrotaEfetivacao->setDado( 'cod_autorizacao', $rsEfetivacao->getCampo('cod_autorizacao') );
-                $obTFrotaEfetivacao->setDado( 'exercicio_autorizacao', $rsEfetivacao->getCampo('exercicio_autorizacao') );
+                $obTFrotaEfetivacao->setDado( 'cod_manutencao'          , $arManutencao[0] );
+                $obTFrotaEfetivacao->setDado( 'exercicio_manutencao'    , $arManutencao[1] );
+                $obTFrotaEfetivacao->setDado( 'cod_autorizacao'         , $rsEfetivacao->getCampo('cod_autorizacao') );
+                $obTFrotaEfetivacao->setDado( 'exercicio_autorizacao'   , $rsEfetivacao->getCampo('exercicio_autorizacao') );
                 $obTFrotaEfetivacao->exclusao();
                 $rsEfetivacao->proximo();
             }
 
             foreach ( Sessao::read('arItensAutorizacao') AS $arTemp ) {
-                $obTFrotaManutencaoItem->setDado( 'cod_manutencao', $arManutencao[0] );
-                $obTFrotaManutencaoItem->setDado( 'cod_item', $arTemp['cod_item'] );
-                $obTFrotaManutencaoItem->setDado( 'exercicio', $arManutencao[1] );
-                $obTFrotaManutencaoItem->setDado( 'quantidade', $arTemp['quantidade'] );
-                $obTFrotaManutencaoItem->setDado( 'valor', $arTemp['valor'] );
+                $obTFrotaManutencaoItem->setDado( 'cod_manutencao'  , $arManutencao[0] );
+                $obTFrotaManutencaoItem->setDado( 'cod_item'        , $arTemp['cod_item'] );
+                $obTFrotaManutencaoItem->setDado( 'exercicio'       , $arManutencao[1] );
+                $obTFrotaManutencaoItem->setDado( 'quantidade'      , $arTemp['quantidade'] );
+                $obTFrotaManutencaoItem->setDado( 'valor'           , $arTemp['valor'] );
                 $obTFrotaManutencaoItem->inclusao();
 
                 //se for um combustivel, insere na efetuacao tambem
-                if ($arTemp['combustivel']) {
-                    $obTFrotaEfetivacao->setDado( 'cod_autorizacao', $arAutorizacao[0] );
-                    $obTFrotaEfetivacao->setDado( 'cod_manutencao', $arManutencao[0] );
-                    $obTFrotaEfetivacao->setDado( 'exercicio_autorizacao', $arAutorizacao[1] );
-                    $obTFrotaEfetivacao->setDado( 'exercicio_manutencao', $arManutencao[1] );
-                    $obTFrotaEfetivacao->inclusao();
+                if ( $arTemp['tipo'] == 'Combustível' ) {
+                    if ( $_REQUEST['inCodAutorizacao'] != '' ) {
+                        $obTFrotaEfetivacao->setDado( 'cod_autorizacao'         , $arAutorizacao[0] );
+                        $obTFrotaEfetivacao->setDado( 'cod_manutencao'          , $arManutencao[0] );
+                        $obTFrotaEfetivacao->setDado( 'exercicio_autorizacao'   , $arAutorizacao[1] );
+                        $obTFrotaEfetivacao->setDado( 'exercicio_manutencao'    , $arManutencao[1] );
+                        $obTFrotaEfetivacao->inclusao();    
+                    }else{                                        
+                        $stMensagem = "Quando for tipo 'Combustível' deve existir um Código de Autorização, na qual está vazio";
+                        break;
+                    }
                 }
             }
-
-            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Manutenção - '.$arManutencao[0].'/'.$arManutencao[1],"alterar","aviso", Sessao::getId(), "../");
+            //Validando qualquer erro durante os inserts e updates
+            if (!$stMensagem) {
+                SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Manutenção - '.$arManutencao[0].'/'.$arManutencao[1],"alterar","aviso", Sessao::getId(), "../");
+            }else{
+                SistemaLegado::LiberaFrames(true,true);
+                SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
+            }
         } else {
             SistemaLegado::LiberaFrames(true,true);
             SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");

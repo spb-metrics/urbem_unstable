@@ -34,7 +34,7 @@
 
     * @ignore
 
-    * $Id: OCManterLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterLote.php 62230 2015-04-10 17:35:05Z michel $
 
     * Casos de uso: uc-05.01.08
 */
@@ -154,7 +154,8 @@ function montaListaConfrontacao(&$rsListaConfrontacao)
             $obLista->ultimaAcao->addCampo( "2","stLsTipoConfrotacao" );
             $obLista->ultimaAcao->addCampo( "3","flExtensao" );
             $obLista->ultimaAcao->addCampo( "4","stTestada" );
-            $obLista->ultimaAcao->addCampo( "5", "stDescricao" );
+            $obLista->ultimaAcao->addCampo( "5", "stChaveTrecho" );
+            $obLista->ultimaAcao->addCampo( "6", "stTrecho" );
             $obLista->ultimaAcao->setFuncao( true );
             $obLista->ultimaAcao->setLink( "javascript:montaConfrontacaoAlterar();" );
             $obLista->commitAcao();
@@ -419,13 +420,11 @@ switch ($stCtrl) {
             $stJs = 'f.inCodigoUF.value = '.$inCodUF.';';
             $stJs .= 'f.inCodigoMunicipio.value = '.$inCodMunicipio.';';
             $stJs .= 'd.getElementById("innerBairroLote").innerHTML = "'.$obRCIMBairro->getNomeBairro().'";';
-//            SistemaLegado::LiberaFrames();
         } else {
             $stJs .= 'f.inCodigoUF.value = "";';
             $stJs .= 'f.inCodigoMunicipio.value = "";';
             $stJs .= 'd.getElementById("innerBairroLote").innerHTML = "&nbsp;";';
             $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST["inCodigoBairroLote"].")','form','erro','".Sessao::getId()."');";
-//            SistemaLegado::LiberaFrames();
         }
         SistemaLegado::executaFrameOculto($stJs);
     break;
@@ -578,8 +577,6 @@ switch ($stCtrl) {
             $stJs .= "f.stAcaoConfrontacao.value = '';\n";
             $stJs .= "f.inIndice.value = '';\n";
             $stJs .= "f.flExtensao.value = '';\n";
-            //$stJs .= "f.inNumTrecho.value = '';\n";
-            //$stJs .= 'd.getElementById("stNumTrecho").innerHTML = "&nbsp;";';
             $stJs .= 'd.getElementById("spnConfrontacao").innerHTML = "";';
 
             $stJs .=  montaListaConfrontacao( $rsListaConfrontacao );
@@ -733,10 +730,20 @@ switch ($stCtrl) {
     break;
 
     case "trecho":
+        $ArDescricao = explode ('-', $_REQUEST['descricao'] );
+        $inNumTrecho = trim($ArDescricao[0]);
+        $ArDescricaoTemp = '';
 
-        //echo $_REQUEST['descricao'].'sdfsdf';
-        $ArDescricao = explode (' - ', $_REQUEST['descricao'] );
-        $inNumTrecho = $ArDescricao[0];
+        for($i=1; $i<(count($ArDescricao));$i++){
+            if($ArDescricaoTemp=='')
+                $ArDescricaoTemp .= trim($ArDescricao[$i]);
+            else
+                $ArDescricaoTemp .= ' - '.trim($ArDescricao[$i]);
+        }
+        $stTrecho = $ArDescricaoTemp;
+
+        $inNumTrecho = (isset($_REQUEST['stChaveTrecho'])) ? $_REQUEST['stChaveTrecho'] : trim($ArDescricao[0]);
+        $stTrecho = (isset($_REQUEST['stTrecho'])) ? $_REQUEST['stTrecho'] : $stTrecho;
 
         $obBuscaTrecho = new BuscaInner;
         $obBuscaTrecho->setId                           ( "stNumTrecho"     );
@@ -771,12 +778,10 @@ switch ($stCtrl) {
         $stJs .= "d.getElementById(\"spnConfrontacao\").innerHTML = '".$stHtml."'; ";
 
         if ($_REQUEST['Acao'] == 'alterarConfrontacao') {
-            $stJs .= 'd.getElementById("stNumTrecho").innerHTML = "'. $ArDescricao[1] .'";';
+            $stJs .= 'd.getElementById("stNumTrecho").innerHTML = "'. $stTrecho .'";';
         } else {
             $stJs .= 'd.getElementById("stNumTrecho").innerHTML = "&nbsp;";';
         }
-
-        //echo $_REQUEST['Acao']; exit;
 
         SistemaLegado::executaFrameOculto( $stJs );
     break;

@@ -131,7 +131,7 @@ foreach ($rsRegistro10->arElementos as $arRegistro10) {
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
 
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_previsto");
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_fonte_recurso");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
 

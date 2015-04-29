@@ -55,7 +55,7 @@ $pgForm          = "FM".$stPrograma.".php";
 $pgProc          = "PR".$stPrograma.".php";
 $pgOcul          = "OC".$stPrograma.".php";
 $pgJs            = "JS".$stPrograma.".js";
-
+include_once $pgJs;
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
 
@@ -65,6 +65,8 @@ $stOrdenacao    = '';
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
+
+$inCodUF = SistemaLegado::pegaConfiguracao('cod_uf',2,Sessao::getExercicio(),$boTransacao);
 
 $obForm = new Form;
 $obForm->setAction( CAM_FW_POPUPS."relatorio/OCRelatorio.php" );
@@ -131,13 +133,41 @@ $obCmbOrdenacao->setId      ( "stOrdenacao"      );
 $obCmbOrdenacao->setValue   ( $stOrdenacao       );
 $obCmbOrdenacao->addOption  ( "estrutural","Código Estrutural" );
 $obCmbOrdenacao->addOption  ( "reduzido", "Código Reduzido"    );
-$obCmbOrdenacao->addOption  ( "recurso", "Código Recurso"         );
+$obCmbOrdenacao->addOption  ( "recurso", "Código Recurso"      );
+if ( $inCodUF == 11 ) {
+    $obCmbOrdenacao->addOption  ( "conta_corrente", "Conta Corrente" );
+    $obCmbOrdenacao->obEvento->setOnChange(" if (jQuery('#stOrdenacao').val() == 'conta_corrente'){ verificaAgruparContaCorrente(true); } ");
+}
 
 $obSimNaoMovimentacaoConta = new SimNao();
 $obSimNaoMovimentacaoConta->setRotulo ( "Listar Contas Sem Movimentação" );
 $obSimNaoMovimentacaoConta->setName   ( 'boMovimentacaoConta'      );
 $obSimNaoMovimentacaoConta->setNull   ( true                       );
 $obSimNaoMovimentacaoConta->setChecked( 'SIM'                      );
+
+//Agrupamento somente para o estado o de Minas Gerais MG
+if ( $inCodUF == 11 ) {
+    $obRadboAgruparContaCorrenteSim = new Radio();
+    $obRadboAgruparContaCorrenteSim->setId    ('boAgruparContaCorrente');
+    $obRadboAgruparContaCorrenteSim->setName  ('boAgruparContaCorrente');
+    $obRadboAgruparContaCorrenteSim->setValue ('S');
+    $obRadboAgruparContaCorrenteSim->setRotulo('Agrupar por Conta Corrente');
+    $obRadboAgruparContaCorrenteSim->setLabel ('Sim');
+    $obRadboAgruparContaCorrenteSim->obEvento->setOnChange("verificaAgruparContaCorrente(true);");
+
+    $obRadboAgruparContaCorrenteNao = new Radio();
+    $obRadboAgruparContaCorrenteNao->setId    ('boAgruparContaCorrente');
+    $obRadboAgruparContaCorrenteNao->setName  ('boAgruparContaCorrente');
+    $obRadboAgruparContaCorrenteNao->setValue ('N');
+    $obRadboAgruparContaCorrenteNao->setRotulo('Agrupar por Conta Corrente');
+    $obRadboAgruparContaCorrenteNao->setLabel ('Não');
+    $obRadboAgruparContaCorrenteNao->setChecked(true);
+    $obRadboAgruparContaCorrenteNao->obEvento->setOnChange("verificaAgruparContaCorrente(false);");
+
+    // Agrupa os Radios num array()
+    $arRadAgrupaContaCorrente = array($obRadboAgruparContaCorrenteSim, $obRadboAgruparContaCorrenteNao);    
+}
+
 
 include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
 $obMontaAssinaturas = new IMontaAssinaturas;
@@ -153,19 +183,22 @@ $obIIntervaloPopUpContaAnalitica->setTipoBusca('codigoReduzidoBanco');
 $obIIntervaloPopUpEstruturalPlano = new IIntervaloPopUpEstruturalPlano();
 
 $obFormulario = new Formulario();
-$obFormulario->addForm( $obForm );
-$obFormulario->addHidden( $obHdnCaminho );
-$obFormulario->addHidden( $obHdnAcao );
-$obFormulario->addHidden( $obHdnCtrl );
-$obFormulario->addHidden( $obHdnNomeEntidade );
-$obFormulario->addTitulo( "Dados para Filtro" );
-$obFormulario->addComponenteComposto( $obTxtEntidade, $obCmbEntidade );
-$obFormulario->addComponente( $obPeriodo );
-$obFormulario->addComponente( $obIIntervaloPopUpContaAnalitica );
-$obFormulario->addComponente( $obIIntervaloPopUpEstruturalPlano );
-$obIMontaRecursoDestinacao->geraFormulario ( $obFormulario );
-$obFormulario->addComponente( $obCmbOrdenacao );
-$obFormulario->addComponente( $obSimNaoMovimentacaoConta );
+$obFormulario->addForm                      ( $obForm );
+$obFormulario->addHidden                    ( $obHdnCaminho );
+$obFormulario->addHidden                    ( $obHdnAcao );
+$obFormulario->addHidden                    ( $obHdnCtrl );
+$obFormulario->addHidden                    ( $obHdnNomeEntidade );
+$obFormulario->addTitulo                    ( "Dados para Filtro" );
+$obFormulario->addComponenteComposto        ( $obTxtEntidade, $obCmbEntidade );
+$obFormulario->addComponente                ( $obPeriodo );
+$obFormulario->addComponente                ( $obIIntervaloPopUpContaAnalitica );
+$obFormulario->addComponente                ( $obIIntervaloPopUpEstruturalPlano );
+$obIMontaRecursoDestinacao->geraFormulario  ( $obFormulario );
+$obFormulario->addComponente                ( $obCmbOrdenacao );
+$obFormulario->addComponente                ( $obSimNaoMovimentacaoConta );
+
+if ( $inCodUF == 11 )
+    $obFormulario->agrupaComponentes            ( $arRadAgrupaContaCorrente  );
 
 $obMontaAssinaturas->geraFormulario ( $obFormulario );
 

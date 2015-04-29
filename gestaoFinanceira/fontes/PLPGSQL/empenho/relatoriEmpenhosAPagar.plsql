@@ -26,12 +26,12 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatoriEmpenhosAPagar.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: relatoriEmpenhosAPagar.plsql 62328 2015-04-24 13:35:46Z jean $
 *
 * Casos de uso: uc-02.03.07
 */
 
-CREATE OR REPLACE FUNCTION empenho.fn_relatorio_empenhos_a_pagar(varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar) RETURNS SETOF RECORD AS '
+CREATE OR REPLACE FUNCTION empenho.fn_relatorio_empenhos_a_pagar(varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stFiltro                        ALIAS FOR $1;
     stCodEntidades                  ALIAS FOR $2;
@@ -47,11 +47,11 @@ DECLARE
     stCodRecurso                    ALIAS FOR $12;
     stDestinacaoRecurso             ALIAS FOR $13;
 
-    stSql               VARCHAR   := '''';
+    stSql               VARCHAR   := '';
     reRegistro          RECORD;
 
 BEGIN
-    stSql := ''CREATE TEMPORARY TABLE tmp_empenhado AS (
+    stSql := 'CREATE TEMPORARY TABLE tmp_empenhado AS (
         SELECT
             e.cod_entidade      as entidade,
             e.cod_empenho       as empenho,
@@ -61,41 +61,41 @@ BEGIN
             empenho.empenho             as e,
             empenho.item_pre_empenho    as ipe,
             empenho.pre_empenho         as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
-
+    
+    LEFT JOIN empenho.pre_empenho_despesa as ped
+           ON pe.exercicio        = ped.exercicio
+          AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+            
+    LEFT JOIN orcamento.despesa as ode
+           ON ped.exercicio       = ode.exercicio
+          AND ped.cod_despesa     = ode.cod_despesa
+            
         WHERE
-            e.cod_entidade      IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || quote_literal(stCodEntidades) || ') AND
+            e.exercicio         =   ' || quote_literal(stExercicio) || '::varchar AND ';
 
-            if (stDataInicial is not null and stDataInicial<>'''') then
-               stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+            if (stDataInicial is not null and stDataInicial <> '') then
+               stSql := stSql || ' e.dt_empenho >= to_date(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND';
             end if;
 
-            if (stDataFinal is not null and stDataFinal<>'''') then
-               stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+            if (stDataFinal is not null and stDataFinal <> '') then
+               stSql := stSql || ' e.dt_empenho <= to_date(''' || stDataFinal || ''',''dd/mm/yyyy'') AND';
             end if;
 
-            if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-               stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND '';
+            if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+               stSql := stSql || ' e.cod_empenho >= ''' || inCodEmpenhoInicial || ''' AND ';
             end if;
 
-            if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-               stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND '';
+            if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+               stSql := stSql || ' e.cod_empenho <= ''' || inCodEmpenhoFinal || ''' AND ';
             end if;
 
-            if (inNumOrgao is not null and inNumOrgao <> '''') then
-               stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+            if (inNumOrgao is not null and inNumOrgao <> '') then
+               stSql := stSql || ' ode.num_orgao = ''' || inNumOrgao || ''' AND ';
             end if;
 
 
-        stSql := stSql || ''
+        stSql := stSql || '
             --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -107,11 +107,11 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
 
         EXECUTE stSql;
 
-   stSql := ''CREATE TEMPORARY TABLE tmp_anulado AS (
+   stSql := 'CREATE TEMPORARY TABLE tmp_anulado AS (
         SELECT
             e.cod_entidade      as entidade,
             e.cod_empenho       as empenho,
@@ -122,44 +122,44 @@ BEGIN
             empenho.empenho_anulado         as ea,
             empenho.empenho_anulado_item    as eai,
             empenho.pre_empenho             as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
+            
+  LEFT JOIN empenho.pre_empenho_despesa as ped
+         ON pe.exercicio        = ped.exercicio
+        AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+            
+  LEFT JOIN orcamento.despesa as ode
+         ON ped.exercicio       = ode.exercicio
+        AND ped.cod_despesa     = ode.cod_despesa
 
         WHERE
-            e.cod_entidade      IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
+            e.exercicio         =   ' || quote_literal( stExercicio ) || '::varchar AND ';
 
-        if (stDataInicial is not null and stDataInicial<>'''') then
-            stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataInicial is not null and stDataInicial <> '' ) then
+            stSql := stSql || ' e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ', ''dd/mm/yyyy'') AND ';
         end if;
 
-        if (stDataFinal is not null and stDataFinal<>'''') then
-            stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataFinal is not null and stDataFinal <> '') then
+            stSql := stSql || ' e.dt_empenho <= to_date(' || quote_literal( stDataFinal ) || ', ''dd/mm/yyyy'') AND ';
         end if;
 
-        if (stDataSituacao is not null and stDataSituacao<>'''') then
-           stSql := stSql || '' to_date( to_char( ea.timestamp, ''''dd/mm/yyyy''''), ''''dd/mm/yyyy'''' ) <= to_date ('''''' || stDataSituacao || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataSituacao is not null and stDataSituacao <> '') then
+           stSql := stSql || ' to_date( to_char( ea.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'' ) <= to_date ('|| quote_literal( stDataSituacao ) || ',''dd/mm/yyyy'') AND ';
         end if;
 
-        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-           stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND'';
+        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+           stSql := stSql || ' e.cod_empenho >= ' || inCodEmpenhoInicial || ' AND ';
         end if;
 
-        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-           stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND'';
+        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+           stSql := stSql || ' e.cod_empenho <= ' || inCodEmpenhoFinal || ' AND ';
         end if;
 
-        if (inNumOrgao is not null and inNumOrgao <> '''') then
-            stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+        if (inNumOrgao is not null and inNumOrgao <> '') then
+            stSql := stSql || ' ode.num_orgao = ' || inNumOrgao || ' AND ';
         end if;
 
-        stSql := stSql || ''
+        stSql := stSql || '
             --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -178,10 +178,10 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
         EXECUTE stSql;
 
-   stSql := ''CREATE TEMPORARY TABLE tmp_liquidado AS (
+   stSql := 'CREATE TEMPORARY TABLE tmp_liquidado AS (
         SELECT
             e.cod_entidade      as entidade,
             e.cod_empenho       as empenho,
@@ -192,43 +192,44 @@ BEGIN
             empenho.nota_liquidacao         as nl,
             empenho.nota_liquidacao_item    as nli,
             empenho.pre_empenho             as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
+  
+  LEFT JOIN empenho.pre_empenho_despesa as ped
+         ON pe.exercicio        = ped.exercicio
+        AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+        
+  LEFT JOIN orcamento.despesa as ode 
+         ON ped.exercicio       = ode.exercicio
+        AND ped.cod_despesa     = ode.cod_despesa
+        
         WHERE
-            e.cod_entidade      IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
-        if (stDataInicial is not null and stDataInicial<>'''') then
-          stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataInicial is not null and stDataInicial <> '') then
+          stSql := stSql || ' e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ',''dd/mm/yyyy'') AND ';
         end if;
 
-        if (stDataFinal is not null and stDataFinal<>'''') then
-          stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataFinal is not null and stDataFinal <> '') then
+          stSql := stSql || ' e.dt_empenho <= to_date(' || quote_literal( stDataFinal )|| ', ''dd/mm/yyyy'') AND ';
         end if;
 
-        if (stDataSituacao is not null and stDataSituacao<>'''') then
-           stSql := stSql || '' nl.dt_liquidacao <= to_date('''''' || stDataSituacao || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataSituacao is not null and stDataSituacao <> '') then
+           stSql := stSql || ' nl.dt_liquidacao <= to_date(' || quote_literal( stDataSituacao ) || ',''dd/mm/yyyy'') AND ';
         end if;
 
-        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-           stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND'';
+        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+           stSql := stSql || ' e.cod_empenho >= ' || inCodEmpenhoInicial || ' AND ';
         end if;
 
-        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-           stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND'';
+        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+           stSql := stSql || ' e.cod_empenho <= ' || quote_literal( inCodEmpenhoFinal ) || ' AND ';
         end if;
 
-        if (inNumOrgao is not null and inNumOrgao <> '''') then
-            stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+        if (inNumOrgao is not null and inNumOrgao <> '') then
+            stSql := stSql || ' ode.num_orgao = ' || inNumOrgao || ' AND ';
         end if;
 
-        stSql := stSql || ''
+        stSql := stSql || '
             --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -246,10 +247,10 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
         EXECUTE stSql;
 
-    stSql := ''CREATE TEMPORARY TABLE tmp_liquidado_anulado AS (
+    stSql := 'CREATE TEMPORARY TABLE tmp_liquidado_anulado AS (
         SELECT
             e.cod_entidade       as entidade,
             e.cod_empenho        as empenho,
@@ -261,44 +262,44 @@ BEGIN
             empenho.nota_liquidacao_item    as nli,
             empenho.nota_liquidacao_item_anulado nlia,
             empenho.pre_empenho             as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
-
+            
+  LEFT JOIN empenho.pre_empenho_despesa as ped
+         ON pe.exercicio        = ped.exercicio
+        AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+        
+  LEFT JOIN orcamento.despesa as ode
+         ON ped.exercicio       = ode.exercicio
+        AND ped.cod_despesa     = ode.cod_despesa
+            
         WHERE
-            e.cod_entidade      IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
-       if (stDataInicial is not null and stDataInicial<>'''') then
-          stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+       if (stDataInicial is not null and stDataInicial <> '') then
+          stSql := stSql || ' e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ',''dd/mm/yyyy'') AND ';
        end if;
 
        if (stDataFinal is not null and stDataFinal<>'''') then
-          stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+          stSql := stSql || ' e.dt_empenho <= to_date(' || quote_literal( stDataFinal ) || ',''dd/mm/yyyy'') AND ';
        end if;
 
-        if (stDataSituacao is not null and stDataSituacao<>'''') then
-           stSql := stSql || '' to_date(to_char(nlia.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date('''''' || stDataSituacao || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataSituacao is not null and stDataSituacao <> '') then
+           stSql := stSql || ' to_date(to_char(nlia.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date(' || quote_literal( stDataSituacao ) || ',''dd/mm/yyyy'') AND';
         end if;
 
-        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-           stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND'';
+        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+           stSql := stSql || ' e.cod_empenho >= ' || quote_literal( inCodEmpenhoInicial ) || ' AND ';
         end if;
 
-        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-           stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND'';
+        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+           stSql := stSql || ' e.cod_empenho <= ' || inCodEmpenhoFinal || ' AND ';
         end if;
 
-        if (inNumOrgao is not null and inNumOrgao <> '''') then
-            stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+        if (inNumOrgao is not null and inNumOrgao <> '') then
+            stSql := stSql || ' ode.num_orgao = ' || inNumOrgao || ' AND ';
         end if;
 
-        stSql := stSql || ''
+        stSql := stSql || '
             --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -324,10 +325,10 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
         EXECUTE stSql;
 
-    stSql := ''CREATE TEMPORARY TABLE tmp_pago AS (
+    stSql := 'CREATE TEMPORARY TABLE tmp_pago AS (
         SELECT
             e.cod_entidade      as entidade,
             e.cod_empenho       as empenho,
@@ -338,43 +339,43 @@ BEGIN
             empenho.nota_liquidacao         as nl,
             empenho.nota_liquidacao_paga    as nlp,
             empenho.pre_empenho             as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
-
+            
+  LEFT JOIN empenho.pre_empenho_despesa as ped
+         ON pe.exercicio        = ped.exercicio
+        AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+        
+  LEFT JOIN orcamento.despesa as ode
+         ON ped.exercicio       = ode.exercicio
+        AND ped.cod_despesa     = ode.cod_despesa
+        
         WHERE
-            e.cod_entidade      IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
-       if (stDataInicial is not null and stDataInicial<>'''') then
-          stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+       if (stDataInicial is not null and stDataInicial <> '') then
+          stSql := stSql || ' e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ',''dd/mm/yyyy'') AND ';
        end if;
 
-       if (stDataFinal is not null and stDataFinal<>'''') then
-          stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+       if (stDataFinal is not null and stDataFinal <> '') then
+          stSql := stSql || ' e.dt_empenho <= to_date(' || quote_literal( stDataFinal ) || ',''dd/mm/yyyy'') AND';
        end if;
 
-        if (stDataSituacao is not null and stDataSituacao<>'''') then
-           stSql := stSql || '' to_date(to_char(nlp.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date('''''' || stDataSituacao || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataSituacao is not null and stDataSituacao <> '') then
+           stSql := stSql || ' to_date(to_char(nlp.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date('|| quote_literal( stDataSituacao ) || ',''dd/mm/yyyy'') AND ';
         end if;
 
-        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-           stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND'';
+        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+           stSql := stSql || ' e.cod_empenho >= ' || inCodEmpenhoInicial || ' AND ';
         end if;
-        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-           stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND'';
-        end if;
-
-        if (inNumOrgao is not null and inNumOrgao <> '''') then
-            stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+           stSql := stSql || ' e.cod_empenho <= ' || inCodEmpenhoFinal || ' AND ';
         end if;
 
-        stSql := stSql || ''
+        if (inNumOrgao is not null and inNumOrgao <> '' ) then
+            stSql := stSql || ' ode.num_orgao = ' || inNumOrgao || ' AND ';
+        end if;
+
+        stSql := stSql || '
              --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -392,10 +393,10 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
         EXECUTE stSql;
 
-    stSql := ''CREATE TEMPORARY TABLE tmp_estornado AS (
+    stSql := 'CREATE TEMPORARY TABLE tmp_estornado AS (
         SELECT
             e.cod_entidade          as entidade,
             e.cod_empenho           as empenho,
@@ -407,44 +408,44 @@ BEGIN
             empenho.nota_liquidacao_paga            as nlp,
             empenho.nota_liquidacao_paga_anulada    as nlpa,
             empenho.pre_empenho             as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
+            
+  LEFT JOIN empenho.pre_empenho_despesa as ped
+         ON pe.exercicio        = ped.exercicio
+        AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+            
+  LEFT JOIN orcamento.despesa as ode
+         ON ped.exercicio       = ode.exercicio
+        AND ped.cod_despesa     = ode.cod_despesa
 
         WHERE
-            e.cod_entidade          IN ('' || stCodEntidades || '') AND
-            e.exercicio         =   '' || stExercicio || ''::varchar AND '';
+            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.exercicio         =   ' || stExercicio || '::varchar AND ';
 
-       if (stDataInicial is not null and stDataInicial<>'''') then
-          stSql := stSql || '' e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') AND'';
+       if (stDataInicial is not null and stDataInicial <> '' ) then
+          stSql := stSql || ' e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ',''dd/mm/yyyy'') AND ';
        end if;
 
-       if (stDataFinal is not null and stDataFinal<>'''') then
-          stSql := stSql || '' e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') AND'';
+       if (stDataFinal is not null and stDataFinal <> '') then
+          stSql := stSql || ' e.dt_empenho <= to_date(' || quote_literal( stDataFinal ) || ',''dd/mm/yyyy'') AND ';
        end if;
 
-        if (stDataSituacao is not null and stDataSituacao<>'''') then
-           stSql := stSql || '' to_date(to_char(nlpa.timestamp_anulada,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date('''''' || stDataSituacao || '''''',''''dd/mm/yyyy'''') AND'';
+        if (stDataSituacao is not null and stDataSituacao <> '') then
+           stSql := stSql || ' to_date(to_char(nlpa.timestamp_anulada,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date(' || quote_literal( stDataSituacao ) || ',''dd/mm/yyyy'') AND ';
         end if;
 
-        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-           stSql := stSql || '' e.cod_empenho >= '' || inCodEmpenhoInicial || '' AND'';
+        if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+           stSql := stSql || ' e.cod_empenho >= ' || inCodEmpenhoInicial || ' AND ';
         end if;
 
-        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-           stSql := stSql || '' e.cod_empenho <= '' || inCodEmpenhoFinal || '' AND'';
+        if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+           stSql := stSql || ' e.cod_empenho <= ' || inCodEmpenhoFinal || ' AND ' ;
         end if;
 
-        if (inNumOrgao is not null and inNumOrgao <> '''') then
-            stSql := stSql || '' ode.num_orgao = '' || inNumOrgao || '' AND '';
+        if (inNumOrgao is not null and inNumOrgao <> '' ) then
+            stSql := stSql || ' ode.num_orgao = ' || inNumOrgao || ' AND ';
         end if;
 
-        stSql := stSql || ''
+        stSql := stSql || '
             --Ligação EMPENHO : PRE_EMPENHO
             e.exercicio         = pe.exercicio AND
             e.cod_pre_empenho   = pe.cod_pre_empenho AND
@@ -468,10 +469,10 @@ BEGIN
             e.cod_entidade,
             e.cod_empenho,
             e.exercicio
-        )'';
+        )';
         EXECUTE stSql;
 
-stSql := ''
+stSql := '
 SELECT * FROM (
     SELECT
         cod_entidade,
@@ -493,7 +494,7 @@ SELECT * FROM (
             e.cod_entidade          as cod_entidade,
             e.cod_empenho           as cod_empenho,
             e.exercicio             as exercicio,
-            to_char(e.dt_empenho, ''''dd/mm/yyyy'''') as dt_emissao,
+            to_char(e.dt_empenho, ''dd/mm/yyyy'') as dt_emissao,
             pe.cgm_beneficiario     as cgm,
             cgm.nom_cgm             as credor,
             recurso.cod_recurso,
@@ -505,71 +506,72 @@ SELECT * FROM (
             coalesce(empenho.fn_somatorio_razao_credor_liquidado_anulado(e.cod_empenho, e.cod_entidade, e.exercicio),0.00) as estornoliquidado,
             coalesce(empenho.fn_somatorio_razao_credor_pago(e.cod_empenho, e.cod_entidade, e.exercicio),0.00) as pago,
             coalesce(empenho.fn_somatorio_razao_credor_estornado(e.cod_empenho, e.cod_entidade, e.exercicio),0.00) as estornopago
-        FROM
-            empenho.empenho     as e
-            INNER JOIN empenho.pre_empenho_despesa
-                        ON pre_empenho_despesa.cod_pre_empenho = e.cod_pre_empenho
-                       AND pre_empenho_despesa.exercicio       = e.exercicio
-            INNER JOIN orcamento.despesa
-                    ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                   AND despesa.exercicio   = pre_empenho_despesa.exercicio
-            INNER JOIN orcamento.recurso('''''' || stExercicio || '''''') as recurso
-                    ON recurso.cod_recurso = despesa.cod_recurso
-                   AND recurso.exercicio   = despesa.exercicio,
-            sw_cgm              as cgm,
-            empenho.pre_empenho as pe
-            LEFT JOIN empenho.pre_empenho_despesa as ped on(
-                pe.exercicio        = ped.exercicio
-            AND pe.cod_pre_empenho  = ped.cod_pre_empenho
-            )
-            LEFT JOIN orcamento.despesa as ode on(
-                ped.exercicio       = ode.exercicio
-            AND ped.cod_despesa     = ode.cod_despesa
-            )
+        
+        FROM empenho.empenho as e
+            
+  INNER JOIN empenho.pre_empenho_despesa
+          ON pre_empenho_despesa.cod_pre_empenho = e.cod_pre_empenho
+         AND pre_empenho_despesa.exercicio       = e.exercicio
+                   
+  INNER JOIN orcamento.despesa
+          ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+         AND despesa.exercicio   = pre_empenho_despesa.exercicio
+         
+  INNER JOIN orcamento.recurso(' || quote_literal( stExercicio ) || ') as recurso
+          ON recurso.cod_recurso = despesa.cod_recurso
+         AND recurso.exercicio   = despesa.exercicio
+         
+  INNER JOIN empenho.pre_empenho as pe
+          ON e.exercicio         = pe.exercicio
+	 AND e.cod_pre_empenho   = pe.cod_pre_empenho
 
-        WHERE
-                e.cod_entidade          IN ('' || stCodEntidades || '')
-                AND e.exercicio         =   '' || stExercicio || ''::varchar '';
+  INNER JOIN sw_cgm as cgm
+	  ON pe.cgm_beneficiario = cgm.numcgm
+            
+   LEFT JOIN empenho.pre_empenho_despesa as ped
+          ON pe.exercicio        = ped.exercicio
+         AND pe.cod_pre_empenho  = ped.cod_pre_empenho
+       
+   LEFT JOIN orcamento.despesa as ode
+          ON ped.exercicio     = ode.exercicio
+         AND  ped.cod_despesa  = ode.cod_despesa
 
-                stSql := stSql || ''
-                AND e.exercicio         = pe.exercicio
-                AND e.cod_pre_empenho   = pe.cod_pre_empenho
+        WHERE   e.cod_entidade          IN (' || quote_literal( stCodEntidades ) || ')
+                AND e.exercicio         =   ' || quote_literal( stExercicio ) || '::varchar ';
 
-                AND pe.cgm_beneficiario = cgm.numcgm '';
-
-                if (stDataInicial is not null and stDataInicial<>'''') then
-                   stSql := stSql || '' AND e.dt_empenho >= to_date('''''' || stDataInicial || '''''',''''dd/mm/yyyy'''') '';
+                if (stDataInicial is not null and stDataInicial<>'') then
+                   stSql := stSql || ' AND e.dt_empenho >= to_date(' || quote_literal( stDataInicial ) || ',''dd/mm/yyyy'') ';
                 end if;
 
-                if (stDataFinal is not null and stDataFinal<>'''') then
-                   stSql := stSql || '' AND e.dt_empenho <= to_date('''''' || stDataFinal || '''''',''''dd/mm/yyyy'''') '';
+                if (stDataFinal is not null and stDataFinal <> '') then
+                   stSql := stSql || ' AND e.dt_empenho <= to_date(' || quote_literal( stDataFinal ) || ', ''dd/mm/yyyy'') ';
                 end if;
 
-                if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <>'''') then
-                   stSql := stSql || ''AND e.cod_empenho >= '' || inCodEmpenhoInicial || '' '';
+                if (inCodEmpenhoInicial is not null and inCodEmpenhoInicial <> '') then
+                   stSql := stSql || 'AND e.cod_empenho >= ' || inCodEmpenhoInicial || ' ';
                 end if;
 
-                if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <>'''') then
-                   stSql := stSql || ''AND e.cod_empenho <= '' || inCodEmpenhoFinal || '' '';
+                if (inCodEmpenhoFinal is not null and inCodEmpenhoFinal <> '') then
+                   stSql := stSql || 'AND e.cod_empenho <= ' || inCodEmpenhoFinal || ' ';
                 end if;
 
-                if (inNumOrgao is not null and inNumOrgao <> '''') then
-                    stSql := stSql || '' AND ode.num_orgao = '' || inNumOrgao || '' '';
+                if (inNumOrgao is not null and inNumOrgao <> '') then
+                    stSql := stSql || ' AND ode.num_orgao = ' || inNumOrgao || ' ';
                 end if;
 
-                if (inCGM is not null and inCGM<>'''') then
-                    stSql := stSql || '' AND pe.cgm_beneficiario     = '' || inCGM || '' '';
-                end if;
-                
-                if (stCodRecurso is not null and stCodRecurso<>'''') then
-                    stSql := stSql || '' AND recurso.cod_recurso = ''|| stCodRecurso ||'' '';
+                if (inCGM is not null and inCGM <> '' ) then
+                    stSql := stSql || ' AND pe.cgm_beneficiario     = ' || inCGM || ' ';
                 end if;
                 
-                if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '''') then
-                    stSql := stSql || '' AND recurso.masc_recurso_red like ''''''|| stDestinacaoRecurso || ''%'' ||'''''' '';
+                if (stCodRecurso is not null and stCodRecurso <> '') then
+                    stSql := stSql || ' AND recurso.cod_recurso = '|| quote_literal( stCodRecurso ) || ' ';
                 end if;
                 
-           stSql := stSql || ''
+                if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '') then
+                    stSql := stSql || ' AND recurso.masc_recurso_red like '|| stDestinacaoRecurso || '%' || ' ';
+                end if;
+                
+           stSql := stSql || '
             GROUP BY
                 e.cod_entidade,
                 e.cod_empenho,
@@ -601,43 +603,43 @@ SELECT * FROM (
             nom_recurso,
             masc_recurso_red
         ) as tmp
-        WHERE apagar > 0 '';
+        
+        WHERE apagar > 0 ';
 
-        stSql := stSql || ''
-        ORDER BY '';
+        stSql := stSql || '
+        ORDER BY ';
 
-        if (inOrdenacao is not null and inOrdenacao<>'''') then
+        if (inOrdenacao is not null and inOrdenacao <> '') then
             if(inOrdenacao = 1) then
-                stSql := stSql || ''
+                stSql := stSql || '
                     cod_empenho,
                     exercicio,
                     cod_entidade,
                     dt_emissao,
                     credor
-                '';
+                ';
             end if;
             if(inOrdenacao = 2) then
-                stSql := stSql || ''
+                stSql := stSql || '
                     credor,
                     cod_empenho,
                     exercicio,
                     cod_entidade,
                     dt_emissao
-                '';
+                ';
             end if;
         else
-            stSql := stSql || ''
+            stSql := stSql || '
                 cod_empenho,
                 exercicio,
                 cod_entidade,
                 dt_emissao,
                 credor
-            '';
+            ';
         end if;
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
-
         RETURN next reRegistro;
     END LOOP;
 
@@ -651,4 +653,5 @@ SELECT * FROM (
     RETURN;
 
 END;
-'language 'plpgsql';
+
+$$ language 'plpgsql';

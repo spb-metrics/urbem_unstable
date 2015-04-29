@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGLoteRegistroPrecos.class.php 59719 2014-09-08 15:00:53Z franver $
- * $Revision: 59719 $
+ * $Id: TTCEMGLoteRegistroPrecos.class.php 61913 2015-03-13 18:55:57Z franver $
+ * $Revision: 61913 $
  * $Author: franver $
- * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
+ * $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
  * 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -51,14 +51,16 @@ class TTCEMGLoteRegistroPrecos extends Persistente
         $this->setTabela('tcemg.lote_registro_precos');
 
         $this->setCampoCod('');
-        $this->setComplementoChave('cod_entidade, numero_processo_adesao, exercicio_adesao, cod_lote');
+        $this->setComplementoChave('cod_entidade, numero_registro_precos, exercicio, interno, numcgm_gerenciador, cod_lote');
 
         $this->addCampo('cod_entidade'             , 'integer' , true  , ''    , true  , true);
-        $this->AddCampo('numero_processo_adesao'   , 'integer' , true  ,   ''  , true  , true);
-        $this->AddCampo('exercicio_adesao'         , 'varchar' , true  ,  '4'  , true  , true);
+        $this->AddCampo('numero_registro_precos'   , 'integer' , true  ,   ''  , true  , true);
+        $this->AddCampo('exercicio'                , 'varchar' , true  ,  '4'  , true  , true);
         $this->AddCampo('cod_lote'                 , 'integer' , true  ,   ''  , true  , false);
         $this->AddCampo('descricao_lote'           , 'varchar' , true  , '250' , false , false);
         $this->AddCampo('percentual_desconto_lote' , 'numeric' , false , '6.2' , false , false);
+        $this->AddCampo('interno'                  , 'boolean' , true , ''    ,  true ,  true);
+        $this->AddCampo('numcgm_gerenciador'       , 'integer' , true , ''    ,  true ,  true);
     }
     
     public function __destruct(){}

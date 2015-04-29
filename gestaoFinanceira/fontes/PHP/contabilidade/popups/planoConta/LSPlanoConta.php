@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 61653 2015-02-20 19:35:15Z arthur $
+    * $Id: LSPlanoConta.php 62294 2015-04-20 14:58:06Z jean $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -552,7 +552,7 @@ if ($_REQUEST['tipoBusca']) {
             if( $_REQUEST['stDescricao'] )
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
 
-            $stFiltro .= "\n   (pc.cod_estrutural like '1.1.%' )AND ";
+            $stFiltro .= "\n   (pc.cod_estrutural like '2.%' )AND ";
         break;
 
         case 'tes_contrapartida_lancamento':

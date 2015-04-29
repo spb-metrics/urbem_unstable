@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterConfiguracaoRais.php 60993 2014-11-27 17:32:39Z gelson $
+    $Id: FMManterConfiguracaoRais.php 62188 2015-04-06 18:21:28Z carlos.silva $
 
     * Casos de uso: uc-04.08.12
 */
@@ -234,7 +234,7 @@ $obIntExercicio->setSize(5);
 $obIntExercicio->setMaxLength(4);
 $obIntExercicio->setNull(false);
 $obIntExercicio->setValue($inExercicio);
-if ($_POST["stAcao"] == "alterar") {
+if ($_REQUEST["stAcao"] == "alterar") {
     $obIntExercicio->setReadOnly(true);
 }
 

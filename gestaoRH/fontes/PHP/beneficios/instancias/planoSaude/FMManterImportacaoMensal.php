@@ -46,6 +46,8 @@ adicionado trecho de log do CVS
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php"                             );
+include_once (CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                        );
 include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
 
 $stPrograma = "ManterImportacaoMensal";
@@ -62,6 +64,8 @@ if ( empty( $stAcao ) ) {
 }
 
 Sessao::write( "link", "" );
+
+$obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 
 $obForm = new Form;
 $obForm->setAction ( $pgProc               );
@@ -86,7 +90,7 @@ $obCGMFornecedor->setName('stCGMFornecedor');
 $obCGMFornecedor->setId('stCGMFornecedor');
 $obCGMFornecedor->obCampoCod->setName('inCGMFornecedor');
 $obCGMFornecedor->obCampoCod->setId('inCGMFornecedor');
-$obCGMFornecedor->setNull(true);
+$obCGMFornecedor->setNull(false);
 
 //Cria objeto FileBox para upload de arquivo
 $obFilArquivo = new FileBox;
@@ -103,6 +107,7 @@ $obFormulario = new Formulario;
 $obFormulario->addForm      ( $obForm );
 $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
+$obFormulario->addTitulo    ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
 $obFormulario->addTitulo    ( "Dados dos Arquivos" );
 $obFormulario->addComponente( $obCGMFornecedor );
 $obFormulario->addComponente( $obFilArquivo );

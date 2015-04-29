@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: reciboProcesso.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+    $Id: reciboProcesso.php 62351 2015-04-28 13:51:03Z arthur $
 
 */
 
@@ -46,6 +46,7 @@ $preview->setNomeArquivo('reciboProcesso');
 
 $numMatricula = pegaDado("num_matricula","sw_processo_matricula","Where cod_processo = '".$_REQUEST['codProcesso' ]."' and ano_exercicio = '".$_REQUEST['anoExercicio']."' ");
 $numInscricao = pegaDado("num_inscricao","sw_processo_inscricao","Where cod_processo = '".$_REQUEST['codProcesso' ]."' and ano_exercicio = '".$_REQUEST['anoExercicio']."' ");
+$stEntidadePrincipal = SistemaLegado::pegaConfiguracao("nom_prefeitura",2,Sessao::getExercicio());
 
 $preview->addParametro ( 'pNumMatricula' , $numMatricula );
 $preview->addParametro ( 'pNumInscricao' , $numInscricao );
@@ -59,8 +60,11 @@ $cod_municipio = pegaConfiguracao("cod_municipio");
 $codUf = pegaConfiguracao("cod_uf");
 $preview->addParametro ( 'pCodMunicipio' , $cod_municipio );
 $preview->addParametro ( 'pCodUf' , $codUf );
+$preview->addParametro ('pEntidadePrincipal'     , $stEntidadePrincipal);
 
 $stDataHoje = dataExtenso(date("Y-m-d"));
 $preview->addParametro ('pDataHoje', $stDataHoje);
+
+$preview->addAssinaturas(Sessao::read('assinaturas'));
 
 $preview->preview();

@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: FMManterConfiguracaoEMP.php 61714 2015-02-27 13:16:41Z carlos.silva $
+    $Id: FMManterConfiguracaoEMP.php 61800 2015-03-04 20:16:20Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -174,16 +174,7 @@ $obFormulario->agrupaComponentes( array( $obBtnIncluir, $obBtnLimpar ),"","" );
 $obFormulario->addSpan      ( $spnLista );
 
 $obOk  = new Ok();
-//$obOk->obEvento->setOnClick("ValidaNF();");
-//
-//$obCancelar  = new Cancelar();
-//if ($_REQUEST['stAcao'] == 'incluir') {
-//    $obCancelar->obEvento->setOnClick("Cancelar('".$pgForm.'?'.Sessao::getId().'&stAcao='.$_REQUEST['stAcao'] ."','telaPrincipal');");
-//} else {
-//    $obCancelar->obEvento->setOnClick("Cancelar('".$pgList.'?'.Sessao::getId().'&stAcao='.$_REQUEST['stAcao'].$stLink ."','telaPrincipal');");
-//}
-//
-$obFormulario->defineBarra(array( $obOk/*, $obCancelar*/ ));
+$obFormulario->defineBarra(array( $obOk ));
 
 $jsOnload = "montaParametrosGET('carregaDados','');";
 

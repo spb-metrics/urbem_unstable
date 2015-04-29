@@ -79,11 +79,12 @@ $obStCodInventario->setName   ('stIdInventario');
 $obStCodInventario->setRotulo ('Código do Inventário');
 $obStCodInventario->setValue  ($_REQUEST['inIdInventario']);
 
-$obDataInicial = new TextBox;
-$obDataInicial->setName   ('stDataInicial');
-$obDataInicial->setRotulo ('Data Inicial');
-$obDataInicial->setLabel  (true);
-$obDataInicial->setValue  ((($stAcao == 'incluir') ? date("d/m/Y") : $_REQUEST['stDataInicial']));
+$obDataInicial = new Data();
+$obDataInicial->setName     ('stDataInicial');
+$obDataInicial->setId       ('stDataInicial');
+$obDataInicial->setRotulo   ('Data Inicial');
+$obDataInicial->setValue    ( (($stAcao == 'incluir') ? date("d/m/Y") : $_REQUEST['stDataInicial']) );
+$obDataInicial->setSize     (7);
 
 $obTxtObservacao = new TextArea;
 $obTxtObservacao->setId     ('stObservacao');
@@ -138,7 +139,7 @@ if ($stAcao == "processar") {
     $jsOnLoad  .= "jQuery('#Ok').attr('disabled', 'disabled');";
 }
 
-$jsOnLoad .= "BloqueiaFrames(true, false);";
+//$jsOnLoad .= "BloqueiaFrames(true, false);";
 # Chamada para a função que irá popular as tabelas do Inventário com o último status dos Bens do Patrimônio.
 $jsOnLoad .= "montaParametrosGET('recuperaCargaInicial', '');";
 

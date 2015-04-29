@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOPFR.class.php 61567 2015-02-06 11:47:54Z michel $
+    $Id: TTGOPFR.class.php 62199 2015-04-07 17:23:57Z carlos.silva $
 
     * Casos de uso: uc-06.04.00
 */
@@ -74,7 +74,6 @@ class TTGOPFR extends Persistente
                       END AS dotacao2002
                     , empenho.cod_empenho
                     , to_char(empenho.dt_empenho, 'dd/mm/yyyy') as dt_empenho
-                    , RP_NL.cod_nota||'/'||RP_NL.exercicio AS cod_nota
                     , RP_NL.entidade
                     , sw_cgm.nom_cgm AS credor
                     , 1 AS tipo_lancamento
@@ -205,7 +204,6 @@ class TTGOPFR extends Persistente
              GROUP BY RP_NL.empenho
                     , RP_NL.exercicio
                     , RP_NL.entidade
-                    , RP_NL.cod_nota
                     , RP_NL.valor
                     , despesa.num_orgao
                     , dotacao2001

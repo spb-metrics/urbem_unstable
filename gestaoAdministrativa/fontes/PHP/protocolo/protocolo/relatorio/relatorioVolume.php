@@ -281,55 +281,79 @@ include_once '../../../framework/legado/mascarasLegado.lib.php';
             </tr>
             ";
 
-        $sql  = "";
-        $sql .= "SELECT distinct orgao.cod_orgao\n";
-        $sql .= "     , orgao_nivel.cod_organograma \n";
-        $sql .= "     , organograma.fn_consulta_orgao(orgao_nivel.cod_organograma, orgao.cod_orgao) as mascara_reduzida\n";
-        $sql .= "     , recuperaDescricaoOrgao(orgao.cod_orgao, '".$dataF."'::date) as codunidsetor\n";
-        $sql .= "     , COALESCE(processos_recebidos.qtd_recebidos, 0) AS qtd_recebidos\n";
-        $sql .= "     , COALESCE(processos_encaminhados.qtd_encaminhados, 0) AS qtd_encaminhados\n";
-        $sql .= "  FROM organograma.orgao\n";
-        $sql .= " INNER JOIN organograma.orgao_nivel \n";
-        $sql .= "    ON orgao.cod_orgao = orgao_nivel.cod_orgao \n";
-        $sql .= "       LEFT JOIN (SELECT COUNT(*) AS qtd_recebidos\n";
-        $sql .= "                       , sw_andamento.cod_orgao          \n";
-        $sql .= "                    FROM public.sw_processo\n";
-        $sql .= "                    JOIN public.sw_andamento\n";
-        $sql .= "                      ON sw_andamento.ano_exercicio = sw_processo.ano_exercicio
-                                      AND sw_andamento.cod_processo = sw_processo.cod_processo
-                                     JOIN public.sw_recebimento
-                                       ON sw_recebimento.ano_exercicio = sw_andamento.ano_exercicio
-                                      AND sw_recebimento.cod_processo = sw_andamento.cod_processo
-                                      AND sw_recebimento.cod_andamento = sw_andamento.cod_andamento\n";
-        $sql .= "                   WHERE sw_processo.cod_situacao = 3 -- Valor fixo\n";
+        $sql  = "
+                 SELECT distinct orgao.cod_orgao
+                      , orgao_nivel.cod_organograma 
+                      , organograma.fn_consulta_orgao(orgao_nivel.cod_organograma, orgao.cod_orgao) as mascara_reduzida
+                      , recuperaDescricaoOrgao(orgao.cod_orgao, '".$dataF."'::date) as codunidsetor
+                      , COALESCE(processos_recebidos.qtd_recebidos, 0) AS qtd_recebidos 
+                      , COALESCE(processos_encaminhados.qtd_encaminhados, 0) AS qtd_encaminhados
+                   FROM organograma.orgao
+                   
+             INNER JOIN organograma.orgao_nivel
+                     ON orgao.cod_orgao = orgao_nivel.cod_orgao 
+              
+              LEFT JOIN (SELECT COUNT(*) AS qtd_recebidos
+                              , usuario.cod_orgao          
+                           FROM public.sw_processo
+                           
+                     INNER JOIN public.sw_andamento
+                             ON sw_andamento.ano_exercicio = sw_processo.ano_exercicio
+                            AND sw_andamento.cod_processo  = sw_processo.cod_processo
+                            
+                     INNER JOIN public.sw_recebimento
+                             ON sw_recebimento.ano_exercicio = sw_andamento.ano_exercicio
+                            AND sw_recebimento.cod_processo  = sw_andamento.cod_processo
+                            AND sw_recebimento.cod_andamento = sw_andamento.cod_andamento
+                            
+                     INNER JOIN sw_assinatura_digital
+                             ON sw_assinatura_digital.ano_exercicio = sw_andamento.ano_exercicio
+                            AND sw_assinatura_digital.cod_processo  = sw_andamento.cod_processo
+                            AND sw_assinatura_digital.cod_andamento = sw_andamento.cod_andamento
+
+                     INNER JOIN administracao.usuario
+                             ON usuario.numcgm = sw_assinatura_digital.cod_usuario
+                          
+                          WHERE sw_processo.cod_situacao = 3 -- Valor fixo \n ";
+        
         if ($dataInicial != '' and $dataFinal != '') {
-            $sql .= "                 AND TO_DATE(sw_recebimento.timestamp::text, 'yyyy-mm-dd') BETWEEN '$dataI' AND\n";
+            $sql .= "       AND TO_DATE(sw_recebimento.timestamp::text, 'yyyy-mm-dd') BETWEEN '$dataI' AND \n";
             $sql .= "'$dataF'\n";
         } elseif ($dataInicial) {
-            $sql .= "                   AND TO_DATE(sw_recebimento.timestamp::text, 'yyyy-mm-dd') =  '$dataI'\n";
+            $sql .= "       AND TO_DATE(sw_recebimento.timestamp::text, 'yyyy-mm-dd') =  '$dataI' \n";
         }
-        $sql .= "               GROUP BY sw_andamento.cod_orgao ) AS processos_recebidos         \n";
-        $sql .= "              ON processos_recebidos.cod_orgao              = orgao.cod_orgao    \n";
-        $sql .= "       LEFT JOIN (SELECT COUNT(*) AS qtd_encaminhados \n";
-        $sql .= "                       , sw_andamento.cod_orgao          \n";
-        $sql .= "                    FROM public.sw_processo\n";
-        $sql .= "                    JOIN public.sw_andamento
-                                       ON sw_andamento.ano_exercicio = sw_processo.ano_exercicio
-                                      AND sw_andamento.cod_processo = sw_processo.cod_processo
-                                    JOIN sw_ultimo_andamento
-                                      ON sw_ultimo_andamento.ano_exercicio = sw_andamento.ano_exercicio
-                                     AND sw_ultimo_andamento.cod_processo = sw_andamento.cod_processo
-                                     AND sw_ultimo_andamento.cod_andamento = sw_andamento.cod_andamento\n";
-        $sql .= "                   WHERE sw_processo.cod_situacao =       2 -- Valor fixo\n";
+        
+        $sql .= "      GROUP BY usuario.cod_orgao
+                        ) AS processos_recebidos
+                       ON processos_recebidos.cod_orgao = orgao.cod_orgao
+                    
+                LEFT JOIN (SELECT COUNT(*) AS qtd_encaminhados
+                                , sw_andamento.cod_orgao
+                             FROM public.sw_processo
+                           
+                       INNER JOIN public.sw_andamento
+                               ON sw_andamento.ano_exercicio = sw_processo.ano_exercicio
+                              AND sw_andamento.cod_processo  = sw_processo.cod_processo
+                          
+                       INNER JOIN sw_ultimo_andamento
+                               ON sw_ultimo_andamento.ano_exercicio = sw_andamento.ano_exercicio
+                              AND sw_ultimo_andamento.cod_processo  = sw_andamento.cod_processo
+                              AND sw_ultimo_andamento.cod_andamento = sw_andamento.cod_andamento
+                       
+                            WHERE sw_processo.cod_situacao = 2 -- Valor fixo \n";
+                                   
         //$sql .= "                     AND sw_andamento.cod_andamento =       (sw_ultimo_andamento.cod_andamento - 1)\n";
+        
         if ($dataInicial != '' and $dataFinal != '') {
-            $sql .= "                 AND TO_DATE(sw_ultimo_andamento.timestamp::text, 'yyyy-mm-dd') BETWEEN '$dataI' AND\n";
+            $sql .= "         AND TO_DATE(sw_ultimo_andamento.timestamp::text, 'yyyy-mm-dd') BETWEEN '$dataI' AND \n";
             $sql .= "'$dataF'\n";
         } elseif ($dataInicial) {
-            $sql .= "                   AND TO_DATE(sw_ultimo_andamento.timestamp::text, 'yyyy-mm-dd') =  '$dataI'\n";
+            $sql .= "         AND TO_DATE(sw_ultimo_andamento.timestamp::text, 'yyyy-mm-dd') =  '$dataI' \n";
         }
-        $sql .= "                   GROUP BY sw_andamento.cod_orgao ) AS processos_encaminhados         \n";
-        $sql .= "              ON processos_encaminhados.cod_orgao           = orgao.cod_orgao    \n";
+        
+        $sql .= "     GROUP BY sw_andamento.cod_orgao
+                      ) AS processos_encaminhados        
+                      ON processos_encaminhados.cod_orgao = orgao.cod_orgao    \n";
 
         $st_ordenacao = array(
              1 => "mascara_reduzida",
@@ -346,11 +370,14 @@ include_once '../../../framework/legado/mascarasLegado.lib.php';
         $paginacao->complemento .= "&dataInicial=".urlencode($dataInicial)."&dataFinal=".urlencode($dataFinal);
         $paginacao->geraLinks();
         $paginacao->pegaOrder("cod_organograma, ".$st_ordenacao[$ordem],"ASC");
+        
         $sSQL = $paginacao->geraSQL();
+        
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);
         $stSubTituloPeriodo = "";
+        
         if ($dataInicial != '' and $dataFinal != '') {
             $periodo = "stperiodo="."Período: ".$dataInicial." a ".$dataFinal;
             $stSubTituloPeriodo = "Período: ".$dataInicial." a ".$dataFinal;

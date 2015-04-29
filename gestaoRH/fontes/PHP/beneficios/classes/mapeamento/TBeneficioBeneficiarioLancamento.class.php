@@ -45,15 +45,15 @@ function TBeneficioBeneficiarioLancamento()
 
     $this->setCampoCod('cod_contrato, cgm_fornecedor, cod_modalidade, cod_tipo_convenio, codigo_usuario, timestamp, timestamp_lancamento');
 
-    $this->AddCampo('cod_contrato'             , 'integer'   , true,  ''     , true  , true);
-    $this->AddCampo('cgm_fornecedor'           , 'integer'   , true,  ''     , true  , true);
-    $this->AddCampo('cod_modalidade'           , 'integer'   , true,  ''     , true  , true);
-    $this->AddCampo('cod_tipo_convenio'        , 'integer'   , true,  ''     , true  , true);
-    $this->AddCampo('codigo_usuario'           , 'integer'   , true,  ''   , true  , true);
-    $this->AddCampo('timestamp'                , 'timestamp' , true,  ''     , true  , true);
-    $this->AddCampo('timestamp_lancamento'     , 'timestamp' , true,  ''     , true  , false);
-    $this->AddCampo('valor'                    , 'numeric'   , true,  '14,2' , false , false);
-    $this->AddCampo('cod_periodo_movimentacao' , 'integer'   , true,  ''     , false , true);
+    $this->AddCampo('cod_contrato'             , 'integer'       , true,  ''     , true  , true);
+    $this->AddCampo('cgm_fornecedor'           , 'integer'       , true,  ''     , true  , true);
+    $this->AddCampo('cod_modalidade'           , 'integer'       , true,  ''     , true  , true);
+    $this->AddCampo('cod_tipo_convenio'        , 'integer'       , true,  ''     , true  , true);
+    $this->AddCampo('codigo_usuario'           , 'integer'       , true,  ''   , true  , true);
+    $this->AddCampo('timestamp'                , 'timestamp'     , true,  ''     , true  , true);
+    $this->AddCampo('timestamp_lancamento'     , 'timestamp_now' , true,  ''     , true  , false);
+    $this->AddCampo('valor'                    , 'numeric'       , true,  '14,2' , false , false);
+    $this->AddCampo('cod_periodo_movimentacao' , 'integer'       , true,  ''     , false , true);
 }
 
 function verificaPeriodoMovimentacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")

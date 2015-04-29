@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: OCManterNotasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterNotasFiscais.php 62088 2015-03-28 18:44:40Z arthur $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -120,6 +120,7 @@ function montaChaveAcesso($boMunicipal = false, $value = "")
     $obTxtChave->setInteiro   ( false                                 );
     $obTxtChave->setSize      ( $Size                                 );
     $obTxtChave->setMaxLength ( $Size                                 );
+    $obTxtChave->obEvento->setOnblur ( "montaParametrosGET('validaTamanhoChaveAcesso', 'inChave".$stNome."');");
 
     $obFormulario = new Formulario;
     $obFormulario->addComponente( $obTxtChave );
@@ -131,6 +132,23 @@ function montaChaveAcesso($boMunicipal = false, $value = "")
 }
 
 switch ($stCtrl) {
+    
+    case "validaTamanhoChaveAcesso":
+        
+        if( isset($_REQUEST['inChaveMunicipal']) ){
+            
+            if (strlen($_REQUEST['inChaveMunicipal']) < 60)
+                $stJs .= "alertaAviso('O campo Chave de Acesso Municipal deve conter 60 caracteres!','form','erro','".Sessao::getId()."');\n";
+            
+        } else {
+            
+            if (strlen($_REQUEST['inChave']) < 44)
+                $stJs .= "alertaAviso('O campo Chave de Acesso Municipal deve conter 44 caracteres!','form','erro','".Sessao::getId()."');\n";
+        }
+        
+        echo $stJs ;
+    
+    break;
 
     case "montaSpan":
 

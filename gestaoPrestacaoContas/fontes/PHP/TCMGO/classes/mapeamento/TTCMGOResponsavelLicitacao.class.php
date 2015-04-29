@@ -100,8 +100,8 @@ class TTCMGOResponsavelLicitacao extends Persistente
     function montaRecuperaResponsaveisLicitacao()
     {
         $stSql ="   SELECT 10 as tipo_registro
-                            , LPAD(''||orgao.num_orgao,2, '0') as cod_orgao
-                            , LPAD(''||licitacao.num_unidade,2, '0') AS codunidade
+                            , LPAD(''||despesa.num_orgao,2, '0') as cod_orgao
+                            , LPAD(''||despesa.num_unidade,2, '0') AS codunidade
                             , licitacao.exercicio as exercicio_licitacao
                             , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS num_processo_licitatorio 
                             , dadosResponsaveis.tipo_responsabilidade
@@ -119,34 +119,34 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                         sw_cgm.fone_celular 
                             END as fone_responsavel
                             , sw_cgm.e_mail as email
-                            , CASE sw_escolaridade.descricao 
-                                    WHEN '0'  THEN 0
-                                    WHEN '1'  THEN 01
-                                    WHEN '2'  THEN 02
-                                    WHEN '4'  THEN 01
-                                    WHEN '5'  THEN 02
-                                    WHEN '6'  THEN 03
-                                    WHEN '7'  THEN 04
-                                    WHEN '8'  THEN 05
-                                    WHEN '9'  THEN 02
-                                    WHEN '10' THEN 10
-                                    WHEN '11' THEN 12
-                                    WHEN '12' THEN 09
-                                    WHEN '13' THEN 11
-                                    WHEN '14' THEN 08
-                                    WHEN '15' THEN 07
+                            , CASE sw_escolaridade.cod_escolaridade 
+                                    WHEN 0  THEN 0
+                                    WHEN 1  THEN 0
+                                    WHEN 2  THEN 01
+                                    WHEN 4  THEN 01
+                                    WHEN 5  THEN 02
+                                    WHEN 6  THEN 03
+                                    WHEN 7  THEN 04
+                                    WHEN 8  THEN 05
+                                    WHEN 9  THEN 06
+                                    WHEN 10 THEN 10
+                                    WHEN 11 THEN 12
+                                    WHEN 12 THEN 09
+                                    WHEN 13 THEN 11
+                                    WHEN 14 THEN 08
+                                    WHEN 15 THEN 07
                             END as escolaridade
                             , ''::VARCHAR(15) as brancos
                                                         
                     FROM licitacao.licitacao    
 
-                    JOIN tcmgo.responsavel_licitacao
-                         ON tcmgo.responsavel_licitacao.exercicio      = licitacao.exercicio
-                        AND tcmgo.responsavel_licitacao.cod_licitacao  = licitacao.cod_licitacao
-                        AND tcmgo.responsavel_licitacao.cod_modalidade = licitacao.cod_modalidade
-                        AND tcmgo.responsavel_licitacao.cod_entidade   = licitacao.cod_entidade
+              INNER JOIN tcmgo.responsavel_licitacao
+                      ON tcmgo.responsavel_licitacao.exercicio      = licitacao.exercicio
+                     AND tcmgo.responsavel_licitacao.cod_licitacao  = licitacao.cod_licitacao
+                     AND tcmgo.responsavel_licitacao.cod_modalidade = licitacao.cod_modalidade
+                     AND tcmgo.responsavel_licitacao.cod_entidade   = licitacao.cod_entidade
               
-                    JOIN (
+              INNER JOIN (
                             SELECT *
                                     , 1 AS tipo_responsabilidade
                                     
@@ -232,18 +232,18 @@ class TTCMGOResponsavelLicitacao extends Persistente
                         AND mapa_cotacao.cod_mapa = licitacao.cod_mapa
              
                     JOIN compras.cotacao
-                         ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+                         ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
                         AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
             
                     JOIN compras.julgamento
-                         ON julgamento.exercicio = cotacao.exercicio
+                         ON julgamento.exercicio   = cotacao.exercicio
                         AND julgamento.cod_cotacao = cotacao.cod_cotacao
             
                     JOIN licitacao.homologacao
-                         ON homologacao.cod_licitacao=licitacao.cod_licitacao
-                        AND homologacao.cod_modalidade=licitacao.cod_modalidade
-                        AND homologacao.cod_entidade=licitacao.cod_entidade
-                        AND homologacao.exercicio_licitacao=licitacao.exercicio
+                         ON homologacao.cod_licitacao  = licitacao.cod_licitacao
+                        AND homologacao.cod_modalidade = licitacao.cod_modalidade
+                        AND homologacao.cod_entidade   = licitacao.cod_entidade
+                        AND homologacao.exercicio_licitacao = licitacao.exercicio
                         AND (
                                 SELECT homologacao_anulada.num_homologacao 
                                 FROM licitacao.homologacao_anulada
@@ -256,21 +256,54 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                 AND homologacao.lote                        = homologacao_anulada.lote
                     ) IS NULL
                     
-                    JOIN tcmgo.orgao
+              INNER JOIN tcmgo.orgao
                       ON orgao.num_orgao = licitacao.num_orgao
                      AND orgao.exercicio = licitacao.exercicio
+                     
+              INNER JOIN compras.mapa
+                      ON mapa.exercicio = licitacao.exercicio_mapa
+                     AND mapa.cod_mapa  = licitacao.cod_mapa
+                     
+              INNER JOIN compras.mapa_solicitacao
+                      ON mapa_solicitacao.exercicio = mapa.exercicio
+                     AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
+                    
+              INNER JOIN compras.mapa_item
+                      ON mapa_item.exercicio             = mapa_solicitacao.exercicio
+                     AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
+                     AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
+                     AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
+                     AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                   
+              INNER JOIN compras.solicitacao_item
+                      ON solicitacao_item.exercicio         = mapa_item.exercicio_solicitacao
+                     AND solicitacao_item.cod_entidade     = mapa_item.cod_entidade
+                     AND solicitacao_item.cod_solicitacao  = mapa_item.cod_solicitacao
+                     AND solicitacao_item.cod_centro       = mapa_item.cod_centro
+                     AND solicitacao_item.cod_item         = mapa_item.cod_item
 
-                    WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                    AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
-                    AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
-                    AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
-                    AND licitacao.cod_modalidade NOT IN (8,9)
-                    AND NOT EXISTS( SELECT 1
-                                    FROM licitacao.licitacao_anulada
-                                    WHERE licitacao_anulada.cod_licitacao   = licitacao.cod_licitacao
-                                      AND licitacao_anulada.cod_modalidade  = licitacao.cod_modalidade
-                                      AND licitacao_anulada.cod_entidade    = licitacao.cod_entidade
-                                      AND licitacao_anulada.exercicio       = licitacao.exercicio )
+              INNER JOIN compras.solicitacao_item_dotacao
+                      ON solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
+                     AND solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
+                     AND solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+                     AND solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
+                     AND solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
+                                           
+              INNER JOIN orcamento.despesa
+                      ON despesa.exercicio   = solicitacao_item_dotacao.exercicio
+                     AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
+
+                   WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                     AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
+                     AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+                     AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+                     AND licitacao.cod_modalidade NOT IN (8,9)
+                     AND NOT EXISTS( SELECT 1
+                                       FROM licitacao.licitacao_anulada
+                                      WHERE licitacao_anulada.cod_licitacao   = licitacao.cod_licitacao
+                                        AND licitacao_anulada.cod_modalidade  = licitacao.cod_modalidade
+                                        AND licitacao_anulada.cod_entidade    = licitacao.cod_entidade
+                                        AND licitacao_anulada.exercicio       = licitacao.exercicio )
                          
         GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
         ORDER BY num_processo_licitatorio";
@@ -290,8 +323,8 @@ class TTCMGOResponsavelLicitacao extends Persistente
     function montaRecuperaComissaoLicitacao()
     {
         $stSql = "SELECT DISTINCT 20 as tipo_registro
-                        , LPAD(''||orgao.num_orgao,2, '0') as cod_orgao
-                        , LPAD(''||licitacao.num_unidade,2, '0') AS cod_unidade
+                        , LPAD(''||despesa.num_orgao,2, '0') as cod_orgao
+                        , LPAD(''||despesa.num_unidade,2, '0') AS cod_unidade
                         , licitacao.exercicio as exercicio_licitacao
                         , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS nro_processo_licitatorio
                         , CASE WHEN comissao.cod_tipo_comissao = 1 THEN 2
@@ -309,7 +342,7 @@ class TTCMGOResponsavelLicitacao extends Persistente
                         , to_char(norma.dt_assinatura,'ddmmyyyy') as data_ato_nomeacao
                         , to_char(norma.dt_publicacao,'ddmmyyyy') as inicio_vigencia
                         , to_char(norma_data_termino.dt_termino,'ddmmyyyy') as final_vigencia
-                        , sw_cgm.nom_cgm as nom_membro_com_lic
+                        , sem_acentos(sw_cgm.nom_cgm) as nom_membro_com_lic
                         , CASE WHEN (comissao_membros.numcgm = tipo_membro.numcgm) THEN 
                                     comissao_membros.cargo
                             WHEN (membro_adicional.numcgm = tipo_membro.numcgm) THEN 
@@ -320,7 +353,7 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                WHEN (membro_adicional.numcgm = tipo_membro.numcgm) THEN 
                                     membro_adicional.natureza_cargo
                         END AS natureza_cargo
-                        , sw_cgm.logradouro as logra_res_membro
+                        , sem_acentos(sw_cgm.logradouro) as logra_res_membro
                         , ''::varchar(20) as setor_logra_membro
                         , sw_municipio.nom_municipio as cidade_logra_membro
                         , sw_uf.sigla_uf as uf_cidade_lograMembro
@@ -331,55 +364,56 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                     sw_cgm.fone_celular 
                         END as fone_membro
                         , sw_cgm.e_mail as email
-                        , CASE sw_escolaridade.descricao 
-                                    WHEN '0'  THEN 0
-                                    WHEN '1'  THEN 01
-                                    WHEN '2'  THEN 02
-                                    WHEN '4'  THEN 01
-                                    WHEN '5'  THEN 02
-                                    WHEN '6'  THEN 03
-                                    WHEN '7'  THEN 04
-                                    WHEN '8'  THEN 05
-                                    WHEN '9'  THEN 02
-                                    WHEN '10' THEN 10
-                                    WHEN '11' THEN 12
-                                    WHEN '12' THEN 09
-                                    WHEN '13' THEN 11
-                                    WHEN '14' THEN 08
-                                    WHEN '15' THEN 07
-                        END as escolaridade
+                        , CASE sw_escolaridade.cod_escolaridade 
+                                    WHEN 0  THEN 0
+                                    WHEN 1  THEN 0
+                                    WHEN 2  THEN 01
+                                    WHEN 4  THEN 01
+                                    WHEN 5  THEN 02
+                                    WHEN 6  THEN 03
+                                    WHEN 7  THEN 04
+                                    WHEN 8  THEN 05
+                                    WHEN 9  THEN 06
+                                    WHEN 10 THEN 10
+                                    WHEN 11 THEN 12
+                                    WHEN 12 THEN 09
+                                    WHEN 13 THEN 11
+                                    WHEN 14 THEN 08
+                                    WHEN 15 THEN 07
+                            END as escolaridade
                         
             FROM licitacao.licitacao    
             
-            JOIN licitacao.comissao_licitacao
-                      ON comissao_licitacao.exercicio = licitacao.exercicio
-                     AND comissao_licitacao.cod_licitacao = licitacao.cod_licitacao
-                     AND comissao_licitacao.cod_modalidade = licitacao.cod_modalidade
-                     AND comissao_licitacao.cod_entidade = licitacao.cod_entidade
+         INNER JOIN licitacao.comissao_licitacao
+                 ON comissao_licitacao.exercicio = licitacao.exercicio
+                AND comissao_licitacao.cod_licitacao = licitacao.cod_licitacao
+                AND comissao_licitacao.cod_modalidade = licitacao.cod_modalidade
+                AND comissao_licitacao.cod_entidade = licitacao.cod_entidade
 
-            JOIN licitacao.comissao
-                      ON comissao.cod_comissao = comissao_licitacao.cod_comissao
-                     AND ( comissao.cod_tipo_comissao = 1
-                           OR comissao.cod_tipo_comissao = 2
-                           OR comissao.cod_tipo_comissao = 3 )
-                    JOIN normas.norma
-                      ON norma.cod_norma = comissao.cod_norma
-                     AND ( norma.cod_tipo_norma = 2
-                           OR norma.cod_tipo_norma = 4 )
+         INNER JOIN licitacao.comissao
+                 ON comissao.cod_comissao = comissao_licitacao.cod_comissao
+                AND ( comissao.cod_tipo_comissao = 1
+                   OR comissao.cod_tipo_comissao = 2
+                   OR comissao.cod_tipo_comissao = 3 )
+                
+         INNER JOIN normas.norma
+                 ON norma.cod_norma = comissao.cod_norma
+                AND ( norma.cod_tipo_norma = 2
+                   OR norma.cod_tipo_norma = 4 )
 
-            JOIN normas.norma_data_termino
-                  ON norma_data_termino.cod_norma = norma.cod_norma
+         INNER JOIN normas.norma_data_termino
+                 ON norma_data_termino.cod_norma = norma.cod_norma
 
-            JOIN licitacao.comissao_membros
-                  ON comissao_licitacao.cod_comissao = comissao_membros.cod_comissao
+        INNER JOIN licitacao.comissao_membros
+                ON comissao_licitacao.cod_comissao = comissao_membros.cod_comissao
 
-            LEFT JOIN licitacao.membro_adicional
-                      ON membro_adicional.exercicio = licitacao.exercicio
-                     AND membro_adicional.cod_licitacao = licitacao.cod_licitacao
-                     AND membro_adicional.cod_modalidade = licitacao.cod_modalidade
-                     AND membro_adicional.cod_entidade = licitacao.cod_entidade
+         LEFT JOIN licitacao.membro_adicional
+                ON membro_adicional.exercicio = licitacao.exercicio
+               AND membro_adicional.cod_licitacao = licitacao.cod_licitacao
+               AND membro_adicional.cod_modalidade = licitacao.cod_modalidade
+               AND membro_adicional.cod_entidade = licitacao.cod_entidade
 
-            JOIN (  SELECT  pf.numcgm
+        INNER JOIN (  SELECT  pf.numcgm
                             , pf.CPF
                             , CASE  WHEN (membro_adicional.numcgm = pf.numcgm) THEN 2
                                     WHEN (comissao_membros.cod_tipo_membro = 1) THEN 2
@@ -408,37 +442,37 @@ class TTCMGOResponsavelLicitacao extends Persistente
                 ON comissao_membros.numcgm = tipo_membro.numcgm
                 OR membro_adicional.numcgm = tipo_membro.numcgm
 
-            JOIN sw_cgm
+        INNER JOIN sw_cgm
                 ON sw_cgm.numcgm = tipo_membro.numcgm
 
-            JOIN sw_municipio
-                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
-                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+        INNER JOIN sw_municipio
+                ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+               AND sw_municipio.cod_uf        = sw_cgm.cod_uf
 
-            JOIN sw_uf
+        INNER JOIN sw_uf
                 ON sw_uf.cod_uf = sw_municipio.cod_uf
 
-            JOIN sw_escolaridade
+        INNER JOIN sw_escolaridade
                 ON sw_escolaridade.cod_escolaridade = tipo_membro.cod_escolaridade
                       
-            JOIN compras.mapa_cotacao
-                 ON mapa_cotacao.exercicio_mapa = licitacao.exercicio
-                AND mapa_cotacao.cod_mapa = licitacao.cod_mapa
+        INNER JOIN compras.mapa_cotacao
+                ON mapa_cotacao.exercicio_mapa = licitacao.exercicio
+               AND mapa_cotacao.cod_mapa       = licitacao.cod_mapa
                      
-            JOIN compras.cotacao
-                 ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-                AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+        INNER JOIN compras.cotacao
+                ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
+               AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
             
-            JOIN compras.julgamento
-                 ON julgamento.exercicio = cotacao.exercicio
-                AND julgamento.cod_cotacao = cotacao.cod_cotacao
+        INNER JOIN compras.julgamento
+                ON julgamento.exercicio   = cotacao.exercicio
+               AND julgamento.cod_cotacao = cotacao.cod_cotacao
                     
-            JOIN licitacao.homologacao
-              ON homologacao.cod_licitacao=licitacao.cod_licitacao
-             AND homologacao.cod_modalidade=licitacao.cod_modalidade
-             AND homologacao.cod_entidade=licitacao.cod_entidade
-             AND homologacao.exercicio_licitacao=licitacao.exercicio
-             AND (
+        INNER JOIN licitacao.homologacao
+                ON homologacao.cod_licitacao  = licitacao.cod_licitacao
+               AND homologacao.cod_modalidade = licitacao.cod_modalidade
+               AND homologacao.cod_entidade   = licitacao.cod_entidade
+               AND homologacao.exercicio_licitacao = licitacao.exercicio
+               AND (
                     SELECT homologacao_anulada.num_homologacao FROM licitacao.homologacao_anulada
                     WHERE homologacao_anulada.cod_licitacao=licitacao.cod_licitacao
                     AND homologacao_anulada.cod_modalidade=licitacao.cod_modalidade
@@ -449,28 +483,60 @@ class TTCMGOResponsavelLicitacao extends Persistente
                     AND homologacao.lote=homologacao_anulada.lote
             ) IS NULL
                               
-            JOIN tcmgo.orgao
-              ON orgao.num_orgao = licitacao.num_orgao
-             AND orgao.exercicio = licitacao.exercicio
+     INNER JOIN tcmgo.orgao
+            ON orgao.num_orgao = licitacao.num_orgao
+           AND orgao.exercicio = licitacao.exercicio
+           
+    INNER JOIN compras.mapa
+            ON mapa.exercicio = licitacao.exercicio_mapa
+           AND mapa.cod_mapa  = licitacao.cod_mapa
+           
+    INNER JOIN compras.mapa_solicitacao
+            ON mapa_solicitacao.exercicio = mapa.exercicio
+           AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
+          
+    INNER JOIN compras.mapa_item
+            ON mapa_item.exercicio             = mapa_solicitacao.exercicio
+           AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
+           AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
+           AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
+           AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+         
+    INNER JOIN compras.solicitacao_item
+            ON solicitacao_item.exercicio        = mapa_item.exercicio_solicitacao
+           AND solicitacao_item.cod_entidade     = mapa_item.cod_entidade
+           AND solicitacao_item.cod_solicitacao  = mapa_item.cod_solicitacao
+           AND solicitacao_item.cod_centro       = mapa_item.cod_centro
+           AND solicitacao_item.cod_item         = mapa_item.cod_item
+
+    INNER JOIN compras.solicitacao_item_dotacao
+            ON solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
+           AND solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
+           AND solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+           AND solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
+           AND solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
+                                 
+    INNER JOIN orcamento.despesa
+            ON despesa.exercicio   = solicitacao_item_dotacao.exercicio
+           AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa       
                    
-                   WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                     AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
-                     AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
-                     AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
-                     AND licitacao.cod_modalidade NOT IN (8,9)
-                     AND NOT EXISTS( SELECT 1
-                                     FROM licitacao.licitacao_anulada
-                                     WHERE licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
-                                         AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                         AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
-                                         AND licitacao_anulada.exercicio = licitacao.exercicio
-                                 )
-                    AND NOT EXISTS( SELECT 1
-                                     FROM licitacao.membro_excluido
-                                     WHERE membro_excluido.numcgm = tipo_membro.numcgm
-                                 )
-                  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
-                  ";
+         WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+           AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
+           AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
+           AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
+           AND licitacao.cod_modalidade NOT IN (8,9)
+           AND NOT EXISTS( SELECT 1
+                           FROM licitacao.licitacao_anulada
+                           WHERE licitacao_anulada.cod_licitacao    = licitacao.cod_licitacao
+                               AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                               AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                               AND licitacao_anulada.exercicio      = licitacao.exercicio
+                       )
+          AND NOT EXISTS( SELECT 1
+                           FROM licitacao.membro_excluido
+                           WHERE membro_excluido.numcgm = tipo_membro.numcgm
+                       )
+         GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 ";
         return $stSql;
     }
     

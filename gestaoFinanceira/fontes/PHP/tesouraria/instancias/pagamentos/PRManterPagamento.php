@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 61267 2014-12-23 17:06:46Z diogo.zarpelon $
+    * $Id: PRManterPagamento.php 62349 2015-04-28 13:34:07Z diogo.zarpelon $
 
     * Casos de uso: uc-02.04.05
 */
@@ -64,12 +64,12 @@ list( $inCodBoletim , $stDtBoletim ) = explode ( ':' , $_REQUEST[ 'inCodBoletim'
 list($stDia, $stMes, $stAno) = explode( '/', $stDtBoletim );
 
 //valida a utilização da rotina de encerramento do mês contábil
-$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
+$boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9, '', $boTransacao);
 include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
-$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
+$obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ', $boTransacao);
 
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $stMes) {
     SistemaLegado::exibeAviso(urlencode("Mês do Boletim encerrado!"),"n_incluir","erro");
@@ -90,7 +90,7 @@ $obRTesourariaBoletim->addPagamento();
 
 $obRTesourariaConfiguracao = new RTesourariaConfiguracao();
 $obRTesourariaConfiguracao->setExercicio( Sessao::getExercicio() );
-$obRTesourariaConfiguracao->consultarTesouraria();
+$obRTesourariaConfiguracao->consultarTesouraria($boTransacao);
 
 #$boTransacao = isset($boTransacao) ? $boTransacao : "";
 
@@ -264,7 +264,7 @@ switch ($stAcao) {
 
             //fim do processo de inclusao de origens de recurso
 
-            $obTTesourariaPagamento->recuperaTodos($rsPagamentos,$stFiltroPagamentos,"",$boTransacao);
+            $obTTesourariaPagamento->recuperaTodos($rsPagamentos, $stFiltroPagamentos,"",$boTransacao);
 
             if (isset($_POST['inDocTipo'])) {
 
@@ -290,7 +290,7 @@ switch ($stAcao) {
                 }
 
                 ###TCEMG
-                $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE configuracao.parametro = 'seta_tipo_documento_tcemg'","",$boTransacao);
+                $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE configuracao.parametro = 'seta_tipo_documento_tcemg'","", $boTransacao);
 
                 if ($rsAdministracaoConfiguracao->getCampo('valor')  == 'true') {
                     require_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGPagamentoTipoDocumento.class.php";
@@ -313,7 +313,7 @@ switch ($stAcao) {
                 ###TCEAL
                 $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'","",$boTransacao);
                 $inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
-                $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."");
+                $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."", $boTransacao);
                 
                 if ($stSiglaUf == "AL") {
                     require_once CAM_GPC_TCEAL_MAPEAMENTO."TTCEALPagamentoTipoDocumento.class.php";
@@ -336,7 +336,7 @@ switch ($stAcao) {
             
             $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'","",$boTransacao);
             $inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
-            $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."");
+            $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."", $boTransacao);
             
             if ($stSiglaUf == "TO") {
                 if ( !$obErro->ocorreu() ) {
@@ -360,14 +360,16 @@ switch ($stAcao) {
             }
         }
 
+        # Encerra Transação para validar o commit ou rollback
+        $obErro = $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTesourariaPagamento );
+
         if ( $obRTesourariaConfiguracao->getFormaComprovacao() ) {
             SistemaLegado::alertaAviso($pgAutenticacao."?".( $_REQUEST['boPagarOutra'] ? $stPagarOutraAuth : "pg_volta=../pagamentos/".$pgList ),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::alertaAviso(($_REQUEST['boPagarOutra'] ? $stPagarOutra : $pgList),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
         }
-
     } else {
-        $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'));
+        $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'), $boTransacao);
         SistemaLegado::exibeAviso(urlencode("Erro ao executar ação: ".$nomAcao." (".$obErro->getDescricao().")"),"","erro");
         SistemaLegado::LiberaFrames();
     }
@@ -465,7 +467,8 @@ switch ($stAcao) {
         Sessao::write('pagamento',true);
     }
 
-    $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'));
+    $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'), $boTransacao);
+
     if ( !$obErro->ocorreu() ) {
         if( $obRTesourariaConfiguracao->getFormaComprovacao() )
             SistemaLegado::alertaAviso($pgAutenticacao."?pg_volta=../pagamentos/".$pgList."&".Sessao::getId(),"Estorno de Pagamento Concluído com Sucesso! (OP: ".$_POST['inCodOrdem'] . "/" . Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");

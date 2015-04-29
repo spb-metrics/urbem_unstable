@@ -59,83 +59,19 @@ function FTCEMGDespesaCorrente()
 function montaRecuperaTodos()
 {
     $stSql  = "
-    SELECT mes
-          ,despPesEncSoc
-          ,despJurDivInt
-          ,despJurDivExt
-          ,despOutDespCor
-          ,mesanula
-          ,despPesEncSocanula
-          ,despJurDivIntanula
-          ,despJurDivExtanula
-          ,despOutDespCoranula
-          ,mesatual
-          ,despPesEncSocatual
-          ,despJurDivIntatual
-          ,despJurDivExtatual
-          ,despOutDespCoratual
-          ,mesliqui
-          ,despPesEncSocliqui
-          ,despJurDivIntliqui
-          ,despJurDivExtliqui
-          ,despOutDespCorliqui
-          ,mesatualizada
-          ,despPesEncSocatualizada
-          ,despJurDivIntatualizada
-          ,despJurDivExtatualizada
-          ,despOutDespCoratualizada
-          ,mesemp
-          ,despPesEncSocemp
-          ,despJurDivIntemp
-          ,despJurDivExtemp
-          ,despOutDespCoremp
-          ,codTipoini
-          ,codTipoanula
-          ,codTipoliqui
-          ,codTipoemp
-          ,codTipoatual
-          ,codTipoatualizada
+    SELECT *
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
                                      , ".$this->getDado("mes")."
                                      ) AS retorno(
-                                                  mes                  INTEGER,
-                                                  despPesEncSoc        NUMERIC(14,2),
-                                                  despJurDivInt        Numeric(14,2),
-                                                  despJurDivExt        Numeric(14,2),
-                                                  despOutDespCor       NUMERIC(14,2),
-                                                  mesanula             INTEGER,
-                                                  despPesEncSocanula   Numeric(14,2),
-                                                  despJurDivIntanula   Numeric(14,2),
-                                                  despJurDivExtanula   Numeric(14,2),
-                                                  despOutDespCoranula  NUMERIC(14,2),
-                                                  mesatual             INTEGER,
-                                                  despPesEncSocatual   Numeric(14,2),
-                                                  despJurDivIntatual   Numeric(14,2),
-                                                  despJurDivExtatual   Numeric(14,2),
-                                                  despOutDespCoratual  NUMERIC(14,2),
-                                                  mesliqui             INTEGER,
-                                                  despPesEncSocliqui Numeric(14,2),
-                                                  despJurDivIntliqui Numeric(14,2),
-                                                  despJurDivExtliqui Numeric(14,2),
-                                                  despOutDespCorliqui NUMERIC(14,2),
-                                                  mesatualizada INTEGER,
-                                                  despPesEncSocatualizada Numeric(14,2),
-                                                  despJurDivIntatualizada Numeric(14,2),
-                                                  despJurDivExtatualizada Numeric(14,2),
-                                                  despOutDespCoratualizada NUMERIC(14,2),
-                                                  mesemp INTEGER,
-                                                  despPesEncSocemp Numeric(14,2),
-                                                  despJurDivIntemp Numeric(14,2),
-                                                  despJurDivExtemp Numeric(14,2),
-                                                  despOutDespCoremp NUMERIC(14,2),
-                                                  codTipoini INTEGER,
-                                                  codTipoanula INTEGER,
-                                                  codTipoliqui INTEGER,
-                                                  codTipoemp INTEGER,
-                                                  codTipoatual INTEGER,
-                                                  codTipoatualizada INTEGER
-                                                 )";
+                                                  mes                      INTEGER,
+                                                  cod_tipo                 TEXT,
+                                                  despPesEncSoc            TEXT,
+                                                  despJurDivInt            TEXT,
+                                                  despJurDivExt            TEXT,
+                                                  despOutDespCor           TEXT
+                                                 )
+          ORDER BY cod_tipo";
 return $stSql;
 }
 

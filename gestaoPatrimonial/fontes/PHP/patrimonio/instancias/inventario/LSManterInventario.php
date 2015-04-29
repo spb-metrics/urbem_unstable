@@ -64,7 +64,7 @@ if (is_numeric($_POST['inCodInventario'])) {
 }
 
 if (is_numeric($_POST['stExercicio'])) {
-    $obTInventario->setDado('exercicio' , $_POST['stExercicio']);
+    $stFiltro = " AND inventario.exercicio = '".$_POST['stExercicio']."'";
 }
 
 $stOrder = " ORDER BY inventario.id_inventario DESC";

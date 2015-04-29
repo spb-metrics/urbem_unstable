@@ -28,7 +28,7 @@
 
     * Casos de uso: uc-03.05.16
 
-    $Id: OCMontaNumeroLicitacao.php 60333 2014-10-14 18:26:22Z carolina $
+    $Id: OCMontaNumeroLicitacao.php 62279 2015-04-16 18:38:45Z arthur $
 
 */
 
@@ -127,19 +127,22 @@ switch ($_REQUEST['stCtrl']) {
     break;
     case 'carregaLicitacao':
     case 'carregaLicitacaoContrato':
-    if ($request->get('boSetarValorLicitacao')) {
-        echo "d.getElementById('valorLicitacao').innerHTML = '&nbsp;'; ";
-    }
+        
+        if ($request->get('boSetarValorLicitacao')) {
+            echo "d.getElementById('valorLicitacao').innerHTML = '&nbsp;'; ";
+        }
 
     if ($_REQUEST['stExercicioLicitacao'] && $_REQUEST['inCodEntidade'] && $_REQUEST['inCodModalidade']) {
-        $obTLicitacaoLicitacao->setDado( 'exercicio' , $_REQUEST['stExercicioLicitacao'] );
-        $obTLicitacaoLicitacao->setDado( 'cod_entidade', $_REQUEST['inCodEntidade'] );
+        
+        $obTLicitacaoLicitacao->setDado( 'exercicio'     , $_REQUEST['stExercicioLicitacao'] );
+        $obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $_REQUEST['inCodEntidade'] );
         $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $_REQUEST['inCodModalidade'] );
 
         if ( $request->get('inNumEdital')) {
             $obTLicitacaoLicitacao->setDado( 'num_edital', $_REQUEST['inNumEdital'] );
         }
-    $stFiltro = "";
+        
+        $stFiltro = "";
         // verifica licitações que ja tenham editais e estão anulados ou que apenas não tenham editais
         if ($_REQUEST['stFiltraLicitacao'] == true) {
             $stFiltro .= " AND ( EXISTS (
@@ -169,6 +172,7 @@ switch ($_REQUEST['stCtrl']) {
             }
             $stFiltro.="     )";
         }
+        
         if ($_REQUEST['stCtrl'] == 'carregaLicitacaoContrato') {
             $stFiltro.="
                   AND EXISTS (
@@ -195,28 +199,55 @@ switch ($_REQUEST['stCtrl']) {
         }
 
         if ($request->get('stFiltro') == 'adjudicacao' || $request->get('stFiltro') == 'julgamento') {
+            
             $stFiltro.= "
-         AND EXISTS (
-            SELECT 1
-              FROM licitacao.edital
-             WHERE edital.cod_licitacao = ll.cod_licitacao
-               AND edital.cod_modalidade = ll.cod_modalidade
-               AND edital.cod_entidade = ll.cod_entidade
-               AND edital.exercicio = ll.exercicio
-             )
-             AND EXISTS ( SELECT 1
-                            FROM compras.mapa_cotacao
-                      INNER JOIN compras.julgamento
-                              ON julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
-                             AND julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
-                           WHERE mapa_cotacao.cod_mapa       = ll.cod_mapa
-                             AND mapa_cotacao.exercicio_mapa = ll.exercicio_mapa
-                             AND NOT EXISTS ( SELECT 1
-                                                FROM compras.cotacao_anulada
-                                               WHERE cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
-                                                 AND cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
-                                            )
-                         )";
+                -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+                AND CASE WHEN ll.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                        
+                          EXISTS (
+				SELECT 1
+				  FROM licitacao.edital
+				 WHERE edital.cod_licitacao = ll.cod_licitacao
+				   AND edital.cod_modalidade = ll.cod_modalidade
+				   AND edital.cod_entidade = ll.cod_entidade
+				   AND edital.exercicio = ll.exercicio
+			)
+    
+                  -- Para as modalidades 8,9 é facultativo possuir um edital
+                  WHEN ll.cod_modalidade in (8,9) THEN
+                        
+                           EXISTS (
+				SELECT 1
+				  FROM licitacao.edital
+				 WHERE edital.cod_licitacao = ll.cod_licitacao
+				   AND edital.cod_modalidade = ll.cod_modalidade
+				   AND edital.cod_entidade = ll.cod_entidade
+				   AND edital.exercicio = ll.exercicio
+				 )
+    
+                    OR NOT EXISTS (
+                           SELECT 1
+                             FROM licitacao.edital
+                            WHERE edital.cod_licitacao = ll.cod_licitacao
+                              AND edital.cod_modalidade = ll.cod_modalidade
+                              AND edital.cod_entidade = ll.cod_entidade
+                              AND edital.exercicio = ll.exercicio
+                            )
+                 END
+                 
+                 AND EXISTS ( SELECT 1
+                                FROM compras.mapa_cotacao
+                          INNER JOIN compras.julgamento
+                                  ON julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
+                                 AND julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
+                               WHERE mapa_cotacao.cod_mapa       = ll.cod_mapa
+                                 AND mapa_cotacao.exercicio_mapa = ll.exercicio_mapa
+                                 AND NOT EXISTS ( SELECT 1
+                                                    FROM compras.cotacao_anulada
+                                                   WHERE cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
+                                                     AND cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
+                                                )
+                             )";
 
             if ($_REQUEST['stFiltro'] == 'adjudicacao') {
                 $stFiltro.= "
@@ -255,7 +286,7 @@ switch ($_REQUEST['stCtrl']) {
         }
 
         $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao, $stFiltro );
-        
+
         if ( $rsLicitacao->getNumLinhas() > 0 ) {
             $stJs.= preencheLicitacao( $rsLicitacao, 'inCodLicitacao' );
         } else {
@@ -263,12 +294,14 @@ switch ($_REQUEST['stCtrl']) {
             $stJs.= "limpaSelect(f.inCodLicitacao,1);\n";
             $stJs.= "d.getElementById('stProcesso').innerHTML = '&nbsp;';\n";
         }
+        
     } else {
             $stJs = "f.inCodLicitacao.value = '';\n";
             $stJs.= "limpaSelect(f.inCodLicitacao,1);\n";
             $stJs.= "d.getElementById('stProcesso').innerHTML = '&nbsp;';\n";
     }
     break;
+
 case 'carregaProcesso':
 
     if ($_REQUEST['boSetarValorLicitacao']) {

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterAdjudicacao.php 60882 2014-11-20 16:42:31Z evandro $
+    * $Id: OCManterAdjudicacao.php 62309 2015-04-20 19:43:33Z arthur $
 
     * Casos de uso: uc-03.05.20
 */
@@ -189,7 +189,7 @@ function montaSpnItens()
     $table->Head->addCabecalho( 'Valor Ref.'       , 10 );
     $table->Head->addCabecalho( 'Valor'            , 10 );
     $table->Head->addCabecalho( 'Status'           , 10 );
-    $table->Head->addCabecalho( 'Selecione'        ,  5 );
+    //$table->Head->addCabecalho( 'Selecione'        ,  5 );
 
     $table->Body->addCampo( '[codItem] - [descricaoItem]<br>[complemento]' );
     $table->Body->addCampo( 'lote'            , 'D'       );
@@ -203,15 +203,18 @@ function montaSpnItens()
         $table->setHeadFixed(true);
         $table->setBodyHeight(150);
     }
-
+    
+    /*
+    // Conforme solicitado pelo ticket #22715, até 2ª ordem nao permitir o usuário a selecionar parcialmente os itens.
     $obRdnAdjudicarItem = new Radio();
     $obRdnAdjudicarItem->setValue( "inId" );
     $obRdnAdjudicarItem->setName( "boAdjudicarItemInId" );
     $obRdnAdjudicarItem->setNull( false );
     $obRdnAdjudicarItem->obEvento->setOnClick("montaParametrosGET( 'carregaClassificacao', 'boAdjudicarItemInId' );");
-
+    
     $table->Body->addComponente( $obRdnAdjudicarItem, false );
-
+    */
+    
     $table->montaHTML(true);
     $stHtml = $table->getHTML();
 
@@ -231,7 +234,7 @@ function montaSpnItens()
 
         $obBtnAdjudicar = new Button;
         $obBtnAdjudicar->setName ( "btnAdjudicarTodos" );
-        $obBtnAdjudicar->setValue( "Adjudicar Todos" );
+        $obBtnAdjudicar->setValue( "Adjudicar" );
         $obBtnAdjudicar->setTipo ( "button" );
         $obBtnAdjudicar->obEvento->setOnClick ( "montaParametrosGET( 'adjudicarTodos', 'hdnCgmFornecedor, btnAdjudicarTodos' );" );
 

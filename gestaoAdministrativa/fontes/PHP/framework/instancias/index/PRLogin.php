@@ -58,7 +58,9 @@ try {
             if ( !$obErro->ocorreu() ) {
                 $current_url = str_replace('PRLogin.php','',$_SERVER['SCRIPT_NAME']);
                 $urbem_index = $current_url.'index2.php';
-
+                
+                //Sessao::configurarSessaoTimeOut();
+                
                 echo 'Login efetuado com sucesso <br />';
                 echo 'Abrindo Urbem...';
                 echo "<script type='text/javascript'>\n";

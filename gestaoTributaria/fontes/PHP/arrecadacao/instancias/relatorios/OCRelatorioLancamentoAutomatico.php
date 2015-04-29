@@ -28,7 +28,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: OCRelatorioLancamentoAutomatico.php 61508 2015-01-27 19:54:30Z carolina $
+    * $Id: OCRelatorioLancamentoAutomatico.php 62330 2015-04-24 14:32:29Z lisiane $
 
     * Casos de uso: 
 
@@ -38,8 +38,9 @@ include_once '../../../../../../config.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once CLA_MPDF;
+//include_once CLA_MPDF;
 include_once ( CAM_GT_ARR_MAPEAMENTO."TARRLancamento.class.php"            );
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "Licencas";
@@ -50,6 +51,13 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
+$preview = new PreviewBirt(5,25,7);
+$preview->setTitulo('Relatório de Lançamentos Automáticos');
+$preview->setVersaoBirt( '2.5.0' );
+$preview->setFormato('pdf');
+$stNomeArquivo = "RelatorioDeLancamentoAutomatico_";
+
+
 $boTransacao = new Transacao();
 list($inCodGrupoCreditoInicial, $stExercicioInicial) = explode('/', $request->get('inCodGrupoInicio'));
 list($inCodGrupoCreditoFinal, $stExercicioFinal) = explode('/', $request->get('inCodGrupoTermino'));
@@ -57,7 +65,7 @@ list($inCodGrupoCreditoFinal, $stExercicioFinal) = explode('/', $request->get('i
 $stFiltro = "";
 if ( $request->get('inCodGrupoInicio') != "" && $request->get('inCodGrupoTermino') == "" ) {
     $stFiltro .= " lancamento.cod_grupo = ".$inCodGrupoCreditoInicial." AND  lancamento.ano_exercicio= '".$stExercicioInicial."' AND ";
-} else if ( $request->get('inCodGrupoInicio') == "" && $request->get('inCodGrupoInicio') != "" ) {
+} else if ( $request->get('inCodGrupoInicio') == "" && $request->get('inCodGrupoTermino') != "" ) {
     $stFiltro .= " lancamento.cod_grupo = ".$inCodGrupoCreditoFinal."  AND  lancamento.ano_exercicio= '".$stExercicioFInal."' AND  ";
 } else if ( $request->get('inCodGrupoInicio') != "" && $request->get('inCodGrupoTermino') != "" ) {
     $stFiltro .= " lancamento.cod_grupo BETWEEN ".$inCodGrupoCreditoInicial." AND ".$inCodGrupoCreditoFinal." AND lancamento.ano_exercicio= '". $stExercicioInicial. "' AND " ;
@@ -80,27 +88,28 @@ if ( $request->get('inNumInscricaoEconomicaInicial') != "" && $request->get('inN
 }
    
 if ( $request->get('inCodContribuinteInicial') != "" && $request->get('inCodContribuinteFinal') == "" ) {
-    $stFiltro .= " lancamento.numcgm = ".$request->get('inCodContribuinteInicial')." AND ";
+    $stFiltro .= " lancamento.numcgm = '".$request->get('inCodContribuinteInicial')."' AND ";
 } else if ( $request->get('inCodContribuinteInicial') == "" && $request->get('inCodContribuinteFinal') != "" ) {
-    $stFiltro .= " lancamento.numcgm = ".$request->get('inCodContribuinteFinal')." AND ";
+    $stFiltro .= " lancamento.numcgm = '".$request->get('inCodContribuinteFinal')."' AND ";
 } else if ( $request->get('inCodContribuinteInicial') != "" && $request->get('inCodContribuinteFinal') != "" ) {
-    $stFiltro .= " lancamento.numcgm BETWEEN ".$request->get('inCodContribuinteInicial')." AND ".$request->get('inCodContribuinteFinal')." AND ";
+    $stFiltro .= " lancamento.numcgm BETWEEN '".$request->get('inCodContribuinteInicial')."' AND '".$request->get('inCodContribuinteFinal')."' AND ";
 }
    
 if ($stFiltro) {
     $stFiltro = " WHERE ". substr ( $stFiltro, 0, strlen ($stFiltro) - 4 ) ;
 }
+$stFiltro .=' ORDER BY cod_lancamento,  numeracao, ordenacao';
+$preview->addParametro( 'filtro', $stFiltro);
+$preview->addParametro( 'tipo_filtro', $tipo_filtro );
 
-$obTARRLancamento = new TARRLancamento;
-$obTARRLancamento->recuperaRelatorioLancamentoAutomatico( $rsRecordSet, $stFiltro, $boTransacao, 'ORDER BY cod_lancamento, ordenacao' );
+//adicionada data de emissão no rodapé do relatório
+$dtDataEmissao = date('d/m/Y');
+$dtHoraEmissao = date('H:i');
 
-$arLancamentosAutomaticos['arLancamentos']=$rsRecordSet->getElementos();
+//necessário codificar os caracteres especias em ascii para o birt interpretar corretamente
+$stDataEmissao = "Data da emissão ".$dtDataEmissao." e hora da emissão ".$dtHoraEmissao;
+$preview->addParametro( 'data_emissao', $stDataEmissao );
 
-Sessao::write('arLancamentoAutomatico', $arLancamentosAutomaticos['arLancamentos']);
-
-SistemaLegado::LiberaFrames(true,true);
-$stCaminho = CAM_GT_ARR_INSTANCIAS."relatorios/OCGeraRelatorioLancamentoAutomatico.php";
-
-SistemaLegado::mudaFramePrincipal($stCaminho);
+$preview->preview();
 
 ?>

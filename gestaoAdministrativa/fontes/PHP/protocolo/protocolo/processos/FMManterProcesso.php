@@ -33,17 +33,21 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: FMManterProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
+    $Id: FMManterProcesso.php 61966 2015-03-18 21:54:54Z jean $
 
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+//include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/URBEM/ajax.php';
+
 include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloProcesso.class.php";
 include_once CAM_GA_PROT_COMPONENTES."ISelectClassificacaoAssunto.class.php";
 include_once CAM_GA_PROT_COMPONENTES."IChkDocumentoProcesso.class.php";
-include_once CAM_FRAMEWORK."legado/funcoesLegado.lib.php";
+//include_once CAM_FRAMEWORK."legado/funcoesLegado.lib.php";
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
+include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloAndamento.class.php";
+include_once CAM_GA_PROT_MAPEAMENTO."TPROAtributoProtocolo.class.php";
 
 Sessao::write('codigo_processo',$_REQUEST['inCodigoProcesso']);
 
@@ -54,43 +58,28 @@ $pgList = "LS".$stPrograma.".php?".Sessao::getId()."&pg=".Sessao::read('link_pg'
 $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php?".Sessao::getId();
+$pgJS   = "JS".$stPrograma.".js";
 
 $stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : 'alterar';
 
-$stSQL = "
-    SELECT  *
-      FROM  SW_ANDAMENTO
-     WHERE  (COD_ANDAMENTO = 1 OR COD_ANDAMENTO = 0)
-       AND  COD_PROCESSO=".$_REQUEST['inCodigoProcesso']."
-       AND  ANO_EXERCICIO = '".$_REQUEST['inAnoExercicio']."'
-  ORDER BY  COD_ANDAMENTO DESC
-     LIMIT  1";
+$obTProtocoloAndamento = new TProtocoloAndamento;
+$obTProtocoloAndamento->recuperaTodos($rsRecordAndamento, " WHERE cod_processo = ".$_REQUEST['inCodigoProcesso']."
+                                                              AND ano_exercicio = '".$_REQUEST['inAnoExercicio']."'",
+                                                          " ORDER BY cod_andamento DESC LIMIT 1");
 
-$dbSQLSetor = new databaseLegado;
-$dbSQLSetor->abreBd();
-$dbSQLSetor->abreSelecao($stSQL);
-
-if (!$dbSQLSetor->eof()) {
-    $codOrgao          = $dbSQLSetor->pegaCampo("cod_orgao");
-    $codAndamento      = $dbSQLSetor->pegaCampo("cod_andamento");
-}
+$codOrgao = $rsRecordAndamento->getCampo('cod_orgao');
+$codAndamento = $rsRecordAndamento->getCampo('cod_andamento');
 
 $obIMontaOrganograma = new IMontaOrganograma;
 $obIMontaOrganograma->setNivelObrigatorio(1);
 $obIMontaOrganograma->setCodOrgao($codOrgao);
 
-$dbSQLSetor->limpaSelecao();
-$dbSQLSetor->fechaBd();
+$obTProcesso = new TProcesso;
+$obTProcesso->setDado('cod_processo',$_REQUEST['inCodigoProcesso']);
+$obTProcesso->setDado('ano_exercicio',$_REQUEST['inAnoExercicio']);
+$obTProcesso->recuperaPorChave($rsRecordProcesso);
 
-$stSql = "SELECT cod_situacao FROM SW_PROCESSO WHERE COD_PROCESSO = ".$_GET['inCodigoProcesso']." AND ANO_EXERCICIO = '".$_GET['inAnoExercicio']."' ";
-$stSQLSituacao = new databaseLegado;
-$stSQLSituacao->abreBd();
-$stSQLSituacao->abreSelecao($stSql);
-if (!$stSQLSituacao->eof()) {
-    $codSituacao       = $stSQLSituacao->pegaCampo("cod_situacao");
-}
-$stSQLSituacao->limpaSelecao();
-$stSQLSituacao->fechaBd();
+$codSituacao = $rsRecordProcesso->getCampo('cod_situacao');
 
 $obHdnCtrl = new hidden;
 $obHdnCtrl->setName( 'stCtrl' );
@@ -100,88 +89,65 @@ $obHdnAcao->setName( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
 
 $obTProtocoloProcesso = new TProtocoloProcesso();
-$stProcesso = $obTProtocoloProcesso->mascararProcesso($_GET['inCodigoProcesso'], $_GET['inAnoExercicio']);
+$stProcesso = $obTProtocoloProcesso->mascararProcesso($_REQUEST['inCodigoProcesso'], $_REQUEST['inAnoExercicio']);
 
-Sessao::write('filtro',array('inCodigoProcesso' => $_GET['inCodigoProcesso'], 'inAnoExercicio' => $_GET['inAnoExercicio']));
+Sessao::write('filtro',array('inCodigoProcesso' => $_REQUEST['inCodigoProcesso'], 'inAnoExercicio' => $_REQUEST['inAnoExercicio']));
 
-$obTProtocoloProcesso->setDado('cod_processo', $_GET['inCodigoProcesso']);
-$obTProtocoloProcesso->setDado('ano_exercicio',$_GET['inAnoExercicio']);
+$obTProtocoloProcesso->setDado('cod_processo', $_REQUEST['inCodigoProcesso']);
+$obTProtocoloProcesso->setDado('ano_exercicio',$_REQUEST['inAnoExercicio']);
 $obTProtocoloProcesso->recuperaPorChave($rsProcesso);
 
-$select = "SELECT
-                AP.cod_atributo,
-                AP.nom_atributo,
-                AP.tipo,
-                AP.valor_padrao
-            FROM
-                sw_atributo_protocolo AS AP,
-                sw_assunto_atributo   AS AT
-            WHERE
-                AP.cod_atributo      = AT.cod_atributo AND
-                AT.cod_classificacao = ".$_REQUEST['inCodigoClassificacao']." AND
-                AT.cod_assunto       = ".$_REQUEST['inCodigoAssunto']."
-            ORDER BY
-                AP.nom_atributo";
+$obTPROAtributoProtocolo = new TPROAtributoProtocolo;
+$obTPROAtributoProtocolo->setDado('cod_classificacao',$_REQUEST['inCodigoClassificacao']);
+$obTPROAtributoProtocolo->setDado('cod_assunto',$_REQUEST['inCodigoAssunto']);
+$obTPROAtributoProtocolo->recuperaAtributoAssunto($rsRecordProtocolo);
 
-$dbConfig = new dataBaseLegado;
-$dbConfig->abreBd();
-$dbConfig->abreSelecao($select);
-
-while (!($dbConfig->eof())) {
-    $codAtributo = $dbConfig->pegaCampo("cod_atributo");
-    $tipo        = $dbConfig->pegaCampo("tipo");
-    $valorLista  = $dbConfig->pegaCampo("valor_padrao");
+while (!$rsRecordProtocolo->eof()) {
+    $codAtributo = $rsRecordProtocolo->getCampo("cod_atributo");
+    $tipo        = $rsRecordProtocolo->getCampo("tipo");
+    $valorLista  = $rsRecordProtocolo->getCampo("valor_padrao");
 
     if ($tipo == "l") {
         $lista = explode("\n", $valorLista);
     }
-    $dbConfig->vaiProximo();
+
+    $rsRecordProtocolo->proximo();
 }
 
-$stSQL = "  SELECT  AP.nom_atributo,
-                    AP.cod_atributo,
-                    AP.tipo,
-                    AAV.valor
-              FROM  sw_assunto_atributo_valor AS AAV,
-                    sw_atributo_protocolo AS AP
-             WHERE  AAV.cod_processo      = ".$_REQUEST['inCodigoProcesso']."      AND
-                    AAV.exercicio         = '".$_REQUEST['inAnoExercicio']."'      AND
-                    AAV.cod_assunto       = ".$_REQUEST['inCodigoAssunto']."       AND
-                    AAV.cod_classificacao = ".$_REQUEST['inCodigoClassificacao']." AND
-                    AAV.cod_atributo      = AP.cod_atributo
-          ORDER BY  AP.nom_atributo";
+$obTPROAtributoProtocolo->setDado('cod_classificacao',$_REQUEST['inCodigoClassificacao']);
+$obTPROAtributoProtocolo->setDado('cod_assunto',$_REQUEST['inCodigoAssunto']);
+$obTPROAtributoProtocolo->setDado('cod_processo',$_REQUEST['inCodigoProcesso']);
+$obTPROAtributoProtocolo->setDado('ano_exercicio',$_REQUEST['inAnoExercicio']);
+$obTPROAtributoProtocolo->recuperaAtributoValor($rsRecordProtocolo);
 
-$dbConfig = new dataBaseLegado;
-$dbConfig->abreBd();
-$dbConfig->abreSelecao($stSQL);
-
-if ($dbConfig->numeroDeLinhas > 0) {
-    while (!($dbConfig->eof())) {
-        $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
-        $tipo        = $dbConfig->pegaCampo("tipo");
+if ($rsRecordProtocolo->getNumLinhas() > 0) {
+    while (!$rsRecordProtocolo->eof()) {
+        $nomAtributo = $rsRecordProtocolo->getCampo("nom_atributo");
+        $tipo        = $rsRecordProtocolo->getCampo("tipo");
 
         if ($tipo == "l") {
-            $numValor = $dbConfig->pegaCampo("valor");
+            $numValor = $rsRecordProtocolo->getCampo("valor");
             $listaTipoCmb = explode("\n", $tipo);
         }
 
         if ($tipo == "t") {
-            $stTexto = $dbConfig->pegaCampo("valor");
+            $stTexto = $rsRecordProtocolo->getCampo("valor");
             $listaTipoTxt = explode("\n", $tipo);
         }
 
         if ($tipo == "n") {
-            $numNumero = $dbConfig->pegaCampo("valor");
+            $numNumero = $rsRecordProtocolo->getCampo("valor");
             $listaTipoNum = explode("\n", $tipo);
         }
 
-        $dbConfig->vaiProximo();
+        $rsRecordProtocolo->proximo();
     }
 }
 
 if ($lista == "") {
     $lista = array();
 }
+
 $rsLista = new RecordSet();
 $rsLista->preenche($lista);
 
@@ -207,6 +173,7 @@ $obTxtResumo->setRotulo('Assunto Resumido');
 $obTxtResumo->setSize(80);
 $obTxtResumo->setMaxLength(80);
 $obTxtResumo->setValue( $rsProcesso->getCampo('resumo_assunto') );
+$obTxtResumo->obEvento->setOnBlur ("montaParametrosGET('aaaa');"); 
 
 $obISelectClassificacaoAssunto = new ISelectClassificacaoAssunto;
 $obISelectClassificacaoAssunto->setNull                     ( false               );
@@ -236,6 +203,15 @@ $obSpnDocumentos->setId('obCmpDocumento');
 $obSpnDocumentos->setValue( $obFormulario->getHTML() );
 unset( $obFormulario );
 
+include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
+$obMontaAssinaturas = new IMontaAssinaturas;
+$obMontaAssinaturas->setOpcaoAssinaturas( false );
+$obMontaAssinaturas->obRadioAssinaturasSim->obEvento->setOnClick("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stIncluirAssinaturas='+this.value, 'montaEntidade');");
+$obMontaAssinaturas->obRadioAssinaturasNao->obEvento->setOnClick("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stIncluirAssinaturas='+this.value, 'montaEntidade');");
+
+$obSpnEntidade = new Span();
+$obSpnEntidade->setId('spnEntidade');
+
 $obForm = new Form();
 $obForm->setAction($pgProc);
 $obForm->setTarget('oculto');
@@ -253,97 +229,88 @@ $obISelectClassificacaoAssunto->geraFormulario($obFormulario);
 
 if ($codSituacao == '2' || ($codSituacao == '3' && $codAndamento == 0)) {
     $obIMontaOrganograma->geraFormulario($obFormulario);
-    #$obMontaOrgUniDepSet->montaFormulario( $obFormulario );
 }
 
 $obFormulario->addSpan($obSpnDocumentos);
 
-if ($dbConfig->numeroDeLinhas > 0) {
+if ($rsRecordProtocolo->getNumLinhas() > 0) {
     $obFormulario->addTitulo('Atributos de Assunto de Processo');
 
     if ($listaTipoTxt[0] == "t") {
-        $dbConfig = new dataBaseLegado;
-        $dbConfig->abreBd();
-        $dbConfig->abreSelecao($stSQL);
-        if ($dbConfig->numeroDeLinhas > 0) {
-            while (!($dbConfig->eof())) {
-                $codAtributo = $dbConfig->pegaCampo("cod_atributo");
-                $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
-                $tipo        = $dbConfig->pegaCampo("tipo");
+        while (!$rsRecordProtocolo->eof()){
+            $codAtributo = $rsRecordProtocolo->getCampo("cod_atributo");
+            $nomAtributo = $rsRecordProtocolo->getCampo("nom_atributo");
+            $tipo        = $rsRecordProtocolo->getCampo("tipo");
 
-                if ($tipo == "t") {
-                    $stTexto = $dbConfig->pegaCampo("valor");
+            if ($tipo == "t") {
+                $stTexto = $rsRecordProtocolo->getCampo("valor");
 
-                    $obTxtAtributosProcessos = new TextBox();
-                    $obTxtAtributosProcessos->setName("valorAtributo[".$codAtributo."]");
-                    $obTxtAtributosProcessos->setSize('60');
-                    $obTxtAtributosProcessos->setMaxLength('50');
-                    $obTxtAtributosProcessos->setRotulo($nomAtributo);
-                    $obTxtAtributosProcessos->setValue($stTexto);
+                $obTxtAtributosProcessos = new TextBox();
+                $obTxtAtributosProcessos->setName("valorAtributo[".$codAtributo."]");
+                $obTxtAtributosProcessos->setSize('60');
+                $obTxtAtributosProcessos->setMaxLength('50');
+                $obTxtAtributosProcessos->setRotulo($nomAtributo);
+                $obTxtAtributosProcessos->setValue($stTexto);
 
-                    $obFormulario->addComponente($obTxtAtributosProcessos);
-                }
-                $dbConfig->vaiProximo();
+                $obFormulario->addComponente($obTxtAtributosProcessos);
             }
+            $rsRecordProtocolo->proximo();
         }
     }
-    if ($listaTipoNum[0] == "n") {
-        $dbConfig = new dataBaseLegado;
-        $dbConfig->abreBd();
-        $dbConfig->abreSelecao($stSQL);
-        if ($dbConfig->numeroDeLinhas > 0) {
-            while (!($dbConfig->eof())) {
-                $codAtributo = $dbConfig->pegaCampo("cod_atributo");
-                $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
-                $tipo        = $dbConfig->pegaCampo("tipo");
 
-                if ($tipo == "n") {
-                    $numNumero = $dbConfig->pegaCampo("valor");
+    if ($listaTipoNum[0] == "n"){
+        while (!$rsRecordProtocolo->eof()){
+            $codAtributo = $rsRecordProtocolo->getCampo("cod_atributo");
+            $nomAtributo = $rsRecordProtocolo->getCampo("nom_atributo");
+            $tipo        = $rsRecordProtocolo->getCampo("tipo");
 
-                    $obTxtAtributosProcessosNum = new TextBox();
-                    $obTxtAtributosProcessosNum->setName("valorAtributo[".$codAtributo."]");
-                    $obTxtAtributosProcessosNum->setSize('60');
-                    $obTxtAtributosProcessosNum->setMaxLength('50');
-                    $obTxtAtributosProcessosNum->setRotulo($nomAtributo);
-                    $obTxtAtributosProcessosNum->setValue($numNumero);
+            if ($tipo == "t") {
+                $stTexto = $rsRecordProtocolo->getCampo("valor");
 
-                    $obFormulario->addComponente($obTxtAtributosProcessosNum);
-                }
-                $dbConfig->vaiProximo();
+                $obTxtAtributosProcessos = new TextBox();
+                $obTxtAtributosProcessos->setName("valorAtributo[".$codAtributo."]");
+                $obTxtAtributosProcessos->setSize('60');
+                $obTxtAtributosProcessos->setMaxLength('50');
+                $obTxtAtributosProcessos->setRotulo($nomAtributo);
+                $obTxtAtributosProcessos->setValue($stTexto);
+
+                $obFormulario->addComponente($obTxtAtributosProcessos);
             }
+            $rsRecordProtocolo->proximo();
         }
     }
+
     if ($listaTipoCmb[0] == "l") {
-        $dbConfig = new dataBaseLegado;
-        $dbConfig->abreBd();
-        $dbConfig->abreSelecao($stSQL);
-        if ($dbConfig->numeroDeLinhas > 0) {
-            while (!($dbConfig->eof())) {
-                $codAtributo = $dbConfig->pegaCampo("cod_atributo");
-                $nomAtributo = $dbConfig->pegaCampo("nom_atributo");
-                $tipo        = $dbConfig->pegaCampo("tipo");
+        while (!$rsRecordProtocolo->eof()){
+            $codAtributo = $rsRecordProtocolo->getCampo("cod_atributo");
+            $nomAtributo = $rsRecordProtocolo->getCampo("nom_atributo");
+            $tipo        = $rsRecordProtocolo->getCampo("tipo");
 
-                if ($tipo == "l") {
-                    $numValor = $dbConfig->pegaCampo("valor");
+            if ($tipo == "l") {
+                $numValor = $rsRecordProtocolo->getCampo("valor");
 
-                    $obCmbAtributosProcesso = new Select();
-                    $obCmbAtributosProcesso->setName("valorAtributo[".$codAtributo."]");
-                    $obCmbAtributosProcesso->setRotulo($nomAtributo);
-                    $obCmbAtributosProcesso->setValue($numValor);
-                    $obCmbAtributosProcesso->setStyle ( "width: 200px" );
-                    $obCmbAtributosProcesso->addOption ( '', 'Selecione' );
-                    while (list($key, $val) = each($lista)) {
-                        $val = trim($val);
-                        $obCmbAtributosProcesso->addOption($val, $val);
-                    }
+                $obCmbAtributosProcesso = new Select();
+                $obCmbAtributosProcesso->setName("valorAtributo[".$codAtributo."]");
+                $obCmbAtributosProcesso->setRotulo($nomAtributo);
+                $obCmbAtributosProcesso->setValue($numValor);
+                $obCmbAtributosProcesso->setStyle ( "width: 200px" );
+                $obCmbAtributosProcesso->addOption ( '', 'Selecione' );
 
-                    $obFormulario->addComponente($obCmbAtributosProcesso);
+                while (list($key, $val) = each($lista)) {
+                    $val = trim($val);
+                    $obCmbAtributosProcesso->addOption($val, $val);
                 }
-                $dbConfig->vaiProximo();
+
+                $obFormulario->addComponente($obCmbAtributosProcesso);
             }
+            
+            $rsRecordProtocolo->proximo();
         }
     }
 }
+
+$obFormulario->addSpan($obSpnEntidade);
+$obMontaAssinaturas->geraFormulario($obFormulario);
 
 $obFormulario->Cancelar($pgList);
 $obFormulario->show();

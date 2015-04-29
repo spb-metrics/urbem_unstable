@@ -60,7 +60,10 @@ require_once CAM_GF_PPA_NEGOCIO    . 'RPPAManterPrograma.class.php';
 require_once CAM_GF_PPA_NEGOCIO    . 'RPPAManterReceita.class.php';
 require_once CAM_GF_PPA_NEGOCIO    . 'RPPAManterAcao.class.php';
 require_once CAM_GF_PPA_NEGOCIO    . 'RPPAGerarDadosPPA.class.php';
+include_once CAM_GF_PPA_MAPEAMENTO . 'TTCETOAcaoIdentificadorAcao.class.php';
+include_once CAM_GF_PPA_MAPEAMENTO . 'TTCEALAcaoIdentificadorAcao.class.php';
 
+            
 class RPPAManterPPA
 {
     public $inCodPPA,
@@ -144,7 +147,24 @@ class RPPAManterPPA
         # Recupera norma da ação.
         $rsAcaoNorma = $obRPPAManterAcao->recuperaNorma($inCodAcao, $tsImportacao, $boTransacao);
         $inCodNorma = $rsAcaoNorma->getCampo('cod_norma');
-
+        
+        //Estado de AL = 2
+        //Estado de TO = 27
+        $inCodUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(),$boTransacao);
+        if ($inCodUf == 2) {
+            # Encontra o codigo de identificacao da acao.
+            $stFiltro = 'cod_acao = ' . $inCodAcao ;
+            $rsAcaoIdentificador = $this->pesquisa('TTCEALAcaoIdentificadorAcao', 'recuperaTodos', $stFiltro, '', $boTransacao);
+            $arParametros['inCodIdentificadorAcao'] = $rsAcaoIdentificador->getCampo('cod_identificador');
+        }
+        
+        if ($inCodUf == 27) {
+            # Encontra o codigo de identificacao da acao.
+            $stFiltro = 'cod_acao = ' . $inCodAcao ;
+            $rsAcaoIdentificador = $this->pesquisa('TTCETOAcaoIdentificadorAcao', 'recuperaTodos', $stFiltro, '', $boTransacao);
+            $arParametros['inCodIdentificadorAcao'] = $rsAcaoIdentificador->getCampo('cod_identificador');
+        }
+        
         $arRecursos    = array();
         $arExeRecurso  = array();
         $arCodRecurso  = array();
@@ -658,7 +678,7 @@ class RPPAManterPPA
     }
 
     public function incluir($arParametros)
-    {
+    {  
         # Testa se o ano é válido.
         if ($arParametros['stAnoInicio'] % 4 != 2) {
             return SistemaLegado::exibeAviso('Ano inicial inválido!', 'form', 'aviso');

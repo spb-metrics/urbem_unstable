@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: ROrcamentoEntidade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: ROrcamentoEntidade.class.php 61852 2015-03-10 16:39:19Z michel $
 
     $Revision: 30824 $
     $Name$
@@ -752,11 +752,11 @@ function listarUsuariosEntidade(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
         $stFiltro .= " AND E.exercicio = '".$this->stExercicio."' ";
     }
     if ($this->getVerificaConfiguracao()) {
-        $stFiltro .= " AND NOT EXISTS ( SELECT 1                                    \n";
-        $stFiltro .= "                    FROM administracao.configuracao ac        \n";
-        $stFiltro .= "                   WHERE ac.valor     = E.cod_entidade        \n";
-        $stFiltro .= "                     AND ac.exercicio = E.exercicio           \n";
-        $stFiltro .= "                     AND ac.parametro = 'cod_entidade_camara') \n";
+        $stFiltro .= " AND NOT EXISTS ( SELECT 1                                            \n";
+        $stFiltro .= "                    FROM administracao.configuracao ac                \n";
+        $stFiltro .= "                   WHERE ac.valor::integer = E.cod_entidade           \n";
+        $stFiltro .= "                     AND ac.exercicio      = E.exercicio              \n";
+        $stFiltro .= "                     AND ac.parametro      = 'cod_entidade_camara')   \n";
     }
     $obErro = $obTEntidade->recuperaUsuariosEntidade( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
 

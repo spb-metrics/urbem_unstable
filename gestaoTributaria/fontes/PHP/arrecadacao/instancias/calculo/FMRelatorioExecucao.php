@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: FMRelatorioExecucao.php 61457 2015-01-19 13:55:53Z carolina $
+    * $Id: FMRelatorioExecucao.php 62144 2015-03-31 17:39:32Z jean $
 
     Caso de uso: uc-05.03.05
 **/
@@ -125,20 +125,25 @@ if ($stTipoCalculo == 'Geral') {
     }
 } else {
     $nome_arquivo_calculo = Sessao::read('arquivo_calculos');
-    if ( !$arquivo = fopen ( $nome_arquivo_calculo, 'r') ) {
+    if (empty($nome_arquivo_calculo)) {
         $stErro = "Não foi possível abrir o arquivo de cálculos.";
     } else {
-        $tamanho_arquivo = filesize($nome_arquivo_calculo);
-        if ($tamanho_arquivo > 0) {
-            $stCalculos = fread ( $arquivo, filesize($nome_arquivo_calculo) );
-            $stCalculos = substr( $stCalculos, 0, strlen ( $stCalculos) -1 );
+        if ( !$arquivo = fopen ( $nome_arquivo_calculo, 'r') ) {
+            $stErro = "Não foi possível abrir o arquivo de cálculos.";
         } else {
-            $stErro = "Arquivo de cálculos com erro";
+            $tamanho_arquivo = filesize($nome_arquivo_calculo);
+            if ($tamanho_arquivo > 0) {
+                $stCalculos = fread ( $arquivo, filesize($nome_arquivo_calculo) );
+                $stCalculos = substr( $stCalculos, 0, strlen ( $stCalculos) -1 );
+            } else {
+                $stErro = "Arquivo de cálculos com erro";
+            }
         }
     }
 }
 
 if (!$stErro) {
+    SistemaLegado::mostravar('1');
     /*
         deve-se dividir a string de STCalculos em arrays de 1000 calculos,
         executar o lançamento de 1000 em 1000 e ir concatenando as
@@ -171,6 +176,8 @@ if (!$stErro) {
 
         $cont++;
     }
+} else {
+    SistemaLegado::exibeAviso( urlencode($stErro ), "n_erro", "erro", Sessao::getId(), "../" );
 }
 
 // OBJETOS HIDDEN

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: FTCEMGDespesaTotalPessoalPE.class.php 61837 2015-03-09 16:48:00Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -60,47 +60,53 @@ function montaRecuperaTodos()
 {
  $stSql  = "
         SELECT mes
-             , vencVantagens
-             , inativos
-             , pensionistas
-             , salarioFamilia
-             , subsPrefeito
-             , subsVice
-             , subsSecret
-             , obrigPatronais
-             , repassePatronal
-             , sentJudPessoal
-             , indenDemissao
-             , incDemVolunt
-             , sentJudAnt
-             , inatPensFontCustProp
-             , outrasDespesasPessoal
-             , nadaDeclararPessoal
-             , despAnteriores
-             , exclusaoDespAnteriores
+             , REPLACE(vencVantagens            ::TEXT, '.', '') AS vencVantagens
+             , REPLACE(inativos                 ::TEXT, '.', '') AS inativos
+             , REPLACE(pensionistas             ::TEXT, '.', '') AS pensionistas
+             , REPLACE(salarioFamilia           ::TEXT, '.', '') AS salarioFamilia
+             , REPLACE(subsPrefeito             ::TEXT, '.', '') AS subsPrefeito
+             , REPLACE(subsVice                 ::TEXT, '.', '') AS subsVice
+             , REPLACE(subsSecret               ::TEXT, '.', '') AS subsSecret
+             , REPLACE(obrigPatronais           ::TEXT, '.', '') AS obrigPatronais
+             , REPLACE(repassePatronal          ::TEXT, '.', '') AS repassePatronal
+             , REPLACE(sentJudPessoal           ::TEXT, '.', '') AS sentJudPessoal
+             , REPLACE(indenDemissao            ::TEXT, '.', '') AS indenDemissao
+             , REPLACE(incDemVolunt             ::TEXT, '.', '') AS incDemVolunt
+             , REPLACE(sentJudAnt               ::TEXT, '.', '') AS sentJudAnt
+             , REPLACE(inatPensFontCustProp     ::TEXT, '.', '') AS inatPensFontCustProp
+             , REPLACE(outrasDespesasPessoal    ::TEXT, '.', '') AS outrasDespesasPessoal
+             , REPLACE(nadaDeclararPessoal      ::TEXT, '.', '') AS nadaDeclararPessoal
+             , REPLACE(despExercAnt             ::TEXT, '.', '') AS despExercAnt
+             , REPLACE(exclusaoDespAnteriores   ::TEXT, '.', '') AS exclusaoDespAnteriores
+             , REPLACE(corrPerApurac            ::TEXT, '.', '') AS corrPerApurac
+             , REPLACE(despCorres               ::TEXT, '.', '') AS despCorres
+             , REPLACE(despAnteriores           ::TEXT, '.', '') AS despAnteriores
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
                                      , ".$this->getDado("mes")."
                                      ) AS retorno(
                                                   mes              INTEGER,
-                                                  vencVantagens    NUMERIC(14,2),
-                                                  inativos         NUMERIC(14,2),
-                                                  pensionistas     NUMERIC(14,2),
-                                                  salarioFamilia   NUMERIC(14,2),
-                                                  subsPrefeito     NUMERIC(14,2),
-                                                  subsVice         NUMERIC(14,2),
-                                                  subsSecret       NUMERIC(14,2),
-                                                  obrigPatronais   NUMERIC(14,2),
-                                                  repassePatronal  NUMERIC(14,2),
-                                                  sentJudPessoal   NUMERIC(14,2),
-                                                  indenDemissao    NUMERIC(14,2),
-                                                  incDemVolunt     NUMERIC(14,2),
-                                                  sentJudAnt       NUMERIC(14,2),
-                                                  inatPensFontCustProp   NUMERIC(14,2),
-                                                  outrasDespesasPessoal  NUMERIC(14,2),
-                                                  despAnteriores         NUMERIC(14,2),
-                                                  exclusaoDespAnteriores NUMERIC(14,2),
-                                                  nadaDeclararPessoal    VARCHAR(1)
+                                                  vencVantagens    NUMERIC,
+                                                  inativos         NUMERIC,
+                                                  pensionistas     NUMERIC,
+                                                  salarioFamilia   NUMERIC,
+                                                  subsPrefeito     NUMERIC,
+                                                  subsVice         NUMERIC,
+                                                  subsSecret       NUMERIC,
+                                                  obrigPatronais   NUMERIC,
+                                                  repassePatronal  NUMERIC,
+                                                  sentJudPessoal   NUMERIC,
+                                                  indenDemissao    NUMERIC,
+                                                  incDemVolunt     NUMERIC,
+                                                  sentJudAnt       NUMERIC,
+                                                  inatPensFontCustProp   NUMERIC,
+                                                  outrasDespesasPessoal  NUMERIC,
+                                                  despExercAnt           NUMERIC,
+                                                  exclusaoDespAnteriores NUMERIC,
+                                                  corrPerApurac          NUMERIC,
+                                                  despCorres             NUMERIC,
+                                                  despAnteriores         NUMERIC,
+                                                  nadaDeclararPessoal    VARCHAR
                                                  )";
 
     return $stSql;

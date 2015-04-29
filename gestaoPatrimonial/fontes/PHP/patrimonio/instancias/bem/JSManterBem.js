@@ -79,6 +79,15 @@ inclusão dos arquivos
 		document.getElementById('spnListaAtributos').innerHTML = '';
 	}
 	
+	function validarArquivo()
+	{
+		var fileArquivoNF = document.getElementById("fileArquivoNF");
+		if ( fileArquivoNF.files[0].size > 10485760) {
+			alertaAviso('Arquivo excede tamanho máximo de 10MB!','form','erro','<?=Sessao::getId()?>');
+			fileArquivoNF.value = '';
+		}
+	}
+	
 	jQuery(document).ready(function(){
 		
 		jQuery("input#id_stNomBem").autocomplete(jQuery("input#id_stJson").val(), jQuery.extend({}, {

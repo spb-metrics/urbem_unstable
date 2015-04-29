@@ -31,7 +31,7 @@
     * @author Desenvolvedor: Leandro André Zis
     * @ignore
 
-    * $Id: PRManterManutencaoParticipante.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterManutencaoParticipante.php 62309 2015-04-20 19:43:33Z arthur $
 
     * Casos de uso: uc-03.04.07
 
@@ -60,7 +60,7 @@ Sessao::getTransacao()->setMapeamento( $obTLicitacaoParticipante );
 
 switch ($stAcao) {
 
-    case "manter":
+    case "alterar":
         $stMensagem = '';
         $arPart = Sessao::read('part');
             if ( count($arPart) <= 0) {
@@ -89,10 +89,10 @@ switch ($stAcao) {
             $obTLicitacaoParticipante->setDado("exercicio",$stExercicio);
 
             $obTLicitacaoParticipante->recuperaParticipanteLicitacao( $rsParticipanteLicitacao );
-
+            
             //CRIANDO ARRAY PARA MONTAR CHAVE DOS REGISTROS QUE JÁ ESTÃO CADASTRADOS DO BANCO
             $arChaveBd = array();
-
+                        
             while ( !$rsParticipanteLicitacao->eof() ) {
                 $stChaveBanco = $rsParticipanteLicitacao->getCampo('cod_licitacao') .'-'.
                                 $rsParticipanteLicitacao->getCampo('cod_modalidade').'-'.
@@ -102,17 +102,17 @@ switch ($stAcao) {
                 $arChaveBd[$stChaveBanco] = true;
                 $rsParticipanteLicitacao->proximo();
             }
-
+            
             //agora inclui os participantes
             foreach ($arPart as $partAux) {
 
                 $stChaveNew = $codLicitacao.'-'.$codModalidade.'-'.$codEntidade.'-'.$stExercicio.'-'.$partAux['cgmParticipante'];
-
+                
                 $obTLicitacaoParticipante->setDado('cgm_fornecedor', $partAux['cgmParticipante']);
                 $obTLicitacaoParticipante->setDado('numcgm_representante', $partAux['cgmRepLegal']);
                 $obTLicitacaoParticipante->setDado('dt_inclusao',addSlashes($partAux['dataInclusao']));
                 $obTLicitacaoParticipante->setDado('exercicio',$stExercicio);
-
+                                
                 if ( !isset($arChaveBd[$stChaveNew]) ) {
                     $obTLicitacaoParticipante->inclusao();
                     $boConsorcio = true;
@@ -286,7 +286,7 @@ switch ($stAcao) {
         }
 
         if (!$stMensagem) {
-          SistemaLegado::alertaAviso($pgForm."?".Sessao::getId(),"Participantes da licitação gravados com sucesso!","aviso","aviso", Sessao::getId(), "../");
+          SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=alterar","Participantes da licitação gravados com sucesso!","aviso","aviso", Sessao::getId(), "../");
         } else {
           SistemaLegado::exibeAviso(urlencode($stMensagem),"n_incluir","erro");
         }

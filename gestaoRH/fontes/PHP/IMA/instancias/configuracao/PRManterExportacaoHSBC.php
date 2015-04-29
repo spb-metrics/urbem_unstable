@@ -78,7 +78,7 @@ switch ($stAcao) {
 
         $arContasConvenio = Sessao::read("arContasConvenio");
 
-        if (is_array($arContasConvenio) && count($arContasConvenio) == 0) {
+        if (empty($arContasConvenio)) {
             Sessao::getExcecao()->setDescricao("Deve ser informado no mínimo uma Contas do Convênio.");
         }
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-     $Id: PRManterHabilitacaoParticipante.php 59612 2014-09-02 12:00:51Z gelson $
+     $Id: PRManterHabilitacaoParticipante.php 61943 2015-03-17 16:32:31Z arthur $
 
     * Casos de uso: uc-03.05.19
 */
@@ -58,7 +58,7 @@ Sessao::getTransacao()->setMapeamento( $obTLicitacaoParticipanteDocumentos );
 $stAcao = $request->get('stAcao');
 
 switch ($_REQUEST['stAcao']) {
-    case 'manter':
+    case 'alterar':
 
         $obTLicitacaoParticipante = new TLicitacaoParticipante();
         $obTLicitacaoParticipante->setDado('cod_licitacao'	,$_REQUEST['cod_licitacao'	]);
@@ -134,7 +134,7 @@ switch ($_REQUEST['stAcao']) {
             $stAlerta = ' (Existem participantes com documento(s) em branco) ';
         }
 
-        SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=manter","Habilitação de participante gravado com sucesso!".$stAlerta.$stMensagemErro,"manter","aviso", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=alterar","Habilitação de participante gravado com sucesso!".$stAlerta.$stMensagemErro,"alterar","aviso", Sessao::getId(), "../");
 
     break;
 }//fim do switch

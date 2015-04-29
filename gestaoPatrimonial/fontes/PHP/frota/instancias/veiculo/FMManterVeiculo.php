@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterVeiculo.php 61654 2015-02-20 20:34:48Z jean $
+    $Id: FMManterVeiculo.php 61881 2015-03-12 12:51:02Z carlos.silva $
 
     * Casos de uso: uc-03.02.06
 */
@@ -172,7 +172,7 @@ $obRdOrigemProprio->setId    ( 'stOrigemBemProprio' );
 $obRdOrigemProprio->setLabel ( 'Veículo Próprio' );
 $obRdOrigemProprio->setValue ( 'proprio' );
 $obRdOrigemProprio->setNull  ( false );
-$obRdOrigemProprio->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaOrigem' ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaResponsavel');" );
+$obRdOrigemProprio->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value+'&inCodVeiculo=".$rsVeiculo->getCampo('cod_veiculo')."','montaOrigem' ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaResponsavel');" );
 
 $obRdOrigemTerceiro = new Radio();
 $obRdOrigemTerceiro->setRotulo( 'Origem do Bem' );
@@ -182,7 +182,7 @@ $obRdOrigemTerceiro->setId    ( 'stOrigemBemTerceiros' );
 $obRdOrigemTerceiro->setLabel ( 'Veículo de Terceiros' );
 $obRdOrigemTerceiro->setValue ( 'terceiro' );
 $obRdOrigemTerceiro->setNull  ( false );
-$obRdOrigemTerceiro->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaOrigem' ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaResponsavel');" );
+$obRdOrigemTerceiro->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value+'&inCodVeiculo=".$rsVeiculo->getCampo('cod_veiculo')."','montaOrigem' ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stOrigem='+this.value,'montaResponsavel');" );
 
 //span para o tipo de origem: proprio/terceiros
 $obSpnOrigem = new Span();

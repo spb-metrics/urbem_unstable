@@ -50,6 +50,8 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
+include_once $pgJs;
+
 $arLicitacao = Sessao::read("arLicitacao");
 
 if(!empty($arLicitacao)){
@@ -228,7 +230,7 @@ $obBtnOK->obEvento->setOnClick("Salvar();");
 $obBtnOK->setId('Ok');
 
 $obLimpar = new Limpar();
-$obLimpar->obEvento->setOnClick( "Limpar();" );
+$obLimpar->obEvento->setOnClick( "limparFormulario(); return false;" );
 
 $stLocation = $pgList.'?'.Sessao::getId().$stFiltro;
 $obCancelar  = new Cancelar;

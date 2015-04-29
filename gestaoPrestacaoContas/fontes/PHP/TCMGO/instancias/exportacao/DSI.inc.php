@@ -472,8 +472,8 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
         foreach ($rsCredenciado->arElementos as $stChaveCredenciado) {
             $stKey15 = $stChaveCredenciado['cod_orgao'] . $stChaveCredenciado['cod_unidade'] . $stChaveCredenciado['num_processo'] . $stChaveCredenciado['ano_exercicio_processo'] . $stChaveCredenciado['tipo_processo']; // . $stChaveCredenciado['tipo_documento'] . $stChaveCredenciado['num_documento'] . $stChaveCredenciado['dt_credenciamento'] . $stChaveCredenciado['num_lote'] . $stChaveCredenciado['num_item'];
             
-            if ($stKey15 === $stKey) {
-                $arEmpenhoContrato['numero_sequencial'] = ++$inCount;
+            if ($stKey15 === $stKey && ( $stChave['tipo_processo'] == 3 OR $stChave['tipo_processo'] == 4 ) ) {
+                $stChaveCredenciado['numero_sequencial'] = ++$inCount;
                 $rsBloco = 'rsBloco_' . $inCount;
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
@@ -509,13 +509,13 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
                 
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_credenciamento");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(08);
-                
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_documento");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+                
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_credenciamento");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(08);
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_lote");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -575,7 +575,7 @@ include_once( CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php" );
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(758);
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(776);
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

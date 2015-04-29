@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Anderson R. M. Buzo
 
-    $Id: RContabilidadePlanoContaAnalitica.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RContabilidadePlanoContaAnalitica.class.php 62341 2015-04-24 21:14:44Z carlos.silva $
 
     * Casos de uso: uc-02.02.02, uc-02.02.19, uc-02.04.03, uc-02.04.09, uc-02.03.23
 */
@@ -112,6 +112,12 @@ var $stCodEstruturalFinal;
     * @param Integer
 */
 var $inCodGrupo;
+
+/**
+    * @access Public
+    * @param Integer
+*/
+var $inCodRecurso;
 
 /**
  *   dtSaldo
@@ -196,6 +202,12 @@ function setCodGrupo($valor)
 
 /**
     * @access Public
+    * @return Integer
+*/
+function setCodRecurso($valor) { $this->inCodRecurso = $valor;  }
+
+/**
+    * @access Public
     * @return Object
 */
 function getROrcamentoRecurso() { return $this->obROrcamentoRecurso; }
@@ -248,6 +260,13 @@ function getCodGrupo()
 {
     return $this->inCodGrupo;
 }
+
+/**
+    * @access Public
+    * @return Integer
+*/
+function getCodRecurso() { return $this->inCodRecurso;  }
+
 
 /**
      * Método construtor
@@ -1172,10 +1191,14 @@ function listarLoteImplantacaoAux(&$rsRecordSet, $stOrder = "" , $boTransacao = 
         $stFiltro .= " lower(nom_conta) like lower('".$this->stNomConta."%') AND ";
     if(trim($this->inCodGrupo))
         $stFiltro .= " SUBSTR(pc.cod_estrutural, 1, 1) = '".$this->inCodGrupo."' AND ";
+    if(trim($this->inCodRecurso))
+        $stFiltro .= " pr.cod_recurso = '" . $this->inCodRecurso . "' AND ";
+        
     $stFiltro = ($stFiltro) ? " AND " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
     $stOrder  = ($stOrder)  ? $stOrder : "cod_estrutural";
+    
     $obErro = $obTContabilidadePlanoAnalitica->recuperaPlanoContaAnalitica( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-
+    
     return $obErro;
 }
 

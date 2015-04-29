@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterVeiculo.php 61654 2015-02-20 20:34:48Z jean $
+    * $Id: PRManterVeiculo.php 61844 2015-03-09 21:09:51Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -366,7 +366,7 @@ switch ($stAcao) {
 
             if ($_REQUEST['inCategoriaVeiculo']) {
                 $obTTCERNVeiculoCategoriaVinculo = new TTCERNVeiculoCategoriaVinculo();
-                $obTTCERNVeiculoCategoriaVinculo->setDado('cod_veiculo', $_REQUEST['inCodVeiculo']);
+                $obTTCERNVeiculoCategoriaVinculo->setDado('cod_veiculo', $inCodVeiculo);
                 $obTTCERNVeiculoCategoriaVinculo->setDado('cod_categoria', $_REQUEST['inCategoriaVeiculo']);
                 $obErro = $obTTCERNVeiculoCategoriaVinculo->inclusao();
             }

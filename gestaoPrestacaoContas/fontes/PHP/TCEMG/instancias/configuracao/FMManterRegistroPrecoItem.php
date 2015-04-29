@@ -21,13 +21,39 @@
     *                                                                                *
     **********************************************************************************
 */
+?>
+<?php
+/**
+  * Página de Formulario de Configuração de Orgão
+  * Data de Criação: 11/03/2014
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+  * @author Analista:      Eduardo Paculski Schitz
+  * @author Desenvolvedor: Franver Sarmento de Moraes
+  *
+  * @ignore
+  * $Id: FMManterRegistroPrecoItem.php 62200 2015-04-07 18:09:25Z michel $
+  * $Date: 2015-04-07 15:09:25 -0300 (Ter, 07 Abr 2015) $
+  * $Author: michel $
+  * $Rev: 62200 $
+  **/
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/IMontaQuantidadeValores.class.php';
+include_once CAM_GP_ALM_COMPONENTES.'IMontaItemUnidade.class.php';
 
 $obHdnInId = new Hidden;
 $obHdnInId->setName  ( 'inId' );
+$obHdnInId->setId    ( 'inId' );
 $obHdnInId->setValue ( $inId  );
+
+$obHdnIdItem = new Hidden;
+$obHdnIdItem->setName  ( 'inIdItem' );
+$obHdnIdItem->setId    ( 'inIdItem' );
+$obHdnIdItem->setValue ( $inIdItem  );
+
+$obIntNumItem = new Inteiro();
+$obIntNumItem->setRotulo("*Número do Item no Lote");
+$obIntNumItem->setName("inNumItemLote");
+$obIntNumItem->setId("inNumItemLote");
 
 $obVlrPrecoUnitario = new Moeda();
 $obVlrPrecoUnitario->setRotulo('Preço Unitário');
@@ -106,6 +132,12 @@ $obBscCGMVencedor->obCampoCod->setId("inNumCGMVencedor");
 $obBscCGMVencedor->obCampoCod->setValue( $inNumCGMVencedor );
 $obBscCGMVencedor->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumCGMVencedor='+this.value,'buscaCGMVencedor');");
 $obBscCGMVencedor->setFuncaoBusca( "abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumCGMVencedor','inNomCGMVencedor','','".Sessao::getId()."&stCtrl=buscaCGMVencedor','800','550');" );
+
+$obIntOrdemClassificacao = new Inteiro();
+$obIntOrdemClassificacao->setRotulo("*Ordem de Classificação do Fornecedor");
+$obIntOrdemClassificacao->setName("inOrdemClassifFornecedor");
+$obIntOrdemClassificacao->setId("inOrdemClassifFornecedor");
+$obIntOrdemClassificacao->setMaxLength(2);
 
 $obBtnSalvar = new Button;
 $obBtnSalvar->setName  ("btnSalvar");

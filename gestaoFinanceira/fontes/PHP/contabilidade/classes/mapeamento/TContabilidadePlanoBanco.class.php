@@ -625,9 +625,8 @@ function recuperaSaldoInicialRecurso(&$rsRecordSet, $stFiltro = "", $boTransacao
 function montaRecuperaSaldoInicialRecurso()
 {
     $stSql  ="     SELECT                                                                       \n";
-    $stSql .="                contas.cod_plano                                                  \n";
-    $stSql .="                ,sum(vl_lancamento) as saldo                                      \n";
-    $stSql .="                ,contas.sequencia                                                 \n";
+    $stSql .="                 sum(vl_lancamento) as saldo                                      \n";
+    $stSql .="                ,contas.cod_recurso                                               \n";
     $stSql .="     FROM (                                                                       \n";
     $stSql .="                SELECT                                                            \n";
     $stSql .="                    plano_conta.cod_conta                                         \n";
@@ -639,11 +638,13 @@ function montaRecuperaSaldoInicialRecurso()
     $stSql .="                    ,CVL.tipo_valor                                               \n";
     $stSql .="                    ,CVL.vl_lancamento                                            \n";
     $stSql .="                    ,CVL.sequencia                                                \n";
+    $stSql .="                    ,CPR.cod_recurso                                              \n";
     $stSql .="                        FROM contabilidade.plano_conta                            \n";
     $stSql .="                        ,contabilidade.plano_banco      AS CPB                    \n";
     $stSql .="                            ,contabilidade.plano_analitica  AS CPA                \n";
     $stSql .="                            ,contabilidade.conta_debito     AS CCD                \n";
     $stSql .="                            ,contabilidade.valor_lancamento AS CVL                \n";
+    $stSql .="                            ,contabilidade.plano_recurso    AS CPR                \n";
     $stSql .="                          -- Join com plano_analitica                             \n";
     $stSql .="                        WHERE CPB.exercicio    = CPA.exercicio                    \n";
     $stSql .="                          AND CPB.cod_plano    = CPA.cod_plano                    \n";
@@ -660,6 +661,8 @@ function montaRecuperaSaldoInicialRecurso()
     $stSql .="                          AND CCD.tipo_valor   = CVL.tipo_valor                   \n";
     $stSql .="                          AND CCD.cod_lote     = CVL.cod_lote                     \n";
     $stSql .="                          AND CCD.sequencia    = CVL.sequencia                    \n";
+    $stSql .="                          AND CPR.cod_plano    = CPA.cod_plano                    \n";
+    $stSql .="                          AND CPR.exercicio    = CPA.exercicio                    \n";
     $stSql .="                          -- Filtros                                              \n";
     $stSql .="                          AND CPA.exercicio    = '".$this->getDado('exercicio')."' \n";
     $stSql .="                      AND CVL.tipo = 'I'                                          \n";
@@ -674,11 +677,13 @@ function montaRecuperaSaldoInicialRecurso()
     $stSql .="                    ,CVL.tipo_valor                                               \n";
     $stSql .="                    ,CVL.vl_lancamento                                            \n";
     $stSql .="                    ,CVL.vl_lancamento                                            \n";
+    $stSql .="                    ,CPR.cod_recurso                                              \n";
     $stSql .="                        FROM contabilidade.plano_conta                            \n";
     $stSql .="                        ,contabilidade.plano_banco      AS CPB                    \n";
     $stSql .="                            ,contabilidade.plano_analitica  AS CPA                \n";
     $stSql .="                            ,contabilidade.conta_credito    AS CCC                \n";
     $stSql .="                            ,contabilidade.valor_lancamento AS CVL                \n";
+    $stSql .="                            ,contabilidade.plano_recurso    AS CPR                \n";
     $stSql .="                          -- Join com plano_analitica                             \n";
     $stSql .="                        WHERE CPB.exercicio    = CPA.exercicio                    \n";
     $stSql .="                          AND CPB.cod_plano    = CPA.cod_plano                    \n";
@@ -695,6 +700,8 @@ function montaRecuperaSaldoInicialRecurso()
     $stSql .="                          AND CCC.tipo_valor   = CVL.tipo_valor                   \n";
     $stSql .="                          AND CCC.cod_lote     = CVL.cod_lote                     \n";
     $stSql .="                          AND CCC.sequencia    = CVL.sequencia                    \n";
+    $stSql .="                          AND CPR.cod_plano    = CPA.cod_plano                    \n";
+    $stSql .="                          AND CPR.exercicio    = CPA.exercicio                    \n";
     $stSql .="                          -- Filtros                                              \n";
     $stSql .="                          AND CPA.exercicio    = '".$this->getDado('exercicio')."' \n";
     $stSql .="                          AND CVL.tipo = 'I'                                      \n";
@@ -705,8 +712,8 @@ function montaRecuperaSaldoInicialRecurso()
     $stSql .="                    LEFT JOIN orcamento.recurso                                   \n";
     $stSql .="                        ON (recurso.cod_recurso = plano_recurso.cod_recurso       \n";
     $stSql .="                        AND recurso.exercicio = plano_recurso.exercicio)          \n";
-    $stSql .="                    GROUP BY contas.cod_plano,contas.sequencia                    \n";
-    $stSql .="                    ORDER BY contas.cod_plano                                     \n";
+    $stSql .="                    GROUP BY contas.cod_recurso                                   \n";
+    $stSql .="                    ORDER BY contas.cod_recurso                                   \n";
 
     return $stSql;
 

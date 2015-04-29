@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterLote.php 62230 2015-04-10 17:35:05Z michel $
 
     * Casos de uso: uc-05.01.08
 */
@@ -47,6 +47,11 @@ include_once ( CAM_GA_ADM_MAPEAMENTO."TUnidadeMedida.class.php"       );
 //MANTEM O FILTRO E A PAGINACAO
 $stLink = Sessao::read('stLink');
 $link   = Sessao::read('link');
+
+foreach($link as $key => $value){
+    if($value!='')
+        $stLink .= "&".$key."=".$value;
+}
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLote" ;
@@ -70,8 +75,6 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_validar", $chama
     print '<script language="JavaScript1.2" type="text/javascript">
                 alertaAviso ( "'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
            </script>';
-
-//    Sessao::setId("PHPSESSID=".session_id());
 
     $aux = explode("?",$location);
 

@@ -53,4 +53,69 @@ function TPROAtributoProtocolo()
     $this->AddCampo('tipo',			'char',		true,'1',	false,false);
     $this->AddCampo('valor_padrao',	'text',		true,'',	false,false);
 }
+
+public function recuperaAtributoAssunto(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaAtributoAssunto().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+
+        return $obErro;
+    }
+
+public function montaRecuperaAtributoAssunto()
+    {
+        $stSql  = "
+                    SELECT
+                            AP.cod_atributo,
+                            AP.nom_atributo,
+                            AP.tipo,
+                            AP.valor_padrao
+                      FROM
+                            sw_atributo_protocolo AS AP,
+                            sw_assunto_atributo   AS AT
+                      WHERE
+                            AP.cod_atributo      = AT.cod_atributo AND
+                            AT.cod_classificacao = ".$this->getDado('cod_classificacao')." AND
+                            AT.cod_assunto       = ".$this->getDado('cod_assunto')."
+                      ORDER BY
+                            AP.nom_atributo
+                ";
+        return $stSql;
+    }
+
+public function recuperaAtributoValor(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaAtributoValor().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+
+        return $obErro;
+    }
+
+public function montaRecuperaAtributoValor()
+    {
+        $stSql  = "
+                    SELECT  AP.nom_atributo,
+                            AP.cod_atributo,
+                            AP.tipo,
+                            AAV.valor
+                      FROM  sw_assunto_atributo_valor AS AAV,
+                            sw_atributo_protocolo AS AP
+                      WHERE AAV.cod_processo      = ".$this->getDado('cod_processo')."      AND
+                            AAV.exercicio         = '".$this->getDado('ano_exercicio')."'   AND
+                            AAV.cod_assunto       = ".$this->getDado('cod_assunto')."       AND
+                            AAV.cod_classificacao = ".$this->getDado('cod_classificacao')." AND
+                            AAV.cod_atributo      = AP.cod_atributo
+                      ORDER BY  AP.nom_atributo
+                ";
+        return $stSql;
+    }
+
 }

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: FTCEMGDespesaCapital.class.php 62056 2015-03-27 14:53:30Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -60,17 +60,17 @@ class FTCEMGDespesaCapital extends Persistente
     {
         $stSql  = "
             SELECT mes
-                 , ROUND(desp_invest,2) AS desp_invest
-                 , ROUND(desp_inv_finan,2) AS desp_inv_finan
-                 , ROUND(desp_amort_div_int,2) AS desp_amort_div_int
-                 , ROUND(desp_amort_div_ext,2) AS desp_amort_div_ext
-                 , ROUND(desp_amort_div_mob,2) AS desp_amort_div_mob
-                 , ROUND(desp_out_desp_cap,2) AS desp_out_desp_cap
-                 , ROUND(conc_emprestimos,2) AS conc_emprestimos
-                 , ROUND(aquisicao_titulos,2) AS aquisicao_titulos
-                 , ROUND(incent_contrib,2) AS incent_contrib
-                 , ROUND(incent_inst_finan,2) AS incent_inst_finan
-                 , LPAD(cod_tipo,2,'0') AS cod_tipo
+                 , REPLACE( ROUND(desp_invest       ,2)::TEXT, '.', '') AS desp_invest
+                 , REPLACE( ROUND(desp_inv_finan    ,2)::TEXT, '.', '') AS desp_inv_finan
+                 , REPLACE( ROUND(desp_amort_div_int,2)::TEXT, '.', '') AS desp_amort_div_int
+                 , REPLACE( ROUND(desp_amort_div_ext,2)::TEXT, '.', '') AS desp_amort_div_ext
+                 , REPLACE( ROUND(desp_amort_div_mob,2)::TEXT, '.', '') AS desp_amort_div_mob
+                 , REPLACE( ROUND(desp_out_desp_cap ,2)::TEXT, '.', '') AS desp_out_desp_cap
+                 , REPLACE( ROUND(conc_emprestimos  ,2)::TEXT, '.', '') AS conc_emprestimos
+                 , REPLACE( ROUND(aquisicao_titulos ,2)::TEXT, '.', '') AS aquisicao_titulos
+                 , REPLACE( ROUND(incent_contrib    ,2)::TEXT, '.', '') AS incent_contrib
+                 , REPLACE( ROUND(incent_inst_finan ,2)::TEXT, '.', '') AS incent_inst_finan
+                 , LPAD(cod_tipo::varchar,2,'0') AS cod_tipo 
               FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
                                           (  mes                 INTEGER,
                                              desp_invest         NUMERIC,

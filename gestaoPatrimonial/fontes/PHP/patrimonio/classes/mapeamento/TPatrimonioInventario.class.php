@@ -292,6 +292,19 @@ class TPatrimonioInventario extends Persistente
         return $stSql;
     }
 
+    public function recuperaNovoPrimeiroInventario(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaNovoPrimeiroInventario().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
+
+        return $obErro;
+    }
+
+
 }
 
 ?>

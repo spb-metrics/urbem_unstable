@@ -34,7 +34,7 @@
 
   * Casos de uso : 01.06.98
 
-  $Id: imprimeRelatorioDespachos.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: imprimeRelatorioDespachos.php 61884 2015-03-12 14:34:32Z jean $
 
   */
 
@@ -56,6 +56,9 @@ $preview->addParametro('pNumInscricao' , $numInscricao);
 
 $preview->addParametro('pCodProcesso'  , $_REQUEST['codProcesso' ]);
 $preview->addParametro('pAnoExercicio' , $_REQUEST['anoExercicio']);
+
+$preview->addAssinaturas(Sessao::read('assinaturas'));
+
 $preview->preview();
 
 ?>

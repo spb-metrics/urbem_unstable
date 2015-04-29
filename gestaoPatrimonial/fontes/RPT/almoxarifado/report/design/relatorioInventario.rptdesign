@@ -3,6 +3,7 @@
     <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <list-property name="libraries">
         <structure>
@@ -967,8 +968,16 @@ WHERE assinatura.exercicio = ?]]></xml-property>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">10mm</property>
+            <property name="leftMargin">10mm</property>
+            <property name="bottomMargin">20mm</property>
+            <property name="rightMargin">10mm</property>
             <page-header>
-                <grid name="cabecalho_retrato" id="17" extends="urbem_250.cabecalho_retrato">
+                <grid name="cabecalho" id="1158" extends="urbem_250.cabecalho_retrato">
+                    <property name="fontFamily">serif</property>
+                    <property name="fontSize">medium</property>
                     <overridden-values>
                         <ref-entry baseId="1051" id="1051"/>
                         <ref-entry baseId="1052" id="1052"/>
@@ -1340,9 +1349,9 @@ WHERE assinatura.exercicio = ?]]></xml-property>
         </grid>
         <table id="1438">
             <property name="fontSize">6pt</property>
-            <property name="marginLeft">12pt</property>
-            <property name="marginRight">12pt</property>
-            <property name="width">7.572916666666667in</property>
+            <property name="marginLeft">0pt</property>
+            <property name="marginRight">0pt</property>
+            <property name="width">7.479166666666667in</property>
             <property name="dataSet">inventarioItem</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -1406,10 +1415,10 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                 <property name="width">0.8125in</property>
             </column>
             <column id="1484">
-                <property name="width">0.9270833333333334in</property>
+                <property name="width">0.9166666666666666in</property>
             </column>
             <column id="1485">
-                <property name="width">0.78125in</property>
+                <property name="width">0.6979166666666666in</property>
             </column>
             <header>
                 <row id="1439">

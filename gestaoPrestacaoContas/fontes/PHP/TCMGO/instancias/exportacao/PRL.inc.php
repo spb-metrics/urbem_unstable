@@ -30,10 +30,10 @@
     * @author Analista:      Eduardo Paculski Schitz
     * @author Desenvolvedor: Franver Sarmento de Moraes
     * @ignore
-    * $Id: PRL.inc.php 61496 2015-01-26 18:19:27Z evandro $
-    * $Rev: 61496 $
+    * $Id: PRL.inc.php 61934 2015-03-16 19:05:53Z evandro $
+    * $Rev: 61934 $
     * $Author: evandro $
-    * $Date: 2015-01-26 16:19:27 -0200 (Seg, 26 Jan 2015) $
+    * $Date: 2015-03-16 16:05:53 -0300 (Seg, 16 Mar 2015) $
 */
 include_once CAM_GPC_TGO_MAPEAMENTO.'TTCMGOParecerLicitacao.class.php';
 
@@ -52,13 +52,10 @@ foreach ($rsRecordSetPRL10->arElementos as $stChave) {
         $i++;
 }
 
-$arRecordSetPRL99 = array (
-    'tipo_registro'  => '99',
-    'brancos'        => '',
-    'nro_sequencial' => '1'
-);
 
-if (count($rsRecordSetPRL10->getElementos()) > 0) {
+
+if ( $rsRecordSetPRL10->getNumLinhas() > 0 ) {
+    
     $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
     $obExportador->roUltimoArquivo->addBloco($rsRecordSetPRL10);
 
@@ -72,7 +69,7 @@ if (count($rsRecordSetPRL10->getElementos()) > 0) {
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(5);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_licitacao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -130,25 +127,31 @@ if (count($rsRecordSetPRL10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-}else{
-
-    $rsRecordSetPRL99 = new RecordSet();
-    $rsRecordSetPRL99->preenche( $arRecordSetPRL99 );
-
-    $obExportador->roUltimoArquivo->addBloco($rsRecordSetPRL99);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(330);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-
 }
+
+$arRecordSetPRL99 = array (
+    '0' => array(
+        'tipo_registro' => '99',
+        'brancos' => '',
+        'nro_sequencial' => $i+1,
+    )
+);
+
+$rsRecordSetPRL99 = new RecordSet();
+$rsRecordSetPRL99->preenche( $arRecordSetPRL99 );
+
+$obExportador->roUltimoArquivo->addBloco($rsRecordSetPRL99);
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(330);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
 $obTTCMGOParecerLicitacao = null;
 $rsRecordSetPRL10 = null;

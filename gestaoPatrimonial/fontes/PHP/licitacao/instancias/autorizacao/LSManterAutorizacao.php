@@ -32,7 +32,7 @@
 
     * @ignore
 
-     $Id: LSManterAutorizacao.php 60857 2014-11-19 14:54:43Z michel $
+     $Id: LSManterAutorizacao.php 62279 2015-04-16 18:38:45Z arthur $
 
     * Casos de uso: uc-uc-03.05.21
 */
@@ -163,15 +163,40 @@ $stFiltros .= " AND NOT EXISTS
                                    AND ll.cod_entidade = licitacao.cod_entidade
                                    AND ll.exercicio = licitacao.exercicio
                            )
-            AND EXISTS     (
-                                SELECT 1
-                                  FROM licitacao.edital
-                                 WHERE edital.cod_licitacao = licitacao.cod_licitacao
-                                   AND edital.cod_modalidade = licitacao.cod_modalidade
-                                   AND edital.cod_entidade = licitacao.cod_entidade
-                                   AND edital.exercicio = licitacao.exercicio
-                           )
-" ;
+                      
+             -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                        
+                EXISTS (
+                    SELECT 1
+                      FROM licitacao.edital
+                     WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                       AND edital.cod_modalidade = licitacao.cod_modalidade
+                       AND edital.cod_entidade = licitacao.cod_entidade
+                       AND edital.exercicio = licitacao.exercicio
+                )
+    
+                  -- Para as modalidades 8,9 é facultativo possuir um edital
+                  WHEN licitacao.cod_modalidade in (8,9) THEN
+                        
+                    EXISTS (
+                        SELECT 1
+                          FROM licitacao.edital
+                         WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                           AND edital.cod_modalidade = licitacao.cod_modalidade
+                           AND edital.cod_entidade = licitacao.cod_entidade
+                           AND edital.exercicio = licitacao.exercicio
+                    )
+    
+                    OR NOT EXISTS (
+                           SELECT 1
+                             FROM licitacao.edital
+                            WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                              AND edital.cod_modalidade = licitacao.cod_modalidade
+                              AND edital.cod_entidade = licitacao.cod_entidade
+                              AND edital.exercicio = licitacao.exercicio
+                    )
+                 END \n " ;
 
 $obTLicitacaoHomolocacao = new TLicitacaoHomologacao;
 $obTLicitacaoHomolocacao->recuperaCotacoesParaEmpenho( $rsCotacoes, $stFiltros );

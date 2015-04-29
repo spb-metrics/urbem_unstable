@@ -26,7 +26,7 @@
  * @author Analista: Gelson W. Gonçalves
  * @author Desenvolvedor: Henrique Boaventura
 
- * $Id: PRManterBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
+ * $Id: PRManterBem.php 62215 2015-04-08 21:28:32Z jean $
 
  * Casos de uso: uc-03.01.06
  */
@@ -508,13 +508,13 @@ switch ($stAcao) {
         $rsReavaliacao->preenche(Sessao::read('arReavaliacao'));
 
         while (!$rsReavaliacao->eof() ) {
-            $inCodBem = $rsReavaliacao->getCampo('inCodBem');
-            $inCodReavaliacao = $rsReavaliacao->getCampo('inCodReavaliacao');
-            $dtReavaliacao = $rsReavaliacao->getCampo('dtReavaliacao');
+            $inCodBem              = $rsReavaliacao->getCampo('inCodBem');
+            $inCodReavaliacao      = $rsReavaliacao->getCampo('inCodReavaliacao');
+            $dtReavaliacao         = $rsReavaliacao->getCampo('dtReavaliacao');
             $inVidaUtilReavaliacao = $rsReavaliacao->getCampo('inVidaUtilReavaliacao');
             $flValorBemReavaliacao = $rsReavaliacao->getCampo('flValorBemReavaliacao');
-            $stMotivoReavaliacao = $rsReavaliacao->getCampo('stMotivoReavaliacao');
-            $inserir = $rsReavaliacao->getCampo('inserir');
+            $stMotivoReavaliacao   = $rsReavaliacao->getCampo('stMotivoReavaliacao');
+            $inserir               = $rsReavaliacao->getCampo('inserir');
 
             if ($inCodBem != '' && $inCodReavaliacao === 0 && $dtReavaliacao != '' && $inVidaUtilReavaliacao  != '' && $flValorBemReavaliacao  != '' && $stMotivoReavaliacao != '' && $inserir === 'true') {
                 $obTPatrimonioReavaliacao->proximoCod( $inCodReavaliacao );
@@ -755,13 +755,25 @@ switch ($stAcao) {
                 $obTPatrimonioBemProcesso->setDado('cod_processo', $inCodProcesso);
                 $obTPatrimonioBemProcesso->recuperaPorChave($rsProcesso);
 
-                if ($rsProcesso->getNumLinhas > 0) {
+                if ($rsProcesso->getNumLinhas() > 0) {
                     $obTPatrimonioBemProcesso->alteracao();
                 }  else {
                     $obTPatrimonioBemProcesso->inclusao();
                 }
+            } elseif (!empty($_REQUEST['hdnChaveProcesso'])) {
+                $arProcessoAux = explode("/",$_REQUEST['hdnChaveProcesso']);
+                $stAnoProcessoAux = $arProcessoAux[0];
+                $stCodProcessoAux = $arProcessoAux[1];
+                $obTPatrimonioBemProcesso->setDado('cod_bem', $inCodBem);
+                $obTPatrimonioBemProcesso->setDado('ano_exercicio', $stAnoProcessoAux);
+                $obTPatrimonioBemProcesso->setDado('cod_processo', $stCodProcessoAux);
+                $obTPatrimonioBemProcesso->recuperaPorChave($rsProcesso);
+
+                if ($rsProcesso->getNumLinhas() > 0) {
+                    $obTPatrimonioBemProcesso->exclusao();
+                }
             }
-              
+
             $obTPatrimonioBemComprado->recuperaTodos($rsBemComprado, ' WHERE cod_bem = '.$_REQUEST['inCodBem'].' ' );
             if ( $rsBemComprado->getNumLinhas() > 0) {
                 //altera a table patrimonio.bem_comprado

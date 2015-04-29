@@ -70,6 +70,15 @@ class FTCEMGDispFinanceiras extends Persistente
                  , ROUND(contas_vinculadas_rpps,2) AS contas_vinculadas_rpps
                  , ROUND(aplicacoes_financeiras_rpps,2) AS aplicacoes_financeiras_rpps
                  , ROUND(compromissado_rpps,2) AS compromissado_rpps
+                 , 'S' AS nada_declarar
+                 , 0.00 AS caixa_rppsas
+                 , 0.00 AS conta_movimento_rppsas
+                 , 0.00 AS contas_vinculadas_rppsas
+                 , 0.00 AS aplicacoes_financeiras_rppsas
+                 , 0.00 AS compromissado_rppsas
+                 , 0.00 AS aplicacoes_financeiras_vinc
+                 , 0.00 AS aplicacoes_financeiras_vinc_rpps
+                 , 0.00 AS aplicacoes_financeiras_vinc_rppsas
               FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
                                           ( mes                         INTEGER,
                                             caixa                       DECIMAL(14,2) ,
@@ -83,7 +92,7 @@ class FTCEMGDispFinanceiras extends Persistente
                                             aplicacoes_financeiras_rpps DECIMAL(14,2) ,
                                             compromissado_rpps          DECIMAL(14,2)
                                           )";
-
+SistemaLegado::mostravar($stSql);die;
         return $stSql;
     }
 

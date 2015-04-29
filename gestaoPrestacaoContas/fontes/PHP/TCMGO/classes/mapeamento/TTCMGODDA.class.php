@@ -70,6 +70,7 @@ class TTCMGODDA extends Persistente
                                     ELSE
                                         2
                              END AS situacao_cobranca
+                            
                             , 0.00 AS vl_original_divida
                             , 0.00 AS vl_ant_principal_atualizado
                             , 0.00 AS vl_ant_juros_atualizado

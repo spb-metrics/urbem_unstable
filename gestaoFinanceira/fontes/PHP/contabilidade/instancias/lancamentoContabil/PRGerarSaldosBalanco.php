@@ -73,7 +73,7 @@ switch ($stAcao) {
         $obErro = $obRContabilidadeLancamentoValor->gerarSaldosBalanco();
         if ( !$obErro->ocorreu() ) {
             if ($obRContabilidadeLancamentoValor->boLogErros) {
-                SistemaLegado::alertaAviso($pgFilt."?stAcao=incluir","Geração de Saldos de Balanço Concluida com erros. <a href='../../tmp/".$obRContabilidadeLancamentoValor->getNomLogErros()."' target='blank'>Verifique o log.</a>","pagar","aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgFilt."?stAcao=incluir","Geração de Saldos de Balanço Concluida com erros. <a href='".CAM_GF_CONTABILIDADE."/tmp/".$obRContabilidadeLancamentoValor->getNomLogErros()."' target='blank'>Verifique o log.</a>","pagar","aviso", Sessao::getId(), "../");
             } else {
                 SistemaLegado::alertaAviso($pgFilt."?stAcao=incluir","Geração de Saldos de Balanço Concluida.","pagar","aviso", Sessao::getId(), "../");
             }

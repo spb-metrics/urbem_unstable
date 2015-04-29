@@ -26,6 +26,8 @@
 /*
  * @author Analista      Carlos Adriano
  * @author Desenvolvedor Carlos Adriano
+ *
+ $Id: DWManterImportacaoMensal.php 61856 2015-03-10 17:52:02Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -33,7 +35,8 @@ include_once(CLA_ARQUIVO                       );
 
 $stArquivo = $_GET['arquivo'];
 
-$obArquivo = new Arquivo(CAM_FRAMEWORK.'tmp/'.$stArquivo, 'relatorioImportacao');
+$obArquivo = new Arquivo(CAM_FRAMEWORK.'tmp/'.$stArquivo, 'relatorioImportacao.zip');
+$obArquivo->setTipo("application/zip");
 $obArquivo->Show();
 
 ?>

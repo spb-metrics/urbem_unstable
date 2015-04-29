@@ -130,6 +130,7 @@ function geraFormulario(&$obFormulario)
     $this->obRDespesaMontaOrgaoUnidade->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->listar($rsOrgao, "ORDER BY num_orgao");
     $obCmbOrgao = new Select;
     $obCmbOrgao->setName('inMontaCodOrgaoM');
+    $obCmbOrgao->setId('inMontaCodOrgaoM');
     $obCmbOrgao->setValue($this->getCodOrgao());
     $obCmbOrgao->setRotulo('Orgão');
     $obCmbOrgao->setStyle("width: 400px");
@@ -143,6 +144,7 @@ function geraFormulario(&$obFormulario)
     //Monta combo para seleção de UNIDADE ORCAMENTARIA
     $obCmbUnidade = new Select;
     $obCmbUnidade->setName('inMontaCodUnidadeM');
+    $obCmbUnidade->setId('inMontaCodUnidadeM');
     $obCmbUnidade->setValue($this->getCodUnidade());
     $obCmbUnidade->setRotulo('Unidade');
     $obCmbUnidade->setStyle("width: 400px");

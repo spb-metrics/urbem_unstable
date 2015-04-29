@@ -57,6 +57,8 @@ foreach ($_REQUEST as $key => $value) {
     }
 }
 
+Sessao::setTrataExcecao( true );
+
 switch ($stAcao) {
     case 'manter' :
 

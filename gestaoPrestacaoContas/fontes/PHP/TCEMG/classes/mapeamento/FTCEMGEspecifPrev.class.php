@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: FTCEMGEspecifPrev.class.php 61835 2015-03-09 14:28:12Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -61,17 +61,27 @@ function FTCEMGEspecifPrev()
 function montaRecuperaTodos()
 {
     $stSql  = "
-        SELECT *
+        SELECT CASE WHEN aplicacoes_financeiras <> 0 THEN
+                            REPLACE(aplicacoes_financeiras::TEXT, '.', '')
+                    ELSE    '000'
+               END AS aplicacoes_financeiras
+             , CASE WHEN caixa <> 0 THEN
+                            REPLACE(caixa::TEXT, '.', '')
+                    ELSE    '000'
+               END AS caixa
+             , CASE WHEN banco <> 0 THEN
+                            REPLACE(banco::TEXT, '.', '')
+                    ELSE    '000'
+               END AS banco
           FROM ".$this->getTabela()."( '".$this->getDado("stExercicio")."'
                                      , '".$this->getDado("dtInicio")."'
                                      , '".$this->getDado("dtFinal")."'
                                      , '".$this->getDado("stEntidades")."'
                                      , '".$this->getDado("stRpps")."'
                                      ) AS retorno(
-                                                   aplicacoes_financeiras   DECIMAL(14,2)
-                                                 , caixa                    DECIMAL(14,2)
-                                                 , conta_movimento          DECIMAL(14,2)
-                                                 , contas_vinculadas        DECIMAL(14,2)
+                                                   aplicacoes_financeiras   NUMERIC
+                                                 , caixa                    NUMERIC
+                                                 , banco                    NUMERIC
                                                  )";
 
     return $stSql;

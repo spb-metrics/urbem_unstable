@@ -94,6 +94,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="bimestre" id="1301">
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
@@ -1502,7 +1503,7 @@ total</expression>
                             <property name="fontWeight">normal</property>
                             <property name="paddingTop">1pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -1521,7 +1522,7 @@ total</expression>
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2133,7 +2134,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2156,7 +2157,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2178,7 +2179,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -2197,7 +2198,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -3403,7 +3404,7 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
                             <property name="fontWeight">normal</property>
                             <property name="paddingTop">1pt</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -3422,7 +3423,7 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
                             <property name="fontSize">5pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -3989,7 +3990,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4012,7 +4013,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4035,7 +4036,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
@@ -4055,7 +4056,7 @@ true;
                             <property name="fontSize">4pt</property>
                             <property name="fontWeight">normal</property>
                             <property name="textAlign">center</property>
-                            <expression name="valueExpr">'Até o Bimestre/'+params["exercicio_anterior"]</expression>
+                            <expression name="valueExpr">'Até o Período/'+params["exercicio_anterior"]</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>

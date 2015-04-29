@@ -185,6 +185,10 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="entidade_assinatura" id="6690" extends="urbem_221.entidade_assinatura"/>
+        <scalar-parameter name="numcgm_assinatura" id="6691" extends="urbem_221.numcgm_assinatura"/>
+        <scalar-parameter name="timestamp_assinatura" id="6692" extends="urbem_221.timestamp_assinatura"/>
+        <scalar-parameter name="numero_assinatura" id="6693" extends="urbem_221.numero_assinatura"/>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
@@ -1002,6 +1006,8 @@ INNER JOIN  sw_municipio
      WHERE  sw_processo.cod_processo = ?
        AND  sw_processo.ano_exercicio = ?]]></xml-property>
         </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="assinaturas" id="6694"
+ extends="urbem_221.assinaturas"/>
     </data-sets>
     <styles>
         <style name="crosstab" id="4">
@@ -1797,5 +1803,45 @@ INNER JOIN  sw_municipio
                 </row>
             </detail>
         </table>
+        <label id="6695"/>
+        <label id="6696"/>
+        <label id="6697"/>
+        <grid name="assinaturas" id="6667" extends="urbem_221.assinaturas">
+            <overridden-values>
+                <ref-entry baseId="1215" id="1215"/>
+                <ref-entry baseId="1150" id="6668"/>
+                <ref-entry baseId="1151" id="6669"/>
+                <ref-entry baseId="1152" id="6670"/>
+                <ref-entry baseId="1218" id="1218"/>
+                <ref-entry baseId="1179" id="6671"/>
+                <ref-entry baseId="1213" id="6672"/>
+                <ref-entry baseId="1180" id="1180"/>
+                <ref-entry baseId="1183" name="NewTable2" id="1183"/>
+                <ref-entry baseId="1186" id="1186"/>
+                <ref-entry baseId="1187" id="6673"/>
+                <ref-entry baseId="1188" name="NewData122" id="6674"/>
+                <ref-entry baseId="1189" name="NewData132" id="6675"/>
+                <ref-entry baseId="1192" id="6676"/>
+                <ref-entry baseId="1216" id="1216"/>
+                <ref-entry baseId="1153" id="6677"/>
+                <ref-entry baseId="1214" id="6678"/>
+                <ref-entry baseId="1154" id="6679"/>
+                <ref-entry baseId="1157" name="NewTable" id="6680"/>
+                <ref-entry baseId="1160" id="6681"/>
+                <ref-entry baseId="1161" id="6682"/>
+                <ref-entry baseId="1167" name="NewData12" id="6683"/>
+                <ref-entry baseId="1168" name="NewData13" id="6684"/>
+                <ref-entry baseId="1164" id="6685"/>
+                <ref-entry baseId="1155" id="6686"/>
+                <ref-entry baseId="1156" id="6687"/>
+                <ref-entry baseId="1169" name="NewTable1" id="6688"/>
+                <ref-entry baseId="1172" id="1172"/>
+                <ref-entry baseId="1173" id="1173"/>
+                <ref-entry baseId="1174" name="NewData121" id="1174"/>
+                <ref-entry baseId="1175" name="NewData131" id="6689"/>
+                <ref-entry baseId="1178" id="1178"/>
+                <ref-entry baseId="1217" id="1217"/>
+            </overridden-values>
+        </grid>
     </body>
 </report>

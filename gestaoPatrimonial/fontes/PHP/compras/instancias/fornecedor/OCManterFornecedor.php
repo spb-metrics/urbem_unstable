@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.04.03
 
-    $Id: OCManterFornecedor.php 60437 2014-10-21 17:03:40Z michel $
+    $Id: OCManterFornecedor.php 62068 2015-03-27 19:55:45Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -514,7 +514,7 @@ switch ($stCtrl) {
         
         if($inCount > 0) {
             foreach ($arSocioSessao as $arSocio) {
-                if($_REQUEST['cgmSocio'] == $arSocio['numcgm']) {
+                if($_REQUEST['cgmSocio'] == $arSocio['numcgm'] && (($_REQUEST['inCodTipo'] == $arSocio['cod_tipo']) || $arSocio['cod_tipo'] == 3 || $_REQUEST['inCodTipo'] == 3)) {
                         echo "alertaAviso( 'O sócio escolhido já está na lista!','form','erro','".Sessao::getId()."' );";
                         return false;
                 }
@@ -548,7 +548,7 @@ switch ($stCtrl) {
     case 'excluirSocio':
         $inCount=0;
         $arSocioSessao = Sessao::read('arSocio');
-        
+//SistemaLegado::mostravar($arSocioSessao);die;
         foreach ( $arSocioSessao as $arSocio ) {
             if ($arSocio['id'] != $_REQUEST['id']) {
                 $arSocioSessaoAtualizado[$inCount]['id']              = $inCount;
@@ -556,8 +556,8 @@ switch ($stCtrl) {
                 $arSocioSessaoAtualizado[$inCount]['descricao']       = $arSocio['descricao'];
                 $arSocioSessaoAtualizado[$inCount]['numcgm']          = $arSocio['numcgm'];
                 $arSocioSessaoAtualizado[$inCount]['nom_cgm']         = $arSocio['nom_cgm'];
-                $arSocioSessaoAtualizado[$inCount]['ativo']           = $arSocio['boAtivo'];
-                $arSocioSessaoAtualizado[$inCount]['ativo_descricao'] = $arSocio['boAtivo'] ? 'Sim':'Não';
+                $arSocioSessaoAtualizado[$inCount]['ativo']           = $arSocio['ativo'];
+                $arSocioSessaoAtualizado[$inCount]['ativo_descricao'] = $arSocio['ativo'] ? 'Sim':'Não';
                 $inCount++;
             }
         }

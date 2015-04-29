@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: PRManterNotasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterNotasFiscais.php 62088 2015-03-28 18:44:40Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -70,6 +70,7 @@ switch ($_REQUEST['stAcao']) {
         Sessao::setTrataExcecao ( true );
 
         $obErro = new Erro;
+        $stMensagem = "";
 
         if (count($arLiquidacoes) > 0 ) {
             $obTTCEMGNotaFiscal->setDado( 'exercicio'                   , $_REQUEST['stExercicio']       		);
@@ -96,53 +97,62 @@ switch ($_REQUEST['stAcao']) {
             }
             if ($_REQUEST['inChave']) {
                 $obTTCEMGNotaFiscal->setDado ( 'chave_acesso'           , $_REQUEST['inChave']                  );
+                if (strlen($_REQUEST['inChave']) < 44)
+                    $stMensagem = "O campo Chave de Acesso deve conter 44 caracteres!";
             }
             if ($_REQUEST['inChaveMunicipal']) {
                 $obTTCEMGNotaFiscal->setDado ( 'chave_acesso_municipal' , $_REQUEST['inChaveMunicipal']         );
+                if (strlen($_REQUEST['inChaveMunicipal']) < 60)
+                    $stMensagem = "O campo Chave de Acesso Municipal deve conter 60 caracteres!";
             }
-
-            $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
-            $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
-
-            $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
-            $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
-
-            $obTTCEMGNotaFiscal->setDado( 'vl_total'        , (float)$nuVlTotalDoctoFiscal);
-            $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , (float)$nuVlDescontoDoctoFiscal);
-            $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
-
-            $obErro = $obTTCEMGNotaFiscal->inclusao();
-
-            if (!$obErro->ocorreu()) {
-                $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
-
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'           , $inCodNota                      );
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'          , $_REQUEST['stExercicio']        );
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']      );
-
-                $rsRecordSet = new RecordSet;
-                $rsRecordSet->preenche($arLiquidacoes);
-
-                while ( !$rsRecordSet->eof() and !$obErro->ocorreu() ) {
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $rsRecordSet->getCampo('cod_empenho')         );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $rsRecordSet->getCampo('exercicio')           );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $rsRecordSet->getCampo('cod_nota_liquidacao') );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , $rsRecordSet->getCampo('exercicio_liquidacao'));
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $rsRecordSet->getCampo('nuVlAssociado'));
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $rsRecordSet->getCampo('valor_liquidacao')    );
-
-                    $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao();
-                    $rsRecordSet->proximo();
-                }
-            }
-
-            if ($obErro->ocorreu()) {
-                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+            
+            if (isset($stMensagem)) {
+                SistemaLegado::exibeAviso($stMensagem,"n_incluir","erro");                
             } else {
-                $stLink = "?stAcao=".$_REQUEST['stAcao'].Sessao::read('filtroAux');
-                Sessao::remove('arLiquidacoes');
-                Sessao::remove('arEmpenhos');
-                sistemaLegado::alertaAviso($pgForm.$stLink,"Incluir Notas Fiscais concluído com sucesso!","aviso", Sessao::getId(), "../");
+            
+                $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
+                $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
+    
+                $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
+                $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
+    
+                $obTTCEMGNotaFiscal->setDado( 'vl_total'        , (float)$nuVlTotalDoctoFiscal);
+                $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , (float)$nuVlDescontoDoctoFiscal);
+                $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
+    
+                $obErro = $obTTCEMGNotaFiscal->inclusao();
+    
+                if (!$obErro->ocorreu()) {
+                    $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
+    
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'           , $inCodNota                      );
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'          , $_REQUEST['stExercicio']        );
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']      );
+    
+                    $rsRecordSet = new RecordSet;
+                    $rsRecordSet->preenche($arLiquidacoes);
+    
+                    while ( !$rsRecordSet->eof() and !$obErro->ocorreu() ) {
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $rsRecordSet->getCampo('cod_empenho')         );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $rsRecordSet->getCampo('exercicio')           );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $rsRecordSet->getCampo('cod_nota_liquidacao') );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , $rsRecordSet->getCampo('exercicio_liquidacao'));
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $rsRecordSet->getCampo('nuVlAssociado'));
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $rsRecordSet->getCampo('valor_liquidacao')    );
+    
+                        $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao();
+                        $rsRecordSet->proximo();
+                    }
+                }
+    
+                if ($obErro->ocorreu()) {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+                } else {
+                    $stLink = "?stAcao=".$_REQUEST['stAcao'].Sessao::read('filtroAux');
+                    Sessao::remove('arLiquidacoes');
+                    Sessao::remove('arEmpenhos');
+                    sistemaLegado::alertaAviso($pgForm.$stLink,"Incluir Notas Fiscais concluído com sucesso!","aviso", Sessao::getId(), "../");
+                }
             }
         } else {
             sistemaLegado::exibeAviso( 'Informe o(s) empenho(s).',"n_incluir","erro" );
@@ -157,7 +167,8 @@ switch ($_REQUEST['stAcao']) {
         Sessao::setTrataExcecao ( true );
 
         $obErro = new Erro;
-
+        $stMensagem = null;
+        
         if (count($arLiquidacoes) > 0 ) {
             $obTTCEMGNotaFiscal->setDado( 'cod_nota'                    , $_REQUEST['inCodNota']                );
             $obTTCEMGNotaFiscal->setDado( 'exercicio'                   , $_REQUEST['stExercicio']              );
@@ -181,58 +192,68 @@ switch ($_REQUEST['stAcao']) {
             }
             if ($_REQUEST['inChave']) {
                 $obTTCEMGNotaFiscal->setDado ( 'chave_acesso'           , $_REQUEST['inChave']                  );
+                if (strlen($_REQUEST['inChave']) < 44)
+                    $stMensagem = "O campo Chave de Acesso deve conter 44 caracteres!";
             }
             if ($_REQUEST['inChaveMunicipal']) {
                 $obTTCEMGNotaFiscal->setDado ( 'chave_acesso_municipal' , $_REQUEST['inChaveMunicipal']         );
+                if (strlen($_REQUEST['inChaveMunicipal']) < 60)
+                    $stMensagem = "O campo Chave de Acesso Municipal deve conter 60 caracteres!";
             }
-
-            $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
-            $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
-
-            $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
-            $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
-
-            $obTTCEMGNotaFiscal->setDado( 'vl_total'        , $nuVlTotalDoctoFiscal);
-            $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , $nuVlDescontoDoctoFiscal);
-            $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
-
-            $obErro = $obTTCEMGNotaFiscal->alteracao();
             
-            if ( !$obErro->ocorreu() ) {
-                $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
-
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'           , $_REQUEST['inCodNota']          );
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'          , $_REQUEST['stExercicio'] 		);
-                $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']      );
-
-                $obErro = $obTTCEMGNotaFiscalEmpenho->exclusao();
-
+            if (isset($stMensagem)) {
+                SistemaLegado::exibeAviso($stMensagem,"n_incluir","erro");                
+            } else {
+            
+                $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
+                $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
+    
+                $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
+                $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
+    
+                $obTTCEMGNotaFiscal->setDado( 'vl_total'        , $nuVlTotalDoctoFiscal);
+                $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , $nuVlDescontoDoctoFiscal);
+                $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
+    
+                $obErro = $obTTCEMGNotaFiscal->alteracao();
+                
                 if ( !$obErro->ocorreu() ) {
-                    $rsRecordSet = new RecordSet;
-                    $rsRecordSet->preenche($arLiquidacoes);
-
-                    while ( !$rsRecordSet->eof() and !$obErro->ocorreu() ) {
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $rsRecordSet->getCampo('cod_empenho')         );
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $rsRecordSet->getCampo('exercicio')           );
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $rsRecordSet->getCampo('cod_nota_liquidacao') );
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , $rsRecordSet->getCampo('exercicio_liquidacao'));
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $rsRecordSet->getCampo('valor_liquidacao')    );
-                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $rsRecordSet->getCampo('nuVlAssociado'));
-
-                        $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao();
-                        $rsRecordSet->proximo();
+                    $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
+    
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'           , $_REQUEST['inCodNota']          );
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'          , $_REQUEST['stExercicio'] 		);
+                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']      );
+    
+                    $obErro = $obTTCEMGNotaFiscalEmpenho->exclusao();
+    
+                    if ( !$obErro->ocorreu() ) {
+                        $rsRecordSet = new RecordSet;
+                        $rsRecordSet->preenche($arLiquidacoes);
+    
+                        while ( !$rsRecordSet->eof() and !$obErro->ocorreu() ) {
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $rsRecordSet->getCampo('cod_empenho')         );
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $rsRecordSet->getCampo('exercicio')           );
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $rsRecordSet->getCampo('cod_nota_liquidacao') );
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , $rsRecordSet->getCampo('exercicio_liquidacao'));
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $rsRecordSet->getCampo('valor_liquidacao')    );
+                            $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $rsRecordSet->getCampo('nuVlAssociado'));
+    
+                            $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao();
+                            $rsRecordSet->proximo();
+                        }
                     }
                 }
+    
+                if ( $obErro->ocorreu() ) {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+                } else {
+                    $stLink = "?stAcao=".$_REQUEST['stAcao'].Sessao::read('filtroAux');
+                    SistemaLegado::alertaAviso($pgList.$stLink, "Alterar Notas Fiscais concluído com sucesso!","aviso", Sessao::getId(), "../");
+                    Sessao::remove('arLiquidacoes');
+                    Sessao::remove('arEmpenhos');
+                }
             }
-
-            if ( $obErro->ocorreu() ) {
-                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
-            } else {
-                $stLink = "?stAcao=".$_REQUEST['stAcao'].Sessao::read('filtroAux');
-                SistemaLegado::alertaAviso($pgList.$stLink, "Alterar Notas Fiscais concluído com sucesso!","aviso", Sessao::getId(), "../");
-                Sessao::remove('arLiquidacoes');
-                Sessao::remove('arEmpenhos');
-            }
+            
         } else {
             sistemaLegado::exibeAviso( 'Informe o(s) empenho(s).',"n_incluir","erro" );
         }

@@ -44,4 +44,31 @@ function alterarItem() {
     jQuery('#imgBuscar').css('visibility', '');
 }
 
+function alterarOrgao() {
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
+    document.frm.stCtrl.value = 'alterarListaOrgaos';
+    document.frm.submit();
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
+    document.frm.btnSalvarOrgao.value = 'Incluir Orgão';
+    document.frm.stCtrl.value = 'incluirListaOrgaos';
+}
+
+/**
+* Faz o chamada de alerta de Questão.
+*/
+function alertaQuestaoValor(pagina,tipo,sessao,valorEnt = ''){
+    var x = 350;
+    var y = 200;
+    var valor = 'teste';
+    var chave = 1;
+    if (valorEnt=='') {
+        valorEnt = "&chave=1&valor=teste";
+    }
+    var sessaoid = sessao.substr(15,8);
+    var sArq = '../../../../../../gestaoAdministrativa/fontes/PHP/framework/popups/alerta/alerta.php?'+sessaoid+'&tipo='+tipo+'&chamada=sn'+valorEnt+'&pagQuestao='+pagina;
+    var wVolta=false;
+    var sAux = "msgc"+ sessaoid +" = window.open(sArq,'msgc"+ sessaoid +"','width=400px,height=230px,resizable=1,scrollbars=0,left="+x+",top="+y+"');";
+    eval(sAux);
+}
+
 </script>

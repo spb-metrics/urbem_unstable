@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLExportacaoPrincipais.php 61473 2015-01-21 13:32:02Z evandro $
+    $Id: FLExportacaoPrincipais.php 62094 2015-03-29 00:14:58Z lisiane $
 
     * Casos de uso: uc-02.08.01
 */

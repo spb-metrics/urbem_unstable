@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.04.08
 
-    $Id: PRManterConfiguracao.php 60668 2014-11-06 19:32:49Z evandro $
+    $Id: PRManterConfiguracao.php 61893 2015-03-12 17:33:33Z carlos.silva $
 
     */
 
@@ -110,6 +110,13 @@ switch ($stAcao) {
         $obTConfiguracao->setDado( 'cod_modulo' , 35 );
         $obTConfiguracao->setDado( 'exercicio'  , Sessao::getExercicio() );
         $obTConfiguracao->setDado( 'parametro'  , 'numeracao_automatica' );
+        $obTConfiguracao->setDado( 'valor', $_REQUEST['boIdCompraAutomatica'] );
+        $obTConfiguracao->alteracao();
+        
+        // Altera o parâmetro que define se o ID da Licitação vai ser criado automático ou manual.
+        $obTConfiguracao->setDado( 'cod_modulo' , 35 );
+        $obTConfiguracao->setDado( 'exercicio'  , Sessao::getExercicio() );
+        $obTConfiguracao->setDado( 'parametro'  , 'numeracao_automatica_licitacao' );
         $obTConfiguracao->setDado( 'valor', $_REQUEST['boIdLicitacaoAutomatica'] );
         $obTConfiguracao->alteracao();
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterDesoneracao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterDesoneracao.php 62186 2015-04-06 17:34:12Z jean $
 
     * Casos de uso: uc-05.03.04
 */
@@ -177,6 +177,7 @@ $obDtExpiracao->setValue     ( $_REQUEST["dtExpiracao"]        );
 $obDtExpiracao->setRotulo    ( "Data de Expiração" );
 $obDtExpiracao->setMaxLength ( 20                  );
 $obDtExpiracao->setSize      ( 10                  );
+$obDtExpiracao->setNull      ( false               );
 
 if ($_REQUEST['inCodigoFormula'] && $_REQUEST['inCodigoModulo'] && $_REQUEST['inCodigoBiblioteca']) {
     $inCodigoFormula = sprintf( "%02d.%02d.%03d", $_REQUEST['inCodigoModulo'], $_REQUEST['inCodigoBiblioteca'], $_REQUEST['inCodigoFormula'] );

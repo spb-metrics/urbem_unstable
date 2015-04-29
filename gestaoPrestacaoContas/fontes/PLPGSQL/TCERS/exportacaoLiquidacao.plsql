@@ -26,10 +26,11 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
+* $Id: exportacaoLiquidacao.plsql 62149 2015-03-31 19:56:33Z arthur $
 * $Revision: 59612 $
 * $Name$
 * $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Date: 2014-09-02 09:00:51 -0300 (Tue, 02 Sep 2014) $
 *
 * Casos de uso: uc-02.08.01
 * Casos de uso: uc-02.08.01
@@ -188,7 +189,9 @@ BEGIN
                         ,max(observacao)
                         ,ordem
                         ,1 AS oid
-               FROM    tmp_total as tm 
+               FROM    tmp_total as tm
+                WHERE
+                        tm.data_pagamento BETWEEN TO_DATE('||quote_literal(stDtInicial)||', ''dd/mm/yyyy'') - interval ''1 year'' AND TO_DATE('||quote_literal(stDtFinal)||', ''dd/mm/yyyy'')
                 GROUP BY     exercicio
                             ,cod_entidade
                             ,cod_empenho

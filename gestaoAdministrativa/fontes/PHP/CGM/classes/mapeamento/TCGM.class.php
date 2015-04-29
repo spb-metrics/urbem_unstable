@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: TCGM.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: TCGM.class.php 62175 2015-04-02 19:34:56Z lisiane $
 
 $Revision: 28411 $
 $Name$
@@ -50,35 +50,35 @@ function TCGM()
     $this->setTabela('sw_cgm');
     $this->setCampoCod('numcgm');
 
-    $this->AddCampo('numcgm',                  'integer', true,  '', true,  false);
-    $this->AddCampo('cod_municipio',           'integer', true,  '', false, false);
-    $this->AddCampo('cod_uf',                  'integer', true,  '', false, false);
-    $this->AddCampo('cod_pais',                'integer', true,  '', false, false);
-    $this->AddCampo('cod_pais_corresp',        'integer', true,  '', false, false);
-    $this->AddCampo('cod_municipio_corresp',   'integer', true,  '', false, false);
-    $this->AddCampo('cod_responsavel',         'integer', true,  '', false, false);
-    $this->AddCampo('cod_uf_corresp',          'integer', true,  '', false, false);
-    $this->AddCampo('nom_cgm',                 'varchar', true, 200, false, false);
-    $this->AddCampo('tipo_logradouro',         'varchar', true,  10, false, false);
-    $this->AddCampo('logradouro',              'varchar', true,  60, false, false);
-    $this->AddCampo('numero',                  'varchar', true,   6, false, false);
-    $this->AddCampo('complemento',             'varchar', true,  20, false, false);
-    $this->AddCampo('bairro',                  'varchar', true,  30, false, false);
-    $this->AddCampo('cep',                     'varchar', true,   8, false, false);
-    $this->AddCampo('tipo_logradouro_corresp', 'varchar', true,  10, false, false);
-    $this->AddCampo('logradouro_corresp',      'varchar', true,  60, false, false);
-    $this->AddCampo('numero_corresp',          'varchar', true,   6, false, false);
-    $this->AddCampo('complemento_corresp',     'varchar', true,  20, false, false);
-    $this->AddCampo('bairro_corresp',          'varchar', true,  30, false, false);
-    $this->AddCampo('cep_corresp',             'varchar', true,   8, false, false);
-    $this->AddCampo('fone_residencial',        'char',    true,  12, false, false);
-    $this->AddCampo('ramal_residencial',       'char',    true,   6, false, false);
-    $this->AddCampo('fone_comercial',          'char',    true,  12, false, false);
-    $this->AddCampo('ramal_comercial',         'char',    true,   6, false, false);
-    $this->AddCampo('fone_celular',            'char',    true,  12, false, false);
-    $this->AddCampo('e_mail',                  'char',    true, 100, false, false);
-    $this->AddCampo('e_mail_adcional',         'char',    true, 100, false, false);
-    $this->AddCampo('dt_cadastro',             'date',   false,  '', false, false);
+    $this->AddCampo('numcgm',                  'integer',  true,  '', true,  false);
+    $this->AddCampo('cod_municipio',           'integer',  true,  '', false, false);
+    $this->AddCampo('cod_uf',                  'integer',  true,  '', false, false);
+    $this->AddCampo('cod_pais',                'integer',  true,  '', false, false);
+    $this->AddCampo('cod_pais_corresp',        'integer',  true,  '', false, false);
+    $this->AddCampo('cod_municipio_corresp',   'integer',  true,  '', false, false);
+    $this->AddCampo('cod_responsavel',         'integer',  true,  '', false, false);
+    $this->AddCampo('cod_uf_corresp',          'integer',  true,  '', false, false);
+    $this->AddCampo('nom_cgm',                 'varchar',  true, 200, false, false);
+    $this->AddCampo('tipo_logradouro',         'varchar',  true,  10, false, false);
+    $this->AddCampo('logradouro',              'varchar',  true,  60, false, false);
+    $this->AddCampo('numero',                  'varchar',  true,   6, false, false);
+    $this->AddCampo('complemento',             'varchar',  true,  20, false, false);
+    $this->AddCampo('bairro',                  'varchar',  true,  30, false, false);
+    $this->AddCampo('cep',                     'varchar',  true,   8, false, false);
+    $this->AddCampo('tipo_logradouro_corresp', 'varchar',  true,  10, false, false);
+    $this->AddCampo('logradouro_corresp',      'varchar',  true,  60, false, false);
+    $this->AddCampo('numero_corresp',          'varchar',  true,   6, false, false);
+    $this->AddCampo('complemento_corresp',     'varchar',  true,  20, false, false);
+    $this->AddCampo('bairro_corresp',          'varchar',  true,  30, false, false);
+    $this->AddCampo('cep_corresp',             'varchar',  true,   8, false, false);
+    $this->AddCampo('fone_residencial',        'char',     true,  12, false, false);
+    $this->AddCampo('ramal_residencial',       'char',     true,   6, false, false);
+    $this->AddCampo('fone_comercial',          'char',     true,  12, false, false);
+    $this->AddCampo('ramal_comercial',         'char',     true,   6, false, false);
+    $this->AddCampo('fone_celular',            'char',     true,  12, false, false);
+    $this->AddCampo('e_mail',                  'char',     true, 100, false, false);
+    $this->AddCampo('e_mail_adcional',         'char',     true, 100, false, false);
+    $this->AddCampo('dt_cadastro',             'date',     false, '', false, false);
 }
 
 function montaRecuperaRelacionamento()

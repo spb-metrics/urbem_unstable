@@ -244,8 +244,12 @@ function montaListaContratos()
         /************* Montando busca da listagem de contratos **************/
         $rsLista = new Recordset;
         $obTFolhaPagamentoEventoComplementar = new TFolhaPagamentoRegistroEventoComplementar();
-
-        $stFiltro = " AND registro_evento_complementar.cod_evento = ".$rsEvento->getCampo("cod_evento");
+        if($rsEvento->getCampo("cod_evento") != ''){
+             $stFiltro = " AND registro_evento_complementar.cod_evento = ".$rsEvento->getCampo("cod_evento");
+        } else {
+            $stFiltro = "";
+        }
+       
         $stFiltro .= " AND registro_evento_complementar.cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao');
         $stFiltro .= " AND registro_evento_complementar.cod_complementar = ".$_REQUEST['inCodComplementar'];
 

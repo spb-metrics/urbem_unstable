@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCDemonstrativoSaldos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCDemonstrativoSaldos.php 62264 2015-04-14 20:05:56Z evandro $
 
     * Casos de uso: uc-02.04.24
 */
@@ -50,25 +50,47 @@ if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
 
+$inCodUF = SistemaLegado::pegaConfiguracao('cod_uf',2,Sessao::getExercicio(),$boTransacao);
 $arFiltro = Sessao::read('filtroRelatorio');
 
-$obRTesourariaRelatorioDemonstrativoSaldos->setCodEntidade     ($arFiltro['inCodEntidade']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setInicioPeriodo   ($arFiltro['stDataInicial']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setFimPeriodo      ($arFiltro['stDataFinal']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setInicioReduzido  ($arFiltro['inCodPlanoInicial']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setFimReduzido     ($arFiltro['inCodPlanoFinal']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setInicioEstrutural($arFiltro['stCodEstruturalInicial']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setFimEstrutural   ($arFiltro['stCodEstruturalFinal']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setCodRecurso      ($arFiltro['inCodRecurso']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setCodEntidade     ( $arFiltro['inCodEntidade']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setInicioPeriodo   ( $arFiltro['stDataInicial']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setFimPeriodo      ( $arFiltro['stDataFinal']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setInicioReduzido  ( $arFiltro['inCodPlanoInicial']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setFimReduzido     ( $arFiltro['inCodPlanoFinal']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setInicioEstrutural( $arFiltro['stCodEstruturalInicial']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setFimEstrutural   ( $arFiltro['stCodEstruturalFinal']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setCodRecurso      ( $arFiltro['inCodRecurso']);
 if ($arFiltro['inCodUso'] != "" && $arFiltro['inCodDestinacao'] != "" && $arFiltro['inCodEspecificacao'] != "") {
     $obRTesourariaRelatorioDemonstrativoSaldos->setDestinacaoRecurso( $arFiltro['inCodUso'].".".$arFiltro['inCodDestinacao'].".".$arFiltro['inCodEspecificacao'] );
 }
-$obRTesourariaRelatorioDemonstrativoSaldos->setCodDetalhamento ($arFiltro['inCodDetalhamento']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setOrdenacao       ($arFiltro['stOrdenacao']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setSemMovimentacao ($arFiltro['boMovimentacaoConta']);
-$obRTesourariaRelatorioDemonstrativoSaldos->setExercicio       (Sessao::getExercicio());
-$obRTesourariaRelatorioDemonstrativoSaldos->geraRecordSetBanco ($arRecordSet);
+$obRTesourariaRelatorioDemonstrativoSaldos->setCodDetalhamento      ( $arFiltro['inCodDetalhamento']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setOrdenacao            ( $arFiltro['stOrdenacao']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setSemMovimentacao      ( $arFiltro['boMovimentacaoConta']);
+$obRTesourariaRelatorioDemonstrativoSaldos->setExercicio            ( Sessao::getExercicio());
+
+//Relatorio quando for agrupado por conta corrente
+if ($inCodUF == 11) {
+    if ( $arFiltro['boAgruparContaCorrente'] == 'S') {
+        $obRTesourariaRelatorioDemonstrativoSaldos->geraRecordSetBancoContaCorrente( $arRecordSet );
+    }else{
+        $obRTesourariaRelatorioDemonstrativoSaldos->geraRecordSetBanco( $arRecordSet );
+    }
+}else{
+    $obRTesourariaRelatorioDemonstrativoSaldos->geraRecordSetBanco( $arRecordSet );
+}
 
 Sessao::write('arDados', $arRecordSet);
 
-$obRRelatorio->executaFrameOculto( "OCGeraRelatorioDemonstrativoSaldos.php" );
+//Relatorio quando for agrupado por conta corrente
+if ($inCodUF == 11) {
+    if ( $arFiltro['boAgruparContaCorrente'] == 'S') {
+        $obRRelatorio->executaFrameOculto( "OCGeraRelatorioDemonstrativoSaldosContaCorrente.php" );
+    }else{
+        $obRRelatorio->executaFrameOculto( "OCGeraRelatorioDemonstrativoSaldos.php" );
+    }
+}else{
+    $obRRelatorio->executaFrameOculto( "OCGeraRelatorioDemonstrativoSaldos.php" );
+}
+
+?>

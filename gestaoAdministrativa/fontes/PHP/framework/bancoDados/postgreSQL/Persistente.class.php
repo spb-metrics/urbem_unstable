@@ -33,9 +33,9 @@
     * @package Conectividade
     * @subpackage Persistente
 
-    $Id: Persistente.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: Persistente.class.php 62212 2015-04-08 17:39:51Z diogo.zarpelon $
 
-Casos de uso: uc-01.01.00
+    Casos de uso: uc-01.01.00
 
 */
 

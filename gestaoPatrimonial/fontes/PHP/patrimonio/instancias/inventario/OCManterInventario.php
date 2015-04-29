@@ -113,7 +113,12 @@ function montaTableLocal($inCodOrgao, $inIdInventario, $stExercicio)
     $table->Body->addCampo('[total_bem]', 'C');
 
     # Função para chamar uma pop-up que exibe os Bens do órgão/local.
-    $table->Body->addAcao('consultar', 'abreListagemBem(%s, %s, %s, %s)', array($inIdInventario, $stExercicio, $inCodOrgao, 'cod_local'), '');
+    //Verificar se é o primeiro registro no exercicio
+    $inIdInventario = SistemaLegado::pegaDado( "id_inventario" ," patrimonio.inventario_historico_bem"," where exercicio = '".Sessao::getExercicio()."' ");    
+    if ( empty($inIdInventario) ) 
+        $table->Body->addAcao('consultar', 'abreListagemBemInicial(%s, %s, %s)', array($inIdInventario, $inCodOrgao, 'cod_local'), '');
+    else
+        $table->Body->addAcao('consultar', 'abreListagemBem(%s, %s, %s, %s)', array($inIdInventario, $stExercicio, $inCodOrgao, 'cod_local'), '');
 
     $table->montaHTML();
     $stHtml = $table->getHtml();
@@ -505,53 +510,26 @@ switch ($stCtrl) {
         $stExercicio = $_REQUEST['stExercicio'];
 
         # Inclui um novo Inventário e carrega o último status do Bem do Patrimônio.
-        if ($_REQUEST['stAcao'] == 'incluir') {
+        if ($_REQUEST['stAcao'] == 'incluir') {            
             $obTPatrimonioInventario = new TPatrimonioInventario;
-            $obTPatrimonioInventario->proximoCod($inIdInventario);
-            $obTPatrimonioInventario->setDado('id_inventario' , $inIdInventario);
-            $obTPatrimonioInventario->setDado('exercicio'     , $stExercicio);
-            $obTPatrimonioInventario->recuperaCargaInicialInventario($rsCargaInicial);
+            $obTPatrimonioInventario->setDado('exercicio', Sessao::getExercicio() );
+            $obTPatrimonioInventario->proximoCod($inIdInventario, $boTransacao);
+        
         } else {
             $inIdInventario = $_REQUEST['inIdInventario'];
         }
-
+                
         # Filtro para listar somente órgãos que tenham bens vinculados.
         $obTOrganogramaOrgao = new TOrganogramaOrgao;
         $obTOrganogramaOrgao->setDado('vigencia','now()');
 
-        $stFiltroOrgao = "
-            AND  EXISTS
-                 (
-                    SELECT  1
-                      FROM  organograma.organograma
-                     WHERE  organograma.cod_organograma = orgao_nivel.cod_organograma
-                       AND  organograma.ativo = true
-                 )
+        if ($_REQUEST['stAcao'] == 'alterar') {
+            $stFiltroOrgao = "  AND  inventario_historico_bem.id_inventario = ".$inIdInventario."
+                                AND  inventario_historico_bem.exercicio     = '".$stExercicio."'
+                            ";
+        }
 
-            AND  EXISTS
-                 (
-                     SELECT  1
-                       FROM  patrimonio.historico_bem
-
-                 INNER JOIN  (
-                                SELECT  cod_bem
-                                     ,  MAX(timestamp) AS timestamp
-                                  FROM  patrimonio.historico_bem
-                              GROUP BY  cod_bem
-                             ) as resumo
-                         ON  resumo.cod_bem   = historico_bem.cod_bem
-                        AND  resumo.timestamp = historico_bem.timestamp
-
-                 INNER JOIN  patrimonio.inventario_historico_bem
-                         ON  inventario_historico_bem.cod_bem = resumo.cod_bem
-
-                      WHERE  1=1
-                        AND  historico_bem.cod_orgao                = orgao.cod_orgao
-                        AND  inventario_historico_bem.id_inventario = ".$inIdInventario."
-                        AND  inventario_historico_bem.exercicio     = '".$stExercicio."'
-                 )";
-
-        $obTOrganogramaOrgao->recuperaOrgaos($rsOrgao, $stFiltroOrgao,' ORDER BY cod_estrutural');
+        $obTOrganogramaOrgao->recuperaOrgaosInventario($rsOrgao, $stFiltroOrgao,' ORDER BY cod_estrutural');
 
         while (!$rsOrgao->eof()) {
             $inCountOrgao = $rsOrgao->getCorrente()-1;
@@ -561,51 +539,26 @@ switch ($stCtrl) {
             $arInventario[$inCountOrgao]['cod_orgao']      = $rsOrgao->getCampo('cod_orgao');
             $arInventario[$inCountOrgao]['descricao']      = $rsOrgao->getCampo('descricao');
             $arInventario[$inCountOrgao]['cod_estrutural'] = $rsOrgao->getCampo('cod_estrutural');
-
-            $obTPatrimonioInventario = new TPatrimonioInventario;
-            $obTPatrimonioInventario->setDado('id_inventario' , $inIdInventario);
-            $obTPatrimonioInventario->setDado('exercicio'     , "'".$stExercicio."'");
-            $obTPatrimonioInventario->setDado('cod_orgao'     , $inCodOrgao);
-            $obTPatrimonioInventario->recuperaNroTotalBem($rsTotalBem);
-
-            # Guarda o número total de Bens vinculados ao Órgão.
-            //$arInventario[$inCountOrgao]['total_bem'] = $rsTotalBem->getCampo('total');
-
+            
             # Filtro para listar somente locais que tenham bens vinculados.
             $obTOrganogramaLocal = new TOrganogramaLocal;
-
-            $stFiltroLocal = "
-
-                WHERE  EXISTS
-                       (
-                            SELECT  1
-                              FROM  patrimonio.historico_bem
-
-                        INNER JOIN  (
-                                       SELECT  cod_bem
-                                            ,  MAX(timestamp) AS timestamp
-                                         FROM  patrimonio.historico_bem
-                                     GROUP BY  cod_bem
-                                    ) as resumo
-                                ON  resumo.cod_bem   = historico_bem.cod_bem
-                               AND  resumo.timestamp = historico_bem.timestamp
-
-                        INNER JOIN  patrimonio.inventario_historico_bem
-                                ON  inventario_historico_bem.cod_bem = resumo.cod_bem
-
-                          WHERE  1=1
-                            AND  historico_bem.cod_local                = local.cod_local
-                            AND  historico_bem.cod_orgao                = ".$rsOrgao->getCampo('cod_orgao')."
-                            AND  inventario_historico_bem.id_inventario = ".$inIdInventario."
-                            AND  inventario_historico_bem.exercicio     = '".$stExercicio."'
-                       )";
-
-            $stFiltroTotalizador = " WHERE inventario_historico_bem.id_inventario = ".$inIdInventario."
-                                       AND inventario_historico_bem.exercicio     = '".$stExercicio."'
-                                        AND  historico_bem.cod_local 	     	  = local.cod_local
-                                       AND historico_bem.cod_orgao 	     	      = ".$rsOrgao->getCampo('cod_orgao');
-
-             $obTOrganogramaLocal->recuperaTodosTotalizado($rsLocal, $stFiltroLocal, $stFiltroTotalizador, ' ORDER BY local.descricao');
+            $obTOrganogramaLocal->setDado('id_inventario',$inIdInventario);
+            $obTOrganogramaLocal->setDado('acao',$_REQUEST['stAcao']);
+            
+            if ($_REQUEST['stAcao'] == 'incluir') {
+                $stFiltroLocal = "  WHERE historico_bem.cod_orgao = ".$rsOrgao->getCampo('cod_orgao')."
+                                    AND bem_baixado.cod_bem IS NULL
+                                ";
+            }else{
+                $stFiltroLocal = "  WHERE inventario_historico_bem.id_inventario = ".$inIdInventario."
+                                    AND inventario_historico_bem.exercicio       = '".$stExercicio."'
+                                    AND  historico_bem.cod_local 	     	     = local.cod_local
+                                    AND historico_bem.cod_orgao                  = ".$rsOrgao->getCampo('cod_orgao')."
+                                    AND bem_baixado.cod_bem IS NULL
+                            ";
+            }
+            
+            $obTOrganogramaLocal->recuperaTodosTotalizado($rsLocal, $stFiltroLocal,' ORDER BY cod_local');            
 
             $countTotalBem = 0;
 
@@ -627,11 +580,11 @@ switch ($stCtrl) {
             # Guarda o número total de Bens vinculados ao Órgão.
             $arInventario[$inCountOrgao]['total_bem'] = $countTotalBem;
 
-             $rsOrgao->proximo();
+            $rsOrgao->proximo();
         }
 
         Sessao::write('arInventario', $arInventario);
-
+        
         # Atualiza o Label que exibe o código do Inventário.
         $stJs .= "jQuery('#inIdInventario').val('".$inIdInventario."');  \n";
         $stJs .= "jQuery('#stIdInventario').html('".$inIdInventario."'); \n";

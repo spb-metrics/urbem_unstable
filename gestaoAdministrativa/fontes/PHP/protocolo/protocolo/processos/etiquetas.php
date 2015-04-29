@@ -31,7 +31,7 @@
 
     * Casos de uso : uc-01.06.98
 
-    $Id: etiquetas.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: etiquetas.php 61967 2015-03-18 21:59:24Z jean $
 
     */
 
@@ -175,5 +175,7 @@ if ((strlen($_REQUEST['dataInicial']) > 0) && (strlen($_REQUEST['dataFinal']) > 
     $preview->addParametro( 'prmDataIni', '');
     $preview->addParametro( 'prmDataFim', '');
 }
+
+$preview->addAssinaturas(Sessao::read('assinaturas'));
 
 $preview->preview();

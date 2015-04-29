@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterHomologacao.php 59615 2014-09-02 13:34:33Z franver $
+    * $Id: PRManterHomologacao.php 62279 2015-04-16 18:38:45Z arthur $
 
     * Casos de uso: uc-03.05.21
 */
@@ -59,8 +59,7 @@ $stFiltro = ' WHERE cod_licitacao = '.$_REQUEST["inCodLicitacao"].'
 
 $obTLicitacaoAdjudicacao = new TLicitacaoAdjudicacao();
 $obTLicitacaoAdjudicacao->recuperaTodos($rsAdjudicacao, $stFiltro);
-$obTLicitacaoAdjudicacao->debug();
-//SistemaLegado::mostravar($_REQUEST["stDtHomologacao"]); exit;
+
 $itensHomologacao = Sessao::read('itensHomologacao');
 $arDatas = array();     
 $itemCodCotacao = '';

@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15, uc-03.05.00
 
-    $Id: IMontaNumeroLicitacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IMontaNumeroLicitacao.class.php 62279 2015-04-16 18:38:45Z arthur $
 
 */
 
@@ -69,26 +69,26 @@ class IMontaNumeroLicitacao extends Objeto
 
     public function setTipoBusca($stTipoBusca)
     {
-    $boFiltraLicitacao = isset($boFiltraLicitacao) ? $boFiltraLicitacao : "";
+        $boFiltraLicitacao = isset($boFiltraLicitacao) ? $boFiltraLicitacao : "";
         $this->obISelectModalidade = new ISelectModalidade();
         $this->obISelectModalidade->setNull(false);
-    $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('../../instancias/processamento/OCMontaNumeroLicitacao.php?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=".$boFiltraLicitacao."&numLicitacao='+document.getElementById('hdnNumLicitacao').value, '".$stTipoBusca."');");
+        $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('../../instancias/processamento/OCMontaNumeroLicitacao.php?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=".$boFiltraLicitacao."&numLicitacao='+document.getElementById('hdnNumLicitacao').value, '".$stTipoBusca."');");
     }
 
     public function IMontaNumeroLicitacao(&$obForm, $boFiltraLicitacao=false, $stFiltro='', $preencherValorLicitacao='')
     {
-    parent::Objeto();
-    global $pgOcult;
-    $oculto = "../../instancias/processamento/OCMontaNumeroLicitacao.php";
-
-    $rsLicitacao = new RecordSet();
+        parent::Objeto();
+        global $pgOcult;
+        $oculto = "../../instancias/processamento/OCMontaNumeroLicitacao.php";
+    
+        $rsLicitacao = new RecordSet();
 
         include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
         include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php"      );
         include_once ( CAM_GP_COM_COMPONENTES."ISelectModalidade.class.php" );
 
         $this->obExercicio = new Exercicio();
-    $this->obExercicio->setName( 'stExercicioLicitacao' );
+        $this->obExercicio->setName( 'stExercicioLicitacao' );
 
         $this->setSelecionaAutomaticamenteLicitacao(true);
 
@@ -101,35 +101,35 @@ class IMontaNumeroLicitacao extends Objeto
         $this->obITextBoxSelectEntidadeUsuario->obTextBox->obEvento->setOnChange("ajaxJavaScript('".$oculto."?".Sessao::getId()."&inExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
 
         $this->obISelectModalidade = new ISelectModalidade();
-    $this->obISelectModalidade->setNull( false );
-    $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$oculto."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=".$boFiltraLicitacao."&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=".$stFiltro."&boSetarValorLicitacao=".$preencherValorLicitacao."', 'carregaLicitacao');");
+        $this->obISelectModalidade->setNull( false );
+        $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$oculto."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=".$boFiltraLicitacao."&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=".$stFiltro."&boSetarValorLicitacao=".$preencherValorLicitacao."', 'carregaLicitacao');");
 
         $this->obCmbLicitacao = new Select();
         $this->obCmbLicitacao->setName     ( 'inCodLicitacao'   );
         $this->obCmbLicitacao->setRotulo   ( 'Licitação'        );
         $this->obCmbLicitacao->setTitle    ( 'Selecione a Licitação.' );
-    $this->obCmbLicitacao->setId       ( 'inCodLicitacao'   );
+        $this->obCmbLicitacao->setId       ( 'inCodLicitacao'   );
         $this->obCmbLicitacao->setCampoID  ( 'cod_licitacao'    );
         $this->obCmbLicitacao->setCampoDesc( 'cod_licitacao'    );
         $this->obCmbLicitacao->addOption   ( '','Selecione'     );
-    $this->obCmbLicitacao->setNull     ( false );
+        $this->obCmbLicitacao->setNull     ( false );
         $this->obCmbLicitacao->preencheCombo( $rsLicitacao      );
-    $this->obCmbLicitacao->obEvento->setOnChange("ajaxJavaScript('".$oculto."?".Sessao::getId()."&stExercicioLicitacao=' +frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+ '&inCodLicitacao='+this.value+'&boSetarValorLicitacao=".$preencherValorLicitacao."', 'carregaProcesso');");
+        $this->obCmbLicitacao->obEvento->setOnChange("ajaxJavaScript('".$oculto."?".Sessao::getId()."&stExercicioLicitacao=' +frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+ '&inCodLicitacao='+this.value+'&boSetarValorLicitacao=".$preencherValorLicitacao."', 'carregaProcesso');");
 
-    $this->obProcessoLicitatorio = new Label();
-    $this->obProcessoLicitatorio->setId( 'stProcesso' );
-    $this->obProcessoLicitatorio->setValue( isset($stProcesso) ? $stProcesso : '&nbsp;' );
-    $this->obProcessoLicitatorio->setRotulo( 'Processo Administrativo' );
+        $this->obProcessoLicitatorio = new Label();
+        $this->obProcessoLicitatorio->setId( 'stProcesso' );
+        $this->obProcessoLicitatorio->setValue( isset($stProcesso) ? $stProcesso : '&nbsp;' );
+        $this->obProcessoLicitatorio->setRotulo( 'Processo Administrativo' );
 
         $this->obHdnProcessoLicitatorio = new Hidden();
         $this->obHdnProcessoLicitatorio->setName( 'hdnProcesso' );
         $this->obHdnProcessoLicitatorio->setId( 'hdnProcesso' );
         $this->obHdnProcessoLicitatorio->setValue( isset($stProcesso) ? $stProcesso : "" );
 
-    $this->obHdnDtLicitacao = new Hidden();
-    $this->obHdnDtLicitacao->setName( 'hdnDtLicitacao' );
-    $this->obHdnDtLicitacao->setId( 'hdnDtLicitacao' );
-    $this->obHdnDtLicitacao->setValue( isset($dtLicitacao) ? $dtLicitacao  : "");
+        $this->obHdnDtLicitacao = new Hidden();
+        $this->obHdnDtLicitacao->setName( 'hdnDtLicitacao' );
+        $this->obHdnDtLicitacao->setId( 'hdnDtLicitacao' );
+        $this->obHdnDtLicitacao->setValue( isset($dtLicitacao) ? $dtLicitacao  : "");
 
         $this->obHdnNumLicitacao = new Hidden();
         $this->obHdnNumLicitacao->setName( 'hdnNumLicitacao' );
@@ -139,18 +139,19 @@ class IMontaNumeroLicitacao extends Objeto
     public function geraFormulario(&$obFormulario)
     {
         Sessao::write('IMontaNumeroLicitacao', $this);
-    $obFormulario->addComponente( $this->obExercicio );
-    if ( !$this->getEntidadeUsuario() ) {
-        $obFormulario->addComponente( $this->obITextBoxSelectEntidadeGeral );
-    } else {
-        $obFormulario->addComponente( $this->obITextBoxSelectEntidadeUsuario );
-    }
-    $obFormulario->addComponente( $this->obISelectModalidade );
-    $obFormulario->addComponente( $this->obCmbLicitacao );
-    $obFormulario->addComponente( $this->obProcessoLicitatorio );
-    $obFormulario->addHidden    ( $this->obHdnProcessoLicitatorio );
-    $obFormulario->addHidden    ( $this->obHdnDtLicitacao );
-    $obFormulario->addHidden    ( $this->obHdnNumLicitacao );
+        $obFormulario->addComponente( $this->obExercicio );
+        if ( !$this->getEntidadeUsuario() ) {
+            $obFormulario->addComponente( $this->obITextBoxSelectEntidadeGeral );
+        } else {
+            $obFormulario->addComponente( $this->obITextBoxSelectEntidadeUsuario );
+        }
+        $obFormulario->addComponente( $this->obISelectModalidade );
+        $obFormulario->addComponente( $this->obCmbLicitacao );
+        $obFormulario->addComponente( $this->obProcessoLicitatorio );
+        $obFormulario->addHidden    ( $this->obHdnProcessoLicitatorio );
+        $obFormulario->addHidden    ( $this->obHdnDtLicitacao );
+        $obFormulario->addHidden    ( $this->obHdnNumLicitacao );
     }
 }
+
 ?>

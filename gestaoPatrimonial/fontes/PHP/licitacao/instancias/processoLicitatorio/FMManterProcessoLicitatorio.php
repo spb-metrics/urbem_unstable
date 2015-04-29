@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Fernando Zank Correa Evangelista
 
-    $Id: FMManterProcessoLicitatorio.php 60659 2014-11-06 16:17:39Z diogo.zarpelon $
+    $Id: FMManterProcessoLicitatorio.php 62228 2015-04-10 13:01:15Z evandro $
 
     * Casos de uso : uc-03.04.15
 */
@@ -53,6 +53,8 @@ include_once CAM_GP_COM_COMPONENTES."IPopUpMapaCompras.class.php";
 include_once CAM_GP_LIC_COMPONENTES."ISelectDocumento.class.php";
 include_once TLIC."TLicitacaoLicitacaoAnulada.class.php";
 include_once CAM_GF_PPA_COMPONENTES.'MontaOrgaoUnidade.class.php';
+include_once CAM_GRH_PES_COMPONENTES.'ISelectCargo.class.php';
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoNaturezaCargo.class.php";
 
 //Definições padrões do framework
 $stPrograma = "ManterProcessoLicitatorio";
@@ -154,7 +156,7 @@ if ($stAcao == 'incluir') {
     include_once CAM_GP_COM_MAPEAMENTO.'TComprasConfiguracao.class.php';
 
     $obTConfiguracao = new TComprasConfiguracao;
-    $obTConfiguracao->setDado('parametro', 'numeracao_automatica');
+    $obTConfiguracao->setDado('parametro', 'numeracao_automatica_licitacao');
     $obTConfiguracao->recuperaPorChave($rsConfiguracao);
     $boIdLicitacaoAutomatica = $rsConfiguracao->getCampo('valor');
 
@@ -199,6 +201,33 @@ $obMembroAdicional->setName  ( "stMembroAdicional" );
 $obMembroAdicional->setNull  (true);
 $obMembroAdicional->setValue ( "" );
 $obMembroAdicional->setObrigatorioBarra(true);
+
+//Cargo para o Membro Adicional
+$obTxtCargoMembro = new TextBox();
+$obTxtCargoMembro->setName          ( "stCargoMembro" );
+$obTxtCargoMembro->setId            ( "stCargoMembro" );
+$obTxtCargoMembro->setRotulo        ( "Cargo do Membro Adicional" );
+$obTxtCargoMembro->setTitle         ( "Cargo do Membro Adicional." );
+$obTxtCargoMembro->setNull          ( true );
+$obTxtCargoMembro->setMaxLength     ( 50 );
+$obTxtCargoMembro->setSize          ( 80 );
+$obTxtCargoMembro->setObrigatorioBarra(true);
+
+//Natureza do cargo para o Membro Adicional
+$obTLicitacaoNaturezaCargo = new TLicitacaoNaturezaCargo();
+$obTLicitacaoNaturezaCargo->recuperaTodos($rsNaturezaCargo, "", "", $boTransacao);
+
+$obSlNaturezaCargo = new Select();
+$obSlNaturezaCargo->setRotulo       ( 'Natureza do Cargo'              );
+$obSlNaturezaCargo->setTitle        ( 'Selecione a natureza do cargo.' );
+$obSlNaturezaCargo->setId           ( 'inCodNaturezaCargoMembro'       );
+$obSlNaturezaCargo->setName         ( 'inCodNaturezaCargoMembro'       );
+$obSlNaturezaCargo->addOption       ( '','Selecione'                   );
+$obSlNaturezaCargo->setCampoId      ( "codigo"                         );
+$obSlNaturezaCargo->setCampoDesc    ( "[codigo] - [descricao]"         );
+$obSlNaturezaCargo->preencheCombo   ( $rsNaturezaCargo                 );
+$obSlNaturezaCargo->setNull         ( treu                            );
+$obSlNaturezaCargo->setObrigatorioBarra(true);
 
 //recuperar o valor total da referência...
 // = soma do total de todos itens da cotação ou precisa calcular atráves do mapa de compras.
@@ -586,7 +615,9 @@ if ($stAcao != 'anular' ) {
     $obFormulario->addSpan          ( $obSpnMembros                    );
     $obFormulario->addTitulo        ( "Membro Adicional"               );
     $obFormulario->addComponente    ( $obMembroAdicional               );
-    $obFormulario->Incluir          ('MembroAdicional', array ( $obMembroAdicional ),true);
+    $obFormulario->addComponente    ( $obTxtCargoMembro                );
+    $obFormulario->addComponente    ( $obSlNaturezaCargo               );
+    $obFormulario->Incluir          ('MembroAdicional', array ( $obMembroAdicional,$obTxtCargoMembro,$obSlNaturezaCargo ),true);
     $obFormulario->addSpan          ( $obSpnMembroAdicional            );
     
     if(!$boEdital) {
@@ -607,10 +638,11 @@ if ($stAcao != 'anular' ) {
     $obFormulario->addSpan   ( $obSpnItens );
 }
 
- if ($stAcao == "alterar" || $stAcao == "anular") {
-        $jsOnload .="ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao=". $request->get('stExercicioLicitacao')."&inCodEntidade=".$inCodEntidade."&inCodLicitacao=".$request->get('inCodEntidade')."&stMapaCompras=".$request->get('stMapaCompra')."&boAlteraAnula=true','montaItensAlterar');";
-    }
- if ($stAcao == 'alterar' OR $stAcao == 'anular') {
+if ($stAcao == "alterar" || $stAcao == "anular") {
+    $jsOnload .="ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao=". $request->get('stExercicioLicitacao')."&inCodEntidade=".$inCodEntidade."&inCodLicitacao=".$request->get('inCodEntidade')."&stMapaCompras=".$request->get('stMapaCompra')."&boAlteraAnula=true','montaItensAlterar');";
+}
+
+if ($stAcao == 'alterar' OR $stAcao == 'anular') {
    $obButtonVoltar = new Button;
    $obButtonVoltar->setName  ( "Voltar" );
    $obButtonVoltar->setValue ( "Voltar" );
@@ -620,21 +652,24 @@ if ($stAcao != 'anular' ) {
 
    $obFormulario->defineBarra( array($obOk, $obButtonVoltar ), "left", "" );
 } else
-   $obFormulario->OK();
+    $obFormulario->OK();
+
 $obFormulario->show();
 
 if ($stAcao != "alterar") {
-$jsOnload .= " jq(document).ready(function () {
-    jq('#limpar').click(function () {
-        montaParametrosGET('limpaListas')
-    });
-});";
+    $jsOnload .= " jq(document).ready(function () {
+                        jq('#limpar').click(function () {
+                            montaParametrosGET('limpaListas')
+                        });
+                    });";
 }
+
 if ($stAcao != "alterar") {
-$jsOnload .= "
-    // Desabilita o combo de Comissão de Apoio, até que seja escolhida uma Comissão.
-    habilitaEquipeApoio(false);
-    ";
+    $jsOnload .= " // Desabilita o combo de Comissão de Apoio, até que seja escolhida uma Comissão.
+                    habilitaEquipeApoio(false);
+                ";
 }
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

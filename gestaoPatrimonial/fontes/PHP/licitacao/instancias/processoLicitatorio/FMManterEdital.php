@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMManterEdital.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterEdital.php 61893 2015-03-12 17:33:33Z carlos.silva $
 
     * Casos de uso: uc-03.05.16
 */
@@ -141,7 +141,7 @@ if ($_REQUEST['inNumEdital'] && $_REQUEST['stExercicio']) {
     include_once CAM_GP_COM_MAPEAMENTO."TComprasConfiguracao.class.php";
 
     $obTConfiguracao = new TComprasConfiguracao;
-    $obTConfiguracao->setDado( "parametro" , "numeracao_automatica" );
+    $obTConfiguracao->setDado( "parametro" , "numeracao_automatica_licitacao" );
     $obTConfiguracao->recuperaPorChave($rsConfiguracao);
     $boIdLicitacaoAutomatica = $rsConfiguracao->getCampo('valor');
 

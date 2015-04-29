@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoParticipante.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TLicitacaoParticipante.class.php 62309 2015-04-20 19:43:33Z arthur $
 
     * Casos de uso: uc-03.05.18
             uc-03.05.19
@@ -95,61 +95,387 @@ function montaRecuperaParticipanteLicitacao()
                  ,  ll.cod_modalidade
                  ,  modalidade.descricao AS nom_modalidade
                  ,  ll.exercicio
-                 ,  le.cod_licitacao
+                 ,  ll.cod_licitacao
                  ,  ll.cod_objeto
                  ,  cgm.numcgm
                  ,  cgm.nom_cgm
                  ,  lp.cgm_fornecedor
                  ,  lp.numcgm_representante
+                 
               FROM  licitacao.licitacao AS ll
+         
          LEFT JOIN  licitacao.edital AS le
                 ON  ll.cod_licitacao = le.cod_licitacao
                AND  ll.cod_modalidade = le.cod_modalidade
                AND  ll.cod_entidade = le.cod_entidade
                AND  ll.exercicio = le.exercicio
+        
         INNER JOIN  licitacao.participante AS lp
                 ON  lp.cod_licitacao = ll.cod_licitacao
                AND  lp.cod_modalidade = ll.cod_modalidade
                AND  lp.cod_entidade = ll.cod_entidade
                AND  lp.exercicio = ll.exercicio
+        
         INNER JOIN  sw_cgm AS cgm
                 ON  cgm.numcgm = lp.cgm_fornecedor
+        
         INNER JOIN  compras.modalidade
                 ON  modalidade.cod_modalidade = ll.cod_modalidade
+        
         INNER JOIN  orcamento.entidade AS oe
                 ON  oe.exercicio = ll.exercicio
                AND  oe.cod_entidade = ll.cod_entidade
+        
         INNER JOIN  sw_cgm AS entidade
                 ON  entidade.numcgm = oe.numcgm
+             
              WHERE  NOT EXISTS (  SELECT  1
                                     FROM  licitacao.edital_anulado
                                    WHERE  edital_anulado.num_edital = le.num_edital
                                      AND  edital_anulado.exercicio = le.exercicio
                                )
+                               
+               -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+               AND CASE WHEN ll.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                   le.cod_licitacao  IS NOT NULL
+               AND le.cod_modalidade IS NOT NULL
+               AND le.cod_entidade   IS NOT NULL 
+               AND le.exercicio      IS NOT NULL 
+
+              -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN ll.cod_modalidade in (8,9) THEN
+                    
+                    le.cod_licitacao  IS NULL
+                 OR le.cod_modalidade IS NULL
+                 OR le.cod_entidade   IS NULL 
+                 OR le.exercicio      IS NULL 
+
+	         OR le.cod_licitacao  IS NOT NULL
+	         OR le.cod_modalidade IS NOT NULL
+	         OR le.cod_entidade   IS NOT NULL 
+	         OR le.exercicio      IS NOT NULL 
+            END  \n
     ";
 
     if ($this->getDado('cod_licitacao')) {
-        $stSql .="  and le.cod_licitacao = ".$this->getDado('cod_licitacao')."\n";
+        $stSql .="  AND ll.cod_licitacao = ".$this->getDado('cod_licitacao')."\n";
     }
 
     if ($this->getDado('cod_modalidade')) {
-        $stSql .="  and ll.cod_modalidade = ".$this->getDado('cod_modalidade')."\n";
+        $stSql .="  AND ll.cod_modalidade = ".$this->getDado('cod_modalidade')."\n";
     }
 
     if ($this->getDado('cod_entidade')) {
-        $stSql .=" and ll.cod_entidade = ".$this->getDado('cod_entidade')."\n";
+        $stSql .=" AND ll.cod_entidade = ".$this->getDado('cod_entidade')."\n";
     }
 
     if ($this->getDado('num_edital')) {
-      $stSql .="    AND le.num_edital = ".$this->getDado('num_edital')."      \n";
+      $stSql .="    AND ll.num_edital = ".$this->getDado('num_edital')."  \n";
     }
     if ($this->getDado('exercicio')) {
-      $stSql .="    AND le.exercicio = '".$this->getDado('exercicio')."'        \n";
+      $stSql .="    AND ll.exercicio = '".$this->getDado('exercicio')."'  \n";
     }
-    $stSql .="    order by cgm.numcgm                                         \n";
+    $stSql .="    ORDER BY cgm.numcgm \n";
 
     return $stSql;
 }
+
+function recuperaParticipanteLicitacaoHabilitacaoLista(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaParticipanteLicitacaoHabilitacaoLista().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+}
+
+function montaRecuperaParticipanteLicitacaoHabilitacaoLista()
+{
+    $stSql = "
+            SELECT licitacao.cod_processo
+		 , licitacao.cod_licitacao||'/'||licitacao.exercicio as num_licitacao                 
+                 , licitacao.exercicio
+		 , licitacao.exercicio_processo
+		 , licitacao.cod_modalidade
+                 , licitacao.cod_entidade
+                 , cgm_entidade.nom_cgm AS nom_entidade
+                 , modalidade.descricao 
+                 , licitacao.cod_licitacao
+                 , edital.num_edital
+             
+             FROM licitacao.licitacao
+                           
+        LEFT JOIN licitacao.edital
+               ON edital.cod_licitacao   = licitacao.cod_licitacao                                
+              AND edital.cod_modalidade  = licitacao.cod_modalidade                               
+              AND edital.cod_entidade    = licitacao.cod_entidade                                 
+              AND edital.exercicio       = licitacao.exercicio                                    
+              
+       INNER JOIN licitacao.comissao_licitacao                            
+               ON comissao_licitacao.cod_licitacao  = licitacao.cod_licitacao                                 
+              AND comissao_licitacao.cod_modalidade = licitacao.cod_modalidade                                
+              AND comissao_licitacao.cod_entidade   = licitacao.cod_entidade                                  
+              AND comissao_licitacao.exercicio      = licitacao.exercicio                                     
+       
+       INNER JOIN compras.modalidade                                
+               ON licitacao.cod_modalidade = modalidade.cod_modalidade                                
+       
+       INNER JOIN orcamento.entidade
+               ON entidade.cod_entidade = licitacao.cod_entidade                                    
+              AND entidade.exercicio    = licitacao.exercicio                                       
+
+       INNER JOIN  licitacao.participante
+               ON  participante.cod_licitacao  = licitacao.cod_licitacao
+              AND  participante.cod_modalidade = licitacao.cod_modalidade
+              AND  participante.cod_entidade   = licitacao.cod_entidade
+              AND  participante.exercicio      = licitacao.exercicio
+              
+       INNER JOIN  sw_cgm AS cgm
+               ON  cgm.numcgm = participante.cgm_fornecedor
+
+       INNER JOIN  sw_cgm AS cgm_entidade
+               ON  cgm_entidade.numcgm = entidade.numcgm
+                     
+            WHERE NOT EXISTS ( SELECT 1
+                                 FROM licitacao.edital_anulado
+                                WHERE edital_anulado.num_edital = edital.num_edital
+                                  AND edital_anulado.exercicio  = edital.exercicio
+                              )
+                              
+            -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                    edital.cod_licitacao IS NOT NULL
+               AND edital.cod_modalidade IS NOT NULL
+               AND edital.cod_entidade   IS NOT NULL 
+               AND edital.exercicio      IS NOT NULL 
+
+           -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN licitacao.cod_modalidade in (8,9) THEN
+                    
+                    edital.cod_licitacao  IS NULL
+                 OR edital.cod_modalidade IS NULL
+                 OR edital.cod_entidade   IS NULL 
+                 OR edital.exercicio      IS NULL 
+
+             OR edital.cod_licitacao  IS NOT NULL
+             OR edital.cod_modalidade IS NOT NULL
+             OR edital.cod_entidade   IS NOT NULL 
+             OR edital.exercicio      IS NOT NULL
+             
+            END \n";
+
+    if ( $this->getDado( 'num_edital' ) ) {
+        $stSql .= " AND edital.num_edital = '". $this->getDado( 'num_edital' )."' \n";
+    }
+    
+    if ( $this->getDado( 'exercicio' ) ) {
+        $stSql .= " AND licitacao.exercicio = '". $this->getDado( 'exercicio' )."' \n";
+    }
+    
+    if ( $this->getDado( 'cod_entidade' ) ) {
+        $stSql .= " AND licitacao.cod_entidade in ( ". $this->getDado( 'cod_entidade' )." ) \n";
+    }
+
+    if ( $this->getDado( 'cod_modalidade' ) ) {
+        $stSql .= " AND licitacao.cod_modalidade = ". $this->getDado( 'cod_modalidade' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_licitacao' ) ) {
+        $stSql .= " AND licitacao.cod_licitacao = ". $this->getDado( 'cod_licitacao' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_processo' ) ) {
+        $stSql .= " AND licitacao.cod_processo = ". $this->getDado( 'cod_processo' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_mapa' ) ) {
+        $stSql .= " AND licitacao.cod_mapa = ". $this->getDado( 'cod_mapa' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_tipo_licitacao' ) ) {
+        $stSql .= " AND licitacao.cod_tipo_licitacao = ". $this->getDado( 'cod_tipo_licitacao' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_criterio' ) ) {
+        $stSql .= " AND licitacao.cod_criterio = ". $this->getDado( 'cod_criterio' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_tipo_objeto' ) ) {
+        $stSql .= " AND licitacao.cod_tipo_objeto = ". $this->getDado( 'cod_tipo_objeto' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_objeto' ) ) {
+        $stSql .= " AND licitacao.cod_objeto = ". $this->getDado( 'cod_objeto' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_comissao' ) ) {
+        $stSql .= " AND comissao_licitacao.cod_comissao = ". $this->getDado( 'cod_comissao' )." \n";
+    }
+
+    $stSql .="
+            GROUP BY licitacao.cod_licitacao
+                    , licitacao.cod_modalidade
+                    , licitacao.cod_entidade
+                    , licitacao.cod_processo
+                    , licitacao.exercicio
+                    , licitacao.exercicio_processo
+                    , cgm_entidade.nom_cgm 
+                    , modalidade.descricao 
+                    , edital.num_edital
+    
+             ORDER BY licitacao.cod_processo ";
+
+    return $stSql;
+}
+
+function recuperaParticipanteLicitacaoHabilitacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaParticipanteLicitacaoHabilitacao().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+}
+
+function montaRecuperaParticipanteLicitacaoHabilitacao()
+{
+    $stSql = "
+            SELECT licitacao.cod_processo
+		 , licitacao.cod_licitacao||'/'||licitacao.exercicio as num_licitacao                 
+		 , licitacao.exercicio_processo
+		 , modalidade.descricao 
+		 , licitacao.cod_modalidade
+                 , licitacao.cod_entidade
+                 , cgm_entidade.nom_cgm AS nom_entidade
+                 , licitacao.cod_modalidade
+                 , modalidade.descricao AS nom_modalidade
+                 , licitacao.exercicio
+                 , licitacao.cod_licitacao
+                 , licitacao.cod_objeto
+                 , cgm.numcgm
+                 , cgm.nom_cgm
+                 , participante.cgm_fornecedor
+                 , participante.numcgm_representante
+                 , edital.num_edital
+             
+             FROM licitacao.licitacao
+                           
+        LEFT JOIN licitacao.edital
+               ON edital.cod_licitacao   = licitacao.cod_licitacao                                
+              AND edital.cod_modalidade  = licitacao.cod_modalidade                               
+              AND edital.cod_entidade    = licitacao.cod_entidade                                 
+              AND edital.exercicio       = licitacao.exercicio                                    
+              
+       INNER JOIN licitacao.comissao_licitacao                            
+               ON comissao_licitacao.cod_licitacao  = licitacao.cod_licitacao                                 
+              AND comissao_licitacao.cod_modalidade = licitacao.cod_modalidade                                
+              AND comissao_licitacao.cod_entidade   = licitacao.cod_entidade                                  
+              AND comissao_licitacao.exercicio      = licitacao.exercicio                                     
+       
+       INNER JOIN compras.modalidade                                
+               ON licitacao.cod_modalidade = modalidade.cod_modalidade                                
+       
+       INNER JOIN orcamento.entidade
+               ON entidade.cod_entidade = licitacao.cod_entidade                                    
+              AND entidade.exercicio    = licitacao.exercicio                                       
+
+       INNER JOIN  licitacao.participante
+               ON  participante.cod_licitacao  = licitacao.cod_licitacao
+              AND  participante.cod_modalidade = licitacao.cod_modalidade
+              AND  participante.cod_entidade   = licitacao.cod_entidade
+              AND  participante.exercicio      = licitacao.exercicio
+              
+       INNER JOIN  sw_cgm AS cgm
+               ON  cgm.numcgm = participante.cgm_fornecedor
+
+       INNER JOIN  sw_cgm AS cgm_entidade
+               ON  cgm_entidade.numcgm = entidade.numcgm
+                     
+            WHERE NOT EXISTS ( SELECT 1
+                                 FROM licitacao.edital_anulado
+                                WHERE edital_anulado.num_edital = edital.num_edital
+                                  AND edital_anulado.exercicio  = edital.exercicio
+                              )
+            -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                    
+                    edital.cod_licitacao IS NOT NULL
+               AND edital.cod_modalidade IS NOT NULL
+               AND edital.cod_entidade   IS NOT NULL 
+               AND edital.exercicio      IS NOT NULL 
+
+           -- Para as modalidades 8,9 é facultativo possuir um edital
+              WHEN licitacao.cod_modalidade in (8,9) THEN
+                    
+                    edital.cod_licitacao  IS NULL
+                 OR edital.cod_modalidade IS NULL
+                 OR edital.cod_entidade   IS NULL 
+                 OR edital.exercicio      IS NULL 
+
+             OR edital.cod_licitacao  IS NOT NULL
+             OR edital.cod_modalidade IS NOT NULL
+             OR edital.cod_entidade   IS NOT NULL 
+             OR edital.exercicio      IS NOT NULL
+             
+            END \n";
+
+    if ( $this->getDado( 'num_edital' ) ) {
+        $stSql .= " AND edital.num_edital = '". $this->getDado( 'num_edital' )."' \n";
+    }
+    
+    if ( $this->getDado( 'exercicio' ) ) {
+        $stSql .= " AND licitacao.exercicio = '". $this->getDado( 'exercicio' )."' \n";
+    }
+    
+    if ( $this->getDado( 'cod_entidade' ) ) {
+        $stSql .= " AND licitacao.cod_entidade in ( ". $this->getDado( 'cod_entidade' )." ) \n";
+    }
+
+    if ( $this->getDado( 'cod_modalidade' ) ) {
+        $stSql .= " AND licitacao.cod_modalidade = ". $this->getDado( 'cod_modalidade' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_licitacao' ) ) {
+        $stSql .= " AND licitacao.cod_licitacao = ". $this->getDado( 'cod_licitacao' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_processo' ) ) {
+        $stSql .= " AND licitacao.cod_processo = ". $this->getDado( 'cod_processo' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_mapa' ) ) {
+        $stSql .= " AND licitacao.cod_mapa = ". $this->getDado( 'cod_mapa' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_tipo_licitacao' ) ) {
+        $stSql .= " AND licitacao.cod_tipo_licitacao = ". $this->getDado( 'cod_tipo_licitacao' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_criterio' ) ) {
+        $stSql .= " AND licitacao.cod_criterio = ". $this->getDado( 'cod_criterio' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_tipo_objeto' ) ) {
+        $stSql .= " AND licitacao.cod_tipo_objeto = ". $this->getDado( 'cod_tipo_objeto' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_objeto' ) ) {
+        $stSql .= " AND licitacao.cod_objeto = ". $this->getDado( 'cod_objeto' )." \n";
+    }
+
+    if ( $this->getDado( 'cod_comissao' ) ) {
+        $stSql .= " AND comissao_licitacao.cod_comissao = ". $this->getDado( 'cod_comissao' )." \n";
+    }
+
+    $stSql .=" ORDER BY cgm.numcgm ";
+
+    return $stSql;
+}
+
 /**
  * Retorna os participantes
  */
@@ -510,8 +836,7 @@ and licitacao.timestamp <= to_date( '".$this->getDado( 'dt_final' )."', 'dd/mm/y
     public function montaRecuperaParticipanteLicitacaoManutencaoPropostas()
     {
     $stSql = "
-        SELECT
-            ll.cod_entidade
+        SELECT ll.cod_entidade
              ,  entidade.nom_cgm AS nom_entidade
              ,  ll.cod_modalidade
              ,  modalidade.descricao AS nom_modalidade
@@ -526,41 +851,53 @@ and licitacao.timestamp <= to_date( '".$this->getDado( 'dt_final' )."', 'dd/mm/y
              ,  cgm_representante.nom_cgm as representante
              ,  cgm_consorcio.nom_cgm as consorc
              ,  lp.dt_inclusao
+             
           FROM  licitacao.licitacao AS ll
-         LEFT JOIN  licitacao.edital AS le
+     
+     LEFT JOIN  licitacao.edital AS le
             ON  ll.cod_licitacao = le.cod_licitacao
            AND  ll.cod_modalidade = le.cod_modalidade
            AND  ll.cod_entidade = le.cod_entidade
            AND  ll.exercicio = le.exercicio
-        INNER JOIN  licitacao.participante AS lp
+    
+    INNER JOIN  licitacao.participante AS lp
             ON  lp.cod_licitacao = ll.cod_licitacao
            AND  lp.cod_modalidade = ll.cod_modalidade
            AND  lp.cod_entidade = ll.cod_entidade
            AND  lp.exercicio = ll.exercicio
-        INNER JOIN  sw_cgm AS cgm_fornecedor
+           
+    INNER JOIN  sw_cgm AS cgm_fornecedor
             ON  cgm_fornecedor.numcgm = lp.cgm_fornecedor
-        INNER JOIN  sw_cgm AS cgm_representante
+    
+    INNER JOIN  sw_cgm AS cgm_representante
             ON  cgm_representante.numcgm = lp.numcgm_representante
-         LEFT JOIN  licitacao.participante_consorcio lpc
-                    ON  lp.cod_licitacao  = lpc.cod_licitacao
-                   AND  lp.cod_modalidade = lpc.cod_modalidade
-                   AND  lp.cod_entidade   = lpc.cod_entidade
-                   AND  lp.exercicio      = lpc.exercicio
-                   AND  lp.cgm_fornecedor = lpc.cgm_fornecedor
-         LEFT JOIN  sw_cgm AS cgm_consorcio
+     
+     LEFT JOIN  licitacao.participante_consorcio lpc
+            ON  lp.cod_licitacao  = lpc.cod_licitacao
+           AND  lp.cod_modalidade = lpc.cod_modalidade
+           AND  lp.cod_entidade   = lpc.cod_entidade
+           AND  lp.exercicio      = lpc.exercicio
+           AND  lp.cgm_fornecedor = lpc.cgm_fornecedor
+           
+     LEFT JOIN  sw_cgm AS cgm_consorcio
             ON  cgm_consorcio.numcgm = lpc.numcgm
-        INNER JOIN  compras.modalidade
+            
+    INNER JOIN  compras.modalidade
             ON  modalidade.cod_modalidade = ll.cod_modalidade
-        INNER JOIN  orcamento.entidade AS oe
+            
+    INNER JOIN  orcamento.entidade AS oe
             ON  oe.exercicio = ll.exercicio
            AND  oe.cod_entidade = ll.cod_entidade
-        INNER JOIN  sw_cgm AS entidade
+           
+    INNER JOIN  sw_cgm AS entidade
             ON  entidade.numcgm = oe.numcgm
+            
          WHERE  NOT EXISTS (  SELECT  1
                     FROM  licitacao.edital_anulado
                        WHERE  edital_anulado.num_edital = le.num_edital
                      AND  edital_anulado.exercicio = le.exercicio
                    )
+                   
            --a quantidade de documentos deve ser a mesma da quantidade de documentos preenchidos para o participante
            AND  ((  SELECT  count(1)
                 FROM  licitacao.licitacao_documentos
@@ -579,7 +916,7 @@ and licitacao.timestamp <= to_date( '".$this->getDado( 'dt_final' )."', 'dd/mm/y
                ) OR lp.cod_modalidade IN (6,7))
     ";
     if ($this->getDado('cod_licitacao')) {
-        $stSql .="  and le.cod_licitacao = ".$this->getDado('cod_licitacao')."\n";
+        $stSql .="  and ll.cod_licitacao = ".$this->getDado('cod_licitacao')."\n";
     }
 
     if ($this->getDado('cod_modalidade')) {
@@ -594,7 +931,7 @@ and licitacao.timestamp <= to_date( '".$this->getDado( 'dt_final' )."', 'dd/mm/y
       $stSql .="    AND le.num_edital = ".$this->getDado('num_edital')."      \n";
     }
     if ($this->getDado('exercicio')) {
-      $stSql .="    AND le.exercicio = '".$this->getDado('exercicio')."'        \n";
+      $stSql .="    AND ll.exercicio = '".$this->getDado('exercicio')."'        \n";
     }
     $stSql .="    order by cgm_fornecedor.numcgm                                         \n";
 

@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRelatorioRazaoDespesa.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: OCGeraRelatorioRazaoDespesa.php 62308 2015-04-20 19:41:57Z evandro $
 
  * Casos de uso : uc-06.01.20
  */
@@ -69,16 +69,25 @@ switch($_REQUEST['stTipoRelatorio']) {
     $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData);
     break;
 
+    case 'empenhado':
+    case 'liquidado':
+    case 'pago':
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaEmpenhoLiquidadoPago($rsData);
+        foreach($rsData->getElementos() as $registro) {    
+            $arOrgaoUnidade[]       = $registro['num_orgao'].",".$registro['num_unidade']; 
+        }
+    break;
+
     default:
     $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaPrincipal($rsData);
     break;
 }
 
 //Preenche com campos de agrupamento
-foreach($rsData->getElementos() as $registro) {
-    $arEstrutural[]  = array_key_exists('despesa'         , $registro) ? $registro['despesa'] : null;
-    $arData[]        = array_key_exists('dt_pagamento'    , $registro) ? $registro['dt_pagamento'] : null;
-    $arDataReceita[] = array_key_exists('dt_transferencia', $registro) ? $registro['dt_transferencia'] : null;
+foreach($rsData->getElementos() as $registro) {        
+    $arEstrutural[]         = array_key_exists('despesa'         , $registro) ? $registro['despesa'] : null;
+    $arData[]               = array_key_exists('dt_pagamento'    , $registro) ? $registro['dt_pagamento'] : null;
+    $arDataReceita[]        = array_key_exists('dt_transferencia', $registro) ? $registro['dt_transferencia'] : null;
 }
 
 //Seta variável título do relatório
@@ -118,12 +127,25 @@ switch($_REQUEST['stTipoRelatorio']) {
     case 'restos_pagar':
     $stTipoRelatorio = 'Restos a Pagar';
     break;
+    
+    case 'empenhado':
+    $stTipoRelatorio = 'Empenhado';
+    break;
+    
+    case 'liquidado':
+    $stTipoRelatorio = 'Liquidado';
+    break;
+    
+    case 'pago':
+    $stTipoRelatorio = 'Pago';
+    break;
 }
 
-if(is_array($arEstrutural))           { $arEstrutural  = array_unique($arEstrutural); }
-if(is_array($arData))                 { $arData        = array_unique($arData); }
-if(is_array($arDataReceita))          { $arDataReceita = array_unique($arDataReceita); }
-if(is_array($rsData->getElementos())) { $registros     = $rsData->getElementos(); } 
+if(is_array($arOrgaoUnidade))         { $arOrgaoUnidade = array_unique($arOrgaoUnidade); }
+if(is_array($arEstrutural))           { $arEstrutural   = array_unique($arEstrutural); }
+if(is_array($arData))                 { $arData         = array_unique($arData); }
+if(is_array($arDataReceita))          { $arDataReceita  = array_unique($arDataReceita); }
+if(is_array($rsData->getElementos())) { $registros      = $rsData->getElementos(); }
 
 $arDados = array(
     'registros'       => $rsData->getElementos(),
@@ -131,6 +153,7 @@ $arDados = array(
     'arEstrutural'    => $arEstrutural,
     'arData'          => $arData,
     'arDataReceita'   => $arDataReceita,
+    'arOrgaoUnidade'  => $arOrgaoUnidade,
 );
         
 // Switch necessário para selecionar template do relatório. Embora parecidos, há campos que constam num que não constam no outro.
@@ -147,6 +170,12 @@ switch($_REQUEST['stTipoRelatorio']) {
     $obMPDF = new FrameWorkMPDF(6,55,13);
     break;
     
+    case 'empenhado':
+    case 'liquidado':
+    case 'pago':
+    $obMPDF = new FrameWorkMPDF(6,55,16);
+    break;
+
     default:
     $obMPDF = new FrameWorkMPDF(6,55,10);
     break;

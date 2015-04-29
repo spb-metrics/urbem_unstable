@@ -22,29 +22,29 @@
 */
 
 
-CREATE OR REPLACE FUNCTION tcemg.fn_despesa_prev(varchar, varchar ,varchar, varchar) RETURNS SETOF RECORD AS '
+CREATE OR REPLACE FUNCTION tcemg.fn_despesa_prev(varchar, varchar ,varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio             ALIAS FOR $1;
     stCodEntidades          ALIAS FOR $2;
     dtInicial               ALIAS FOR $3;
     dtFinal                 ALIAS FOR $4;
 
-    dtInicioAno             VARCHAR   := '''';
-    dtFimAno                VARCHAR   := '''';
-    stSql                   VARCHAR   := '''';
-    stSql1                  VARCHAR   := '''';
-    stMascClassReceita      VARCHAR   := '''';
-    stMascRecurso           VARCHAR   := '''';
-    stCodEstrutural         VARCHAR   := '''';
+    dtInicioAno             VARCHAR   := '';
+    dtFimAno                VARCHAR   := '';
+    stSql                   VARCHAR   := '';
+    stSql1                  VARCHAR   := '';
+    stMascClassReceita      VARCHAR   := '';
+    stMascRecurso           VARCHAR   := '';
+    stCodEstrutural         VARCHAR   := '';
     reRegistro              RECORD;
 
     arDatas varchar[] ;
 
 BEGIN
         
-        dtInicioAno := ''01/01/'' || stExercicio;
+        dtInicioAno := '01/01/' || stExercicio;
         
-        stSql := ''
+        stSql := '
         CREATE TEMPORARY TABLE tmp_despesa_lib AS (
             SELECT
                 cd.exercicio,
@@ -79,9 +79,9 @@ BEGIN
                         sup.exercicio = sups.exercicio AND
                         sup.cod_suplementacao = sups.cod_suplementacao 
                 WHERE 
-                    sup.exercicio = '''''' || stExercicio || ''''''  AND
-                    sup.dt_suplementacao BETWEEN TO_DATE('''''' || dtInicioAno || '''''', ''''dd/mm/yyyy'''') AND
-                                             TO_DATE('''''' || dtFinal || '''''', ''''dd/mm/yyyy'''') 
+                    sup.exercicio = ''' || stExercicio || '''  AND
+                    sup.dt_suplementacao BETWEEN TO_DATE(''' || dtInicioAno || ''', ''dd/mm/yyyy'') AND
+                                             TO_DATE(''' || dtFinal || ''', ''dd/mm/yyyy'') 
                     
                 GROUP BY
                     sups.exercicio, 
@@ -102,9 +102,9 @@ BEGIN
                         sup.exercicio = supr.exercicio AND 
                         sup.cod_suplementacao = supr.cod_suplementacao 
                 WHERE 
-                    sup.exercicio = '''''' || stExercicio || ''''''  AND
-                    sup.dt_suplementacao BETWEEN TO_DATE('''''' || dtInicioAno || '''''', ''''dd/mm/yyyy'''') AND
-                                             TO_DATE('''''' || dtFinal || '''''', ''''dd/mm/yyyy'''') 
+                    sup.exercicio = ''' || stExercicio || '''  AND
+                    sup.dt_suplementacao BETWEEN TO_DATE(''' || dtInicioAno || ''', ''dd/mm/yyyy'') AND
+                                             TO_DATE(''' || dtFinal || ''', ''dd/mm/yyyy'') 
                 GROUP BY 
                     supr.exercicio, 
                     supr.cod_despesa
@@ -113,8 +113,8 @@ BEGIN
               supr.cod_despesa = d.cod_despesa 
             
             WHERE 
-                cd.exercicio = '''''' || stExercicio || '''''' AND 
-                d.cod_entidade IN ('' || stCodEntidades || '') 
+                cd.exercicio = ''' || stExercicio || ''' AND 
+                d.cod_entidade IN (' || stCodEntidades || ') 
             
             GROUP BY 
                 cd.exercicio, 
@@ -127,11 +127,11 @@ BEGIN
                 d.cod_subfuncao, 
                 d.cod_recurso 
             )
-            '';
+            ';
         EXECUTE stSql;
         
         
-        stSql := ''CREATE TEMPORARY TABLE tmp_despesa AS (
+        stSql := 'CREATE TEMPORARY TABLE tmp_despesa AS (
             SELECT
                     cast(1 as integer) AS grupo
                   , cast(1 as integer) as nivel
@@ -141,14 +141,15 @@ BEGIN
                   , (coalesce(sum(tmp_despesa_lib.vl_original),0.00)) + (coalesce(sum(tmp_despesa_lib.vl_credito_adicional),0.00))  as vl_suplementacoes
                   , case when( empenho.cod_empenho is not null ) then 
                         (SELECT * 
-                           FROM  empenho.fn_empenho_empenhado(   '''''' || stExercicio || ''''''
+                           FROM  empenho.fn_empenho_empenhado(   ''' || stExercicio || '''
                                                              , empenho.cod_empenho
-                                                             , '''''' ||  stCodEntidades ||''''''
-                                                             , ''''''||dtInicial||''''''
-                                                             ,   ''''''||dtFinal||''''''))                        
+                                                             , ''' ||  stCodEntidades ||'''
+                                                             , '''||dtInicial||'''
+                                                             ,   '''||dtFinal||'''))                        
                     else
-                         ''''0.00''''   
+                         ''0.00''   
                     end as vl_empenhado
+                  , funcao.cod_funcao
             FROM orcamento.despesa
             LEFT JOIN 	orcamento.conta_despesa
                     ON	conta_despesa.cod_conta = despesa.cod_conta
@@ -169,17 +170,17 @@ BEGIN
             LEFT JOIN empenho.empenho
                    ON empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
                   AND empenho.exercicio       = pre_empenho.exercicio
-            where despesa.exercicio = '''''' || stExercicio || ''''''
-                and despesa.cod_entidade IN ('' || stCodEntidades || '') 
+            where despesa.exercicio = ''' || stExercicio || '''
+                and despesa.cod_entidade IN (' || stCodEntidades || ') 
                 --and despesa.cod_funcao IN (4,9)
-                and (conta_despesa.cod_estrutural ilike ''''3.%''''
-                     or conta_despesa.cod_estrutural ilike ''''4.%''''
-                     or conta_despesa.cod_estrutural ilike ''''9.%''''
-                     or conta_despesa.cod_estrutural ilike ''''7.%'''')
-                --and conta_despesa.cod_estrutural not ilike ''''%.9.1.%''''
-            group by 	funcao.descricao, conta_despesa.cod_estrutural, conta_despesa.descricao,  empenho.cod_empenho
+                and (conta_despesa.cod_estrutural ilike ''3.%''
+                     or conta_despesa.cod_estrutural ilike ''4.%''
+                     or conta_despesa.cod_estrutural ilike ''9.%''
+                     or conta_despesa.cod_estrutural ilike ''7.%'')
+                --and conta_despesa.cod_estrutural not ilike ''%.9.1.%''
+            group by 	funcao.descricao, conta_despesa.cod_estrutural, conta_despesa.descricao,  empenho.cod_empenho, funcao.cod_funcao
             order by 	funcao.descricao, conta_despesa.cod_estrutural    
-        ) ''; 
+        ) '; 
 
         EXECUTE stSql;
 
@@ -187,302 +188,214 @@ BEGIN
 
     SELECT cod_estrutural INTO stCodEstrutural
       FROM tmp_despesa
-     WHERE cod_estrutural = ''3.3.9.0.01.00.00.00.00'';
+     WHERE cod_estrutural = '3.3.9.0.01.00.00.00.00';
 
     IF stCodEstrutural IS NULL THEN
-        INSERT INTO tmp_despesa VALUES (2, 3, ''Aposentadorias'', ''3.3.9.0.01.00.00.00.00'');
+        INSERT INTO tmp_despesa VALUES (2, 3, 'Aposentadorias', '3.3.9.0.01.00.00.00.00');
     ELSE 
-        UPDATE tmp_despesa SET nom_conta = ''Aposentadorias''                    WHERE cod_estrutural = ''3.3.9.0.01.00.00.00.00'';
+        UPDATE tmp_despesa SET nom_conta = 'Aposentadorias' WHERE cod_estrutural = '3.3.9.0.01.00.00.00.00';
     END IF;
 
     SELECT cod_estrutural INTO stCodEstrutural
       FROM tmp_despesa
-     WHERE cod_estrutural = ''3.3.9.0.03.00.00.00.00'';
+     WHERE cod_estrutural = '3.3.9.0.03.00.00.00.00';
 
     IF stCodEstrutural IS NULL THEN
-        INSERT INTO tmp_despesa VALUES (2, 3, ''Pensões'', ''3.3.9.0.03.00.00.00.00'');
+        INSERT INTO tmp_despesa VALUES (2, 3, 'Pensões', '3.3.9.0.03.00.00.00.00');
     ELSE
-        UPDATE tmp_despesa SET nom_conta = ''Pensões''                           WHERE cod_estrutural = ''3.3.9.0.03.00.00.00.00'';
+        UPDATE tmp_despesa SET nom_conta = 'Pensões' WHERE cod_estrutural = '3.3.9.0.03.00.00.00.00';
     END IF;
 
     SELECT cod_estrutural INTO stCodEstrutural
       FROM tmp_despesa
-     WHERE cod_estrutural = ''3.3.9.0.05.00.00.00.00'';
+     WHERE cod_estrutural = '3.3.9.0.05.00.00.00.00';
 
     IF stCodEstrutural IS NULL THEN
-        INSERT INTO tmp_despesa VALUES (2, 3, ''Outros Benefícios Previdenciários'', ''3.3.9.0.05.00.00.00.00'');
+        INSERT INTO tmp_despesa VALUES (2, 3, 'Outros Benefícios Previdenciários', '3.3.9.0.05.00.00.00.00');
     ELSE
-        UPDATE tmp_despesa SET nom_conta = ''Outros Benefícios Previdenciários'' WHERE cod_estrutural = ''3.3.9.0.05.00.00.00.00'';
+        UPDATE tmp_despesa SET nom_conta = 'Outros Benefícios Previdenciários' WHERE cod_estrutural = '3.3.9.0.05.00.00.00.00';
     END IF;
 
     SELECT cod_estrutural INTO stCodEstrutural
       FROM tmp_despesa
-     WHERE cod_estrutural = ''3.3.9.0.09.00.00.00.00'';
+     WHERE cod_estrutural = '3.3.9.0.09.00.00.00.00';
 
     IF stCodEstrutural IS NULL THEN
-        INSERT INTO tmp_despesa VALUES (2, 3, ''Outros Benefícios Previdenciários'', ''3.3.9.0.09.00.00.00.00'');
+        INSERT INTO tmp_despesa VALUES (2, 3, 'Outros Benefícios Previdenciários', '3.3.9.0.09.00.00.00.00');
     ELSE
-        UPDATE tmp_despesa SET nom_conta = ''Outros Benefícios Previdenciários''
-                             , cod_estrutural = ''3.3.9.0.05.00.00.00.00'' WHERE cod_estrutural = ''3.3.9.0.09.00.00.00.00'';
+        UPDATE tmp_despesa SET nom_conta = 'Outros Benefícios Previdenciários'
+                             , cod_estrutural = '3.3.9.0.05.00.00.00.00' WHERE cod_estrutural = '3.3.9.0.09.00.00.00.00';
     END IF;
 
  
-    INSERT INTO tmp_despesa VALUES (3, 3, ''Pessoal Militar'', ''militar1'');
-    INSERT INTO tmp_despesa VALUES (3, 4, ''Reformas'', ''militar2'');
-    INSERT INTO tmp_despesa VALUES (3, 4, ''Pensões'', ''militar3'');
-    INSERT INTO tmp_despesa VALUES (3, 4, ''Outros Benefícios Previdenciários'', ''militar4'');
+    INSERT INTO tmp_despesa VALUES (3, 3, 'Pessoal Militar', 'militar1');
+    INSERT INTO tmp_despesa VALUES (3, 4, 'Reformas', 'militar2');
+    INSERT INTO tmp_despesa VALUES (3, 4, 'Pensões', 'militar3');
+    INSERT INTO tmp_despesa VALUES (3, 4, 'Outros Benefícios Previdenciários', 'militar4');
 
     IF stCodEstrutural IS NULL THEN
-        INSERT INTO tmp_despesa VALUES (4, 5, ''Reserva de Contingência'', ''9.9.9.9.99.00.00.00.00'');
+        INSERT INTO tmp_despesa VALUES (4, 5, 'Reserva de Contingência', '9.9.9.9.99.00.00.00.00');
     ELSE
-        UPDATE tmp_despesa SET nom_conta = ''Reserva de Contingência''
-                             , cod_estrutural = ''9.9.9.9.99.00.00.00.00'' WHERE cod_estrutural = ''9.%'';
+        UPDATE tmp_despesa SET nom_conta = 'Reserva de Contingência'
+                             , cod_estrutural = '9.9.9.9.99.00.00.00.00' WHERE cod_estrutural = '9.%';
     END IF;
     
-    stSql := ''
+    stSql := '
+
     CREATE TEMPORARY TABLE tmp_retorno AS (
-        SELECT cast(1 as integer) as grupo
-            ,  cast(1 as integer) as nivel
-            ,  cast('''''''' as varchar) as cod_estrutural
-            ,  cast(''''DESPESAS PREVIDENCIÁRIAS - RPPS (EXCETO INTRA-ORÇAMENTÁRIAS) (VII)'''' as varchar) as nom_conta
+        SELECT 1 AS grupo
             ,  sum(coalesce(vl_original, 0.00)) as vl_original
             ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
             ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    FROM tmp_despesa
-    where (cod_estrutural LIKE ''''3.%''''
-      or  cod_estrutural LIKE ''''4.%''''
-      or  cod_estrutural LIKE ''''9.%'''')
-      and cod_estrutural NOT LIKE ''''%.9.1.%''''
-    
-    UNION ALL
+          FROM tmp_despesa
+         WHERE cod_funcao = 4
 
-        SELECT cast(1 as integer) as grupo
-            ,  cast(2 as integer) as nivel
-            ,  cast('''''''' as varchar) as cod_estrutural
-            ,  cast(''''ADMINISTRAÇÃO'''' as varchar) as nom_conta
+        UNION ALL
+
+        SELECT 2 AS grupo
             ,  sum(coalesce(vl_original, 0.00)) as vl_original
             ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
             ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    FROM tmp_despesa
-    where (cod_estrutural LIKE ''''3.%''''
-      or  cod_estrutural LIKE ''''4.%''''
-      or  cod_estrutural LIKE ''''9.%'''')
-      and cod_estrutural NOT LIKE ''''%.9.1.%''''
-      and cod_estrutural NOT IN ( ''''3.3.9.0.01.00.00.00.00''''
-                            , ''''3.3.9.0.03.00.00.00.00''''
-                            , ''''3.3.9.0.05.00.00.00.00'''')
+          FROM tmp_despesa
+         WHERE cod_funcao = 9
+
+        UNION ALL
     
-    UNION ALL
-    
-    SELECT cast(1 as integer) as grupo
-            ,  cast(3 as integer) as nivel
-            ,  cast('''''''' as varchar) as cod_estrutural
-            ,  cast(''''Despesas Correntes'''' as varchar) as nom_conta
+        SELECT 3 AS grupo
             ,  sum(coalesce(vl_original, 0.00)) as vl_original
             ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
             ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    from tmp_despesa
-    where (cod_estrutural LIKE ''''3.%''''
-      or  cod_estrutural LIKE ''''9.%'''')
-      and cod_estrutural NOT LIKE ''''%.9.1.%''''
-      and cod_estrutural NOT IN ( ''''3.3.9.0.01.00.00.00.00''''
-                            , ''''3.3.9.0.03.00.00.00.00''''
-                            , ''''3.3.9.0.05.00.00.00.00'''')
-    
-    
-    UNION ALL
-    
-    SELECT cast(1 as integer) as grupo
-        ,  cast(3 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''Despesas de Capital'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    from tmp_despesa
-    where cod_estrutural LIKE ''''4.%''''
-    
-    
-    UNION ALL
-    
-    SELECT cast(2 as integer) as grupo
-        ,  cast(2 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''PREVIDÊNCIA SOCIAL'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural IN ( ''''3.3.9.0.01.00.00.00.00''''
-                            , ''''3.3.9.0.03.00.00.00.00''''
-                            , ''''3.3.9.0.05.00.00.00.00'''')
-    
-    UNION ALL
-    
-    SELECT cast(2 as integer) as grupo
-        ,  cast(3 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''Pessoa Civil'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural IN ( ''''3.3.9.0.01.00.00.00.00''''
-                            , ''''3.3.9.0.03.00.00.00.00''''
-                            , ''''3.3.9.0.05.00.00.00.00'''')
-                            
-    UNION ALL
-    
-    SELECT cast(2 as integer) as grupo
-        ,  cast(4 as integer) as nivel
-        ,  cod_estrutural
-        ,  nom_conta
-        ,  coalesce(vl_original, 0.00) as vl_original
-        ,  coalesce(vl_suplementacoes, 0.00) as vl_suplementacoes
-        ,  coalesce(vl_empenhado, 0.00) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural = ''''3.3.9.0.01.00.00.00.00''''
-                            
-                            
-    UNION ALL
-    
-    SELECT cast(2 as integer) as grupo
-        ,  cast(4 as integer) as nivel
-        ,  cod_estrutural
-        ,  nom_conta
-        ,  coalesce(vl_original, 0.00) as vl_original
-        ,  coalesce(vl_suplementacoes, 0.00) as vl_suplementacoes
-        ,  coalesce(vl_empenhado, 0.00) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural = ''''3.3.9.0.03.00.00.00.00''''
-                            
-    UNION ALL
-    
-    SELECT cast(2 as integer) as grupo
-        ,  cast(4 as integer) as nivel
-        ,  cod_estrutural
-        ,  nom_conta
-        ,  SUM(coalesce(vl_original, 0.00)) as vl_original
-        ,  SUM(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  SUM(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural = ''''3.3.9.0.05.00.00.00.00''''
- GROUP BY tmp_despesa.cod_estrutural
-        , tmp_despesa.nom_conta
-    
-    UNION ALL
-    
-    SELECT grupo
-        ,  nivel
-        ,  cod_estrutural
-        ,  nom_conta
-        ,  coalesce(vl_original, 0.00) as vl_original
-        ,  coalesce(vl_suplementacoes, 0.00) as vl_suplementacoes
-        ,  coalesce(vl_empenhado, 0.00) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural like ''''militar%''''
-    
-    UNION ALL
-    
-    SELECT cast(4 as integer) as grupo
-        ,  cast(3 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''Outras Despesas Previdenciárias'''' as varchar) as nom_conta
-        ,  cast(0.00 as numeric(14,2)) as vl_original
-        ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
-        ,  cast(0.00 as numeric(14,2)) as vl_empenhado
-        
-    UNION ALL
-    
-    SELECT cast(4 as integer) as grupo
-        ,  cast(4 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''Compensação Previdenciária do RPPS para o RGPS'''' as varchar) as nom_conta
-        ,  cast(0.00 as numeric(14,2)) as vl_original
-        ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
-        ,  cast(0.00 as numeric(14,2)) as vl_empenhado
-        
-    UNION ALL
-    
-    SELECT cast(4 as integer) as grupo
-        ,  cast(4 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''Demais Despesas Previdenciárias'''' as varchar) as nom_conta
-        ,  cast(0.00 as numeric(14,2)) as vl_original
-        ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
-        ,  cast(0.00 as numeric(14,2)) as vl_empenhado
-    
-    UNION ALL
-    
-    SELECT cast(5 as integer) as grupo
-        ,  cast(2 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''DESPESAS PREVIDENCIÁRIAS - RPPS (INTRA-ORÇAMENTÁRIAS) (VIII)'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural like ''''%.9.1.%''''
-    
-    UNION ALL
-    
-    SELECT cast(6 as integer) as grupo
-        ,  cast(2 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''RESERVA DO RPPS (IX)'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
-    
-    from tmp_despesa
-    where cod_estrutural like ''''7.%''''
+          FROM tmp_despesa
+         WHERE cod_funcao = 9
+           AND (cod_estrutural LIKE ''3.1.9.0.01%''
+            OR cod_estrutural LIKE ''3.1.9.0.03%'')
 
-    UNION ALL 
+        UNION ALL
 
-    SELECT cast(7 as integer) as grupo
-        ,  cast(2 as integer) as nivel
-        ,  cast('''''''' as varchar) as cod_estrutural
-        ,  cast(''''RESERVA DE CONTINGÊNCIA'''' as varchar) as nom_conta
-        ,  sum(coalesce(vl_original, 0.00)) as vl_original
-        ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
-        ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+        SELECT 4 AS grupo
+            ,  sum(coalesce(vl_original, 0.00)) as vl_original
+            ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''3.3%''
 
-    from tmp_despesa
-    where cod_estrutural like ''''9.9.%''''
-        
-    )'';
+        UNION ALL
+
+        SELECT 5 AS grupo
+            ,  sum(coalesce(vl_original, 0.00)) as vl_original
+            ,  sum(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  sum(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''4.4%''
+
+        UNION ALL
+
+        SELECT 6 AS grupo
+            ,  cast(0.00 as numeric(14,2)) as vl_original
+            ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
+            ,  cast(0.00 as numeric(14,2)) as vl_empenhado
+
+        UNION ALL
+    
+        SELECT 7 AS grupo
+            ,  coalesce(vl_original, 0.00) as vl_original
+            ,  coalesce(vl_suplementacoes, 0.00) as vl_suplementacoes
+            ,  coalesce(vl_empenhado, 0.00) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''3.1.9.1.13%''
+
+        UNION ALL
+
+        SELECT 8 AS grupo
+            ,  cast(0.00 as numeric(14,2)) as vl_original
+            ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
+            ,  cast(0.00 as numeric(14,2)) as vl_empenhado
+
+        UNION ALL
+
+        SELECT 9 AS grupo
+            ,  cast(0.00 as numeric(14,2)) as vl_original
+            ,  cast(0.00 as numeric(14,2)) as vl_suplementacoes
+            ,  cast(0.00 as numeric(14,2)) as vl_empenhado
+
+        UNION ALL
+    
+        SELECT 10 AS grupo
+            ,  coalesce(vl_original, 0.00) as vl_original
+            ,  coalesce(vl_suplementacoes, 0.00) as vl_suplementacoes
+            ,  coalesce(vl_empenhado, 0.00) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''3%''
+           AND cod_funcao = 4
+
+        UNION ALL
+    
+        SELECT 11 AS grupo
+            ,  SUM(coalesce(vl_original, 0.00)) as vl_original
+            ,  SUM(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  SUM(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''4%''
+           AND cod_funcao = 4
+
+        UNION ALL
+
+        SELECT 12 AS grupo
+            ,  SUM(coalesce(vl_original, 0.00)) as vl_original
+            ,  SUM(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  SUM(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''3.3.9.0.05%''
+           AND cod_funcao = 9
+
+        UNION ALL
+
+        SELECT 13 AS grupo
+            ,  SUM(coalesce(vl_original, 0.00)) as vl_original
+            ,  SUM(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  SUM(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE cod_estrutural LIKE ''3.3.2.0.01.01%''
+           AND cod_funcao = 9
+
+        UNION ALL
+
+        SELECT 14 AS grupo
+            ,  SUM(coalesce(vl_original, 0.00)) as vl_original
+            ,  SUM(coalesce(vl_suplementacoes, 0.00)) as vl_suplementacoes
+            ,  SUM(coalesce(vl_empenhado, 0.00)) as vl_empenhado
+          FROM tmp_despesa
+         WHERE (cod_estrutural NOT LIKE ''3.1.9.0.01%''
+            OR cod_estrutural NOT LIKE ''3.1.9.0.03%''
+            OR cod_estrutural NOT LIKE ''3.3.9.0.05%''
+            OR cod_estrutural NOT LIKE ''3.1.9.1.13%''
+            OR cod_estrutural NOT LIKE ''3.3.2.0.01.01%'')
+           AND cod_funcao = 9
+    )';
    
     EXECUTE stSql;
    
-    CREATE TEMP SEQUENCE seq;
+    /*CREATE TEMP SEQUENCE seq;
  
-    stSql := ''
+    stSql := '
     CREATE TABLE tmp_retorno_index AS(
-    SELECT nextval(''''seq'''') AS cont 
+    SELECT nextval(''seq'') AS cont 
          , vl_original
          , vl_suplementacoes
          , vl_empenhado
       FROM tmp_retorno 
-    )'';    
+    )';    
 
     EXECUTE stSql;
+    */
 
-    stSql := ''
+/*
+    stSql := '
 
     SELECT
         ( SELECT sum(coalesce(vl_original,0.00)) as vl_original
             FROM tmp_retorno_index
-           WHERE cont = 7
-              OR cont = 8
-              OR cont = 11
-              OR cont = 12 ) as despPrevSocInatPens
+           WHERE cont = 1 ) as despPrevSocInatPens
       , ( SELECT sum(coalesce(vl_original,0.00)) as vl_original
             FROM tmp_retorno_index
            WHERE cont = 19 ) as despReservaContingencia
@@ -582,15 +495,158 @@ BEGIN
             FROM tmp_retorno_index
            WHERE cont = 16 ) as outrasDespesas
 
-    '';
+    ';
+*/
+
+    stSql := '
+                SELECT
+                        ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 1 ) AS despAdmGeral
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 2 ) AS despPrevSoci
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 3 ) AS despPrevSocInatPens
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 4 ) AS outrasDespCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 5 ) AS despInvestimentos
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 6 ) AS despInversoesFinanceiras
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 7 ) AS despesasPrevIntra
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 8 ) AS despReserva
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 9 ) AS despOutrasReservas
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 10 ) AS despCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 11 ) AS despCapital
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 12 ) AS outrosBeneficios
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 13 ) AS contPrevidenciaria
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_original
+                            FROM tmp_despesa
+                           WHERE grupo = 14 ) AS outrasDespesas
+                      , CAST(01 AS INTEGER) as codTipo
+
+                UNION ALL
+
+                SELECT
+                        ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 1 ) AS despAdmGeral
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 2 ) AS despPrevSoci
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 3 ) AS despPrevSocInatPens
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 4 ) AS outrasDespCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 5 ) AS despInvestimentos
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 6 ) AS despInversoesFinanceiras
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 7 ) AS despesasPrevIntra
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 8 ) AS despReserva
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 9 ) AS despOutrasReservas
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 10 ) AS despCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 11 ) AS despCapital
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 12 ) AS outrosBeneficios
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 13 ) AS contPrevidenciaria
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_suplementacoes
+                            FROM tmp_despesa
+                           WHERE grupo = 14 ) AS outrasDespesas
+                      , CAST(02 AS INTEGER) as codTipo
+
+                UNION ALL
+
+                SELECT
+                        ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 1 ) AS despAdmGeral
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 2 ) AS despPrevSoci
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 3 ) AS despPrevSocInatPens
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 4 ) AS outrasDespCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 5 ) AS despInvestimentos
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 6 ) AS despInversoesFinanceiras
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 7 ) AS despesasPrevIntra
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 8 ) AS despReserva
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 9 ) AS despOutrasReservas
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 10 ) AS despCorrentes
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 11 ) AS despCapital
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 12 ) AS outrosBeneficios
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 13 ) AS contPrevidenciaria
+                      , ( SELECT SUM(COALESCE(vl_empenhado,0.00)) as vl_empenhado
+                            FROM tmp_despesa
+                           WHERE grupo = 14 ) AS outrasDespesas
+                      , CAST(03 AS INTEGER) as codTipo
+    ';
+
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN next reRegistro;
     END LOOP;
 
-    DROP TABLE tmp_retorno_index;
+    --DROP TABLE tmp_retorno_index;
 
     RETURN;
 END;
-'language 'plpgsql';
+$$ language 'plpgsql';

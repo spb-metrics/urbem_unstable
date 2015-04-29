@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 61473 2015-01-21 13:32:02Z evandro $
+    $Id: TContabilidadePlanoConta.class.php 62150 2015-03-31 20:04:31Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -853,7 +853,9 @@ function montaRecuperaDadosExportacaoBalVerificacao()
     $stSQL  .= "             nom_sistema         VARCHAR,                                                                                                                                \n";
     $stSQL  .= "             escrituracao        CHAR(9),                                                                                                                                \n";
     $stSQL  .= "             indicador_superavit CHAR(12))                                                                                                                                \n";
-    $stSQL  .= " WHERE (vl_saldo_debitos <> 0.00 or vl_saldo_creditos <> 0.00 or vl_saldo_anterior <> 0.00 ) \n";
+    $stSQL  .= " WHERE (vl_saldo_debitos <> 0.00 or vl_saldo_creditos <> 0.00 or vl_saldo_anterior <> 0.00 )
+                 ORDER BY cod_estrutural;
+    \n";
 
     return $stSQL;
 }

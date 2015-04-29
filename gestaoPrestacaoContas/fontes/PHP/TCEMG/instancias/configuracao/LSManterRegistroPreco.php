@@ -32,16 +32,16 @@
 
   * @ignore
   *
-  * $Id: LSManterRegistroPreco.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: LSManterRegistroPreco.php 61913 2015-03-13 18:55:57Z franver $
   *
-  * $Revision: 59612 $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Revision: 61913 $
+  * $Author: franver $
+  * $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGProcessoAdesaoRegistroPrecos.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRegistroPrecos.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterRegistroPreco";
@@ -69,13 +69,13 @@ if (empty($inCodEntidade)){
     SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"O campo entidade deve ser informado.","","aviso", Sessao::getId(), "../");
 }
 
-$rsProcessoAdesao = new RecordSet();
-$obTTCEMGProcessoAdesaoRegistroPrecos = new TTCEMGProcessoAdesaoRegistroPrecos();
-$obTTCEMGProcessoAdesaoRegistroPrecos->setDado('cod_entidade' , $inCodEntidade);
-$obTTCEMGProcessoAdesaoRegistroPrecos->recuperaListaProcesso( $rsProcessoAdesao );
+$rsRegistroPrecos = new RecordSet();
+$obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
+$obTTCEMGRegistroPrecos->setDado('cod_entidade' , $inCodEntidade);
+$obTTCEMGRegistroPrecos->recuperaListaProcesso( $rsRegistroPrecos );
 
 $obLista = new Lista;
-$obLista->setRecordSet( $rsProcessoAdesao );
+$obLista->setRecordSet( $rsRegistroPrecos );
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
 $obLista->ultimoCabecalho->setWidth( 2 );
@@ -97,6 +97,11 @@ $obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "Tipo de Registro de Preços" );
+$obLista->ultimoCabecalho->setWidth( 10 );
+$obLista->commitCabecalho();
+
+$obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo( "Modalidade" );
 $obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
@@ -107,23 +112,33 @@ $obLista->ultimoCabecalho->setWidth( 5 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "CGM Gerenciador" );
+$obLista->ultimoCabecalho->setWidth( 5 );
+$obLista->commitCabecalho();
+
+$obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
 $obLista->ultimoCabecalho->setWidth( 2 );
 $obLista->commitCabecalho();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
-$obLista->ultimoDado->setCampo( "[codigo_processo_adesao]" );
+$obLista->ultimoDado->setCampo( "[codigo_registro_precos]" );
 $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
-$obLista->ultimoDado->setCampo( "[data_abertura_processo_adesao]" );
+$obLista->ultimoDado->setCampo( "[data_abertura_registro_precos]" );
 $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
 $obLista->ultimoDado->setCampo( "[codigo_processo_licitacao]" );
+$obLista->commitDado();
+
+$obLista->addDado();
+$obLista->ultimoDado->setAlinhamento("CENTRO");
+$obLista->ultimoDado->setCampo( "[tipo_reg_precos]" );
 $obLista->commitDado();
 
 $obLista->addDado();
@@ -136,11 +151,18 @@ $obLista->ultimoDado->setAlinhamento("CENTRO");
 $obLista->ultimoDado->setCampo( "[numero_modalidade]" );
 $obLista->commitDado();
 
+$obLista->addDado();
+$obLista->ultimoDado->setAlinhamento("CENTRO");
+$obLista->ultimoDado->setCampo( "[numcgm_gerenciador] - [nomcgm_gerenciador]" );
+$obLista->commitDado();
+
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->addCampo("&inCodEntidade"             , "cod_entidade");
-$obLista->ultimaAcao->addCampo("&inNroProcessoAdesao"       , "numero_processo_adesao");
-$obLista->ultimaAcao->addCampo("&stExercicioProcessoAdesao" , "exercicio_adesao");
+$obLista->ultimaAcao->addCampo("&inNroRegistroPrecos"       , "numero_registro_precos");
+$obLista->ultimaAcao->addCampo("&stExercicioRegistroPrecos" , "exercicio");
+$obLista->ultimaAcao->addCampo("&boInterno"                 , "interno");
+$obLista->ultimaAcao->addCampo("&numcgmGerenciador"         , "numcgm_gerenciador");
 $obLista->ultimaAcao->setLink( $stCaminho."?".Sessao::getId()."&stAcao=".$stAcao );
 $obLista->commitAcao();
 $obLista->show();

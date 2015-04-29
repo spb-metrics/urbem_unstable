@@ -35,7 +35,7 @@
 
   * Casos de uso: uc-03.04.01
 
-  $Id: TComprasSolicitacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: TComprasSolicitacao.class.php 62339 2015-04-24 20:31:35Z arthur $
 
   */
 
@@ -698,9 +698,100 @@ class TComprasSolicitacao extends Persistente
     INNER JOIN  sw_cgm
             ON  solicitacao.cgm_solicitante = sw_cgm.numcgm
 
-         WHERE  1=1
+     LEFT JOIN (
 
-                -- A SOLICITAÇÃO NÃO PODE ESTAR ANULADA.
+		  SELECT solicitacao.exercicio                                                                                             
+		        , solicitacao.cod_entidade                                                                                          
+		        , solicitacao.cod_solicitacao                                                                                       
+		        , total_solicitacao_item.vl_total_solicitacao
+		        , total_mapa_item.vl_total_mapa                                                                  
+		        , total_anulado_mapa.vl_total_mapa_anulado
+						
+		     FROM compras.solicitacao                                                                                               
+		   			   
+		 LEFT JOIN (
+                                SELECT COALESCE(SUM(solicitacao_item.vl_total),0.00) - COALESCE(SUM(solicitacao_item_anulacao.vl_total),0.00) AS vl_total_solicitacao
+                                     , solicitacao_item.exercicio      
+                                     , solicitacao_item.cod_entidade   
+                                     , solicitacao_item.cod_solicitacao
+				      
+				  FROM compras.solicitacao_item                                                                                 
+				
+			      LEFT JOIN compras.solicitacao_item_anulacao                                                          
+				     ON solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio                          
+                                    AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade                       
+                                    AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+                                    AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
+                                    AND solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
+
+			       GROUP BY solicitacao_item.exercicio      
+                                      , solicitacao_item.cod_entidade   
+                                      , solicitacao_item.cod_solicitacao
+
+			) AS total_solicitacao_item
+			 on  total_solicitacao_item.exercicio       = solicitacao.exercicio
+			AND  total_solicitacao_item.cod_entidade    = solicitacao.cod_entidade
+			AND  total_solicitacao_item.cod_solicitacao = solicitacao.cod_solicitacao
+
+	          LEFT JOIN (
+                                SELECT COALESCE(SUM(mapa_item.vl_total),0.00) - COALESCE(SUM(mapa_item_anulacao.vl_total), 0.00) as vl_total_mapa                                                                     
+                                     , mapa_item.exercicio       
+                                     , mapa_item.cod_entidade    
+                                     , mapa_item.cod_solicitacao
+
+				  FROM compras.mapa_item                                                                                               
+				 
+			     LEFT JOIN compras.mapa_item_anulacao                                                                                      
+                                    ON mapa_item_anulacao.exercicio       = mapa_item.exercicio                                                     
+                                   AND mapa_item_anulacao.cod_entidade    = mapa_item.cod_entidade                                                  
+                                   AND mapa_item_anulacao.cod_solicitacao = mapa_item.cod_solicitacao
+                                   AND mapa_item_anulacao.cod_mapa        = mapa_item.cod_mapa
+                                   AND mapa_item_anulacao.cod_centro      = mapa_item.cod_centro
+                                   AND mapa_item_anulacao.cod_item        = mapa_item.cod_item
+                                   AND mapa_item_anulacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                                   AND mapa_item_anulacao.lote            = mapa_item.lote
+				   
+			      GROUP BY mapa_item.exercicio       
+				     , mapa_item.cod_entidade    
+				     , mapa_item.cod_solicitacao
+                                     
+			) AS total_mapa_item
+			  on total_mapa_item.exercicio       = solicitacao.exercicio
+			 AND total_mapa_item.cod_entidade    = solicitacao.cod_entidade
+			 AND total_mapa_item.cod_solicitacao = solicitacao.cod_solicitacao
+
+		   LEFT JOIN ( 
+				SELECT COALESCE(SUM(mapa_item_anulacao.vl_total),0.00) as vl_total_mapa_anulado  
+				     , mapa_item_anulacao.exercicio_solicitacao 
+				     , mapa_item_anulacao.cod_solicitacao
+				     , mapa_item_anulacao.cod_entidade
+
+				  FROM compras.solicitacao                                                            
+
+			      LEFT JOIN compras.mapa_item_anulacao                                                                                    
+				     ON mapa_item_anulacao.exercicio_solicitacao = solicitacao.exercicio                                                  
+				    AND mapa_item_anulacao.cod_solicitacao       = solicitacao.cod_solicitacao                                            
+				    AND mapa_item_anulacao.cod_entidade          = solicitacao.cod_entidade
+
+			       GROUP BY mapa_item_anulacao.exercicio_solicitacao       
+				      , mapa_item_anulacao.cod_entidade    
+				      , mapa_item_anulacao.cod_solicitacao
+
+			) AS total_anulado_mapa
+			  ON total_anulado_mapa.exercicio_solicitacao  = solicitacao.exercicio
+			 AND total_anulado_mapa.cod_entidade           = solicitacao.cod_entidade
+			 AND total_anulado_mapa.cod_solicitacao        = solicitacao.cod_solicitacao
+          ) AS totais
+            ON totais.exercicio       = solicitacao.exercicio
+           AND totais.cod_entidade    = solicitacao.cod_entidade
+           AND totais.cod_solicitacao = solicitacao.cod_solicitacao
+
+         WHERE  1=1
+           -- se os valores forem iguias é pq já foram utilizados totalemnte e nao parcialmente, entao nao deve trazer.
+           AND totais.vl_total_solicitacao <> totais.vl_total_mapa                                                                  
+           AND totais.vl_total_mapa <> totais.vl_total_mapa_anulado
+         
+           -- A SOLICITAÇÃO NÃO PODE ESTAR ANULADA.
            AND  NOT EXISTS
                 (
                     SELECT  1
@@ -708,87 +799,7 @@ class TComprasSolicitacao extends Persistente
                      WHERE  solicitacao_homologada_anulacao.exercicio       = solicitacao.exercicio
                        AND  solicitacao_homologada_anulacao.cod_entidade    = solicitacao.cod_entidade
                        AND  solicitacao_homologada_anulacao.cod_solicitacao = solicitacao.cod_solicitacao
-                )
-
-           AND  EXISTS
-                (
-                    SELECT  *
-                      FROM  (
-                                SELECT  solicitacao_item.exercicio
-                                     ,  solicitacao_item.cod_entidade
-                                     ,  solicitacao_item.cod_solicitacao
-                                     ,  solicitacao_item.cod_centro
-                                     ,  solicitacao_item.cod_item
-                                     ,  solicitacao_item.quantidade - COALESCE(total_anulacao.qtde_anulada , 0) - COALESCE(totais_mapa.qtde_mapa , 0) as saldo_quantidade
-                                     ,  solicitacao_item.vl_total   - COALESCE(total_anulacao.vl_anulado   , 0) - COALESCE(totais_mapa.vl_mapa   , 0) as saldo
-
-                                  FROM  compras.solicitacao_item
-
-                             LEFT JOIN  (
-                                            SELECT  solicitacao_item_anulacao.exercicio
-                                                 ,  solicitacao_item_anulacao.cod_entidade
-                                                 ,  solicitacao_item_anulacao.cod_solicitacao
-                                                 ,  solicitacao_item_anulacao.cod_centro
-                                                 ,  solicitacao_item_anulacao.cod_item
-                                                 ,  SUM(solicitacao_item_anulacao.quantidade) as qtde_anulada
-                                                 ,  SUM(solicitacao_item_anulacao.vl_total) as vl_anulado
-
-                                              FROM  compras.solicitacao_item_anulacao
-
-                                          GROUP BY  solicitacao_item_anulacao.exercicio
-                                                 ,  solicitacao_item_anulacao.cod_entidade
-                                                 ,  solicitacao_item_anulacao.cod_solicitacao
-                                                 ,  solicitacao_item_anulacao.cod_centro
-                                                 ,  solicitacao_item_anulacao.cod_item
-                                        )  total_anulacao
-                                    ON  solicitacao_item.exercicio        = total_anulacao.exercicio
-                                   AND  solicitacao_item.cod_entidade     = total_anulacao.cod_entidade
-                                   AND  solicitacao_item.cod_solicitacao  = total_anulacao.cod_solicitacao
-                                   AND  solicitacao_item.cod_centro       = total_anulacao.cod_centro
-                                   AND  solicitacao_item.cod_item         = total_anulacao.cod_item
-
-                             LEFT JOIN  (
-                                            SELECT  mapa_item.exercicio
-                                                 ,  mapa_item.cod_entidade
-                                                 ,  mapa_item.cod_solicitacao
-                                                 ,  mapa_item.cod_centro
-                                                 ,  mapa_item.cod_item
-                                                 ,  COALESCE(SUM(mapa_item.quantidade),0.0000) - COALESCE(SUM(mapa_item_anulacao.quantidade),0.0000)  AS qtde_mapa
-                                                 ,  COALESCE(SUM(mapa_item.vl_total),0.00) - COALESCE(SUM(mapa_item_anulacao.vl_total),0.00)  AS vl_mapa
-
-                                              FROM  compras.mapa_item
-
-                                         LEFT JOIN  compras.mapa_item_anulacao
-                                                ON  mapa_item_anulacao.exercicio              = mapa_item.exercicio
-                                               AND  mapa_item_anulacao.exercicio_solicitacao  = mapa_item.exercicio_solicitacao
-                                               AND  mapa_item_anulacao.cod_entidade           = mapa_item.cod_entidade
-                                               AND  mapa_item_anulacao.cod_solicitacao        = mapa_item.cod_solicitacao
-                                               AND  mapa_item_anulacao.cod_item               = mapa_item.cod_item
-
-                                          GROUP BY  mapa_item.exercicio
-                                                 ,  mapa_item.cod_entidade
-                                                 ,  mapa_item.cod_solicitacao
-                                                 ,  mapa_item.cod_centro
-                                                 ,  mapa_item.cod_item
-                                        ) as totais_mapa
-
-                                    ON  totais_mapa.exercicio       = solicitacao_item.exercicio
-                                   AND  totais_mapa.cod_entidade    = solicitacao_item.cod_entidade
-                                   AND  totais_mapa.cod_solicitacao = solicitacao_item.cod_solicitacao
-                                   AND  totais_mapa.cod_centro      = solicitacao_item.cod_centro
-                                   AND  totais_mapa.cod_item        = solicitacao_item.cod_item
-
-                            ) as totais
-
-                     WHERE  1=1
-                     --AND  totais.saldo > 0
-                       AND  totais.saldo_quantidade > 0
-                       AND  totais.exercicio       = solicitacao.exercicio
-                       AND  totais.cod_entidade    = solicitacao.cod_entidade
-                       AND  totais.cod_solicitacao = solicitacao.cod_solicitacao
-                )
-
-                ";
+                ) \n ";
 
         return $stSql;
     }

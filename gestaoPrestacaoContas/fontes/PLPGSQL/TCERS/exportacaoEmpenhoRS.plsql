@@ -26,10 +26,10 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 61556 $
+* $Revision: 62156 $
 * $Name$
-* $Author: evandro $
-* $Date: 2015-02-04 16:20:51 -0200 (Qua, 04 Fev 2015) $
+* $Author: fabio $
+* $Date: 2015-04-01 08:32:21 -0300 (Qua, 01 Abr 2015) $
 *
 * Casos de uso: uc-02.00.00
 * Casos de uso: uc-02.00.00
@@ -257,7 +257,9 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
 
     IF stExercicio::INTEGER < 2015 THEN
     
-            if raRegistro.modalidade = 1 then raRegistro.outras_modalidades := 'Concurso'; raRegistro.modalidade := 99;       
+            if raRegistro.modalidade = 1 then 
+               raRegistro.outras_modalidades := 'Concurso'; 
+               raRegistro.modalidade := 99;       
          elsif raRegistro.modalidade = 2 then raRegistro.modalidade := 3;     
          elsif raRegistro.modalidade = 3 then raRegistro.modalidade := 4;
          elsif raRegistro.modalidade = 4 then raRegistro.modalidade := 5;
@@ -275,19 +277,19 @@ UNION -- FAZ UNIAO COM O 3o Bloco , restos a pagar(anos anteriores)
     
     ELSE
     
-            if raRegistro.modalidade = 1 then  raRegistro.modalidade_licitacao := 'CNS';
-         elsif raRegistro.modalidade = 2 then  raRegistro.modalidade_licitacao := 'CNV';     
-         elsif raRegistro.modalidade = 3 then  raRegistro.modalidade_licitacao := 'TMP';
-         elsif raRegistro.modalidade = 4 then  raRegistro.modalidade_licitacao := 'CNC';
-         elsif raRegistro.modalidade = 5 then  raRegistro.modalidade_licitacao := 'PRD';
-         elsif raRegistro.modalidade = 6 then  raRegistro.modalidade_licitacao := '';
-         elsif raRegistro.modalidade = 7 then  raRegistro.modalidade_licitacao := 'NSA';
-         elsif raRegistro.modalidade = 8 then  raRegistro.modalidade_licitacao := '';
-         elsif raRegistro.modalidade = 9 then  raRegistro.modalidade_licitacao := '';
-         elsif raRegistro.modalidade = 10 then raRegistro.modalidade_licitacao := 'PRP';
+            if raRegistro.modalidade = 1  then raRegistro.modalidade_licitacao := 'CNS';
+         elsif raRegistro.modalidade = 2  then raRegistro.modalidade_licitacao := 'CNV';     
+         elsif raRegistro.modalidade = 3  then raRegistro.modalidade_licitacao := 'TMP';
+         elsif raRegistro.modalidade = 4  then raRegistro.modalidade_licitacao := 'CNC';
+         elsif raRegistro.modalidade = 5  then raRegistro.modalidade_licitacao := 'PRD';
+         elsif raRegistro.modalidade = 6  then raRegistro.modalidade_licitacao := 'PRI';
+         elsif raRegistro.modalidade = 7  then raRegistro.modalidade_licitacao := 'NSA';
+         elsif raRegistro.modalidade = 8  then raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 9  then raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 10 then raRegistro.modalidade_licitacao := '';
          elsif raRegistro.modalidade = 11 then raRegistro.modalidade_licitacao := 'PRP';
          elsif raRegistro.modalidade = 12 then raRegistro.modalidade_licitacao := 'PRE';
-         elsif raRegistro.modalidade = 13 then raRegistro.modalidade_licitacao := '';
+         elsif raRegistro.modalidade = 13 then raRegistro.modalidade_licitacao := 'CHP';
          elsif raRegistro.modalidade = 14 then raRegistro.modalidade_licitacao := 'RPO';
          elsif raRegistro.modalidade = 15 then raRegistro.modalidade_licitacao := '';
          elsif raRegistro.modalidade = 20 then raRegistro.modalidade_licitacao := 'DPV';

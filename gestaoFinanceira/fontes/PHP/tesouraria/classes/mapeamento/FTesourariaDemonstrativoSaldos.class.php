@@ -111,4 +111,55 @@ class FTesourariaDemonstrativoSaldos extends Persistente
         return $stSql;
     }
 
+    public function recuperaDemonstrativoSaldosAgrupadoContaCorrente(&$rsRecordSet, $stOrderBy = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stFiltro    = "";
+
+        if ($stOrderBy == "estrutural") {
+            $stFiltro = " ORDER BY cod_estrutural ASC ";
+        } elseif ($stOrderBy == "reduzido") {
+            $stFiltro = " ORDER BY cod_plano ASC ";
+        } elseif ($stOrderBy == "recurso") {
+            $stFiltro = " ORDER BY cod_recurso ASC ";
+        }
+
+        $stSql = $this->montaRecuperaDemonstrativoSaldosAgrupadoContaCorrente().$stFiltro;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaDemonstrativoSaldosAgrupadoContaCorrente()
+    {
+        $stSql  = " SELECT *                                                                                        
+                    FROM tesouraria.fn_relatorio_demostrativo_saldos_conta_corrente('".$this->getDado("stExercicio")."',
+                                                       '".$this->getDado("inCodEntidade")."',
+                                                       '".$this->getDado("dtDataInicio")."',
+                                                       '".$this->getDado("dtDataFim")."',
+                                                       '".$this->getDado("stCodEstruturalInicio")."',
+                                                       '".$this->getDado("stCodEstruturalFim")."',
+                                                       '".$this->getDado("inCodReduzidoInicio")."',
+                                                       '".$this->getDado("inCodReduzidoFim")."',
+                                                       '".$this->getDado("inCodRecurso")."',
+                                                       '".$this->getDado("boSemMovimento")."',
+                                                       '".$this->getDado("stDestinacaoRecurso")."',     
+                                                       '".$this->getDado("inCodDetalhamento")."',
+                                                       '".$this->getDado("boUtilizaEstruturalTCE")."'
+                    ) as retorno(   exercicio          VARCHAR
+                                    ,cod_estrutural    VARCHAR
+                                    ,des_conta          VARCHAR                                                                     
+                                    ,nom_conta          VARCHAR                                                        
+                                    ,saldo_anterior     NUMERIC                                                        
+                                    ,vl_credito         NUMERIC                                                        
+                                    ,vl_debito          NUMERIC                                                                     
+                    )   
+                    ORDER BY cod_estrutural ASC  
+        ";
+
+        return $stSql;
+    }
 }

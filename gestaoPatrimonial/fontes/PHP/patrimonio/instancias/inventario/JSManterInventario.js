@@ -28,13 +28,25 @@
 
         var link    = "<?=CAM_GP_PAT_INSTANCIAS.'inventario/LSConsultaInventarioHistoricoBem.php';?>";
         var sessao  = "<?=Sessao::getId();?>";
-        var params  = "&inIdInventario="+inIdInventario;
-        params += "&stExercicio="+stExercicio;
+        //var params  = "&inIdInventario="+inIdInventario;
+        var params  = "&stExercicio="+stExercicio;        
         params += "&inCodOrgao="+inCodOrgao;
         params += "&inCodLocal="+inCodLocal;
 
         // Abre a listagem que exibe os bens que estão do Inventário para o grupo e local selecionado.
         abrePopUp(link, '', '', '', sessao+params, '','');
     }
+
+    function abreListagemBemInicial(inIdInventario, inCodOrgao, inCodLocal){
+
+        var link    = "<?=CAM_GP_PAT_INSTANCIAS.'inventario/LSConsultaInventarioHistoricoBem.php';?>";
+        var sessao  = "<?=Sessao::getId();?>";
+        var params  = "&inCodOrgao="+inCodOrgao;        
+        params += "&inCodLocal="+inCodLocal;
+
+        // Abre a listagem que exibe os bens que estão do Inventário para o grupo e local selecionado.
+        abrePopUp(link, '', '', '', sessao+params, '','');
+    }
+
 
 </script>

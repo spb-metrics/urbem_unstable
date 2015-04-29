@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RContabilidadeLancamentoValor.class.php 61283 2014-12-29 17:43:35Z michel $
+    * $Id: RContabilidadeLancamentoValor.class.php 62341 2015-04-24 21:14:44Z carlos.silva $
 
     * Casos de uso: uc-02.02.05, uc-02.02.04, uc-02.02.11, uc-02.02.21, uc-02.02.31, uc-02.02.02
 */
@@ -1057,20 +1057,14 @@ class RContabilidadeLancamentoValor
         $obErro = new Erro;
 
         if (sizeof($this->arAberturaOrcamento)) {
-            foreach ($this->arAberturaOrcamento as $inCodPlano_inCodSequencia => $nuValor) {
-                $arTmp = explode( '-', $inCodPlano_inCodSequencia );
-                $inCodPlano     = $arTmp[0] ;
-                $inCodSequencia = $arTmp[1] ;
-                $this->nuValor = $nuValor;
-                $this->inContaCredito = 0;
-                $this->inContaDebito  = 0;
-                if ($this->nuValor < 0) {
-                    $this->nuValor = ($nuValor * -1);
-                    $this->inContaCredito = $inCodPlano;
-                } else {
-                    $this->inContaDebito  = $inCodPlano;
-                }
-
+            foreach ($this->arAberturaOrcamento as $index => $nuValor) {
+                $arTmp = explode( '-', $index );
+                $this->inContaDebito  = $arTmp[0];
+                $this->inContaCredito = $arTmp[1];
+                $inCodSequencia       = $arTmp[2];
+                $this->nuValor        = $nuValor;
+                
+                
                 $obTContabilidadeLancamentoValor->setDado( "sequencia"    , $inCodSequencia );
                 $obTContabilidadeLancamentoValor->setDado( "exercicio"    , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio()   );
                 $obTContabilidadeLancamentoValor->setDado( "cod_lote"     , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()     );
@@ -1078,11 +1072,12 @@ class RContabilidadeLancamentoValor
                 $obTContabilidadeLancamentoValor->setDado( "cod_entidade" , $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
                 $obTContabilidadeLancamentoValor->setDado( "tipo_valor"   , $this->stTipoValor );
 
-                    if ($this->nuValor <> 0.00) {
-                        if ( !$obErro->ocorreu() ) {
-                            $obErro = $this->incluirLancamentoAberturaOrcamento( $boTransacao );
-                        }
+                if ($this->nuValor <> 0.00) {
+                    if ( !$obErro->ocorreu() ) {
+                        $obErro = $this->incluirLancamentoAberturaOrcamento( $boTransacao );
                     }
+                }
+                
                 if ($obErro->ocorreu()) {
                     break;
                 }
@@ -1119,7 +1114,7 @@ class RContabilidadeLancamentoValor
                     $obTContabilidadeLancamentoValor->setDado( "tipo"          , $this->obRContabilidadeLancamento->obRContabilidadeLote->getTipo() );
                     $obTContabilidadeLancamentoValor->setDado( "exercicio"     , $this->obRContabilidadeLancamento->obRContabilidadeLote->getExercicio() );
                     $obTContabilidadeLancamentoValor->setDado( "cod_entidade"  , $this->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() );
-                    $obTContabilidadeLancamentoValor->setDado( "vl_lancamento" , $this->nuValor     );
+                    $obTContabilidadeLancamentoValor->setDado( "vl_lancamento" , $this->nuValor );
                     $obTContabilidadeLancamentoValor->setDado( "cod_plano_deb" , $this->inContaDebito );
                     $obTContabilidadeLancamentoValor->setDado( "cod_plano_cred", $this->inContaCredito );
                     $obTContabilidadeLancamentoValor->setDado( "cod_historico" , $this->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->getCodHistorico() );
@@ -1131,8 +1126,9 @@ class RContabilidadeLancamentoValor
 
                     if ( !$obErro->ocorreu() ) {
                         if ( $this->obRContabilidadeLancamento->obRContabilidadeLote->getNomLote() ) {
-                            $obTContabilidadeLancamentoValor->setDado( "cod_lote" , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote()   );
+                            $obTContabilidadeLancamentoValor->setDado( "cod_lote" , $this->obRContabilidadeLancamento->obRContabilidadeLote->getCodLote() );
                         }
+                        
                         $obErro = $obTContabilidadeLancamentoValor->inclusaoPorPl( $rsRecordSet, $boTransacao );
                         $this->obRContabilidadeLancamento->setSequencia($rsRecordSet->getCampo( "sequencia" ) );
                         //exercicio, cod_entidade, tipo, cod_lote, sequencia, tipo_valor

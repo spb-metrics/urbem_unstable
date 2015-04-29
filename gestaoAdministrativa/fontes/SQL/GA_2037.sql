@@ -54,3 +54,50 @@ INSERT
      , 'automatico'
      );
 
+
+----------------
+-- Ticket #21749
+----------------
+
+INSERT
+  INTO administracao.configuracao
+     ( cod_modulo
+     , exercicio
+     , parametro
+     , valor
+     )
+     VALUES
+     ( 2
+     , '2015'
+     , 'tempo_inatividade_usuario'
+     , '30'
+     );
+
+
+------------------------------------------------------------------------------------------------
+-- INSERSAO EM tcmgo.plano_contas_tcmgo QUE DEVERIA ESTAR NA ROTINA DE VIRADA - DAGIANE 20150409
+------------------------------------------------------------------------------------------------
+
+INSERT
+  INTO tcmgo.plano_contas_tcmgo
+     ( exercicio
+     , cod_plano
+     , estrutural
+     , titulo
+     , natureza
+     )
+SELECT '2015'
+     , cod_plano
+     , estrutural
+     , titulo
+     , natureza
+  FROM tcmgo.plano_contas_tcmgo AS proximo
+ WHERE exercicio = '2014'
+   AND NOT EXISTS (
+                    SELECT 1
+                      FROM tcmgo.plano_contas_tcmgo
+                     WHERE exercicio = '2015'
+                       AND cod_plano = proximo.cod_plano
+                  )
+     ;
+

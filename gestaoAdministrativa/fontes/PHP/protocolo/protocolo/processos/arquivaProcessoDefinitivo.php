@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: arquivaProcessoDefinitivo.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: arquivaProcessoDefinitivo.php 62351 2015-04-28 13:51:03Z arthur $
 
     */
 
@@ -43,13 +43,15 @@ include_once CAM_FW_LEGADO."funcoesLegado.lib.php";
 $preview = new PreviewBirt(1,5,8);
 $preview->setVersaoBirt('2.5.0');
 
-$codProcesso           = $_REQUEST['codProcesso'];
-$anoExercicio          = $_REQUEST['anoExercicio'];
-$historicoArquivamento = $_REQUEST['historicoArquivamento'];
+$codProcesso           = $_REQUEST['codProcesso'] != 'undefined' ? $_REQUEST['codProcesso'] : '';
+$anoExercicio          = $_REQUEST['anoExercicio'] != 'undefined' ? $_REQUEST['anoExercicio'] : '';
+$historicoArquivamento = $_REQUEST['historicoArquivamento'] != 'undefined' ? $_REQUEST['historicoArquivamento'] : '';
+$stEntidadePrincipal   = SistemaLegado::pegaConfiguracao("nom_prefeitura",2,Sessao::getExercicio());
 
 $preview->addParametro('pCodProcesso'           , $codProcesso);
 $preview->addParametro('pAnoExercicio'          , $anoExercicio);
 $preview->addParametro('pHistoricoArquivamento' , $historicoArquivamento);
+$preview->addParametro('pEntidadePrincipal'     , $stEntidadePrincipal);
 
 $msgEnvio = Sessao::read('texto_complementar');
 $preview->addParametro('pMsgEnvio', $msgEnvio);

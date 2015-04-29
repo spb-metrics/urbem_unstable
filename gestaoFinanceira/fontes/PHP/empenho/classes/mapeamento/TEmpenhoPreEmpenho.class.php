@@ -658,5 +658,33 @@ WHERE baixa_cadastro_economico.timestamp IS NULL
 
         return $stSql;
     }
+    
+    function recuperaSaldoDotacaoCompra(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
+        $stSql = $this->montaRecuperaSaldoDotacaoCompra();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+
+    function montaRecuperaSaldoDotacaoCompra()
+    {
+        $stSql  = "SELECT                                                              \n";
+        $stSql .= "  empenho.fn_saldo_dotacao_compras(                                    \n";
+        $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
+        $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
+        $stSql .= "                               ) AS saldo_anterior                  \n";
+    
+        return $stSql;
+    }
 
 }

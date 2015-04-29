@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGEmpenhoRegistroPrecos.class.php 59719 2014-09-08 15:00:53Z franver $
-  $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
+  $Id: TTCEMGEmpenhoRegistroPrecos.class.php 61913 2015-03-13 18:55:57Z franver $
+  $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
   $Author: franver $
-  $Rev: 59719 $
+  $Rev: 61913 $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
@@ -50,13 +50,17 @@ class TTCEMGEmpenhoRegistroPrecos extends Persistente {
         
         $this->setTabela("tcemg.empenho_registro_precos");
         $this->setCampoCod("");
-        $this->setComplementoChave("cod_entidade, numero_processo_adesao, exercicio_adesao, cod_empenho, exercicio_empenho");
+        $this->setComplementoChave("cod_entidade, numero_registro_precos, exercicio, interno, numcgm_gerenciador, cod_entidade_empenho, cod_empenho, exercicio_empenho");
         
-        $this->AddCampo("cod_entidade"          ,"integer",true, "",true,true);
-        $this->AddCampo("numero_processo_adesao","integer",true, "",true,true);
-        $this->AddCampo("exercicio_adesao"      ,"varchar",true,"4",true,true);
-        $this->AddCampo("cod_empenho"           ,"integer",true, "",true,true);
-        $this->AddCampo("exercicio_empenho"     ,"varchar",true,"4",true,true);
+        $this->AddCampo("cod_entidade"          ,"integer",true, "", true,true);
+        $this->AddCampo("numero_registro_precos","integer",true, "", true,true);
+        $this->AddCampo("exercicio"             ,"varchar",true,"4", true,true);
+        $this->AddCampo("cod_empenho"           ,"integer",true, "", true,true);
+        $this->AddCampo("exercicio_empenho"     ,"varchar",true,"4", true,true);
+        $this->AddCampo('interno'               ,'boolean',true, '', true,true);
+        $this->AddCampo('numcgm_gerenciador'    ,'integer',true, '', true,true);
+        $this->AddCampo("cod_entidade_empenho"  ,"integer",true, "", true,true);
+
     }
     
     public function __destruct(){}

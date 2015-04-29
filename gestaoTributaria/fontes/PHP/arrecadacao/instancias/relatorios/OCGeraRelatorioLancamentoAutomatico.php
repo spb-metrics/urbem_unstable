@@ -27,7 +27,7 @@
     * @author Desenvolvedor: Carolina Schwaab Marçal
     * @package URBEM
     * @subpackage Regra
-    * $Id: OCGeraRelatorioLancamentoAutomatico.php 61508 2015-01-27 19:54:30Z carolina $
+    * $Id: OCGeraRelatorioLancamentoAutomatico.php 62094 2015-03-29 00:14:58Z lisiane $
 
     * Casos de uso: 
 

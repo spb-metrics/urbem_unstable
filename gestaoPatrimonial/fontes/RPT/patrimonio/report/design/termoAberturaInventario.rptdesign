@@ -165,6 +165,17 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="dataCabecalho" id="6667">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
@@ -525,7 +536,12 @@ INNER JOIN  administracao.assinatura_modulo
                         <ref-entry baseId="1093" id="1093"/>
                         <ref-entry baseId="1094" id="1094"/>
                         <ref-entry baseId="1095" id="1095"/>
-                        <ref-entry baseId="765" name="NewText72" id="765"/>
+                        <ref-entry baseId="765" name="NewText72" id="765">
+                            <property name="content">Emissão: &lt;VALUE-OF>
+params['dataCabecalho'];
+&lt;/VALUE-OF></property>
+                            <property name="contentType">html</property>
+                        </ref-entry>
                         <ref-entry baseId="1096" id="1096"/>
                         <ref-entry baseId="767" name="NewText112" id="767"/>
                         <ref-entry baseId="1097" id="1097"/>

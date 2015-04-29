@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: OCManterHomologacao.php 60947 2014-11-25 20:05:13Z arthur $
+    $Id: OCManterHomologacao.php 62309 2015-04-20 19:43:33Z arthur $
 
 */
 
@@ -243,9 +243,11 @@ function montaSpnItens()
     $table->Head->addCabecalho ( 'Status'           , 10 );
 
     $boTodosAutorizados = Sessao::read('boTodosAutorizados');
+    /*
     if (!$boTodosAutorizados) {
         $table->Head->addCabecalho( 'Selecione'        , 1 );
-   }
+    }
+    */
 
     $table->Body->addCampo ( "[codItem] - [descricaoItem]<br>[complemento]" );
     $table->Body->addCampo ( "quantidade"              , "D" );
@@ -253,7 +255,8 @@ function montaSpnItens()
     $table->Body->addCampo ( "valorCotacao"            , "D" );
     $table->Body->addCampo ( "nomFornecedor"                 );
     $table->Body->addCampo ( "status"                  , "C" );
-
+    
+    /*
     $obRdnHomologarItem = new Radio();
     $obRdnHomologarItem->setValue( "inId" );
     $obRdnHomologarItem->setName( "boHomologarItemInId" );
@@ -263,6 +266,7 @@ function montaSpnItens()
     if (!$boTodosAutorizados) {
         $table->Body->addComponente( $obRdnHomologarItem, false );
     }
+    */
 
     $table->montaHTML(true);
     $stHtml = $table->getHTML();
@@ -272,7 +276,7 @@ function montaSpnItens()
     if (!$boTodosAutorizados) {
         $obBtnHomologar = new Button;
         $obBtnHomologar->setName ( "btnHomologarTodos" );
-        $obBtnHomologar->setValue( "Homologar Todos" );
+        $obBtnHomologar->setValue( "Homologar" );
         $obBtnHomologar->setTipo ( "button" );
         $obBtnHomologar->obEvento->setOnClick ( "montaParametrosGET( 'homologarTodos', 'btnHomologarTodos' );" );
 

@@ -59,17 +59,17 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obTMapeamento = new TTCMGOAtivoPermanenteBem;
         $obTMapeamento->setDado ('exercicio'  , Sessao::getExercicio() );
         $obTMapeamento->setDado ('stEntidades',  $stEntidades  );
-        $obTMapeamento->recuperaTodos($arRecordSet[$stArquivo]);
+        $obTMapeamento->recuperaTodos($rsAtivoBem, $boTransacao);
 
         $i = 1;
-        foreach ($arRecordSet[$stArquivo]->arElementos as $stChave => $valor) {
-            $arRecordSet[$stArquivo]->arElementos[$stChave]['numero_registro'] = $i;
-            $arRecordSet[$stArquivo]->arElementos[$stChave]['tipo_registro']   = 10;
+        foreach ($rsAtivoBem->arElementos as $stChave => $valor) {
+            $rsAtivoBem->arElementos[$stChave]['numero_registro'] = $i;
+            $rsAtivoBem->arElementos[$stChave]['tipo_registro']   = 10;
 
             $i++;
         }
         
-        $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
+        $obExportador->roUltimoArquivo->addBloco($rsAtivoBem);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -153,7 +153,7 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
 
         $rsRecordSetRodape = new RecordSet;
@@ -176,4 +176,11 @@ Revision 1.1  2007/05/18 16:02:16  bruce
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
+
+unset($rsRecordSetRodape);
+unset($obTMapeamento);
+unset($rsAtivoBem);
+unset($arRegistro);
+
+?>        

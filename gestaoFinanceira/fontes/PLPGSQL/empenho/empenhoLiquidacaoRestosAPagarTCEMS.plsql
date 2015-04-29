@@ -41,26 +41,46 @@ DECLARE
     RECONTA RECORD;
     REREGISTROSCONTAFIXA RECORD;
     REREGISTROSCONFIGURACAO RECORD;
+    
+    
+    inExercicioEmpenho VARCHAR := '';
 BEGIN 
 
-    inCodDespesa := selectIntoInteger(' SELECT despesa.cod_despesa
-                                          FROM empenho.nota_liquidacao
-                                    INNER JOIN empenho.empenho
-                                            ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
-                                           AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
-                                           AND empenho.cod_entidade = nota_liquidacao.cod_entidade
-                                    INNER JOIN empenho.pre_empenho
-                                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                                           AND pre_empenho.exercicio       = empenho.exercicio
-                                    INNER JOIN empenho.pre_empenho_despesa
-                                            ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                           AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-                                    INNER JOIN orcamento.despesa
-                                            ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                                           AND despesa.exercicio   = pre_empenho_despesa.exercicio
-                                         WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
-                                           AND nota_liquidacao.exercicio = '''||EXERCICIO||'''
-                                           ');
+     inExercicioEmpenho := selectIntoInteger(' SELECT nota_liquidacao.exercicio_empenho
+                                                 FROM empenho.nota_liquidacao
+                                           INNER JOIN empenho.empenho
+                                                   ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
+                                                  AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                                                  AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                                           INNER JOIN empenho.pre_empenho
+                                                   ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                                  AND pre_empenho.exercicio       = empenho.exercicio
+                                           INNER JOIN empenho.pre_empenho_despesa
+                                                   ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                                  AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                                           INNER JOIN orcamento.despesa
+                                                   ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                                                  AND despesa.exercicio   = pre_empenho_despesa.exercicio
+                                                WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
+                                                  AND nota_liquidacao.exercicio = '''||EXERCICIO||'''');
+                                                  
+           inCodDespesa := selectIntoInteger(' SELECT despesa.cod_despesa
+                                                 FROM empenho.nota_liquidacao
+                                           INNER JOIN empenho.empenho
+                                                   ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
+                                                  AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                                                  AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                                           INNER JOIN empenho.pre_empenho
+                                                   ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                                  AND pre_empenho.exercicio       = empenho.exercicio
+                                           INNER JOIN empenho.pre_empenho_despesa
+                                                   ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                                  AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                                           INNER JOIN orcamento.despesa
+                                                   ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                                                  AND despesa.exercicio   = pre_empenho_despesa.exercicio
+                                                WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
+                                                  AND nota_liquidacao.exercicio = '''||EXERCICIO||'''');
 
     boImplantado := selectIntoBoolean(' SELECT pre_empenho.implantado
                                           FROM empenho.nota_liquidacao
@@ -263,7 +283,7 @@ BEGIN
              ) AS tabela_credito
             ON tabela_credito.cod_recurso = recurso.cod_recurso
          WHERE despesa.cod_despesa = '||inCodDespesa||'
-           AND despesa.exercicio = '''||EXERCICIO||'''
+           AND despesa.exercicio = '''||inExercicioEmpenho||'''
             ';
         ELSE
             SQLCONTAFIXA := '
@@ -328,9 +348,6 @@ BEGIN
          END IF;
     END IF;
 
-      -- O URBEM NAO UTILIZA CONTRATO PARA PODER LANCAR ESSAS CONTAS
-      --SEQUENCIA := FAZERLANCAMENTO(  '812410000' , '812420000' , 916 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );   
-      --SEQUENCIA := EMPENHOLIQUIDACAORESTOSAPAGAREXERCICIO(  EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE , CODNOTA , EXERCRP  );      
       RETURN SEQUENCIA;                                                                                                                                     
 END;                                                                                                                                                  
 $$ LANGUAGE 'plpgsql';

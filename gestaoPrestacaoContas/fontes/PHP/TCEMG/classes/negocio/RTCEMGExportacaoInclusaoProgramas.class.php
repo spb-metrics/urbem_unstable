@@ -29,19 +29,20 @@
  * @category    Urbem
  * @package     Tesouraria
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 59612 2014-09-02 12:00:51Z gelson $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
+ * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 62293 2015-04-20 14:51:26Z franver $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
  */
 
 /* Includes */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGArquivoMensalIDE.class.php";
 include_once CAM_GF_EXP_MAPEAMENTO."TExportacaoTCEMGUniOrcam.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGincamp.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracaoEntidade.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRegistrosArquivoPrograma.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGArquivoINCAMP.class.php";
-include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGArquivoIUOC.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGRegistrosArquivoPrograma.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoINCAMP.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoIUOC.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGincamp.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoMensalIDE.class.php";
+
 /**
     * Classe de Regra para geração de arquivo de planejamento para o ExportacaoTCE-MG
 

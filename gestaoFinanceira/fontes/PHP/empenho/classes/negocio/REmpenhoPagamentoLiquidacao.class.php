@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPagamentoLiquidacao.class.php 61267 2014-12-23 17:06:46Z diogo.zarpelon $
+    $Id: REmpenhoPagamentoLiquidacao.class.php 62352 2015-04-28 14:51:38Z diogo.zarpelon $
 
     $Revision: 30805 $
     $Name:  $
@@ -532,6 +532,9 @@ function listarLiquidacaoNaoPagaTesouraria(&$rsRecordSet, $boTransacao = "")
         $stFiltroOrdem .= " AND EOP.cod_ordem <= ".$this->obREmpenhoOrdemPagamento->getCodigoOrdemFinal()." ";
         $this->boNaoListarNota = true;
     }
+
+    # Conforme #22858 não pode listar OP que sejam do exercício anterior ao logado.
+    $stFiltroOrdem .= " AND EOP.exercicio = ''".Sessao::getExercicio()."''";
 
     $stFiltro = "";
     if( $this->boNaoListarNota )

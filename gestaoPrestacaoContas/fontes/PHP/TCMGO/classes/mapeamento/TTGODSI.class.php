@@ -1144,7 +1144,7 @@ class TTGODSI extends Persistente
                  , CASE WHEN certificacao_documentos.cod_documento = 7 THEN certificacao_documentos.num_certificacao ELSE 0 END AS num_cndt
                  , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_emissao,'dd/mm/yyyy') ELSE '' END AS dt_emissao_cndt
                  , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_validade,'dd/mm/yyyy') ELSE '' END AS dt_validade_cndt
-                 , mapa_item.quantidade AS quantidade
+                 , mapa_item.quantidade::NUMERIC(14,2) AS quantidade
                  , mapa_item.vl_total AS valor_item
                  , '' AS brancos
                  , 0 AS numero_sequencial
@@ -1169,7 +1169,13 @@ class TTGODSI extends Persistente
              AND edital.cod_modalidade = licitacao.cod_modalidade
              AND edital.cod_entidade = licitacao.cod_entidade
              AND edital.exercicio_licitacao = licitacao.exercicio
-             
+
+            JOIN licitacao.participante
+              ON participante.cod_licitacao = licitacao.cod_licitacao
+             AND participante.cod_modalidade = licitacao.cod_modalidade
+             AND participante.exercicio = licitacao.exercicio
+             AND participante.cod_entidade = licitacao.cod_entidade
+
             JOIN licitacao.publicacao_edital
               ON publicacao_edital.num_edital = edital.num_edital
              AND publicacao_edital.exercicio = edital.exercicio
@@ -1189,7 +1195,7 @@ class TTGODSI extends Persistente
                         ) AS tabela
                     GROUP BY numcgm, num_documento, tipo_documento
                 ) AS documento_pessoa
-              ON documento_pessoa.numcgm = responsavel.numcgm
+              ON documento_pessoa.numcgm = participante.cgm_fornecedor
               
        LEFT JOIN sw_cgm_pessoa_juridica
               ON sw_cgm_pessoa_juridica.numcgm = responsavel.numcgm

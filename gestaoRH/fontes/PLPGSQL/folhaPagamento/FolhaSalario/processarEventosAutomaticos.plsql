@@ -272,7 +272,7 @@ BEGIN
     END IF;
     --   FIM PENSÃO        --
 
-    --   INÍCIO FALÁRIO FAMÍLIA     --
+    --   INÍCIO SALÁRIO FAMÍLIA     --
     --Código para inclusão de registro de eventos Salário Família
     inQtdDependentesSalarioFamilia = pega0QtdDependentesSalarioFamilia( inCodContrato, stDataFinalCompetencia );
     inQtdDependentesSalarioFamilia = criarBufferInteiro('inQtdDependentesSalarioFamilia',inQtdDependentesSalarioFamilia);
@@ -327,6 +327,7 @@ BEGIN
         END IF;
     END IF;
     --   FIM SALÁRIO FAMÍLIA        --
+    
     --   INÍCIO VALE-TRANSPORTE     --
     inContadorBusca := selectIntoInteger ('SELECT count(contrato_servidor_concessao_vale_transporte.cod_contrato) as contador
                                    FROM beneficio'||stEntidade||'.contrato_servidor_concessao_vale_transporte
@@ -341,16 +342,54 @@ BEGIN
                                       , (  SELECT cod_configuracao
                                                 , max(timestamp) as timestamp
                                              FROM folhapagamento'||stEntidade||'.beneficio_evento
+                                            WHERE cod_tipo=1
                                          GROUP BY cod_configuracao) as max_beneficio_evento
                                   WHERE beneficio_evento.cod_configuracao = max_beneficio_evento.cod_configuracao
                                     AND beneficio_evento.timestamp = max_beneficio_evento.timestamp');
-        IF inCodEvento <> NULL THEN
+        IF inCodEvento IS NOT NULL THEN
             boRetorno := insertRegistroEventoAutomatico(inCodContrato,inCodPeriodoMovimentacao,inCodEvento);
         ELSE
             boRetorno := FALSE;
         END IF;
     END IF;
     --   FIM VALE-TRANSPORTE        --
+
+    --   INÍCIO BENEFÍCIO PLANO DE SAÚDE    --
+    inContadorBusca := selectIntoInteger ('
+                                           SELECT count(beneficiario.cod_contrato) as contador
+          
+                                             FROM beneficio'||stEntidade||'.beneficiario
+          
+                                             JOIN folhapagamento'||stEntidade||'.periodo_movimentacao
+                                               ON periodo_movimentacao.cod_periodo_movimentacao = beneficiario.cod_periodo_movimentacao
+          
+                                            WHERE beneficiario.dt_inicio <= periodo_movimentacao.dt_final
+                                              AND (beneficiario.dt_fim >= periodo_movimentacao.dt_final OR beneficiario.dt_fim IS NULL)
+                                              AND beneficiario.cod_contrato = '||inCodContrato||'
+                                              AND beneficiario.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao
+                                          );
+    IF inContadorBusca > 0 THEN
+        inCodEvento := selectIntoInteger ('
+                                            SELECT cod_evento
+                                              FROM folhapagamento'||stEntidade||'.beneficio_evento
+                                          , (
+                                              SELECT cod_configuracao
+                                                   , max(timestamp) as timestamp
+                                                FROM folhapagamento'||stEntidade||'.beneficio_evento
+                                               WHERE cod_tipo=2
+                                               GROUP BY cod_configuracao
+                                            ) as max_beneficio_evento
+                                             WHERE beneficio_evento.cod_configuracao = max_beneficio_evento.cod_configuracao
+                                               AND beneficio_evento.timestamp = max_beneficio_evento.timestamp
+                                               AND beneficio_evento.cod_tipo = 2'
+                                          );
+        IF inCodEvento IS NOT NULL THEN
+            boRetorno := insertRegistroEventoAutomatico(inCodContrato,inCodPeriodoMovimentacao,inCodEvento);
+        ELSE
+            boRetorno := FALSE;
+        END IF;
+    END IF;
+    --   FIM BENEFÍCIO PLANO DE SAÚDE       --
 
     --EVENTOS DE DESCONTO EXTERNO
     stSql := 'SELECT *

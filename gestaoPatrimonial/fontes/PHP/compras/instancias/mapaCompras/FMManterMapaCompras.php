@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaCompras.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterMapaCompras.php 61787 2015-03-04 13:26:46Z evandro $
 
  */
 
@@ -174,7 +174,7 @@ $obFormulario->addSpan               ( $obSpnItem  );
 $obFormulario->addAba                ( "Totais"          );
 $obFormulario->addSpan               ( $obSpnTotais      );
 
-$obBtnOk = new Ok;
+$obBtnOk = new Ok('true');
 $obBtnOk->setId( 'Ok');
 
 if ($stAcao == 'incluir') {

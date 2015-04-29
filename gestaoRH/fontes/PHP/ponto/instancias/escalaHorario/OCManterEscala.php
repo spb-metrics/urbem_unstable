@@ -380,13 +380,11 @@ function validaTurno()
         $stHoraEntrada2 = str_replace(":", "", $_REQUEST['stHoraEntrada2'])*1;
         $stHoraSaida1   = str_replace(":", "", $_REQUEST['stHoraSaida1'])*1;
         $stHoraSaida2   = str_replace(":", "", $_REQUEST['stHoraSaida2'])*1;
-
+        
         if ($stHoraEntrada1 > 2359) {
             $obErro->setDescricao("O campo Hora Entrada1, deve estar entre 00:00 e 23:59.");
         } elseif ($stHoraSaida1 > 2359) {
             $obErro->setDescricao("O campo Hora Saída1, deve estar entre 00:00 e 23:59.");
-        } elseif ($stHoraSaida1 <= $stHoraEntrada1) {
-            $obErro->setDescricao("O campo Hora Saída1, deve ser maior que o campo Hora Entrada1");
         }
 
         if (!$obErro->ocorreu()) {
@@ -397,8 +395,6 @@ function validaTurno()
                     $obErro->setDescricao("O campo Hora Entrada2, deve ser maior que o campo Hora Saída1");
                 } elseif ($stHoraSaida2 != "" && $stHoraSaida2 > 2359) {
                     $obErro->setDescricao("O campo Hora Saída2, deve estar entre 00:00 e 23:59.");
-                } elseif ($stHoraSaida2 <= $stHoraEntrada2) {
-                    $obErro->setDescricao("O campo Hora Saida2, deve ser maior que o campo Hora Entrada2");
                 }
             }
         }

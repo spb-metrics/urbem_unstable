@@ -58,7 +58,9 @@ $pgProc = "PR".$stPrograma.".php?".Sessao::getId();
 $pgOcul = "OC".$stPrograma.".php?".Sessao::getId();
 $pgJS   = "JS".$stPrograma.".js";
 
-$stFncJavaScript .= " function insereEvento(cod_evento,num,nom,texto) {                      \n";
+SistemaLegado::mostraVar($_REQUEST);
+
+$stFncJavaScript .= " function insereEvento(cod_evento,num,nom,texto) {                     \n";
 $stFncJavaScript .= " var sNum;                                                             \n";
 $stFncJavaScript .= " var sNom;                                                             \n";
 $stFncJavaScript .= " var sTexto;                                                           \n";
@@ -70,7 +72,7 @@ $stFncJavaScript .= " d.getElementById('".$_REQUEST["campoNom"]."').innerHTML = 
 $stFncJavaScript .= " d.".$_REQUEST["nomForm"].".Hdn".$_REQUEST["campoNum"].".value = sNom; \n";
 $stFncJavaScript .= " d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sNum;    \n";
 $stFncJavaScript .= " d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus();         \n";
-$stFncJavaScript .= " ajaxJavaScriptSincrono( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&boPopUp=true&inCodigoEvento='+num, 'preencheDescEvento', '".Sessao::getId()."' );";
+$stFncJavaScript .= " ajaxJavaScriptSincrono( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&boPopUp=true&".$_REQUEST["campoNum"]."='+num, 'preencheDescEvento', '".Sessao::getId()."' );";
 $stFncJavaScript .= " window.close();                                                       \n";
 $stFncJavaScript .= " }                                                                     \n";
 

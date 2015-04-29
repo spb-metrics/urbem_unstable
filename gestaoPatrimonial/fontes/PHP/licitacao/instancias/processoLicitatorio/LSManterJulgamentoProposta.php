@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: LSManterJulgamentoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterJulgamentoProposta.php 62339 2015-04-24 20:31:35Z arthur $
 
     * Casos de uso: uc-03.05.15
 */
@@ -129,40 +129,44 @@ if ($_REQUEST['inCodComissao']) {
 }
 
 $stFiltro = "  ----- este filtro serve para exlcuir da listagem os mapas que forem por lote ou global e tenha fornecedores que não cotaram todos os itens de um lote para o qual fizeram proposta
-              and ( mapa.cod_tipo_licitacao = 1 or  not exists ( select lotes.*
-                                                                   from ( select cotacao_item.exercicio
+              and ( mapa.cod_tipo_licitacao = 1 or  not exists ( SELECT lotes.*
+                                                                   FROM ( SELECT cotacao_item.exercicio
                                                                                , cotacao_item.cod_cotacao
                                                                                , cotacao_item.lote
                                                                                , count ( cotacao_item.cod_item ) as qtd_itens
-                                                                            from compras.cotacao_item
-                                                                          group by cotacao_item.exercicio
+                                                                            FROM compras.cotacao_item
+                                                                        GROUP BY cotacao_item.exercicio
                                                                                , cotacao_item.cod_cotacao
-                                                                               , cotacao_item.lote ) as lotes
-                                                                   join ( select cotacao_fornecedor_item.exercicio
-                                                                               , cotacao_fornecedor_item.cod_cotacao
-                                                                               , cotacao_fornecedor_item.lote
-                                                                               , cotacao_fornecedor_item.cgm_fornecedor
-                                                                               , count ( cotacao_fornecedor_item.cod_item ) as qtd_itens
-                                                                            from compras.cotacao_fornecedor_item
-                                                                          group by cotacao_fornecedor_item.exercicio
-                                                                               ,   cotacao_fornecedor_item.cod_cotacao
-                                                                               ,   cotacao_fornecedor_item.lote
-                                                                               , cotacao_fornecedor_item.cgm_fornecedor ) as fornecedor_lotes
-                                                                     on ( lotes.exercicio   = fornecedor_lotes.exercicio
-                                                                    and   lotes.cod_cotacao = fornecedor_lotes.cod_cotacao
-                                                                    and   lotes.lote        = fornecedor_lotes.lote    )
-                                                                  where lotes.qtd_itens > fornecedor_lotes.qtd_itens
-                                                                    and lotes.cod_cotacao = mapa_cotacao.cod_cotacao
-                                                                    and lotes.exercicio   = mapa_cotacao.exercicio_cotacao )  )";
+                                                                               , cotacao_item.lote
+                                                                        ) AS lotes
+                                                                     JOIN ( SELECT cotacao_fornecedor_item.exercicio
+                                                                                 , cotacao_fornecedor_item.cod_cotacao
+                                                                                 , cotacao_fornecedor_item.lote
+                                                                                 , cotacao_fornecedor_item.cgm_fornecedor
+                                                                                 , count ( cotacao_fornecedor_item.cod_item
+                                                                          ) AS qtd_itens
+                                                                       FROM compras.cotacao_fornecedor_item
+                                                                   GROUP BY cotacao_fornecedor_item.exercicio
+                                                                          , cotacao_fornecedor_item.cod_cotacao
+                                                                          , cotacao_fornecedor_item.lote
+                                                                          , cotacao_fornecedor_item.cgm_fornecedor
+                                                                    ) AS fornecedor_lotes
+                                                                     ON lotes.exercicio   = fornecedor_lotes.exercicio
+                                                                    AND lotes.cod_cotacao = fornecedor_lotes.cod_cotacao
+                                                                    AND lotes.lote        = fornecedor_lotes.lote 
+                                                                  WHERE lotes.qtd_itens > fornecedor_lotes.qtd_itens
+                                                                    AND lotes.cod_cotacao = mapa_cotacao.cod_cotacao
+                                                                    AND lotes.exercicio   = mapa_cotacao.exercicio_cotacao )  )";
 if ($_REQUEST['stAcao'] != 'reemitir') {
     // filtro para excluir da listagem os julgamentos já adjudicados
-    $stFiltro.= "    and not  exists ( select 1
-                                from licitacao.adjudicacao
-                               where adjudicacao.cod_licitacao = ll.cod_licitacao
-                                 and adjudicacao.exercicio_licitacao = ll.exercicio
-                                 and adjudicacao.cod_modalidade      = ll.cod_modalidade
-                                 and adjudicacao.cod_entidade        = ll.cod_entidade
-                            )";
+    $stFiltro.= "    AND NOT EXISTS ( SELECT 1
+                                        FROM licitacao.adjudicacao
+                                       WHERE adjudicacao.cod_licitacao       = ll.cod_licitacao
+                                         AND adjudicacao.exercicio_licitacao = ll.exercicio
+                                         AND adjudicacao.cod_modalidade      = ll.cod_modalidade
+                                         AND adjudicacao.cod_entidade        = ll.cod_entidade
+                                         AND adjudicacao.adjudicado          = true
+                                    )";
 }
 
           //  -- Não pode pegar a cotação que já esteja anulada, nem julgar o que já foi excluido.
@@ -299,7 +303,7 @@ $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("DIREITA");
-$obLista->ultimoDado->setCampo( "[num_edital]/[exercicio]" );
+$obLista->ultimoDado->setCampo( "[num_edital_lista]" );
 $obLista->commitDado();
 
 $obLista->addDado();

@@ -311,29 +311,3 @@ SELECT 6
            )
      ;
 
-
-----------------
--- Ticket #22331
-----------------
-
-INSERT
-  INTO administracao.relatorio
-     ( cod_gestao
-     , cod_modulo
-     , cod_relatorio
-     , nom_relatorio
-     , arquivo )
-SELECT 6
-     , 36
-     , 67
-     , 'RGF - Anexo 1 - Demonstrativo da Despesa com Pessoal'
-     , 'RGFAnexo1_2015.rptdesign'
- WHERE 0 = (
-             SELECT COUNT(1)
-               FROM administracao.relatorio
-              WHERE cod_gestao    = 6
-                AND cod_modulo    = 36
-                AND cod_relatorio = 67
-           )
-     ;
-

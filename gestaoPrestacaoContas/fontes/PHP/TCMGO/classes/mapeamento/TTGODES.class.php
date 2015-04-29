@@ -33,10 +33,12 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 61664 $
+    $Revision: 62219 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-02-23 17:13:27 -0300 (Seg, 23 Fev 2015) $
+    $Author: michel $
+    $Date: 2015-04-09 09:47:41 -0300 (Qui, 09 Abr 2015) $
+    
+    $Id: TTGODES.class.php 62219 2015-04-09 12:47:41Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -80,7 +82,7 @@ class TTGODES extends Persistente
         $stSql = "  SELECT
                               '10'    AS     tipo_registro
                             , ppa_progama.num_programa AS cod_programa
-                            , despesa.cod_despesa
+                            --, despesa.cod_despesa
                             , despesa.num_orgao
                             , despesa.num_unidade
                             , despesa.cod_funcao
@@ -271,7 +273,7 @@ class TTGODES extends Persistente
                     WHERE  despesa.exercicio = '".$this->getDado('exercicio')."'
                     AND  despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
                     GROUP BY  ppa_progama.num_programa
-                           , despesa.cod_despesa
+                           --, despesa.cod_despesa
                            , despesa.num_orgao
                            , despesa.num_unidade
                            , despesa.cod_funcao
@@ -295,7 +297,7 @@ class TTGODES extends Persistente
         SELECT
                 '11'    AS     tipo_registro
              , ppa_progama.num_programa AS cod_programa
-             ,  despesa.cod_despesa
+             --,  despesa.cod_despesa
              ,  despesa.num_orgao
              ,  despesa.num_unidade
              ,  despesa.cod_funcao
@@ -576,7 +578,7 @@ INNER JOIN  orcamento.recurso
          WHERE  despesa.exercicio = '".$this->getDado('exercicio')."'
            AND  despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
       GROUP BY  ppa_progama.num_programa
-             , despesa.cod_despesa
+             --, despesa.cod_despesa
              , despesa.num_orgao
              , despesa.num_unidade
              , despesa.cod_funcao
@@ -600,7 +602,7 @@ INNER JOIN  orcamento.recurso
         SELECT
                 '12'    AS     tipo_registro
              , ppa_progama.num_programa AS cod_programa
-             ,  despesa.cod_despesa
+             --,  despesa.cod_despesa
              ,  despesa.num_orgao
              ,  despesa.num_unidade
              ,  despesa.cod_funcao
@@ -883,7 +885,17 @@ INNER JOIN  orcamento.recurso
            AND  fonte.cod_recurso = despesa.cod_recurso
          WHERE  despesa.exercicio = '".$this->getDado('exercicio')."'
            AND  despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
-            GROUP BY  ppa_progama.num_programa , despesa.cod_despesa, despesa.num_orgao, despesa.num_unidade, despesa.cod_funcao, despesa.cod_subfuncao, cod_natureza, numero_pao, elemento_despesa, despesa.cod_recurso, fonte_recurso.descricao
+            GROUP BY  ppa_progama.num_programa 
+                    --, despesa.cod_despesa
+                    , despesa.num_orgao
+                    , despesa.num_unidade
+                    , despesa.cod_funcao
+                    , despesa.cod_subfuncao
+                    , cod_natureza
+                    , numero_pao
+                    , elemento_despesa
+                    , despesa.cod_recurso
+                    , fonte_recurso.descricao
     ";
 
         return $stSql;
@@ -899,7 +911,7 @@ INNER JOIN  orcamento.recurso
         SELECT
                 '13'    AS     tipo_registro
              , ppa_progama.num_programa AS cod_programa
-             ,  despesa.cod_despesa
+             --,  despesa.cod_despesa
              ,  despesa.num_orgao
              ,  despesa.num_unidade
              ,  despesa.cod_funcao
@@ -1021,7 +1033,17 @@ INNER JOIN  orcamento.recurso
            AND  liquidado.exercicio = despesa.exercicio
          WHERE  despesa.exercicio = '".$this->getDado('exercicio')."'
            AND  despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
-            GROUP BY  ppa_progama.num_programa , despesa.cod_despesa, despesa.num_orgao, despesa.num_unidade, despesa.cod_funcao, despesa.cod_subfuncao, cod_natureza, numero_pao, elemento_despesa, despesa.cod_recurso, fonte_recurso.descricao
+            GROUP BY  ppa_progama.num_programa
+                   --,  despesa.cod_despesa
+                   ,  despesa.num_orgao
+                   ,  despesa.num_unidade
+                   ,  despesa.cod_funcao
+                   ,  despesa.cod_subfuncao
+                   ,  cod_natureza
+                   ,  numero_pao
+                   ,  elemento_despesa
+                   ,  despesa.cod_recurso
+                   ,  fonte_recurso.descricao
     ";
 
         return $stSql;

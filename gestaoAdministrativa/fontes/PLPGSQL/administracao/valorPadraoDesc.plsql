@@ -44,7 +44,7 @@ DECLARE
     stSaida             VARCHAR   := '''';
     reRegistro          RECORD;
     inCount             INTEGER := 1;
-    arValores           INTEGER[] := array[0];
+    arValores           VARCHAR[] := array[0];
 
 BEGIN
         arValores := string_to_array(trim(stValores),'','');
@@ -60,7 +60,7 @@ BEGIN
             WHERE   cod_atributo = inCodAtributo AND
                     cod_cadastro = inCodCadastro AND
                     cod_modulo   = inCodModulo   AND
-                    cod_valor    = arValores[inCount];
+                    cod_valor::VARCHAR    = arValores[inCount];
             stSaida := stSaida || ''[][][]'' || stValor;
             inCount := inCount + 1;
         END LOOP;

@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FLRelatorioLancamentoAutomatico.php 61508 2015-01-27 19:54:30Z carolina $
+    * $Id: FLRelatorioLancamentoAutomatico.php 62330 2015-04-24 14:32:29Z lisiane $
 
     * Casos de uso: 
 */
@@ -97,12 +97,12 @@ $obHdnCaminho->setValue( CAM_GT_ARR_INSTANCIAS."relatorios/OCRelatorioLancamento
 
 $obHdnNomeGrupo = new Hidden;
 $obHdnNomeGrupo->setName    ( "stNomeGrupo" );
-$obHdnNomeGrupo->setId      ("stNomeGrupo");
+$obHdnNomeGrupo->setId      ( "stNomeGrupo" );
 
 $obHdnCodigoCredito = new Hidden;
-$obHdnCodigoCredito->setName    ('inCodigoCredito');
-$obHdnCodigoCredito->setId          ('inCodigoCredito');
-$obHdnCodigoCredito->setValue    ( $inCodigoCredito );
+$obHdnCodigoCredito->setName    ( 'inCodigoCredito' );
+$obHdnCodigoCredito->setId      ( 'inCodigoCredito' );
+$obHdnCodigoCredito->setValue   ( $inCodigoCredito  );
 
 $obBtnOK = new OK(true);
 
@@ -115,7 +115,7 @@ $obBscGrupoCredito = new BuscaInnerIntervalo;
 $obBscGrupoCredito->setRotulo           ( "Grupo de Crédito"    );
 $obBscGrupoCredito->setTitle            ( "Informe o intervalo de Grupo de Crédito");
 $obBscGrupoCredito->setNull(false);
-$obBscGrupoCredito->obLabelIntervalo->setValue ( "e"          );
+$obBscGrupoCredito->obLabelIntervalo->setValue ( "até"          );
 $obBscGrupoCredito->obCampoCod->setName     ("inCodGrupoInicio"  );
 $obBscGrupoCredito->obCampoCod->setMascara ( $stMascaraGrupoCredito );
 $obBscGrupoCredito->obCampoCod->setMaxLength ( strlen($stMascaraGrupoCredito) );
@@ -128,25 +128,25 @@ $obBscGrupoCredito->obCampoCod2->setMinLength ( strlen($stMascaraGrupoCredito) )
 $obBscGrupoCredito->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GT_ARR_POPUPS."grupoCreditos/FLProcurarGrupo.php','frm','inCodGrupoTermino','stNomeGrupo','','".Sessao::getId()."','800','450');" ));
 
 $obNumCGMInicio = new TextBox;
-$obNumCGMInicio->setName          ( "inNumCGMInicio"        );
-$obNumCGMInicio->setRotulo         ( "Contribuinte"   );
-$obNumCGMInicio->setTitle             ( "Informe o Número de CGM inicial" ) ;
-$obNumCGMInicio->setInteiro          ( true                );
+$obNumCGMInicio->setName        ( "inNumCGMInicio"                  );
+$obNumCGMInicio->setRotulo      ( "Contribuinte"                    );
+$obNumCGMInicio->setTitle       ( "Informe o Número de CGM inicial" );
+$obNumCGMInicio->setInteiro     ( true                              );
 
 $obNumCGMTermino = new TextBox;
-$obNumCGMTermino->setName       ( "inNumCGMTermino"       );
-$obNumCGMTermino->setRotulo      ( "Contribuinte"   );
-$obNumCGMTermino->setTitle          ( "Informe o Número de CGM final" );
-$obNumCGMTermino->setInteiro       ( true                 );
+$obNumCGMTermino->setName       ( "inNumCGMTermino"                 );
+$obNumCGMTermino->setRotulo     ( "Contribuinte"                    );
+$obNumCGMTermino->setTitle      ( "Informe o Número de CGM final"   );
+$obNumCGMTermino->setInteiro    ( true                              );
 
 $obBscContribuinte = new BuscaInnerIntervalo;
-$obBscContribuinte->setRotulo           ( "Contribuinte"    );
-$obBscContribuinte->obLabelIntervalo->setValue ( "até"          );
-$obBscContribuinte->obCampoCod->setName     ("inCodContribuinteInicial"  );
+$obBscContribuinte->setRotulo                   ( "Contribuinte"            );
+$obBscContribuinte->obLabelIntervalo->setValue  ( "até"                     );
+$obBscContribuinte->obCampoCod->setName         ("inCodContribuinteInicial" );
 $obBscContribuinte->obCampoCod->setValue        ( $inCodContribuinteInicio  );
-$obBscContribuinte->setFuncaoBusca( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteInicial','stNomeGrupo','','".Sessao::getId()."','800','450');" ));
-$obBscContribuinte->obCampoCod2->setName        ("inCodContribuinteFinal"  );
-$obBscContribuinte->obCampoCod2->setValue       ( $inCodContribuinteFinal  );
+$obBscContribuinte->setFuncaoBusca( str_replace ("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteInicial','stNomeGrupo','','".Sessao::getId()."','800','450');" ));
+$obBscContribuinte->obCampoCod2->setName        ("inCodContribuinteFinal"   );
+$obBscContribuinte->obCampoCod2->setValue       ( $inCodContribuinteFinal   );
 $obBscContribuinte->setFuncaoBusca2( str_replace("'","&quot;","abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodContribuinteFinal','stNomeGrupo','','".Sessao::getId()."','800','450');" ));
 
 $obBscInscricaoImobiliaria = new BuscaInnerIntervalo;

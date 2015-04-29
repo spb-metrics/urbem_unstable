@@ -57,10 +57,22 @@ class Sessao extends SessaoLegada
     private $inNumeroLinhas = 0; //UTILIZADA NA PAGINAÇÃO
     private $stEntidade;
     private $boEntidade;
-    private $inConexao;
+    private $inConexao;    
 
     const CACHE_LIMIT = 30;
 
+    #NAO APAGAR TICKET #21749
+    // public static function setIdleTime($valor)
+    // {
+    //     return Sessao::write('inSessionIdleTime',$valor,true);   
+    // }
+
+    #NAO APAGAR TICKET #21749
+    // public static function setCacheTimeExpire($valor)
+    // {
+    //     return Sessao::write('inTimeCacheExpire',$valor,true);
+    // }
+    
     public static function setVersao($valor)
     {
         return Sessao::write('flVersao', $valor, true);
@@ -273,6 +285,18 @@ class Sessao extends SessaoLegada
 
     }
 
+    #NAO APAGAR TICKET #21749
+    // public static function getCacheTimeExpire()
+    // {
+    //     return Sessao::read('inTimeCacheExpire');
+    // }
+    #NAO APAGAR TICKET #21749
+    // public static function getIdleTime()
+    // {
+    //     return Sessao::read('inSessionIdleTime');   
+    // }
+
+
     public static function getId()
     {
         return Sessao::read('sessao_id');
@@ -288,6 +312,51 @@ class Sessao extends SessaoLegada
         return Sessao::read('modulo');
 
     }
+
+    #NAO APAGAR TICKET #21749
+    // public static function configurarSessaoTimeOut($boTransacao = "")
+    // {
+    //     include_once (CAM_GA_ADM_MAPEAMENTO . "TAdministracaoConfiguracao.class.php");
+    //     $obTConfiguracao = new TAdministracaoConfiguracao;
+    //     $obTConfiguracao->setDado("cod_modulo", 2);
+    //     $obTConfiguracao->setDado("exercicio", Sessao::getExercicio());
+    //     $obErro = $obTConfiguracao->pegaConfiguracao($inValor, "tempo_inatividade_usuario", $boTransacao);
+
+    //     if (!$obErro->ocorreu()) {
+    //         if (!empty($inValor)) {
+    //             //Busca o valor em minutos que foi configurado na base
+    //             Sessao::setIdleTime( $_SERVER['REQUEST_TIME']/60 );
+    //             Sessao::setCacheTimeExpire($inValor);//minutos
+    //             session_cache_expire($inValor);//minutos
+    //         }else{
+    //             Sessao::setIdleTime( $_SERVER['REQUEST_TIME']/60 );
+    //             Sessao::setCacheTimeExpire(1);//minutos
+    //             session_cache_expire(1);//minutos
+    //         }
+    //     }
+    //     return $obErro;
+    // }
+
+    #NAO APAGAR TICKET #21749
+    // public static function sessaoExpirada()
+    // {
+    //     //Validando se a houve o primeiro login com os dados ja armazenados na sessao
+    //     if ( Sessao::getIdleTime() && Sessao::getCacheTimeExpire() ) {
+    //         $inTimeLogIn        = Sessao::getIdleTime();
+    //         $inTimeCacheExpire  = Sessao::getCacheTimeExpire();
+    //         $inTotalTimeSession = $inTimeLogIn + $inTimeCacheExpire;
+    //         $inTimeNow = time()/60;    
+            
+    //         if ( $inTotalTimeSession < $inTimeNow ) {                
+    //             return true;
+    //         }else{
+    //             Sessao::setIdleTime( $_SERVER['REQUEST_TIME']/60 );
+    //             return false;
+    //         }
+    //     }else{
+    //         return false;
+    //     }
+    // }
 
     public static function verificarSistemaAtivo($boTransacao = "")
     {
@@ -412,22 +481,38 @@ class Sessao extends SessaoLegada
      * Abre sessao
      *
      * @return true
-     */
-
+    */
     public static function open($nomeSessao = false)
     {
         if (!Sessao::started()) {
+            
             if ($nomeSessao) {
                 session_name($nomeSessao);
             }
-
+            
             session_cache_expire(Sessao::CACHE_LIMIT);
+            
             session_start();
+            #NAO APAGAR TICKET #21749
+            //return true;
         }
-
+        #NAO APAGAR TICKET #21749
+        // else{
+        //     //Verifica TimeOut da sessao configurada
+        //     if ( Sessao::sessaoExpirada() ) {             
+        //         // echo "<script type='text/javascript'>\n";
+        //         // echo "alert('Sessão Expirada!');";
+        //         // //echo "parent.frames['telaStatus'].document.getElementById('logout_link').click();\n";
+        //         // echo "</script>\n";
+        //         return false;
+        //     }else{
+        //         return true;
+        //     }
+        // }
         return true;
-
     }
+
+
     /**
      * fecha sessao e destroi todos os dados
      *

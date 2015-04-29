@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGConfiguracaoEMP.class.php 61709 2015-02-26 19:05:09Z carlos.silva $
+    * $Id: TTCEMGConfiguracaoEMP.class.php 61800 2015-03-04 20:16:20Z arthur $
     *
     * $Name: $
     * $Date: $
@@ -64,6 +64,58 @@ class TTCEMGConfiguracaoEMP extends Persistente
         $this->AddCampo('exercicio_licitacao'       , 'varchar', false,  4, false, false);
         $this->AddCampo('cod_modalidade'            , 'integer', false, '', false, false);
 
+    }
+    
+    function recuperaComprasLicitacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = ""){
+        $obErro      = new Erro;
+	$obConexao   = new Conexao;
+	$rsRecordSet = new RecordSet;
+	$stSql = $this->montaRecuperaComprasLicitacao().$stOrdem;
+	$this->stDebug = $stSql;
+	$obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+	return $obErro;
+    }
+    
+    function montaRecuperaComprasLicitacao(){
+	
+        $stSql  = "SELECT arquivo_emp.cod_empenho
+                        , arquivo_emp.cod_licitacao
+                        , arquivo_emp.exercicio_licitacao
+                        
+                     FROM tcemg.arquivo_emp
+               
+               INNER JOIN empenho.empenho
+                       ON empenho.exercicio    = arquivo_emp.exercicio
+                      AND empenho.cod_entidade = arquivo_emp.cod_entidade
+                      AND empenho.cod_empenho  = arquivo_emp.cod_empenho 
+               
+               INNER JOIN empenho.pre_empenho
+                       ON pre_empenho.exercicio       = empenho.exercicio
+                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+               
+               INNER JOIN empenho.item_pre_empenho
+                       ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                      AND item_pre_empenho.exercicio       = pre_empenho.exercicio       
+                      
+               INNER JOIN empenho.item_pre_empenho_julgamento
+                       ON item_pre_empenho_julgamento.cod_pre_empenho = item_pre_empenho.cod_pre_empenho 
+                      AND item_pre_empenho_julgamento.exercicio       = item_pre_empenho.exercicio       
+                      AND item_pre_empenho_julgamento.num_item        = item_pre_empenho.num_item        
+               
+               INNER JOIN compras.mapa_cotacao
+                       ON mapa_cotacao.cod_cotacao       = item_pre_empenho_julgamento.cod_cotacao
+                      AND mapa_cotacao.exercicio_cotacao = item_pre_empenho_julgamento.exercicio
+               
+               INNER JOIN licitacao.licitacao
+                       ON licitacao.exercicio_mapa = mapa_cotacao.exercicio_mapa
+                      AND licitacao.cod_mapa       = mapa_cotacao.cod_mapa
+               
+                    WHERE arquivo_emp.exercicio_licitacao = '".$this->getDado('exercicio_licitacao')."' 
+                      AND arquivo_emp.cod_licitacao       = ".$this->getDado('cod_licitacao')." 
+                      AND arquivo_emp.cod_modalidade      = ".$this->getDado('cod_modalidade')." 
+                      AND arquivo_emp.cod_empenho         = ".$this->getDado('cod_empenho');
+                      
+        return $stSql;
     }
 
 }

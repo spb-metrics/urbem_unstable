@@ -56,16 +56,47 @@ $stAcao = $request->get('stAcao');
 
 Sessao::setTrataExcecao(true);
 Sessao::getTransacao()->setMapeamento($obTPatrimonioInventario);
+$obErro = new Erro();
 
 switch ($stAcao) {
 
     case "incluir":
+        $inIdInventario    = $_REQUEST['inIdInventario'];
+        $stExercicio       = $_REQUEST['stExercicio'];
+        $boImprimeAbertura = $_REQUEST['boImprimeAbertura'];
+        $stDataInicial     = $_REQUEST['stDataInicial'];        
+        $stObservacao      = $_REQUEST['stObservacao'];
+
+        if (is_numeric($inIdInventario) && !empty($stExercicio)) {
+            $obTPatrimonioInventario = new TPatrimonioInventario;
+            //No OC ja foi atribuido o valor do proximo id inventario            
+            $obTPatrimonioInventario->setDado('id_inventario' , $inIdInventario);
+            $obTPatrimonioInventario->setDado('exercicio'     , $stExercicio);
+            $obTPatrimonioInventario->setDado('dt_inicio'     , $stDataInicial);
+            $obTPatrimonioInventario->setDado('observacao'    , $stObservacao);
+            $obTPatrimonioInventario->setDado('numcgm'        , Sessao::read('numCgm'));
+            $obErro = $obTPatrimonioInventario->inclusao( $boTransacao );
+
+            //Incluindo a carga de bens no inventario patrimonio.inventario_historico_bem usando PL já existente
+            if ( !$obErro->ocorreu() ) {
+                $obTPatrimonioInventario->setDado('id_inventario' , $inIdInventario);
+                $obTPatrimonioInventario->setDado('exercicio'     , $stExercicio);
+                $obErro = $obTPatrimonioInventario->recuperaCargaInicialInventario($rsRecordSet, "", "", $boTransacao);
+            }
+
+            $pgDest = "OCGeraAberturaEncerramentoInventario.php?inIdInventario=".$inIdInventario."&stExercicio=".$stExercicio."&stDataInicial=".$stDataInicial;
+
+            SistemaLegado::alertaAviso($pgDest.'?'.Sessao::getId()."&stAcao=".$_REQUEST['stAcao'], $inIdInventario."/".$stExercicio."",$_REQUEST['stAcao'],"aviso", Sessao::getId(), "../");
+        } else {
+            SistemaLegado::exibeAviso('Erro ao incluir o Inventário.','form','erro',Sessao::getId() );
+        }
+    break;
     case "alterar":
 
         $inIdInventario    = $_REQUEST['inIdInventario'];
         $stExercicio       = $_REQUEST['stExercicio'];
         $boImprimeAbertura = $_REQUEST['boImprimeAbertura'];
-        $stDataInicial     = $_REQUEST['stDataInicial'];
+        $stDataInicial     = $_REQUEST['stDataInicial'];        
         $stObservacao      = $_REQUEST['stObservacao'];
 
         if (is_numeric($inIdInventario) && !empty($stExercicio)) {
@@ -75,17 +106,13 @@ switch ($stAcao) {
             $obTPatrimonioInventario->setDado('dt_inicio'     , $stDataInicial);
             $obTPatrimonioInventario->setDado('observacao'    , $stObservacao);
             $obTPatrimonioInventario->setDado('numcgm'        , Sessao::read('numCgm'));
-            $obTPatrimonioInventario->alteracao();
+            $obTPatrimonioInventario->alteracao($boTransacao);
 
             $pgDest = $pgFilt;
 
-            if ($stAcao == 'incluir') {
-                $pgDest = "OCGeraAberturaEncerramentoInventario.php?inIdInventario=".$inIdInventario."&stExercicio=".$stExercicio;
-            }
-
             SistemaLegado::alertaAviso($pgDest.'?'.Sessao::getId()."&stAcao=".$_REQUEST['stAcao'], $inIdInventario."/".$stExercicio."",$_REQUEST['stAcao'],"aviso", Sessao::getId(), "../");
         } else {
-            SistemaLegado::exibeAviso('Erro ao incluir o Inventário.','form','erro',Sessao::getId() );
+            SistemaLegado::exibeAviso('Erro ao alterar o Inventário.','form','erro',Sessao::getId() );
         }
 
     break;
@@ -100,12 +127,12 @@ switch ($stAcao) {
             $obTPatrimonioInventarioHistoricoBem = new TPatrimonioInventarioHistoricoBem;
             $obTPatrimonioInventarioHistoricoBem->setDado('id_inventario' , $inIdInventario);
             $obTPatrimonioInventarioHistoricoBem->setDado('exercicio'     , $stExercicio);
-            $obErro = $obTPatrimonioInventarioHistoricoBem->exclusao();
+            $obErro = $obTPatrimonioInventarioHistoricoBem->exclusao($boTransacao);
 
             $obTPatrimonioInventario = new TPatrimonioInventario;
             $obTPatrimonioInventario->setDado('id_inventario' , $inIdInventario);
             $obTPatrimonioInventario->setDado('exercicio'     , $stExercicio);
-            $obErro = $obTPatrimonioInventario->exclusao();
+            $obErro = $obTPatrimonioInventario->exclusao($boTransacao);
         }
 
         SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$_REQUEST['stAcao'], $inIdInventario."/".$stExercicio."",$_REQUEST['stAcao'],"aviso", Sessao::getId(), "../");

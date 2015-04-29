@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TOrcamentoDespesa.class.php 61640 2015-02-19 13:32:40Z michel $
+    $Id: TOrcamentoDespesa.class.php 61964 2015-03-18 20:04:41Z evandro $
 
     $Revision: 30668 $
     $Name$
@@ -313,6 +313,8 @@ function montaRecuperaDotacao()
 
     $stSql .= " (valor_orcado + valor_suplementado - valor_reduzido - valor_empenhado + valor_anulado - valor_reserva) as saldo_disponivel ";
 
+    $stSql .= " ,(valor_orcado - valor_reserva) as saldo";
+    
     $stSql .= " FROM(                                                           \n";
 
     $stSql .= " SELECT                                                          \n";

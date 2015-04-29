@@ -100,7 +100,7 @@ if (!empty($inCodLicitacao) && !empty($inCodModalidade)) {
 }
 
 $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional;
-$obTLicitacaoMembroAdicional->setDado('exercicio', Sessao::getExercicio());
+$obTLicitacaoMembroAdicional->setDado('exercicio', $request->get('stExercicioLicitacao'));
 $obTLicitacaoMembroAdicional->recuperaMembroAdicional($rsMembrosAdicionais, $stFiltro, $stOrder,$boTransacao);
 
 $arLicitacao = ($rsLicitacao->arElementos);
@@ -115,7 +115,7 @@ if ($rsMembrosAdicionais->getNumLinhas() < 0){
 }
 
 $obTableTree->setArquivo               ($pgOcul);
-$obTableTree->setParametros            (array('cod_licitacao' => 'cod_licitacao','cod_entidade'=>'cod_entidade','cod_modalidade'=>'cod_modalidade'));
+$obTableTree->setParametros            (array('cod_licitacao' => 'cod_licitacao','cod_entidade'=>'cod_entidade','cod_modalidade'=>'cod_modalidade','exercicio' => 'exercicio'));
 $obTableTree->setComplementoParametros ('stCtrl=montaAcoes'  );
 $obTableTree->setSummary               ('Lista de Licitações');
 $obTableTree->Head->addCabecalho       ('Licitação' ,8);

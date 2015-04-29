@@ -54,103 +54,133 @@ class TTCMGOParecerLicitacao extends Persistente
 
     public function montaRecuperaPareceLicitacaoRegistro10()
     {
-        $stSql ="   SELECT  10 as tipo_registro
-                            , LPAD(orgao.num_orgao::varchar,2,'0') as cod_orgao
-                            , LPAD(licitacao.num_orgao::varchar,2, '0') AS cod_unidade
-                            , licitacao.exercicio as exercicio_licitacao
+      
+           $stSql = " SELECT  10 AS tipo_registro
+                            , LPAD(despesa.num_orgao::varchar,2,'0') AS cod_orgao
+                            , LPAD(despesa.num_unidade::varchar,2, '0') AS cod_unidade
+                            , licitacao.exercicio AS exercicio_licitacao
                             , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS num_processo_licitatorio 
-                            , to_char(edital.dt_aprovacao_juridico, 'ddmmyyyy') as data_parecer
-                            , 2 as tipo_parecer
-                            , pf.cpf as cpf
-                            , sw_cgm.nom_cgm as nome_resp_parecer                            
-                            , sw_cgm.logradouro as logra_res
-                            , ''::varchar(20) as setor_logra
-                            , sw_municipio.nom_municipio as cidade_logra
-                            , sw_uf.sigla_uf as uf_cidade_logra
-                            , sw_cgm.cep as cep_logra_responsavel
+                            , to_char(edital.dt_aprovacao_juridico, 'ddmmyyyy') AS data_parecer
+                            , 2 AS tipo_parecer
+                            , sw_cgm_pessoa_fisica.cpf AS cpf
+                            , sw_cgm.nom_cgm AS nome_resp_parecer                            
+                            , sw_cgm.logradouro AS logra_res
+                            , ''::varchar(20) AS setor_logra
+                            , sw_municipio.nom_municipio AS cidade_logra
+                            , sw_uf.sigla_uf AS uf_cidade_logra
+                            , sw_cgm.cep AS cep_logra_responsavel
                             , CASE WHEN sw_cgm.fone_residencial != '' THEN
                                         sw_cgm.fone_residencial 
                                     ELSE
                                         sw_cgm.fone_celular 
-                            END as fone
-                            , sw_cgm.e_mail as email
+                              END AS fone
+                            , sw_cgm.e_mail AS email
                             
-                    FROM licitacao.licitacao    
-                    JOIN licitacao.edital
+                    FROM licitacao.licitacao 
+   
+                 INNER JOIN licitacao.edital
                          ON edital.exercicio_licitacao = licitacao.exercicio
-                        AND edital.cod_licitacao   = licitacao.cod_licitacao
-                        AND edital.cod_modalidade  = licitacao.cod_modalidade
-                        AND edital.cod_entidade    = licitacao.cod_entidade
-                    JOIN licitacao.cotacao_licitacao AS CL
-                         ON CL.cod_licitacao       = licitacao.cod_licitacao
-                        AND CL.cod_modalidade      = licitacao.cod_modalidade
-                        AND CL.cod_entidade        = licitacao.cod_entidade
-                        AND CL.exercicio_licitacao = licitacao.exercicio
-                    JOIN licitacao.adjudicacao AS A
-                         ON A.cod_licitacao        = CL.cod_licitacao
-                        AND A.cod_modalidade       = CL.cod_modalidade
-                        AND A.cod_entidade         = CL.cod_entidade
-                        AND A.exercicio_licitacao  = CL.exercicio_licitacao
-                        AND A.lote                 = CL.lote
-                        AND A.cod_cotacao          = CL.cod_cotacao
-                        AND A.cod_item             = CL.cod_item
-                        AND A.exercicio_cotacao    = CL.exercicio_cotacao
-                        AND A.cgm_fornecedor       = CL.cgm_fornecedor
-                    JOIN licitacao.homologacao AS H
-                         ON H.num_adjudicacao      = A.num_adjudicacao
-                        AND H.cod_entidade         = A.cod_entidade
-                        AND H.cod_modalidade       = A.cod_modalidade
-                        AND H.cod_licitacao        = A.cod_licitacao
-                        AND H.exercicio_licitacao  = A.exercicio_licitacao
-                        AND H.cod_item             = A.cod_item
-                        AND H.cod_cotacao          = A.cod_cotacao
-                        AND H.lote                 = A.lote
-                        AND H.exercicio_cotacao    = A.exercicio_cotacao
-                        AND H.cgm_fornecedor       = A.cgm_fornecedor
+                        AND edital.cod_licitacao       = licitacao.cod_licitacao
+                        AND edital.cod_modalidade      = licitacao.cod_modalidade
+                        AND edital.cod_entidade        = licitacao.cod_entidade
+                        
+                 INNER JOIN licitacao.cotacao_licitacao
+                         ON cotacao_licitacao.cod_licitacao       = licitacao.cod_licitacao
+                        AND cotacao_licitacao.cod_modalidade      = licitacao.cod_modalidade
+                        AND cotacao_licitacao.cod_entidade        = licitacao.cod_entidade
+                        AND cotacao_licitacao.exercicio_licitacao = licitacao.exercicio
+                        
+                 INNER JOIN licitacao.adjudicacao
+                         ON adjudicacao.cod_licitacao        = cotacao_licitacao.cod_licitacao
+                        AND adjudicacao.cod_modalidade       = cotacao_licitacao.cod_modalidade
+                        AND adjudicacao.cod_entidade         = cotacao_licitacao.cod_entidade
+                        AND adjudicacao.exercicio_licitacao  = cotacao_licitacao.exercicio_licitacao
+                        AND adjudicacao.lote                 = cotacao_licitacao.lote
+                        AND adjudicacao.cod_cotacao          = cotacao_licitacao.cod_cotacao
+                        AND adjudicacao.cod_item             = cotacao_licitacao.cod_item
+                        AND adjudicacao.exercicio_cotacao    = cotacao_licitacao.exercicio_cotacao
+                        AND adjudicacao.cgm_fornecedor       = cotacao_licitacao.cgm_fornecedor
+                        
+                 INNER JOIN licitacao.homologacao
+                         ON homologacao.num_adjudicacao      = adjudicacao.num_adjudicacao
+                        AND homologacao.cod_entidade         = adjudicacao.cod_entidade
+                        AND homologacao.cod_modalidade       = adjudicacao.cod_modalidade
+                        AND homologacao.cod_licitacao        = adjudicacao.cod_licitacao
+                        AND homologacao.exercicio_licitacao  = adjudicacao.exercicio_licitacao
+                        AND homologacao.cod_item             = adjudicacao.cod_item
+                        AND homologacao.cod_cotacao          = adjudicacao.cod_cotacao
+                        AND homologacao.lote                 = adjudicacao.lote
+                        AND homologacao.exercicio_cotacao    = adjudicacao.exercicio_cotacao
+                        AND homologacao.cgm_fornecedor       = adjudicacao.cgm_fornecedor
                         AND (   SELECT num_homologacao
-                                FROM licitacao.homologacao_anulada AS HANUL
-                                WHERE HANUL.num_homologacao      = H.num_homologacao
-                                AND HANUL.cod_licitacao        = H.cod_licitacao
-                                AND HANUL.cod_modalidade       = H.cod_modalidade
-                                AND HANUL.cod_entidade         = H.cod_entidade
-                                AND HANUL.num_adjudicacao      = H.num_adjudicacao
-                                AND HANUL.exercicio_licitacao  = H.exercicio_licitacao
-                                AND HANUL.lote                 = H.lote
-                                AND HANUL.cod_cotacao          = H.cod_cotacao
-                                AND HANUL.cod_item             = H.cod_item
-                                AND HANUL.exercicio_cotacao    = H.exercicio_cotacao
-                                AND HANUL.cgm_fornecedor       = H.cgm_fornecedor
+                                  FROM licitacao.homologacao_anulada
+                                 WHERE homologacao_anulada.num_homologacao      = homologacao.num_homologacao
+                                   AND homologacao_anulada.cod_licitacao        = homologacao.cod_licitacao
+                                   AND homologacao_anulada.cod_modalidade       = homologacao.cod_modalidade
+                                   AND homologacao_anulada.cod_entidade         = homologacao.cod_entidade
+                                   AND homologacao_anulada.num_adjudicacao      = homologacao.num_adjudicacao
+                                   AND homologacao_anulada.exercicio_licitacao  = homologacao.exercicio_licitacao
+                                   AND homologacao_anulada.lote                 = homologacao.lote
+                                   AND homologacao_anulada.cod_cotacao          = homologacao.cod_cotacao
+                                   AND homologacao_anulada.cod_item             = homologacao.cod_item
+                                   AND homologacao_anulada.exercicio_cotacao    = homologacao.exercicio_cotacao
+                                   AND homologacao_anulada.cgm_fornecedor       = homologacao.cgm_fornecedor
                             ) IS NULL  
                     
-                    JOIN public.sw_cgm_pessoa_fisica as pf
-                        ON pf.numcgm = edital.responsavel_juridico
+                INNER JOIN public.sw_cgm_pessoa_fisica
+                        ON sw_cgm_pessoa_fisica.numcgm = edital.responsavel_juridico
 
-                    JOIN sw_cgm
-                        ON sw_cgm.numcgm = pf.numcgm
+                INNER JOIN sw_cgm
+                        ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm
                         
-                    JOIN sw_municipio
-                        ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
-                        AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                INNER JOIN sw_municipio
+                        ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                       AND sw_municipio.cod_uf        = sw_cgm.cod_uf
 
-                    JOIN sw_uf
+                INNER JOIN sw_uf
                         ON sw_uf.cod_uf = sw_municipio.cod_uf
 
-                    LEFT JOIN tcmgo.orgao
-                        ON orgao.num_orgao = licitacao.num_orgao
-                       AND orgao.exercicio = licitacao.exercicio
-               
-                    WHERE H.timestamp BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                    AND licitacao.cod_modalidade NOT IN (8,9)
-                    AND NOT EXISTS (SELECT 1
-                                FROM licitacao.licitacao_anulada
-                                WHERE licitacao_anulada.exercicio = licitacao.exercicio
-                                AND licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
-                                AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
-                                )
-               
-               GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
-            ";
+                    INNER JOIN compras.mapa
+                          ON mapa.exercicio = licitacao.exercicio_mapa
+                         AND mapa.cod_mapa  = licitacao.cod_mapa
+                    
+                    JOIN compras.mapa_solicitacao
+                          ON mapa_solicitacao.exercicio = mapa.exercicio
+                         AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
+                         
+                    INNER JOIN compras.mapa_item
+                          ON mapa_item.exercicio             = mapa_solicitacao.exercicio
+                         AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
+                         AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
+                         AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
+                         AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                        
+                    INNER JOIN compras.mapa_item_dotacao
+                            ON mapa_item_dotacao.exercicio              = mapa_item.exercicio
+                            AND mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+                            AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                            AND mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+                            AND mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                            AND mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+                            AND mapa_item_dotacao.cod_item              = mapa_item.cod_item
+                            AND mapa_item_dotacao.lote                  = mapa_item.lote
+                                            
+                    INNER JOIN orcamento.despesa
+                            ON despesa.exercicio    = mapa_item_dotacao.exercicio
+                            AND despesa.cod_despesa = mapa_item_dotacao.cod_despesa
+
+
+                     WHERE homologacao.timestamp BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                       AND licitacao.cod_modalidade NOT IN (8,9)
+                       AND NOT EXISTS (SELECT 1
+                                         FROM licitacao.licitacao_anulada
+                                        WHERE licitacao_anulada.exercicio      = licitacao.exercicio
+                                          AND licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
+                                          AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                          AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                                      )
+                                      
+                  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 ";
 
         return $stSql;
     }

@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRGrupoCredito.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TARRGrupoCredito.class.php 62125 2015-03-30 17:28:42Z jean $
 
 * Casos de uso: uc-05.03.02
 */
@@ -82,10 +82,33 @@ function TARRGrupoCredito()
                   //nome,           tipo         requerido   Tamanho   PK     FK    Conteudo = ''
     $this->AddCampo('cod_grupo'     ,'integer'  ,true       ,''     ,true   ,false );
     $this->AddCampo('cod_modulo'    ,'integer'  ,true       ,''     ,false  ,true  );
-    $this->AddCampo('ano_exercicio','varchar'  ,true       ,'4'    ,true  ,false );
+    $this->AddCampo('ano_exercicio','char'  ,true       ,'4'    ,true  ,false );
     $this->AddCampo('descricao'     ,'varchar'  ,true       ,'80'   ,false  ,false );
 
 }
+
+public function recuperaListaExercicio(&$rsRecordSet, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaRecuperaListaExercicio();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaListaExercicio()
+    {
+        $stSql = "SELECT distinct ano_exercicio
+                    FROM arrecadacao.grupo_credito
+                  ORDER BY ano_exercicio DESC
+                ";
+
+        return $stSql;
+    }
 
 function recuperaRelacionamento(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
 {

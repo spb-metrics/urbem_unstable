@@ -111,33 +111,31 @@ switch ($stAcao) {
                 $arTotal[ $inContLinhas ] = number_format(($arTotal[ $inContLinhas ] + $inValor),2,'.','');
             }
         }
-
+        
         $boSalvar = 0;
         for ( $inKey = 0; $inKey < count($arTotal); $inKey++) {
             if ($arTotal[ $inKey ] != '0,00') {
                 if ($arTotal[ $inKey ] > $arValorFuncaoCol[ $inKey ] || $arTotal[ $inKey ] < $arValorFuncaoCol[ $inKey ]) {
+                    
+                    SistemaLegado::executaFrameOculto( " jQuery(\"input[name^='inCelula']\").each(function(){            
+                                                            if (!jQuery(this).val() || jQuery(this).val() == '0.00' || jQuery(this).val() == '0,00' || jQuery(this).val() == 0.00){
+                                                                jQuery(this).attr('disabled', false);
+                                                            }
+                                                        });" );
+                    
                     $obErro->setDescricao( "Total da despesa ".$arID[ $inKey ]." diferente do valor da dotação orçamentária." );
                     $boSalvar++;
                     break;
-                }
-            }
-        }
-
-        if ($boSalvar == 0) {
-            if ( count($arID) ) {
-                for ( $inContLinhas = 0; $inContLinhas < count($arID); $inContLinhas++) {
-                    $obRPrevisaoDespesa->setCodigoDespesa   ( $arID[$inContLinhas] );
+                
+                } else { 
+                    $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+                    $obRPrevisaoDespesa->setCodigoDespesa   ( $arID[$inKey] );
                     $obErro = $obRPrevisaoDespesa->limparDados($boTransacao);
-                }
-            }
-            $boFlagTransacao = false;
-            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao ); 
-            if ( !$obErro->ocorreu() ) {
-                for ($inContLinhas = 0; $inContLinhas < $_POST['inQtdLin']; $inContLinhas++) {
+                    
                     for ($inContColunas = 0; $inContColunas < $_POST['inQtdCol']; $inContColunas++) {
-                        $obRPrevisaoDespesa->setCodigoDespesa   ( $arID[$inContLinhas] );
+                        $obRPrevisaoDespesa->setCodigoDespesa   ( $arID[$inKey] );
                         $obRPrevisaoDespesa->setPeriodo         ( $inContColunas + 1 );
-                        $inValor = $_POST["inCelula_".$arID[$inContLinhas]."_".$inContColunas."_".$inContLinhas];
+                        $inValor = $_POST["inCelula_".$arID[$inKey]."_".$inContColunas."_".$inKey];
                         if ($inValor == "") {
                             $obRPrevisaoDespesa->setValorPrevisto ( 0 );
                         } else {
@@ -145,10 +143,12 @@ switch ($stAcao) {
                         }
                         $obErro = $obRPrevisaoDespesa->salvar($boTransacao);
                     }
-                }
-                $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPrevisaoDespesa );
+                    
+                    $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPrevisaoDespesa );
+                } 
             }
         }
+        
         if ( !$obErro->ocorreu() ) {
             SistemaLegado::alertaAviso($pgList,"Configuração realizada com sucesso.", "alterar", "aviso", Sessao::getId(), "../");
         } else {

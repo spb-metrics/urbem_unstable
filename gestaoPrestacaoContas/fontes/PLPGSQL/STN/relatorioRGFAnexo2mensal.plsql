@@ -112,44 +112,44 @@ BEGIN
 
   -- DEFINE O FILTRO PARA CADA LINHA
   arFiltro[1] := '';
-  arFiltro[2] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22211%\\'' OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22221%\\'') AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[2] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22211%'''' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22221%'''') AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
   arFiltro[3] := ''; 
   arFiltro[4] := ''; 
-  arFiltro[5] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22212%\\'' OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22222%\\'') AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
-  arFiltro[6] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2121705%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
-  arFiltro[7] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''21231020203%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[5] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22212%'''' OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22222%'''') AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[6] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2121705%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[7] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''21231020203%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
   arFiltro[8] := ''; 
-  arFiltro[9] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2223\\'' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[9] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2223'''' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
   arFiltro[10] := '';   
-  arFiltro[11] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2224401%\\'' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
-  arFiltro[12] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22244%\\'' AND REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''2224401%\\'' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' ';
-  arFiltro[13] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22249000002%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
-  arFiltro[14] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''22%\\''
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22211%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22221%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22212%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22222%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''2121705%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''21231020203%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''2223%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''2224401%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22244%\\''                                 
-                AND  REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') NOT LIKE \\''22249000002%\\''                                 
+  arFiltro[11] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2224401%'''' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' '; 
+  arFiltro[12] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22244%'''' AND REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''2224401%'''' )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||' ';
+  arFiltro[13] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22249000002%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[14] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''22%''''
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22211%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22221%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22212%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22222%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''2121705%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''21231020203%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''2223%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''2224401%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22244%''''                                 
+                AND  REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') NOT LIKE ''''22249000002%''''                                 
                    )  AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  ' ;
 
   arFiltro[15] := ''; 
-  arFiltro[16] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''111%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
-  arFiltro[17] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''112%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
-  arFiltro[18] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2121102%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''212110302%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2121202%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''212120302%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''21213010002%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''21213030002%\\''
-                  OR REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''21213040002%\\'' 
+  arFiltro[16] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''111%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[17] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''112%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[18] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2121102%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''212110302%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2121202%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''212120302%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''21213010002%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''21213030002%''''
+                  OR REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''21213040002%'''' 
                    ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  ';
   arFiltro[19] := ''; 
-  arFiltro[20] := '( REPLACE(plano_conta.cod_estrutural,\\''.\\'',\\''\\'') LIKE \\''2121704%\\'' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
+  arFiltro[20] := '( REPLACE(plano_conta.cod_estrutural,''''.'''','''''''') LIKE ''''2121704%'''' ) AND lote.cod_entidade <> '||inCodEntidadeRPPS||'  '; 
   arFiltro[21] := ''; 
   arFiltro[22] := ''; 
   arFiltro[23] := ''; 

@@ -363,7 +363,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">cod_entidade</property>
+                    <property name="paramName">data_inicio</property>
                     <property name="dataType">string</property>
                     <property name="position">2</property>
                     <property name="isInput">true</property>
@@ -379,57 +379,9 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">param_4</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">4</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_5</property>
-                    <property name="paramName">data_inicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">5</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_6</property>
-                    <property name="paramName">data_fim</property>
-                    <property name="dataType">string</property>
-                    <property name="position">6</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_7</property>
                     <property name="paramName">cod_entidade</property>
                     <property name="dataType">string</property>
-                    <property name="position">7</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_8</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">8</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_9</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">9</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_10</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">10</property>
+                    <property name="position">4</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -437,92 +389,26 @@ extensionProperties.odaPassword = params["db_password"].value;
             <structure name="cachedMetaData"/>
             <method name="afterClose"><![CDATA[params["qry"] = this.queryText;]]></method>
             <property name="dataSource">Data Source</property>
-            <xml-property name="queryText"><![CDATA[SELECT    q.tipo AS nom_recurso
-		, q.tipo_rd AS tipo_recurso
-		, q.disponibilidade_caixa_bruta
-		, q.obrigacoes_financeiras
-		, (q.disponibilidade_caixa_bruta - q.obrigacoes_financeiras) AS disponibilidade_liquida
-
-FROM (	SELECT lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
-         , tb.tipo
-         , rd.tipo AS tipo_rd
-         
-         /* Disponibilidade Caixa_Bruta */
-         , sum(tb.caixa_liquida) + 
-           sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) + 
-           sum(tb.liquidados_nao_pagos) + 
-           sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) + 
-           sum(tb.empenhados_nao_liquidados) AS disponibilidade_caixa_bruta 
-         
-		/* Obrigações financeiras */
-		, sum(tb.total_processados_exercicios_anteriores) + 
-		  sum(tb.total_processados_exercicio_anterior) + 
-		  sum(tb.total_nao_processados_exercicios_anteriores) + 
-		  sum(tb.total_nao_processados_exercicio_anterior) +
-		  sum(tb2.consignacoes) AS obrigacoes_financeiras
-
-	FROM ( SELECT 
-		      cod_recurso
-		    , entidade
-		    , tipo
-		    , SUM(total_processados_exercicios_anteriores) AS total_processados_exercicios_anteriores
-		    , SUM(total_processados_exercicio_anterior) AS total_processados_exercicio_anterior
-		    , SUM(total_nao_processados_exercicios_anteriores) AS total_nao_processados_exercicios_anteriores
-		    , SUM(total_nao_processados_exercicio_anterior) AS total_nao_processados_exercicio_anterior
-		    , SUM(liquidados_nao_pagos) AS liquidados_nao_pagos
-		    , SUM(empenhados_nao_liquidados) AS empenhados_nao_liquidados
-		    , SUM(empenhados_nao_liquidados_cancelados) AS empenhados_nao_liquidados_cancelados
-		    , SUM(caixa_liquida) AS caixa_liquida
-		FROM stn.fn_rgf_anexo6novo_recurso(?,?,?) AS stn_fn
-		   (  cod_recurso 			      	  integer
-		    , tipo 				      	  varchar
-		    , entidade 				      	  integer
-		    , total_processados_exercicios_anteriores 	  numeric
-		    , total_processados_exercicio_anterior    	  numeric
-		    , total_nao_processados_exercicios_anteriores numeric
-		    , total_nao_processados_exercicio_anterior 	  numeric
-		    , liquidados_nao_pagos 			  numeric
-		    , empenhados_nao_liquidados 		  numeric
-		    , empenhados_nao_liquidados_cancelados 	  numeric
-		    , caixa_liquida 				  numeric )
-	     GROUP BY cod_recurso
-		    , entidade
-		    , tipo
-	  ) AS tb
-
- INNER JOIN stn.pl_recurso_descricao(?,?,?,' ',?,'false') AS tb2
-            (  tipo_recurso				 char(1)
-	      , cod_recurso 				 integer
-	      , exercicio				 varchar
-              , nom_recurso				 varchar
-	      , positivo				 numeric
-	      , negativo				 numeric
-	      , saldo					 numeric
-	      , a_pagar_exercicio			 numeric
-	      , a_pagar_exercicio_anteriores 		 numeric
-	      , valor_consignacao_positivo	 	 numeric
-	      , valor_consignacao_negativo	 	 numeric
-	      , consignacoes 				 numeric
-	      , caixa	  	 	  		 numeric )
-
-       ON tb2.cod_recurso = tb.cod_recurso
-      AND tb2.exercicio   = ?
-
-  INNER JOIN orcamento.recurso_direto AS rd
-        ON rd.cod_recurso = tb.cod_recurso
-       AND rd.exercicio = ? 
-
-     WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = ?))
-
-  GROUP BY tb.cod_recurso
-         , tb.tipo
-	 , tb2.cod_recurso
-	 , tb2.tipo_recurso
-	 , tipo_rd
-	  
-  ORDER BY tb.cod_recurso
-         , tb.tipo
-) AS q]]></xml-property>
+            <xml-property name="queryText"><![CDATA[SELECT *
+FROM stn.pl_recurso_descricao(?,?,?,' ',?,'false')
+AS
+(
+		 tipo_recurso					char(1)
+		,cod_recurso 					integer
+		, exercicio						varchar
+		, nom_recurso					varchar
+		, positivo						numeric
+		, negativo						numeric
+		, saldo							numeric
+		, a_pagar_exercicio				numeric
+		, a_pagar_exercicio_anteriores	numeric
+		, valor_consignacao_positivo	numeric
+		, valor_consignacao_negativo	numeric
+		, consignacoes 					numeric
+		, caixa							numeric
+   
+)
+ORDER BY tipo_recurso DESC]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsRecursosRPPS" id="4575">
             <list-property name="parameters">
@@ -685,7 +571,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                             </structure>
                             <structure>
                                 <property name="name">saldo_bruto_vinculados</property>
-                                <expression name="expression">dataSetRow["disponibilidade_caixa_bruta"];</expression>
+                                <expression name="expression">dataSetRow["caixa"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                             <structure>
@@ -709,12 +595,12 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                             </structure>
                             <structure>
                                 <property name="name">obrigacoes</property>
-                                <expression name="expression">dataSetRow["obrigacoes_financeiras"];</expression>
+                                <expression name="expression">(dataSetRow["a_pagar_exercicio"] + dataSetRow["a_pagar_exercicio_anteriores"] + dataSetRow["consignacoes"])*(-1);</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                             <structure>
                                 <property name="name">caixa_liquida</property>
-                                <expression name="expression">dataSetRow["disponibilidade_liquida"];</expression>
+                                <expression name="expression">row["saldo_bruto_vinculados"] - row["obrigacoes"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                             <structure>
@@ -761,6 +647,16 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                             <structure>
                                 <property name="name">total_caixa_liquida_III</property>
                                 <expression name="expression">row["total_III"] - row["total_obrigacoes_III"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">consignacoes</property>
+                                <expression name="expression">dataSetRow["consignacoes"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">teste</property>
+                                <expression name="expression">Total.sum(row["obrigacoes"]) + Total.sum(dataSetRow["consignacoes"])</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                         </list-property>

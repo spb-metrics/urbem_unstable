@@ -48,14 +48,13 @@ $i = 0;
 
 if (!$rsRegistro10->eof()) {
   foreach ($rsRegistro10->arElementos as $stChave){
-    //$obExportador->roUltimoArquivo->addBloco($rsRegistro10);
     $stChave['sequencial'] = ++$i;
 
     $rsBloco10 = 'rsBloco10_'.$inCount;
     unset($$rsBloco10);
     $$rsBloco10 = new RecordSet();
     $$rsBloco10->preenche(array($stChave));
-
+    
     $obExportador->roUltimoArquivo->addBloco($$rsBloco10);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
@@ -80,9 +79,9 @@ if (!$rsRegistro10->eof()) {
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_subfuncao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 2 );
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 3 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_acao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_natureza");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 1 );
 
@@ -114,35 +113,35 @@ if (!$rsRegistro10->eof()) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 2 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_1Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_1ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_2Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_2ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_3Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_3ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_4Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_fisica_4ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_1Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_1ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_2Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_2ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_3Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_3ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_4Ano");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_financeira_4ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 15 );
 

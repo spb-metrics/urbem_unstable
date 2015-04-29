@@ -26,7 +26,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
+    $Id: FMManterBem.php 62215 2015-04-08 21:28:32Z jean $
 
     * Casos de uso: uc-03.01.06
 
@@ -267,12 +267,17 @@ $obTxtDescricaoBem->setSize( 100 );
 $obTxtDescricaoBem->setNull( false );
 $obTxtDescricaoBem->setValue( $rsBem->getCampo( 'descricao' ) );
 
-if ( $rsPatrimonioBemProcesso->getNumLinhas > 0 ){
-    $stProcesso = str_pad($rsPatrimonioBemProcesso->getCampo('cod_processo')."/".$rsPatrimonioBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT);$stProcesso = str_pad($rsPatrimonioBemProcesso->getCampo('cod_processo')."/".$rsPatrimonioBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT);    
+if ( $stAcao == 'alterar' && $rsPatrimonioBemProcesso->getNumLinhas() > 0 ){
+    $stProcesso = str_pad($rsPatrimonioBemProcesso->getCampo('cod_processo')."/".$rsPatrimonioBemProcesso->getCampo('ano_exercicio'),10,'0',STR_PAD_LEFT);
     $inCodProcesso = $rsPatrimonioBemProcesso->getCampo('cod_processo');
 } else {
     $stProcesso = "";
 }
+
+$obHdnChaveProcesso = new Hidden;
+$obHdnChaveProcesso->setId('hdnChaveProcesso');
+$obHdnChaveProcesso->setName('hdnChaveProcesso');
+$obHdnChaveProcesso->setValue($stProcesso);
 
 //instancia a informação do processo que deu origem a aquisição do bem
 $obPopUpProcesso = new IPopUpProcesso($obForm);
@@ -281,6 +286,7 @@ $obPopUpProcesso->setValue ( $inCodProcesso );
 $obPopUpProcesso->obCampoCod->setValue($stProcesso);
 $obPopUpProcesso->setValidar(true);
 $obPopUpProcesso->setNull   (true);
+//$obPopUpProcesso->obCampoCod->obEvento->setOnBlur("jq('#stChaveProcesso').val('112');");
 
 //instancia um text para o detalhamento do bem
 $obTxtDetalhamentoBem = new TextArea();
@@ -563,6 +569,7 @@ $obFileArquivoNF->setName   ( "fileArquivoNF"                );
 $obFileArquivoNF->setId     ( "fileArquivoNF"                );
 $obFileArquivoNF->setSize   ( 35                             );
 $obFileArquivoNF->setValue  ( ""  );
+$obFileArquivoNF->obEvento->setOnChange( 'validarArquivo();' );
 
 $obLocalizacao = new Link;
 $obLocalizacao->setRotulo("Download da Nota Fiscal");
@@ -964,6 +971,7 @@ $obFormulario->addTitulo('Reavaliação');
 
 if ($stAcao == 'alterar') {
     $obFormulario->addComponente( $obLblCodBemReavaliacao );
+    $obFormulario->addHidden($obHdnChaveProcesso);
 }
 
 $obFormulario->addComponente($obDtReavalicao);

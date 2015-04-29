@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 61612 2015-02-13 16:47:23Z lisiane $
+    $Id: TOrcamentoReceita.class.php 62365 2015-04-28 19:43:51Z carlos.silva $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -1070,7 +1070,12 @@ function montaRecuperaReceitaExportacao10()
                            THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
                            ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
                                        OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
                                      THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+                                     THEN '24210101'
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+                                     THEN '19319900'
                                      ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
                                  END
                        END AS cod_receita_final
@@ -1085,7 +1090,12 @@ function montaRecuperaReceitaExportacao10()
                            THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
                            ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
                                        OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
                                      THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+                                     THEN '24210101'
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+                                     THEN '19319900'
                                      ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
                                  END
                        END AS natureza_receita
@@ -1141,7 +1151,9 @@ function montaRecuperaReceitaExportacao10()
                    AND receita.cod_entidade IN (".$this->getDado('entidades').")
                    AND configuracao_entidade.cod_modulo = 55
                    AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
-                   AND receita.vl_original <> 0.00
+                   --AND receita.vl_original <> 0.00
+                   AND conta_receita.cod_conta NOT IN (384) -- Retirado esta conta devido a erro de cadastro do wallace, sendo cadastrada duas vezes.
+                   
              GROUP BY  cod_receita_final
                      , conta_receita.cod_estrutural
                      , conta_receita.descricao
@@ -1229,18 +1241,33 @@ function recuperaReceitaExportacao11(&$rsRecordSet, $boTransacao = "")
 function montaRecuperaReceitaExportacao11()
 {
     $stSql = "
+    
+    SELECT tipo_registro 
+         , cod_receita
+         , cod_font_recursos
+         , REPLACE(REPLACE(sum(vl_arrecadado_fonte)::VARCHAR,'.',','),'-','') AS vl_arrecadado_fonte
+
+       FROM(
+       
         SELECT 11 AS tipo_registro
              , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
                     THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
                            ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
                                        OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
                                      THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+                                     THEN '24210101'
+                                     WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+                                     THEN '19319900'
                                      ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
                                  END
                 END AS cod_receita
              , receita.cod_recurso::integer AS cod_font_recursos
-             , REPLACE(REPLACE(detalhamento_receitas.arrecadado_periodo::VARCHAR,'.',','),'-','') AS vl_arrecadado_fonte
+             , detalhamento_receitas.arrecadado_periodo AS vl_arrecadado_fonte
+          
           FROM orcamento.receita
+          
           JOIN orcamento.conta_receita
             ON conta_receita.cod_conta = receita.cod_conta
            AND conta_receita.exercicio = receita.exercicio
@@ -1325,16 +1352,27 @@ function montaRecuperaReceitaExportacao11()
             AS detalhamento_receitas
             ON detalhamento_receitas.cod_estrutural = conta_receita.cod_estrutural
                
-         WHERE receita.exercicio = '".Sessao::getExercicio()."'
+         WHERE receita.exercicio    = '".Sessao::getExercicio()."'
            AND receita.cod_entidade IN (".$this->getDado('entidades').")
-           AND receita.vl_original <> 0.00
-           AND detalhamento_receitas.arrecadado_periodo<>0.00
+           --AND receita.vl_original <> 0.00
+           AND detalhamento_receitas.arrecadado_periodo <> 0.00
+           
          GROUP BY receita.cod_receita
              , receita.cod_recurso
              , conta_receita.cod_estrutural
              , detalhamento_receitas.arrecadado_periodo
-         ORDER BY tipo_registro, cod_receita, cod_font_recursos
-    ";
+             
+      ORDER BY tipo_registro
+             , cod_receita
+             , cod_font_recursos
+             
+             ) AS tabela
+
+      GROUP BY tipo_registro 
+             , cod_receita
+             , cod_font_recursos
+
+      ORDER BY tipo_registro, cod_receita, cod_font_recursos ";
 
     return $stSql;
 }
@@ -1694,7 +1732,10 @@ function montaRecuperaCorrecoesReceitas10()
                                 2
                         END AS deducao_receita
                         , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-                        , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS natureza_receita_reduzida
+                        , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                               THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                               ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                           END AS natureza_receita_reduzida
                         , TRIM(conta_receita.descricao) AS especificacao_reduzida
                         , '' AS identificador_acrescida
                         , '' AS natureza_receita_acrescida
@@ -1759,7 +1800,10 @@ function montaRecuperaCorrecoesReceitas10()
                                 2
                         END AS deducao_receita
                         , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-                        , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS natureza_receita_reduzida
+                        , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                               THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                               ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                           END AS natureza_receita_reduzida
                         , TRIM(conta_receita.descricao) AS especificacao_reduzida
                         , '' AS identificador_acrescida
                         , '' AS natureza_receita_acrescida
@@ -1824,7 +1868,10 @@ function montaRecuperaCorrecoesReceitas10()
                                 2
                         END AS deducao_receita
                         , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-                        , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 8) AS natureza_receita_reduzida
+                        , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                               THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                               ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                           END AS natureza_receita_reduzida
                         , TRIM(conta_receita.descricao) AS especificacao_reduzida
                         , '' AS identificador_acrescida
                         , '' AS natureza_receita_acrescida
@@ -2130,10 +2177,14 @@ function montaRecuperaCorrecoesReceitas20()
     , deducao_receita
     , indentificador_deducao_reduzida AS identificador_deducao
     , natureza_receita_reduzida AS natureza_receita_estornada
-    , REPLACE(sem_acentos(especificacao_reduzida), '–', '-') AS especificacao_estornada
+    ,( SELECT sem_acentos(descricao) as descricao
+         FROM orcamento.conta_receita
+        WHERE REPLACE(conta_receita.cod_estrutural, '.', '')::TEXT = RPAD(natureza_receita_reduzida::TEXT, 14, '0')::TEXT
+          AND exercicio = '".$this->getDado('exercicio')."'
+      ) AS especificacao_estornada
     , SUM(vl_reduzido_acrescido) AS vl_estornado
-    , cod_receita
     , cod_correcao
+    
     FROM (
             SELECT
             20 AS tipo_registro
@@ -2145,10 +2196,15 @@ function montaRecuperaCorrecoesReceitas20()
                     2
             END AS deducao_receita
             , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-            , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS natureza_receita_reduzida
-            , TRIM(conta_receita.descricao) AS especificacao_reduzida
+            , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                   THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                   ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+               END AS natureza_receita_reduzida
             , SUM(arrecadacao_receita.vl_arrecadacao) AS vl_reduzido_acrescido
-            , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS cod_correcao
+            , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                   THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                   ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+               END AS cod_correcao
     
             FROM orcamento.receita
     
@@ -2183,14 +2239,13 @@ function montaRecuperaCorrecoesReceitas20()
             AND configuracao_entidade.cod_modulo = 55
             AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
             
-            GROUP BY receita.cod_receita
+     GROUP BY receita.cod_receita
             , receita.exercicio
             , cod_orgao
-            , conta_receita.cod_estrutural
-            , conta_receita.descricao
+            , deducao_receita
             , indentificador_deducao_reduzida
             , natureza_receita_reduzida
-            , especificacao_reduzida
+            , cod_correcao
     
             UNION
     
@@ -2204,10 +2259,15 @@ function montaRecuperaCorrecoesReceitas20()
                     2
             END AS deducao_receita
             , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-            , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS natureza_receita_reduzida
-            , TRIM(conta_receita.descricao) AS especificacao_reduzida
+            , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                   THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                   ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+               END AS natureza_receita_reduzida
             , SUM(arrecadacao_estornada_receita.vl_estornado) AS vl_reduzido_acrescido
-            , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS cod_correcao
+            , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                   THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                   ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+               END AS cod_correcao
     
             FROM orcamento.receita
     
@@ -2242,16 +2302,16 @@ function montaRecuperaCorrecoesReceitas20()
             AND receita.cod_entidade IN (".$this->getDado('entidades').")
             AND configuracao_entidade.cod_modulo = 55
             AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
+             --and receita.vl_original > 0
     
-            GROUP BY receita.cod_receita
+    GROUP BY receita.cod_receita
             , receita.exercicio
             , cod_orgao
-            , conta_receita.cod_estrutural
-            , conta_receita.descricao
+            , deducao_receita
             , indentificador_deducao_reduzida
             , natureza_receita_reduzida
-            , especificacao_reduzida
-    
+            , cod_correcao
+            
             UNION
     
             SELECT
@@ -2264,8 +2324,7 @@ function montaRecuperaCorrecoesReceitas20()
                     2
             END AS deducao_receita
             , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-            , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 8) AS natureza_receita_reduzida
-            , TRIM(conta_receita.descricao) AS especificacao_reduzida
+            , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 9)::INTEGER AS natureza_receita_reduzida
             , SUM(redutora.vl_deducao) AS vl_reduzido_acrescido
             , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9) AS cod_correcao
     
@@ -2324,28 +2383,24 @@ function montaRecuperaCorrecoesReceitas20()
             AND configuracao_entidade.cod_modulo = 55
             AND configuracao_entidade.parametro = 'tcemg_tipo_orgao_entidade_sicom'
     
-            GROUP BY receita.cod_receita
-            , receita.exercicio
-            , cod_orgao
-            , conta_receita.cod_estrutural
-            , conta_receita.descricao
-            , indentificador_deducao_reduzida
-            , natureza_receita_reduzida
-            , especificacao_reduzida
-    
+       GROUP BY tipo_registro
+              , receita.cod_receita
+              , cod_orgao
+              , deducao_receita
+              , indentificador_deducao_reduzida
+              , natureza_receita_reduzida
+              , cod_correcao    
     ) AS consulta
-    GROUP BY
+GROUP BY
     tipo_registro
-    , cod_receita
     , cod_orgao
     , deducao_receita
     , indentificador_deducao_reduzida
     , natureza_receita_reduzida
-    , especificacao_reduzida
+    , especificacao_estornada
     , cod_correcao
     
-    ORDER BY consulta.cod_receita
-    ";
+    ORDER BY consulta.natureza_receita_reduzida ";
 
     return $stSql;
 }
@@ -2377,54 +2432,58 @@ function montaRecuperaCorrecoesReceitas21()
             , receita.cod_receita
             , receita.cod_recurso AS cod_fonte_reduzida
             , SUM(valor_lancamento.vl_lancamento) AS vl_reduzido_acrescido
-            , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) AS cod_correcao
+            , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
+                   THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+                   ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+               END AS cod_correcao
+    
 
             FROM contabilidade.lancamento_receita
 
             JOIN contabilidade.lancamento
-            ON lancamento.exercicio=lancamento_receita.exercicio
-            AND lancamento.cod_entidade=lancamento_receita.cod_entidade
-            AND lancamento.tipo=lancamento_receita.tipo
-            AND lancamento.cod_lote=lancamento_receita.cod_lote
-            AND lancamento.sequencia=lancamento_receita.sequencia
+              ON lancamento.exercicio    = lancamento_receita.exercicio
+             AND lancamento.cod_entidade = lancamento_receita.cod_entidade
+             AND lancamento.tipo         = lancamento_receita.tipo
+             AND lancamento.cod_lote     = lancamento_receita.cod_lote
+             AND lancamento.sequencia    = lancamento_receita.sequencia
 
             JOIN contabilidade.lote
-            ON lancamento.exercicio=lote.exercicio
-            AND lancamento.cod_entidade=lote.cod_entidade
-            AND lancamento.tipo=lote.tipo
-            AND lancamento.cod_lote=lote.cod_lote
+              ON lancamento.exercicio    = lote.exercicio
+             AND lancamento.cod_entidade = lote.cod_entidade
+             AND lancamento.tipo         = lote.tipo
+             AND lancamento.cod_lote     = lote.cod_lote
 
             JOIN contabilidade.valor_lancamento
-            ON lancamento.exercicio=valor_lancamento.exercicio
-            AND lancamento.cod_entidade=valor_lancamento.cod_entidade
-            AND lancamento.tipo=valor_lancamento.tipo
-            AND lancamento.cod_lote=valor_lancamento.cod_lote
-            AND lancamento.sequencia=valor_lancamento.sequencia
-            AND valor_lancamento.tipo_valor='D'
+              ON lancamento.exercicio        = valor_lancamento.exercicio
+             AND lancamento.cod_entidade     = valor_lancamento.cod_entidade
+             AND lancamento.tipo             = valor_lancamento.tipo
+             AND lancamento.cod_lote         = valor_lancamento.cod_lote
+             AND lancamento.sequencia        = valor_lancamento.sequencia
+             AND valor_lancamento.tipo_valor = 'D'
 
             JOIN orcamento.receita
-            ON receita.cod_receita=lancamento_receita.cod_receita
-            AND receita.exercicio=lancamento_receita.exercicio
+              ON receita.cod_receita=lancamento_receita.cod_receita
+             AND receita.exercicio=lancamento_receita.exercicio
 
             JOIN orcamento.conta_receita
-            ON receita.cod_conta=conta_receita.cod_conta
-            AND receita.exercicio=conta_receita.exercicio
-            AND SUBSTR(conta_receita.cod_estrutural, 1, 1) != '9'  	
+              ON receita.cod_conta = conta_receita.cod_conta
+             AND receita.exercicio = conta_receita.exercicio
+             AND SUBSTR(conta_receita.cod_estrutural, 1, 1) != '9'  	
 
-            LEFT JOIN orcamento.recurso('". $this->getDado('exercicio')."') as rec
-            ON rec.cod_recurso=receita.cod_recurso
-            AND rec.exercicio=receita.exercicio
+       LEFT JOIN orcamento.recurso('". $this->getDado('exercicio')."') as rec
+              ON rec.cod_recurso = receita.cod_recurso
+             AND rec.exercicio   = receita.exercicio
 
-            WHERE estorno=true
-            AND lote.dt_lote BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
-            AND receita.cod_entidade IN (".$this->getDado('entidades').")
+           WHERE estorno = true
+             AND lote.dt_lote BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
+             AND receita.cod_entidade IN (".$this->getDado('entidades').")
             
-            GROUP BY tipo_registro
-
-            , receita.cod_receita
-            , receita.exercicio
-            , conta_receita.cod_estrutural
-            , receita.cod_recurso
+        GROUP BY tipo_registro
+               , receita.cod_receita
+               , receita.exercicio
+               , conta_receita.cod_estrutural
+               , receita.cod_recurso
+               , cod_correcao
     
             UNION
     

@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TContabilidadePlanoAnalitica.class.php 61326 2015-01-07 11:02:55Z carolina $
+    $Id: TContabilidadePlanoAnalitica.class.php 62341 2015-04-24 21:14:44Z carlos.silva $
 
     * Casos de uso: uc-02.02.02, uc-02.04.03, uc-02.02.31,uc-02.04.09, uc-02.03.23
 */
@@ -251,7 +251,7 @@ function montaRecuperaPlanoContaAnalitica()
     $stSQL .= "    ,tabela.vl_lancamento                                                                                                       \n ";
     $stSQL .= "    ,pa.cod_plano                                                                                                               \n ";
     $stSQL .= "    ,tabela.sequencia                                                                                                           \n ";
-    $stSQL .= "    ,pa.natureza_saldo                                           \n ";
+    $stSQL .= "    ,pa.natureza_saldo                                                                                                          \n ";
     $stSQL .= "FROM                                                                                                                            \n ";
     $stSQL .= "    contabilidade.plano_conta       as pc                                                                                       \n ";
     $stSQL .= "   ,contabilidade.plano_analitica   as pa                                                                                       \n ";
@@ -318,6 +318,9 @@ function montaRecuperaPlanoContaAnalitica()
     $stSQL .= "            pa.cod_plano = tabela.cod_plano                                                                                     \n ";
     $stSQL .= "        AND pa.exercicio = tabela.exercicio                                                                                     \n ";
     $stSQL .= "      )                                                                                                                         \n ";
+    $stSQL .= "LEFT JOIN   contabilidade.plano_recurso as pr                                                                                   \n ";
+    $stSQL .= "       ON pr.cod_plano = pa.cod_plano                                                                                           \n ";
+    $stSQL .= "      AND pr.exercicio = pa.exercicio                                                                                           \n ";
     $stSQL .= "WHERE   pc.cod_conta = pa.cod_conta                                                                                             \n ";
     $stSQL .= "AND     pc.exercicio = pa.exercicio                                                                                             \n ";
 
@@ -370,18 +373,31 @@ function montaRecuperaContasAberturaOrcamento()
                                             THEN cc.exercicio                                                                                         
                                      ELSE cd.exercicio                                                                                         
                                     END as exercicio
-                                    ,lancamento.cod_lote
+                                    
                                     ,CASE WHEN cld.nom_lote IS NOT NULL
                                             THEN cld.nom_lote
                                      ELSE clc.nom_lote
                                     END as nom_lote
-                                    ,lancamento.cod_historico
+                                    
+                                    ,CASE WHEN lancamento_despesa.cod_lote IS NOT NULL
+                                        THEN lancamento_despesa.cod_lote
+                                     ELSE lancamento_credito.cod_lote
+                                    END as cod_lote
+                                    
+                                    ,CASE WHEN lancamento_despesa.cod_historico IS NOT NULL
+                                        THEN lancamento_despesa.cod_historico
+                                     ELSE lancamento_credito.cod_historico
+                                    END as cod_historico
+                                    
+                                    --,lancamento.cod_lote
+                                    --,lancamento.cod_historico
+                                    
                             FROM contabilidade.plano_analitica as pad                                                                               
                             
                             LEFT JOIN contabilidade.conta_debito as cd                                                                                 
                                 ON( pad.cod_plano   = cd.cod_plano 
                                 AND pad.exercicio   = cd.exercicio 
-                                AND cd.tipo         = 'I' 
+                                AND cd.tipo         = 'M' 
                                 AND cd.cod_entidade = ".$this->getDado('cod_entidade').")         
                             
                             LEFT JOIN contabilidade.valor_lancamento as vld
@@ -392,25 +408,25 @@ function montaRecuperaContasAberturaOrcamento()
                                 AND cd.tipo_valor   = vld.tipo_valor                                                                          
                                 AND cd.cod_entidade = vld.cod_entidade )
 
-                            LEFT JOIN contabilidade.lancamento 
-                                ON( lancamento.exercicio    = vld.exercicio
-                                AND lancamento.cod_lote     = vld.cod_lote
-                                AND lancamento.tipo         = vld.tipo
-                                AND lancamento.sequencia    = vld.sequencia
-                                AND lancamento.cod_entidade = vld.cod_entidade )
+                            LEFT JOIN contabilidade.lancamento as lancamento_despesa
+                                ON( lancamento_despesa.exercicio    = vld.exercicio
+                                AND lancamento_despesa.cod_lote     = vld.cod_lote
+                                AND lancamento_despesa.tipo         = vld.tipo
+                                AND lancamento_despesa.sequencia    = vld.sequencia
+                                AND lancamento_despesa.cod_entidade = vld.cod_entidade )   
                             
                             LEFT JOIN contabilidade.lote as cld
-                                ON( cld.cod_lote     = lancamento.cod_lote
-                                AND cld.exercicio    = lancamento.exercicio
-                                AND cld.tipo         = lancamento.tipo
-                                AND cld.cod_entidade = lancamento.cod_entidade )                                                                                                               
+                                ON( cld.cod_lote     = lancamento_despesa.cod_lote
+                                AND cld.exercicio    = lancamento_despesa.exercicio
+                                AND cld.tipo         = lancamento_despesa.tipo
+                                AND cld.cod_entidade = lancamento_despesa.cod_entidade )                                                                                                               
                             
                             ,contabilidade.plano_analitica as pac                                                                               
                             
                             LEFT JOIN contabilidade.conta_credito as cc                                                                                
                                 ON( pac.cod_plano   = cc.cod_plano 
                                 AND pac.exercicio   = cc.exercicio 
-                                AND cc.tipo         = 'I' 
+                                AND cc.tipo         = 'M' 
                                 AND cc.cod_entidade = ".$this->getDado('cod_entidade').")         
                             
                             LEFT JOIN contabilidade.valor_lancamento as vlc                                                                            
@@ -419,7 +435,14 @@ function montaRecuperaContasAberturaOrcamento()
                                 AND cc.sequencia    = vlc.sequencia                                                                            
                                 AND cc.exercicio    = vlc.exercicio                                                                            
                                 AND cc.tipo_valor   = vlc.tipo_valor                                                                          
-                                AND cc.cod_entidade = vlc.cod_entidade )                                                                                                               
+                                AND cc.cod_entidade = vlc.cod_entidade )
+                                
+                            LEFT JOIN contabilidade.lancamento as lancamento_credito
+                                ON( lancamento_credito.exercicio    = vlc.exercicio
+                                AND lancamento_credito.cod_lote     = vlc.cod_lote
+                                AND lancamento_credito.tipo         = vlc.tipo
+                                AND lancamento_credito.sequencia    = vlc.sequencia
+                                AND lancamento_credito.cod_entidade = vlc.cod_entidade )  
                             
                             LEFT JOIN contabilidade.lote as clc
                                 ON( clc.cod_lote     = vlc.cod_lote
@@ -438,31 +461,31 @@ function montaRecuperaContasAberturaOrcamento()
                 WHERE pc.cod_conta = pa.cod_conta                                                                                             
                 AND   pc.exercicio = pa.exercicio                                                                                             
                 AND   pc.exercicio = '".$this->getDado('exercicio')."'
-                AND   tabela.cod_historico in (820,821,822,823)
+                AND   tabela.cod_historico in (220,221,222,223)
                 --AND   pa.natureza_saldo like 'C'
                 AND ( 
                             ---Receita Bruta Orcada para o Exercicio
-                               (pc.cod_estrutural like '%5.2.1.1.1.00.00.00.00.00%' and tabela.cod_historico = 820)
-                            OR (pc.cod_estrutural like '%6.2.1.1.0.00.00.00.00.00%' and tabela.cod_historico = 820)    
+                               (pc.cod_estrutural like '%5.2.1.1.1.00.00.00.00.00%' and tabela.cod_historico = 220)
+                            OR (pc.cod_estrutural like '%6.2.1.1.0.00.00.00.00.00%' and tabela.cod_historico = 220)    
                             
                             --Receita Dedutora Bruta Orcada para o Exercicio
                                 --Fundeb
-                            OR (pc.cod_estrutural like '%5.2.1.1.2.01.01.00.00.00%' and tabela.cod_historico = 822)
+                            OR (pc.cod_estrutural like '%5.2.1.1.2.01.01.00.00.00%' and tabela.cod_historico = 222)
                                 --Renuncia
-                            OR (pc.cod_estrutural like '%5.2.1.1.2.02.00.00.00.00%' and tabela.cod_historico = 822)
+                            OR (pc.cod_estrutural like '%5.2.1.1.2.02.00.00.00.00%' and tabela.cod_historico = 222)
                                 --Outras Deducoes
-                            OR (pc.cod_estrutural like '%5.2.1.1.2.99.00.00.00.00%' and tabela.cod_historico = 822)
+                            OR (pc.cod_estrutural like '%5.2.1.1.2.99.00.00.00.00%' and tabela.cod_historico = 222)
 
                             --Despesa Prevista para o Exercicio
-                            OR (pc.cod_estrutural like '%5.2.2.1.1.01.00.00.00.00%' and tabela.cod_historico = 821)
-                            OR (pc.cod_estrutural like '%6.2.2.1.1.00.00.00.00.00%' and tabela.cod_historico = 821)
+                            OR (pc.cod_estrutural like '%5.2.2.1.1.01.00.00.00.00%' and tabela.cod_historico = 221)
+                            OR (pc.cod_estrutural like '%6.2.2.1.1.00.00.00.00.00%' and tabela.cod_historico = 221)
                             
                             --Receita Dedutora Somatorio dos Outros Campos
-                            --OR (pc.cod_estrutural like '%6.2.1.1.0.00.00.00.00.00%' and tabela.cod_historico = 822)
+                            --OR (pc.cod_estrutural like '%6.2.1.1.0.00.00.00.00.00%' and tabela.cod_historico = 222)
                             
                             --Lancamentos de Abertura dos Recursos-Fontes
-                            --OR (pc.cod_estrutural like '%7.2.1.1.1.00.01.00.00.00%' and tabela.cod_historico = 823)
-                            --OR (pc.cod_estrutural like '%8.2.1.1.1.00.01.00.00.00%' and tabela.cod_historico = 823)
+                            --OR (pc.cod_estrutural like '%7.2.1.1.1.00.01.00.00.00%' and tabela.cod_historico = 223)
+                            --OR (pc.cod_estrutural like '%8.2.1.1.1.00.01.00.00.00%' and tabela.cod_historico = 223)
                         )
         ";
     return $stSQL;

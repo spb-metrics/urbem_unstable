@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterHabilitacaoParticipante.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterHabilitacaoParticipante.php 62270 2015-04-15 20:13:46Z arthur $
 
     * Casos de uso : uc-03.05.17
 */
@@ -70,13 +70,8 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
-//Numero do edital
-$obPopUpNumeroEdital = new IPopUpNumeroEdital( $obForm );
-$obPopUpNumeroEdital->obCampoCod->setId("num_edital");
-$obPopUpNumeroEdital->obCampoCod->setName ( "num_edital" );
-$obPopUpNumeroEdital->setNull( false );
-$obPopUpNumeroEdital->obCampoCod->obEvento->setOnBlur( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&num_edital='+this.value,'exibeParticipante');");
-$obPopUpNumeroEdital->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&num_edital='+this.value,'exibeParticipante');");
+//Carrega dados apartir do exibeParticipante mandando os valores por Request no carregamento da página
+$jsOnload = "executaFuncaoAjax('exibeParticipante','"."&numEdital=".$request->get('stNumEdital').".&inCodModalidade=".$request->get('inCodModalidade')."&stExercicioLicitacao=".$request->get('stExercicioLicitacao')."&inCodLicitacao=".$request->get('inCodLicitacao')."&inCodEntidade=".$request->get('inCodEntidade')."');";
 
 //Numero da licitação
 $obSpnNumLicitacao = new Span();
@@ -137,7 +132,6 @@ $obFormulario->setAjuda         ("UC-03.05.19"                   );
 $obFormulario->addHidden        ( $obHdnCtrl                     );
 $obFormulario->addHidden        ( $obHdnAcao                     );
 
-//$obFormulario->addHidden        ( $obHdnData                     );
 $obFormulario->addHidden        ( $obHdnCodLicitacao             );
 $obFormulario->addHidden        ( $obHdnCodDocumento             );
 $obFormulario->addHidden        ( $obHdnCgm                      );
@@ -146,15 +140,13 @@ $obFormulario->addHidden        ( $obHdnCodEntidade              );
 $obFormulario->addHidden        ( $obHdnExercicio                );
 
 $obFormulario->addTitulo        ( "Habilitação dos Participantes da Licitação");
-$obFormulario->addComponente    ( $obPopUpNumeroEdital           );
 $obFormulario->addSpan          ( $obSpnNumLicitacao             );
 
 //$obFormulario->addTitulo        ( "Participantes"                );
 $obFormulario->addSpan          ( $obSpnListaParticipante        );
-$obFormulario->addSpan			( $obSpnAlterarDocumentoParticipante );
+$obFormulario->addSpan		( $obSpnAlterarDocumentoParticipante );
 //$obFormulario->addTitulo        ( "Documentos do Participante"   );
 $obFormulario->addSpan          ( $obSpnListaDocumentoParticipante);
-
-$obFormulario->Ok();
+$obFormulario->Cancelar         ($pgFilt.'?'.Sessao::getId().'&'.http_build_query($_REQUEST));
 $obFormulario->show();
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

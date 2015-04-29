@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Lisiane Morais
 
-    $Id: TTCEMGRespLic.class.php 59719 2014-09-08 15:00:53Z franver $
+    $Id: TTCEMGRespLic.class.php 61907 2015-03-13 16:49:31Z michel $
 
    
 */
@@ -106,8 +106,8 @@ class TTCEMGRespLic extends Persistente
                  "SELECT 10 as tipo_registro
                        , LPAD(''||orgao_sicom.valor,2, '0') as cod_orgao
                        , LPAD((LPAD(''||licitacao.num_orgao,2, '0')||LPAD(''||licitacao.num_unidade,2, '0')), 5, '0') AS codunidadesub
-                       , licitacao.exercicio as exercicio_licitacao
-                       , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS num_processo_licitatorio 
+                       , config_licitacao.exercicio_licitacao
+                       , config_licitacao.num_licitacao AS num_processo_licitatorio
                        , dadosResponsaveis.tipo_responsabilidade
                        , dadosResponsaveis.cpf
 
@@ -270,9 +270,22 @@ class TTCEMGRespLic extends Persistente
               ON orgao_sicom.exercicio='".Sessao::getExercicio()."'
              AND orgao_sicom.cod_entidade = licitacao.cod_entidade
 
+            JOIN (
+                     SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+																VALUES (cod_licitacao		INTEGER
+																	   ,cod_modalidade		INTEGER
+																	   ,cod_entidade		INTEGER
+																	   ,exercicio			CHAR(4)
+																	   ,exercicio_licitacao	VARCHAR
+																	   ,num_licitacao		TEXT ) 
+                 ) AS config_licitacao
+              ON config_licitacao.cod_entidade = licitacao.cod_entidade
+             AND config_licitacao.cod_licitacao = licitacao.cod_licitacao
+             AND config_licitacao.cod_modalidade = licitacao.cod_modalidade
+             AND config_licitacao.exercicio = licitacao.exercicio               
+
            WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
              AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
-             AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
              AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
              AND licitacao.cod_modalidade NOT IN (8,9)
              AND NOT EXISTS( SELECT 1
@@ -300,36 +313,36 @@ class TTCEMGRespLic extends Persistente
 
     function montaRecuperaComissaoLicitacao()
     {
-        $stSql = "SELECT 20 as tipo_registro
+        $stSql = " SELECT 20 as tipo_registro
                         , LPAD(''||orgao_sicom.valor,2, '0') as cod_orgao
                         , LPAD((LPAD(''||licitacao.num_orgao,2, '0')||LPAD(''||licitacao.num_unidade,2, '0')), 5, '0') AS codunidadesub
-                        , licitacao.exercicio as exercicio_licitacao
-                        , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS num_processo_licitatorio 
-		        , CASE WHEN comissao.cod_tipo_comissao = 1 THEN 2
-                                WHEN comissao.cod_tipo_comissao = 2 THEN 1
-                                WHEN comissao.cod_tipo_comissao = 3 THEN 2
+                        , config_licitacao.exercicio_licitacao
+                        , config_licitacao.num_licitacao AS num_processo_licitatorio
+                        , CASE WHEN comissao.cod_tipo_comissao = 1 THEN 2
+                               WHEN comissao.cod_tipo_comissao = 2 THEN 1
+                               WHEN comissao.cod_tipo_comissao = 3 THEN 2
                           END AS cod_tipo_comissao
-		        , CASE WHEN (norma.cod_tipo_norma = 4) THEN 
-				1
-			 ELSE 
-				2
-		         END AS cod_tipo_norma
-		        , norma.num_norma
+                        , CASE WHEN (norma.cod_tipo_norma = 4) THEN 
+                                        1
+                               ELSE 
+                                        2
+                          END AS cod_tipo_norma
+                        , norma.num_norma
                         , to_char(norma.dt_assinatura,'ddmmyyyy') as dt_nomeacao
-		        , to_char(norma.dt_publicacao,'ddmmyyyy') as ini_vigencia
-		        , to_char(norma_data_termino.dt_termino,'ddmmyyyy') as fim_vigencia
+                        , to_char(norma.dt_publicacao,'ddmmyyyy') as ini_vigencia
+                        , to_char(norma_data_termino.dt_termino,'ddmmyyyy') as fim_vigencia
                         , tipo_membro.cpf as cpf_membro
                         , tipo_membro.cod_tipo_membro as cod_atribuicao
                         , CASE WHEN (comissao_membros.numcgm = tipo_membro.numcgm) THEN 
-                                    comissao_membros.cargo
-			       WHEN (membro_adicional.numcgm = tipo_membro.numcgm) THEN 
-                                    membro_adicional.cargo
-		          END AS cargo
-		        , CASE WHEN (comissao_membros.numcgm = tipo_membro.numcgm) THEN 
-                                	comissao_membros.natureza_cargo
+                                        comissao_membros.cargo
                                WHEN (membro_adicional.numcgm = tipo_membro.numcgm) THEN 
-                                	membro_adicional.natureza_cargo
-		          END AS natureza_cargo
+                                        membro_adicional.cargo
+                          END AS cargo
+                        , CASE WHEN (comissao_membros.numcgm = tipo_membro.numcgm) THEN 
+                                        comissao_membros.natureza_cargo
+                               WHEN (membro_adicional.numcgm = tipo_membro.numcgm) THEN 
+                                        membro_adicional.natureza_cargo
+                          END AS natureza_cargo
                     FROM licitacao.licitacao	
 			
 		    JOIN licitacao.comissao_licitacao
@@ -421,10 +434,23 @@ class TTCEMGRespLic extends Persistente
                         )  AS orgao_sicom
                       ON orgao_sicom.exercicio='".Sessao::getExercicio()."'
                      AND orgao_sicom.cod_entidade = licitacao.cod_entidade
+                     
+            JOIN (
+                     SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+																VALUES (cod_licitacao		INTEGER
+																	   ,cod_modalidade		INTEGER
+																	   ,cod_entidade		INTEGER
+																	   ,exercicio			CHAR(4)
+																	   ,exercicio_licitacao	VARCHAR
+																	   ,num_licitacao		TEXT ) 
+                 ) AS config_licitacao
+              ON config_licitacao.cod_entidade = licitacao.cod_entidade
+             AND config_licitacao.cod_licitacao = licitacao.cod_licitacao
+             AND config_licitacao.cod_modalidade = licitacao.cod_modalidade
+             AND config_licitacao.exercicio = licitacao.exercicio                      
                    
                    WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
-                     AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
                      AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
                      AND licitacao.cod_modalidade NOT IN (8,9)
                      AND NOT EXISTS( SELECT 1

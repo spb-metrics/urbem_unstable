@@ -31,7 +31,7 @@
 
   * Casos de uso: uc-03.05.15
 
-  $Id: OCManterProcessoLicitatorio.php 61490 2015-01-23 18:50:21Z evandro $
+  $Id: OCManterProcessoLicitatorio.php 62334 2015-04-24 17:34:31Z michel $
 
   */
 
@@ -40,6 +40,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once CAM_GP_COM_MAPEAMENTO."TComprasObjeto.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasMapa.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasMapaItem.class.php";
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoNaturezaCargo.class.php";
 
 global $boEdital;
 $boEdital = Sessao::read('boEdital');
@@ -62,6 +63,22 @@ function montaListaMembroAdicional($arRecordSet , $boExecuta = true)
     if (!isset($stJs)) {
         $stJs="";
     }
+    
+    for($i=0;$i<count($arRecordSet);$i++){
+        $stNatureza = '';
+        $inCodNatureza = ($arRecordSet[$i]['cod_natureza_cargo']>-1) ? $arRecordSet[$i]['cod_natureza_cargo'] : 0;
+        $obTLicitacaoNaturezaCargo = new TLicitacaoNaturezaCargo();
+        $obTLicitacaoNaturezaCargo->recuperaTodos($rsNaturezaCargo, " WHERE codigo=".$inCodNatureza, "", $boTransacao);
+
+        while (!$rsNaturezaCargo->eof()) {
+            $stNatureza = trim($rsNaturezaCargo->getCampo('descricao'));
+
+            $rsNaturezaCargo->proximo();
+        }
+
+        $arRecordSet[$i]['natureza_cargo'] = $stNatureza;        
+    }
+
     $rsListaMembroAdicional = new RecordSet;
 
     $rsListaMembroAdicional->preenche( $arRecordSet );
@@ -80,23 +97,37 @@ function montaListaMembroAdicional($arRecordSet , $boExecuta = true)
     $obListaMembroAdicional->ultimoCabecalho->addConteudo("&nbsp;");
     $obListaMembroAdicional->ultimoCabecalho->setWidth( 3 );
     $obListaMembroAdicional->commitCabecalho();
+    
     $obListaMembroAdicional->addCabecalho();
     $obListaMembroAdicional->ultimoCabecalho->addConteudo("CGM");
     $obListaMembroAdicional->ultimoCabecalho->setWidth( 3);
     $obListaMembroAdicional->commitCabecalho();
+    
     $obListaMembroAdicional->addCabecalho();
     $obListaMembroAdicional->ultimoCabecalho->addConteudo("Nome");
-    $obListaMembroAdicional->ultimoCabecalho->setWidth( 70 );
+    $obListaMembroAdicional->ultimoCabecalho->setWidth( 40 );
     $obListaMembroAdicional->commitCabecalho();
+    
+    $obListaMembroAdicional->addCabecalho();
+    $obListaMembroAdicional->ultimoCabecalho->addConteudo("Cargo");
+    $obListaMembroAdicional->ultimoCabecalho->setWidth( 30 );
+    $obListaMembroAdicional->commitCabecalho();
+
+    $obListaMembroAdicional->addCabecalho();
+    $obListaMembroAdicional->ultimoCabecalho->addConteudo("Natureza do Cargo");
+    $obListaMembroAdicional->ultimoCabecalho->setWidth( 13 );
+    $obListaMembroAdicional->commitCabecalho();
+
     $obListaMembroAdicional->addCabecalho();
     $obListaMembroAdicional->ultimoCabecalho->addConteudo("Adicional");
-    $obListaMembroAdicional->ultimoCabecalho->setWidth(5 );
+    $obListaMembroAdicional->ultimoCabecalho->setWidth( 5 );
     $obListaMembroAdicional->commitCabecalho();
+    
     $obListaMembroAdicional->addCabecalho();
     $obListaMembroAdicional->ultimoCabecalho->addConteudo("&nbsp;");
     $obListaMembroAdicional->ultimoCabecalho->setWidth( 3 );
     $obListaMembroAdicional->commitCabecalho();
-
+    
     $obListaMembroAdicional->addDado();
     $obListaMembroAdicional->ultimoDado->setCampo( "num_cgm" );
     $obListaMembroAdicional->ultimoDado->setAlinhamento( 'ESQUERDA' );
@@ -108,9 +139,26 @@ function montaListaMembroAdicional($arRecordSet , $boExecuta = true)
     $obListaMembroAdicional->commitDado();
 
     $obListaMembroAdicional->addDado();
+    $obListaMembroAdicional->ultimoDado->setCampo( "cargo_membro" );
+    $obListaMembroAdicional->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obListaMembroAdicional->commitDado();
+
+    $obListaMembroAdicional->addDado();
+    $obListaMembroAdicional->ultimoDado->setCampo( "natureza_cargo" );
+    $obListaMembroAdicional->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obListaMembroAdicional->commitDado();
+
+    $obListaMembroAdicional->addDado();
     $obListaMembroAdicional->ultimoDado->setCampo( "adicional" );
     $obListaMembroAdicional->ultimoDado->setAlinhamento( 'CENTRO' );
     $obListaMembroAdicional->commitDado();
+
+    $obListaMembroAdicional->addAcao();
+    $obListaMembroAdicional->ultimaAcao->setAcao( "ALTERAR" );
+    $obListaMembroAdicional->ultimaAcao->setFuncaoAjax( true );
+    $obListaMembroAdicional->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('alterarMembroAdicional');" );
+    $obListaMembroAdicional->ultimaAcao->addCampo("1","num_cgm");
+    $obListaMembroAdicional->commitAcao();
 
     $obListaMembroAdicional->addAcao();
     $obListaMembroAdicional->ultimaAcao->setAcao( "EXCLUIR" );
@@ -699,9 +747,11 @@ switch ($stCtrl) {
             } else {
                 $inCount = sizeof($arrayMembro);
 
-                $arrayMembro[$inCount]['num_cgm']   = $_REQUEST['inCGM'];
-                $arrayMembro[$inCount]['nom_cgm']   = $_REQUEST['stNomCGM'];
-                $arrayMembro[$inCount]['adicional'] = 'Sim';
+                $arrayMembro[$inCount]['num_cgm']            = $_REQUEST['inCGM'];
+                $arrayMembro[$inCount]['nom_cgm']            = $_REQUEST['stNomCGM'];
+                $arrayMembro[$inCount]['cargo_membro']       = $_REQUEST['stCargoMembro'];
+                $arrayMembro[$inCount]['cod_natureza_cargo'] = $_REQUEST['inCodNaturezaCargoMembro'];
+                $arrayMembro[$inCount]['adicional']          = 'Sim';
 
                 Sessao::write("arMembro", $arrayMembro);
 
@@ -725,9 +775,11 @@ switch ($stCtrl) {
             foreach ($arMembroExcluir as $value) {
                 $keyValue = trim($value['num_cgm']);
                 if ($key != $keyValue) {
-                    $arMembro[$inCount]['nom_cgm']   = $value['nom_cgm'  ];
-                    $arMembro[$inCount]['num_cgm']   = $value['num_cgm'];
-                    $arMembro[$inCount]['adicional'] = $value['adicional'];
+                    $arMembro[$inCount]['nom_cgm']              = $value['nom_cgm'];
+                    $arMembro[$inCount]['num_cgm']              = $value['num_cgm'];
+                    $arMembro[$inCount]['cargo_membro']         = $value['cargo_membro'];
+                    $arMembro[$inCount]['cod_natureza_cargo']   = $value['cod_natureza_cargo'];
+                    $arMembro[$inCount]['adicional']            = $value['adicional'];
                     $inCount++;
                 }
             }
@@ -736,7 +788,7 @@ switch ($stCtrl) {
         Sessao::write('arMembro', array());
         Sessao::write('arMembro', $arMembro);
 
-        $stJs .= montaListaMembroAdicional($arMembro);
+        $stJs .= "limpaFormularioMembroAdicional();". montaListaMembroAdicional($arMembro);
     break;
 
     case 'excluirMembro':
@@ -1199,9 +1251,11 @@ switch ($stCtrl) {
 
         while (!$rsMembroAdicional->eof()) {
 
-            $arMembro[$inCount]['nom_cgm'] = $rsMembroAdicional->getCampo('nom_cgm');
-            $arMembro[$inCount]['num_cgm'] = $rsMembroAdicional->getCampo('numcgm');
-            $arMembro[$inCount]['adicional'] = 'Sim';
+            $arMembro[$inCount]['nom_cgm']            = $rsMembroAdicional->getCampo('nom_cgm');
+            $arMembro[$inCount]['num_cgm']            = $rsMembroAdicional->getCampo('numcgm');
+            $arMembro[$inCount]['cargo_membro']       = $rsMembroAdicional->getCampo('cargo');
+            $arMembro[$inCount]['cod_natureza_cargo'] = $rsMembroAdicional->getCampo('natureza_cargo');
+            $arMembro[$inCount]['adicional']          = 'Sim';
             $inCount++;
             $rsMembroAdicional->proximo();
         }
@@ -1456,8 +1510,55 @@ case 'validaDtLicitacao':
         }
        
     break;
+ 
+    case 'alterarMembroAdicional':
+        $arMembro = Sessao::read('arMembro');
+        
+        foreach ( $arMembro as $value ) {
+            if ( $value['num_cgm'] == $_REQUEST['num_cgm'] ) {
+                $stJs .=" jQuery('#inCGM').val('".$value['num_cgm']."'); ";
+                $stJs .=" jQuery('#inCGM').attr('readonly',true); ";
+                $stJs .=" jQuery('#stNomCGM').html('".$value['nom_cgm']."'); ";
+                $stJs .=" jQuery('#stCargoMembro').val('".$value['cargo_membro']."'); ";
+                $stJs .=" jQuery('#inCodNaturezaCargoMembro').val(".$value['cod_natureza_cargo']."); ";
+                $stJs .=" jQuery('#btIncluirMembroAdicional').val('Alterar'); ";
+                $stJs .=" jQuery('#btIncluirMembroAdicional').removeAttr('onclick'); ";                                
+                $stJs .=" jQuery('#btIncluirMembroAdicional').attr('onclick','JavaScript:if ( ValidaMembroAdicional() ) { montaParametrosGET( \'adicionarMembroAdicionalAlterado\', \'\', true  ); limpaFormularioMembroAdicional(); }'); ";
+            }
+        }
+
+    break;
     
- case 'montaItensAlterar':
+    case 'adicionarMembroAdicionalAlterado':
+        $arMembro = Sessao::read('arMembro');
+        
+        foreach ($arMembro as $key => $value) {            
+            if ( $value['num_cgm'] == $_REQUEST['inCGM'] ) {                
+                $arAuxMembro[$key]['nom_cgm']            = $value['nom_cgm'];
+                $arAuxMembro[$key]['num_cgm']            = $_REQUEST['inCGM'];
+                $arAuxMembro[$key]['cargo_membro']       = $_REQUEST['stCargoMembro'];
+                $arAuxMembro[$key]['cod_natureza_cargo'] = $_REQUEST['inCodNaturezaCargoMembro'];
+                $arAuxMembro[$key]['adicional']          = $value['adicional'];
+                $stJs .=" jQuery('#inCGM').removeAttr('readonly'); ";
+                $stJs .=" jQuery('#btIncluirMembroAdicional').val('Incluir'); ";
+                $stJs .=" jQuery('#btIncluirMembroAdicional').removeAttr('onclick'); ";                                
+                $stJs .=" jQuery('#btIncluirMembroAdicional').attr('onclick','JavaScript:if ( ValidaMembroAdicional() ) { montaParametrosGET( \'incluirMembroAdicional\', \'\', true  ); limpaFormularioMembroAdicional(); }'); ";
+            }else{
+                $arAuxMembro[$key]['nom_cgm']            = $arMembro[$key]['nom_cgm'];
+                $arAuxMembro[$key]['num_cgm']            = $arMembro[$key]['num_cgm'];
+                $arAuxMembro[$key]['cargo_membro']       = $arMembro[$key]['cargo_membro'];
+                $arAuxMembro[$key]['cod_natureza_cargo'] = $arMembro[$key]['cod_natureza_cargo'];
+                $arAuxMembro[$key]['adicional']          = $arMembro[$key]['adicional'];
+            }
+        }
+        
+        $arMembro = $arAuxMembro;
+        Sessao::write("arMembro",$arMembro);
+        $stJs .= montaListaMembroAdicional($arMembro);
+
+    break;
+
+    case 'montaItensAlterar':
 
         list($inCodMapa , $stExercicioMapa) = explode('/' , $_REQUEST['stMapaCompras']);
         $stExercicioMapa = ($stExercicioMapa == '') ? Sessao::getExercicio() : $stExercicioMapa;

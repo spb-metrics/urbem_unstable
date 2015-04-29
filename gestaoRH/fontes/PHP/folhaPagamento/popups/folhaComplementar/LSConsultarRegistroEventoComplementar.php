@@ -60,10 +60,15 @@ $stMes = $stMeses[$inCodMes];
 if ( strlen($inCodMes) < 2 ) {
     $inCodMes = "0".$inCodMes;
 }
+if($inRegistro != ''){
+    $stFiltro = ' AND registro = '.$inRegistro;
+} else {
+     $stFiltro ='';
+}
 
 //Consulta o CGM a partir do registro
 $obTPessoalContrato = new TPessoalContrato();
-$obTPessoalContrato->recuperaCgmDoRegistro($rsContratoServidor, ' AND registro = '.$inRegistro);
+$obTPessoalContrato->recuperaCgmDoRegistro($rsContratoServidor, $stFiltro);
 
 //Define a string numcgm - nome_do_servidor
 $stCGM = $rsContratoServidor->getCampo("numcgm") ." - ". $rsContratoServidor->getCampo("nom_cgm");

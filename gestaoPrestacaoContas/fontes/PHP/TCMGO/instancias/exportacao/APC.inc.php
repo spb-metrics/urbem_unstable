@@ -31,10 +31,10 @@
 
     * @ignore
 
-    $Revision: 61679 $
+    $Revision: 62213 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-02-25 10:07:38 -0300 (Qua, 25 Fev 2015) $
+    $Author: jean $
+    $Date: 2015-04-08 16:28:23 -0300 (Qua, 08 Abr 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -60,7 +60,6 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obTMapeamento->setDado ('exercicio'  , Sessao::getExercicio() );
         $obTMapeamento->setDado ('stEntidades',  $stEntidades  );
         $obTMapeamento->recuperaTodos($rsRegistro10);
-        $obTMapeamento->debug();die();
 
         $i = 1;
         foreach ($rsRegistro10->arElementos as $stChave) {

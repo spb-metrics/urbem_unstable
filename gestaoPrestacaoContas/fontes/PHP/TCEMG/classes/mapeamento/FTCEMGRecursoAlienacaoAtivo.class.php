@@ -65,9 +65,9 @@ class FTCEMGRecursoAlienacaoAtivo extends Persistente
                  , ROUND(desp_emp,2) AS desp_emp
                  , ROUND(desp_liq,2) AS desp_liq
                  , ROUND(desp_paga,2) AS desp_paga
-                 , LPAD(cod_vinc,2,'0') AS cod_vinc
+                 , LPAD(cod_vinc::VARCHAR,2,'0') AS cod_vinc
                  , ' ' AS cod_entidade
-              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
+              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "'," . $this->getDado('mes') . ",'" . $this->getDado('cod_entidade') . "') AS retorno
                                           (  mes                 INTEGER,
                                              saldo_anterior      NUMERIC(14,2),
                                              rec_realizada       NUMERIC(14,2),
@@ -77,7 +77,6 @@ class FTCEMGRecursoAlienacaoAtivo extends Persistente
                                              cod_vinc            INTEGER,
                                              cod_entidade        INTEGER
                                           )";
-
         return $stSql;
     }
 

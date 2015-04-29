@@ -30,7 +30,7 @@
       * @author Analista: Cassiano
       * @author Desenvolvedor: Cassiano
 
-      $Id: configuracaoBasica.php 59770 2014-09-10 14:22:52Z carlos.silva $
+      $Id: configuracaoBasica.php 62350 2015-04-28 13:48:39Z arthur $
 
       Casos de uso: uc-01.03.97
     */
@@ -66,36 +66,37 @@ switch ($ctrl) {
 
         if (!(isset($nom_prefeitura))) {
             // Pega os valores atuais da tabela CONFIGURACAO
-            $cod_municipio = pegaConfiguracao("cod_municipio");
-            $codUf = pegaConfiguracao("cod_uf");
-            $nomPrefeitura = pegaConfiguracao("nom_prefeitura");
-            $tipoLogradouro = pegaConfiguracao("tipo_logradouro");
-            $logradouro = pegaConfiguracao("logradouro");
-            $numero = pegaConfiguracao("numero");
-            $complemento = pegaConfiguracao("complemento");
-            $bairro = pegaConfiguracao("bairro");
-            $cep = pegaConfiguracao("cep");
-            $ddd = pegaConfiguracao("ddd");
-            $fone = pegaConfiguracao("fone");
-            $fax = pegaConfiguracao("fax");
-            $email = pegaConfiguracao("e_mail");
-            $site = pegaConfiguracao("site");
-            $cnpj = pegaConfiguracao("cnpj");
-            $populacao = pegaConfiguracao("populacao");
-            $prefeito = pegaConfiguracao("CGMPrefeito");
-            $diario = pegaConfiguracao("CGMDiarioOficial");
-            $dt_implantacao  = pegaConfiguracao("dt_implantacao");
-            $logotipo = pegaConfiguracao("logotipo");
-            $periodoAuditoria =  pegaConfiguracao("periodo_auditoria");
-            $usuarioRelatorio = pegaConfiguracao("usuario_relatorio");
-            $caminhoAcrobat = pegaConfiguracao("caminho_acrobat");
-            $mensagem = pegaConfiguracao("mensagem");
-            $status = pegaConfiguracao("status");
-            $nomMunicipio = pegaConfiguracao("nom_municipio");
-            $anoExercicio = pegaConfiguracao("ano_exercicio");
-            $diretorio = pegaConfiguracao("diretorio");
-            $mascaraSetor = pegaConfiguracao("mascara_setor");
-            $mascaraLocal = pegaConfiguracao("mascara_local");
+            $cod_municipio        = pegaConfiguracao("cod_municipio");
+            $codUf                = pegaConfiguracao("cod_uf");
+            $nomPrefeitura        = pegaConfiguracao("nom_prefeitura");
+            $tipoLogradouro       = pegaConfiguracao("tipo_logradouro");
+            $logradouro           = pegaConfiguracao("logradouro");
+            $numero               = pegaConfiguracao("numero");
+            $complemento          = pegaConfiguracao("complemento");
+            $bairro               = pegaConfiguracao("bairro");
+            $cep                  = pegaConfiguracao("cep");
+            $ddd                  = pegaConfiguracao("ddd");
+            $fone                 = pegaConfiguracao("fone");
+            $fax                  = pegaConfiguracao("fax");
+            $email                = pegaConfiguracao("e_mail");
+            $site                 = pegaConfiguracao("site");
+            $cnpj                 = pegaConfiguracao("cnpj");
+            $populacao            = pegaConfiguracao("populacao");
+            $prefeito             = pegaConfiguracao("CGMPrefeito");
+            $diario               = pegaConfiguracao("CGMDiarioOficial");
+            $dt_implantacao       = pegaConfiguracao("dt_implantacao");
+            $logotipo             = pegaConfiguracao("logotipo");
+            $periodoAuditoria     = pegaConfiguracao("periodo_auditoria");
+            $usuarioRelatorio     = pegaConfiguracao("usuario_relatorio");
+            $caminhoAcrobat       = pegaConfiguracao("caminho_acrobat");
+            $mensagem             = pegaConfiguracao("mensagem");
+            $status               = pegaConfiguracao("status");
+            $nomMunicipio         = pegaConfiguracao("nom_municipio");
+            $anoExercicio         = pegaConfiguracao("ano_exercicio");
+            $diretorio            = pegaConfiguracao("diretorio");
+            $mascaraSetor         = pegaConfiguracao("mascara_setor");
+            $mascaraLocal         = pegaConfiguracao("mascara_local");
+            $inInatividadeUsuario = pegaConfiguracao("tempo_inatividade_usuario");
 
             $samlinkHost 	= pegaConfiguracao("samlink_host");
             $samlinkPort 	= pegaConfiguracao("samlink_port");
@@ -245,6 +246,15 @@ switch ($ctrl) {
                     erro = true;
                 }
 
+                campo = document.frm.inatividadeUsuario.value;                
+                if ( campo == '' && !isInt( campo )) {
+                    mensagem += "@Campo Tempo de Inatividade do Usuário inválido!";                    
+                    erro = true;
+                }else if( campo <= 1 ){
+                    mensagem += "@Campo Tempo de Inatividade do Usuário deve ser maior ou igual a 1 minutos!";
+                    erro = true;
+                }
+
                 campo = document.frm.cep1.value.length;
                 campoaux = document.frm.cep2.value.length;
                 if (campo==0 && campoaux==0) {
@@ -312,9 +322,9 @@ switch ($ctrl) {
 
         <form name="frm" action="configuracaoBasica.php?<?=Sessao::getId();?>" method="POST">
           <table width="100%" cellspacing=2 border=0 cellpadding=2>
-              <tr><td class=alt_dados colspan=2>Dados da Prefeitura</td></tr>
+              <tr><td class=alt_dados colspan=2>Dados da Entidade Principal</td></tr>
                 <tr>
-                    <td class=label width="30%">*Nome da Prefeitura</td>
+                    <td class=label width="30%">*Nome da Entidade Principal</td>
                     <td class=field width="70%">
                         <input type="text" name="nom_prefeitura" size=60 maxlength=60 value="<?=$nomPrefeitura;?>"></td>
                 </tr>
@@ -579,6 +589,12 @@ switch ($ctrl) {
             <input type="text" name="mascaraLocal" size=60 maxlength=60 value="<?=$mascaraLocal;?>">
         </td>
     </tr>
+    <tr>
+        <td class=label>*Tempo de Inatividade do Usuário</td>
+        <td class=field>
+            <input type="text" onkeypress="return event.charCode > 47 && event.charCode < 58;" title="Informe o tempo em minutos que o usuário poderá ficar inativo." name="inatividadeUsuario" id="inatividadeUsuario" size=5 maxlength=3 value="<?=$inInatividadeUsuario;?>">
+        </td>
+    </tr>
     <?php
     //SAMLINK
 
@@ -621,37 +637,38 @@ switch ($ctrl) {
 
 } else {
 
-    $nom_prefeitura = $request->get('nom_prefeitura');
-    $cod_municipio = $request->get('cod_municipio');
-    $cod_uf = $request->get('cod_uf');
-    $nom_municipio = $request->get('nom_municipio');
-    $tipo_logradouro = $request->get('tipo_logradouro');
-    $logradouro = $request->get('logradouro');
-    $numero = $request->get('numero');
-    $complemento = $request->get('complemento');
-    $bairro = $request->get('bairro');
-    $cep1 = $request->get('cep1');
-    $cep2 = $request->get('cep2');
-    $dddRes = $request->get('dddRes');
-    $foneRes = $request->get('foneRes');
-    $dddCom = $request->get('dddCom');
-    $foneCom = $request->get('foneCom');
-    $email = $request->get('email');
-    $site = $request->get('site');
-    $populacao = $request->get('populacao');
-    $cnpj = $request->get('cnpj');
-    $logotipo = $request->get('logotipo');
-    $periodo_auditoria = $request->get('periodo_auditoria');
-    $relatorio_usuario = $request->get('relatorio_usuario');
-    $caminho_acrobat = $request->get('caminho_acrobat');
-    $diretorio = $request->get('diretorio');
-    $anoExercicio = $request->get('anoExercicio');
-    $mascaraSetor = $request->get('mascaraSetor');
-    $mascaraLocal = $request->get('mascaraLocal');
-    $samlink_host = $request->get('samlink_host');
-    $samlink_port = $request->get('samlink_port');
-    $samlink_dbname = $request->get('samlink_dbname');
-    $samlink_user = $request->get('samlink_user');
+    $nom_prefeitura       = $request->get('nom_prefeitura');
+    $cod_municipio        = $request->get('cod_municipio');
+    $cod_uf               = $request->get('cod_uf');
+    $nom_municipio        = $request->get('nom_municipio');
+    $tipo_logradouro      = $request->get('tipo_logradouro');
+    $logradouro           = $request->get('logradouro');
+    $numero               = $request->get('numero');
+    $complemento          = $request->get('complemento');
+    $bairro               = $request->get('bairro');
+    $cep1                 = $request->get('cep1');
+    $cep2                 = $request->get('cep2');
+    $dddRes               = $request->get('dddRes');
+    $foneRes              = $request->get('foneRes');
+    $dddCom               = $request->get('dddCom');
+    $foneCom              = $request->get('foneCom');
+    $email                = $request->get('email');
+    $site                 = $request->get('site');
+    $populacao            = $request->get('populacao');
+    $cnpj                 = $request->get('cnpj');
+    $logotipo             = $request->get('logotipo');
+    $periodo_auditoria    = $request->get('periodo_auditoria');
+    $relatorio_usuario    = $request->get('relatorio_usuario');
+    $caminho_acrobat      = $request->get('caminho_acrobat');
+    $diretorio            = $request->get('diretorio');
+    $anoExercicio         = $request->get('anoExercicio');
+    $mascaraSetor         = $request->get('mascaraSetor');
+    $mascaraLocal         = $request->get('mascaraLocal');
+    $inInatividadeUsuario = $request->get('inatividadeUsuario');
+    $samlink_host         = $request->get('samlink_host');
+    $samlink_port         = $request->get('samlink_port');
+    $samlink_dbname       = $request->get('samlink_dbname');
+    $samlink_user         = $request->get('samlink_user');
 
     include_once( CAM_GA_ADM_NEGOCIO."RAdministracaoConfiguracao.class.php" );
 
@@ -664,32 +681,33 @@ switch ($ctrl) {
 
     $obRAdministracaoConfiguracao->setCodModulo( 2 );
     $obRAdministracaoConfiguracao->setExercicio( Sessao::getExercicio() );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'nom_prefeitura',$nom_prefeitura       );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'cod_municipio',$cod_municipio         );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'cod_uf',$cod_uf                       );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'nom_municipio',$nom_municipio         );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'tipo_logradouro',$tipo_logradouro     );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'logradouro',$logradouro               );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'numero',$numero                       );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'complemento',$complemento             );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'bairro',$bairro                       );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'cep',$cep                             );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'fone',$fone                           );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'fax',$fax                             );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'e_mail',$email                        );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'site',$site                           );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'cnpj',$cnpj                           );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'populacao',$populacao                 );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'CGMPrefeito',$_REQUEST['inCGM']     );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'CGMDiarioOficial',$_REQUEST['inCGMD']);
-    $obRAdministracaoConfiguracao->addConfiguracao( 'logotipo',$logotipo                   );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'periodo_auditoria',$periodo_auditoria );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'usuario_relatorio',$relatorio_usuario );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'caminho_acrobat',$caminho_acrobat     );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'diretorio',$diretorio                 );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'ano_exercicio',$anoExercicio          );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_setor',$mascaraSetor          );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_local',$mascaraLocal          );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'nom_prefeitura'            , $nom_prefeitura       );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'cod_municipio'             , $cod_municipio        );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'cod_uf'                    , $cod_uf               );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'nom_municipio'             , $nom_municipio        );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'tipo_logradouro'           , $tipo_logradouro      );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'logradouro'                , $logradouro           );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'numero'                    , $numero               );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'complemento'               , $complemento          );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'bairro'                    , $bairro               );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'cep'                       , $cep                  );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'fone'                      , $fone                 );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'fax'                       , $fax                  );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'e_mail'                    , $email                );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'site'                      , $site                 );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'cnpj'                      , $cnpj                 );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'populacao'                 , $populacao            );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'CGMPrefeito'               , $_REQUEST['inCGM']    );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'CGMDiarioOficial'          , $_REQUEST['inCGMD']   );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'logotipo'                  , $logotipo             );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'periodo_auditoria'         , $periodo_auditoria    );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'usuario_relatorio'         , $relatorio_usuario    );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'caminho_acrobat'           , $caminho_acrobat      );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'diretorio'                 , $diretorio            );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'ano_exercicio'             , $anoExercicio         );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_setor'             , $mascaraSetor         );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_local'             , $mascaraLocal         );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'tempo_inatividade_usuario' , $inInatividadeUsuario );
     if ($samlinkExiste) {
         $obRAdministracaoConfiguracao->addConfiguracao( 'samlink_host',$samlink_host     );
         $obRAdministracaoConfiguracao->addConfiguracao( 'samlink_port',$samlink_port     );

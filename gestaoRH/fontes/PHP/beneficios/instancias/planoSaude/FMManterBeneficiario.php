@@ -42,7 +42,8 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once (CAM_GRH_BEN_MAPEAMENTO."TBeneficioBeneficiario.class.php");
 include_once (CAM_GRH_BEN_MAPEAMENTO."TBeneficioModalidadeConvenioMedico.class.php");
 include_once (CAM_GRH_BEN_MAPEAMENTO."TBeneficioTipoConvenioMedico.class.php");
-
+include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php"      );
+include_once (CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php" );
 include_once (CAM_GRH_PES_COMPONENTES."IFiltroContrato.class.php");
 include_once (CAM_GA_CGM_MAPEAMENTO."TGrauParentesco.class.php");
 include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
@@ -64,6 +65,8 @@ $stAcao = $request->get('stAcao');
 if (empty($stAcao)) {
     $stAcao = "alterar";
 }
+
+$obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 
 $obForm = new Form;
 $obForm->setAction($pgProc);
@@ -198,6 +201,7 @@ $obBtLimpar->obEvento->setOnClick("limparBeneficiario();");
 
 $obFormulario = new Formulario;
 $obFormulario->addForm  ($obForm);
+$obFormulario->addTitulo( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
 $obFormulario->addTitulo('Titular do Plano de Saúde');
 
 $obFormulario->addHidden($obHdnCtrl);

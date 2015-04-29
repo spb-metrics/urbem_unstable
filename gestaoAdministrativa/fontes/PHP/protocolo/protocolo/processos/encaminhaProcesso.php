@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: encaminhaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: encaminhaProcesso.php 62135 2015-03-31 13:10:20Z michel $
 
     */
 
@@ -468,8 +468,14 @@ if (Sessao::read('ordem_6') != "") {
             $anoExercicioSetor = $_REQUEST["anoExAnt"];
         }
 
+        $usuario = new usuarioLegado;
+        $dadosUsuario = array();
+        $dadosUsuario = $usuario->pegaDadosUsuario(Sessao::read('numCgm'));
+        //Codigo do orgão deve ser o que está configurado para o usuárioa que está logado, do setor que está encaminhando.
+        //$orgao = $dadosUsuario['codOrgao'];
+        //Comitado anterior, para encaminhar o processo para o setor definido no formulário de encaminhamento.
         $orgao = $_REQUEST['codOrgao'];
-
+        
         $processos = new processosLegado;
         //Executa o encaminhamento do processo
         if ($processos->encaminhaProcesso($codProcesso, $anoExercicio, $orgao, Sessao::read('numCgm'))) {

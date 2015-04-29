@@ -105,7 +105,7 @@ function preencheDescEvento()
         $stJs = "d = window.opener.parent.frames['telaPrincipal'].document; \n";
     }
 
-    $stJs .= "d.getElementById('stEvento').innerHTML = '&nbsp;';\n";
+    //$stJs .= "d.getElementById('stEvento').innerHTML = '&nbsp;';\n";
     if ($inCodigoEvento) {
         $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento;
         $obRFolhaPagamentoEvento->setCodigo( $inCodigoEvento );
@@ -117,7 +117,7 @@ function preencheDescEvento()
         $obRFolhaPagamentoEvento->listarEvento( $rsEvento );
         $rsEvento->addFormatacao('valor_quantidade','NUMERIC_BR');
         if ( $rsEvento->getNumLinhas() > 0 ) {
-            $stJs .= "d.getElementById('stEvento').innerHTML = '".$rsEvento->getCampo('descricao')."';\n";
+            $stJs .= "d.getElementById('".$_REQUEST['stCampoNomEvento']."').innerHTML = '".$rsEvento->getCampo('descricao')."';\n";
             $stJs .= "d.frm.hdnDescEvento.value = '".$rsEvento->getCampo('descricao')."';\n";
             $stJs .= "d.frm.HdninCodigoEvento.value = '".$rsEvento->getCampo('cod_evento')."';\n";
             $stJs .= "d.frm.stHdnFixado.value = '".$rsEvento->getCampo('fixado')."';\n";
@@ -127,8 +127,8 @@ function preencheDescEvento()
                 $stJs .= preencheValorQuantidade( $rsEvento->getCampo("fixado"), $rsEvento->getCampo("valor_quantidade"), $rsEvento->getCampo("limite_calculo") );
             }
         } else {
-            $stJs .= "d.getElementById('inCodigoEvento').value = '';\n";
-            $stJs .= "d.getElementById('inCodigoEvento').focus();\n";
+            $stJs .= "d.getElementById('".$_REQUEST['stCampoCodEvento']."').value = '';\n";
+            $stJs .= "d.getElementById('".$_REQUEST['stCampoCodEvento']."').focus();\n";
             $stJs .= "d.getElementById('spnDadosEvento').innerHTML = '';\n";
             $stJs .= "d.frm.hdnDescEvento.value = '';\n";
             $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '&nbsp;';\n";

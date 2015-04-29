@@ -30,7 +30,7 @@
  * @package     Tesouraria
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id:$
+ * $Id: CTCEMGExportacao.class.php 61974 2015-03-19 19:27:32Z jean $
  */
 
 class CTCEMGExportacao
@@ -155,20 +155,25 @@ class CTCEMGExportacao
                         'legislativo' => array(
                                             'comparativoPL.txt',
                                             'despesaTotalPessoalPL.txt',
+                                            'gestaoFiscalPL.txt',
                                          ),
                         'executivo'   => array(
                                             'ativoPerm.txt',
                                             'comparativoPE.txt',
+                                            'deducaoReceita.txt',
+                                            'demonstrativoOpCredito.txt',
                                             'despesaCapital.txt',
                                             'despesaCorrente.txt',
+                                            'DespesaIntra.txt',
                                             'despesaPrev.txt',
                                             'despesaTotalPessoalPE.txt',
                                             'despFuncaoSubfuncao.txt',
-                                            'deducaoReceita.txt',
+                                            'discDividaConsolidadaRPPS.txt',
                                             'especifPrev.txt',
                                             'exclusaoDespesa.txt',
                                             'exclusaoReceita.txt',
                                             'execucaoVariacao.txt',
+                                            'gestaoFiscalPE.txt',
                                             'itemAtivoPassivo.txt',
                                             'metaArrecadacao.txt',
                                             'obsMetaArrecadacao.txt',
@@ -179,8 +184,8 @@ class CTCEMGExportacao
                                             'receitaCorrente.txt',
                                             'receitaCapital.txt',
                                             'recursoAlienacaoAtivo.txt',
-                                            'variacaoPatrimonial.txt',
-                                            'demonstrativoOpCredito.txt',
+                                            'receitaIntra.txt',
+                                            'variacaoPatrimonial.txt'
                                          ),
                      );
 
@@ -211,6 +216,8 @@ class CTCEMGExportacao
             } elseif ($arParams['stTipoPeriodo'] == 'bimestral') {
                 $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][10] . "','" . $arArquivo['executivo'][10] . "');";
                 $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][11] . "','" . $arArquivo['executivo'][11] . "');";
+                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][13] . "','" . $arArquivo['executivo'][13] . "');";
+                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][17] . "','" . $arArquivo['executivo'][17] . "');";
             }
 
             break;
@@ -241,6 +248,14 @@ class CTCEMGExportacao
         $stAcao = $_REQUEST['stAcao'];
 
         $arFiltroRelatorio = Sessao::read('filtroRelatorio');
+        
+        if($arFiltroRelatorio['stTipoPeriodo']=='mensal'){
+            $dataInicial = '01/'.str_pad($arFiltroRelatorio['inPeriodo'], 2, "0", STR_PAD_LEFT).'/'.Sessao::read('exercicio');
+            $dataFinal = SistemaLegado::retornaUltimoDiaMes($arFiltroRelatorio['inPeriodo'],Sessao::read('exercicio'));
+        }else{
+            //Bimestral
+            sistemalegado::periodoInicialFinalBimestre($dataInicial, $dataFinal, $arFiltroRelatorio['inPeriodo'], Sessao::read('exercicio') );
+        }
 
         $stTipoDocumento = "TCE_MG";
         $obExportador    = new Exportador();
@@ -250,7 +265,7 @@ class CTCEMGExportacao
             $obExportador->addArquivo($arArquivo[0].'.'.$arArquivo[1]);
             $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
 
-            include( $arArquivo[0] . ".inc.php");
+            include( CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/SIACE/".$arArquivo[0] . ".inc.php");
 
             $arRecordSet = null;
         }

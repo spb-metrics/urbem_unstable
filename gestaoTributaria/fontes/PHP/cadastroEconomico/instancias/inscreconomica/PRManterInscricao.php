@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: PRManterInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterInscricao.php 62193 2015-04-06 19:03:02Z jean $
 
     * Casos de uso: uc-05.02.10
 
@@ -199,6 +199,9 @@ switch ($stAcao) {
 
             if ( !$obErro->ocorreu() ) {
                 $obErro = $obRCEMInscricaoEconomica->incluirInscricao();
+                if ( $obErro->ocorreu() ) {
+                    $obErro->setDescricao("CGM ".$obRCEMInscricaoEconomica->obTCEMCadastroEconomicoEmpresaDireito->arEstrutura[1]->getConteudo()." pertencente a outra Inscrição Econômica.");
+                }
             }
         }
         if ( !$obErro->ocorreu() ) {

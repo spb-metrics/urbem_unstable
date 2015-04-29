@@ -63,22 +63,22 @@ BEGIN
                 rpp_exercicios_anteriores
                 +
                 outras_obrigacoes_financeiras) AS compromissado
-             , CAST(0 AS DECIMAL(14,2)) AS caixa_rpps
-             , CAST(0 AS DECIMAL(14,2)) AS conta_movimento_rpps
-             , CAST(0 AS DECIMAL(14,2)) AS contas_vinculadas_rpps
-             , CAST(0 AS DECIMAL(14,2)) AS aplicacoes_financeiras_rpps
-             , CAST(0 AS DECIMAL(14,2)) AS compromissado_rpps
-          FROM stn.fn_rgf_anexo5_geral ( stExercicio , stDtInicial, stDtFinal, stCodEntidade, 'false') as
-          (     caixa                                 DECIMAL(14,2)
-              , conta_movimento                       DECIMAL(14,2)
-              , contas_vinculadas                     DECIMAL(14,2)
-              , aplicacoes_financeiras                DECIMAL(14,2)
-              , outras_disponibilidades_financeiras   DECIMAL(14,2)
-              , depositos                             DECIMAL(14,2)
-              , rpp_exercicio                         DECIMAL(14,2)
-              , rpp_exercicios_anteriores             DECIMAL(14,2)
-              , outras_obrigacoes_financeiras         DECIMAL(14,2)
-              , restos_nao_processados                DECIMAL(14,2)
+             , 0.00 AS caixa_rpps
+             , 0.00 AS conta_movimento_rpps
+             , 0.00 AS contas_vinculadas_rpps
+             , 0.00 AS aplicacoes_financeiras_rpps
+             , 0.00 AS compromissado_rpps
+          FROM tcemg.fn_rgf_anexo5_geral_disp_finan ( stExercicio , stDtInicial, stDtFinal, stCodEntidade, 'false') as
+          (     caixa                                 NUMERIC
+              , conta_movimento                       NUMERIC
+              , contas_vinculadas                     NUMERIC
+              , aplicacoes_financeiras                NUMERIC
+              , outras_disponibilidades_financeiras   NUMERIC
+              , depositos                             NUMERIC
+              , rpp_exercicio                         NUMERIC
+              , rpp_exercicios_anteriores             NUMERIC
+              , outras_obrigacoes_financeiras         NUMERIC
+              , restos_nao_processados                NUMERIC
           );
 
 
@@ -93,17 +93,17 @@ BEGIN
          , rpp_exercicios_anteriores
          , outras_obrigacoes_financeiras
          , restos_nao_processados
-      FROM stn.fn_rgf_anexo5_geral ( ''' || stExercicio || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''', ''' || stCodEntidade || ''', ''true'') as
-      (     caixa                                 DECIMAL(14,2)
-          , conta_movimento                       DECIMAL(14,2)
-          , contas_vinculadas                     DECIMAL(14,2)
-          , aplicacoes_financeiras                DECIMAL(14,2)
-          , outras_disponibilidades_financeiras   DECIMAL(14,2)
-          , depositos                             DECIMAL(14,2)
-          , rpp_exercicio                         DECIMAL(14,2)
-          , rpp_exercicios_anteriores             DECIMAL(14,2)
-          , outras_obrigacoes_financeiras         DECIMAL(14,2)
-          , restos_nao_processados                DECIMAL(14,2)
+      FROM tcemg.fn_rgf_anexo5_geral_disp_finan ( ''' || stExercicio || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''', ''' || stCodEntidade || ''', ''true'') as
+      (     caixa                                 NUMERIC
+          , conta_movimento                       NUMERIC
+          , contas_vinculadas                     NUMERIC
+          , aplicacoes_financeiras                NUMERIC
+          , outras_disponibilidades_financeiras   NUMERIC
+          , depositos                             NUMERIC
+          , rpp_exercicio                         NUMERIC
+          , rpp_exercicios_anteriores             NUMERIC
+          , outras_obrigacoes_financeiras         NUMERIC
+          , restos_nao_processados                NUMERIC
       )';
 
     FOR reRegistro IN EXECUTE stSql

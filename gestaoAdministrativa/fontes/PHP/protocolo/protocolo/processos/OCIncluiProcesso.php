@@ -32,12 +32,14 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: OCIncluiProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCIncluiProcesso.php 61966 2015-03-18 21:54:54Z jean $
 */
 
 include_once '../../../../../../config.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once(CAM_FW_COMPONENTES."Table/TableTree.class.php"								       );
+include_once (CAM_FW_LEGADO."funcoesLegado.lib.php"      );
+include_once (CAM_FW_URBEM."SistemaLegado.class.php");
 
 header("HTTP/1.1 200 OK");
 
@@ -301,6 +303,27 @@ switch ($stCtrl) {
         $stJs = " if ($('spnInteressados')) { $('spnInteressados').innerHTML = '&nbsp;'; }";
     break;
 
+    case 'montaEntidade':
+        if ($_REQUEST['stIncluirAssinaturas'] == 'sim') {
+            include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeGeral.class.php';
+            $obITextBoxSelectEntidade = new ITextBoxSelectEntidadeGeral();
+            $obITextBoxSelectEntidade->setId('inCodEntidade');
+            $obITextBoxSelectEntidade->setName('inCodEntidade');
+            $obITextBoxSelectEntidade->setObrigatorio(true);
+            $obITextBoxSelectEntidade->setCodEntidade($inCodEntidade);
+            $obITextBoxSelectEntidade->obTextBox->obEvento->setOnChange("getIMontaAssinaturas();");
+            $obITextBoxSelectEntidade->obSelect->obEvento->setOnChange("getIMontaAssinaturas();");
+
+            $obFormulario = new Formulario();
+            $obFormulario->setLarguraRotulo(30);
+            $obFormulario->addComponente($obITextBoxSelectEntidade);
+            $obFormulario->montaInnerHTML();
+            $stHTML = $obFormulario->getHTML();
+            $stJs .= "jQuery('#spnEntidade').html('".$stHTML."');\n";
+        } else {
+            $stJs .= "jQuery('#spnEntidade').html('');\n";
+        }
+    break;
 }
 
 if (!empty($stJs)) {

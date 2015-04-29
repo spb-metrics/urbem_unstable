@@ -78,7 +78,7 @@ class TPatrimonioInventarioHistoricoBem extends Persistente
 
     public function montaRecuperaBemHistoricoInventario()
     {
-        $stSql  = "       SELECT  																						 \n";
+        $stSql  = "       SELECT DISTINCT																			 \n";
         $stSql .= "               historico_bem.cod_bem																 \n";
         $stSql .= "            ,  TRIM(bem.descricao) as nom_bem														 \n";
         $stSql .= "            ,  recuperaDescricaoOrgao(historico_bem.cod_orgao, 'NOW()') as nom_orgao					 \n";
@@ -122,8 +122,7 @@ class TPatrimonioInventarioHistoricoBem extends Persistente
         $stSql .= "                     FROM  patrimonio.historico_bem													 \n";
         $stSql .= "                 GROUP BY  cod_bem																	 \n";
         $stSql .= "               ) as resumo																			 \n";
-        $stSql .= "       ON  resumo.cod_bem   = historico_bem.cod_bem													 \n";
-        $stSql .= "      AND  resumo.timestamp = historico_bem.timestamp												 \n";
+        $stSql .= "       ON  resumo.cod_bem   = historico_bem.cod_bem													 \n";        
         $stSql .= "																										 \n";
         $stSql .= "   INNER JOIN  patrimonio.inventario_historico_bem													 \n";
         $stSql .= "           ON  inventario_historico_bem.cod_bem = resumo.cod_bem										 \n";

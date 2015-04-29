@@ -33,10 +33,10 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: RPL.inc.php 61694 2015-02-25 21:20:33Z jean $
-    * $Rev: 61694 $
-    * $Author: jean $
-    * $Date: 2015-02-25 18:20:33 -0300 (Qua, 25 Fev 2015) $
+    * $Id: RPL.inc.php 61928 2015-03-16 17:21:05Z michel $
+    * $Rev: 61928 $
+    * $Author: michel $
+    * $Date: 2015-03-16 14:21:05 -0300 (Seg, 16 Mar 2015) $
 
 */
 include_once CAM_GPC_TGO_MAPEAMENTO."TTCMGOResponsavelLicitacao.class.php";
@@ -57,39 +57,23 @@ $obTTCMGOResponsavelLicitacao->recuperaResponsaveisLicitacao($rsRecordSetRESPLIC
 //Tipo Registro 20
 $obTTCMGOResponsavelLicitacao->recuperaComissaoLicitacao($rsRecordSetRESPLIC20);
 
-$i = 0;
-foreach ($rsRecordSetRESPLIC10->arElementos as $stChave) {
-        $rsRecordSetRESPLIC10->arElementos[$i]['nro_sequencial'] = $i+1;
-        $i++;
-}
-$i = 0;
-foreach ($rsRecordSetRESPLIC20->arElementos as $stChave) {
-        $rsRecordSetRESPLIC20->arElementos[$i]['nro_sequencial'] = $i+1;
-        $i++;
-}
-//Tipo Registro 99
-$arRecordSetRESPLIC99 = array(
-    '0' => array(
-        'tipo_registro' => '99',
-        'brancos' => '',
-        'nro_sequencial' => 1,
-    )
-);
-$rsRecordSetRESPLIC99 = new RecordSet();
-$rsRecordSetRESPLIC99->preenche($arRecordSetRESPLIC99);
-
 //REGISTRO 10   
 $inCount = 0;
 if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
     $stChave10 = '';
     $stChave = '';
+    
     foreach ( $rsRecordSetRESPLIC10->getElementos() as $arRESPLIC10 ) {
-        $auxiliarStChave10=$arRESPLIC10['tipo_registro'].$arRESPLIC10['cod_orgao'].$arRESPLIC10['codunidadesub'].$arRESPLIC10['exercicio_licitacao'].$arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['tipo_responsabilidade'];
+        
+        $auxiliarStChave10=$arRESPLIC10['tipo_registro'].$arRESPLIC10['cod_orgao'].$arRESPLIC10['codunidade'].$arRESPLIC10['exercicio_licitacao'].$arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['tipo_responsabilidade'];
+        
         if ( !($stChave10 === $auxiliarStChave10)){
             $inCount++; 
-            $stChave10 = $arRESPLIC10['tipo_registro'].$arRESPLIC10['cod_orgao'].$arRESPLIC10['codunidadesub'].$arRESPLIC10['exercicio_licitacao'].$arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['tipo_responsabilidade'];
+            $stChave10 = $arRESPLIC10['tipo_registro'].$arRESPLIC10['cod_orgao'].$arRESPLIC10['codunidade'].$arRESPLIC10['exercicio_licitacao'].$arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['tipo_responsabilidade'];
             $stChave = $arRESPLIC10['num_processo_licitatorio'];
-            $stChaveAuxiliar =  $arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['codunidadesub'];
+            $stChaveAuxiliar =  $arRESPLIC10['num_processo_licitatorio'].$arRESPLIC10['codunidade'];
+            $arRESPLIC10['nro_sequencial'] = $inCount;
+            
             $rsBloco = 'rsBloco_'.$inCount;
             unset($$rsBloco);
             $$rsBloco = new RecordSet();
@@ -105,9 +89,9 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
             
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codunidadesub");
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codunidade");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(5);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_licitacao");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -115,7 +99,7 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo_licitatorio");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(12);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_responsabilidade");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -179,16 +163,20 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
     //REGISTRO 20    
     if ( count($rsRecordSetRESPLIC20->getElementos()) > 0 ) {
         $stChave20 = '';
+        
         foreach ( $rsRecordSetRESPLIC20->getElementos() as $arRESPLIC20 ) {
-            $stChaveElemento = $arRESPLIC20['num_processo_licitatorio'].$arRESPLIC20['codunidadesub'];
-            if ( $stChaveElemento==$stChaveAuxiliar ) {
+            
+            $stChaveElemento = $arRESPLIC20['nro_processo_licitatorio'].$arRESPLIC20['cod_unidade'];
+            
+            if ( $stChaveElemento == $stChaveAuxiliar ) {
                 $inCount++;                
-                $stChave20 = $arRESPLIC20['num_processo_licitatorio'].$arRESPLIC20['codunidadesub'];
+                $stChave20 = $arRESPLIC20['nro_processo_licitatorio'].$arRESPLIC20['cod_unidade'];
+                $arRESPLIC20['nro_sequencial'] = $inCount;
                 $rsBloco = 'rsBloco_'.$inCount;
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
                 $$rsBloco->preenche(array($arRESPLIC20));
-                                            
+                                      
                 $obExportador->roUltimoArquivo->addBloco($$rsBloco);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
@@ -201,7 +189,7 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(5);
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_licitacao");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -209,7 +197,7 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_processo_licitatorio");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(12);
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_comissao");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -249,7 +237,7 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cargo");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(50);
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_cargo");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
@@ -293,21 +281,33 @@ if ( count($rsRecordSetRESPLIC10->getElementos()) > 0 ) {
             }
         }
     }
-}else {
-    $obExportador->roUltimoArquivo->addBloco($rsRecordSetRESPLIC99);
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");    
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");    
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(389);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);    
 }
+
+//Tipo Registro 99
+$arRecordSetRESPLIC99 = array(
+    '0' => array(
+        'tipo_registro' => '99',
+        'brancos'       => '',
+        'nro_sequencial'=> $inCount+1
+    )
+);
+$rsRecordSetRESPLIC99 = new RecordSet();
+$rsRecordSetRESPLIC99->preenche($arRecordSetRESPLIC99);
+
+$obExportador->roUltimoArquivo->addBloco($rsRecordSetRESPLIC99);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");    
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");    
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(389);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);    
 
 $rsRecordSetRESPLIC10         = null;
 $rsRecordSetRESPLIC20         = null;

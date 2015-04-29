@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioSimulacaoCobranca.php 61651 2015-02-20 18:47:10Z evandro $
+    * $Id: OCGeraRelatorioSimulacaoCobranca.php 62067 2015-03-27 19:02:19Z jean $
 
     * Casos de uso: uc-05.04.04
 */
@@ -322,13 +322,14 @@ $rsParcelas->preenche ( $arParcelasSessao );
     $arTamanhos[1] = 10;
     $arTamanhos[2] = 10.4;
     $arTamanhos[3] = 10;
+    $arTamanhos[4] = 10;
     for ( $inJ=0; $inJ<count($arAcrescimos); $inJ++ ) {
         $arAcrescimos[$inJ] = number_format ( $arAcrescimos[$inJ], 2, ',', '.' );
         $obPDF->addCabecalho   ( $arAcrescimos[$inJ], $arTamanhos[$inJ], 10, "B" );
     }
 
     $obPDF->addCabecalho   ( $flReducao, 9.3, 10, "B" );
-    $obPDF->addCabecalho   ( $flValorTotal, 7, 10, "B" );
+    $obPDF->addCabecalho   ( $flValorTotal, 30, 10, "B" );
 
     unset( $arSomatorioCredito );
     $arSomatorioCredito[] = array( "labelListaParcela" => "Detalhamento do tributo de dívidas vinculadas" );

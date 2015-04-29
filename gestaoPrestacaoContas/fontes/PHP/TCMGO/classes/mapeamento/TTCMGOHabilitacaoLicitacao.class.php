@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Arthur Cruz
 
     * @ignore
-    * $Id: $
+    * $Id: TTCMGOHabilitacaoLicitacao.class.php 62344 2015-04-27 14:58:36Z michel $
     * $Rev: $
     * $Author: $
     * $Date: $
@@ -61,7 +61,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
     public function montarecuperaExportacao10()
     {            
         $stSql = " SELECT 10 AS tipo_registro
-                          , LPAD(tcmgo_orgao.num_orgao::VARCHAR, 2, '0') AS cod_orgao
+                          , LPAD(despesa.num_orgao::VARCHAR, 2, '0') AS cod_orgao
                           , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                           , licitacao.exercicio_processo AS exercicio_licitacao
                           , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
@@ -76,15 +76,15 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                           , sw_cgm_pessoa_juridica.num_registro_cvm
                           , sw_cgm_pessoa_juridica.insc_estadual AS num_inscricao_estadual
                           , sw_uf.sigla_uf AS uf_inscricao_estadual
-                          , CASE WHEN certificacao_documentos.cod_documento = 5 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_certidao_regularidade_inss
-                          , CASE WHEN certificacao_documentos.cod_documento = 5 THEN TO_CHAR(certificacao_documentos.dt_emissao,'dd/mm/yyyy') ELSE '' END AS dt_emissao_certidao_regularidade_inss
-                          , CASE WHEN certificacao_documentos.cod_documento = 5 THEN TO_CHAR(certificacao_documentos.dt_validade,'dd/mm/yyyy') ELSE '' END AS dt_validade_certidao_regularida_inss
-                          , CASE WHEN certificacao_documentos.cod_documento = 6 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_certidao_regularidade_fgts
-                          , CASE WHEN certificacao_documentos.cod_documento = 6 THEN TO_CHAR(certificacao_documentos.dt_emissao,'dd/mm/yyyy') ELSE '' END AS dt_emissao_certidao_regularidade_fgts
-                          , CASE WHEN certificacao_documentos.cod_documento = 6 THEN TO_CHAR(certificacao_documentos.dt_validade,'dd/mm/yyyy') ELSE '' END AS dt_validade_certidao_regularida_fgts
-                          , CASE WHEN certificacao_documentos.cod_documento = 7 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_cndt
-                          , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_emissao,'dd/mm/yyyy') ELSE '' END AS dt_emissao_cndt
-                          , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_validade,'dd/mm/yyyy') ELSE '' END AS dt_validade_cndt
+                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN certificacao_documentos_inss.num_documento ELSE NULL END AS num_certidao_regularidade_inss
+                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_inss.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_inss
+                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_inss.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_inss
+                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN certificacao_documentos_fgts.num_documento ELSE NULL END AS num_certidao_regularidade_fgts
+                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_fgts.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_fgts
+                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_fgts.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_fgts
+                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN certificacao_documentos_cndt.num_documento ELSE NULL END AS num_cndt
+                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_cndt.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_cndt
+                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_cndt.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_cndt
                           , TO_CHAR(participante_certificacao.dt_registro,'ddmmyyyy') AS dt_habilitacao
                           , CASE WHEN participante_documentos.cgm_fornecedor::VARCHAR <> '' THEN 1 ELSE 2 END AS presenca_licitantes
                           , CASE WHEN participante.renuncia_recurso = 't' THEN 1 ELSE 2 END AS renuncia_recurso
@@ -138,11 +138,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
     
                    LEFT JOIN sw_cgm_pessoa_juridica
                           ON sw_cgm_pessoa_juridica.numcgm = documento_cgm.numcgm
-                   
-                   LEFT JOIN tcmgo.orgao AS tcmgo_orgao
-                          ON tcmgo_orgao.numcgm_orgao    = sw_cgm_pessoa_juridica.numcgm
-                         AND tcmgo_orgao.numcgm_contador = sw_cgm.numcgm
-    
+                       
                         JOIN compras.objeto
                           ON objeto.cod_objeto = licitacao.cod_objeto
                 
@@ -156,11 +152,47 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                           ON participante_certificacao.cgm_fornecedor = participante_documentos.cgm_fornecedor
                          AND participante_certificacao.exercicio      = participante_documentos.exercicio
                         
-                        JOIN licitacao.certificacao_documentos
-                          ON participante_certificacao.num_certificacao = certificacao_documentos.num_certificacao
-                         AND participante_certificacao.exercicio        = certificacao_documentos.exercicio
-                         AND participante_certificacao.cgm_fornecedor   = certificacao_documentos.cgm_fornecedor
-                         AND certificacao_documentos.timestamp = (SELECT MAX(timestamp) from licitacao.certificacao_documentos AS CD where cgm_fornecedor = certificacao_documentos.cgm_fornecedor)
+                   LEFT JOIN (SELECT *
+                                FROM licitacao.certificacao_documentos
+                               WHERE certificacao_documentos.cod_documento = 5
+                                 AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
+                                 AND certificacao_documentos.timestamp = (select MAX(timestamp)
+									    from licitacao.certificacao_documentos AS CD
+									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+									    and CD.cod_documento = certificacao_documentos.cod_documento
+									    and CD.exercicio   = certificacao_documentos.exercicio)
+                             ) AS certificacao_documentos_inss
+                          ON participante_certificacao.num_certificacao = certificacao_documentos_inss.num_certificacao
+                         AND participante_certificacao.exercicio        = certificacao_documentos_inss.exercicio
+                         AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_inss.cgm_fornecedor
+                   
+                   LEFT JOIN (SELECT *
+                                FROM licitacao.certificacao_documentos
+                               WHERE certificacao_documentos.cod_documento = 6
+                                 AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
+                                 AND certificacao_documentos.timestamp = (select MAX(timestamp)
+									    from licitacao.certificacao_documentos AS CD
+									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+									    and CD.cod_documento = certificacao_documentos.cod_documento
+									    and CD.exercicio   = certificacao_documentos.exercicio)
+                             ) AS certificacao_documentos_fgts
+                          ON participante_certificacao.num_certificacao = certificacao_documentos_fgts.num_certificacao
+                         AND participante_certificacao.exercicio        = certificacao_documentos_fgts.exercicio
+                         AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_fgts.cgm_fornecedor
+
+                   LEFT JOIN (SELECT *
+                                FROM licitacao.certificacao_documentos
+                               WHERE certificacao_documentos.cod_documento = 7
+                                 AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
+                                 AND certificacao_documentos.timestamp = (select MAX(timestamp)
+									    from licitacao.certificacao_documentos AS CD
+									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+									    and CD.cod_documento = certificacao_documentos.cod_documento
+									    and CD.exercicio   = certificacao_documentos.exercicio)
+                             ) AS certificacao_documentos_cndt
+                          ON participante_certificacao.num_certificacao = certificacao_documentos_cndt.num_certificacao
+                         AND participante_certificacao.exercicio        = certificacao_documentos_cndt.exercicio
+                         AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_cndt.cgm_fornecedor
                           
                         JOIN compras.mapa
                           ON mapa.exercicio = licitacao.exercicio_mapa
@@ -176,7 +208,21 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                          AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                          AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                          AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-                         
+                        
+                        JOIN compras.mapa_item_dotacao
+                            ON mapa_item_dotacao.exercicio              = mapa_item.exercicio
+                            AND mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+                            AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                            AND mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+                            AND mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                            AND mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+                            AND mapa_item_dotacao.cod_item              = mapa_item.cod_item
+                            AND mapa_item_dotacao.lote                  = mapa_item.lote
+                                            
+                        JOIN orcamento.despesa
+                            ON despesa.exercicio    = mapa_item_dotacao.exercicio
+                            AND despesa.cod_despesa = mapa_item_dotacao.cod_despesa
+                        
                         JOIN compras.mapa_cotacao
                           ON mapa.exercicio = mapa_cotacao.exercicio_mapa
                          AND mapa.cod_mapa  = mapa_cotacao.cod_mapa
@@ -258,7 +304,8 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                           , renuncia_recurso
                           , licitacao.exercicio_processo
                           , participante.cgm_fornecedor
-                          , tipo_objeto.cod_tipo_objeto ";
+                          , tipo_objeto.cod_tipo_objeto
+                        ORDER BY num_processo_licitatorio ";
 
         return $stSql;
     }
@@ -276,7 +323,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
     function montarecuperaExportacao11()
     {
         $stSql = " SELECT 11 AS tipo_registro
-                        , LPAD(tcmgo_orgao.num_orgao::VARCHAR, 2, '0') AS cod_orgao
+                        , LPAD(despesa.num_orgao::VARCHAR, 2, '0') AS cod_orgao
                         , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                         , licitacao.exercicio_processo AS exercicio_licitacao
                         , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
@@ -299,11 +346,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                               
                     JOIN sw_cgm_pessoa_juridica
                       ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-                      
-               LEFT JOIN tcmgo.orgao AS tcmgo_orgao
-                      ON tcmgo_orgao.numcgm_orgao    = sw_cgm_pessoa_juridica.numcgm
-                     AND tcmgo_orgao.numcgm_contador = sw_cgm.numcgm
-                    
+                                          
                     JOIN compras.fornecedor
                       ON fornecedor.cgm_fornecedor = participante.cgm_fornecedor
                 
@@ -376,7 +419,21 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                      AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                      AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                      AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-        
+                        
+                    JOIN compras.mapa_item_dotacao
+                        ON mapa_item_dotacao.exercicio              = mapa_item.exercicio
+                        AND mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+                        AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                        AND mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+                        AND mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                        AND mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+                        AND mapa_item_dotacao.cod_item              = mapa_item.cod_item
+                        AND mapa_item_dotacao.lote                  = mapa_item.lote
+                                            
+                    JOIN orcamento.despesa
+                        ON despesa.exercicio    = mapa_item_dotacao.exercicio
+                        AND despesa.cod_despesa = mapa_item_dotacao.cod_despesa
+
                     WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
                       AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
                       AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
@@ -388,7 +445,8 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                                          AND licitacao_anulada.cod_entidade     = licitacao.cod_entidade
                                          AND licitacao_anulada.exercicio        = licitacao.exercicio )
                                          
-                    GROUP BY 1,2,3,4,5,6,7,8,9,10 ";
+                    GROUP BY 1,2,3,4,5,6,7,8,9,10 
+                    ORDER BY num_processo_licitatorio ";
         return $stSql;
     }
     
@@ -405,7 +463,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
     function montaRecuperaExportacao20()
     {
         $stSql = " SELECT 20 AS tipo_registro
-                        , LPAD(tcmgo_orgao.num_orgao::VARCHAR, 2, '0') AS cod_orgao
+                        , LPAD(despesa.num_orgao::VARCHAR, 2, '0') AS cod_orgao
                         , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                         , licitacao.exercicio_processo AS exercicio_licitacao
                         , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
@@ -440,10 +498,7 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                      
                     JOIN sw_cgm
                       ON sw_cgm.numcgm = participante.cgm_fornecedor
-                      
-               LEFT JOIN tcmgo.orgao AS tcmgo_orgao
-                      ON tcmgo_orgao.numcgm_contador = sw_cgm.numcgm
-                    
+                                          
                     JOIN sw_uf
                       ON sw_cgm.cod_uf = sw_uf.cod_uf
                       
@@ -536,7 +591,21 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                      AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                      AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                      AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-                      
+                    
+                    JOIN compras.mapa_item_dotacao
+                        ON mapa_item_dotacao.exercicio              = mapa_item.exercicio
+                        AND mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+                        AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                        AND mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+                        AND mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                        AND mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+                        AND mapa_item_dotacao.cod_item              = mapa_item.cod_item
+                        AND mapa_item_dotacao.lote                  = mapa_item.lote
+                                            
+                    JOIN orcamento.despesa
+                        ON despesa.exercicio    = mapa_item_dotacao.exercicio
+                        AND despesa.cod_despesa = mapa_item_dotacao.cod_despesa
+
                     WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
                       AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
                       AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'

@@ -117,6 +117,10 @@ class IBscEvento
     public $obLblMesAno;
 
     public $stTodosEventos;
+    
+    public $stCampoCodEvento;
+    
+    public $stCampoNomEvento;
 
     /**
         * @access Public
@@ -200,11 +204,20 @@ class IBscEvento
 
     public function getTodosEventos() { return $this->stTodosEventos; }
 
+    ###
+    public function getCampoCodEvento() { return $this->stCampoCodEvento; }
+    
+    public function setCampoCodEvento($var) { $this->stCampoCodEvento = $var; }
+    
+    public function getCampoNomEvento() { return $this->stCampoNomEvento; }
+    
+    public function setCampoNomEvento($var) { $this->stCampoNomEvento = $var; }
+    
     /**
         * Método Construtor
         * @access Public
     */
-    public function IBscEvento()
+    public function IBscEvento($stCampoCodEvento='inCodigoEvento', $stCampoNomEvento='stEvento')
     {
         include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php" );
 
@@ -212,14 +225,22 @@ class IBscEvento
         $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
         $obRFolhaPagamentoConfiguracao->consultar();
         $stMascaraEvento = $obRFolhaPagamentoConfiguracao->getMascaraEvento();
+        
+        $this->setCampoCodEvento($stCampoCodEvento);
+        $this->setCampoNomEvento($stCampoNomEvento);
 
+        //Define a mascara do campo Evento
+        $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
+        $obRFolhaPagamentoConfiguracao->consultar();
+        $stMascaraEvento = $obRFolhaPagamentoConfiguracao->getMascaraEvento();
+        
         $this->obBscInnerEvento = new BuscaInner;
-        $this->obBscInnerEvento->setRotulo              ( "Evento"         );
-        $this->obBscInnerEvento->setId                  ( "stEvento"       );
+        $this->obBscInnerEvento->setRotulo              ( "Evento"   );
+        $this->obBscInnerEvento->setId                  ( $stCampoNomEvento );
         $this->obBscInnerEvento->setTitle               ( "Informe o evento a ser lançado." );
-        $this->obBscInnerEvento->obCampoCod->setName    ( "inCodigoEvento"    );
-        $this->obBscInnerEvento->obCampoCod->setId      ( "inCodigoEvento"    );
-        $this->obBscInnerEvento->obCampoCod->setValue   ( $inCodigoEvento     );
+        $this->obBscInnerEvento->obCampoCod->setName    ( $stCampoCodEvento );
+        $this->obBscInnerEvento->obCampoCod->setId      ( $stCampoCodEvento );
+        $this->obBscInnerEvento->obCampoCod->setValue   ( $inCodigoEvento  );
         $this->obBscInnerEvento->obCampoCod->setPreencheComZeros ( "E"     );
         $this->obBscInnerEvento->obCampoCod->setMascara ( $stMascaraEvento );
         $this->obBscInnerEvento->obCampoDescrHidden->setName( "hdnDescEvento" );
@@ -324,7 +345,7 @@ class IBscEvento
             $stTipoEvento = "todos_eventos";
         }
 
-        $this->obBscInnerEvento->setFuncaoBusca( "abrePopUp('".CAM_GRH_FOL_POPUPS."evento/FLManterEvento.php','frm','inCodigoEvento','stEvento','','".Sessao::getId()."&stNaturezasAceitas=".$this->getNaturezasAceitas()."&stNaturezaChecked=".$this->getNaturezaChecked()."&boInformarValorQuantidade=".$this->getInformarValorQuantidade()."&boInformarQuantidadeParcelas=".$this->getInformarQuantidadeParcelas()."&boSugerirValorQuantidade=".$this->getSugerirValorQuantidade()."&stTipoEvento=".$stTipoEvento."','800','550')" );
+        $this->obBscInnerEvento->setFuncaoBusca( "abrePopUp('".CAM_GRH_FOL_POPUPS."evento/FLManterEvento.php','frm','".$this->stCampoCodEvento."','".$this->stCampoNomEvento."','','".Sessao::getId()."&stNaturezasAceitas=".$this->getNaturezasAceitas()."&stNaturezaChecked=".$this->getNaturezaChecked()."&boInformarValorQuantidade=".$this->getInformarValorQuantidade()."&boInformarQuantidadeParcelas=".$this->getInformarQuantidadeParcelas()."&boSugerirValorQuantidade=".$this->getSugerirValorQuantidade()."&stTipoEvento=".$stTipoEvento."','800','550')" );
     }
 
     public function montaFuncaoPreenche()
@@ -336,7 +357,7 @@ class IBscEvento
             $this->setNaturezasAceitas('D');
         }
         $stOnChange = $this->obBscInnerEvento->obCampoCod->obEvento->getOnChange();
-        $this->obBscInnerEvento->obCampoCod->obEvento->setOnChange( "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento='+this.value, 'preencheDescEvento' ); ".$stOnChange );
+        $this->obBscInnerEvento->obCampoCod->obEvento->setOnChange( "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento='+this.value+'&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."', 'preencheDescEvento' ); ".$stOnChange );
     }
 
     public function montaJsPreencheValores()
@@ -344,7 +365,7 @@ class IBscEvento
         Sessao::write('IBscEvento',$this );
 
         $stJs  = "document.getElementById('inCodigoEvento').value = '".$this->obBscInnerEvento->obCampoCod->getValue()."'\n";
-        $stJs .= "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento=".$this->obBscInnerEvento->obCampoCod->getValue()."', 'preencheDescEvento' );";
+        $stJs .= "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento=".$this->obBscInnerEvento->obCampoCod->getValue()."&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."', 'preencheDescEvento' );";
 
         return $stJs;
     }

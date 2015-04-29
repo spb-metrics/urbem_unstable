@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.25
 
-    $Id: OCManterManutencaoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterManutencaoProposta.php 62270 2015-04-15 20:13:46Z arthur $
 
     */
 
@@ -1161,9 +1161,11 @@ switch ( $request->get('stCtrl') ) {
         $stErro = FALSE;
         $stJs = '';
         $rsDataLicitacao='';
+        
         list ( $inCodMapa , $stExercicioMapa ) = explode ( '/' , $request->get('stMapaCompras'));
         list ( $inCodLicitacaoBusca , $stExercicioLicitacao ) = explode ( '/' , $request->get('inCodLicitacao'));
         $stExercicioMapa = ($stExercicioMapa == '') ? Sessao::getExercicio() : $stExercicioMapa;
+        
         if ($inCodMapa && $stExercicioMapa) {
 
             $rsParticipantes = new Recordset();
@@ -1193,6 +1195,7 @@ switch ( $request->get('stCtrl') ) {
             $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
 
             if ( $request->get('stCtrl')  != 'montaLabelsDispensaLicitacao' ) {
+                
                 if (!$stErro) {
                     $obTLicitacaoLicitacao->setDado( 'exercicio', $stExercicioMapa );
                     $obTLicitacaoLicitacao->setDado( 'cod_mapa' , $inCodMapa       );
@@ -1211,8 +1214,9 @@ switch ( $request->get('stCtrl') ) {
                 }
 
                 if (!$stErro) {
+                    
                     $obTLicitacaoLicitacao->recuperaLicitacaoCompleta($rsDataLicitacao);
-
+                    
                     if ( $request->get('stAcao') != "dispensaLicitacao") {
                         $stFiltroLicitacao = " AND licitacao.cod_licitacao =".$inCodLicitacaoBusca;
                         $stFiltroLicitacao .= " AND licitacao.cod_modalidade =".$request->get('inCodModalidade');
@@ -1232,12 +1236,12 @@ switch ( $request->get('stCtrl') ) {
                         $stMapaCompras   = explode('/', $request->get('stMapaCompras'));
                         $stExercicioMapa = $stMapaCompras[1];
                     }
-
+                    
                     require_once( TCOM . "TComprasCotacao.class.php" );
                     $obTComprasCotacao = new TComprasCotacao;
                     $stFiltro          = "  WHERE mapa_cotacao.cod_mapa =  ".$inCodMapa." AND mapa_cotacao.exercicio_mapa = ".$stExercicioMapa."::VARCHAR";
                     $obTComprasCotacao->recuperaCotacaoNaoAnulada($rsCotacao, $stFiltro);
-
+                    
                     if ($rsCotacao->inNumLinhas <= 0) {
                         if ($rsDataLicitacao!='') {
                             $stDataManutencao = SistemaLegado::dataToBr($rsDataLicitacao->getCampo('timestamp'));
@@ -1264,6 +1268,7 @@ switch ( $request->get('stCtrl') ) {
                 }
 
             } else {
+                
                 //Verificar se existe cotações anuladas para o mapa de compras
                 require_once( TCOM . "TComprasMapaCotacao.class.php" );
                 $obTComprasUltimoMapaCotacao = new TComprasMapaCotacao;
@@ -1393,7 +1398,7 @@ switch ( $request->get('stCtrl') ) {
                 // licitacao possui participantes ?
                 include_once ( CAM_GP_COM_MAPEAMENTO . 'TComprasMapa.class.php' );
                 $obTComprasMapa = new TComprasMapa();
-
+            
                 $obTComprasMapa->setDado( 'exercicio', $stExercicioMapa );
                 $obTComprasMapa->setDado( 'cod_mapa', $inCodMapa );
 
@@ -1407,6 +1412,7 @@ switch ( $request->get('stCtrl') ) {
                 $arManterPropostas["tipo_mapa"] = $rsMapa->getCampo('cod_tipo_licitacao');
 
                 if ( $rsMapa->getNumLinhas() > 0 and $rsMapa->getCampo('cod_licitacao') ) {
+                    
                     require_once ( CAM_GP_LIC_MAPEAMENTO . 'TLicitacaoParticipante.class.php' );
                     $obLicParticipantes = new TLicitacaoParticipante;
                     $obLicParticipantes->setDado('cod_licitacao', $rsMapa->getCampo('cod_licitacao'));
@@ -1423,6 +1429,7 @@ switch ( $request->get('stCtrl') ) {
                                                         'cod_tipo_objeto' => $inCodTipoObjeto
                                                       );
                     $obLicParticipantes->recuperaParticipanteLicitacaoManutencaoPropostas( $rsParticipantes);
+                    
                     if ( $rsParticipantes->getNumLinhas() < 1 )
                         $stErro = 'Licitação deve possuir participantes';
                 }

@@ -381,7 +381,11 @@ switch ($_REQUEST['stAcao']) {
                             $obTFolhaPagamentoRegistroEvento->inclusao();
                             $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
                             if ($inParcela > 0) {
+                                $obTFolhaPagamentoRegistroEventoParcela->setDado("cod_registro",$obTFolhaPagamentoUltimoRegistroEvento->getDado('cod_registro'));
+                                $obTFolhaPagamentoRegistroEventoParcela->setDado("timestamp",$obTFolhaPagamentoUltimoRegistroEvento->getDado('timestamp'));
+                                $obTFolhaPagamentoRegistroEventoParcela->setDado("cod_evento",$obTFolhaPagamentoUltimoRegistroEvento->getDado('cod_evento'));
                                 $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela",$inParcela);
+                                $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia",0);
                                 $obTFolhaPagamentoRegistroEventoParcela->inclusao();
                             }
                             $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");

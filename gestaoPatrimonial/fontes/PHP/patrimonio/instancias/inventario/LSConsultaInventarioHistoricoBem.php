@@ -49,7 +49,7 @@ if (is_numeric($_REQUEST['inIdInventario'])) {
     $stLink .= "&inIdInventario=".$_REQUEST['inIdInventario'];
 }
 
-if (is_numeric($_REQUEST['stExercicio'])) {
+if (isset($_REQUEST['stExercicio'])) {
     $obTPatrimonioInventarioHistoricoBem->setDado('exercicio' , $_REQUEST['stExercicio']);
     $stLink .= "&stExercicio='".$_REQUEST['stExercicio']."'";
 }
@@ -63,8 +63,6 @@ if (is_numeric($_REQUEST['inCodLocal'])) {
     $obTPatrimonioInventarioHistoricoBem->setDado('cod_local' , $_REQUEST['inCodLocal']);
     $stLink .= "&inCodLocal=".$_REQUEST['inCodLocal'];
 }
-
-$stOrder = " ORDER BY bem.descricao ";
 
 $obTPatrimonioInventarioHistoricoBem->recuperaBemHistoricoInventario($rsBemHistoricoInventario, $stFiltro, $stOrder);
 

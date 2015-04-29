@@ -616,7 +616,7 @@ INNER JOIN  administracao.usuario
                             <property name="fontSize">9pt</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">left</property>
-                            <text-property name="text">User name</text-property>
+                            <text-property name="text">Usuário</text-property>
                         </label>
                     </cell>
                     <cell id="1159">

@@ -31,7 +31,7 @@
     * @author Desenvolvedor:  Lucas Teixeira Stephanou
     * @ignore
 
-    $Id: FLManterConvenios.php 59803 2014-09-11 20:53:06Z lisiane $
+    $Id: FLManterConvenios.php 62237 2015-04-13 16:35:35Z michel $
 
     *Casos de uso: uc-03.05.14
 */
@@ -149,23 +149,14 @@ $obCgmParticipante->obCampoCod->setId   ( 'inCgmParticipante' );
 $obCgmParticipante->obCampoCod->setNull ( false               );
 $obCgmParticipante->obCampoCod->setValue( $arFiltro['inCgmParticipante']);
 
-$obBtnOk = new Button;
-$obBtnOk->setName              ( "btnOk" );
-$obBtnOk->setId                ( "btnOk" );
-$obBtnOk->setValue             ( "Ok" );
-$obBtnOk->setTipo              ( "button" );
-//$obBtnOk->obEvento->setOnClick ( "montaParametrosGET('buscarFiltro', 'inExercicio,inNumConvenio,inCodTipoConvenio,stObjeto,inCgmParticipante,stAcao', true);" );
-$obBtnOk->obEvento->setOnClick ( "this.form.submit();" );
-$obBtnOk->setDisabled          ( false );
+$obBtnOk = new Ok();
+$obBtnOk->setName   ( "btnOk" );
+$obBtnOk->setId     ( "btnOk" );
 
-$obBtnLimpar = new Button;
-$obBtnLimpar->setName               ( "btnLimpar" );
-$obBtnLimpar->setValue              ( "Limpar" );
-$obBtnLimpar->setTipo               ( "button" );
+$obBtnLimpar = new Limpar();
 $obBtnLimpar->obEvento->setOnClick  ( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."', 'limpaFiltro');" );
-$obBtnLimpar->setDisabled           ( false );
 
-$botoes = array ( $obBtnOk , $obBtnLimpar);
+$arBotoes = array ( $obBtnOk , $obBtnLimpar);
 
 /* span*/
 $obSpanResultado = new Span;
@@ -182,7 +173,7 @@ $obFormulario->addComponente( $obIntNumConvenio );
 $obFormulario->addComponente( $obCmbTiposConvenio );
 $obFormulario->addComponente( $obObjeto );
 $obFormulario->addComponente( $obCgmParticipante );
-$obFormulario->defineBarra  ( $botoes, 'left', '' );
+$obFormulario->defineBarra  ( $arBotoes, 'left', '' );
 $obFormulario->addSpan      ( $obSpanResultado   );
 $obFormulario->show();
 

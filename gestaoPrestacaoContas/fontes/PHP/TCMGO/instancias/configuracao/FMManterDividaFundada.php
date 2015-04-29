@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMManterDividaFundada.php 61773 2015-03-03 14:45:24Z michel $
+    $Id: FMManterDividaFundada.php 62196 2015-04-06 20:59:21Z carlos.silva $
 
     * Casos de uso : uc-06.04.00
 */
@@ -135,7 +135,6 @@ $obIPopUpLeiAutorizacao->obInnerNorma->setValue             ( $stNomNorma       
 $obBscCGM = new IPopUpCGM($obForm);
 $obBscCGM->setId                    ( 'stNomeCGM'               );
 $obBscCGM->setRotulo                ( 'Credor'                  );
-$obBscCGM->setTipo                  ( 'fisica'                  );
 $obBscCGM->setTitle                 ( 'Nome, denominação ou razão social da entidade (credora da dívida) ');
 $obBscCGM->setValue                 ( $stNomeCGMCredor          );
 $obBscCGM->obCampoCod->setName      ( 'inCGM'                   );
@@ -160,7 +159,7 @@ $obFlValorSaldoAnterior->setId        ( "flValorSaldoAnterior"             );
 $obFlValorSaldoAnterior->setName      ( "flValorSaldoAnterior"             );
 $obFlValorSaldoAnterior->setRotulo    ( "Valor do Saldo Anterior"          );
 $obFlValorSaldoAnterior->setTitle     ( "Informe Valor do Saldo Anterior." );
-$obFlValorSaldoAnterior->setValue     ( $request->get('vlSaldoAnterior')   );
+$obFlValorSaldoAnterior->setValue     ( number_format($request->get('vlSaldoAnterior'), 2, ',', '.') );
 $obFlValorSaldoAnterior->setNull      ( false                              );
 $obFlValorSaldoAnterior->setDecimais  ( 2                                  );
 $obFlValorSaldoAnterior->setMaxLength ( 16                                 );
@@ -172,7 +171,7 @@ $obFlValorContratacao->setName      ( "flValorContratacao"              );
 $obFlValorContratacao->setRotulo    ( "Valor de Contratação"            );
 $obFlValorContratacao->setTitle     ( "Informe o Valor de Contratação." );
 $obFlValorContratacao->setNull      ( false                             );
-$obFlValorContratacao->setValue     ( $request->get('vlContratacao')    );
+$obFlValorContratacao->setValue     ( number_format($request->get('vlContratacao'), 2, ',', '.') );
 $obFlValorContratacao->setDecimais  ( 2                                 );
 $obFlValorContratacao->setMaxLength ( 16                                );
 $obFlValorContratacao->setSize      ( 17                                );
@@ -182,7 +181,7 @@ $obFlValorAmortizacao->setId        ( "flValorAmortizacao"              );
 $obFlValorAmortizacao->setName      ( "flValorAmortizacao"              );
 $obFlValorAmortizacao->setRotulo    ( "Valor de Amortização"            );
 $obFlValorAmortizacao->setTitle     ( "Informe o Valor de Amortização." );
-$obFlValorAmortizacao->setValue     ( $request->get('vlAmortizacao')    );
+$obFlValorAmortizacao->setValue     ( number_format($request->get('vlAmortizacao'), 2, ',', '.') );
 $obFlValorAmortizacao->setNull      ( false                             );
 $obFlValorAmortizacao->setDecimais  ( 2                                 );
 $obFlValorAmortizacao->setMaxLength ( 16                                );
@@ -193,7 +192,7 @@ $obFlValorCancelamento->setId        ( "flValorCancelamento"              );
 $obFlValorCancelamento->setName      ( "flValorCancelamento"              );
 $obFlValorCancelamento->setRotulo    ( "Valor de Cancelamento"            );
 $obFlValorCancelamento->setTitle     ( "Informe o Valor de Cancelamento." );
-$obFlValorCancelamento->setValue     ( $request->get('vlCancelamento')    );
+$obFlValorCancelamento->setValue     ( number_format($request->get('vlCancelamento'), 2, ',', '.') );
 $obFlValorCancelamento->setNull      ( false                              );
 $obFlValorCancelamento->setDecimais  ( 2                                  );
 $obFlValorCancelamento->setMaxLength ( 16                                 );
@@ -204,7 +203,7 @@ $obFlValorEncampacao->setId        ( "flValorEncampacao"              );
 $obFlValorEncampacao->setName      ( "flValorEncampacao"              );
 $obFlValorEncampacao->setRotulo    ( "Valor de Encampação"            );
 $obFlValorEncampacao->setTitle     ( "Informe o Valor de Encampação." );
-$obFlValorEncampacao->setValue     ( $request->get('vlEncampacao')    );
+$obFlValorEncampacao->setValue     ( number_format($request->get('vlEncampacao'), 2, ',', '.') );
 $obFlValorEncampacao->setNull      ( false                            );
 $obFlValorEncampacao->setDecimais  ( 2                                );
 $obFlValorEncampacao->setMaxLength ( 16                               );
@@ -215,7 +214,7 @@ $obFlValorCorrecao->setId        ( "flValorCorrecao"              );
 $obFlValorCorrecao->setName      ( "flValorCorrecao"              );
 $obFlValorCorrecao->setRotulo    ( "Valor da Correção"            );
 $obFlValorCorrecao->setTitle     ( "Informe o Valor da Correção." );
-$obFlValorCorrecao->setValue     ( $request->get('vlCorrecao')    );
+$obFlValorCorrecao->setValue     ( number_format($request->get('vlCorrecao'), 2, ',', '.') );
 $obFlValorCorrecao->setNull      ( false                          );
 $obFlValorCorrecao->setDecimais  ( 2                              );
 $obFlValorCorrecao->setMaxLength ( 16                             );
@@ -226,7 +225,7 @@ $obFlValorSaldoAtual->setId        ( "flValorSaldoAtual"               );
 $obFlValorSaldoAtual->setName      ( "flValorSaldoAtual"               );
 $obFlValorSaldoAtual->setRotulo    ( "Valor do Saldo Atual"            );
 $obFlValorSaldoAtual->setTitle     ( "Informe o Valor do Saldo Atual." );
-$obFlValorSaldoAtual->setValue     ( $request->get('vlSaldoAtual')     );
+$obFlValorSaldoAtual->setValue     ( number_format($request->get('vlSaldoAtual'), 2, ',', '.') );
 $obFlValorSaldoAtual->setNull      ( false                             );
 $obFlValorSaldoAtual->setDecimais  ( 2                                 );
 $obFlValorSaldoAtual->setMaxLength ( 16                                );

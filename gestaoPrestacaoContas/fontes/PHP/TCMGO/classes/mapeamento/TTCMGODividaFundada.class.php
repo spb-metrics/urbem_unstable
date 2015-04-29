@@ -65,12 +65,15 @@ class TTCMGODividaFundada extends Persistente
     
     public function montaRecuperaRegistro10()
     {
-        $stSql = "SELECT divida_fundada.*,
-                         TO_CHAR(norma.dt_publicacao,'ddmmyyyy') AS dt_lei,
-                         '10' AS tipo_registro
+        $stSql = "  SELECT '10' AS tipo_registro
+                            , divida_fundada.*
+                            , TO_CHAR(norma.dt_publicacao,'ddmmyyyy') AS dt_lei
+                            , sw_cgm.nom_cgm
                     FROM tcmgo.divida_fundada
                     JOIN normas.norma
-                      ON norma.cod_norma = divida_fundada.cod_norma
+                        ON norma.cod_norma = divida_fundada.cod_norma
+                    JOIN sw_cgm
+                        ON sw_cgm.numcgm = divida_fundada.numcgm
                 ";
 
         return $stSql;
