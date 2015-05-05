@@ -199,6 +199,26 @@ $obLblModalidade = new Label;
 $obLblModalidade->setRotulo('Modalidade');
 $obLblModalidade->setValue($_REQUEST['stModalidade']);
 
+include_once(TLIC."TLicitacaoTipoChamadaPublica.class.php");
+$obTLicitacaoTipoChamadaPublica = new TLicitacaoTipoChamadaPublica;
+$obTLicitacaoTipoChamadaPublica->setDado('cod_tipo',$rsLicitacao->getCampo("tipo_chamada_publica"));
+$obTLicitacaoTipoChamadaPublica->recuperaPorChave($rsTipoChamadaPublica);
+
+# Define o Label de Tipo de Chamada Pública
+$obLblChamadaPublica = new Label;
+
+if ($rsLicitacao->getCampo('cod_modalidade') == 8 || $rsLicitacao->getCampo('cod_modalidade') == 9) {
+    $obLblChamadaPublica->setRotulo('Chamada Pública');
+    if ($rsTipoChamadaPublica->getCampo("cod_tipo") != 0) {
+        $obLblChamadaPublica->setValue("Sim");
+    } else {
+        $obLblChamadaPublica->setValue("Não");
+    }
+} else {
+    $obLblChamadaPublica->setRotulo('Tipo de Chamada Pública');
+    $obLblChamadaPublica->setValue($rsTipoChamadaPublica->getCampo("cod_tipo")." - ".$rsTipoChamadaPublica->getCampo("descricao"));
+}
+
 # Define o Label para tipo de Cotação
 $obLblTipoCotacao = new Label;
 $obLblTipoCotacao->setName ( 'txtTipoCotacao' );
@@ -336,6 +356,14 @@ $obFormulario->addComponente    ( $obLblDtLicitacao  );
 $obFormulario->addComponente    ( $obLblValorReferencia);
 $obFormulario->addComponente    ( $obLblTipoCotacao  );
 $obFormulario->addComponente    ( $obLblModalidade	);
+
+if ($rsLicitacao->getCampo('cod_modalidade') == 8 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 9 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 10
+   ) {
+    $obFormulario->addComponente ( $obLblChamadaPublica );
+}
+
 $obFormulario->addComponente    ( $obILblCriterioJulgamento);
 $obFormulario->addComponente    ( $obILblTipoObjeto);
 $obFormulario->addComponente    ( $obLblObjeto );

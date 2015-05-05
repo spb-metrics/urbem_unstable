@@ -28,7 +28,7 @@
     * Data de Criação   : 06/08/2004
     * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
     * @ignore
-    * $Id: FLRelatorioRazaoDespesa.php 62308 2015-04-20 19:41:57Z evandro $
+    * $Id: FLRelatorioRazaoDespesa.php 62411 2015-05-05 19:01:22Z lisiane $
     * Casos de uso: uc-02.01.22
 */
 
@@ -242,7 +242,6 @@ $obCmbRecursos->setCampoId2   ('cod_recurso');
 $obCmbRecursos->setCampoDesc2 ('[cod_recurso] - [nom_recurso]');
 $obCmbRecursos->SetRecord2    ( $rsRecordsetRecursos );
 
-
 //Define objeto span para componentes de filtro
 $obSpan = new Span;
 $obSpan->setId( "spnFormularioFiltro" );
@@ -251,25 +250,14 @@ $obFormularioFiltro = new Formulario;
 $obFormularioFiltro->addComponenteComposto($obTxtOrgao  , $obCmbOrgao  );
 $obFormularioFiltro->addComponenteComposto($obTxtUnidade, $obCmbUnidade);
 $obFormularioFiltro->addComponenteComposto($obTxtPao    , $obCmbPao    );
+
 $obFormularioFiltro->montaInnerHTML();
 $stHtml = $obFormularioFiltro->getHTML();
-
-$obFormularioFiltroRecurso = new Formulario;
-$obFormularioFiltroRecurso->addComponente($obCmbRecursos);
-$obFormularioFiltroRecurso->montaInnerHTML();
-$stHtmlRecurso = $obFormularioFiltroRecurso->getHTML();
 
 $jsOnLoad = "
     function salvar() {
         selecionaTodosSelect(document.frm.inCodEntidade);
-        
-        if(   jQuery('#stTipoRelatorio').val() == 'educacao_despesa_extra_orcamentaria'
-           || jQuery('#stTipoRelatorio').val() == 'educacao_receita_extra_orcamentaria'
-           || jQuery('#stTipoRelatorio').val() == 'restos_pagar' ){
-            
-            selecionaTodosSelect(document.frm.inCodRecurso);
-        }
-        
+        selecionaTodosSelect(document.frm.inCodRecurso);
         document.frm.submit();
     }
   
@@ -300,14 +288,15 @@ $jsOnLoad = "
 ";
 
 $obFormulario = new Formulario;
-$obFormulario->setAjuda     ('UC-02.01.22');
-$obFormulario->addForm      ($obForm);
-$obFormulario->addHidden    ($obHdnCaminho);
+$obFormulario->setAjuda     ('UC-02.01.22'      );
+$obFormulario->addForm      ($obForm            );
+$obFormulario->addHidden    ($obHdnCaminho      ); 
 $obFormulario->addTitulo    ("Dados para Filtro");
-$obFormulario->addComponente($obCmbEntidades);
-$obFormulario->addComponente($obPeriodicidade);
+$obFormulario->addComponente($obCmbEntidades    );
+$obFormulario->addComponente($obPeriodicidade   );
 $obFormulario->addComponente($obCmbTipoRelatorio);
-$obFormulario->addSpan($obSpan);
+$obFormulario->addSpan      ($obSpan            );
+$obFormulario->addComponente($obCmbRecursos     );
 
 // BOTÕES DE AÇÃO DO FORMULÁRIO (OK/LIMPAR)
 $obBtnOk = new Ok();

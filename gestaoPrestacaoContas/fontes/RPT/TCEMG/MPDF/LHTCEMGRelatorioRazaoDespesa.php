@@ -66,19 +66,28 @@
     </p>
     
     <?php
-            $totalGeralEmpenhado += $totalEmpenhado;
-            $totalGeralLiquidado += $totalLiquidado;
-            $totalGeralPago      += $totalPago;
+            $totalGeralEmpenhado         = $registro['vl_total_empenhado'];
+            $totalGeralLiquidado         = $registro['vl_total_liquidado'];
+            $totalGeralPago              = $registro['vl_total_pago'];
+            $totalGeralEmpenhadoAnulado  = $registro['vl_total_empenhado_anulado'];
+            $totalGeralLiquidadoAnulado  = $registro['vl_total_liquidado_anulado'];
+            $totalGeralPagoAnulado       = $registro['vl_total_pago_anulado'];
     
             $totalEmpenhado = 0;
             $totalLiquidado = 0;
             $totalPago      = 0;
+         /*   $totalGeralEmpenhadoAnulado  = 0;
+            $totalGeralLiquidadoAnulado  = 0;
+            $totalGeralPagoAnulado       = 0;*/
         endforeach;
     ?>
     
     <p>
         <h5>Total Geral</h5>
-        Empenhado: <?= number_format($totalGeralEmpenhado, '2', ',', '.') ?> <br />
-        Liquidado: <?= number_format($totalGeralLiquidado, '2', ',', '.') ?> <br />
-        Pago:      <?= number_format($totalGeralPago, '2', ',', '.') ?>
+        Empenhado:         <?= number_format($totalGeralEmpenhado, '2', ',', '.') ?> <br />
+        Empenhado Anulado: <?= number_format($totalGeralEmpenhadoAnulado, '2', ',', '.') ?> <br />
+        Liquidado:         <?= number_format($totalGeralLiquidado, '2', ',', '.') ?> <br />
+        Liquidado Anulado: <?= number_format($totalGeralLiquidadoAnulado, '2', ',', '.') ?> <br />
+        Pago:              <?= number_format($totalGeralPago, '2', ',', '.') ?> <br />
+        Pago Anulado:      <?= number_format($totalGeralPagoAnulado, '2', ',', '.') ?>
     </p>

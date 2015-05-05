@@ -47,8 +47,10 @@ class TTGODSI extends Persistente
                                 , licitacao.num_unidade AS cod_unidade
                                 , sw_processo.cod_processo AS num_processo
                                 , sw_processo.ano_exercicio AS ano_exercicio_processo
-                                , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                                       WHEN modalidade.cod_modalidade = 9 THEN 2
+                                , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                                       WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                                       WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                                       WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
                                  END AS tipo_processo
                                 , TO_CHAR(licitacao.timestamp,'dd/mm/yyyy') AS dt_abertura
                                 , CASE WHEN tipo_objeto.cod_tipo_objeto = 1 THEN 2
@@ -166,9 +168,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 1 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -268,9 +272,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 2 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -370,9 +376,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 3 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -472,9 +480,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 4 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -574,9 +584,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 5 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -676,9 +688,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 6 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -778,9 +792,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                    WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , 7 AS tipo_resp
                  , responsavel_dispensa.cpf AS num_cpf_responsavel
                  , responsavel_dispensa.nom_cgm AS nome_responsavel
@@ -891,8 +907,10 @@ class TTGODSI extends Persistente
                                 , licitacao.num_unidade AS cod_unidade
                                 , sw_processo.cod_processo AS num_processo
                                 , sw_processo.ano_exercicio AS ano_exercicio_processo
-                                , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                                       WHEN modalidade.cod_modalidade = 9 THEN 2
+                                , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                                       WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                                       WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                                       WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
                                   END AS tipo_processo
                                 , mapa_item.lote AS num_lote
                                 , mapa_item.cod_item AS num_item
@@ -991,9 +1009,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , despesa.cod_funcao AS cod_funcao
                  , despesa.cod_subfuncao AS cod_subfuncao
                  , despesa.cod_programa AS cod_programa
@@ -1125,9 +1145,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , documento_pessoa.tipo_documento AS tipo_documento
                  , documento_pessoa.num_documento AS num_documento
                  , mapa_item.lote AS num_lote
@@ -1282,9 +1304,11 @@ class TTGODSI extends Persistente
                  , licitacao.num_unidade AS cod_unidade
                  , sw_processo.cod_processo AS num_processo
                  , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                 END AS tipo_processo
+                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                   END AS tipo_processo
                  , documento_pessoa.tipo_documento AS tipo_documento
                  , documento_pessoa.num_documento AS num_documento
                  , TO_CHAR (participante_certificacao.dt_registro, 'dd/mm/yyyy') AS dt_credenciamento

@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 62279 2015-04-16 18:38:45Z arthur $
+    $Id: TLicitacaoLicitacao.class.php 62370 2015-04-29 15:01:13Z jean $
 
 */
 
@@ -80,6 +80,7 @@ function TLicitacaoLicitacao()
     $this->AddCampo('num_orgao'         ,'integer' ,true  ,''      ,false,false);
     $this->AddCampo('num_unidade'       ,'integer' ,true  ,''      ,false,false);
     $this->AddCampo('cod_regime'        ,'integer' ,false ,''      ,false,false);
+    $this->AddCampo('tipo_chamada_publica','integer' ,false ,''      ,false,true);
 }
 
 function proximoCodigoLicitacao(&$inCodLicitacao , $boTransacao = "")

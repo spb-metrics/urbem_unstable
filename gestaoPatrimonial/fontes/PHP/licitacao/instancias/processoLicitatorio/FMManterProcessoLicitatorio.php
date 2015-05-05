@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Fernando Zank Correa Evangelista
 
-    $Id: FMManterProcessoLicitatorio.php 62228 2015-04-10 13:01:15Z evandro $
+    $Id: FMManterProcessoLicitatorio.php 62402 2015-05-04 20:19:28Z jean $
 
     * Casos de uso : uc-03.04.15
 */
@@ -282,6 +282,7 @@ if ($stAcao == 'incluir') {
     $obISelectModalidadeLicitacao->setCampoDesc  ("[cod_modalidade] - [descricao]"        );
     $obISelectModalidadeLicitacao->preencheCombo ($rsRecordSet                            );
     $obISelectModalidadeLicitacao->setNull       ( false                                  );
+    $obISelectModalidadeLicitacao->obEvento->setOnChange ("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodModalidade='+this.value,'recuperaRegistroModalidade');");
 }
 
 if(!$boEdital) {
@@ -419,7 +420,6 @@ if ($stAcao != "incluir") {
     $obLblLicitacao->setRotulo('Código da Licitação');
     $obLblLicitacao->setValue($_REQUEST['inCodLicitacao']);
     
-    
     if ( $compraJulgamento ) {
         $obLblProcessoAdm = new Label();
         $obLblProcessoAdm->setRotulo('Processo Administrativo');
@@ -534,6 +534,9 @@ if ($stAcao != "incluir") {
 $obSpnItens = new Span;
 $obSpnItens->setId( 'spnItens' );
 
+$obSpnRegistroModalidade = new Span;
+$obSpnRegistroModalidade->setId('spnRegistroModalidade');
+
 //define o formulário
 $obFormulario = new Formulario;
 $obFormulario->addForm          ( $obForm                          );
@@ -587,9 +590,11 @@ if ($stAcao != 'anular' ) {
     if ($stAcao == 'incluir') {
         $obFormulario->addComponente( $obISelectModalidadeLicitacao    );
     } else {
-        $obFormulario->addComponente( $obLblModalidade		       );
+        $obFormulario->addComponente( $obLblModalidade		           );
     }
-    
+
+    $obFormulario->addSpan          ( $obSpnRegistroModalidade             );
+
      if($compraJulgamento){
         $obFormulario->addComponente    ( $obLblCriterioJulg             );
     }else{

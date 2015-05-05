@@ -138,48 +138,53 @@ function preencherForm()
 
 function submeter()
 {
+    //SistemaLegado::BloqueiaFrames(true,false);
+
     $obErro = new Erro();
-    switch ($_GET["inTipoInscricao"]) {
+
+    switch ($_REQUEST["inTipoInscricao"]) {
         case 1:
-            if ($_GET["inCGM"] == "") {
-                $obErro->setDescricao("Campo CGM inválido!()");;
+            if ($_REQUEST["inCGM"] == "") {
+                $obErro->setDescricao("Campo CGM inválido!");
             } else {
                 include_once(CAM_GA_CGM_MAPEAMENTO."TCGMPessoaJuridica.class.php");
                 $obTCGMPessoaJuridica =  new TCGMPessoaJuridica();
-
                 $obTCGMPessoaJuridica->setDado("numcgm",$_GET["inCGM"]);
                 $obTCGMPessoaJuridica->recuperaPorChave($rsCgm);
+
                 if ( $rsCgm->getCampo("cnpj") == "" ) {
                     $obErro->setDescricao("O CGM ".$_GET["inCGM"]." não possui um cnpj cadastrado!");
                 }
             }
-            break;
+        break;
+
         case 2:
-            if ($_GET["inCGM"] == "") {
-                $obErro->setDescricao("Campo CEI inválido!()");
+            if ($_REQUEST["inCGM"] == "") {
+                $obErro->setDescricao("Campo CEI inválido!");
             }
-            break;
+        break;
+
         case 3:
-            if ($_GET["inCGM"] == "") {
-                $obErro->setDescricao("Campo CGM inválido!()");;
+            if ($_REQUEST["inCGM"] == "") {
+                $obErro->setDescricao("Campo CGM inválido!");
             } else {
                 include_once(CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php");
                 $obTCGMPessoaFisica =  new TCGMPessoaFisica();
-
                 $obTCGMPessoaFisica->setDado("numcgm",$_GET["inCGM"]);
                 $obTCGMPessoaFisica->recuperaPorChave($rsCgm);
+
                 if ( $rsCgm->getCampo("cpf") == "" ) {
                     $obErro->setDescricao("O CGM ".$_GET["inCGM"]." não possui um cpf cadastrado!");
                 }
             }
-            break;
+        break;
     }
+
     if ( !$obErro->ocorreu() ) {
-        $stJs .= "parent.frames[2].Salvar();\n";
+        $stJs .= "BloqueiaFrames(true,false);\nparent.frames[2].Salvar();\n";
     } else {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     }
-
     return $stJs;
 }
 

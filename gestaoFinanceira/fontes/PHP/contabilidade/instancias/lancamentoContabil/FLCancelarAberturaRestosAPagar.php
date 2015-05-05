@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: FLCancelarAberturaRestosAPagar.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLCancelarAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
 
     * Casos de uso:
 */
@@ -77,7 +77,17 @@ $obHdnEval = new HiddenEval;
 $obHdnEval->setName  ( "stEval"         );
 $obHdnEval->setValue ( $stEval          );
 
-$stObs = "Este processo é lento devido aos cálculos de restos a pagar.<BR>Recomenda-se que o mesmo seja executado após o término do expediente.";
+$obRConfiguracao = new RConfiguracaoConfiguracao;
+$obRConfiguracao->setParametro('abertura_RP');
+$obRConfiguracao->setExercicio( Sessao::getExercicio());
+$obRConfiguracao->setCodModulo( 9 );
+$obRConfiguracao->consultar($boTransacao);
+
+if ( $obRConfiguracao->getValor() == 'T' ) {
+    $stObs = "Este processo é lento devido aos cálculos de restos a pagar.<BR>Recomenda-se que o mesmo seja executado após o término do expediente.";
+} else {
+    $stObs = "Este processo já foi executado! Se deseja prosseguir faça a Abertura de Restos à pagar primeiro!";
+}
 
 $obLblObs = new Label;
 $obLblObs->setValue   ( $stObs          );
@@ -95,9 +105,9 @@ $obFormulario->addTitulo( "Cancelar Abertura de Restos a Pagar do Exercício."  
 $obFormulario->addComponente($obLblObs                                          );
 $obBtnOk = new Ok();
 $obBtnOk ->obEvento->setOnClick('BloqueiaFrames(true,false); Salvar();'         );
-
-$obFormulario->defineBarra( array($obBtnOk) );
-
+if ( $obRConfiguracao->getValor() == 'T' ) {
+    $obFormulario->defineBarra( array($obBtnOk) );
+}
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLAberturaRestosAPagar.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
 
     $Revision: $
     $Name$
@@ -73,17 +73,17 @@ $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( $stCtrl );
 
 $obRConfiguracao = new RConfiguracaoConfiguracao;
-$obRConfiguracao->setParametro('virada_GF');
+$obRConfiguracao->setParametro('abertura_RP');
 $obRConfiguracao->setExercicio( Sessao::getExercicio());
-$obRConfiguracao->setCodModulo( 10 );
-$obRConfiguracao->consultar();
+$obRConfiguracao->setCodModulo( 9 );
+$obRConfiguracao->consultar($boTransacao);
 
 $obHdnEval = new HiddenEval;
 $obHdnEval->setName  ( "stEval"            );
 $obHdnEval->setValue ( $stEval             );
 
 if ( $obRConfiguracao->getValor() == 'T' ) {
-    $stObs = "Este processo já foi  executado! Se deseja prosseguir faça a Anulação de Restos à pagar primeiro!";
+    $stObs = "Este processo já foi executado! Se deseja prosseguir faça a Anulação de Restos à pagar primeiro!";
 } else {
     $stObs = "Este processo é lento devido aos cálculos de restos a pagar.<BR>Recomenda-se que o mesmo seja executado após o término do expediente.";
 }
@@ -102,7 +102,7 @@ $obFormulario->addHidden( $obHdnAcao              );
 $obFormulario->addHidden( $obHdnCtrl              );
 $obFormulario->addTitulo( "Restos a Pagar Abertura do Exercício."        );
 $obFormulario->addComponente($obLblObs);
-$obBtnOk = new Ok();
+$obBtnOk = new Ok(true);
 if ( $obRConfiguracao->getValor() != 'T') {
     $obFormulario->defineBarra( array($obBtnOk) );
 }

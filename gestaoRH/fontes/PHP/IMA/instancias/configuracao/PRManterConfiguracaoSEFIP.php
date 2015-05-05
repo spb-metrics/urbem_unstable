@@ -51,76 +51,101 @@ $pgJS   = "JS".$stPrograma.".js";
 
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
+Sessao::setTrataExcecao(true);
+Sessao::getTransacao()->setMapeamento($obTAdministracaoConfiguracao);
+
+$obErro = new Erro();
+
 switch ($stAcao) {
+
     case "configurar":
-        Sessao::setTrataExcecao(true);
         $inCodModulo = 40;
-        $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao();
-        $obTIMACategoriaSefip = new TIMACategoriaSefip();
-        $obTAdministracaoConfiguracao->setDado( "cod_modulo", $inCodModulo );
-        $obTAdministracaoConfiguracao->setDado( "exercicio" , Sessao::getExercicio() );
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "cnae_fiscal".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["HdninCodCnae"] );
-        $obTAdministracaoConfiguracao->alteracao();
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "centralizacao".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodCentralizacao"] );
-        $obTAdministracaoConfiguracao->alteracao();
+        if (count(Sessao::read("arModalidades")) == 0) {
+            Sessao::write('NOVAacao',$stAcao);
+            SistemaLegado::alertaAviso($pgForm,"É necessário inserir ao menos 1 (uma) Modalidades de Recolhimento!","n_incluir","erro", Sessao::getId(), "../");
+        } else {
+            $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao();
+            $obTIMACategoriaSefip = new TIMACategoriaSefip();
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "codigo_outras_entidades_sefip".Sessao::getEntidade() );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodigoOutrasEntidades"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "cod_modulo", $inCodModulo                        );
+            $obTAdministracaoConfiguracao->setDado( "exercicio" , Sessao::getExercicio()              );
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "cnae_fiscal".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["HdninCodCnae"]              );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "fpas".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodFPAS"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "centralizacao".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodCentralizacao"]          );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "gps".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodPagamentoGPS"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "codigo_outras_entidades_sefip".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodigoOutrasEntidades"]                     );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "tipo_inscricao".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inTipoInscricao"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "fpas".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodFPAS"]          );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "inscricao_fornecedor".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCGM"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "gps".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCodPagamentoGPS"] );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "nome_pessoa_contato_sefip".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stPessoaContato"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "tipo_inscricao".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inTipoInscricao"]              );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "telefone_pessoa_contato_sefip".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stTelefoneContato"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "inscricao_fornecedor".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inCGM"]                              );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "DDD_pessoa_contato_sefip".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stDDDContato"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "nome_pessoa_contato_sefip".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stPessoaContato"]                         );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTAdministracaoConfiguracao->setDado( "parametro" , "mail_pessoa_contato_sefip".Sessao::getEntidade()        );
-        $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stEmailContato"] );
-        $obTAdministracaoConfiguracao->alteracao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "telefone_pessoa_contato_sefip".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stTelefoneContato"]                           );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-        $obTIMACategoriaSefip->excluirTodos();
-        
-        if(count(Sessao::read("arModalidades")) == 0) {
-            Sessao::encerraExcecao();
-            SistemaLegado::alertaAviso($pgForm,"É necessário inserir ao menos 1 (uma) Modalidades de Recolhimento!","incluir","aviso", Sessao::getId(), "../");
-            break;
-        }
-        
-        foreach (Sessao::read("arModalidades") as $inIndex=>$arModalidade) {
-            $obTIMACategoriaSefip->setDado("cod_modalidade",$arModalidade["inCodModalidadeRecolhimento"]);
-            foreach ($arModalidade["categorias"] as $inCodCategoria) {
-                $obTIMACategoriaSefip->setDado("cod_categoria",$inCodCategoria);
-                $obTIMACategoriaSefip->inclusao();
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "DDD_pessoa_contato_sefip".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stDDDContato"]                           );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
+
+            $obTAdministracaoConfiguracao->setDado( "parametro" , "mail_pessoa_contato_sefip".Sessao::getEntidade() );
+            $obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["stEmailContato"]                          );
+            $obTAdministracaoConfiguracao->alteracao($boTransacao);
+
+            $obErro = $obTIMACategoriaSefip->excluirTodos($boTransacao);
+
+            if (!$obErro->ocorreu()) {
+                foreach (Sessao::read("arModalidades") as $inIndex=>$arModalidade) {
+                    $obTIMACategoriaSefip->setDado("cod_modalidade",$arModalidade["inCodModalidadeRecolhimento"]);
+
+                    foreach ($arModalidade["categorias"] as $inCodCategoria) {
+                        $obTIMACategoriaSefip->setDado("cod_categoria",$inCodCategoria);
+                        $obErro = $obTIMACategoriaSefip->inclusao($boTransacao);
+
+                        if ($obErro->ocorreu()) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!$obErro->ocorreu()) {
+                $stMsg = "Configuração da SEFIP concluída com sucesso!";
+
+                Sessao::write('NOVAacao',$stAcao);
+
+                SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=".$stAcao, $stMsg."",$stAcao,"aviso", Sessao::getId(), "../");
+            } else {
+                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()), 'form', 'erro', Sessao::getId(), '../');
             }
         }
-
-        Sessao::encerraExcecao();
-        SistemaLegado::alertaAviso($pgForm,"Configuração da SEFIP concluída com sucesso!","incluir","aviso", Sessao::getId(), "../");
     break;
 }
+
+Sessao::encerraExcecao();
+
+SistemaLegado::LiberaFrames(true,true);
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

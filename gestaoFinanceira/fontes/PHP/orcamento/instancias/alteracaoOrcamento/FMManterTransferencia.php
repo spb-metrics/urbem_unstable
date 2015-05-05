@@ -32,32 +32,15 @@
 
     * @ignore
 
-    $Revision: 30813 $
-    $Name$
-    $Author: melo $
-    $Date: 2007-05-21 16:04:19 -0300 (Seg, 21 Mai 2007) $
+    $Id: FMManterTransferencia.php 62400 2015-05-04 17:30:31Z michel $
 
     * Casos de uso: uc-02.01.07
-*/
-
-/*
-$Log$
-Revision 1.8  2007/05/21 18:55:10  melo
-Bug #9229#
-
-Revision 1.7  2006/07/24 20:19:42  andre.almeida
-Bug #6408#
-
-Revision 1.6  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once( CAM_GF_INCLUDE."validaGF.inc.php");
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(CAM_GF_ORC_NEGOCIO."ROrcamentoSuplementacao.class.php");
-//include_once("../../../classes/componentes/Link.class.php");
 
 $stPrograma = "ManterTransferencia";
 $pgFilt = "FL".$stPrograma.".php";
@@ -109,8 +92,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     Sessao::remove('arRedutoras');
     Sessao::remove('arSuplementada');
-    //sessao->transf3['arRedutoras']    = array();
-    //sessao->transf3['arSuplementada'] = array ();
 
     $obHdnAcao = new Hidden;
     $obHdnAcao->setName( "stAcao" );
@@ -220,7 +201,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscDespesaReducao->obCampoCod->setAlign ("left");
     $obBscDespesaReducao->obCampoCod->obEvento->setOnBlur("buscaDado('buscaDespesaReducao');");
     if ($stAcao == 'Remaneja') {
-        $obBscDespesaReducao->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoReducao','stNomDotacaoRedutora','alteracaoOrcamento&inCodEntidade='+document.frm.inCodEntidade.value + '&stMascClassificacaoDespesa=3.1','".Sessao::getId()."','800','550');");
+        $obBscDespesaReducao->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoReducao','stNomDotacaoRedutora','alteracaoOrcamento&inCodEntidade='+document.frm.inCodEntidade.value + '&stMascClassificacaoDespesa=3.1&stAcao=Remaneja','".Sessao::getId()."','800','550');");
     } else {
         $obBscDespesaReducao->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoReducao','stNomDotacaoRedutora','alteracaoOrcamento&inCodEntidade='+document.frm.inCodEntidade.value,'".Sessao::getId()."','800','550');");
     }
@@ -265,8 +246,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscDespesaSuplementada->obCampoCod->setValue ( $inCodDotacaoOrcamentaria );
     $obBscDespesaSuplementada->obCampoCod->setAlign ("left");
     $obBscDespesaSuplementada->obCampoCod->obEvento->setOnBlur("buscaDado('buscaDespesaSuplementada');");
-    $obBscDespesaSuplementada->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoSuplementada','stNomDotacaoSuplementada','alteracaoOrcamento&inCodEntidade='+document.frm.inCodEntidade.value,'".Sessao::getId()."','800','550');");
-
+    if ($stAcao == 'Remaneja') {
+        $obBscDespesaSuplementada->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoSuplementada','stNomDotacaoSuplementada','alteracaoOrcamento&stAcao=Remaneja&inCodEntidade='+document.frm.inCodEntidade.value,'".Sessao::getId()."','800','550');");
+    } else {
+        $obBscDespesaSuplementada->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDotacaoSuplementada','stNomDotacaoSuplementada','alteracaoOrcamento&inCodEntidade='+document.frm.inCodEntidade.value,'".Sessao::getId()."','800','550');");
+    }
+    
     // Define Objeto Numeric para Total
     $obTxtTotalSuplementada = new Numerico;
     $obTxtTotalSuplementada->setName     ( "nuVlDotacaoSuplementada" );

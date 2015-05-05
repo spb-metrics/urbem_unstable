@@ -154,9 +154,13 @@ BEGIN
             ,coalesce( lpad(lc.mes::text,2,''0''), '''') as mes           
             ,lc.exercicio_conciliacao   
         FROM           
+            
             tesouraria.boletim as BOLETIM,           
             tesouraria.pagamento as P,           
-            contabilidade.pagamento as cp           
+            contabilidade.pagamento as cp
+            
+            
+            
             LEFT JOIN tesouraria.conciliacao_lancamento_contabil as lc            
             on(    cp.cod_lote         = lc.cod_lote                                             
                AND cp.tipo             = lc.tipo                                                 
@@ -238,159 +242,170 @@ BEGIN
             AND to_char(P.timestamp,''yyyy'')::integer BETWEEN '''||stExercicio||'''::integer-1 AND '''||stExercicio||'''::integer
             AND lo.dt_lote = to_date(to_char(P.timestamp,''yyyy-mm-dd''),''yyyy-mm-dd'')          
              
-     UNION           
-             
-              
-        SELECT            
-            cp.cod_lote,           
-            BOLETIM.dt_boletim as dt_lancamento,           
-            TO_DATE(conciliacao.dt_extrato::VARCHAR,''yyyy-mm-dd'') AS dt_conciliacao,
-            boletim.exercicio,           
-            p.cod_plano,           
-            cast(           
-            CASE WHEN TRIM(substring(ENLPA.observacao,1,60)) =  '''' THEN           
-                CASE WHEN (ENL.exercicio_empenho < P.exercicio_boletim) THEN           
-                     ''Estorno de Pagamento de RP n° '' || ENL.cod_empenho || ''/'' || ENL.exercicio_empenho           
-                ELSE ''Estorno de Pagamento de Empenho n° '' || ENL.cod_empenho || ''/'' || ENL.exercicio_empenho           
-                END           
-            ELSE           
-                CASE WHEN (ENL.exercicio_empenho < P.exercicio_boletim) THEN           
-                     ''Estorno de Pagamento de RP n° '' || ENL.cod_empenho || ''/'' || ENL.exercicio_empenho            
-                ELSE ''Estorno de Pagamento de Empenho n° '' || ENL.cod_empenho || ''/'' || ENL.exercicio_empenho            
-                END           
-            END  as varchar) 
-            || CASE WHEN (cheque_emissao_ordem_pagamento.num_cheque IS NOT NULL) THEN
-                    '' CH '' || cheque_emissao_ordem_pagamento.num_cheque 
-               END 
-            as descricao,
-            replace(trim(substring(coalesce(ENLPA.observacao,''''),1,60)),'''','''')  as observacao,           
-            enlpa.vl_anulado as vl_lancamento,           
-            cast( ''C'' as varchar ) as tipo_valor,           
-            cp.tipo,           
-            cp.sequencia,           
-            boletim.cod_entidade,           
-            CASE           
-                 WHEN lc.cod_plano is not null           
-                     THEN ''true''           
-                     ELSE ''''           
-            END as conciliar,           
-            ''A'' as tipo_movimentacao,           
-            0 as cod_arrecadacao,           
-            0 as cod_receita,           
-            ttp.cod_bordero,           
-            CAST('''' as text ) as timestamp_arrecadacao,           
-            CAST('''' as text ) as timestamp_estornada,           
-            CAST('''' as text ) as tipo_arrecadacao           
-            ,coalesce( lpad(lc.mes::text,2,''0''), '''') as mes           
-            ,lc.exercicio_conciliacao
-        FROM           
-            tesouraria.boletim             as BOLETIM,           
-            tesouraria.pagamento_estornado as PE,           
-            tesouraria.pagamento           as P,           
-            contabilidade.pagamento as cp           
-            JOIN contabilidade.pagamento_estorno as cpe           
-            on(    cp.cod_lote         = cpe.cod_lote           
-               AND cp.tipo             = cpe.tipo           
-               AND cp.sequencia        = cpe.sequencia           
-               AND cp.exercicio        = cpe.exercicio           
-               AND cp.cod_entidade     = cpe.cod_entidade           
-               AND cp.timestamp        = cpe.timestamp           
-               AND cp.cod_nota         = cpe.cod_nota           
-               AND cp.exercicio_liquidacao = cpe.exercicio_liquidacao     
-            )                                          
-            LEFT JOIN tesouraria.conciliacao_lancamento_contabil as lc           
-            on(    cp.cod_lote         = lc.cod_lote           
-               AND cp.tipo             = lc.tipo           
-               AND cp.sequencia        = lc.sequencia           
-               AND cp.exercicio        = lc.exercicio           
-               AND cp.cod_entidade     = lc.cod_entidade           
-               AND lc.tipo_valor = ''C''           
-            )           
-            LEFT JOIN tesouraria.conciliacao
-                   ON lc.cod_plano             = conciliacao.cod_plano
-                  AND lc.exercicio_conciliacao = conciliacao.exercicio
-                  AND lc.mes                   = conciliacao.mes
+     UNION
+     
+     
+     
+     
+     
+     
+        
+                SELECT            
+                       conciliacao_pagamento.cod_lote
+                     , boletim.dt_boletim as dt_lancamento
+                     , TO_DATE(conciliacao.dt_extrato::VARCHAR,''yyyy-mm-dd'') AS dt_conciliacao
+                     , boletim.exercicio
+                     , pagamento.cod_plano
+                     , CAST(           
+                        CASE WHEN TRIM(substring(nota_liquidacao_paga_anulada.observacao,1,60)) =  '''' THEN           
+                            CASE WHEN (nota_liquidacao.exercicio_empenho < pagamento.exercicio_boletim) THEN           
+                                 ''Estorno de Pagamento de RP n° '' || nota_liquidacao.cod_empenho || ''/'' || nota_liquidacao.exercicio_empenho           
+                            ELSE ''Estorno de Pagamento de Empenho n° '' || nota_liquidacao.cod_empenho || ''/'' || nota_liquidacao.exercicio_empenho           
+                            END           
+                        ELSE           
+                            CASE WHEN (nota_liquidacao.exercicio_empenho < pagamento.exercicio_boletim) THEN           
+                                 ''Estorno de Pagamento de RP n° '' || nota_liquidacao.cod_empenho || ''/'' || nota_liquidacao.exercicio_empenho            
+                            ELSE ''Estorno de Pagamento de Empenho n° '' || nota_liquidacao.cod_empenho || ''/'' || nota_liquidacao.exercicio_empenho            
+                            END           
+                        END  as varchar) 
+                        || CASE WHEN (cheque_emissao_ordem_pagamento.num_cheque IS NOT NULL) THEN
+                                '' CH '' || cheque_emissao_ordem_pagamento.num_cheque 
+                           END 
+                        AS descricao
+                      , replace(trim(substring(coalesce(nota_liquidacao_paga_anulada.observacao,''''),1,60)),'''','''') AS observacao
+                      , nota_liquidacao_paga_anulada.vl_anulado AS vl_lancamento
+                      , cast( ''C'' as varchar ) AS tipo_valor
+                      , conciliacao_pagamento.tipo
+                      , conciliacao_pagamento.sequencia
+                      , boletim.cod_entidade
+                      , CASE           
+                            WHEN conciliacao_lancamento_contabil.cod_plano is not null           
+                                THEN ''true''
+                                ELSE ''''
+                       END as conciliar    
+                     , ''A'' as tipo_movimentacao       
+                     , 0 AS cod_arrecadacao      
+                     , 0 AS cod_receita        
+                     , transacoes_pagamento.cod_bordero
+                     , CAST('''' as text ) AS timestamp_arrecadacao
+                     , CAST('''' as text ) AS timestamp_estornada
+                     , CAST('''' as text ) AS tipo_arrecadacao           
+                     , coalesce( lpad(conciliacao_lancamento_contabil.mes::text,2,''0''), '''') AS mes
+                     , conciliacao_lancamento_contabil.exercicio_conciliacao
+        
+                FROM tesouraria.boletim
+	      
+	      INNER JOIN tesouraria.pagamento_estornado
+     		      ON boletim.cod_boletim  = pagamento_estornado.cod_boletim
+		         AND boletim.exercicio    = pagamento_estornado.exercicio_boletim
+		         AND boletim.cod_entidade = pagamento_estornado.cod_entidade
+               		               
+	      INNER JOIN tesouraria.pagamento                      
+		          ON pagamento_estornado.cod_nota     = pagamento.cod_nota                
+		         AND pagamento_estornado.exercicio    = pagamento.exercicio                
+                 AND pagamento_estornado.cod_entidade = pagamento.cod_entidade             
+		         AND pagamento_estornado.timestamp    = pagamento.timestamp
+               
+		    , contabilidade.pagamento AS conciliacao_pagamento  
+         
+           INNER JOIN contabilidade.pagamento_estorno
+                   ON conciliacao_pagamento.cod_lote             = pagamento_estorno.cod_lote           
+                  AND conciliacao_pagamento.tipo                 = pagamento_estorno.tipo           
+                  AND conciliacao_pagamento.sequencia            = pagamento_estorno.sequencia           
+                  AND conciliacao_pagamento.exercicio            = pagamento_estorno.exercicio           
+                  AND conciliacao_pagamento.cod_entidade         = pagamento_estorno.cod_entidade           
+                  AND conciliacao_pagamento.timestamp            = pagamento_estorno.timestamp           
+                  AND conciliacao_pagamento.cod_nota             = pagamento_estorno.cod_nota           
+                  AND conciliacao_pagamento.exercicio_liquidacao = pagamento_estorno.exercicio_liquidacao                                 
 
-            JOIN contabilidade.lancamento_empenho as LE                                             
-            ON (   le.cod_entidade = cp.cod_entidade                                           
-               AND le.tipo         = cp.tipo                                                   
-               AND le.sequencia    = cp.sequencia                                              
-               AND le.exercicio    = cp.exercicio                                               
-               AND le.cod_lote     = cp.cod_lote                                                
-               AND le.estorno = ''true''                                                          
-            )                                                                                   
-            JOIN contabilidade.lote as lo                                                   
-            ON (   le.cod_lote     = lo.cod_lote                                            
-               AND le.cod_entidade = lo.cod_entidade                                        
-               AND le.tipo         = lo.tipo                                                
-               AND le.exercicio    = lo.exercicio                   
-            ),                                                          
-            empenho.pagamento_liquidacao as EPL
-  LEFT JOIN tesouraria.cheque_emissao_ordem_pagamento
-         ON cheque_emissao_ordem_pagamento.cod_ordem    = EPL.cod_ordem
-        AND cheque_emissao_ordem_pagamento.exercicio    = EPL.exercicio
-        AND cheque_emissao_ordem_pagamento.cod_entidade = EPL.cod_entidade
-        AND cheque_emissao_ordem_pagamento.timestamp_emissao = ( SELECT MAX(timestamp_emissao)
-                                                                   FROM tesouraria.cheque_emissao_ordem_pagamento
-                                                                  WHERE cod_ordem    = EPL.cod_ordem
-                                                                    AND exercicio    = EPL.exercicio
-                                                                    AND cod_entidade = EPL.cod_entidade ),
-            empenho.pagamento_liquidacao_nota_liquidacao_paga as EPLNLP           
-            LEFT JOIN tesouraria.transacoes_pagamento as TTP           
-            ON (    ttp.cod_ordem    = EPLNLP.cod_ordem           
-                AND ttp.cod_entidade = EPLNLP.cod_entidade           
-                AND ttp.exercicio    = EPLNLP.exercicio           
-            ),           
-            empenho.nota_liquidacao_paga                      as ENLP,           
-            empenho.nota_liquidacao_paga_anulada              as ENLPA,           
-            empenho.nota_liquidacao                           as ENL           
+           LEFT JOIN tesouraria.conciliacao_lancamento_contabil
+                  ON conciliacao_pagamento.cod_lote         = conciliacao_lancamento_contabil.cod_lote           
+                 AND conciliacao_pagamento.tipo             = conciliacao_lancamento_contabil.tipo           
+                 AND conciliacao_pagamento.sequencia        = conciliacao_lancamento_contabil.sequencia           
+                 AND conciliacao_pagamento.exercicio        = conciliacao_lancamento_contabil.exercicio           
+                 AND conciliacao_pagamento.cod_entidade     = conciliacao_lancamento_contabil.cod_entidade           
+                 AND conciliacao_lancamento_contabil.tipo_valor = ''C''             
+
+           LEFT JOIN tesouraria.conciliacao
+                  ON conciliacao_lancamento_contabil.cod_plano             = conciliacao.cod_plano
+                 AND conciliacao_lancamento_contabil.exercicio_conciliacao = conciliacao.exercicio
+                 AND conciliacao_lancamento_contabil.mes                   = conciliacao.mes
+
+          INNER JOIN contabilidade.lancamento_empenho                                             
+                  ON lancamento_empenho.cod_entidade = conciliacao_pagamento.cod_entidade                                           
+                 AND lancamento_empenho.tipo         = conciliacao_pagamento.tipo                                                   
+                 AND lancamento_empenho.sequencia    = conciliacao_pagamento.sequencia                                              
+                 AND lancamento_empenho.exercicio    = conciliacao_pagamento.exercicio                                               
+                 AND lancamento_empenho.cod_lote     = conciliacao_pagamento.cod_lote                                                
+                 AND lancamento_empenho.estorno = ''true''                                                        
+                                                                              
+         INNER JOIN contabilidade.lote                                                  
+                 ON lancamento_empenho.cod_lote     = lote.cod_lote                                            
+                AND lancamento_empenho.cod_entidade = lote.cod_entidade                                        
+                AND lancamento_empenho.tipo         = lote.tipo                                                
+                AND lancamento_empenho.exercicio    = lote.exercicio
+                                      
+            , empenho.pagamento_liquidacao
+            
+        LEFT JOIN ( SELECT MAX(timestamp_emissao), num_cheque, cod_ordem, exercicio, cod_entidade
+                      FROM tesouraria.cheque_emissao_ordem_pagamento
+                  GROUP BY num_cheque, cod_ordem, exercicio, cod_entidade
+        ) AS cheque_emissao_ordem_pagamento
+          ON cheque_emissao_ordem_pagamento.cod_ordem    = pagamento_liquidacao.cod_ordem
+         AND cheque_emissao_ordem_pagamento.exercicio    = pagamento_liquidacao.exercicio
+         AND cheque_emissao_ordem_pagamento.cod_entidade = pagamento_liquidacao.cod_entidade 
+
+            , empenho.pagamento_liquidacao_nota_liquidacao_paga   
+   
+         LEFT JOIN tesouraria.transacoes_pagamento
+                ON transacoes_pagamento.cod_ordem    = pagamento_liquidacao_nota_liquidacao_paga.cod_ordem           
+               AND transacoes_pagamento.cod_entidade = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade           
+               AND transacoes_pagamento.exercicio    = pagamento_liquidacao_nota_liquidacao_paga.exercicio           
+               
+            , empenho.nota_liquidacao_paga
+            , empenho.nota_liquidacao_paga_anulada
+            , empenho.nota_liquidacao
+
         WHERE           
-                BOLETIM.cod_boletim         = PE.cod_boletim                
-            AND BOLETIM.exercicio           = PE.exercicio_boletim                
-            AND BOLETIM.cod_entidade        = PE.cod_entidade             
+                pagamento_estornado.cod_nota          = nota_liquidacao_paga_anulada.cod_nota 
+            AND pagamento_estornado.exercicio         = nota_liquidacao_paga_anulada.exercicio
+            AND pagamento_estornado.cod_entidade      = nota_liquidacao_paga_anulada.cod_entidade
+            AND pagamento_estornado.timestamp_anulado = nota_liquidacao_paga_anulada.timestamp_anulada           
+            AND pagamento_estornado.timestamp         = nota_liquidacao_paga_anulada.timestamp           
                
-            AND PE.cod_nota                 = P.cod_nota                
-            AND PE.exercicio                = P.exercicio                
-            AND PE.cod_entidade             = P.cod_entidade             
-            AND PE.timestamp                = P.timestamp           
+            AND nota_liquidacao_paga_anulada.exercicio         = pagamento_estorno.exercicio_liquidacao           
+            AND nota_liquidacao_paga_anulada.cod_nota          = pagamento_estorno.cod_nota           
+            AND nota_liquidacao_paga_anulada.cod_entidade      = pagamento_estorno.cod_entidade           
+            AND nota_liquidacao_paga_anulada.timestamp         = pagamento_estorno.timestamp           
+            AND nota_liquidacao_paga_anulada.timestamp_anulada = pagamento_estorno.timestamp_anulada   
                
-            AND PE.cod_nota                 = ENLPA.cod_nota                
-            AND PE.exercicio                = ENLPA.exercicio                
-            AND PE.cod_entidade             = ENLPA.cod_entidade             
-            AND PE.timestamp_anulado        = ENLPA.timestamp_anulada           
-            AND PE.timestamp                = ENLPA.timestamp           
+            AND nota_liquidacao_paga_anulada.cod_nota     = nota_liquidacao_paga.cod_nota           
+            AND nota_liquidacao_paga_anulada.exercicio    = nota_liquidacao_paga.exercicio           
+            AND nota_liquidacao_paga_anulada.cod_entidade = nota_liquidacao_paga.cod_entidade           
+            AND nota_liquidacao_paga_anulada.timestamp    = nota_liquidacao_paga.timestamp           
                
-            AND ENLPA.exercicio              = CPE.exercicio_liquidacao           
-            AND ENLPA.cod_nota               = CPE.cod_nota           
-            AND ENLPA.cod_entidade           = CPE.cod_entidade           
-            AND ENLPA.timestamp              = CPE.timestamp           
-            AND ENLPA.timestamp_anulada      = CPE.timestamp_anulada   
+            AND nota_liquidacao_paga.cod_nota     = nota_liquidacao.cod_nota                
+            AND nota_liquidacao_paga.exercicio    = nota_liquidacao.exercicio                
+            AND nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade             
                
-            AND ENLPA.cod_nota               = ENLP.cod_nota           
-            AND ENLPA.exercicio              = ENLP.exercicio           
-            AND ENLPA.cod_entidade           = ENLP.cod_entidade           
-            AND ENLPA.timestamp              = ENLP.timestamp           
-               
-            AND ENLP.cod_nota               = ENL.cod_nota                
-            AND ENLP.exercicio              = ENL.exercicio                
-            AND ENLP.cod_entidade           = ENL.cod_entidade             
-               
-            AND EPL.cod_ordem               = EPLNLP.cod_ordem           
-            AND EPL.exercicio               = EPLNLP.exercicio           
-            AND EPL.cod_entidade            = EPLNLP.cod_entidade           
-            AND EPL.exercicio_liquidacao    = EPLNLP.exercicio_liquidacao           
-            AND EPL.cod_nota                = EPLNLP.cod_nota           
+            AND pagamento_liquidacao.cod_ordem            = pagamento_liquidacao_nota_liquidacao_paga.cod_ordem           
+            AND pagamento_liquidacao.exercicio            = pagamento_liquidacao_nota_liquidacao_paga.exercicio           
+            AND pagamento_liquidacao.cod_entidade         = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade           
+            AND pagamento_liquidacao.exercicio_liquidacao = pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao           
+            AND pagamento_liquidacao.cod_nota             = pagamento_liquidacao_nota_liquidacao_paga.cod_nota           
                        
-            AND EPLNLP.exercicio_liquidacao = ENLP.exercicio           
-            AND EPLNLP.cod_nota             = ENLP.cod_nota           
-            AND EPLNLP.cod_entidade         = ENLP.cod_entidade           
-            AND EPLNLP.timestamp            = ENLP.timestamp           
+            AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = nota_liquidacao_paga.exercicio           
+            AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = nota_liquidacao_paga.cod_nota           
+            AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = nota_liquidacao_paga.cod_entidade           
+            AND pagamento_liquidacao_nota_liquidacao_paga.timestamp            = nota_liquidacao_paga.timestamp           
                
-            AND p.cod_plano = '||inCodPlano||'
-            AND pe.cod_entidade in ( '||stCodEntidade||' )
-            AND to_char(PE.timestamp_anulado,''yyyy'')::integer   BETWEEN '''||stExercicio||'''::integer-1 AND '''||stExercicio||'''::integer
-            AND TO_CHAR(BOLETIM.dt_boletim,''mm'') = TO_CHAR(TO_DATE( '''||stDtFinal||'''::VARCHAR, ''dd/mm/yyyy'' ),''mm'')
-            AND lo.dt_lote = to_date(to_char(PE.timestamp_anulado,''yyyy-mm-dd''),''yyyy-mm-dd'')          
+            AND pagamento.cod_plano = '||inCodPlano||'
+            AND pagamento_estornado.cod_entidade in ( '||stCodEntidade||' )
+            AND to_char(pagamento_estornado.timestamp_anulado,''yyyy'')::INTEGER BETWEEN '''||stExercicio||'''::integer-1 AND '''||stExercicio||'''::integer
+            AND TO_CHAR(BOLETIM.dt_boletim,''mm'') =  TO_CHAR(TO_DATE( '''||stDtFinal||'''::VARCHAR, ''dd/mm/yyyy'' ),''mm'')
+            AND lote.dt_lote = to_date(to_char(pagamento_estornado.timestamp_anulado,''yyyy-mm-dd''),''yyyy-mm-dd'')       
+  
+          
                
      UNION           
                
@@ -1061,6 +1076,8 @@ BEGIN
            AND TO_CHAR(BOLETIM.dt_boletim,''mm'') < TO_CHAR(TO_DATE( '''||stDtFinal||'''::VARCHAR, ''dd/mm/yyyy''),''mm'')
      ) as tbl 
     ';
+    
+    --RAISE NOTICE '%', stSql || stFiltro;
 
     IF(stFiltro != '')THEN
         stSql := stSql || stFiltro;

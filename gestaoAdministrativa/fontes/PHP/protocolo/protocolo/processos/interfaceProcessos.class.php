@@ -32,7 +32,7 @@
 
      * Casos de uso: uc-01.06.98
 
-    $Id: interfaceProcessos.class.php 62345 2015-04-27 18:46:06Z jean $
+    $Id: interfaceProcessos.class.php 62399 2015-05-04 17:27:11Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -592,6 +592,13 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                     campo = document.frm.codAssunto.value;
                     if (campo=='xxx') {
                         mensagem += '@A combo Assunto é obrigatória';
+                        erro = true;
+                    }
+                    
+                    campo = jq('#inCodOrganogramaClassificacao').val();
+
+                    if (campo=='0.00.00' || campo=='') {
+                        mensagem += '@A combo Classificação de Encaminhamento de Processo é obrigatória';
                         erro = true;
                     }
 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+    <property name="units">in</property>
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
-    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <list-property name="propertyBindings">
         <structure>
             <property name="name">queryText</property>
@@ -20,7 +21,6 @@
             <property name="id">1181</property>
         </structure>
     </list-property>
-    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -33,9 +33,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -45,9 +45,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -57,9 +57,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -69,12 +69,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">org.postgresql.Driver</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -84,12 +84,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -99,12 +99,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">[usuario]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -114,12 +114,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">[usuario]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -128,9 +128,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -139,10 +139,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -151,9 +151,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -162,10 +162,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -174,10 +174,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -186,9 +186,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,9 +197,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,9 +208,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -219,9 +219,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -233,10 +233,9 @@
         <scalar-parameter name="pEntidadePrincipal" id="6686">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="distinct">true</property>
-            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -1395,7 +1394,7 @@ INNER JOIN  sw_municipio
                 </structure>
                 <structure>
                     <property name="name">Column Binding</property>
-                    <text-property name="displayName">cod_situacao</text-property>
+                    <property name="displayName">cod_situacao</property>
                     <expression name="expression">dataSetRow["cod_situacao"]</expression>
                     <property name="dataType">any</property>
                 </structure>
@@ -1490,8 +1489,8 @@ INNER JOIN  sw_municipio
                             </list-property>
                             <property name="pageBreakInterval">50</property>
                             <column id="1227">
-                                <property name="textAlign">right</property>
                                 <property name="width">1.6145833333in</property>
+                                <property name="textAlign">right</property>
                             </column>
                             <column id="1228">
                                 <property name="width">0.3229166667in</property>
@@ -2154,7 +2153,7 @@ INNER JOIN  sw_municipio
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <expression name="expression">dataSetRow["valor"]+', '</expression>
+                    <expression name="expression">params["pEntidadePrincipal"] + ', '</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
@@ -2166,15 +2165,14 @@ INNER JOIN  sw_municipio
             <detail>
                 <row id="1618">
                     <cell id="1619">
-                        <data id="6687">
+                        <data id="6688">
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">right</property>
                             <list-property name="boundDataColumns">
                                 <structure>
                                     <property name="name">pEntidadePrincipal</property>
-                                    <expression name="expression" type="javascript">params["pEntidadePrincipal"] + ', '</expression>
+                                    <expression name="expression">params["pEntidadePrincipal"].value + ', '</expression>
                                     <property name="dataType">string</property>
-                                    <property name="allowExport">true</property>
                                 </structure>
                             </list-property>
                             <property name="resultSetColumn">pEntidadePrincipal</property>
@@ -2203,42 +2201,270 @@ INNER JOIN  sw_municipio
             <property name="marginTop">0pt</property>
             <property name="paddingTop">1pt</property>
         </label>
-        <grid name="assinaturas" id="6667" extends="urbem_221.assinaturas">
-            <overridden-values>
-                <ref-entry baseId="1215" id="1215"/>
-                <ref-entry baseId="1150" id="1150"/>
-                <ref-entry baseId="1151" id="6668"/>
-                <ref-entry baseId="1152" id="6669"/>
-                <ref-entry baseId="1218" id="1218"/>
-                <ref-entry baseId="1179" id="1179"/>
-                <ref-entry baseId="1213" id="6670"/>
-                <ref-entry baseId="1180" id="1180"/>
-                <ref-entry baseId="1183" name="NewTable2" id="1183"/>
-                <ref-entry baseId="1186" id="1186"/>
-                <ref-entry baseId="1187" id="6671"/>
-                <ref-entry baseId="1188" name="NewData122" id="6672"/>
-                <ref-entry baseId="1189" name="NewData132" id="6673"/>
-                <ref-entry baseId="1192" id="6674"/>
-                <ref-entry baseId="1216" id="1216"/>
-                <ref-entry baseId="1153" id="1153"/>
-                <ref-entry baseId="1214" id="6675"/>
-                <ref-entry baseId="1154" id="1154"/>
-                <ref-entry baseId="1157" name="NewTable" id="1157"/>
-                <ref-entry baseId="1160" id="1160"/>
-                <ref-entry baseId="1161" id="1161"/>
-                <ref-entry baseId="1167" name="NewData12" id="1167"/>
-                <ref-entry baseId="1168" name="NewData13" id="1168"/>
-                <ref-entry baseId="1164" id="1164"/>
-                <ref-entry baseId="1155" id="1155"/>
-                <ref-entry baseId="1156" id="1156"/>
-                <ref-entry baseId="1169" name="NewTable1" id="1169"/>
-                <ref-entry baseId="1172" id="1172"/>
-                <ref-entry baseId="1173" id="1173"/>
-                <ref-entry baseId="1174" name="NewData121" id="1174"/>
-                <ref-entry baseId="1175" name="NewData131" id="1175"/>
-                <ref-entry baseId="1178" id="1178"/>
-                <ref-entry baseId="1217" id="1217"/>
-            </overridden-values>
+        <grid id="6789">
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">params["numero_assinatura"] == 0</expression>
+                </structure>
+            </list-property>
+            <column id="6790">
+                <property name="width">20%</property>
+            </column>
+            <column id="6806">
+                <property name="width">25%</property>
+                <property name="textAlign">center</property>
+            </column>
+            <column id="6791">
+                <property name="width">10%</property>
+                <property name="textAlign">center</property>
+            </column>
+            <column id="6792">
+                <property name="width">25%</property>
+                <property name="textAlign">center</property>
+            </column>
+            <column id="6793">
+                <property name="width">20%</property>
+            </column>
+            <row id="6794">
+                <cell id="6795"/>
+                <cell id="6804">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <table name="NewTable21" id="6819">
+                        <property name="marginTop">0pt</property>
+                        <property name="width">100%</property>
+                        <property name="dataSet">urbem_221.assinaturas</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr">params["numero_assinatura"] > 1 || params["numero_assinatura"] == "" || params["numero_assinatura"] == ""</expression>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">exercicio</property>
+                                <expression name="expression">dataSetRow["exercicio"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cod_entidade</property>
+                                <expression name="expression">dataSetRow["cod_entidade"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">numcgm</property>
+                                <expression name="expression">dataSetRow["numcgm"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cargo</property>
+                                <expression name="expression">dataSetRow["cargo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">timestamp</property>
+                                <expression name="expression">dataSetRow["timestamp"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_cgm</property>
+                                <expression name="expression">dataSetRow["nom_cgm"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="6824"/>
+                        <detail>
+                            <row id="6820">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">(row.__rownum%2==1)</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6821">
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">1px</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingBottom">40pt</property>
+                                    <data name="NewData1221" id="6822">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">nom_cgm</property>
+                                    </data>
+                                    <data name="NewData1321" id="6823">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">cargo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+                <cell id="6798"/>
+            </row>
+            <row id="6799">
+                <cell id="6800">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <table name="NewTable3" id="6807">
+                        <property name="width">100%</property>
+                        <property name="dataSet">urbem_221.assinaturas</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr">params["numero_assinatura"] &lt; 2 || params["numero_assinatura"] == "" || params["numero_assinatura"] == ""</expression>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">exercicio</property>
+                                <expression name="expression">dataSetRow["exercicio"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cod_entidade</property>
+                                <expression name="expression">dataSetRow["cod_entidade"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">numcgm</property>
+                                <expression name="expression">dataSetRow["numcgm"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cargo</property>
+                                <expression name="expression">dataSetRow["cargo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">timestamp</property>
+                                <expression name="expression">dataSetRow["timestamp"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_cgm</property>
+                                <expression name="expression">dataSetRow["nom_cgm"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="6812"/>
+                        <detail>
+                            <row id="6808">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">(row.__rownum%2==1)</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6809">
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">1px</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingBottom">40pt</property>
+                                    <data name="NewData123" id="6810">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">nom_cgm</property>
+                                    </data>
+                                    <data name="NewData133" id="6811">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">cargo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+                <cell id="6801"/>
+                <cell id="6802">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <table name="NewTable11" id="6813">
+                        <property name="width">100%</property>
+                        <property name="dataSet">urbem_221.assinaturas</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr">params["numero_assinatura"] &lt; 2 || params["numero_assinatura"] == "" || params["numero_assinatura"] == ""</expression>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">exercicio</property>
+                                <expression name="expression">dataSetRow["exercicio"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cod_entidade</property>
+                                <expression name="expression">dataSetRow["cod_entidade"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">numcgm</property>
+                                <expression name="expression">dataSetRow["numcgm"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">cargo</property>
+                                <expression name="expression">dataSetRow["cargo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">timestamp</property>
+                                <expression name="expression">dataSetRow["timestamp"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">nom_cgm</property>
+                                <expression name="expression">dataSetRow["nom_cgm"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="6818"/>
+                        <detail>
+                            <row id="6814">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">(row.__rownum%2==0)</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6815">
+                                    <property name="borderTopColor">#000000</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">1px</property>
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingBottom">40pt</property>
+                                    <data name="NewData1211" id="6816">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">nom_cgm</property>
+                                    </data>
+                                    <data name="NewData1311" id="6817">
+                                        <property name="fontFamily">serif</property>
+                                        <property name="fontSize">medium</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="resultSetColumn">cargo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
         </grid>
     </body>
 </report>

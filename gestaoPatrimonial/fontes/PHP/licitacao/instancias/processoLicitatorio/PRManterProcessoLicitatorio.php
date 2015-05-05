@@ -1,4 +1,4 @@
-<?php
+    <?php
 /*
     **********************************************************************************
     *                                                                                *
@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: PRManterProcessoLicitatorio.php 62228 2015-04-10 13:01:15Z evandro $
+    $Id: PRManterProcessoLicitatorio.php 62403 2015-05-04 20:42:51Z jean $
 
 */
 
@@ -173,6 +173,30 @@ switch ($stAcao) {
                     $obTLicitacaoLicitacao->setDado('cod_objeto'            , $_REQUEST['stObjeto']             );
                     $obTLicitacaoLicitacao->setDado('cod_criterio'          , $_REQUEST['inCodCriterio']        );
                     $obTLicitacaoLicitacao->setDado('cod_tipo_licitacao'    , $_REQUEST['inCodTipoCotacao']     );
+
+                    if ($_REQUEST['boRegistroModalidade'] == '' || (!isset($_REQUEST['boRegistroModalidade']))) {
+                        $registroModalidade = 0;
+                    } else {
+                        $registroModalidade = $_REQUEST['boRegistroModalidade'];
+                    }
+
+                    if (($_REQUEST['inCodModalidade'] == 3 ||
+                        $_REQUEST['inCodModalidade'] == 6 ||
+                        $_REQUEST['inCodModalidade'] == 7
+                       ) && $registroModalidade == 'Sim') {
+                        $obTLicitacaoLicitacao->setDado('registro_precos'  , 't' );
+                    } else {
+                        $obTLicitacaoLicitacao->setDado('registro_precos'  , 'f' );
+                    }
+
+                    if ($_REQUEST['inCodModalidade'] == 8 && $registroModalidade == 'Sim') {
+                        $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , 1 );
+                    } elseif ($_REQUEST['inCodModalidade'] == 9 && $chamadaPublica == 'Sim') {
+                        $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , 2 );
+                    } else {
+                        $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , $chamadaPublica );
+                    }
+                    
                     $obTLicitacaoLicitacao->setDado('cod_mapa'              , $arMapa[0]                        );
                     $obTLicitacaoLicitacao->setDado('exercicio_mapa'        , "".$arMapa[1].""                  );
                     $obTLicitacaoLicitacao->setDado('cod_processo'          , $arProcesso[0]                    );
@@ -475,6 +499,30 @@ switch ($stAcao) {
                 $obTLicitacaoLicitacao->setDado('num_orgao'  , $arStUnidadeOrcamentaria[0]);
                 $obTLicitacaoLicitacao->setDado('num_unidade', $arStUnidadeOrcamentaria[1]);
                 $obTLicitacaoLicitacao->setDado('cod_regime',$_REQUEST['inCodRegime'] != '' ? $_REQUEST['inCodRegime'] : 'null');
+
+                if ($_REQUEST['boRegistroModalidade'] == '' || (!isset($_REQUEST['boRegistroModalidade']))) {
+                    $registroModalidade = 0;
+                } else {
+                    $registroModalidade = $_REQUEST['boRegistroModalidade'];
+                }
+
+               if (($_REQUEST['inCodModalidade'] == 3 ||
+                    $_REQUEST['inCodModalidade'] == 6 ||
+                    $_REQUEST['inCodModalidade'] == 7
+                   ) && $registroModalidade == 'Sim') {
+                    $obTLicitacaoLicitacao->setDado('registro_precos'  , 't' );
+               } else {
+                    $obTLicitacaoLicitacao->setDado('registro_precos'  , 'f' );
+               }
+
+                if ($_REQUEST['inCodModalidade'] == 8 && $registroModalidade == 'Sim') {
+                    $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , 1 );
+                } elseif ($_REQUEST['inCodModalidade'] == 9 && $chamadaPublica == 'Sim') {
+                    $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , 2 );
+                } else {
+                    $obTLicitacaoLicitacao->setDado('tipo_chamada_publica'  , $chamadaPublica );
+                }
+
                 $obTLicitacaoLicitacao->alteracao();
  
                 $obTMapaModalidade = new TComprasMapaModalidade();

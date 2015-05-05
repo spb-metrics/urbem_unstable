@@ -30,7 +30,7 @@
     * @author Desenvolvedor: Marcelo Boezzio Paulino
     * @ignore
 
-    $Id: LSDespesa.php 61756 2015-03-02 16:03:30Z michel $
+    $Id: LSDespesa.php 62398 2015-05-04 17:23:58Z michel $
 
     $Revision: 31725 $
     $Name$
@@ -117,14 +117,17 @@ $stMascClassificacaoDespesa = isset($_REQUEST['stMascClassificacaoDespesa']) ? $
 $stLink = '';
 //Monta sessae com os valores do filtro
 $arFiltro = Sessao::read('filtroPopUp');
-if ( is_array($arFiltro) ) {
-    $_REQUEST = $arFiltro;
-} else {
-    foreach ($_REQUEST as $key => $valor) {
-        $arFiltro[$key] = $valor;
+
+if($_REQUEST['pg']&&$_REQUEST['pos']){
+    if ( is_array($arFiltro) ) {
+        $_REQUEST = $arFiltro;
     }
-    Sessao::write('filtroPopUp',$arFiltro);
 }
+    
+foreach ($_REQUEST as $key => $valor) {
+    $arFiltro[$key] = $valor;
+}
+Sessao::write('filtroPopUp',$arFiltro);
 
 if ( isset($_REQUEST["campoNom"]) ) {
     $stLink .= '&campoNom='.$_REQUEST['campoNom'];
@@ -198,7 +201,9 @@ if ($stTipoBusca == 'autorizacaoEmpenho') {
 } elseif ($stTipoBusca == 'alteracaoOrcamento') {
     $obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
     $obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $inCodEntidade );
-    $obROrcamentoDespesa->listarDespesaCredEspecial( $rsLista , "ORDER BY cod_despesa");
+    if( $stAcao == 'Remaneja' )
+        $obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascClassificacao('3.1');
+    $obROrcamentoDespesa->listarDespesa( $rsLista );    
 } else {
     $obROrcamentoDespesa->setCodDespesa( $inCodDespesa );
     $obROrcamentoDespesa->setDescricao( $stDescricao );

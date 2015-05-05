@@ -54,10 +54,16 @@ BEGIN
   stSql := '
     CREATE TEMPORARY TABLE tmp_recursos_processados_exercicios_anteriores AS
 
-      SELECT busca_recurso.cod_recurso
+      SELECT CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN restos_pre_empenho.recurso
+                  ELSE busca_recurso.cod_recurso
+              END AS cod_recurso
            , liquidado.cod_empenho
            , liquidado.cod_entidade
-           , busca_recurso.nom_recurso
+           , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN recurso_restos.nom_recurso
+                  ELSE busca_recurso.nom_recurso
+              END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
 
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
@@ -241,11 +247,16 @@ BEGIN
      LEFT JOIN empenho.restos_pre_empenho
             ON restos_pre_empenho.exercicio = liquidado.exercicio
            AND restos_pre_empenho.cod_pre_empenho = liquidado.cod_pre_empenho
+     LEFT JOIN orcamento.recurso AS recurso_restos
+            ON restos_pre_empenho.recurso = recurso_restos.cod_recurso
+           AND restos_pre_empenho.exercicio = liquidado.exercicio
 
       GROUP BY busca_recurso.cod_recurso
+             , restos_pre_empenho.recurso
              , liquidado.cod_empenho
              , liquidado.cod_entidade
              , busca_recurso.nom_recurso
+             , recurso_restos.nom_recurso
              , sw_cgm.nom_cgm
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural
@@ -263,10 +274,16 @@ BEGIN
   stSql := '
     CREATE TEMPORARY TABLE tmp_recursos_processados_exercicio_anterior AS
 
-      SELECT busca_recurso.cod_recurso
+      SELECT CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN restos_pre_empenho.recurso
+                  ELSE busca_recurso.cod_recurso
+              END AS cod_recurso
            , liquidado.cod_empenho
            , liquidado.cod_entidade
-           , busca_recurso.nom_recurso
+           , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN recurso_restos.nom_recurso
+                  ELSE busca_recurso.nom_recurso
+              END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
 
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
@@ -448,11 +465,16 @@ BEGIN
      LEFT JOIN empenho.restos_pre_empenho
             ON restos_pre_empenho.exercicio = liquidado.exercicio
            AND restos_pre_empenho.cod_pre_empenho = liquidado.cod_pre_empenho
+     LEFT JOIN orcamento.recurso AS recurso_restos
+            ON restos_pre_empenho.recurso = recurso_restos.cod_recurso
+           AND restos_pre_empenho.exercicio = liquidado.exercicio
 
       GROUP BY busca_recurso.cod_recurso
+             , restos_pre_empenho.recurso
              , liquidado.cod_empenho
              , liquidado.cod_entidade
              , busca_recurso.nom_recurso
+             , recurso_restos.nom_recurso
              , sw_cgm.nom_cgm
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural
@@ -466,10 +488,16 @@ BEGIN
   StSql := '
     CREATE TEMPORARY TABLE tmp_recursos_nao_processados_exercicios_anteriores AS
 
-      SELECT busca_recurso.cod_recurso
+      SELECT CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN restos_pre_empenho.recurso
+                  ELSE busca_recurso.cod_recurso
+              END AS cod_recurso
            , empenhado.cod_empenho
            , empenhado.cod_entidade
-           , busca_recurso.nom_recurso
+           , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN recurso_restos.nom_recurso
+                  ELSE busca_recurso.nom_recurso
+              END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
 
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
@@ -627,9 +655,14 @@ BEGIN
      LEFT JOIN empenho.restos_pre_empenho
             ON restos_pre_empenho.exercicio = empenhado.exercicio
            AND restos_pre_empenho.cod_pre_empenho = empenhado.cod_pre_empenho
+     LEFT JOIN orcamento.recurso AS recurso_restos
+            ON restos_pre_empenho.recurso = recurso_restos.cod_recurso
+           AND restos_pre_empenho.exercicio = empenhado.exercicio
 
       GROUP BY busca_recurso.cod_recurso
+             , restos_pre_empenho.recurso
              , busca_recurso.nom_recurso
+             , recurso_restos.nom_recurso
              , sw_cgm.nom_cgm
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural
@@ -645,10 +678,16 @@ BEGIN
   StSql := '
     CREATE TEMPORARY TABLE tmp_recursos_nao_processados_exercicio_anterior AS
 
-      SELECT busca_recurso.cod_recurso
+      SELECT CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN restos_pre_empenho.recurso
+                  ELSE busca_recurso.cod_recurso
+              END AS cod_recurso
            , empenhado.cod_empenho
            , empenhado.cod_entidade
-           , busca_recurso.nom_recurso
+           , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
+                  THEN recurso_restos.nom_recurso
+                  ELSE busca_recurso.nom_recurso
+              END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
 
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
@@ -804,9 +843,14 @@ BEGIN
      LEFT JOIN empenho.restos_pre_empenho
             ON restos_pre_empenho.exercicio = empenhado.exercicio
            AND restos_pre_empenho.cod_pre_empenho = empenhado.cod_pre_empenho
+     LEFT JOIN orcamento.recurso AS recurso_restos
+            ON restos_pre_empenho.recurso = recurso_restos.cod_recurso
+           AND restos_pre_empenho.exercicio = empenhado.exercicio
 
       GROUP BY busca_recurso.cod_recurso
+             , restos_pre_empenho.recurso
              , busca_recurso.nom_recurso
+             , recurso_restos.nom_recurso
              , sw_cgm.nom_cgm
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural

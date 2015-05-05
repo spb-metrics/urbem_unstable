@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: PRCancelarAberturaRestosAPagar.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRCancelarAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
 
     * Casos de uso:
 */
@@ -43,6 +43,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadeCancelarAberturaRestosAPagar.class.php"               );
+include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "CancelarAberturaRestosAPagar";
@@ -110,7 +111,15 @@ switch ($stAcao) {
                 }
                 #FIM DA CADEIA
             }
-        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRContabilidadeCancelarAberturaRestosAPagar->obTContabilidadeLote );
+            if (!$obErro->ocorreu()) {
+                $obRConfiguracao = new RConfiguracaoConfiguracao;
+                $obRConfiguracao->setParametro('abertura_RP');
+                $obRConfiguracao->setExercicio( Sessao::getExercicio());
+                $obRConfiguracao->setCodModulo( 9 );
+                $obRConfiguracao->setValor( 'F' );
+                $obErro = $obRConfiguracao->alterar($boTransacao);
+            }
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRContabilidadeCancelarAberturaRestosAPagar->obTContabilidadeLote );
         }
 
         if (!$obErro->ocorreu()) {

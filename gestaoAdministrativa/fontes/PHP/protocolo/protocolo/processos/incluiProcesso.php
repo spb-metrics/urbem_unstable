@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: incluiProcesso.php 60298 2014-10-10 21:01:01Z arthur $
+    $Id: incluiProcesso.php 62399 2015-05-04 17:27:11Z jean $
 
     */
 
@@ -157,6 +157,7 @@ switch ($controle) {
 
             # Insere o processo no banco de dados e exibe mensagens
             $processos = new processosLegado;
+            
             $boProcessoIncluido = $processos->incluiProcesso($codProcesso,$_REQUEST["vinculo"],$codClassificacao,$codAssunto,$numCgm,$_REQUEST["numMatricula"],
                                           $_REQUEST['numInscricao'],$_REQUEST["observacoes"],$_REQUEST["resumo"],$refAnterior,$processosAnexos,
                                           Sessao::read('numCgm'),$codOrgao,$codUnidade,$codDpto,$codSetor,

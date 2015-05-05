@@ -56,7 +56,13 @@ $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPag
 $jsOnload = "executaFuncaoAjax('preencherForm');";
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+//$stAcao = $_REQUEST['stAcao'] ?  $_REQUEST['stAcao'] : Sessao::read('acao');
+
+if (Sessao::read('NOVAacao') != "") {
+    $stAcao = Sessao::read('NOVAacao');
+} else {
+    $stAcao = $_REQUEST['stAcao'];
+}
 
 $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao();
 $obTAdministracaoConfiguracao->setDado("cod_modulo",40);
@@ -301,9 +307,9 @@ $stComplementoValida .= "       erro = true;\n";
 $stComplementoValida .= "       mensagem += '@Campo E-mail do Contato inválido!()';\n";
 $stComplementoValida .= "   }\n";
 $stComplementoValida .= "}\n";
-$stComplementoValida .= "if (erro == false) {\n";
-$stComplementoValida .= "   BloqueiaFrames(true,false);\n";
-$stComplementoValida .= "   parent.frames[2].document.body.scrollTop=0; }\n";
+//$stComplementoValida .= "if (erro == false) {\n";
+//$stComplementoValida .= "   BloqueiaFrames(true,false);\n";
+//$stComplementoValida .= "   parent.frames[2].document.body.scrollTop=0; }\n";
 
 $obFormulario->obJavaScript->setComplementoValida($stComplementoValida);
 

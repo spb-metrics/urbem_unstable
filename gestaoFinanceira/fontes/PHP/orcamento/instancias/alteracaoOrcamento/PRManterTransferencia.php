@@ -32,19 +32,9 @@
 
     * @ignore
 
-    $Revision: 30813 $
-    $Name$
-    $Author: cleisson $
-    $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+    $Id: PRManterTransferencia.php 62400 2015-05-04 17:30:31Z michel $
 
     * Casos de uso: uc-02.01.07
-*/
-
-/*
-$Log$
-Revision 1.4  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -130,6 +120,9 @@ switch ($stAcao) {
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
+        }
+        else {
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
     break;
 }

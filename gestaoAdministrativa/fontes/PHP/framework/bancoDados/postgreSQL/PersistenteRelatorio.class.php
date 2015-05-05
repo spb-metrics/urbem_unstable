@@ -74,7 +74,7 @@ function PersistenteRelatorio()
     * Método abstrato
     * @access Public
 */
-function geraRecordSet(&$rsRecordSet , $stOrder = "")
-{
-}
+//function geraRecordSet(&$rsRecordSet , $stOrder = "")
+//{
+//}
 }

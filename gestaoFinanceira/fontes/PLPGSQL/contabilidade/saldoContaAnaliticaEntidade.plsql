@@ -41,13 +41,12 @@ Bug #8125#
 
 */
 
-CREATE OR REPLACE FUNCTION contabilidade.fn_saldo_conta_analitica_entidade(VARCHAR,INTEGER,INTEGER) RETURNS NUMERIC AS '
-
+CREATE OR REPLACE FUNCTION contabilidade.fn_saldo_conta_analitica_entidade(VARCHAR,INTEGER,INTEGER) RETURNS NUMERIC AS $$
 DECLARE
     stExercicio    ALIAS FOR $1;
     inCodPlano     ALIAS FOR $2;
     inCodEntidade  ALIAS FOR $3;
-    stSql          VARCHAR := '''';
+    stSql          VARCHAR := '';
     nuVlDebito     NUMERIC := 0.00;
     nuVlCredito    NUMERIC := 0.00;
     reRecord       RECORD;
@@ -103,4 +102,4 @@ BEGIN
     RETURN nuVlDebito + nuVlCredito;
 
 END;
-'LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

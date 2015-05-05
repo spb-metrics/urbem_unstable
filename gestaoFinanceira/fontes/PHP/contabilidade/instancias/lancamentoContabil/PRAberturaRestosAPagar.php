@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRAberturaRestosAPagar.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
 
     $Revision: 30668 $
     $Name$
@@ -41,14 +41,6 @@
 
     * Casos de uso: uc-02.02.31
 */
-
-/*
-$Log$
-Revision 1.2  2006/07/05 20:50:57  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
@@ -73,7 +65,16 @@ switch ($stAcao) {
     case "incluir":
 
         $obFContabilidadeAberturaRestosAPagar->setDado("stExercicio", Sessao::getExercicio());
-        $obErro = $obFContabilidadeAberturaRestosAPagar->gerarRestosAbertura($rsRecordSet, "");
+        $obErro = $obFContabilidadeAberturaRestosAPagar->gerarRestosAbertura($rsRecordSet, $boTransacao);
+        if (!$obErro->ocorreu()) {
+            $obRConfiguracao = new RConfiguracaoConfiguracao;
+            $obRConfiguracao->setParametro('abertura_RP');
+            $obRConfiguracao->setExercicio( Sessao::getExercicio());
+            $obRConfiguracao->setCodModulo( 9 );
+            $obRConfiguracao->setValor( 'T' );
+            $obErro = $obRConfiguracao->alterar($boTransacao);
+        }
+
         if ( !$obErro->ocorreu() ) {
              SistemaLegado::alertaAviso($pgFilt."?stAcao=incluir","Geração de Abertura do Exercício - Restos a Pagar realizado.","pagar","aviso", Sessao::getId(), "../");
         } else {
@@ -81,4 +82,5 @@ switch ($stAcao) {
         }
     break;
 }
+SistemaLegado::LiberaFrames(true, false);
 ?>

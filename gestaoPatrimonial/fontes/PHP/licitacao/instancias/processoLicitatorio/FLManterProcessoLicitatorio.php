@@ -68,6 +68,8 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 //include ($pgJs);
+$jsOnload = '';
+
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao = $request->get('stAcao');
@@ -132,6 +134,7 @@ $obFormulario->setAjuda                  ("UC-03.05.15");
 $obFormulario->addHidden     ( $obHdnAcao              );
 $obFormulario->addHidden     ( $obHdnCtrl              );
 $obMontaLicitacao->geraFormulario( $obFormulario );
+$obMontaLicitacao->obExercicio->setReadOnly(true);
 $obFormulario->addComponente    ( $obHomologada);
 $obFormulario->addComponente    ( $obPopUpProcesso                 );
 $obFormulario->addComponente    ( $obPopUpMapa                     );
@@ -143,5 +146,7 @@ $obFormulario->addComponente    ( $obISelectTipoObjeto             );
 $obFormulario->addComponente    ( $obPopUpObjeto                   );
 $obFormulario->OK();
 $obFormulario->show();
+
+//$jsOnload .="jq('#stExercicioLicitacao').attr('readonly',true);";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

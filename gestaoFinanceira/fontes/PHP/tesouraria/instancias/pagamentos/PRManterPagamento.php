@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 62349 2015-04-28 13:34:07Z diogo.zarpelon $
+    * $Id: PRManterPagamento.php 62401 2015-05-04 17:36:47Z lisiane $
 
     * Casos de uso: uc-02.04.05
 */
@@ -80,7 +80,7 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
 $obRTesourariaBoletim = new RTesourariaBoletim();
 $obRTesourariaBoletim->setExercicio  ( Sessao::getExercicio() );
 $obRTesourariaBoletim->setCodBoletim ( $inCodBoletim );
-$obRTesourariaBoletim->setDataBoletim( $stDtBoletim );
+$obRTesourariaBoletim->setDataBoletim( $stDtBoletim  );
 $obRTesourariaBoletim->obROrcamentoEntidade->setCodigoEntidade ( $_POST['inCodEntidade'] );
 $obRTesourariaBoletim->obRTesourariaUsuarioTerminal->obRCGM->setNumCGM( Sessao::read('numCgm') );
 $obRTesourariaBoletim->obRTesourariaUsuarioTerminal->setTimestampUsuario( $_POST['stTimestampUsuario'] );
@@ -93,7 +93,6 @@ $obRTesourariaConfiguracao->setExercicio( Sessao::getExercicio() );
 $obRTesourariaConfiguracao->consultarTesouraria($boTransacao);
 
 #$boTransacao = isset($boTransacao) ? $boTransacao : "";
-
 switch ($stAcao) {
     case 'incluir':
 
@@ -375,6 +374,8 @@ switch ($stAcao) {
     }
 
     break;
+///////////////////////////////////////////////////////////////////////////////
+
 
     case 'alterar':
     if ( $stDtBoletim == date( 'd/m/Y' ) ) {
@@ -458,8 +459,11 @@ switch ($stAcao) {
             $obErro->setDescricao("O valor a estornar deve ser maior que 0,00.");
         }
     }
+
     if (!$obErro->ocorreu()) {
-        $obErro = $obRTesourariaBoletim->roUltimoPagamento->estornar( $boTransacao );
+        Sessao::setTrataExcecao ( true );
+        $obErro = $obRTesourariaBoletim->roUltimoPagamento->estornar( $boTransacao ); 
+        Sessao::encerraExcecao();
     }
 
     $boRetencao = $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getRetencao();

@@ -29,7 +29,7 @@
  
  * @package URBEM
 
- *  $Id: aberturaRestosPagar.plsql 59612 2014-09-02 12:00:51Z gelson $
+ *  $Id: aberturaRestosPagar.plsql 62406 2015-05-05 14:43:16Z franver $
 */
 
 CREATE OR REPLACE FUNCTION contabilidade.fn_abertura_restos_pagar(varchar) RETURNS VARCHAR AS $$
@@ -166,7 +166,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                                                                                               WHERE cod_estrutural like ''5.3.2.1%'' 
                                                                                                    AND plano_conta.exercicio= entidade.exercicio)::VARCHAR) as cod_estrutural_debito
 
-                        , contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                        , contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                                                          FROM contabilidade.plano_conta 
                                                                                                                                  INNER JOIN contabilidade.plano_analitica 
                                                                                                                                              ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -177,7 +177,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                 FROM orcamento.entidade
               WHERE entidade.exercicio = ''' || stExercicio || '''
                   AND entidade.cod_entidade IN  ('|| stCodEntidade ||')
-                  AND contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                  AND contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                         FROM contabilidade.plano_conta 
                         INNER JOIN contabilidade.plano_analitica 
                             ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -194,7 +194,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                                                                                          INNER JOIN contabilidade.plano_analitica 
                                                                                                      ON plano_analitica.exercicio = plano_conta.exercicio 
                                                                                                    AND plano_analitica.cod_conta= plano_conta.cod_conta 
-                                                                                               WHERE cod_estrutural like ''6.3.2.7%'' 
+                                                                                               WHERE cod_estrutural like ''6.3.2.1%'' 
                                                                                                    AND plano_conta.exercicio= entidade.exercicio
                                                                                               )::VARCHAR) as cod_estrutural_credito
 
@@ -203,10 +203,10 @@ CREATE TEMPORARY TABLE tmp_valores AS
                                                                                          INNER JOIN contabilidade.plano_analitica 
                                                                                                      ON plano_analitica.exercicio = plano_conta.exercicio 
                                                                                                    AND plano_analitica.cod_conta= plano_conta.cod_conta 
-                                                                                              WHERE cod_estrutural like ''6.3.2.1%'' 
+                                                                                              WHERE cod_estrutural like ''6.3.2.7%'' 
                                                                                                    AND plano_conta.exercicio= entidade.exercicio)::VARCHAR) as cod_estrutural_debito
 
-                        , contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                        , contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                                                          FROM contabilidade.plano_conta 
                                                                                                                                  INNER JOIN contabilidade.plano_analitica 
                                                                                                                                              ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -217,7 +217,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                 FROM orcamento.entidade
               WHERE entidade.exercicio = ''' || stExercicio || '''
                   AND entidade.cod_entidade IN  ('|| stCodEntidade ||')
-                  AND contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                  AND contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                         FROM contabilidade.plano_conta 
                         INNER JOIN contabilidade.plano_analitica 
                             ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -249,7 +249,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                                                                                               WHERE cod_estrutural like ''5.3.1.1%'' 
                                                                                                    AND plano_conta.exercicio= entidade.exercicio)::VARCHAR) as cod_estrutural_debito
 
-                        , contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                        , contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                                                          FROM contabilidade.plano_conta 
                                                                                                                                  INNER JOIN contabilidade.plano_analitica 
                                                                                                                                              ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -260,7 +260,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                 FROM orcamento.entidade
               WHERE entidade.exercicio = ''' || stExercicio || '''
                   AND entidade.cod_entidade IN  ('|| stCodEntidade ||')
-                  AND contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                  AND contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                         FROM contabilidade.plano_conta 
                         INNER JOIN contabilidade.plano_analitica 
                             ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -285,10 +285,10 @@ CREATE TEMPORARY TABLE tmp_valores AS
                                                                                          INNER JOIN contabilidade.plano_analitica 
                                                                                                      ON plano_analitica.exercicio = plano_conta.exercicio 
                                                                                                    AND plano_analitica.cod_conta= plano_conta.cod_conta 
-                                                                                              WHERE cod_estrutural like ''6.3.1.1%'' 
+                                                                                              WHERE cod_estrutural like ''6.3.1.7.1%'' 
                                                                                                    AND plano_conta.exercicio= entidade.exercicio)::VARCHAR) as cod_estrutural_debito
 
-                        , contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                        , contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                                                          FROM contabilidade.plano_conta 
                                                                                                                                  INNER JOIN contabilidade.plano_analitica 
                                                                                                                                              ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -299,7 +299,7 @@ CREATE TEMPORARY TABLE tmp_valores AS
                 FROM orcamento.entidade
               WHERE entidade.exercicio = ''' || stExercicio || '''
                   AND entidade.cod_entidade IN  ('|| stCodEntidade ||')
-                  AND contabilidade.fn_saldo_conta_analitica_entidade(entidade.exercicio,(SELECT plano_analitica.cod_plano 
+                  AND contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(entidade.exercicio,(SELECT plano_analitica.cod_plano 
                         FROM contabilidade.plano_conta 
                         INNER JOIN contabilidade.plano_analitica 
                             ON plano_analitica.exercicio = plano_conta.exercicio 
@@ -346,8 +346,8 @@ UNION ALL
       GROUP BY  tmp_valores.exercicio,  tmp_valores.cod_entidade , cod_estrutural_credito, cod_estrutural_debito
 
 UNION ALL       
-          SELECT exercicio 
-                     ,cod_entidade
+          SELECT conta_contabil_rp_np.exercicio 
+                     , conta_contabil_rp_np.cod_entidade
                      , buscaCodigoEstrutural(conta_contabil_rp_np.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                FROM contabilidade.plano_conta 
                                                                                                INNER JOIN contabilidade.plano_analitica 
@@ -360,18 +360,21 @@ UNION ALL
                      , buscaCodigoEstrutural(conta_contabil_rp_np.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                FROM contabilidade.plano_analitica
                                                                                              WHERE plano_analitica.cod_conta = conta_contabil_rp_np.cod_conta 
-                                                                                                  AND plano_analitica.natureza_saldo = ''D''
+                                                                                                  AND plano_analitica.natureza_saldo = pa.natureza_saldo
                                                                                                    AND plano_analitica.exercicio= conta_contabil_rp_np.exercicio)::VARCHAR) as cod_estrutural_debito
 
-                     , contabilidade.fn_saldo_conta_analitica_entidade(conta_contabil_rp_np.exercicio,(SELECT plano_analitica.cod_plano 
+                     , contabilidade.fn_saldo_inicial_conta_analitica_entidade_rp(conta_contabil_rp_np.exercicio,(SELECT plano_analitica.cod_plano 
                                                                                                                                        FROM contabilidade.plano_analitica
                                                                                                                                      WHERE plano_analitica.cod_conta = conta_contabil_rp_np.cod_conta 
-                                                                                                                                         AND plano_analitica.natureza_saldo = ''D''
+                                                                                                                                         AND plano_analitica.natureza_saldo = pa.natureza_saldo
                                                                                                                                          AND plano_analitica.exercicio= conta_contabil_rp_np.exercicio), conta_contabil_rp_np.cod_entidade) AS valor
                      , CAST(''Não Processados nos Exercicios Anteriores.'' AS VARCHAR) AS complemento
              FROM contabilidade.conta_contabil_rp_np 
-          WHERE exercicio  = ''' || stExercicio || '''
-               AND cod_entidade IN  ('|| stCodEntidade ||')
+       INNER JOIN contabilidade.plano_analitica AS pa
+               ON pa.cod_conta = conta_contabil_rp_np.cod_conta
+              ANd pa.exercicio = conta_contabil_rp_np.exercicio
+          WHERE conta_contabil_rp_np.exercicio  = ''' || stExercicio || '''
+               AND conta_contabil_rp_np.cod_entidade IN  ('|| stCodEntidade ||')
 
 UNION ALL
  ------------------------------------------------------------------------------------------------------------

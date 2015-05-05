@@ -269,7 +269,7 @@ function montaBoletim($inCodEntidade, $inCodBoletim = '')
         $obISelectBoletim = new ISelectBoletim;
         $obISelectBoletim->obBoletim->obROrcamentoEntidade->setCodigoEntidade( $inCodEntidade  );
         $obISelectBoletim->obBoletim->setExercicio( Sessao::getExercicio() );
-        $obISelectBoletim->obEvento->setOnChange ( "montaParametrosGET('alteraBoletim');");
+        $obISelectBoletim->obEvento->setOnChange ( "buscaDado('alteraBoletim');");
         $obISelectBoletim->setNull ( false );
 
         $obFormulario = new Formulario;
@@ -287,14 +287,13 @@ function montaBoletim($inCodEntidade, $inCodBoletim = '')
         $ISaldoCaixa = new ISaldoCaixa();
         $ISaldoCaixa->inCodEntidade = $_REQUEST['inCodEntidade'];
         $stJs .= $ISaldoCaixa->montaSaldo();
-
+      
         if ($inCodBoletim) {
             $stJs .= "if(d.getElementById('inCodBoletim')) \n
                         d.getElementById('inCodBoletim').value = '".$inCodBoletim."';\n
             ";
         }
     }
-
     return $stJs;
 }
 
@@ -465,6 +464,7 @@ function montaDescricaoTipoPagamento($inTIpoPagamento)
 
     return $stJs;
 }
+
 switch ($_REQUEST['stCtrl']) {
 case 'limparCampos':
     $stJs  = limparCampos();
@@ -479,12 +479,12 @@ case 'alteraBoletim':
 
     if ( !$obErro->ocorreu() && $rsBoletimAberto->getNumLinhas() == 1 ) {
         $stJs .= "f.inCodBoletim.value = '" . $rsBoletimAberto->getCampo( 'cod_boletim' ) . "';\r\n";
-        $stJs .= "jQuery('#stDtBoletim').val('" . $rsBoletimAberto->getCampo( 'dt_boletim' ) . "');\r\n";
-        //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
+        $stJs .= "jQuery('#stDtBoletim').val('" . $rsBoletimAberto->getCampo( 'dt_boletim' ) . "');\r\n"; 
+        SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     } else {
         $stJs .= "f.inCodBoletim.value = '';\r\n";
         $stJs .= "jQuery('#stDtBoletim').val('');\r\n";
-        //SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
+        SistemaLegado::executaFrameOculto( "LiberaFrames(true,false);".$stJs );
     }
     //exit;
   

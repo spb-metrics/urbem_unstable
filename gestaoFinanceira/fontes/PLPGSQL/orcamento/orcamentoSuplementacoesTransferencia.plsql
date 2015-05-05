@@ -20,6 +20,15 @@
     *                                                                                *
     **********************************************************************************
 */
+/*
+* Script de função PLPGSQL
+*
+* URBEM Soluções de Gestão Pública Ltda
+* www.urbem.cnm.org.br
+*
+* $Id: orcamentoSuplementacoesTransferencia.plsql 62400 2015-05-04 17:30:31Z michel $
+*/
+
 CREATE OR REPLACE FUNCTION orcamentosuplementacoestransferencia (character varying, numeric, character varying, integer, character varying, integer, integer)  RETURNS INTEGER AS $$
 DECLARE
     EXERCICIO       ALIAS FOR $1;
@@ -32,6 +41,12 @@ DECLARE
 
     SEQUENCIA INTEGER;
 BEGIN
+    IF EXERCICIO::integer > 2013 THEN
+        SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , CODHISTORICO , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , CODHISTORICO , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        SEQUENCIA := FAZERLANCAMENTO(  '522130300' , '522139900' , CODHISTORICO , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+    END IF;
+    
     IF EXERCICIO::integer > 2012 THEN
         SEQUENCIA := FAZERLANCAMENTO(  '522190101' , '622110000' , CODHISTORICO , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
         SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '522190109' , CODHISTORICO , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );

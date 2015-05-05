@@ -78,6 +78,7 @@ class IMontaNumeroLicitacaoMultiploEntidadeUsuario extends Objeto
 
         $this->obExercicio = new Exercicio();
         $this->obExercicio->setName( 'stExercicioLicitacao' );
+        $this->obExercicio->setId( 'stExercicioLicitacao' );
         $this->obExercicio->setNull( true );
 
         $this->obISelectMultiploEntidadeUsuario = new ISelectMultiploEntidadeUsuario();
@@ -88,6 +89,7 @@ class IMontaNumeroLicitacaoMultiploEntidadeUsuario extends Objeto
 
         $this->obTxtLicitacao = new TextBox();
         $this->obTxtLicitacao->setName     ( 'inCodLicitacao'   );
+        $this->obTxtLicitacao->setId     ( 'inCodLicitacao'   );
         $this->obTxtLicitacao->setRotulo   ( 'Licitação'        );
         $this->obTxtLicitacao->setTitle    ( 'Selecione a Licitação.' );
 

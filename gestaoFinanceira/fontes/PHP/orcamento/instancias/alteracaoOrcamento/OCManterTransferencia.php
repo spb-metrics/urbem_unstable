@@ -32,10 +32,7 @@
 
     * @ignore
 
-    $Revision: 30813 $
-    $Name$
-    $Author: cleisson $
-    $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+    $Id: OCManterTransferencia.php 62400 2015-05-04 17:30:31Z michel $
 
     * Casos de uso: uc-02.01.07
 */
@@ -401,10 +398,13 @@ switch ($stCtrl) {
             }
         }
         Sessao::write('arSuplementada',$arTEMP);
-        //sessao->transf3['arSuplementada'] = $arTEMP;
+
         montaListaSuplementada( $arTEMP, $nuVlTotal );
     break;
     case 'buscaDespesaReducao':
+        $boErro = false;
+        $stMsg = '';
+        
         if (($_REQUEST["inCodDotacaoReducao"] != "") && ($_REQUEST['inCodEntidade'] != "")) {
             $obRegra->addDespesaReducao();
             $obRegra->roUltimoDespesaReducao->setCodDespesa( $_REQUEST["inCodDotacaoReducao"] );
@@ -417,20 +417,30 @@ switch ($stCtrl) {
             $stNomDespesa = $rsDespesa->getCampo( "descricao" );
 
             if (!$stNomDespesa) {
-                $js  = 'f.inCodDotacaoReducao.value = "";';
-                $js .= 'f.inCodDotacaoReducao.focus();';
-                $js .= 'd.getElementById("stNomDotacaoRedutora").innerHTML = "&nbsp;";';
-                $js .= "alertaAviso('@Valor inválido. (".$_REQUEST["inCodDotacaoReducao"].")','form','erro','".Sessao::getId()."');";
+                $boErro = true;
+                $stMsg .= "@Valor inválido. (".$_REQUEST["inCodDotacaoReducao"].")";
             } else {
                 $js  = 'd.getElementById("stNomDotacaoRedutora").innerHTML = "'.$stNomDespesa.'";';
             }
         } else {
-            $js  = 'd.getElementById("stNomDotacaoRedutora").innerHTML = "&nbsp;";';
+            $boErro = true;
+            if($_REQUEST['inCodEntidade'] == "")
+                $stMsg .= "@Selecione a Entidade para buscar a Dotação Orçamentária Redutora.";
+        }
+        
+        if ($boErro) {
+            $js  = 'f.inCodDotacaoReducao.value = "";';
+            $js .= 'd.getElementById("stNomDotacaoRedutora").innerHTML = "&nbsp;";';
+            if($stMsg!='')
+                $js .= "alertaAviso('".$stMsg."','form','erro','".Sessao::getId()."');";
         }
         SistemaLegado::executaFrameOculto($js);
     break;
 
     case 'buscaDespesaSuplementada':
+        $boErro = false;
+        $stMsg = '';
+        
         if (($_REQUEST["inCodDotacaoSuplementada"] != "") && ($_REQUEST['inCodEntidade'] != "")) {
             $obRegra->addDespesaSuplementada();
             $obRegra->roUltimoDespesaSuplementada->setCodDespesa( $_REQUEST["inCodDotacaoSuplementada"] );
@@ -443,23 +453,29 @@ switch ($stCtrl) {
             $stNomDespesa = $rsDespesa->getCampo( "descricao" );
 
             if (!$stNomDespesa) {
-                $js  = 'f.inCodDotacaoSuplementada.value = "";';
-                $js .= 'f.inCodDotacaoSuplementada.focus();';
-                $js .= 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "&nbsp;";';
-                $js .= "alertaAviso('@Valor inválido. (".$_REQUEST["inCodDotacaoSuplementada"].")','form','erro','".Sessao::getId()."');";
+                $boErro = true;
+                $stMsg .= "@Valor inválido. (".$_REQUEST["inCodDotacaoSuplementada"].")";
             } else {
                 $js  = 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "'.$stNomDespesa.'";';
             }
         } else {
-            $js  = 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "&nbsp;";';
+            $boErro = true;
+            if($_REQUEST['inCodEntidade'] == "")
+                $stMsg .= "@Selecione a Entidade para buscar a Dotação Orçamentária Suplementada.";
         }
+
+        if ($boErro) {
+            $js  = 'f.inCodDotacaoSuplementada.value = "";';
+            $js .= 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "&nbsp;";';
+            if($stMsg!='')
+                $js .= "alertaAviso('".$stMsg."','form','erro','".Sessao::getId()."');";
+        }
+
         SistemaLegado::executaFrameOculto($js);
     break;
     case 'limparListas':
         Sessao::remove('arSuplementada');
         Sessao::remove('arRedutoras');
-        //sessao->transf3['arSuplementada'] = array();
-        //sessao->transf3['arRedutoras']    = array();
     break;
 
         case 'buscaNorma':
