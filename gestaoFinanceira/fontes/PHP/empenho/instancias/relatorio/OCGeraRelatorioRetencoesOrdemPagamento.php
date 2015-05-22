@@ -54,7 +54,7 @@ $preview->addParametro('entidade_retencao', $stCodEntidades);
 
 // Faz as verificações para o codigo da entidade que deve ser passado para montar o cabeçalho
 if (count($_REQUEST['inCodEntidade']) > 1) {
-    $stWhere = "where exercicio= '".Sessao::getExercicio()."' and parametro='cod_entidade_prefeitura'";
+    $stWhere = "where exercicio= '".$_REQUEST['stAno']."' and parametro='cod_entidade_prefeitura'";
     $inCodEntidade = SistemaLegado::pegaDado('valor', 'administracao.configuracao', $stWhere);
     $preview->addParametro('entidade', $inCodEntidade);
 } else {
@@ -63,7 +63,7 @@ if (count($_REQUEST['inCodEntidade']) > 1) {
 
 // Faz a verificação dos nomes das entidades para que apareça nos filtros selecionados
 $obTOrcamentoEntidade = new TOrcamentoEntidade;
-$obTOrcamentoEntidade->setDado('exercicio', Sessao::getExercicio());
+$obTOrcamentoEntidade->setDado('exercicio', $_REQUEST['stAno']);
 
 if (is_array($_REQUEST['inCodEntidade'])) {
     foreach ($_REQUEST['inCodEntidade'] as $inCodEntidade) {
@@ -81,7 +81,15 @@ $stNomeEntidade = implode("<br/>", $arNomeEntidade);
 $preview->addParametro('nome_entidade', $stNomeEntidade);
 
 // Adiciona outros parametros obrigatórios, por isso não é feita uma validação dos dados
-$preview->addParametro('exercicio', Sessao::getExercicio());
+if ( $_REQUEST['stAno'] == '') {
+    $arTemp = explode("/", $_REQUEST['stDataFinal']);
+    $stExercicio  = $arTemp[2];
+}else{
+    $stExercicio = $_REQUEST['stAno'];
+}
+
+$preview->addParametro('exercicio', $_REQUEST['stAno']);
+$preview->addParametro('exercicio_retencao', $stExercicio);
 $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
 $preview->addParametro('data_final', $_REQUEST['stDataFinal']);
 
@@ -152,6 +160,12 @@ if ($_REQUEST['inReceitaFinal'] != "") {
     $preview->addParametro('cod_receita_final', $_REQUEST['inReceitaFinal']);
 } else {
     $preview->addParametro('cod_receita_final', '');
+}
+
+if ( $_REQUEST['boDataPagamento'] == 'S' ) {    
+    $preview->addParametro('data_pagamento','true' );
+}else{
+    $preview->addParametro('data_pagamento','false' );
 }
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Desenvolvedor: Carlos Adriano &lt;carlos.silva@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -19,9 +19,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -30,12 +30,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -44,20 +44,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -66,31 +55,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -99,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -110,12 +77,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -124,12 +91,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -138,12 +105,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -152,12 +119,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -166,12 +133,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -180,12 +147,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -194,12 +161,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,13 +175,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -223,12 +190,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -237,12 +204,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -251,12 +218,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -265,12 +232,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -279,12 +246,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -293,12 +260,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -307,9 +274,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -318,12 +285,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -332,12 +299,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -346,23 +313,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-}]]></method>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150" extends="urbem_250.postgres">
             <list-property name="privateDriverProperties">
                 <ex-property>
                     <name>metadataBidiFormatStr</name>
@@ -379,8 +339,6 @@
                     <name>disabledContentBidiFormatStr</name>
                 </ex-property>
             </list-property>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -1206,7 +1164,7 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <property name="displayName">total_liq</property>
+                    <text-property name="displayName">total_liq</text-property>
                     <expression name="expression" type="javascript">params['sum_total_liq'] = Total.sum(row['liq'])
 
  Total.sum(row['liq'])</expression>
@@ -1214,7 +1172,7 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <property name="displayName">liq</property>
+                    <text-property name="displayName">liq</text-property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1248,8 +1206,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </column>
             <header>
                 <row id="2391">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
+                    <property name="height">0mm</property>
                     <cell id="2392">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">3</property>
@@ -1398,8 +1356,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="2397">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
+                    <property name="height">0mm</property>
                     <cell id="2400">
                         <property name="colSpan">2</property>
                         <property name="rowSpan">1</property>
@@ -1481,12 +1439,12 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="2406">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0mm</property>
                     <cell id="6667">
                         <property name="backgroundColor">#E5E5E5</property>
                         <property name="borderBottomColor">#000000</property>
@@ -1535,12 +1493,12 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                     </cell>
                 </row>
                 <row id="6858">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0mm</property>
                     <cell id="6859">
                         <property name="backgroundColor">#E5E5E5</property>
                         <property name="fontWeight">bold</property>
@@ -1773,8 +1731,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </header>
             <detail>
                 <row id="2424">
-                    <property name="height">0in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0in</property>
                     <cell id="2425">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2055,7 +2013,7 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <property name="displayName">total_liq</property>
+                    <text-property name="displayName">total_liq</text-property>
                     <expression name="expression" type="javascript">params['sum_total_liq'] =  params['sum_total_liq']  + Total.sum(row['liq'])
 
  Total.sum(row['liq'])</expression>
@@ -2063,7 +2021,7 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <property name="displayName">liq</property>
+                    <text-property name="displayName">liq</text-property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -2267,8 +2225,8 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             </header>
             <detail>
                 <row id="6759">
-                    <property name="height">0in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0in</property>
                     <cell id="6760">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2443,7 +2401,7 @@ Total.sum(row['empenhados_nao_liquidados_cancelados'])</expression>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">sum_total_liq</property>
-                    <property name="displayName">sum_total_liq</property>
+                    <text-property name="displayName">sum_total_liq</text-property>
                     <expression name="expression" type="javascript">params["sum_total_liq"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -2809,13 +2767,13 @@ str.search("Instituto") &lt; 0</expression>
                 </structure>
                 <structure>
                     <property name="name">total_liq</property>
-                    <property name="displayName">total_liq</property>
+                    <text-property name="displayName">total_liq</text-property>
                     <expression name="expression" type="javascript">Total.sum(row['liq'])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">liq</property>
-                    <property name="displayName">liq</property>
+                    <text-property name="displayName">liq</text-property>
                     <expression name="expression" type="javascript">dataSetRow["disponibilidade_caixa_liquida"] - (dataSetRow["liquidados_nao_pagos"] + dataSetRow["liquidados_nao_pagos_exercicios_anteriores"] + dataSetRow["empenhados_nao_liquidados_exercicios_anteriores"] + dataSetRow["obrigacoes_financeiras"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -3017,8 +2975,8 @@ str.search("Instituto") &lt; 0</expression>
             </header>
             <detail>
                 <row id="6811">
-                    <property name="height">0in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0in</property>
                     <cell id="6812">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>

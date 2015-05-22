@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCGeraRelatorioAnexoII.php 61189 2014-12-12 19:46:17Z arthur $
-  * $Date: 2014-12-12 17:46:17 -0200 (Sex, 12 Dez 2014) $
-  * $Author: arthur $
-  * $Rev: 61189 $
+  * $Id: OCGeraRelatorioAnexoII.php 62495 2015-05-14 18:23:15Z jean $
+  * $Date: 2015-05-14 15:23:15 -0300 (Qui, 14 Mai 2015) $
+  * $Author: jean $
+  * $Rev: 62495 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -48,7 +48,7 @@ $preview->setVersaoBirt( '2.5.0' );
 $boRestos = $request->get("stRestos") == "true" ? "true" : "false";
 
 $preview->addParametro("stExercicio"  , Sessao::getExercicio());
-$preview->addParametro("stFiltro"     , "AND od.cod_entidade IN (2) AND od.cod_recurso = 101 AND od.cod_funcao = 12 AND od.cod_subfuncao IN (122,272,361,365,367)");
+$preview->addParametro("stFiltro"     , "AND od.cod_entidade IN (2) AND od.cod_recurso = 101 AND od.cod_funcao = 12 AND od.cod_subfuncao IN (122,272,361,365,367,368)");
 $preview->addParametro("stDataInicial", $request->get("stDataInicial"));
 $preview->addParametro("stDataFinal"  , $request->get("stDataFinal"));
 $preview->addParametro("stSituacao"   , $request->get("stSituacao"));

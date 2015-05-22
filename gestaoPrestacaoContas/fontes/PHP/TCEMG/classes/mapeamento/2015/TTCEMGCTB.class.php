@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCTB.class.php 62371 2015-04-29 16:38:50Z michel $
+    * $Id: TTCEMGCTB.class.php 62547 2015-05-19 17:15:30Z michel $
 
 */
 
@@ -926,9 +926,9 @@ class TTCEMGCTB extends Persistente
                        , receita_indentificadores_peculiar_receita.cod_identificador as identificador_deducao
                        , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
                            THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 8)::integer
-                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
-                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
-                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+                           ELSE CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6)::INTEGER = 172401
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6)::INTEGER = 172199
+                                       OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6)::INTEGER = 193199
                                      THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
                                     
                                      ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER

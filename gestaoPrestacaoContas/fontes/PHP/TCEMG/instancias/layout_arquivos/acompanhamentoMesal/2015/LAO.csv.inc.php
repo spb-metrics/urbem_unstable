@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: LAO.csv.inc.php 62280 2015-04-17 13:50:27Z michel $
-  * $Date: 2015-04-17 10:50:27 -0300 (Sex, 17 Abr 2015) $
+  * $Id: LAO.csv.inc.php 62439 2015-05-11 13:14:01Z michel $
+  * $Date: 2015-05-11 10:14:01 -0300 (Seg, 11 Mai 2015) $
   * $Author: michel $
-  * $Rev: 62280 $
+  * $Rev: 62439 $
   *
 */
 /**
@@ -82,13 +82,14 @@ $arRecordSetLAO99 = array(
 
 $rsRecordSetLAO99 = new RecordSet();
 $rsRecordSetLAO99->preenche($arRecordSetLAO99);
+$boRegistro99 = true;
 
 $inCount = 0;
 if (count($rsRecordSetLAO10->getElementos()) > 0) {
 
     foreach ($rsRecordSetLAO10->getElementos() as $arLAO10) {
         $inCount++;
-
+        $boRegistro99 = false;
         $stChave = $arLAO10['tipo_registro'].$arLAO10['cod_orgao'].$arLAO10['nro_lei_alteracao'];
         $inNumLei = $arLAO10['nro_lei_alteracao'];
 
@@ -177,7 +178,7 @@ if (count($rsRecordSetLAO20->getElementos()) > 0) {
 
     foreach ($rsRecordSetLAO20->getElementos() as $arLAO20) {
         $inCount++;
-
+        $boRegistro99 = false;
         $stChave = $arLAO20['tipo_registro'].$arLAO20['cod_orgao'].$arLAO20['nro_lei_alter_orcam'];
         $inNumLei2 = $arLAO20['nro_lei_alter_orcam'];
 
@@ -261,7 +262,7 @@ if (count($rsRecordSetLAO20->getElementos()) > 0) {
     }
 }
 
-if ($stChave == '') {
+if ($boRegistro99) {
     $obExportador->roUltimoArquivo->addBloco($rsRecordSetLAO99);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');

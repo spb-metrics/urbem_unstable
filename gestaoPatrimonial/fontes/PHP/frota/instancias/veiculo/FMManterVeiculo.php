@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterVeiculo.php 61881 2015-03-12 12:51:02Z carlos.silva $
+    $Id: FMManterVeiculo.php 62489 2015-05-14 13:40:01Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -46,6 +46,7 @@ include_once( CAM_GP_FRO_MAPEAMENTO."TFrotaControleInterno.class.php" );
 include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
 include_once( CAM_GPC_TCERN_MAPEAMENTO."TTCERNCategoriaVeiculoTCE.class.php" );
 include_once( CAM_GPC_TCERN_MAPEAMENTO."TTCERNVeiculoCategoriaVinculo.class.php" );
+include_once(CAM_GA_PROT_COMPONENTES.'IPopUpProcesso.class.php');
 
 $stPrograma = "ManterVeiculo";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -404,6 +405,72 @@ $obSpnLocacao->setId ( 'spnLocacao' );
 //$obSpnLocacao->setName ( 'spnLocacao' );
 
 /****
+* Cessão
+****/
+
+//cria um hidden para o id
+$obHdnIdCessao = new Hidden();
+$obHdnIdCessao->setName( 'hdnIdCessao' );
+$obHdnIdCessao->setId( 'hdnIdCessao' );
+
+//cria um form
+$obFormCessao = new Form();
+$obFormCessao->setAction ($pgProc);
+$obFormCessao->setTarget ("oculto");
+
+//processo
+$obPopUpProcesso = new IPopUpProcesso($obFormCessao);
+$obPopUpProcesso->setRotulo("Processo");
+$obPopUpProcesso->obCampoCod->setId('stProcessoCessao');
+$obPopUpProcesso->obCampoCod->setName('stProcessoCessao');
+$obPopUpProcesso->setValidar(true);
+$obPopUpProcesso->setObrigatorioBarra( true );
+
+//instancia o CGM cedente
+$obCGMCedente = new IPopUpCGMVinculado( $obForm );
+$obCGMCedente->setTabelaVinculo    ( 'sw_cgm_pessoa_juridica' );
+$obCGMCedente->setCampoVinculo     ( 'numcgm'                 );
+$obCGMCedente->setNomeVinculo      ( 'CGM Cedente'            );
+$obCGMCedente->setRotulo           ( 'CGM Cedente'            );
+$obCGMCedente->setTitle            ( 'Informe o CGM cedente.' );
+$obCGMCedente->setName             ( 'stNomCedente'           );
+$obCGMCedente->setId               ( 'stNomCedente'           );
+$obCGMCedente->obCampoCod->setName ( 'inCodCedente'           );
+$obCGMCedente->obCampoCod->setId   ( 'inCodCedente'           );
+$obCGMCedente->setObrigatorioBarra( true );
+$obCGMCedente->setNull ( true );
+
+//ĩnstancia a data de início
+$obDtInicioCessao = new Data();
+$obDtInicioCessao->setRotulo( 'Início' );
+$obDtInicioCessao->setTitle ( 'Informe a data de início da cessão.' );
+$obDtInicioCessao->setName  ( 'dtInicioCessao' );
+$obDtInicioCessao->setId    ( 'dtInicioCessao' );
+$obDtInicioCessao->setObrigatorioBarra( true );
+
+//ĩnstancia a data de término
+$obDtTerminoCessao = new Data();
+$obDtTerminoCessao->setRotulo( 'Término' );
+$obDtTerminoCessao->setTitle ( 'Informe a data de término da cessão.' );
+$obDtTerminoCessao->setName  ( 'dtTerminoCessao' );
+$obDtTerminoCessao->setId    ( 'dtTerminoCessao' );
+$obDtTerminoCessao->setObrigatorioBarra( true );
+
+$obSpnListaCessao = new Span();
+$obSpnListaCessao->setId ( 'spnListaCessao' );
+
+//define objeto buttion para incluir cessao
+$obBtnIncluirCessao = new Button;
+$obBtnIncluirCessao->setValue             ( "Incluir" );
+$obBtnIncluirCessao->setId                ( "incluiDadosCessao" );
+$obBtnIncluirCessao->obEvento->setOnClick ( "montaParametrosGET('incluirDadosCessao','stProcessoCessao,inCodCedente,stNomCedente,dtInicioCessao,dtTerminoCessao');" );
+
+//Define Objeto Button para Limpar cessao
+$obBtnLimparCessao = new Button;
+$obBtnLimparCessao->setValue             ( "Limpar" );
+$obBtnLimparCessao->obEvento->setOnClick ( "montaParametrosGET('limparDadosCessao');" );
+
+/****
  * Controle de documentos
 ****/
 
@@ -514,7 +581,6 @@ $obFormulario->addComponente( $obSelectTipoVeiculo );
 $obFormulario->addComponente( $obISelectMultiploCombustivel );
 $obFormulario->agrupaComponentes( array( $obRdOrigemProprio, $obRdOrigemTerceiro ) );
 $obFormulario->addSpan      ( $obSpnOrigem );
-
 $obFormulario->addHidden    ($obHdnOrigem,true);
 
 $obFormulario->addSpan      ( $obSpnPrefixoPlaca );
@@ -543,6 +609,22 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == '20'
 }
 
 $obFormulario->addSpan      ( $obSpnResponsavel );
+
+$obFormulario->addTitulo    ( 'Cessão' );
+$obFormulario->addHidden    ( $obHdnIdCessao );
+$obFormulario->addComponente( $obPopUpProcesso );
+$obFormulario->addComponente( $obCGMCedente );
+$obFormulario->addComponente( $obDtInicioCessao );
+$obFormulario->addComponente( $obDtTerminoCessao );
+$obFormulario->defineBarra  ( array( $obBtnIncluirCessao, $obBtnLimparCessao ) );
+$obFormulario->addSpan      ( $obSpnListaCessao );
+
+/*
+$obFormulario->addSpan      ( $obSpnEmpenho );
+$obFormulario->defineBarra  ( array( $obBtnIncluirCessao, $obBtnLimparCessao ) );
+$obFormulario->addSpan      ( $obSpnDocumentos );
+$obFormulario->addSpan      ( $obSpnInfracao );
+*/
 
 $obFormulario->addTitulo    ( 'Controle de Documentos' );
 $obFormulario->addHidden    ( $obHdnId );

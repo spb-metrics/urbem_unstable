@@ -23,22 +23,8 @@
 */
 ?>
 <?php
-   /*
-    * Arquivo de geracao do arquivo gestaoFiscalPE TCM/MG
-    * Data de Criação   : 09/03/2015
 
-    * @author Analista      Dagiane Vieira
-    * @author Desenvolvedor Michel Teixeira
-
-    * @package URBEM
-    * @subpackage
-
-    * @ignore
-
-    $Id: gestaoFiscalPE.inc.php 61836 2015-03-09 15:41:51Z michel $
-    */
-
-    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGMedidas.class.php' );
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGMedidas.class.php" );
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
@@ -69,15 +55,16 @@
 
         $rsArquivo->Proximo();
     }
+
     $rsArquivo->setPrimeiroElemento();
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contratacao_aro');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('riscos_fiscais');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('metas_fiscais');    

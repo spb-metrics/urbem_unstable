@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: FMManterConfiguracaoDirf.php 61330 2015-01-07 15:57:46Z diogo.zarpelon $
+    $Id: FMManterConfiguracaoDirf.php 62511 2015-05-15 17:45:15Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -41,10 +41,11 @@ include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php"        
 include_once ( CAM_GF_CONT_COMPONENTES."IPopUpEstrutural.class.php"                                      );
 include_once ( CAM_GRH_FOL_COMPONENTES."IBuscaInnerEvento.class.php"                                     );
 include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPrestador.class.php"                          );
-include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrf.class.php"                               );
-include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfInss.class.php"                               );
+//include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfPlanoConta.class.php"                     );
+//include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfContaReceita.class.php"                 );
 include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfInss.class.php"                               );
 include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php"                              );
+include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
 
 $stPrograma = "ManterConfiguracaoDirf";
 $pgFilt = "FL".$stPrograma.".php";
@@ -54,9 +55,11 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$jsOnload = "montaParametrosGET('montaListaPrestadoresServico', '');";
+$jsOnload = "montaParametrosGET('montaListaPrestadoresServico', ''); ";
 
 Sessao::write("arPrestadoresServico", array());
+Sessao::write("arPrestadoresServicoRetencaoINSS", array());
+Sessao::write("arPrestadoresServicoRetencaoIRRF", array());
 Sessao::write("arPlanoSaude", array());
 
 $stIdsComponentes = "";
@@ -138,38 +141,52 @@ if ($_REQUEST["stAcao"] == "alterar") {
     $arElementosPlano = array();
     while ( !$rsConfiguracaoDirfPlano->eof() ) {
         $arTMP = array();
-        $arTMP['inId'] = count($arElementosPlano)+1;
-        $arTMP['inRegistro'] = $rsConfiguracaoDirfPlano->getCampo('registro_ans');
-        $arTMP['inCGMPlanoSaude'] = $rsConfiguracaoDirfPlano->getCampo('numcgm');
-        $arTMP['stNomCGMPlanoSaude'] = $rsConfiguracaoDirfPlano->getCampo('nom_cgm');
-        $arTMP['inCodigoEventoPlanoSaude'] = $rsConfiguracaoDirfPlano->getCampo('codigo');
-        $arTMP['stNomEventoPlanoSaude'] = $rsConfiguracaoDirfPlano->getCampo('descricao');
+        $arTMP['inId']                      = count($arElementosPlano)+1;
+        $arTMP['inRegistro']                = $rsConfiguracaoDirfPlano->getCampo('registro_ans');
+        $arTMP['inCGMPlanoSaude']           = $rsConfiguracaoDirfPlano->getCampo('numcgm');
+        $arTMP['stNomCGMPlanoSaude']        = $rsConfiguracaoDirfPlano->getCampo('nom_cgm');
+        $arTMP['inCodigoEventoPlanoSaude']  = $rsConfiguracaoDirfPlano->getCampo('codigo');
+        $arTMP['stNomEventoPlanoSaude']     = $rsConfiguracaoDirfPlano->getCampo('descricao');
         $arElementosPlano[] = $arTMP;
         $rsConfiguracaoDirfPlano->proximo();
     }
     Sessao::write("arPlanoSaude", $arElementosPlano);
+    
+    $obTIMAConfiguracaoDirfIrrf = new TIMAConfiguracaoDirf();
+    $obTIMAConfiguracaoDirfIrrf->setDado('exercicio', $_REQUEST["inExercicio"]);
+    $obTIMAConfiguracaoDirfIrrf->recuperaDadosIRRF($rsConfiguracaoDirfIrrf, "","",$boTransacao);    
 
-    $stFiltro = " WHERE configuracao_dirf_irrf.exercicio = '".$_REQUEST["inExercicio"]."'";
-    $obTIMAConfiguracaoDirfIrrf = new TIMAConfiguracaoDirfIrrf();
-    $obTIMAConfiguracaoDirfIrrf->recuperaRelacionamento($rsConfiguracaoDirfIrrf, $stFiltro);
-
-    if ($rsConfiguracaoDirfIrrf->getNumLinhas() > 0) {
-        $stFiltro  = " WHERE trim(cod_estrutural) = '".substr($rsConfiguracaoDirfIrrf->getCampo("cod_estrutural"),2)."' ";
-        $stFiltro .= "   AND exercicio = ".$_REQUEST["inExercicio"];
-        $obTOrcamentoContaReceita = new TOrcamentoContaReceita;
-        $obTOrcamentoContaReceita->recuperaTodos($rsContaReceita, $stFiltro);
-
-        $inCodClassificacaoIRRF = $rsContaReceita->getCampo("cod_estrutural");
-        $stCodClassificacaoIRRF = $rsContaReceita->getCampo("descricao");
+    Sessao::remove("arPrestadoresServicoRetencaoIRRF");
+    $arIRRF = array();
+    
+    while ( !$rsConfiguracaoDirfIrrf->eof() ) {
+        $arTMP = array();
+        $arTMP['inId']              = count($arIRRF) + 1;
+        $arTMP['classificacao']     = $rsConfiguracaoDirfIrrf->getCampo("cod_estrutural");
+        $arTMP['descricao']         = $rsConfiguracaoDirfIrrf->getCampo("descricao");
+        $arTMP['cod_receita_irrf']  = $rsConfiguracaoDirfIrrf->getCampo("cod_receita_irrf");
+        
+        $arIRRF[] = $arTMP;
+        $rsConfiguracaoDirfIrrf->proximo();
     }
+    Sessao::write("arPrestadoresServicoRetencaoIRRF",$arIRRF);
 
     $stFiltro = " WHERE configuracao_dirf_inss.exercicio = '".$_REQUEST["inExercicio"]."'";
     $obTIMAConfiguracaoDirfInss = new TIMAConfiguracaoDirfInss();
     $obTIMAConfiguracaoDirfInss->recuperaRelacionamento($rsConfiguracaoDirfInss, $stFiltro);
-    if ($rsConfiguracaoDirfInss->getNumLinhas() > 0) {
-        $inCodClassificacaoINSS = $rsConfiguracaoDirfInss->getCampo("cod_estrutural");
-        $stCodClassificacaoINSS = $rsConfiguracaoDirfInss->getCampo("nom_conta");
+    
+    Sessao::remove("arPrestadoresServicoRetencaoINSS");
+    $arINSS = array();
+    while ( !$rsConfiguracaoDirfInss->eof() ) {
+        
+        $arTMP = array();
+        $arTMP['inId']          = count($arINSS) + 1;
+        $arTMP['classificacao'] = $rsConfiguracaoDirfInss->getCampo("cod_estrutural");
+        $arTMP['descricao']     = $rsConfiguracaoDirfInss->getCampo("nom_conta");
+        $arINSS[] = $arTMP;
+        $rsConfiguracaoDirfInss->proximo();
     }
+    Sessao::write("arPrestadoresServicoRetencaoINSS",$arINSS);
 
     if ( $rsConfiguracaoDirf->getCampo('pagamento_mes_competencia') == 't' ) {
         $opPagamentoMes = 'S';
@@ -273,6 +290,7 @@ $obNaturezaEstabelecimento->setFuncaoBusca("abrePopUp('".CAM_GRH_IMA_POPUPS."con
 
 $obRegra             = new REmpenhoEmpenhoAutorizacao;
 $stMascaraRubrica    = $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->recuperaMascara();
+
 $obBscRubricaDespesa = new BuscaInner;
 $obBscRubricaDespesa->setRotulo               ( "Elemento de Despesa"                       );
 $obBscRubricaDespesa->setTitle                ( "Informe o elemento de despesa."            );
@@ -332,26 +350,53 @@ $obHdnInId->setValue( $_REQUEST["inId"] );
 $obIPopUpEstrutural = new IPopUpEstrutural();
 $obIPopUpEstrutural->setRotulo               ( "Código Classificação INSS" );
 $obIPopUpEstrutural->setTitle                ( "Informe o Código Classificação(receita extra-orçamentária) no plano de contas referente a retenção da previdência INSS." );
+$obIPopUpEstrutural->setName                 ( "stCodClassificacaoINSS" );
 $obIPopUpEstrutural->setId                   ( "stCodClassificacaoINSS" );
 $obIPopUpEstrutural->setValue                ( $stCodClassificacaoINSS  );
 $obIPopUpEstrutural->obCampoCod->setName     ( "inCodClassificacaoINSS" );
+$obIPopUpEstrutural->obCampoCod->setId       ( "inCodClassificacaoINSS" );
 $obIPopUpEstrutural->obCampoCod->setValue    ( $inCodClassificacaoINSS  );
 
+$obBtnIncluirINSS = new Button;
+$obBtnIncluirINSS->setName              ( "btIncluirINSS"    );
+$obBtnIncluirINSS->setId                ( "btIncluirINSS"    );
+$obBtnIncluirINSS->setValue             ( "Incluir"          );
+$obBtnIncluirINSS->obEvento->setOnClick ( " montaParametrosGET( 'incluirINSS', '');" );
+
 $obPopUpClassificacaoIRRF = new BuscaInner;
-$obPopUpClassificacaoIRRF->setRotulo               ( "Código Classificação IRRF"                 );
-$obPopUpClassificacaoIRRF->setTitle                ( "Informe o código de classificação (receita orçamentária) referente a retenção do IRRF." );
+$obPopUpClassificacaoIRRF->setRotulo               ( "Código Receita IRRF"                 );
+$obPopUpClassificacaoIRRF->setTitle                ( "Informe o código de receita (receita orçamentária ou extra orçamentária) utilizada para a retenção do IRRF." );
 $obPopUpClassificacaoIRRF->setId                   ( "stCodClassificacaoIRRF"                    );
+$obPopUpClassificacaoIRRF->setName                 ( "stCodClassificacaoIRRF"                    );
 $obPopUpClassificacaoIRRF->setValue                ( $stCodClassificacaoIRRF                     );
-$obPopUpClassificacaoIRRF->obCampoCod->setName     ( "inCodClassificacaoIRRF"                    );
-$obPopUpClassificacaoIRRF->obCampoCod->setId       ( "inCodClassificacaoIRRF"                    );
-$obPopUpClassificacaoIRRF->obCampoCod->setSize     ( strlen($stMascaraRubrica)                   );
-$obPopUpClassificacaoIRRF->obCampoCod->setMaxLength( strlen($stMascaraRubrica)                   );
-$obPopUpClassificacaoIRRF->obCampoCod->setValue    ( $inCodClassificacaoIRRF                     );
-$obPopUpClassificacaoIRRF->obCampoCod->setAlign    ("left"                                       );
+$obPopUpClassificacaoIRRF->obCampoCod->setName     ( "inCodReceitaIRRF"                    );
+$obPopUpClassificacaoIRRF->obCampoCod->setId       ( "inCodReceitaIRRF"                    );
+$obPopUpClassificacaoIRRF->obCampoCod->setSize     ( 5         );
+$obPopUpClassificacaoIRRF->obCampoCod->setMaxLength( 5         );
+$obPopUpClassificacaoIRRF->obCampoCod->setValue    ( $inCodReceitaIRRF                     );
+$obPopUpClassificacaoIRRF->obCampoCod->setAlign    ( "left"                                      );
 $obPopUpClassificacaoIRRF->obCampoCod->obEvento->setOnFocus("selecionaValorCampo( this );"       );
-$obPopUpClassificacaoIRRF->obCampoCod->obEvento->setOnKeyUp("mascaraDinamico('".$stMascaraRubrica."', this, event);");
-$obPopUpClassificacaoIRRF->obCampoCod->obEvento->setOnBlur ("montaParametrosGET('mascaraClassificacaoIRRF', 'inCodClassificacaoIRRF,stMascClassificacao,inExercicio');");
-$obPopUpClassificacaoIRRF->setFuncaoBusca( "abrePopUp('".CAM_GF_ORC_POPUPS."classificacaoreceita/FLClassificacaoReceita.php','frm','inCodClassificacaoIRRF','stCodClassificacaoIRRF','&mascClassificacao=$stMascaraRubrica&inExercicio='+document.getElementById('inExercicio').value,'".Sessao::getId()."','800','550');" );
+$obPopUpClassificacaoIRRF->obCampoCod->obEvento->setOnBlur ("montaParametrosGET('mascaraClassificacaoIRRF', '');");
+$obPopUpClassificacaoIRRF->setFuncaoBusca( "abrePopUp('".CAM_GF_ORC_POPUPS."classificacaoreceita/FLClassificacaoReceita.php','frm','inCodReceitaIRRF','stCodClassificacaoIRRF','&mascClassificacao=$stMascaraRubrica&tipoBusca=receitaIRRF&inExercicio='+document.getElementById('inExercicio').value,'".Sessao::getId()."','800','550');" );
+
+$obHdnEstruturalIRRF = new Hidden();
+$obHdnEstruturalIRRF->setName('HdnEstruturalIRRF');
+$obHdnEstruturalIRRF->setId  ('HdnEstruturalIRRF');
+
+$obHdnstCodClassificacaoIRRF = new Hidden();
+$obHdnstCodClassificacaoIRRF->setId('HdnstCodClassificacaoIRRF');
+
+$obBtnIncluirIRRF = new Button;
+$obBtnIncluirIRRF->setName              ( "btIncluirIRRF"    );
+$obBtnIncluirIRRF->setId                ( "btIncluirIRRF"    );
+$obBtnIncluirIRRF->setValue             ( "Incluir"          );
+$obBtnIncluirIRRF->obEvento->setOnClick ( " montaParametrosGET( 'incluirIRRF', '');" );
+
+$obSpnPrestadoresServicoRetencaoINSS = new Span;
+$obSpnPrestadoresServicoRetencaoINSS->setId ( "spnListaPrestadoresServicoRetencaoINSS" );
+
+$obSpnPrestadoresServicoRetencaoIRRF = new Span;
+$obSpnPrestadoresServicoRetencaoIRRF->setId ( "spnListaPrestadoresServicoRetencaoIRRF" );
 
 $obSpnPrestadoresServico = new Span;
 $obSpnPrestadoresServico->setId ( "spnListaPrestadoresServico" );
@@ -432,6 +477,8 @@ $obFormulario->addHidden      ( $obHdnAcao );
 $obFormulario->addHidden      ( $obHdnCtrl );
 $obFormulario->addHidden      ( $obHdnInId );
 $obFormulario->addHidden      ( $obHdnMascaraRubrica );
+$obFormulario->addHidden      ( $obHdnstCodClassificacaoIRRF );
+$obFormulario->addHidden      ( $obHdnEstruturalIRRF );
 $obFormulario->addTitulo      ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() , "right");
 $obFormulario->addForm        ( $obForm );
 $obFormulario->addTitulo      ( "Configuração DIRF" );
@@ -452,9 +499,15 @@ $obFormulario->addComponente  ( $obCmbTipoPrestador );
 $obFormulario->addComponente  ( $obPopUpRetencaoDIRF );
 $obFormulario->incluirAlterar ( "PrestadoresDeServico", $arCampos, true, false, $stIdsComponentes);
 $obFormulario->addSpan        ( $obSpnPrestadoresServico );
-$obFormulario->addTitulo      ("Informações sobre Retenções - Prestadores de Serviço");
-$obFormulario->addComponente  ( $obIPopUpEstrutural );
-$obFormulario->addComponente  ( $obPopUpClassificacaoIRRF );
+
+$obFormulario->addTitulo      ( "Informações sobre Retenções - Prestadores de Serviço");
+$obFormulario->addComponente  ( $obIPopUpEstrutural);
+$obFormulario->addComponente  ( $obBtnIncluirINSS);
+$obFormulario->addSpan        ( $obSpnPrestadoresServicoRetencaoINSS );
+$obFormulario->addComponente  ( $obPopUpClassificacaoIRRF);
+$obFormulario->addComponente  ( $obBtnIncluirIRRF);
+$obFormulario->addSpan        ( $obSpnPrestadoresServicoRetencaoIRRF );
+
 $obFormulario->addTitulo      ("Informações de Plano Privado de Assistência à Saúde - Coletivo Empresarial");
 $obFormulario->addComponente  ( $obIPopUpCGMPlanoSaude );
 $obFormulario->addComponente  ( $obIntRegistro );
@@ -470,6 +523,8 @@ $obFormulario->show();
 if ($_REQUEST['stAcao'] == 'alterar') {
     $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPlanoSaude');";
     $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPrestadoresServico');";
+    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPrestadoresServicoRetencaoINSS');";
+    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPrestadoresServicoRetencaoIRRF');";
 }
 
 $jsOnload = $stJs;

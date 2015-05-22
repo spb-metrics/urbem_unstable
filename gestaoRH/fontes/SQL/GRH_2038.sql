@@ -30,13 +30,5 @@
 *
 */
 
-----------------
--- Ticket #22872
-----------------
-
-SELECT atualizarbanco('ALTER TABLE ima.configuracao_dirf_inss DROP CONSTRAINT pk_configuracao_dirf_inss;');
-SELECT atualizarbanco('ALTER TABLE ima.configuracao_dirf_inss ADD  CONSTRAINT pk_configuracao_dirf_inss PRIMARY KEY (exercicio, cod_conta);');
-
-SELECT atualizarbanco('ALTER TABLE ima.configuracao_dirf_irrf DROP CONSTRAINT pk_configuracao_dirf_irrf;');
-SELECT atualizarbanco('ALTER TABLE ima.configuracao_dirf_irrf ADD  CONSTRAINT pk_configuracao_dirf_irrf PRIMARY KEY (exercicio, cod_conta);');
+SELECT now();
 

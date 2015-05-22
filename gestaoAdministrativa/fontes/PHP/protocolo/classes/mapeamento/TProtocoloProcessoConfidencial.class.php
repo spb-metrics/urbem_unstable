@@ -24,48 +24,27 @@
 ?>
 <?php
 /**
-    * Classe de mapeamento da tabela ima.configuracao_dirf_irrf
-    * Data de Criação: 16/01/2009
-
-    * @author Analista     : Dagiane
-    * @author Desenvolvedor: Rafael Garbin
-
-    * @package URBEM
-    * @subpackage Mapeamento
-
-    $Id:$
-*/
+ * Classe de Mapeamento para a tabela sw_processo_confidencial
+ * Data de Criação: 04/05/2015
+ * $Id:$
+ */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-class TIMAConfiguracaoDirfIrrf extends Persistente
+class TProtocoloProcessoConfidencial extends Persistente
 {
-    /**
-        * Método Construtor
-        * @access Private
-    */
-    public function TIMAConfiguracaoDirfIrrf()
+
+    public function TProtocoloProcessoConfidencial()
     {
         parent::Persistente();
-        $this->setTabela("ima.configuracao_dirf_irrf");
-
-        $this->setCampoCod('');
-        $this->setComplementoChave('exercicio');
-
-        $this->AddCampo('exercicio','char'   ,true  ,'4'  ,true,'TOrcamentoContaReceita');
-        $this->AddCampo('cod_conta','integer',true  ,''   ,false,'TOrcamentoContaReceita');
+        $this->setTabela('sw_processo_confidencial');
+        
+        $this->setComplementoChave('ano_exercicio, cod_processo, numcgm');
+        
+        $this->AddCampo('ano_exercicio' ,'varchar' ,true ,'' ,true ,true);
+        $this->AddCampo('cod_processo'  ,'integer' ,true ,'' ,true ,true);
+        $this->AddCampo('numcgm'        ,'integer' ,true ,'' ,true ,true);
     }
 
-    public function montaRecuperaRelacionamento()
-    {
-        $stSql  = "     SELECT *                                                         \n";
-        $stSql .= "       FROM ima.configuracao_dirf_irrf                                \n";
-        $stSql .= " INNER JOIN contabilidade.plano_conta                                 \n";
-        $stSql .= "         ON configuracao_dirf_irrf.cod_conta = plano_conta.cod_conta  \n";
-        $stSql .= "        AND configuracao_dirf_irrf.exercicio = plano_conta.exercicio  \n";
-
-        return $stSql;
-    }
 }
-?>

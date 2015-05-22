@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterVeiculo.php 61844 2015-03-09 21:09:51Z jean $
+    * $Id: PRManterVeiculo.php 62535 2015-05-18 19:36:53Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -53,6 +53,7 @@ include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemResponsavel.class.php" );
 include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioVeiculoUniorcam.class.php" );
 include_once( CAM_GPC_TCERN_MAPEAMENTO."TTCERNVeiculoCategoriaVinculo.class.php" );
 include_once( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoLocacao.class.php' );
+include_once( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoCessao.class.php' );
 
 
 $stPrograma = "ManterVeiculo";
@@ -81,6 +82,7 @@ $obTFrotaTipoVeiculo = new TFrotaTipoVeiculo();
 $obTPatrimonioVeiculoUniorcam = new TPatrimonioVeiculoUniorcam();
 $obTFrotaControleInterno = new TFrotaControleInterno();
 $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao();
+$obTFrotaVeiculoCessao = new TFrotaVeiculoCessao();
 
 Sessao::setTrataExcecao( true );
 Sessao::getTransacao()->setMapeamento( $obTFrotaVeiculo );
@@ -98,6 +100,7 @@ Sessao::getTransacao()->setMapeamento( $obTPatrimonioBemResponsavel );
 Sessao::getTransacao()->setMapeamento( $obTPatrimonioVeiculoUniorcam );
 Sessao::getTransacao()->setMapeamento( $obTFrotaControleInterno );
 Sessao::getTransacao()->setMapeamento( $obTFrotaVeiculoLocacao );
+Sessao::getTransacao()->setMapeamento( $obTFrotaVeiculoCessao );
 
 if ($_REQUEST['inCategoriaVeiculo']) {
     $obTTCERNVeiculoCategoriaVinculo = new TTCERNVeiculoCategoriaVinculo();
@@ -219,24 +222,6 @@ switch ($stAcao) {
                 $obTFrotaVeiculoTerceirosResponsavel->setDado('dt_inicio', $_REQUEST['dtInicio'] );
                 $obTFrotaVeiculoTerceirosResponsavel->inclusao();
                 
-                //if(!empty($_REQUEST['inCodEntidade'])) {
-                //    if(empty($_REQUEST['inCodOrgao'])) {
-                //        SistemaLegado::exibeAviso(urlencode('Ao selecionar uma Entidade você deve obrigatoriamente selecionar um Órgão.'),"n_incluir","erro");
-                //        SistemaLegado::LiberaFrames(true,true);
-                //        Sessao::encerraExcecao();
-                //        die;
-                //    }
-                //}
-                
-                //if(!empty($_REQUEST['inCodOrgao'])) {
-                //    if(empty($_REQUEST['inCodUnidade'])) {
-                //        SistemaLegado::exibeAviso(urlencode('Ao selecionar um Órgão você deve obrigatoriamente selecionar uma Unidade.'),"n_incluir","erro");
-                //        SistemaLegado::LiberaFrames(true,true);
-                //        Sessao::encerraExcecao();
-                //        die;
-                //    }
-                //}
-                
                 if(!empty($_REQUEST['inCodEntidade']) && !empty($_REQUEST['inCodOrgao']) && !empty($_REQUEST['inCodUnidade'])) {
                     $obTPatrimonioVeiculoUniorcam->setDado('cod_veiculo',$inCodVeiculo);
                     $obTPatrimonioVeiculoUniorcam->setDado('exercicio',$_REQUEST['stExercicio']);
@@ -318,7 +303,8 @@ switch ($stAcao) {
             //seta os dados da table frota.veiculo_locacao e inclui
             if ( is_array( Sessao::read('arLocacoes') ) ) {
                 foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
-                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id'] );
+                    $obTFrotaVeiculoLocacao->proximoCod($inCodLocacao);
+                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $inCodLocacao );
                     $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $inCodVeiculo );
                     $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
                     $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
@@ -330,37 +316,22 @@ switch ($stAcao) {
                     $obTFrotaVeiculoLocacao->setDado( 'cod_entidade' , $arTemp['inCodEntidadeLocacao'] );
                     $obTFrotaVeiculoLocacao->setDado( 'cod_empenho'  , $arTemp['inNumEmpenhoLocacao'] );
                     $obTFrotaVeiculoLocacao->setDado( 'vl_locacao'   , $arTemp['inValorLocacao'] );
-
-                    $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacao);
-
-                    if ($rsVeiculoLocacao->getNumLinhas() > 0) {
-                        $obTFrotaVeiculoLocacao->alteracao();
-                    } else {
-                        $obTFrotaVeiculoLocacao->inclusao();
-                    }
+                    $obTFrotaVeiculoLocacao->inclusao();
                 }
             }
 
-            if ( is_array( Sessao::read('arLocacoesExcluidas') ) ) {
-                foreach ( Sessao::read('arLocacoesExcluidas') AS $arTemp ) {
-                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $inCodVeiculo );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
-                    $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
-                    $obTFrotaVeiculoLocacao->setDado( 'cgm_locatario', $arTemp['inCodLocatario'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_contrato'  , $arTemp['dtContrato'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_inicio'    , $arTemp['dtIniLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_termino'   , $arTemp['dtFimLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'exercicio'    , $arTemp['stExercicioLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_entidade' , $arTemp['inCodEntidadeLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_empenho'  , $arTemp['inNumEmpenhoLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'vl_locacao'   , $arTemp['inValorLocacao'] );
-
-                    $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacaoExclusao);
-
-                    if ($rsVeiculoLocacaoExclusao->getNumLinhas > 0) {
-                        $obTFrotaVeiculoLocacao->exclusao();
-                    }
+            //seta os dados da table frota.veiculo_cessao e inclui
+            if ( is_array( Sessao::read('arListaCessao') ) ) {
+                foreach ( Sessao::read('arListaCessao') AS $arTemp ) {
+                    $obTFrotaVeiculoCessao->proximoCod($inCodCessao);
+                    $obTFrotaVeiculoCessao->setDado( 'id'            , $inCodCessao );
+                    $obTFrotaVeiculoCessao->setDado( 'cod_veiculo'   , $inCodVeiculo );
+                    $obTFrotaVeiculoCessao->setDado( 'cod_processo'  , $arTemp['cod_processo'] );
+                    $obTFrotaVeiculoCessao->setDado( 'exercicio'     , $arTemp['exercicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cgm_cedente'   , $arTemp['cgm_cedente'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_inicio'     , $arTemp['dt_inicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_termino'    , $arTemp['dt_termino'] );
+                    $obTFrotaVeiculoCessao->inclusao();
                 }
             }
 
@@ -655,35 +626,9 @@ switch ($stAcao) {
                 }  
             }
 
-            //seta os dados da table frota.veiculo_locacao e inclui
-            if ( is_array( Sessao::read('arLocacoes') ) ) {
-                foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
-                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $_REQUEST['inCodVeiculo'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
-                    $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
-                    $obTFrotaVeiculoLocacao->setDado( 'cgm_locatario', $arTemp['inCodLocatario'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_contrato'  , $arTemp['dtContrato'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_inicio'    , $arTemp['dtIniLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_termino'   , $arTemp['dtFimLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'exercicio'    , $arTemp['stExercicioLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_entidade' , $arTemp['inCodEntidadeLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_empenho'  , $arTemp['inNumEmpenhoLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'vl_locacao'   , $arTemp['inValorLocacao'] );
-
-                    $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacao);
-
-                    if ($rsVeiculoLocacao->getNumLinhas() > 0) {
-                        $obTFrotaVeiculoLocacao->alteracao();
-                    } else {
-                        $obTFrotaVeiculoLocacao->inclusao();
-                    }
-                }
-            }
-
             if ( is_array( Sessao::read('arLocacoesExcluidas') ) ) {
                 foreach ( Sessao::read('arLocacoesExcluidas') AS $arTemp ) {
-                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id_locacao'] );
                     $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $_REQUEST['inCodVeiculo'] );
                     $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
                     $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
@@ -698,8 +643,90 @@ switch ($stAcao) {
 
                     $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacaoExclusao);
 
-                    if ($rsVeiculoLocacaoExclusao->getNumLinhas > 0) {
+                    if ($rsVeiculoLocacaoExclusao->getNumLinhas() > 0) {
                         $obTFrotaVeiculoLocacao->exclusao();
+                    }
+                }
+            }
+
+            //seta os dados da table frota.veiculo_locacao e inclui
+            if ( is_array( Sessao::read('arLocacoes') ) ) {
+                foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
+                    $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $_REQUEST['inCodVeiculo'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
+                    $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
+                    $obTFrotaVeiculoLocacao->setDado( 'cgm_locatario', $arTemp['inCodLocatario'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'dt_contrato'  , $arTemp['dtContrato'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'dt_inicio'    , $arTemp['dtIniLocacao'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'dt_termino'   , $arTemp['dtFimLocacao'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'exercicio'    , $arTemp['stExercicioLocacao'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'cod_entidade' , $arTemp['inCodEntidadeLocacao'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'cod_empenho'  , $arTemp['inNumEmpenhoLocacao'] );
+                    $obTFrotaVeiculoLocacao->setDado( 'vl_locacao'   , $arTemp['inValorLocacao'] );
+
+                    if ($arTemp['id_locacao'] != '') {
+                        $obTFrotaVeiculoLocacao->setDado( 'id'       , $arTemp['id_locacao'] );
+                    } else {
+                        $obTFrotaVeiculoLocacao->proximoCod($inCodNovoLocacao);
+                        $obTFrotaVeiculoLocacao->setDado( 'id'       , $inCodNovoLocacao );
+                    }
+
+                    $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacao);
+
+                    if ($rsVeiculoLocacao->getNumLinhas() > 0) {
+                        $obTFrotaVeiculoLocacao->alteracao();
+                    } else {
+                        $obTFrotaVeiculoLocacao->inclusao();
+                    }
+                }
+            } else {
+                $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacao, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo'] );
+                if ($rsVeiculoLocacao->getNumLinhas() > 0) {
+                    foreach ($rsVeiculoLocacao->getElementos() as $arTemp => $value) {
+                        $obTFrotaVeiculoLocacao->setDado( 'id' , $value['id'] );
+                        $obTFrotaVeiculoLocacao->exclusao();
+                    }
+                }
+            }
+
+            if ( is_array( Sessao::read('arCessoesExcluidas') ) ) {
+                foreach ( Sessao::read('arCessoesExcluidas') AS $arTemp ) {
+                    $obTFrotaVeiculoCessao->setDado( 'id'           , $arTemp['id_cessao'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cod_veiculo'  , $_REQUEST['inCodVeiculo'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cod_processo' , $arTemp['cod_processo'] );
+                    $obTFrotaVeiculoCessao->setDado( 'exercicio'    , $arTemp['exercicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cgm_cedente'  , $arTemp['cgm_cedente'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_inicio'    , $arTemp['dt_inicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_termino'   , $arTemp['dt_termino'] );
+
+                    $obTFrotaVeiculoCessao->recuperaPorChave($rsVeiculoCessaoExclusao);
+
+                    if ($rsVeiculoCessaoExclusao->getNumLinhas() > 0) {
+                        $obTFrotaVeiculoCessao->exclusao();
+                    }
+                }
+            }
+
+            //seta os dados da table frota.veiculo_cessao e inclui
+            if ( is_array( Sessao::read('arListaCessao') ) ) {
+                foreach ( Sessao::read('arListaCessao') AS $arTemp ) {
+                    $obTFrotaVeiculoCessao->setDado( 'cod_veiculo'   , $_REQUEST['inCodVeiculo'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cod_processo'  , $arTemp['cod_processo'] );
+                    $obTFrotaVeiculoCessao->setDado( 'exercicio'     , $arTemp['exercicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'cgm_cedente'   , $arTemp['cgm_cedente'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_inicio'     , $arTemp['dt_inicio'] );
+                    $obTFrotaVeiculoCessao->setDado( 'dt_termino'    , $arTemp['dt_termino'] );
+
+                    if ($arTemp['id_cessao'] != '') {
+                        $obTFrotaVeiculoCessao->setDado( 'id' , $arTemp['id_cessao'] );
+                        $obTFrotaVeiculoCessao->recuperaPorChave($rsVeiculoCessao);
+                        if ($rsVeiculoCessao->getNumLinhas() > 0) {
+                            $obTFrotaVeiculoCessao->alteracao();
+                        }
+                    } else {
+                        $obTFrotaVeiculoCessao->proximoCod($inCodNovoCessao);
+                        $obTFrotaVeiculoCessao->setDado( 'id' , $inCodNovoCessao );
+                        $obTFrotaVeiculoCessao->inclusao();
                     }
                 }
             }
@@ -721,7 +748,6 @@ switch ($stAcao) {
             SistemaLegado::exibeAviso(urlencode($stMensagem),"n_incluir","erro");
             echo "<script>LiberaFrames(true,true);</script>";
         }
-
         break;
 
     case 'excluir' :
@@ -785,29 +811,21 @@ switch ($stAcao) {
         $obTTCERNVeiculoCategoriaVinculo->setDado('cod_veiculo', $_REQUEST['inCodVeiculo']);
         $obTTCERNVeiculoCategoriaVinculo->exclusao();
 
-        //seta os dados da table frota.veiculo_locacao e exclui
-            if ( is_array( Sessao::read('arLocacoes') ) ) {
-                foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
-                    $obTFrotaVeiculoLocacao->setDado( 'id'           , $arTemp['id'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_veiculo'  , $_REQUEST['inCodVeiculo'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_processo' , substr($arTemp['stProcessoLocacao'],0,5) );
-                    $obTFrotaVeiculoLocacao->setDado( 'ano_exercicio', substr($arTemp['stProcessoLocacao'],6,4) );
-                    $obTFrotaVeiculoLocacao->setDado( 'cgm_locatario', $arTemp['inCodLocatario'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_contrato'  , $arTemp['dtContrato'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_inicio'    , $arTemp['dtIniLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'dt_termino'   , $arTemp['dtFimLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'exercicio'    , $arTemp['stExercicioLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_entidade' , $arTemp['inCodEntidadeLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'cod_empenho'  , $arTemp['inNumEmpenhoLocacao'] );
-                    $obTFrotaVeiculoLocacao->setDado( 'vl_locacao'   , $arTemp['inValorLocacao'] );
-
-                    $obTFrotaVeiculoLocacao->recuperaPorChave($rsVeiculoLocacao);
-
-                    if ($rsVeiculoLocacaoExclusao->getNumLinhas > 0) {
-                        $obTFrotaVeiculoLocacao->exclusao();
-                    }
-                }
+        $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacao, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo'] );
+        if ($rsVeiculoLocacao->getNumLinhas() > 0) {
+            foreach ($rsVeiculoLocacao->getElementos() as $arTemp => $value) {
+                $obTFrotaVeiculoLocacao->setDado( 'id' , $value['id'] );
+                $obTFrotaVeiculoLocacao->exclusao();
             }
+        }
+
+        $obTFrotaVeiculoCessao->recuperaTodos($rsVeiculoCessao, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo'] );
+        if ($rsVeiculoCessao->getNumLinhas() > 0) {
+            foreach ($rsVeiculoCessao->getElementos() as $arTemp => $value) {
+                $obTFrotaVeiculoCessao->setDado( 'id' , $value['id'] );
+                $obTFrotaVeiculoCessao->exclusao();
+            }
+        }
                 
         sistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Veículo - '.$_REQUEST['inCodVeiculo'],"excluir","excluir", Sessao::getId(), "../");
 

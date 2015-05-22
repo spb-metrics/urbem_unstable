@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.17" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.3.1.v20080911 Build &lt;2.3.1.v20080922-1151></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,11 +25,11 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -36,24 +37,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,38 +49,14 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.2.56:5432/des_ldo</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">gf</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.2.56:5432/des_ldo</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">123456</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -100,64 +64,64 @@
         <scalar-parameter name="ano_ldo" id="2460">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="ano_ldo_2" id="1652">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="ano_ldo_3" id="1653">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="ano_ldo_4" id="1654">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="2459">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -165,97 +129,98 @@
         <scalar-parameter name="cod_nota_explicativa" id="2462">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_1" id="1645">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_2" id="1646">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_3" id="1647">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_1" id="1648">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_2" id="1649">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_3" id="1650">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.2.56:5432/des_ldo</property>
-            <property name="odaUser">gf</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIzNDU2</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="nota" id="2359">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">cod_nota_explicativa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -286,18 +251,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">cod_nota_explicativa</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -330,8 +283,8 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">select * from ldo.nota_explicativa 
-where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
+            <xml-property name="queryText"><![CDATA[select * from ldo.nota_explicativa 
+where ldo.nota_explicativa.cod_nota_explicativa = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -351,6 +304,32 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="alienacao_bens_moveis" id="2465">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">ano_ldo_2</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">ano_ldo_3</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_3</property>
+                    <property name="paramName">ano_ldo_4</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -371,32 +350,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">ano_ldo_2</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">ano_ldo_3</property>
-                    <property name="dataType">string</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_3</property>
-                    <property name="paramName">ano_ldo_4</property>
-                    <property name="dataType">string</property>
-                    <property name="position">3</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -417,31 +370,11 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensmoveis_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensmoveis_ano2
      , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensmoveis_ano3
-     , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensmoveis_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensmoveis_ano4]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="alienacao_bens_imoveis" id="2470">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">alienacao_bensimoveis_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">alienacao_bensimoveis_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">alienacao_bensimoveis_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -474,6 +407,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">alienacao_bensimoveis_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">alienacao_bensimoveis_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">alienacao_bensimoveis_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -494,9 +447,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensimoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensimoveis_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensimoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensimoveis_ano2
 	 , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensimoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensimoveis_ano3
-	 , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensimoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensimoveis_ano4</property>
+	 , COALESCE((SELECT * FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensimoveis(), ?) AS (valor varchar)),'0,00') AS alienacao_bensimoveis_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -538,26 +491,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="investimentos" id="2506">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">investimentos_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">investimentos_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">investimentos_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -590,6 +523,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">investimentos_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">investimentos_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">investimentos_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -610,9 +563,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinvestimentos(), ?) AS (valor varchar)),'0,00') AS investimentos_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinvestimentos(), ?) AS (valor varchar)),'0,00') AS investimentos_ano2
      , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinvestimentos(), ?) AS (valor varchar)),'0,00') AS investimentos_ano3
-     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinvestimentos(), ?) AS (valor varchar)),'0,00') AS investimentos_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinvestimentos(), ?) AS (valor varchar)),'0,00') AS investimentos_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -654,26 +607,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="inversoes_financeiras" id="2511">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">inversoesfinanceiras_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">inversoesfinanceiras_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">inversoesfinanceiras_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -706,6 +639,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">inversoesfinanceiras_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">inversoesfinanceiras_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">inversoesfinanceiras_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -726,9 +679,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinversoesfinanceiras(), ?) AS (valor varchar)),'0,00') AS inversoesfinanceiras_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinversoesfinanceiras(), ?) AS (valor varchar)),'0,00') AS inversoesfinanceiras_ano2
      , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinversoesfinanceiras(), ?) AS (valor varchar)),'0,00') AS inversoesfinanceiras_ano3
-     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinversoesfinanceiras(), ?) AS (valor varchar)),'0,00') AS inversoesfinanceiras_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasinversoesfinanceiras(), ?) AS (valor varchar)),'0,00') AS inversoesfinanceiras_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -770,26 +723,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="amortizacao_divida" id="2647">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">amortizacaodedivida_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">amortizacaodedivida_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">amortizacaodedivida_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -822,6 +755,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">amortizacaodedivida_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">amortizacaodedivida_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">amortizacaodedivida_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -842,9 +795,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasamortizacaodedivida(), ?) AS (valor varchar)),'0,00') AS amortizacaodedivida_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasamortizacaodedivida(), ?) AS (valor varchar)),'0,00') AS amortizacaodedivida_ano2
      , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasamortizacaodedivida(), ?) AS (valor varchar)),'0,00') AS amortizacaodedivida_ano3
-     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasamortizacaodedivida(), ?) AS (valor varchar)),'0,00') AS amortizacaodedivida_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasamortizacaodedivida(), ?) AS (valor varchar)),'0,00') AS amortizacaodedivida_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -886,26 +839,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="regime_geral" id="2651">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">regimegeral_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">regimegeral_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">regimegeral_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -938,6 +871,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">regimegeral_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">regimegeral_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">regimegeral_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -958,9 +911,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimegeral_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimegeral_ano2
      , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimegeral_ano3
-     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimegeral_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimegeral_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1002,26 +955,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="regime_proprio" id="2652">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">regimeproprio_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">regimeproprio_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">regimeproprio_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -1054,6 +987,26 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">regimeproprio_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">regimeproprio_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">regimeproprio_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1074,9 +1027,9 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimeproprio_ano2
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimeproprio_ano2
      , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimeproprio_ano3
-     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimeproprio_ano4</property>
+     , COALESCE((SELECT * FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor varchar)),'0,00') AS regimeproprio_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1118,16 +1071,6 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="saldofinaceiro_ano4" id="2711">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">resultado_ano4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -1190,6 +1133,16 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">resultado_ano4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1198,7 +1151,7 @@ where ldo.nota_explicativa.cod_nota_explicativa = ?</property>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">-- Saldo Financeiro "i" (i) = (c - f)
+            <xml-property name="queryText"><![CDATA[-- Saldo Financeiro "i" (i) = (c - f)
 SELECT COALESCE(TO_REAL(((
 	(
 	(SELECT TO_NUMBER(valor1, '999999999999D99') FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor1 varchar)) + 
@@ -1211,7 +1164,7 @@ SELECT COALESCE(TO_REAL(((
 	(SELECT  TO_NUMBER(valor6, '999999999999D99') FROM ldo.getdespesasexecutadas(ldo.despesasexecutadasregimegeraleproprio(), ?) AS (valor6 varchar))) 
 	)		
 			)),'0,00'
-	     ) AS resultado_ano4</property>
+	     ) AS resultado_ano4]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1286,16 +1239,6 @@ SELECT COALESCE(TO_REAL(((
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="saldofinanceiro_ano3" id="2713">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">resultado_ano3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -1418,6 +1361,16 @@ SELECT COALESCE(TO_REAL(((
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">resultado_ano3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1426,7 +1379,7 @@ SELECT COALESCE(TO_REAL(((
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT COALESCE(TO_REAL(((
+            <xml-property name="queryText"><![CDATA[SELECT COALESCE(TO_REAL(((
 	-- Até parâmetro 6: ano 3
 	(
 	(SELECT TO_NUMBER(valor1, '999999999999D99') FROM ldo.getreceitasrealizadas(ldo.receitasrealizadasbensmoveis(), ?) AS (valor1 varchar)) + 
@@ -1453,7 +1406,7 @@ SELECT COALESCE(TO_REAL(((
 	)
 	
 			)),'0,00'
-	     ) AS resultado_ano3</property>
+	     ) AS resultado_ano3]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1591,20 +1544,9 @@ SELECT COALESCE(TO_REAL(((
       </design:attributes>
     </design:parameterDefinitions>
   </design:DataSetParameters>
-</model:DesignValues>
-]]></xml-property>
+</model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="saldofinanceiro_ano2" id="2715">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">resultado_ano2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -1727,6 +1669,16 @@ SELECT COALESCE(TO_REAL(((
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">resultado_ano2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1735,7 +1687,7 @@ SELECT COALESCE(TO_REAL(((
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">-- SALDO FINANCEIRO ANO LDO - 2 (g) = ((a - d)) + h)
+            <xml-property name="queryText"><![CDATA[-- SALDO FINANCEIRO ANO LDO - 2 (g) = ((a - d)) + h)
 SELECT COALESCE(TO_REAL(((
 	-- Parâmetros 1 a 6: ano 2
 	(
@@ -1763,7 +1715,7 @@ SELECT COALESCE(TO_REAL(((
 	)
 	
 			)),'0,00'
-	     ) AS resultado_ano2</property>
+	     ) AS resultado_ano2]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1901,8 +1853,7 @@ SELECT COALESCE(TO_REAL(((
       </design:attributes>
     </design:parameterDefinitions>
   </design:DataSetParameters>
-</model:DesignValues>
-]]></xml-property>
+</model:DesignValues>]]></xml-property>
         </oda-data-set>
     </data-sets>
     <styles>
@@ -2209,16 +2160,16 @@ SELECT COALESCE(TO_REAL(((
                 <property name="width">40%</property>
             </column>
             <column id="2607">
-                <property name="width">20%</property>
                 <property name="textAlign">right</property>
+                <property name="width">20%</property>
             </column>
             <column id="2590">
-                <property name="width">20%</property>
                 <property name="textAlign">right</property>
+                <property name="width">20%</property>
             </column>
             <column id="2591">
-                <property name="width">20%</property>
                 <property name="textAlign">right</property>
+                <property name="width">20%</property>
             </column>
             <row id="2742">
                 <property name="borderBottomColor">#000000</property>
@@ -2336,7 +2287,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensmoveis_ano2</property>
-                                <property name="displayName">alienacao_bensmoveis_ano2</property>
+                                <text-property name="displayName">alienacao_bensmoveis_ano2</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensmoveis_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2356,7 +2307,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensmoveis_ano3</property>
-                                <property name="displayName">alienacao_bensmoveis_ano3</property>
+                                <text-property name="displayName">alienacao_bensmoveis_ano3</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensmoveis_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2373,7 +2324,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensmoveis_ano4</property>
-                                <property name="displayName">alienacao_bensmoveis_ano4</property>
+                                <text-property name="displayName">alienacao_bensmoveis_ano4</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensmoveis_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2406,7 +2357,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensimoveis_ano2</property>
-                                <property name="displayName">alienacao_bensimoveis_ano2</property>
+                                <text-property name="displayName">alienacao_bensimoveis_ano2</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensimoveis_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2426,7 +2377,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensimoveis_ano3</property>
-                                <property name="displayName">alienacao_bensimoveis_ano3</property>
+                                <text-property name="displayName">alienacao_bensimoveis_ano3</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensimoveis_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2443,7 +2394,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">alienacao_bensimoveis_ano4</property>
-                                <property name="displayName">alienacao_bensimoveis_ano4</property>
+                                <text-property name="displayName">alienacao_bensimoveis_ano4</text-property>
                                 <expression name="expression">dataSetRow["alienacao_bensimoveis_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2453,10 +2404,10 @@ SELECT COALESCE(TO_REAL(((
                 </cell>
             </row>
             <row id="2717">
-                <property name="height">0.26744186046511625in</property>
                 <property name="borderBottomColor">#000000</property>
                 <property name="borderBottomStyle">solid</property>
                 <property name="borderBottomWidth">1px</property>
+                <property name="height">0.26744186046511625in</property>
                 <cell id="2718"/>
                 <cell id="2719">
                     <property name="textAlign">center</property>
@@ -2600,7 +2551,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">investimentos_ano2</property>
-                                <property name="displayName">investimentos_ano2</property>
+                                <text-property name="displayName">investimentos_ano2</text-property>
                                 <expression name="expression">dataSetRow["investimentos_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2620,7 +2571,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">investimentos_ano3</property>
-                                <property name="displayName">investimentos_ano3</property>
+                                <text-property name="displayName">investimentos_ano3</text-property>
                                 <expression name="expression">dataSetRow["investimentos_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2637,7 +2588,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">investimentos_ano4</property>
-                                <property name="displayName">investimentos_ano4</property>
+                                <text-property name="displayName">investimentos_ano4</text-property>
                                 <expression name="expression">dataSetRow["investimentos_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2669,7 +2620,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">inversoesfinanceiras_ano2</property>
-                                <property name="displayName">inversoesfinanceiras_ano2</property>
+                                <text-property name="displayName">inversoesfinanceiras_ano2</text-property>
                                 <expression name="expression">dataSetRow["inversoesfinanceiras_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2687,7 +2638,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">inversoesfinanceiras_ano3</property>
-                                <property name="displayName">inversoesfinanceiras_ano3</property>
+                                <text-property name="displayName">inversoesfinanceiras_ano3</text-property>
                                 <expression name="expression">dataSetRow["inversoesfinanceiras_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2702,7 +2653,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">inversoesfinanceiras_ano4</property>
-                                <property name="displayName">inversoesfinanceiras_ano4</property>
+                                <text-property name="displayName">inversoesfinanceiras_ano4</text-property>
                                 <expression name="expression">dataSetRow["inversoesfinanceiras_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2734,7 +2685,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">amortizacaodedivida_ano2</property>
-                                <property name="displayName">amortizacaodedivida_ano2</property>
+                                <text-property name="displayName">amortizacaodedivida_ano2</text-property>
                                 <expression name="expression">dataSetRow["amortizacaodedivida_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2752,7 +2703,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">amortizacaodedivida_ano3</property>
-                                <property name="displayName">amortizacaodedivida_ano3</property>
+                                <text-property name="displayName">amortizacaodedivida_ano3</text-property>
                                 <expression name="expression">dataSetRow["amortizacaodedivida_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2767,7 +2718,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">amortizacaodedivida_ano4</property>
-                                <property name="displayName">amortizacaodedivida_ano4</property>
+                                <text-property name="displayName">amortizacaodedivida_ano4</text-property>
                                 <expression name="expression">dataSetRow["amortizacaodedivida_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2824,7 +2775,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimegeral_ano2</property>
-                                <property name="displayName">regimegeral_ano2</property>
+                                <text-property name="displayName">regimegeral_ano2</text-property>
                                 <expression name="expression">dataSetRow["regimegeral_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2842,7 +2793,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimegeral_ano3</property>
-                                <property name="displayName">regimegeral_ano3</property>
+                                <text-property name="displayName">regimegeral_ano3</text-property>
                                 <expression name="expression">dataSetRow["regimegeral_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2857,7 +2808,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimegeral_ano4</property>
-                                <property name="displayName">regimegeral_ano4</property>
+                                <text-property name="displayName">regimegeral_ano4</text-property>
                                 <expression name="expression">dataSetRow["regimegeral_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2889,7 +2840,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimeproprio_ano2</property>
-                                <property name="displayName">regimeproprio_ano2</property>
+                                <text-property name="displayName">regimeproprio_ano2</text-property>
                                 <expression name="expression">dataSetRow["regimeproprio_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2907,7 +2858,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimeproprio_ano3</property>
-                                <property name="displayName">regimeproprio_ano3</property>
+                                <text-property name="displayName">regimeproprio_ano3</text-property>
                                 <expression name="expression">dataSetRow["regimeproprio_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2922,7 +2873,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">regimeproprio_ano4</property>
-                                <property name="displayName">regimeproprio_ano4</property>
+                                <text-property name="displayName">regimeproprio_ano4</text-property>
                                 <expression name="expression">dataSetRow["regimeproprio_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2932,11 +2883,11 @@ SELECT COALESCE(TO_REAL(((
                 </cell>
             </row>
             <row id="2662">
-                <property name="height">0.26744186046511625in</property>
                 <property name="style">padrao_urbem</property>
                 <property name="borderBottomColor">#000000</property>
                 <property name="borderBottomStyle">solid</property>
                 <property name="borderBottomWidth">1px</property>
+                <property name="height">0.26744186046511625in</property>
                 <cell id="2663"/>
                 <cell id="2664"/>
                 <cell id="2665"/>
@@ -3035,7 +2986,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">resultado_ano2</property>
-                                <property name="displayName">resultado_ano2</property>
+                                <text-property name="displayName">resultado_ano2</text-property>
                                 <expression name="expression">dataSetRow["resultado_ano2"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3054,7 +3005,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">resultado_ano3</property>
-                                <property name="displayName">resultado_ano3</property>
+                                <text-property name="displayName">resultado_ano3</text-property>
                                 <expression name="expression">dataSetRow["resultado_ano3"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3070,7 +3021,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">resultado_ano4</property>
-                                <property name="displayName">resultado_ano4</property>
+                                <text-property name="displayName">resultado_ano4</text-property>
                                 <expression name="expression">dataSetRow["resultado_ano4"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3153,7 +3104,7 @@ SELECT COALESCE(TO_REAL(((
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">descricao</property>
-                                <property name="displayName">descricao</property>
+                                <text-property name="displayName">descricao</text-property>
                                 <expression name="expression">dataSetRow["descricao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3398,8 +3349,8 @@ SELECT COALESCE(TO_REAL(((
                             <property name="width">2%</property>
                         </column>
                         <column id="1660">
-                            <property name="width">53%</property>
                             <property name="fontWeight">normal</property>
+                            <property name="width">53%</property>
                         </column>
                         <row id="1661">
                             <cell id="1662">

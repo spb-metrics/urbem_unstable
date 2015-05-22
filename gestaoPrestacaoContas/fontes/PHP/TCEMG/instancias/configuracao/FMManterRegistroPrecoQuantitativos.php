@@ -32,10 +32,10 @@
   *
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoQuantitativos.php 62200 2015-04-07 18:09:25Z michel $
-  * $Date: 2015-04-07 15:09:25 -0300 (Ter, 07 Abr 2015) $
-  * $Author: michel $
-  * $Rev: 62200 $
+  * $Id: FMManterRegistroPrecoQuantitativos.php 62546 2015-05-19 17:00:05Z evandro $
+  * $Date: 2015-05-19 14:00:05 -0300 (Ter, 19 Mai 2015) $
+  * $Author: evandro $
+  * $Rev: 62546 $
   */
 $obHdnQtdeFornecida = new Hidden();
 $obHdnQtdeFornecida->setId('nuHdnQtdeFornecida');
@@ -89,6 +89,7 @@ $obSlcFornecedor->obEvento->setOnChange("montaParametrosGET('preencheSpanQuantid
 
 $obLblQtdePermitidaFornecedor = new Label();
 $obLblQtdePermitidaFornecedor->setRotulo("Quantidade Fornecida pelo Fornecedor");
+$obLblQtdePermitidaFornecedor->setTitle("Quantidade informada na aba Itens.");
 $obLblQtdePermitidaFornecedor->setId("nuQtdeFornecida");
 $obLblQtdePermitidaFornecedor->setName("nuQtdeFornecida");
 $obLblQtdePermitidaFornecedor->setValue("0,0000");

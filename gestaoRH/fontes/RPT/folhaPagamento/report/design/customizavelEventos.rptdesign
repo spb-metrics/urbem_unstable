@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <property name="units">in</property>
-    <property name="comments">uc-04.05.51
-$Log$
-Revision 1.11  2007/10/10 16:07:50  souzadl
-Bug#10318#
-
-Revision 1.10  2007/10/02 21:16:46  souzadl
-Bug#10313#
-
-Revision 1.9  2007/10/02 14:27:20  souzadl
-Bug#10297#
-
-Revision 1.8  2007/09/11 20:17:50  souzadl
-migracao de tipo de relatorio, do fpdf para o birt
-
-Revision 1.7  2007/09/11 20:14:26  souzadl
-migracao de tipo de relatorio, do fpdf para o birt</property>
     <text-property name="displayName">Template Urbem Paisagem Entidade</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -30,9 +14,9 @@ migracao de tipo de relatorio, do fpdf para o birt</property>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -57,37 +41,7 @@ migracao de tipo de relatorio, do fpdf para o birt</property>
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="485">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="486">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="490">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="491">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -243,12 +197,12 @@ migracao de tipo de relatorio, do fpdf para o birt</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -347,9 +301,9 @@ migracao de tipo de relatorio, do fpdf para o birt</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -358,26 +312,16 @@ migracao de tipo de relatorio, do fpdf para o birt</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-   	extensionProperties.odaDriverClass = params["db_driver"].value;
- 	extensionProperties.odaURL = params["db_conn_url"].value;
-	extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}
-]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -754,7 +698,7 @@ where cod_evento = ?]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">cpf_formatado</property>
-                    <property name="displayName">cpf_formatado</property>
+                    <text-property name="displayName">cpf_formatado</text-property>
                     <expression name="expression">dataSetRow["cpf_formatado"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -777,112 +721,112 @@ where cod_evento = ?]]></xml-property>
                 <property name="width">46mm</property>
             </column>
             <column id="2183">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento1"] != 0 &amp;&amp; params["inApresentaValor"]  == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2184">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento1"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="2185">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento2"] != 0 &amp;&amp; params["inApresentaValor"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2186">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento2"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="2187">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento3"] != 0 &amp;&amp; params["inApresentaValor"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2188">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento3"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="2189">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento4"] != 0 &amp;&amp; params["inApresentaValor"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2190">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento4"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="2191">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento5"] != 0 &amp;&amp; params["inApresentaValor"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2192">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento5"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="2193">
-                <property name="width">16mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento6"] != 0 &amp;&amp; params["inApresentaValor"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">16mm</property>
             </column>
             <column id="2194">
-                <property name="width">10mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">!(params["cod_evento6"] != 0 &amp;&amp; params["inApresentaQuantidade"] == 1)</expression>
                     </structure>
                 </list-property>
+                <property name="width">10mm</property>
             </column>
             <header>
                 <row id="2062">
@@ -944,7 +888,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento1"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento1"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -972,7 +918,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento2"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento2"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1000,7 +948,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento3"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento3"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1028,7 +978,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento4"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento4"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1056,7 +1008,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento5"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento5"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1084,7 +1038,9 @@ if(params["cod_configuracao"] == "4") "Rescisão"</VALUE-OF>]]></text-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">cod_evento</property>
-                                    <expression name="expression">params["cod_evento6"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>params["cod_evento6"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1654,7 +1610,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento1"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento1"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1694,7 +1652,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento3"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento3"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1734,7 +1694,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento5"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento5"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1777,7 +1739,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento2"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento2"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1817,7 +1781,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento4"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento4"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1857,7 +1823,9 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">cod_evento</property>
-                                <expression name="expression">params["cod_evento6"]</expression>
+                                <simple-property-list name="expression">
+                                    <value>params["cod_evento6"]</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
@@ -1968,7 +1936,7 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                 TAbNQTMhwstEhLyyyRA3bXLKT6PMMs866xzCuVf/kPXWJWs8BNciXC0CwFEPUXbUK6M8wtMyn4u2EB6L
                 8PTcKNP9thByS11E3E7ArHHaMIsM91ppm703E2sPXoTXTyytteOG4x05jIErTl3hWgt+8eFOHJ0xEYx7
                 LfrXpKPMuH2ns4W5Ykv/bXbqRoQAteQGeq++uhEAADs=
-            </property>
+</property>
         </structure>
         <structure>
             <property name="name">00029994.jpg</property>
@@ -2687,7 +2655,7 @@ if(params["stApresentarPorMatricula"] == 'funcao') row["desc_funcao"]||'/'||row[
                 GzYTEzvJDhlWQ3+rmd7+4+zTUkeJ+lFoERogLd2Shv76LB/lx+gqMRu3rSgydkVe6ZVM8UWYcjsPlVcT
                 JHBA80/0VIUF2Ys1lHWlH9mWtDBf58foaD2pllwmHxUKyRnClWW6t3jAMKQ/wF/+Phf/APLlp7Gf7731
                 h06Pk3//2Q==
-            </property>
+</property>
         </structure>
     </list-property>
 </report>

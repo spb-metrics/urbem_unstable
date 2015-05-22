@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <method name="initialize"><![CDATA[function visibilidade(name) 
 {
 	var arDados = params["colunasVisiveis"].split(",");    		
@@ -44,9 +44,9 @@ function visibilidadeEspacamento()
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -56,9 +56,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -68,24 +68,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -95,42 +80,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -139,9 +94,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -150,9 +105,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -161,9 +116,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -172,9 +127,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -183,9 +138,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -194,9 +149,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -205,9 +160,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -216,9 +171,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -227,9 +182,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -238,9 +193,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -249,9 +204,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -260,12 +215,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">pensionistas</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -274,9 +229,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -285,9 +240,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -296,9 +251,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -307,12 +262,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -321,12 +276,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -335,12 +290,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -349,12 +304,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -363,13 +318,13 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -378,12 +333,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -392,12 +347,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -406,12 +361,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -420,12 +375,12 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -434,9 +389,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -445,9 +400,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -456,9 +411,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -467,9 +422,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -478,9 +433,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -489,9 +444,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -500,9 +455,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -511,9 +466,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -522,9 +477,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -533,9 +488,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -544,9 +499,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -555,9 +510,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -566,9 +521,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -577,9 +532,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -588,9 +543,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -599,9 +554,9 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -609,9 +564,9 @@ function visibilidadeEspacamento()
         <scalar-parameter name="stNomeTabela" id="3601">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -620,28 +575,19 @@ function visibilidadeEspacamento()
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-   extensionProperties.odaDriverClass = params["db_driver"].value;
-   extensionProperties.odaURL = params["db_conn_url"].value;
-   extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_250.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -1368,7 +1314,6 @@ from relatorioDefinivelServidor(?) as (
             </list-property>
             <property name="pageBreakInterval">0</property>
             <column id="1327">
-                <property name="width">20mm</property>
                 <property name="suppressDuplicates">false</property>
                 <list-property name="visibility">
                     <structure>
@@ -1380,9 +1325,9 @@ from relatorioDefinivelServidor(?) as (
                 <property name="whiteSpace">normal</property>
                 <property name="display">block</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1328">
-                <property name="width">90mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1390,9 +1335,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">true</property>
+                <property name="width">90mm</property>
             </column>
             <column id="1329">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1401,9 +1346,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1330">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1412,9 +1357,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1331">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1423,9 +1368,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1332">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1434,9 +1379,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1333">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1444,9 +1389,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1334">
-                <property name="width">75mm</property>
                 <property name="suppressDuplicates">false</property>
                 <list-property name="visibility">
                     <structure>
@@ -1456,9 +1401,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="widows">2</property>
                 <property name="canShrink">false</property>
+                <property name="width">75mm</property>
             </column>
             <column id="1335">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1466,9 +1411,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1336">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1476,9 +1421,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1549">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1486,9 +1431,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1555">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1496,9 +1441,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1562">
-                <property name="width">10mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1507,9 +1452,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">10mm</property>
             </column>
             <column id="1568">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1517,9 +1462,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1574">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1527,9 +1472,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1580">
-                <property name="width">24mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1537,9 +1482,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">24mm</property>
             </column>
             <column id="1586">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1547,9 +1492,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1592">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1558,9 +1503,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1602">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1569,9 +1514,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1608">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1580,9 +1525,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1614">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1591,9 +1536,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1620">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1602,9 +1547,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1628">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1613,9 +1558,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1635">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1624,9 +1569,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1641">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1635,9 +1580,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1647">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1646,9 +1591,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1653">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1657,9 +1602,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1659">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1668,9 +1613,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1665">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1679,9 +1624,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1671">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1690,9 +1635,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1677">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1701,9 +1646,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1683">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1712,9 +1657,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1689">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1723,9 +1668,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1695">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1734,9 +1679,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3212">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1745,9 +1690,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1701">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1756,9 +1701,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3082">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1767,9 +1712,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3088">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1778,9 +1723,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3094">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1789,9 +1734,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1707">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1800,9 +1745,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1713">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1811,9 +1756,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1719">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1822,9 +1767,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="1725">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1833,9 +1778,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1731">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1844,9 +1789,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="1737">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1855,9 +1800,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="1743">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1866,9 +1811,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="1749">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1877,9 +1822,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1755">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1888,9 +1833,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="1761">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1899,9 +1844,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1767">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1910,9 +1855,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1773">
-                <property name="width">75mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1921,9 +1866,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">75mm</property>
             </column>
             <column id="1779">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1932,9 +1877,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1785">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1943,9 +1888,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="1791">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1954,9 +1899,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="1797">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1965,9 +1910,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1803">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1976,9 +1921,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1809">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1987,9 +1932,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1815">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1998,9 +1943,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1821">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2009,9 +1954,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1827">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2020,9 +1965,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="1837">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2031,9 +1976,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1847">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2042,9 +1987,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1854">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2053,9 +1998,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1862">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2064,9 +2009,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1868">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2075,9 +2020,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1874">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2086,9 +2031,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1880">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2097,9 +2042,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1886">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2108,9 +2053,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1892">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2119,9 +2064,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="1898">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -2130,6 +2075,7 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3132">
                 <list-property name="visibility">
@@ -3773,23 +3719,22 @@ from relatorioDefinivelServidor(?) as (
             <property name="repeatHeader">false</property>
             <property name="pageBreakInterval">50</property>
             <column id="2656">
-                <property name="width">20mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="textAlign">center</property>
                 <property name="whiteSpace">normal</property>
                 <property name="display">block</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="3613">
-                <property name="width">10mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="textAlign">center</property>
                 <property name="whiteSpace">normal</property>
                 <property name="display">block</property>
                 <property name="canShrink">true</property>
+                <property name="width">10mm</property>
             </column>
             <column id="2657">
-                <property name="width">90mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3797,9 +3742,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">true</property>
+                <property name="width">90mm</property>
             </column>
             <column id="2658">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3808,9 +3753,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2659">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3819,9 +3764,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2660">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3830,9 +3775,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2661">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3841,9 +3786,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">true</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2662">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3851,9 +3796,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2663">
-                <property name="width">75mm</property>
                 <property name="suppressDuplicates">false</property>
                 <list-property name="visibility">
                     <structure>
@@ -3863,9 +3808,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="widows">2</property>
                 <property name="canShrink">false</property>
+                <property name="width">75mm</property>
             </column>
             <column id="2664">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3873,9 +3818,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2665">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3883,9 +3828,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2666">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3893,9 +3838,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2667">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3903,9 +3848,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2668">
-                <property name="width">10mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3914,9 +3859,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">10mm</property>
             </column>
             <column id="2669">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3924,9 +3869,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2670">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3934,9 +3879,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2671">
-                <property name="width">24mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3944,9 +3889,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">24mm</property>
             </column>
             <column id="2672">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3954,9 +3899,9 @@ from relatorioDefinivelServidor(?) as (
                     </structure>
                 </list-property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2673">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3965,9 +3910,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2674">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3976,9 +3921,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2675">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3987,9 +3932,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2676">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3998,9 +3943,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2677">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4009,9 +3954,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2678">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4020,9 +3965,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2679">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4031,9 +3976,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2680">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4042,9 +3987,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2681">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4053,9 +3998,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2682">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4064,9 +4009,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2683">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4075,9 +4020,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2684">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4086,9 +4031,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2685">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4097,9 +4042,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2686">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4108,9 +4053,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2687">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4119,9 +4064,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2688">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4130,9 +4075,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2689">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4141,9 +4086,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3220">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4152,9 +4097,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2690">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4163,9 +4108,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3102">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4174,9 +4119,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3110">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4185,9 +4130,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3598">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4196,9 +4141,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3241">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4207,9 +4152,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3249">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4218,9 +4163,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3257">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4229,9 +4174,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3263">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4240,9 +4185,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3269">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4251,9 +4196,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3275">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4262,9 +4207,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3292">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4273,9 +4218,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3298">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4284,9 +4229,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2691">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4295,9 +4240,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2692">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4306,9 +4251,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2693">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4317,9 +4262,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="2694">
-                <property name="width">20mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4328,9 +4273,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">20mm</property>
             </column>
             <column id="2695">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4339,9 +4284,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="2696">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4350,9 +4295,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="2697">
-                <property name="width">35mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4361,9 +4306,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">35mm</property>
             </column>
             <column id="2698">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4372,9 +4317,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2699">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4383,9 +4328,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="2700">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4394,9 +4339,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2701">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4405,9 +4350,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2702">
-                <property name="width">75mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4416,9 +4361,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">75mm</property>
             </column>
             <column id="2703">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4427,9 +4372,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2704">
-                <property name="width">50mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4438,9 +4383,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">50mm</property>
             </column>
             <column id="2705">
-                <property name="width">40mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4449,9 +4394,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">40mm</property>
             </column>
             <column id="2706">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4460,9 +4405,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2707">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4471,9 +4416,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2708">
-                <property name="width">25mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4482,9 +4427,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">25mm</property>
             </column>
             <column id="2709">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4493,9 +4438,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2710">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4504,9 +4449,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2711">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4515,9 +4460,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">45mm</property>
             </column>
             <column id="2712">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4526,9 +4471,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2713">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4537,9 +4482,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2714">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4548,9 +4493,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2715">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4559,9 +4504,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2716">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4570,9 +4515,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2717">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4581,9 +4526,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2718">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4592,9 +4537,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2719">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4603,9 +4548,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2720">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4614,9 +4559,9 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="2721">
-                <property name="width">30mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -4625,6 +4570,7 @@ from relatorioDefinivelServidor(?) as (
                 </list-property>
                 <property name="textAlign">center</property>
                 <property name="canShrink">false</property>
+                <property name="width">30mm</property>
             </column>
             <column id="3138">
                 <list-property name="visibility">
@@ -6592,7 +6538,7 @@ from relatorioDefinivelServidor(?) as (
             <property name="data">
                 iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHUlE
                 QVQ4y2P8n5bGQC5gYqAAjGoe1TyqeVQz5ZoB7PsB81JqW/YAAAAASUVORK5CYII=
-            </property>
+</property>
         </structure>
     </list-property>
 </report>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.1.r22a_v20071101 Build &lt;2.2.1.v20071101-1439></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,11 +25,11 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -36,24 +37,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,333 +49,298 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.2.56:5432/des_ppa</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">gt</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.2.56:5432/des_ppa</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">123456</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_ppa" id="1154">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_programa_ini" id="1172">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_programa_fim" id="1173">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_acao_ini" id="1174">
             <property name="valueType">static</property>
+            <property name="isRequired">true</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
-            <property name="isRequired">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_acao_fim" id="1175">
             <property name="valueType">static</property>
+            <property name="isRequired">true</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
-            <property name="isRequired">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="num_cgm_servidor" id="1176">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_regiao" id="1177">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_recurso" id="1178">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="st_ordem" id="1179">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="bo_programa_filtro" id="1180">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="bo_acao_filtro" id="1181">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="num_orgao_ini" id="1182">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="num_orgao_fim" id="1183">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="num_unidade_ini" id="1184">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="num_unidade_fim" id="1185">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_1" id="2580">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_2" id="2581">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_3" id="2582">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_1" id="2583">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_2" id="2584">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_3" id="2585">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="st_num_cgm" id="2925">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="st_cod_regiao" id="2926">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="st_cod_recurso" id="2927">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.2.56:5432/des_ppa</property>
-            <property name="odaUser">gt</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIzNDU2</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -395,11 +348,25 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">plano_plurianual</property>
-                    <property name="displayName">plano_plurianual</property>
+                    <text-property name="displayName">plano_plurianual</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ppa</property>
-                    <property name="displayName">cod_ppa</property>
+                    <text-property name="displayName">cod_ppa</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">cod_ppa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -417,20 +384,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">cod_ppa</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -447,12 +400,12 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
 	SELECT 'Plano Plurianual - PPA - '||ppa.ano_inicio||' a '||ppa.ano_final as plano_plurianual
 	     , ppa.cod_ppa 
 	  FROM ppa.ppa as ppa 
 	 WHERE ppa.cod_ppa = ?
-		</property>
+		]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -527,64 +480,29 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_programa</property>
-                    <property name="displayName">cod_programa</property>
+                    <text-property name="displayName">cod_programa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ppa</property>
-                    <property name="displayName">cod_ppa</property>
+                    <text-property name="displayName">cod_ppa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">identificacao</property>
-                    <property name="displayName">identificacao</property>
+                    <text-property name="displayName">identificacao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numero</property>
-                    <property name="displayName">numero</property>
+                    <text-property name="displayName">numero</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_descricao</property>
-                    <property name="displayName">cod_descricao</property>
+                    <text-property name="displayName">cod_descricao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ultimo_timestamp_programa_dados</property>
-                    <property name="displayName">ultimo_timestamp_programa_dados</property>
+                    <text-property name="displayName">ultimo_timestamp_programa_dados</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">cod_programa</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">cod_ppa</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">identificacao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">numero</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">cod_descricao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">ultimo_timestamp_programa_dados</property>
-                        <property name="dataType">date-time</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -761,6 +679,41 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">cod_programa</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">cod_ppa</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">identificacao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">numero</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">cod_descricao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">ultimo_timestamp_programa_dados</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -805,7 +758,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">93</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
     SELECT DISTINCT 
     	   p.cod_programa 
      	 , ppa.cod_ppa 
@@ -871,7 +824,7 @@ INNER JOIN orcamento.subfuncao as osf
        AND pa.ativo = 't' 
        AND p.ativo = 't' 
   ORDER BY numero asc
-	 	 , p.ultimo_timestamp_programa_dados desc</property>
+	 	 , p.ultimo_timestamp_programa_dados desc]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1168,208 +1121,93 @@ INNER JOIN orcamento.subfuncao as osf
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">ordem</property>
-                    <property name="displayName">ordem</property>
+                    <text-property name="displayName">ordem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_acao</property>
-                    <property name="displayName">cod_acao</property>
+                    <text-property name="displayName">cod_acao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_acao</property>
-                    <property name="displayName">num_acao</property>
+                    <text-property name="displayName">num_acao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao</property>
-                    <property name="displayName">descricao</property>
+                    <text-property name="displayName">descricao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ultimo_timestamp_acao_dados</property>
-                    <property name="displayName">ultimo_timestamp_acao_dados</property>
+                    <text-property name="displayName">ultimo_timestamp_acao_dados</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">timestamp_acao_dados</property>
-                    <property name="displayName">timestamp_acao_dados</property>
+                    <text-property name="displayName">timestamp_acao_dados</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor_num</property>
-                    <property name="displayName">valor_num</property>
+                    <text-property name="displayName">valor_num</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_programa</property>
-                    <property name="displayName">num_programa</property>
+                    <text-property name="displayName">num_programa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_programa</property>
-                    <property name="displayName">cod_programa</property>
+                    <text-property name="displayName">cod_programa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_tipo</property>
-                    <property name="displayName">cod_tipo</property>
+                    <text-property name="displayName">cod_tipo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">tipo</property>
-                    <property name="displayName">tipo</property>
+                    <text-property name="displayName">tipo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_regiao</property>
-                    <property name="displayName">cod_regiao</property>
+                    <text-property name="displayName">cod_regiao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nome_regiao</property>
-                    <property name="displayName">nome_regiao</property>
+                    <text-property name="displayName">nome_regiao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao_produto</property>
-                    <property name="displayName">descricao_produto</property>
+                    <text-property name="displayName">descricao_produto</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_produto</property>
-                    <property name="displayName">cod_produto</property>
+                    <text-property name="displayName">cod_produto</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_unidade_orcamentaria</property>
-                    <property name="displayName">num_unidade_orcamentaria</property>
+                    <text-property name="displayName">num_unidade_orcamentaria</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_funcao</property>
-                    <property name="displayName">cod_funcao</property>
+                    <text-property name="displayName">cod_funcao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dsc_funcao</property>
-                    <property name="displayName">dsc_funcao</property>
+                    <text-property name="displayName">dsc_funcao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_subfuncao</property>
-                    <property name="displayName">cod_subfuncao</property>
+                    <text-property name="displayName">cod_subfuncao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dsc_subfuncao</property>
-                    <property name="displayName">dsc_subfuncao</property>
+                    <text-property name="displayName">dsc_subfuncao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">ordem</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">cod_acao</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">num_acao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">descricao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">ultimo_timestamp_acao_dados</property>
-                        <property name="dataType">date-time</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">timestamp_acao_dados</property>
-                        <property name="dataType">date-time</property>
-                    </structure>
-                    <structure>
-                        <property name="position">7</property>
-                        <property name="name">valor</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">8</property>
-                        <property name="name">valor_num</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">9</property>
-                        <property name="name">num_programa</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">10</property>
-                        <property name="name">cod_programa</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">11</property>
-                        <property name="name">cod_tipo</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">12</property>
-                        <property name="name">tipo</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">13</property>
-                        <property name="name">cod_regiao</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">nome_regiao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">15</property>
-                        <property name="name">descricao_produto</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">16</property>
-                        <property name="name">cod_produto</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">17</property>
-                        <property name="name">num_unidade_orcamentaria</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">18</property>
-                        <property name="name">cod_funcao</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">19</property>
-                        <property name="name">dsc_funcao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">20</property>
-                        <property name="name">cod_subfuncao</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">21</property>
-                        <property name="name">dsc_subfuncao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">22</property>
-                        <property name="name">nom_cgm</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -1533,6 +1371,121 @@ INNER JOIN orcamento.subfuncao as osf
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ordem</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">cod_acao</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">num_acao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">descricao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">ultimo_timestamp_acao_dados</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">timestamp_acao_dados</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">valor</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">valor_num</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">num_programa</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">cod_programa</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">cod_tipo</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">tipo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">cod_regiao</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">nome_regiao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">descricao_produto</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">cod_produto</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">num_unidade_orcamentaria</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">cod_funcao</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">dsc_funcao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">cod_subfuncao</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">dsc_subfuncao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">nom_cgm</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1689,7 +1642,7 @@ INNER JOIN orcamento.subfuncao as osf
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
     SELECT DISTINCT 
 		   CASE ?  
 			WHEN 'acao' THEN a.num_acao
@@ -1798,7 +1751,7 @@ INNER JOIN sw_cgm as cgm
          , ad.timestamp_acao_dados 
          --, ore.nom_recurso
   ORDER BY ordem asc
-	 --, a.ultimo_timestamp_acao_dados desc </property>
+	 --, a.ultimo_timestamp_acao_dados desc ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1832,7 +1785,7 @@ INNER JOIN sw_cgm as cgm
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_programa&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_programa&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2072,19 +2025,9 @@ INNER JOIN sw_cgm as cgm
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">quantidade1</property>
-                    <property name="displayName">quantidade1</property>
+                    <text-property name="displayName">quantidade1</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">quantidade1</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2109,6 +2052,16 @@ INNER JOIN sw_cgm as cgm
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">quantidade1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2118,7 +2071,7 @@ INNER JOIN sw_cgm as cgm
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
    SELECT COALESCE(novo.valor, nulo.valor) as quantidade1 
      FROM ( SELECT CASE aum.simbolo
 						WHEN '' THEN to_real(0.00)||' '||aum.nom_unidade 
@@ -2155,7 +2108,7 @@ LEFT JOIN ( SELECT paq.cod_acao
 	       	   AND paq.ano = 1 
            ) as novo 
         ON novo.ano = nulo.ano
-        </property>
+        ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -2170,7 +2123,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2185,7 +2138,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2222,19 +2175,9 @@ LEFT JOIN ( SELECT paq.cod_acao
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">quantidade2</property>
-                    <property name="displayName">quantidade2</property>
+                    <text-property name="displayName">quantidade2</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">quantidade2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2259,6 +2202,16 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">quantidade2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2268,7 +2221,7 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
    SELECT COALESCE(novo.valor, nulo.valor) as quantidade2 
      FROM ( SELECT CASE aum.simbolo
 						WHEN '' THEN to_real(0.00)||' '||aum.nom_unidade 
@@ -2305,7 +2258,7 @@ LEFT JOIN ( SELECT paq.cod_acao
 	       	   AND paq.ano = 2 
            ) as novo 
         ON novo.ano = nulo.ano
-        </property>
+        ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -2320,7 +2273,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2335,7 +2288,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2372,19 +2325,9 @@ LEFT JOIN ( SELECT paq.cod_acao
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">quantidade3</property>
-                    <property name="displayName">quantidade3</property>
+                    <text-property name="displayName">quantidade3</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">quantidade3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2409,6 +2352,16 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">quantidade3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2418,7 +2371,7 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
    SELECT COALESCE(novo.valor, nulo.valor) as quantidade3 
      FROM ( SELECT CASE aum.simbolo
 						WHEN '' THEN to_real(0.00)||' '||aum.nom_unidade 
@@ -2455,7 +2408,7 @@ LEFT JOIN ( SELECT paq.cod_acao
 	       	   AND paq.ano = 3 
            ) as novo 
         ON novo.ano = nulo.ano
-        </property>
+        ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -2470,7 +2423,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2485,7 +2438,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2522,19 +2475,9 @@ LEFT JOIN ( SELECT paq.cod_acao
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">quantidade4</property>
-                    <property name="displayName">quantidade4</property>
+                    <text-property name="displayName">quantidade4</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">quantidade4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2559,6 +2502,16 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">quantidade4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2568,7 +2521,7 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
    SELECT COALESCE(novo.valor, nulo.valor) as quantidade4 
      FROM ( SELECT CASE aum.simbolo
 						WHEN '' THEN to_real(0.00)||' '||aum.nom_unidade 
@@ -2605,7 +2558,7 @@ LEFT JOIN ( SELECT paq.cod_acao
 	       	   AND paq.ano = 4 
            ) as novo 
         ON novo.ano = nulo.ano
-        </property>
+        ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -2620,7 +2573,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2635,7 +2588,7 @@ LEFT JOIN ( SELECT paq.cod_acao
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2672,39 +2625,52 @@ LEFT JOIN ( SELECT paq.cod_acao
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_acao</property>
-                    <property name="displayName">cod_acao</property>
+                    <text-property name="displayName">cod_acao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">timestamp_acao_dados</property>
-                    <property name="displayName">timestamp_acao_dados</property>
+                    <text-property name="displayName">timestamp_acao_dados</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_recurso</property>
-                    <property name="displayName">cod_recurso</property>
+                    <text-property name="displayName">cod_recurso</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">exercicio_recurso</property>
-                    <property name="displayName">exercicio_recurso</property>
+                    <text-property name="displayName">exercicio_recurso</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valorreal</property>
-                    <property name="displayName">valorreal</property>
+                    <text-property name="displayName">valorreal</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_recurso</property>
-                    <property name="displayName">nom_recurso</property>
+                    <text-property name="displayName">nom_recurso</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ano_v</property>
-                    <property name="displayName">ano_v</property>
+                    <text-property name="displayName">ano_v</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ano</property>
-                    <property name="displayName">ano</property>
+                    <text-property name="displayName">ano</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">row["cod_acao"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -2757,19 +2723,6 @@ LEFT JOIN ( SELECT paq.cod_acao
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">row["cod_acao"]</expression>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2835,7 +2788,7 @@ LEFT JOIN ( SELECT paq.cod_acao
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT DISTINCT   ar.cod_acao 
+            <xml-property name="queryText"><![CDATA[SELECT DISTINCT   ar.cod_acao 
 		, ar.timestamp_acao_dados 
 		, ar.cod_recurso 
 		, ar.exercicio_recurso 
@@ -2854,7 +2807,7 @@ INNER JOIN orcamento.recurso as ore
      WHERE ar.cod_acao = ?
   ORDER BY ar.ano ASC 
      --  AND ar.cod_recurso = ?
-	  -- AND ar.timestamp_acao_dados = ?</property>
+	  -- AND ar.timestamp_acao_dados = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -2869,7 +2822,7 @@ INNER JOIN orcamento.recurso as ore
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -2963,19 +2916,9 @@ INNER JOIN orcamento.recurso as ore
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">valor_total_acao</property>
-                    <property name="displayName">valor_total_acao</property>
+                    <text-property name="displayName">valor_total_acao</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">valor_total_acao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2989,6 +2932,16 @@ INNER JOIN orcamento.recurso as ore
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">valor_total_acao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -2998,12 +2951,12 @@ INNER JOIN orcamento.recurso as ore
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT 'R$ '|| to_real( COALESCE(SUM(par.valor), 0.00)) as valor_total_acao 
+            <xml-property name="queryText"><![CDATA[SELECT 'R$ '|| to_real( COALESCE(SUM(par.valor), 0.00)) as valor_total_acao 
 	FROM ppa.acao as pa
 INNER JOIN ppa.acao_recurso par 
 	ON pa.cod_acao = par.cod_acao 
 	AND pa.ultimo_timestamp_acao_dados = par.timestamp_acao_dados 
-	where pa.cod_acao = ?</property>
+	where pa.cod_acao = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -3018,7 +2971,7 @@ INNER JOIN ppa.acao_recurso par
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>row[&quot;cod_acao&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>row[&amp;quot;cod_acao&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -3055,19 +3008,9 @@ INNER JOIN ppa.acao_recurso par
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">valor_total_acoes</property>
-                    <property name="displayName">valor_total_acoes</property>
+                    <text-property name="displayName">valor_total_acoes</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">valor_total_acoes</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -3242,6 +3185,16 @@ INNER JOIN ppa.acao_recurso par
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">valor_total_acoes</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -3251,7 +3204,7 @@ INNER JOIN ppa.acao_recurso par
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
    SELECT 'R$ '||to_real(COALESCE(novo.valor, nulo.valor)) as valor_total_acoes  
      FROM ( SELECT 0.00 as valor
 				 , 1 as comparar 
@@ -3304,7 +3257,7 @@ INNER JOIN sw_cgm as cgm
        ) as novo
 		ON novo.comparar = nulo.comparar 
        AND novo.valor notnull 
-       </property>
+       ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -3626,19 +3579,9 @@ INNER JOIN sw_cgm as cgm
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">valor_total_ppa</property>
-                    <property name="displayName">valor_total_ppa</property>
+                    <text-property name="displayName">valor_total_ppa</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">valor_total_ppa</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -3653,6 +3596,16 @@ INNER JOIN sw_cgm as cgm
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">valor_total_ppa</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -3662,11 +3615,11 @@ INNER JOIN sw_cgm as cgm
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">	
+            <xml-property name="queryText"><![CDATA[	
 	SELECT 'R$ '||to_real(COALESCE(round(sum(pr.valor_total_ppa), 2) , 0.00)) as valor_total_ppa
 	  FROM ppa.ppa pr
 	 WHERE pr.cod_ppa = ? 
-	 </property>
+	 ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -3971,6 +3924,7 @@ INNER JOIN sw_cgm as cgm
                     <property name="dataType">date-time</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="1170">
                 <property name="width">25%</property>
             </column>
@@ -4151,7 +4105,7 @@ INNER JOIN sw_cgm as cgm
                                 </structure>
                                 <structure>
                                     <property name="name">desc_tipo</property>
-                                    <property name="displayName">desc_tipo</property>
+                                    <text-property name="displayName">desc_tipo</text-property>
                                     <expression name="expression">switch (row["cod_tipo"]) {
 	case 1:
 		var campo = 'Projeto';
@@ -4170,6 +4124,7 @@ campo;</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <column id="1301">
                                 <property name="width">25%</property>
                             </column>
@@ -4463,6 +4418,7 @@ campo;</expression>
                                                                 <property name="dataType">string</property>
                                                             </structure>
                                                         </list-property>
+                                                        <property name="pageBreakInterval">50</property>
                                                         <column id="1501">
                                                             <property name="width">50%</property>
                                                         </column>
@@ -4509,6 +4465,7 @@ campo;</expression>
                                                                 <property name="dataType">string</property>
                                                             </structure>
                                                         </list-property>
+                                                        <property name="pageBreakInterval">50</property>
                                                         <column id="1513">
                                                             <property name="width">50%</property>
                                                         </column>
@@ -4555,6 +4512,7 @@ campo;</expression>
                                                                 <property name="dataType">string</property>
                                                             </structure>
                                                         </list-property>
+                                                        <property name="pageBreakInterval">50</property>
                                                         <column id="1525">
                                                             <property name="width">50%</property>
                                                         </column>
@@ -4598,6 +4556,7 @@ campo;</expression>
                                                                 <property name="dataType">string</property>
                                                             </structure>
                                                         </list-property>
+                                                        <property name="pageBreakInterval">50</property>
                                                         <column id="1489">
                                                             <property name="width">50%</property>
                                                         </column>
@@ -4893,11 +4852,12 @@ if (campo % 4==0){
                                                 </structure>
                                                 <structure>
                                                     <property name="name">ano</property>
-                                                    <property name="displayName">ano</property>
+                                                    <text-property name="displayName">ano</text-property>
                                                     <expression name="expression">dataSetRow["ano"];</expression>
                                                     <property name="dataType">any</property>
                                                 </structure>
                                             </list-property>
+                                            <property name="pageBreakInterval">50</property>
                                             <column id="1466">
                                                 <property name="width">15%</property>
                                             </column>
@@ -5165,6 +5125,7 @@ if (campo % 4==0){
                                                     <property name="dataType">string</property>
                                                 </structure>
                                             </list-property>
+                                            <property name="pageBreakInterval">50</property>
                                             <column id="1610"/>
                                             <detail>
                                                 <row id="1606">
@@ -5201,13 +5162,13 @@ if (campo % 4==0){
             <property name="fontSize">12px</property>
             <property name="width">285mm</property>
             <column id="1524">
-                <property name="width">80%</property>
                 <property name="fontWeight">bold</property>
                 <property name="textAlign">right</property>
+                <property name="width">80%</property>
             </column>
             <column id="2597">
-                <property name="width">20%</property>
                 <property name="textAlign">center</property>
+                <property name="width">20%</property>
             </column>
             <row id="2598">
                 <cell id="2599">
@@ -5349,6 +5310,7 @@ if (campo % 4==0){
                     <table id="2455">
                         <property name="fontSize">8px</property>
                         <property name="width">195mm</property>
+                        <property name="pageBreakInterval">50</property>
                         <column id="2468">
                             <property name="verticalAlign">bottom</property>
                         </column>
@@ -5360,8 +5322,8 @@ if (campo % 4==0){
                         </column>
                         <detail>
                             <row id="2460">
-                                <property name="height">30mm</property>
                                 <property name="verticalAlign">middle</property>
+                                <property name="height">30mm</property>
                                 <cell id="2461">
                                     <grid id="2471">
                                         <property name="style">padrao_urbem</property>
@@ -5516,8 +5478,8 @@ if (campo % 4==0){
                             <property name="width">2%</property>
                         </column>
                         <column id="2508">
-                            <property name="width">53%</property>
                             <property name="fontWeight">normal</property>
+                            <property name="width">53%</property>
                         </column>
                         <row id="2509">
                             <cell id="2510">
@@ -5689,7 +5651,7 @@ campo;</expression>
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">filtro_regiao</property>
-                                            <property name="displayName">filtro_regiao</property>
+                                            <text-property name="displayName">filtro_regiao</text-property>
                                             <expression name="expression">if (params["st_cod_regiao"] == "s"){
 	var campo = "Sim";
 } else{
@@ -5717,7 +5679,7 @@ campo;</expression>
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">filtro_recurso</property>
-                                            <property name="displayName">filtro_recurso</property>
+                                            <text-property name="displayName">filtro_recurso</text-property>
                                             <expression name="expression">if (params["st_cod_recurso"] == "s"){
 	var campo = "Sim";
 } else{
@@ -5745,7 +5707,7 @@ campo;</expression>
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">filtro_ordenar</property>
-                                            <property name="displayName">filtro_ordenar</property>
+                                            <text-property name="displayName">filtro_ordenar</text-property>
                                             <expression name="expression">if(params["st_ordem"] == 'programa'){
 		var campo = "Programa";
 } else if(params["st_ordem"] == 'funcao'){

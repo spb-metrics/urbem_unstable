@@ -25,50 +25,52 @@
 <?php
    /*
     * Arquivo de geracao do arquivo sertTerceiros TCM/MG
-    * Data de Criação   : 29/01/2009
+    * Data de Criação   : 03/02/2009
 
     * @author Analista      Tonismar Régis Bernardo
-    * @author Desenvolvedor Lucas Andrades Mendes
+    * @author Desenvolvedor André Machado
 
     * @package URBEM
     * @subpackage
 
     * @ignore
 
-    $Id:$
+    $Id: especifPrev.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDespesaCorrente.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGEspecifPrev.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obFTCEMGDespesaCorrente = new FTCEMGDespesaCorrente();
-    $obFTCEMGDespesaCorrente->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGDespesaCorrente->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDespesaCorrente->setDado('mes'         , $arFiltros['inPeriodo']);
-    $obFTCEMGDespesaCorrente->setDado('data_inicial', $arFiltros['inPeriodo']);
-    $obFTCEMGDespesaCorrente->setDado('data_final'  , $arFiltros['inPeriodo']);
+    $ndias =  cal_days_in_month(CAL_GREGORIAN, $arFiltros['inPeriodo'], Sessao::read('exercicio') );
+    if ($arFiltros['inPeriodo'] < 10) {
+        $arFiltros['inPeriodo'] = '0'.$arFiltros['inPeriodo'];
+    }
 
-    $obFTCEMGDespesaCorrente->recuperaTodos($rsDespesaCorrente);
+    $obFTCEMGEspecifPrev = new FTCEMGEspecifPrev();
+    $obFTCEMGEspecifPrev->setDado('stExercicio'   , Sessao::read('exercicio'));
+    $obFTCEMGEspecifPrev->setDado('dtInicio'      , '01/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio')   );
+    $obFTCEMGEspecifPrev->setDado('dtFinal'       , $ndias.'/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio'));
+    $obFTCEMGEspecifPrev->setDado('stEntidades'   , implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGEspecifPrev->setDado('stRpps'        , 'false');
 
-    //DOTAÇÃO ANUAL INICIAL
+    $obFTCEMGEspecifPrev->recuperaTodos($rsEspecifPrev);
 
-    $obExportador->roUltimoArquivo->addBloco($rsDespesaCorrente);
+    while (  !$rsEspecifPrev->eof() ) {
+            $rsEspecifPrev->setCampo('mes', $arFiltros['inPeriodo']);
+            $rsEspecifPrev->Proximo();
+    }
+    $rsEspecifPrev->setPrimeiroElemento();
+
+    $obExportador->roUltimoArquivo->addBloco($rsEspecifPrev);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('caixa');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desppesencsoc');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('aplicacoes_financeiras');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivint');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivext');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despoutdespcor');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-?>
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('banco');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    

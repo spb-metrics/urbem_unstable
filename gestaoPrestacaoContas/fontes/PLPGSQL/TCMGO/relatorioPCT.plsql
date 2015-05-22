@@ -243,6 +243,7 @@ BEGIN
                         , 0.00                                                                                           AS vl_saldo_creditos
                         , 0.00                                                                                           AS vl_saldo_atual
                         , plano_conta.cod_estrutural::VARCHAR                                                            AS cod_estrutural
+                        , plano_conta.obrigatorio_tcmgo
                      FROM contabilidade.plano_conta
 
                 LEFT JOIN contabilidade.plano_analitica
@@ -279,9 +280,9 @@ BEGIN
         reRegistro.vl_saldo_debitos  := arRetorno[2];
         reRegistro.vl_saldo_creditos := arRetorno[3];
         reRegistro.vl_saldo_atual    := arRetorno[4];
-        IF ( reRegistro.vl_saldo_anterior <> 0.00 ) OR
-           ( reRegistro.vl_saldo_debitos  <> 0.00 ) OR
-           ( reRegistro.vl_saldo_creditos <> 0.00 )
+        IF (( reRegistro.vl_saldo_anterior <> 0.00 ) OR
+            ( reRegistro.vl_saldo_debitos  <> 0.00 ) OR
+            ( reRegistro.vl_saldo_creditos <> 0.00 )) OR reRegistro.obrigatorio_tcmgo IS TRUE
         THEN
             SELECT cod_conta
               INTO inCodConta

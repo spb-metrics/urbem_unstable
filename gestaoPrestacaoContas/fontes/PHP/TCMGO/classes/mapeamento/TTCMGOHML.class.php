@@ -110,7 +110,7 @@ public function montaRecupera10()
                               END AS nro_lote
                             , cotacao_fornecedor_item.cod_item
                             , cotacao_item.quantidade
-                            , catalogo_item.descricao as desc_item
+                            , remove_acentos(REPLACE(REPLACE(catalogo_item.descricao,'”','\"'),'–','-')) as desc_item
                             , (cotacao_fornecedor_item.vl_cotacao / cotacao_item.quantidade)::numeric(14,4) as valor_unitario
                             , documento_pessoa.tipo_documento
                             , documento_pessoa.num_documento as nro_documento

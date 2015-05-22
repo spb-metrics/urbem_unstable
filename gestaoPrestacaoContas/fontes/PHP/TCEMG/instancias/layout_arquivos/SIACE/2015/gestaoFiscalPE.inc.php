@@ -23,53 +23,61 @@
 */
 ?>
 <?php
-/*
- * Arquivo de geracao do arquivo projecaoAtuarial TCM/MG
- * Data de Criação   : 06/03/2015
+   /*
+    * Arquivo de geracao do arquivo gestaoFiscalPE TCM/MG
+    * Data de Criação   : 09/03/2015
 
- * @author Analista: Dagiane Vieira
- * @author Desenvolvedor: Michel Teixeira
+    * @author Analista      Dagiane Vieira
+    * @author Desenvolvedor Michel Teixeira
 
- * @package URBEM
- * @subpackage
+    * @package URBEM
+    * @subpackage
 
- * @ignore
+    * @ignore
 
- $Id: projecaoAtuarial.inc.php 61821 2015-03-06 17:01:48Z michel $
- */
-include_once CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGProjecaoAtuarial.class.php';
+    $Id: gestaoFiscalPE.inc.php 62522 2015-05-18 14:22:51Z evandro $
+    */
 
-$arFiltros = Sessao::read('filtroRelatorio');
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGMedidas.class.php' );
 
-foreach ($arFiltros['inCodEntidadeSelecionado'] as $key => $value){
-    $obTTCEMGProjecaoAtuarial = new TTCEMGProjecaoAtuarial();        
-    $obTTCEMGProjecaoAtuarial->setDado('exercicio_entidade',Sessao::getExercicio());
-    $obTTCEMGProjecaoAtuarial->setDado('cod_entidade',$value);
+    $arFiltros = Sessao::read('filtroRelatorio');
+
+    $obTTCEMGMedidas = new TTCEMGMedidas();
     
-    $obTTCEMGProjecaoAtuarial->recuperaPorExercicioEntidade($rsArquivo);
+    $stFiltro = ' WHERE medidas.cod_mes ='.$arFiltros['inPeriodo'];
     
+    $obTTCEMGMedidas->recuperaDados($rsArquivo, $stFiltro);
+    
+    while (  !$rsArquivo->eof() ) {
+        if($rsArquivo->getCampo('riscos_fiscais')=='t')
+            $rsArquivo->setCampo('riscos_fiscais', 'S'); 
+        else
+            $rsArquivo->setCampo('riscos_fiscais', 'N');
+
+        if($rsArquivo->getCampo('metas_fiscais')=='t')
+            $rsArquivo->setCampo('metas_fiscais', 'S'); 
+        else
+            $rsArquivo->setCampo('metas_fiscais', 'N');
+
+        if($rsArquivo->getCampo('contratacao_aro')=='t')
+            $rsArquivo->setCampo('contratacao_aro', 'S'); 
+        else
+            $rsArquivo->setCampo('contratacao_aro', 'N');
+        
+        if($arFiltros['inPeriodo']!=12)
+            $rsArquivo->setCampo('contratacao_aro', '');
+
+        $rsArquivo->Proximo();
+    }
+    $rsArquivo->setPrimeiroElemento();
+
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('exercicio');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_patronal');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_receita');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contratacao_aro');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_despesa');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('riscos_fiscais');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_rpps');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
-}
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('metas_fiscais');    

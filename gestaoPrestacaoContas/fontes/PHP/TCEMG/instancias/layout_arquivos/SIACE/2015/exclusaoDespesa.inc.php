@@ -24,7 +24,7 @@
 ?>
 <?php
    /*
-    * Arquivo de geracao do arquivo exclusao receita TCM/MG
+    * Arquivo de geracao do arquivo exclusaoDespesa TCM/MG
     * Data de Criação   : 23/01/2009
 
     * @author Analista      Tonismar Régis Bernardo
@@ -35,57 +35,59 @@
 
     * @ignore
 
-    $Id: exclusaoReceita.inc.php 61833 2015-03-09 12:59:57Z michel $
+    $Id: exclusaoDespesa.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGExclusaoReceita.class.php');
-
     $arFiltros = Sessao::read('filtroRelatorio');
+    $arArquivo = array(0 => array( 'mes'                        => $arFiltros['inPeriodo'],
+                                   'fundacoes_transf_corrente'  => '000',
+                                   'autarquias_transf_corrente' => '000',
+                                   'emprestdep_transf_corrente' => '000',
+                                   'demaisent_transf_corrente'  => '000',
+                                   'fundacoes_transf_capital'   => '000',
+                                   'autarquias_transf_capital'  => '000',
+                                   'emprestdep_transf_capital'  => '000',
+                                   'demaisent_transf_capital'   => '000',
+                                   'cod_tipo'                   => '04',
+                                 ),
+                       1 => array( 'mes'                        => $arFiltros['inPeriodo'],
+                                   'fundacoes_transf_corrente'  => '000',
+                                   'autarquias_transf_corrente' => '000',
+                                   'emprestdep_transf_corrente' => '000',
+                                   'demaisent_transf_corrente'  => '000',
+                                   'fundacoes_transf_capital'   => '000',
+                                   'autarquias_transf_capital'  => '000',
+                                   'emprestdep_transf_capital'  => '000',
+                                   'demaisent_transf_capital'   => '000',
+                                   'cod_tipo'                   => '05',
+                                 ),
+                      );
 
-    $obFTCEMGExclusaoReceita = new FTCEMGExclusaoReceita();
-    $obFTCEMGExclusaoReceita->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGExclusaoReceita->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGExclusaoReceita->setDado('mes'         , $arFiltros['inPeriodo']);
-
-    $obFTCEMGExclusaoReceita->recuperaTodos($rsArquivo);
+    $rsArquivo = new RecordSet();
+    $rsArquivo->preenche($arArquivo);
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contr_serv');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('compens_reg_prev');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('out_duplic');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contr_patronal');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desc_outras_duplic");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_corrente');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_corrente');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('empestdep_transf_corrente');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_corrente');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('empestdep_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_capital');
+    
+    
+    
+
+    

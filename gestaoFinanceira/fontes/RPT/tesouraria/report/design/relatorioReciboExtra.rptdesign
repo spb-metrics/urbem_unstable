@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,9 +28,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,24 +40,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -67,42 +52,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://172.16.30.3:5432/gf_mariana_1008_1960</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sw.suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -111,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -122,9 +77,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -133,9 +88,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -144,9 +99,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -155,9 +110,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -166,9 +121,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -177,9 +132,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -188,9 +143,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -199,9 +154,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -210,9 +165,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -221,9 +176,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -232,9 +187,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -243,9 +198,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -254,9 +209,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -265,9 +220,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -280,9 +235,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -291,9 +246,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -302,9 +257,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -313,9 +268,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -324,27 +279,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.3:5432/gf_mariana_1008_1960</property>
-            <property name="odaUser">sw.suporte</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">c3Vwb3J0ZQ==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -747,61 +691,61 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">recibo_extra</property>
-                    <property name="displayName">recibo_extra</property>
+                    <text-property name="displayName">recibo_extra</text-property>
                     <expression name="expression">dataSetRow["recibo_extra"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">dataSetRow["recurso"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                     <expression name="expression">dataSetRow["data"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">tipo_recibo</property>
-                    <property name="displayName">tipo_recibo</property>
+                    <text-property name="displayName">tipo_recibo</text-property>
                     <expression name="expression">dataSetRow["tipo_recibo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">dataSetRow["credor"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">conta</property>
-                    <property name="displayName">conta</property>
+                    <text-property name="displayName">conta</text-property>
                     <expression name="expression">dataSetRow["conta"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">dataSetRow["caixa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                     <expression name="expression">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">credor_desc</property>
-                    <property name="displayName">credor_desc</property>
+                    <text-property name="displayName">credor_desc</text-property>
                     <expression name="expression">if (dataSetRow['credor'] != null) { dataSetRow['credor']+' - '+dataSetRow['nom_cgm'];}</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">autenticado</property>
-                    <property name="displayName">autenticado</property>
+                    <text-property name="displayName">autenticado</text-property>
                     <expression name="expression">if (dataSetRow["autenticado"] == null) { 'Não' } else { 'Sim' }</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -826,7 +770,7 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">total_geral</property>
-                    <property name="displayName">total_geral</property>
+                    <text-property name="displayName">total_geral</text-property>
                     <expression name="expression">Total.sum(dataSetRow['valor'])</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -1156,55 +1100,55 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">recibo_extra</property>
-                    <property name="displayName">recibo_extra</property>
+                    <text-property name="displayName">recibo_extra</text-property>
                     <expression name="expression">dataSetRow["recibo_extra"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">dataSetRow["recurso"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                     <expression name="expression">dataSetRow["data"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">tipo_recibo</property>
-                    <property name="displayName">tipo_recibo</property>
+                    <text-property name="displayName">tipo_recibo</text-property>
                     <expression name="expression">dataSetRow["tipo_recibo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">dataSetRow["credor"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">conta</property>
-                    <property name="displayName">conta</property>
+                    <text-property name="displayName">conta</text-property>
                     <expression name="expression">dataSetRow["conta"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">dataSetRow["caixa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                     <expression name="expression">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">credor_desc</property>
-                    <property name="displayName">credor_desc</property>
+                    <text-property name="displayName">credor_desc</text-property>
                     <expression name="expression">if (dataSetRow['credor'] != null) { dataSetRow['credor']+' - '+dataSetRow['nom_cgm'];}</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -1224,7 +1168,7 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">autenticado</property>
-                    <property name="displayName">autenticado</property>
+                    <text-property name="displayName">autenticado</text-property>
                     <expression name="expression">if (dataSetRow["autenticado"] == null) { 'Não' } else { 'Sim' }</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -1555,61 +1499,61 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">recibo_extra</property>
-                    <property name="displayName">recibo_extra</property>
+                    <text-property name="displayName">recibo_extra</text-property>
                     <expression name="expression">dataSetRow["recibo_extra"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">dataSetRow["recurso"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                     <expression name="expression">dataSetRow["data"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">tipo_recibo</property>
-                    <property name="displayName">tipo_recibo</property>
+                    <text-property name="displayName">tipo_recibo</text-property>
                     <expression name="expression">dataSetRow["tipo_recibo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">dataSetRow["credor"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">conta</property>
-                    <property name="displayName">conta</property>
+                    <text-property name="displayName">conta</text-property>
                     <expression name="expression">dataSetRow["conta"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">dataSetRow["caixa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                     <expression name="expression">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">credor_desc</property>
-                    <property name="displayName">credor_desc</property>
+                    <text-property name="displayName">credor_desc</text-property>
                     <expression name="expression">if (dataSetRow['credor'] != null) { dataSetRow['credor']+' - '+dataSetRow['nom_cgm'];}</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">agg_total_recurso</property>
-                    <property name="displayName">agg_total_recurso</property>
+                    <text-property name="displayName">agg_total_recurso</text-property>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
                         <value>agg_recurso</value>
@@ -1624,7 +1568,7 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">autenticado</property>
-                    <property name="displayName">autenticado</property>
+                    <text-property name="displayName">autenticado</text-property>
                     <expression name="expression">if (dataSetRow["autenticado"] == null) { 'Não' } else { 'Sim' }</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -1953,61 +1897,61 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">recibo_extra</property>
-                    <property name="displayName">recibo_extra</property>
+                    <text-property name="displayName">recibo_extra</text-property>
                     <expression name="expression">dataSetRow["recibo_extra"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">dataSetRow["recurso"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                     <expression name="expression">dataSetRow["data"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">tipo_recibo</property>
-                    <property name="displayName">tipo_recibo</property>
+                    <text-property name="displayName">tipo_recibo</text-property>
                     <expression name="expression">dataSetRow["tipo_recibo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">dataSetRow["credor"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">conta</property>
-                    <property name="displayName">conta</property>
+                    <text-property name="displayName">conta</text-property>
                     <expression name="expression">dataSetRow["conta"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">dataSetRow["caixa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                     <expression name="expression">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">credor_desc</property>
-                    <property name="displayName">credor_desc</property>
+                    <text-property name="displayName">credor_desc</text-property>
                     <expression name="expression">if (dataSetRow['credor'] != null) { dataSetRow['credor']+' - '+dataSetRow['nom_cgm'];}</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">agg_total_caixa</property>
-                    <property name="displayName">agg_total_caixa</property>
+                    <text-property name="displayName">agg_total_caixa</text-property>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
                         <value>caixa</value>
@@ -2022,13 +1966,13 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">autenticado</property>
-                    <property name="displayName">autenticado</property>
+                    <text-property name="displayName">autenticado</text-property>
                     <expression name="expression">if (dataSetRow["autenticado"] == null) { 'Não' } else { 'Sim' }</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">total_caixa</property>
-                    <property name="displayName">total_caixa</property>
+                    <text-property name="displayName">total_caixa</text-property>
                     <expression name="expression">Total.sum(dataSetRow['valor'])</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -2351,61 +2295,61 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">recibo_extra</property>
-                    <property name="displayName">recibo_extra</property>
+                    <text-property name="displayName">recibo_extra</text-property>
                     <expression name="expression">dataSetRow["recibo_extra"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">dataSetRow["recurso"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                     <expression name="expression">dataSetRow["data"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">tipo_recibo</property>
-                    <property name="displayName">tipo_recibo</property>
+                    <text-property name="displayName">tipo_recibo</text-property>
                     <expression name="expression">dataSetRow["tipo_recibo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">dataSetRow["credor"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">conta</property>
-                    <property name="displayName">conta</property>
+                    <text-property name="displayName">conta</text-property>
                     <expression name="expression">dataSetRow["conta"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">dataSetRow["caixa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                     <expression name="expression">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">credor_desc</property>
-                    <property name="displayName">credor_desc</property>
+                    <text-property name="displayName">credor_desc</text-property>
                     <expression name="expression">if (dataSetRow['credor'] != null) { dataSetRow['credor']+' - '+dataSetRow['nom_cgm'];}</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">agg_total_conta</property>
-                    <property name="displayName">agg_total_conta</property>
+                    <text-property name="displayName">agg_total_conta</text-property>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
                         <value>agg_conta</value>
@@ -2420,13 +2364,13 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">autenticado</property>
-                    <property name="displayName">autenticado</property>
+                    <text-property name="displayName">autenticado</text-property>
                     <expression name="expression">if (dataSetRow["autenticado"] == null) { 'Não' } else { 'Sim' }</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">total_conta</property>
-                    <property name="displayName">total_conta</property>
+                    <text-property name="displayName">total_conta</text-property>
                     <expression name="expression">Total.sum(dataSetRow['valor'])</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -2744,37 +2688,37 @@ params['sql'] =this.queryText; ]]></method>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">periodicidade</property>
-                    <property name="displayName">periodicidade</property>
+                    <text-property name="displayName">periodicidade</text-property>
                     <expression name="expression">params["stDataInicial"].value+' até '+params["stDataFinal"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">params["inCodCredor"].value+' - '+params["stNomCredor"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">caixa</property>
-                    <property name="displayName">caixa</property>
+                    <text-property name="displayName">caixa</text-property>
                     <expression name="expression">params["inCodContaBanco"].value+' - '+params["stNomContaBanco"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">despesa</property>
-                    <property name="displayName">despesa</property>
+                    <text-property name="displayName">despesa</text-property>
                     <expression name="expression">params["inCodContaAnalitica"].value+' - '+params["stNomContaAnalitica"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">params["inCodRecurso"].value+' - '+params["stDescricaoRecurso"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">demonstracao</property>
-                    <property name="displayName">demonstracao</property>
+                    <text-property name="displayName">demonstracao</text-property>
                     <expression name="expression">if (params["stTipoDemonstracao"].value == 'todas') {
 	'Receitas e Despesas'
 } else if ((params["stTipoDemonstracao"].value == 'r') || (params["stTipoDemonstracao"].value == 'R')) {
@@ -2786,7 +2730,7 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">baixado</property>
-                    <property name="displayName">baixado</property>
+                    <text-property name="displayName">baixado</text-property>
                     <expression name="expression">if (params["stBaixado"].value == 'todos') {
 	'Todos'
 } else if (params["stBaixado"].value == 'sim') {
@@ -2798,7 +2742,7 @@ params['sql'] =this.queryText; ]]></method>
                 </structure>
                 <structure>
                     <property name="name">ordenacao</property>
-                    <property name="displayName">ordenacao</property>
+                    <text-property name="displayName">ordenacao</text-property>
                     <expression name="expression">if (params["stOrdenacao"].value == 'credor') {
 	'Credor'
 } else if (params["stOrdenacao"].value == 'caixa') {

@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 62150 2015-03-31 20:04:31Z arthur $
+    $Id: TContabilidadePlanoConta.class.php 62430 2015-05-07 20:35:00Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -122,7 +122,8 @@ function montaRecuperaContaPlanoAnalitica()
     $stSQL .= "     pc.nom_conta ,                              \n";
     $stSQL .= "     pc.cod_classificacao ,                      \n";
     $stSQL .= "     pc.cod_sistema ,                            \n";
-    $stSQL .= "     pc.cod_estrutural                           \n";
+    $stSQL .= "     pc.cod_estrutural ,                         \n";
+    $stSQL .= "     pa.cod_plano                                \n";
     $stSQL .= "FROM                                             \n";
     $stSQL .= "     contabilidade.plano_analitica as pa,        \n";
     $stSQL .= "     contabilidade.plano_conta as pc             \n";

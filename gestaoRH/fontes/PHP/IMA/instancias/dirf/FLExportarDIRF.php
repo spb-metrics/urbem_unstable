@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.15
 
-    $Id: FLExportarDIRF.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLExportarDIRF.php 62430 2015-05-07 20:35:00Z evandro $
 
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -80,13 +80,35 @@ $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao()
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
 $arCompetencia = explode("/",$rsPeriodoMovimentacao->getCampo("dt_final"));
 
-include_once(CAM_GRH_PES_COMPONENTES."ISelectAnoCompetencia.class.php");
-$obISelectAnoCompetencia = new ISelectAnoCompetencia();
-$obISelectAnoCompetencia->obCmbAnoCompetencia->setValue($arCompetencia[2]-1);
-$obISelectAnoCompetencia->obCmbAnoCompetencia->setRotulo("Ano-Calendário");
-$obISelectAnoCompetencia->obCmbAnoCompetencia->setTitle("Selecione o ano-calendário para emissão do arquivo da DIRF. Exemplo: entrega em 2007 da DIRF ano base 2006.");
-$obISelectAnoCompetencia->obCmbAnoCompetencia->setNull(false);
-$obISelectAnoCompetencia->obCmbAnoCompetencia->obEvento->setOnChange("montaParametrosGET('gerarSpanNumeroRecibo','stIndicador,inAnoCompetencia');");
+if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ) {
+    include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenho.class.php';
+    $obTEmpenhoEmpenho = new TEmpenhoEmpenho();
+    $obTEmpenhoEmpenho->recuperaExercicios($rsExercicioEmpenho, "", $boTransacao,"");    
+
+    $obISelectAnoCompetencia = new Select();    
+    $obISelectAnoCompetencia->setRotulo     ( "Ano-Calendário"       );
+    $obISelectAnoCompetencia->setTitle      ( "Selecione o ano-calendário para emissão do arquivo da DIRF. Exemplo: entrega em 2007 da DIRF ano base 2006.");
+    $obISelectAnoCompetencia->setName       ( "inAnoCompetencia"     );
+    $obISelectAnoCompetencia->setId         ( "inAnoCompetencia"     );
+    foreach ($rsExercicioEmpenho->getElementos() as $value) {
+        $obISelectAnoCompetencia->addOption     ( $value['exercicio'], $value['exercicio']);
+    }    
+    $obISelectAnoCompetencia->setCampoId    ( "exercicio"            );
+    $obISelectAnoCompetencia->setCampoDesc  ( "exercicio"            );
+    $obISelectAnoCompetencia->setNull(false);
+    $obISelectAnoCompetencia->obEvento->setOnChange("montaParametrosGET('gerarSpanNumeroRecibo','stIndicador,inAnoCompetencia');");
+    $obISelectAnoCompetencia->setStyle      ( "width: 60"           );
+
+}else{
+    
+    include_once(CAM_GRH_PES_COMPONENTES."ISelectAnoCompetencia.class.php");
+    $obISelectAnoCompetencia = new ISelectAnoCompetencia();
+    $obISelectAnoCompetencia->obCmbAnoCompetencia->setValue($arCompetencia[2]-1);
+    $obISelectAnoCompetencia->obCmbAnoCompetencia->setRotulo("Ano-Calendário");
+    $obISelectAnoCompetencia->obCmbAnoCompetencia->setTitle("Selecione o ano-calendário para emissão do arquivo da DIRF. Exemplo: entrega em 2007 da DIRF ano base 2006.");
+    $obISelectAnoCompetencia->obCmbAnoCompetencia->setNull(false);
+    $obISelectAnoCompetencia->obCmbAnoCompetencia->obEvento->setOnChange("montaParametrosGET('gerarSpanNumeroRecibo','stIndicador,inAnoCompetencia');");
+}
 
 $obRdoNormal = new Radio();
 $obRdoNormal->setRotulo("Tipo de Declaração");
@@ -119,7 +141,10 @@ $obCkbPrestadorServico->setName("boPrestadoresServico");
 $obCkbPrestadorServico->setId("boPrestadoresServico");
 $obCkbPrestadorServico->setValue(true);
 $obCkbPrestadorServico->setTitle("Marque para que seja adicionado no arquivo valores pagos aos prestadores de serviço.");
-
+if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ){
+    $obCkbPrestadorServico->setNull(false);
+    $obCkbPrestadorServico->setChecked(true);
+}
 $obBtnOk = new Ok();
 $obBtnOk->obEvento->setOnClick("montaParametrosGET('submeter','',true);");
 
@@ -130,8 +155,14 @@ $obFormulario = new Formulario;
 $obFormulario->addTitulo                            ( $stTitulo ,"right"  );
 $obFormulario->addForm                              ( $obForm                                           );
 $obFormulario->addHidden                            ( $obHdnAcao                                        );
-$obIFiltroComponentes->geraFormulario($obFormulario);
-$obISelectAnoCompetencia->geraFormulario($obFormulario);
+
+if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ){
+    $obFormulario->addComponente($obISelectAnoCompetencia);
+}else{
+    $obIFiltroComponentes->geraFormulario($obFormulario);
+    $obISelectAnoCompetencia->geraFormulario($obFormulario);
+}
+
 $obFormulario->agrupaComponentes(array($obRdoNormal,$obRdoRetificadora));
 $obFormulario->addSpan($obSpnNumeroRecibo);
 $obFormulario->addHidden($obHdnNumeroRecibo,true);

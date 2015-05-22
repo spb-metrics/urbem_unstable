@@ -56,6 +56,7 @@ class TProcesso extends Persistente
         $this->AddCampo('observacoes','text',true,'',false,false);
         $this->AddCampo('confidencial','boolean',true,1,false,false);
         $this->AddCampo('resumo_assunto','varchar',false,'80',false,false);
+        $this->AddCampo('cod_centro','integer',false,'',false,true);
         $this->AddCampo('timestamp','timestamp_now',true,'',false,false);
     }
 

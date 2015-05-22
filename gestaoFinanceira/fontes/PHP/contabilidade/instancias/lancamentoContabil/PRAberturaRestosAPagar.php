@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
+    $Id: PRAberturaRestosAPagar.php 62560 2015-05-19 20:55:13Z arthur $
 
     $Revision: 30668 $
     $Name$
@@ -72,6 +72,7 @@ switch ($stAcao) {
             $obRConfiguracao->setExercicio( Sessao::getExercicio());
             $obRConfiguracao->setCodModulo( 9 );
             $obRConfiguracao->setValor( 'T' );
+            
             $obErro = $obRConfiguracao->alterar($boTransacao);
         }
 

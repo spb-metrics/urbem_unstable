@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Tonismar Régis Bernardo</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">uc-06.01.22</html-property>
+    <property name="units">in</property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -121,51 +121,15 @@
             <property name="controlType">check-box</property>
             <structure name="format"/>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="740">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="741">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://172.16.30.3:5432/gqs_livramento_1606_1344_gpc9</value>
             </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="742">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sw.suporte</value>
-            </simple-property-list>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="743">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">suporte</value>
-            </simple-property-list>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -223,12 +187,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -237,9 +201,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -252,12 +216,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">90</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -266,9 +230,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -277,9 +241,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -288,25 +252,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="dataSource" id="8">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="dataSource" id="8" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -416,183 +371,183 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_externo_aval</property>
-                    <property name="displayName">saldo_exercicio_anterior_externo_aval</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_externo_aval</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_externo_aval</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_externo_aval</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_externo_aval</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_externo_aval</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_externo_aval</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_externo_outro</property>
-                    <property name="displayName">saldo_exercicio_anterior_externo_outro</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_externo_outro</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_externo_outro</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_externo_outro</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_externo_outro</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_externo_outro</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_externo_outro</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_interno_aval</property>
-                    <property name="displayName">saldo_exercicio_anterior_interno_aval</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_interno_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_interno_aval</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_interno_aval</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_interno_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_interno_aval</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_interno_aval</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_interno_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_interno_aval</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_interno_aval</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_interno_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_interno_outro</property>
-                    <property name="displayName">saldo_exercicio_anterior_interno_outro</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_interno_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_interno_outro</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_interno_outro</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_interno_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_interno_outro</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_interno_outro</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_interno_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_interno_outro</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_interno_outro</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_interno_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_recebido_externo_aval</property>
-                    <property name="displayName">saldo_exercicio_anterior_recebido_externo_aval</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_recebido_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_recebido_externo_aval</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_recebido_externo_aval</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_recebido_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_recebido_externo_aval</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_recebido_externo_aval</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_recebido_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_recebido_externo_aval</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_recebido_externo_aval</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_recebido_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_recebido_externo_outro</property>
-                    <property name="displayName">saldo_exercicio_anterior_recebido_externo_outro</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_recebido_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_recebido_externo_outro</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_recebido_externo_outro</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_recebido_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_recebido_externo_outro</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_recebido_externo_outro</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_recebido_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_recebido_externo_outro</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_recebido_externo_outro</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_recebido_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_recebido_interna_aval</property>
-                    <property name="displayName">saldo_exercicio_anterior_recebido_interna_aval</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_recebido_interna_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_recebido_interna_aval</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_recebido_interna_aval</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_recebido_interna_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_recebido_interna_aval</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_recebido_interna_aval</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_recebido_interna_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_recebido_interna_aval</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_recebido_interna_aval</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_recebido_interna_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_exercicio_anterior_recebido_interna_outro</property>
-                    <property name="displayName">saldo_exercicio_anterior_recebido_interna_outro</property>
+                    <text-property name="displayName">saldo_exercicio_anterior_recebido_interna_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_quadrimestre_recebido_interna_outro</property>
-                    <property name="displayName">saldo_primeiro_quadrimestre_recebido_interna_outro</property>
+                    <text-property name="displayName">saldo_primeiro_quadrimestre_recebido_interna_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_segundo_quadrimestre_recebido_interna_outro</property>
-                    <property name="displayName">saldo_segundo_quadrimestre_recebido_interna_outro</property>
+                    <text-property name="displayName">saldo_segundo_quadrimestre_recebido_interna_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_terceiro_quadrimestre_recebido_interna_outro</property>
-                    <property name="displayName">saldo_terceiro_quadrimestre_recebido_interna_outro</property>
+                    <text-property name="displayName">saldo_terceiro_quadrimestre_recebido_interna_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_externo_aval</property>
-                    <property name="displayName">saldo_primeiro_semestre_externo_aval</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_externo_outro</property>
-                    <property name="displayName">saldo_primeiro_semestre_externo_outro</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_interno_aval</property>
-                    <property name="displayName">saldo_primeiro_semestre_interno_aval</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_interno_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_interno_outro</property>
-                    <property name="displayName">saldo_primeiro_semestre_interno_outro</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_interno_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_recebido_externo_aval</property>
-                    <property name="displayName">saldo_primeiro_semestre_recebido_externo_aval</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_recebido_externo_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_recebido_externo_outro</property>
-                    <property name="displayName">saldo_primeiro_semestre_recebido_externo_outro</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_recebido_externo_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_recebido_interna_aval</property>
-                    <property name="displayName">saldo_primeiro_semestre_recebido_interna_aval</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_recebido_interna_aval</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">saldo_primeiro_semestre_recebido_interna_outro</property>
-                    <property name="displayName">saldo_primeiro_semestre_recebido_interna_outro</property>
+                    <text-property name="displayName">saldo_primeiro_semestre_recebido_interna_outro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">rcl_total_exercicio_anterior</property>
-                    <property name="displayName">rcl_total_exercicio_anterior</property>
+                    <text-property name="displayName">rcl_total_exercicio_anterior</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">rcl_total_primeiro_quadrimestre</property>
-                    <property name="displayName">rcl_total_primeiro_quadrimestre</property>
+                    <text-property name="displayName">rcl_total_primeiro_quadrimestre</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">rcl_total_segundo_quadrimestre</property>
-                    <property name="displayName">rcl_total_segundo_quadrimestre</property>
+                    <text-property name="displayName">rcl_total_segundo_quadrimestre</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">rcl_total_terceiro_quadrimestre</property>
-                    <property name="displayName">rcl_total_terceiro_quadrimestre</property>
+                    <text-property name="displayName">rcl_total_terceiro_quadrimestre</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">rcl_total_primeiro_semestre</property>
-                    <property name="displayName">rcl_total_primeiro_semestre</property>
+                    <text-property name="displayName">rcl_total_primeiro_semestre</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -2810,13 +2765,13 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_saldo</property>
-                    <property name="displayName">limite_alerta_saldo</property>
+                    <text-property name="displayName">limite_alerta_saldo</text-property>
                     <expression name="expression">row["teste"]*(params["perc_limite_alerta"]/100)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_1_qua</property>
-                    <property name="displayName">limite_alerta_1_qua</property>
+                    <text-property name="displayName">limite_alerta_1_qua</text-property>
                     <expression name="expression">if(params["periodo"]>="1"){
 	row["teste1"]*(params["perc_limite_alerta"]/100)
 }else{
@@ -2826,7 +2781,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_qua_2</property>
-                    <property name="displayName">lomite_alerta_qua_2</property>
+                    <text-property name="displayName">lomite_alerta_qua_2</text-property>
                     <expression name="expression">if(params["periodo"]>="2"){
 	row["teste3"]*(params["perc_limite_alerta"]/100)
 }else{
@@ -2836,7 +2791,7 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">limite_alerta_qua_3</property>
-                    <property name="displayName">limite_alerta_qua_3</property>
+                    <text-property name="displayName">limite_alerta_qua_3</text-property>
                     <expression name="expression">if(params["periodo"]=="3"){
 	row["teste4"]*(params["perc_limite_alerta"]/100)
 }else{
@@ -2886,20 +2841,20 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL]]></text-property>
                                 <property name="width">70mm</property>
                             </column>
                             <column id="147">
-                                <property name="width">30mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">30mm</property>
                             </column>
                             <column id="148">
-                                <property name="width">30mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">30mm</property>
                             </column>
                             <column id="2933">
-                                <property name="width">30mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">30mm</property>
                             </column>
                             <column id="2920">
-                                <property name="width">30mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">30mm</property>
                             </column>
                             <row id="151">
                                 <property name="backgroundColor">#F5F5F5</property>
@@ -4882,7 +4837,7 @@ false
                                         <list-property name="boundDataColumns">
                                             <structure>
                                                 <property name="name">nota_explicativa</property>
-                                                <property name="displayName">nota_explicativa</property>
+                                                <text-property name="displayName">nota_explicativa</text-property>
                                                 <expression name="expression">dataSetRow["nota_explicativa"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -5031,7 +4986,7 @@ false
                                         <list-property name="boundDataColumns">
                                             <structure>
                                                 <property name="name">data_extenso</property>
-                                                <property name="displayName">data_extenso</property>
+                                                <text-property name="displayName">data_extenso</text-property>
                                                 <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                                                 <property name="dataType">string</property>
                                             </structure>

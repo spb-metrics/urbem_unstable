@@ -136,6 +136,7 @@ $obCmbSituacao->setTitle ("Selecione a Situação para o filtro.");
 $obCmbSituacao->addOption("", "Selecione");
 $obCmbSituacao->addOption("1", "Pagas");
 $obCmbSituacao->addOption("2", "À Pagar");
+$obCmbSituacao->obEvento->setOnChange("montaParametrosGET('validaSituacao');");
 
 // Define Objeto Select para Ordenação
 $obCmbOrdenacao = new Select();
@@ -147,6 +148,25 @@ $obCmbOrdenacao->addOption("", "Selecione");
 $obCmbOrdenacao->addOption("empenho", "Por Empenho");
 $obCmbOrdenacao->addOption("receita", "Por Receita");
 $obCmbOrdenacao->addOption("credor", "Por Credor");
+$obCmbOrdenacao->addOption("data_pagamento", "Por Data");
+
+$obRdbDataPagamentoSim = new Radio;
+$obRdbDataPagamentoSim->setTitle  ("Exibir Data de Pagamento");
+$obRdbDataPagamentoSim->setRotulo ("Exibir Data de Pagamento");
+$obRdbDataPagamentoSim->setName   ("boDataPagamento");
+$obRdbDataPagamentoSim->setId     ("boDataPagamento");
+$obRdbDataPagamentoSim->setLabel  ("Sim");
+$obRdbDataPagamentoSim->setValue  ("S");
+$obRdbDataPagamentoSim->setChecked( false );
+$obRdbDataPagamentoSim->setNull   ( false );
+
+$obRdbDataPagamentoNao = new Radio;
+$obRdbDataPagamentoNao->setName   ("boDataPagamento");
+$obRdbDataPagamentoNao->setId     ("boDataPagamento");
+$obRdbDataPagamentoNao->setLabel  ("Não");
+$obRdbDataPagamentoNao->setValue  ("N");
+$obRdbDataPagamentoNao->setChecked( true );
+$obRdbDataPagamentoSim->setNull   ( false );
 
 // Componente para montas as assintatuas
 $obMontaAssinaturas = new IMontaAssinaturas;
@@ -168,6 +188,7 @@ $obFormulario->addSpan              ($obSpnContas);
 $obFormulario->addComponente        ($ObIPopUpCredor);
 $obFormulario->addComponenteComposto($obTxtSituacao, $obCmbSituacao);
 $obFormulario->addComponente        ($obCmbOrdenacao);
+$obFormulario->agrupaComponentes( array($obRdbDataPagamentoSim, $obRdbDataPagamentoNao) );
 $obMontaAssinaturas->geraFormulario ($obFormulario);
 
 $obFormulario->OK();

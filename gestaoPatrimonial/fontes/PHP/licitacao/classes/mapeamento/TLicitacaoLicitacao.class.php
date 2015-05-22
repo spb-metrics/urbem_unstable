@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 62370 2015-04-29 15:01:13Z jean $
+    $Id: TLicitacaoLicitacao.class.php 62518 2015-05-15 20:39:53Z evandro $
 
 */
 
@@ -63,24 +63,25 @@ function TLicitacaoLicitacao()
     $this->setCampoCod('cod_licitacao');
     $this->setComplementoChave('cod_modalidade,cod_entidade,exercicio');
 
-    $this->AddCampo('cod_licitacao'     ,'integer',true  ,''      ,true,false);
-    $this->AddCampo('cod_modalidade'    ,'integer' ,true  ,''      ,true,'TComprasModalidade');
-    $this->AddCampo('cod_entidade'      ,'integer' ,true  ,''      ,true,'TOrcamentoEntidade');
-    $this->AddCampo('exercicio'         ,'char'    ,true  ,'4'     ,true,'TOrcamentoEntidade');
-    $this->AddCampo('cod_tipo_objeto'   ,'integer' ,true  ,''      ,false,'TComprasTipoObjeto');
-    $this->AddCampo('cod_objeto'        ,'integer' ,true  ,''      ,false,'TComprasObjeto');
-    $this->AddCampo('cod_criterio'      ,'integer' ,true  ,''      ,false,'TLicitacaoCriterioJulgamento');
-    $this->AddCampo('cod_tipo_licitacao','integer' ,true  ,''      ,false,'TLicitacaoTipoLicitacao');
-    $this->AddCampo('cod_mapa'          ,'integer' ,true  ,''      ,false,'TComprasMapa');
-    $this->AddCampo('exercicio_mapa'    ,'char'    ,true  ,'4'     ,false,'TComprasMapa','exercicio');
-    $this->AddCampo('cod_processo'      ,'integer' ,true  ,''      ,false,'TProtocoloProcesso');
-    $this->AddCampo('exercicio_processo','char'    ,true  ,'4'     ,false,'TProtocoloProcesso','ano_exercicio');
-    $this->AddCampo('vl_cotado'         ,'numeric' ,true  ,'14,2'  ,false,false);
-    $this->AddCampo('timestamp'         ,'timestamp' ,true  ,''  ,false,false);
-    $this->AddCampo('num_orgao'         ,'integer' ,true  ,''      ,false,false);
-    $this->AddCampo('num_unidade'       ,'integer' ,true  ,''      ,false,false);
-    $this->AddCampo('cod_regime'        ,'integer' ,false ,''      ,false,false);
-    $this->AddCampo('tipo_chamada_publica','integer' ,false ,''      ,false,true);
+    $this->AddCampo('cod_licitacao'       ,'integer'    ,true  ,''     ,true,false);
+    $this->AddCampo('cod_modalidade'      ,'integer'    ,true  ,''     ,true,'TComprasModalidade');
+    $this->AddCampo('cod_entidade'        ,'integer'    ,true  ,''     ,true,'TOrcamentoEntidade');
+    $this->AddCampo('exercicio'           ,'char'       ,true  ,'4'    ,true,'TOrcamentoEntidade');
+    $this->AddCampo('cod_tipo_objeto'     ,'integer'    ,true  ,''     ,false,'TComprasTipoObjeto');
+    $this->AddCampo('cod_objeto'          ,'integer'    ,true  ,''     ,false,'TComprasObjeto');
+    $this->AddCampo('cod_criterio'        ,'integer'    ,true  ,''     ,false,'TLicitacaoCriterioJulgamento');
+    $this->AddCampo('cod_tipo_licitacao'  ,'integer'    ,true  ,''     ,false,'TLicitacaoTipoLicitacao');
+    $this->AddCampo('cod_mapa'            ,'integer'    ,true  ,''     ,false,'TComprasMapa');
+    $this->AddCampo('exercicio_mapa'      ,'char'       ,true  ,'4'    ,false,'TComprasMapa','exercicio');
+    $this->AddCampo('cod_processo'        ,'integer'    ,true  ,''     ,false,'TProtocoloProcesso');
+    $this->AddCampo('exercicio_processo'  ,'char'       ,true  ,'4'    ,false,'TProtocoloProcesso','ano_exercicio');
+    $this->AddCampo('vl_cotado'           ,'numeric'    ,true  ,'14,2' ,false,false);
+    $this->AddCampo('timestamp'           ,'timestamp'  ,true  ,''     ,false,false);
+    $this->AddCampo('num_orgao'           ,'integer'    ,true  ,''     ,false,false);
+    $this->AddCampo('num_unidade'         ,'integer'    ,true  ,''     ,false,false);
+    $this->AddCampo('cod_regime'          ,'integer'    ,false ,''     ,false,false);
+    $this->AddCampo('tipo_chamada_publica','integer'    ,false ,''     ,false,true);
+    $this->AddCampo('registro_precos'     ,'boolean'    ,false ,''     ,false,true);
 }
 
 function proximoCodigoLicitacao(&$inCodLicitacao , $boTransacao = "")
@@ -984,7 +985,8 @@ function montaRecuperaLicitacaoNaoHomologada()
                       , ll.exercicio                                                       
                       , to_char(ll.timestamp::date, 'dd/mm/yyyy') as dt_licitacao          
                       , LPAD(ll.num_orgao::VARCHAR, 2, '0') || '.' || LPAD(ll.num_unidade::VARCHAR, 2, '0') AS unidade_orcamentaria       
-                      , homologadas.dt_homologacao                          
+                      , homologadas.dt_homologacao
+                      , ll.tipo_chamada_publica
           
                    FROM licitacao.licitacao as ll
                 

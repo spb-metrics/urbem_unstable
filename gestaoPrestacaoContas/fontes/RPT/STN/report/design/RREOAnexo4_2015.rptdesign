@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
@@ -19,9 +19,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -31,10 +31,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -44,12 +44,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">2007</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -58,10 +58,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -71,12 +71,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">Prefeitura Municipal de Santana do Livramento</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">></property>
                 <property name="pattern">></property>
@@ -86,9 +86,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -98,26 +98,11 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -127,42 +112,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://172.16.30.4:5432/des_morrinhos_2507</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sw.onofre</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -170,12 +125,12 @@
         <scalar-parameter name="mes_anterior" id="1641">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">Janeiro</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -183,12 +138,12 @@
         <scalar-parameter name="poder" id="2585">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">EXECUTIVO</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,9 +152,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,9 +163,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -219,9 +174,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -230,9 +185,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -241,9 +196,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -252,9 +207,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -263,9 +218,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -274,9 +229,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -285,9 +240,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -296,9 +251,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -307,9 +262,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -318,9 +273,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -328,9 +283,9 @@
         <scalar-parameter name="dt_inicial" id="6705">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -338,23 +293,16 @@
         <scalar-parameter name="dt_final" id="6706">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_231.postgres">
             <list-property name="privateDriverProperties">
                 <ex-property>
                     <name>contentBidiFormatStr</name>
@@ -365,8 +313,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <value>ILYNN</value>
                 </ex-property>
             </list-property>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -1280,37 +1226,37 @@ INNER JOIN orcamento.despesa
                 </structure>
                 <structure>
                     <property name="name">total_previsa_inicial</property>
-                    <property name="displayName">total_previsa_inicial</property>
+                    <text-property name="displayName">total_previsa_inicial</text-property>
                     <expression name="expression">Total.sum(dataSetRow["previsao_inicial"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">tot_ate_bimestre_anterior</property>
-                    <property name="displayName">tot_ate_bimestre_anterior</property>
+                    <text-property name="displayName">tot_ate_bimestre_anterior</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bimestre_anterior"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">ate_bimestr</property>
-                    <property name="displayName">tot_ate_bimestre</property>
+                    <text-property name="displayName">tot_ate_bimestre</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bimestre"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">tot_no_bimestre</property>
-                    <property name="displayName">tot_no_bimestre</property>
+                    <text-property name="displayName">tot_no_bimestre</text-property>
                     <expression name="expression">Total.sum(dataSetRow["no_bimestre"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">tot_previsao_atualizada</property>
-                    <property name="displayName">tot_previsao_atualizada</property>
+                    <text-property name="displayName">tot_previsao_atualizada</text-property>
                     <expression name="expression">Total.sum(dataSetRow["previsao_atualizada"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">tot_ate_bimestre</property>
-                    <property name="displayName">tot_ate_bimestre</property>
+                    <text-property name="displayName">tot_ate_bimestre</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bimestre"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1325,7 +1271,7 @@ params["total_ate_bimestre_anterior"] = Total.sum(row["ate_bimestre_anterior"], 
                 </structure>
                 <structure>
                     <property name="name">total_inicial</property>
-                    <property name="displayName">total_inicial</property>
+                    <text-property name="displayName">total_inicial</text-property>
                     <expression name="expression">var total = Total.sum(row.previsao_inicial, row.nivel == 1);
 params["total_previsao_inicial"] = total;
 total</expression>
@@ -1333,7 +1279,7 @@ total</expression>
                 </structure>
                 <structure>
                     <property name="name">total_previsao_atualiada</property>
-                    <property name="displayName">total_previsao_atualiada</property>
+                    <text-property name="displayName">total_previsao_atualiada</text-property>
                     <expression name="expression">var total = Total.sum(row.previsao_atualizada, row.nivel == 1);
 params["total_previsao_atualizada"] = total;
 total</expression>
@@ -1341,7 +1287,7 @@ total</expression>
                 </structure>
                 <structure>
                     <property name="name">total_no_bimestre</property>
-                    <property name="displayName">total_no_bimestre</property>
+                    <text-property name="displayName">total_no_bimestre</text-property>
                     <expression name="expression">var total = Total.sum(row.no_bimestre, row.nivel == 1);
 params["total_no_bimestre"] = total;
 total</expression>
@@ -1349,7 +1295,7 @@ total</expression>
                 </structure>
                 <structure>
                     <property name="name">total_ate_bimestre</property>
-                    <property name="displayName">total_ate_bimestre</property>
+                    <text-property name="displayName">total_ate_bimestre</text-property>
                     <expression name="expression">var total = Total.sum(row.ate_bimestre, row.nivel == 1);
 params["total_ate_bimestre"] = total;
 total</expression>
@@ -1357,7 +1303,7 @@ total</expression>
                 </structure>
                 <structure>
                     <property name="name">total_ate_bimestre_anterior</property>
-                    <property name="displayName">total_ate_bimestre_anterior</property>
+                    <text-property name="displayName">total_ate_bimestre_anterior</text-property>
                     <expression name="expression">var total = Total.sum(row.ate_bimestre_anterior, row.nivel == 1);
 params["total_ate_bimestre_anterior"] = total;
 total</expression>
@@ -1382,8 +1328,8 @@ total</expression>
             </column>
             <header>
                 <row id="1205">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.23958333333333334in</property>
                     <cell id="1206">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -1482,8 +1428,8 @@ total</expression>
                     </cell>
                 </row>
                 <row id="1178">
-                    <property name="height">0.17708333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.17708333333333334in</property>
                     <cell id="1183">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -1530,11 +1476,11 @@ total</expression>
             </header>
             <detail>
                 <row id="1185">
-                    <property name="height">0.15625in</property>
                     <method name="onRender"><![CDATA[if (this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIAS - RPPS (INTRA-ORÇAMENTÁRIAS) (II)'
 	|| this.getRowData().getColumnValue('nom_conta') == 'OUTROS APORTES AO RPPS (V)') {
 	this.getStyle().borderBottomColor = 'Black';
 }]]></method>
+                    <property name="height">0.15625in</property>
                     <cell id="1186">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -1654,7 +1600,6 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
             </detail>
             <footer>
                 <row id="2684">
-                    <property name="height">0.15625in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -1662,6 +1607,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.15625in</property>
                     <cell id="2685">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -1778,7 +1724,7 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre</property>
-                    <property name="displayName">vl_empenhado_ate_bimestre</property>
+                    <text-property name="displayName">vl_empenhado_ate_bimestre</text-property>
                     <expression name="expression">dataSetRow["vl_empenhado_ate_bimestre"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1789,91 +1735,91 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 </structure>
                 <structure>
                     <property name="name">vl_original_total</property>
-                    <property name="displayName">vl_original_total</property>
+                    <text-property name="displayName">vl_original_total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["vl_original"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_suplementacoes_total</property>
-                    <property name="displayName">vl_suplementacoes_total</property>
+                    <text-property name="displayName">vl_suplementacoes_total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["vl_suplementacoes"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_bimestre_total</property>
-                    <property name="displayName">vl_empenhado_bimestre_total</property>
+                    <text-property name="displayName">vl_empenhado_bimestre_total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["vl_empenhado_bimestre"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_total</property>
-                    <property name="displayName">vl_empenhado_ate_bimestre_total</property>
+                    <text-property name="displayName">vl_empenhado_ate_bimestre_total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["vl_empenhado_ate_bimestre"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_anterior_total</property>
-                    <property name="displayName">vl_empenhado_ate_bimestre_anterior_total</property>
+                    <text-property name="displayName">vl_empenhado_ate_bimestre_anterior_total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["vl_empenhado_ate_bimestre_anterior"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_original</property>
-                    <property name="displayName">total_vl_original</property>
+                    <text-property name="displayName">total_vl_original</text-property>
                     <expression name="expression">Total.sum(row["vl_original"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_suplementacoes</property>
-                    <property name="displayName">total_vl_suplementacoes</property>
+                    <text-property name="displayName">total_vl_suplementacoes</text-property>
                     <expression name="expression">Total.sum(row["vl_suplementacoes"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_empenhado_bimestre</property>
-                    <property name="displayName">total_vl_empenhado_bimestre</property>
+                    <text-property name="displayName">total_vl_empenhado_bimestre</text-property>
                     <expression name="expression">Total.sum(row["vl_empenhado_bimestre"], row.nivel == 2)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_empenhado_ate_bimestre</property>
-                    <property name="displayName">total_vl_empenhado_ate_bimestre</property>
+                    <text-property name="displayName">total_vl_empenhado_ate_bimestre</text-property>
                     <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_vl_empenhado_ate_bimestre_anterior</property>
-                    <property name="displayName">total_vl_empenhado_ate_bimestre_anterior</property>
+                    <text-property name="displayName">total_vl_empenhado_ate_bimestre_anterior</text-property>
                     <expression name="expression">Total.sum(row["vl_empenhado_ate_bimestre_anterior"], row.nivel == 2);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_vl_original</property>
-                    <property name="displayName">resultado_vl_original</property>
+                    <text-property name="displayName">resultado_vl_original</text-property>
                     <expression name="expression">params["total_previsao_inicial"] - row["total_vl_original"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_vl_suplementacoes</property>
-                    <property name="displayName">resultado_vl_suplementacoes</property>
+                    <text-property name="displayName">resultado_vl_suplementacoes</text-property>
                     <expression name="expression">params["total_previsao_atualizada"] - row["total_vl_suplementacoes"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_vl_empenhado_bimestre</property>
-                    <property name="displayName">resultado_vl_empenhado_bimestre</property>
+                    <text-property name="displayName">resultado_vl_empenhado_bimestre</text-property>
                     <expression name="expression">params["total_no_bimestre"] - row["total_vl_empenhado_bimestre"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_vl_empenhado_ate_bimestre</property>
-                    <property name="displayName">resultado_vl_empenhado_ate_bimestre</property>
+                    <text-property name="displayName">resultado_vl_empenhado_ate_bimestre</text-property>
                     <expression name="expression">params["total_ate_bimestre"] - row["total_vl_empenhado_ate_bimestre"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">resultado_vl_empenhado_ate_bimestre_anterior</property>
-                    <property name="displayName">resultado_vl_empenhado_ate_bimestre_anterior</property>
+                    <text-property name="displayName">resultado_vl_empenhado_ate_bimestre_anterior</text-property>
                     <expression name="expression">params["total_ate_bimestre_anterior"] - row["total_vl_empenhado_ate_bimestre_anterior"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1951,7 +1897,6 @@ if (  this.getRowData().getColumnValue('nom_conta') == 'RECEITAS PREVIDENCIÁRIA
                 <property name="width">0.6145833333333334in</property>
             </column>
             <column id="6691">
-                <property name="width">0.625in</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1960,9 +1905,9 @@ true;
 }</expression>
                     </structure>
                 </list-property>
+                <property name="width">0.625in</property>
             </column>
             <column id="6698">
-                <property name="width">0.5625in</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -1971,12 +1916,13 @@ true;
 }</expression>
                     </structure>
                 </list-property>
+                <property name="width">0.5625in</property>
             </column>
             <header>
                 <row id="1225">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.23958333333333334in</property>
                     <cell id="1226">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -2112,9 +2058,9 @@ true;
                     </cell>
                 </row>
                 <row id="1256">
-                    <property name="height">0.16666666666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.16666666666666666in</property>
                     <cell id="6668">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -2422,13 +2368,13 @@ true;
             </detail>
             <footer>
                 <row id="2724">
-                    <property name="height">0.14583333333333334in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.14583333333333334in</property>
                     <cell id="2725">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2564,13 +2510,13 @@ true;
                     </cell>
                 </row>
                 <row id="2998">
-                    <property name="height">0.10416666666666667in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.10416666666666667in</property>
                     <cell id="2999"/>
                     <cell id="3000"/>
                     <cell id="3001"/>
@@ -2582,7 +2528,6 @@ true;
                     <cell id="6696"/>
                 </row>
                 <row id="2740">
-                    <property name="height">0.17708333333333334in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -2590,6 +2535,7 @@ true;
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.17708333333333334in</property>
                     <cell id="2741">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2738,8 +2684,8 @@ true;
             <property name="borderBottomWidth">1px</property>
             <property name="width">7.989583333333333in</property>
             <column id="2893">
-                <property name="width">3.21875in</property>
                 <property name="verticalAlign">bottom</property>
+                <property name="width">3.21875in</property>
             </column>
             <column id="2894">
                 <property name="width">1in</property>
@@ -2758,7 +2704,6 @@ true;
             </column>
             <header>
                 <row id="2899">
-                    <property name="height">0.15625in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -2767,6 +2712,7 @@ true;
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">1px</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.15625in</property>
                     <cell id="2900">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -2800,12 +2746,12 @@ true;
                     </cell>
                 </row>
                 <row id="3012">
-                    <property name="height">0.7604166666666666in</property>
                     <property name="fontWeight">normal</property>
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">1px</property>
                     <property name="textAlign">left</property>
+                    <property name="height">0.7604166666666666in</property>
                     <cell id="3013">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2872,7 +2818,6 @@ true;
             </column>
             <header>
                 <row id="2980">
-                    <property name="height">0.17708333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -2881,6 +2826,7 @@ true;
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">1px</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.17708333333333334in</property>
                     <cell id="2981">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2910,10 +2856,10 @@ true;
             </header>
             <detail>
                 <row id="2983">
-                    <property name="height">0.17708333333333334in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
+                    <property name="height">0.17708333333333334in</property>
                     <cell id="2984">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -3007,9 +2953,9 @@ true;
             </column>
             <header>
                 <row id="1398">
-                    <property name="height">0.17708333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.17708333333333334in</property>
                     <cell id="1399">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -3056,9 +3002,9 @@ true;
                     </cell>
                 </row>
                 <row id="1407">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.23958333333333334in</property>
                     <cell id="1408">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -3212,7 +3158,7 @@ true;
                 </structure>
                 <structure>
                     <property name="name">previsao_inicial_total</property>
-                    <property name="displayName">previsao_inicial_total</property>
+                    <text-property name="displayName">previsao_inicial_total</text-property>
                     <expression name="expression">var x = Total.sum(row.previsao_inicial, row.grupo == 1 &amp;&amp;  row.nivel == 1);
 var y = Total.sum(row.previsao_inicial, row.grupo == 8 &amp;&amp;  row.nivel == 1);
 var z = Total.sum(row.previsao_inicial, row.grupo == 10 &amp;&amp;  row.nivel == 1);
@@ -3221,7 +3167,7 @@ var z = Total.sum(row.previsao_inicial, row.grupo == 10 &amp;&amp;  row.nivel ==
                 </structure>
                 <structure>
                     <property name="name">previsao_atualizada_total</property>
-                    <property name="displayName">previsao_atualizada_total</property>
+                    <text-property name="displayName">previsao_atualizada_total</text-property>
                     <expression name="expression">var x = Total.sum(row.previsao_atualizada, row.grupo == 1 &amp;&amp;  row.nivel == 1);
 var y = Total.sum(row.previsao_atualizada, row.grupo == 8 &amp;&amp;  row.nivel == 1);
 var z = Total.sum(row.previsao_atualizada, row.grupo == 10 &amp;&amp;  row.nivel == 1);
@@ -3230,7 +3176,7 @@ var z = Total.sum(row.previsao_atualizada, row.grupo == 10 &amp;&amp;  row.nivel
                 </structure>
                 <structure>
                     <property name="name">no_bimestre_total</property>
-                    <property name="displayName">no_bimestre_total</property>
+                    <text-property name="displayName">no_bimestre_total</text-property>
                     <expression name="expression">var x = Total.sum(row.no_bimestre, row.grupo == 1 &amp;&amp;  row.nivel == 1);
 var y = Total.sum(row.no_bimestre, row.grupo == 8 &amp;&amp;  row.nivel == 1);
 var z = Total.sum(row.no_bimestre, row.grupo == 10 &amp;&amp;  row.nivel == 1);
@@ -3239,7 +3185,7 @@ var z = Total.sum(row.no_bimestre, row.grupo == 10 &amp;&amp;  row.nivel == 1);
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_total</property>
-                    <property name="displayName">ate_bimestre_total</property>
+                    <text-property name="displayName">ate_bimestre_total</text-property>
                     <expression name="expression">var x = Total.sum(row.ate_bimestre, row.grupo == 1 &amp;&amp;  row.nivel == 1);
 var y = Total.sum(row.ate_bimestre, row.grupo == 8 &amp;&amp;  row.nivel == 1);
 var z = Total.sum(row.ate_bimestre, row.grupo == 10 &amp;&amp;  row.nivel == 1);
@@ -3248,7 +3194,7 @@ var z = Total.sum(row.ate_bimestre, row.grupo == 10 &amp;&amp;  row.nivel == 1);
                 </structure>
                 <structure>
                     <property name="name">ate_bimestre_anterior_total</property>
-                    <property name="displayName">ate_bimestre_anterior_total</property>
+                    <text-property name="displayName">ate_bimestre_anterior_total</text-property>
                     <expression name="expression">var x = Total.sum(row.ate_bimestre_anterior, row.grupo == 1 &amp;&amp;  row.nivel == 1);
 var y = Total.sum(row.ate_bimestre_anterior, row.grupo == 8 &amp;&amp;  row.nivel == 1);
 var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.nivel == 1);
@@ -3284,8 +3230,8 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
             </column>
             <header>
                 <row id="1448">
-                    <property name="height">0.13541666666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.13541666666666666in</property>
                     <cell id="1449">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -3383,8 +3329,8 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
                     </cell>
                 </row>
                 <row id="1457">
-                    <property name="height">0.125in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.125in</property>
                     <cell id="1460">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -3539,8 +3485,8 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
             </detail>
             <footer>
                 <row id="1477">
-                    <property name="height">0.16666666666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.16666666666666666in</property>
                     <cell id="1478">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -3711,31 +3657,31 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
                 </structure>
                 <structure>
                     <property name="name">dotacao_inicial_total</property>
-                    <property name="displayName">dotacao_inicial_total</property>
+                    <text-property name="displayName">dotacao_inicial_total</text-property>
                     <expression name="expression">Total.sum(  row.vl_original, row.nivel == 1 )</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">dotaocao_atualizada_total</property>
-                    <property name="displayName">dotaocao_atualizada_total</property>
+                    <text-property name="displayName">dotaocao_atualizada_total</text-property>
                     <expression name="expression">Total.sum(  row.vl_suplementacoes, row.nivel == 1)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_bimestre_total</property>
-                    <property name="displayName">vl_empenhado_bimestre_total</property>
+                    <text-property name="displayName">vl_empenhado_bimestre_total</text-property>
                     <expression name="expression">Total.sum(  row.vl_empenhado_bimestre, row.nivel == 1 )</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_total</property>
-                    <property name="displayName">vl_empenhado_ate_bimestre</property>
+                    <text-property name="displayName">vl_empenhado_ate_bimestre</text-property>
                     <expression name="expression">Total.sum(  row.vl_empenhado_ate_bimestre, row.nivel == 1 )</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">vl_empenhado_ate_bimestre_anterior_total</property>
-                    <property name="displayName">vl_empenhado_ate_bimestre_anterior_total</property>
+                    <text-property name="displayName">vl_empenhado_ate_bimestre_anterior_total</text-property>
                     <expression name="expression">Total.sum(  row.vl_empenhado_ate_bimestre_anterior, row.nivel == 1 )</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -3803,7 +3749,6 @@ var z = Total.sum(row.ate_bimestre_anterior, row.grupo == 10 &amp;&amp;  row.niv
                 <property name="width">0.6145833333333334in</property>
             </column>
             <column id="6724">
-                <property name="width">0.6145833333333334in</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3812,9 +3757,9 @@ true;
 }</expression>
                     </structure>
                 </list-property>
+                <property name="width">0.6145833333333334in</property>
             </column>
             <column id="6735">
-                <property name="width">0.5625in</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
@@ -3823,12 +3768,13 @@ true;
 }</expression>
                     </structure>
                 </list-property>
+                <property name="width">0.5625in</property>
             </column>
             <header>
                 <row id="1498">
-                    <property name="height">0.20833333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.20833333333333334in</property>
                     <cell id="1499">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -3968,9 +3914,9 @@ true;
                     </cell>
                 </row>
                 <row id="1507">
-                    <property name="height">0.1875in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.1875in</property>
                     <cell id="6716">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -4291,8 +4237,8 @@ true;
             </detail>
             <footer>
                 <row id="1527">
-                    <property name="height">0.13541666666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.13541666666666666in</property>
                     <cell id="1528">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -4529,7 +4475,7 @@ true;
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

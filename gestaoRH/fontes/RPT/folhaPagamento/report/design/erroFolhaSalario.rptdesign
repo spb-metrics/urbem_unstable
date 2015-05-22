@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <property name="units">in</property>
-    <property name="comments">uc-04.05.09
-uc-04.05.10
-$Log$
-Revision 1.1  2007/10/10 16:07:50  souzadl
-Bug#10318#</property>
     <text-property name="displayName">Template Urbem Paisagem Entidade</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -19,9 +14,9 @@ Bug#10318#</property>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -46,37 +41,7 @@ Bug#10318#</property>
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="485">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="486">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="490">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="491">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -128,18 +93,7 @@ Bug#10318#</property>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-   	extensionProperties.odaDriverClass = params["db_driver"].value;
- 	extensionProperties.odaURL = params["db_conn_url"].value;
-	extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.181:2345/urbem_teste_migracao_mariana_0602</property>
-            <property name="odaUser">evandro</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIz</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481"extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -625,7 +579,7 @@ params["query"] = this.queryText;]]></method>
                 TAbNQTMhwstEhLyyyRA3bXLKT6PMMs866xzCuVf/kPXWJWs8BNciXC0CwFEPUXbUK6M8wtMyn4u2EB6L
                 8PTcKNP9thByS11E3E7ArHHaMIsM91ppm703E2sPXoTXTyytteOG4x05jIErTl3hWgt+8eFOHJ0xEYx7
                 LfrXpKPMuH2ns4W5Ykv/bXbqRoQAteQGeq++uhEAADs=
-            </property>
+</property>
         </structure>
         <structure>
             <property name="name">00029994.jpg</property>
@@ -1344,7 +1298,7 @@ params["query"] = this.queryText;]]></method>
                 GzYTEzvJDhlWQ3+rmd7+4+zTUkeJ+lFoERogLd2Shv76LB/lx+gqMRu3rSgydkVe6ZVM8UWYcjsPlVcT
                 JHBA80/0VIUF2Ys1lHWlH9mWtDBf58foaD2pllwmHxUKyRnClWW6t3jAMKQ/wF/+Phf/APLlp7Gf7731
                 h06Pk3//2Q==
-            </property>
+</property>
         </structure>
     </list-property>
 </report>

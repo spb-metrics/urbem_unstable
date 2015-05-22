@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.1.r22a_v20071101 Build &lt;2.2.1.v20071101-1439></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,11 +25,11 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -36,24 +37,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,91 +49,56 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.1.15:5432/des_ppa</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">gt</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.1.15:5432/des_ppa</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">123456</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_ppa" id="1621">
             <property name="valueType">static</property>
+            <property name="isRequired">true</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
-            <property name="isRequired">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="desc_regiao" id="1622">
             <property name="valueType">static</property>
+            <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
-            <property name="isRequired">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="des_ppa" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.1.15:5432/des_ppa</property>
-            <property name="odaUser">gt</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIzNDU2</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="des_ppa" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -153,11 +106,24 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">plano_plurianual</property>
-                    <property name="displayName">plano_plurianual</property>
+                    <text-property name="displayName">plano_plurianual</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ppa</property>
-                    <property name="displayName">cod_ppa</property>
+                    <text-property name="displayName">cod_ppa</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">cod_ppa</property>
+                    <property name="paramName">cod_ppa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -175,19 +141,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </list-property>
             </structure>
             <property name="dataSource">des_ppa</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">cod_ppa</property>
-                    <property name="paramName">cod_ppa</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -204,12 +157,12 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
-            <property name="queryText">
+            <xml-property name="queryText"><![CDATA[
 	SELECT 'Plano Plurianual - PPA - '||ppa.ano_inicio||' a '||ppa.ano_final as plano_plurianual
 	     , ppa.cod_ppa 
 	  FROM ppa.ppa as ppa 
 	 WHERE ppa.cod_ppa = ?
-		</property>
+		]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -240,19 +193,32 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_regiao</property>
-                    <property name="displayName">cod_regiao</property>
+                    <text-property name="displayName">cod_regiao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nome</property>
-                    <property name="displayName">nome</property>
+                    <text-property name="displayName">nome</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao_total</property>
-                    <property name="displayName">descricao_total</property>
+                    <text-property name="displayName">descricao_total</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ppa</property>
-                    <property name="displayName">cod_ppa</property>
+                    <text-property name="displayName">cod_ppa</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">cod_ppa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -280,19 +246,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </list-property>
             </structure>
             <property name="dataSource">des_ppa</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">cod_ppa</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -323,7 +276,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT DISTINCT pr.cod_regiao 
+            <xml-property name="queryText"><![CDATA[SELECT DISTINCT pr.cod_regiao 
 	 	 		 , pr.nome as nome
 	 	 		 , pr.descricao as descricao_total
 	   	 		 , ppa.cod_ppa
@@ -337,7 +290,7 @@ extensionProperties.odaPassword = params["db_password"].value;
 				ON pp.cod_programa = pa.cod_programa 
 		INNER JOIN ppa.ppa as ppa 
 				ON pp.cod_ppa = ppa.cod_ppa
-		     WHERE ppa.cod_ppa = ? </property>
+		     WHERE ppa.cod_ppa = ? ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -598,21 +551,22 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="dataType">integer</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="1565">
-                <property name="width">20%</property>
                 <property name="fontWeight">bold</property>
                 <property name="textAlign">center</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">20%</property>
             </column>
             <column id="1566">
-                <property name="width">10%</property>
                 <property name="textAlign">left</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">10%</property>
             </column>
             <column id="1603">
-                <property name="width">70%</property>
                 <property name="textAlign">left</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">70%</property>
             </column>
             <detail>
                 <row id="1553">
@@ -769,15 +723,15 @@ extensionProperties.odaPassword = params["db_password"].value;
                 <property name="width">5%</property>
             </column>
             <column id="1580">
-                <property name="width">40%</property>
                 <property name="fontWeight">bold</property>
+                <property name="width">40%</property>
             </column>
             <column id="1607">
                 <property name="width">2%</property>
             </column>
             <column id="1581">
-                <property name="width">53%</property>
                 <property name="fontWeight">normal</property>
+                <property name="width">53%</property>
             </column>
             <row id="1582">
                 <property name="fontWeight">bold</property>
@@ -815,7 +769,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">filtro_ppa</property>
-                                <property name="displayName">filtro_ppa</property>
+                                <text-property name="displayName">filtro_ppa</text-property>
                                 <expression name="expression">if (params["cod_ppa"] != ""){
 	var campo = "Sim";
 } else{
@@ -845,7 +799,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">filtro_desc</property>
-                                <property name="displayName">filtro_desc</property>
+                                <text-property name="displayName">filtro_desc</text-property>
                                 <expression name="expression">if(params["desc_regiao"] == 1){
 	var campo = "Sim";
 } else{

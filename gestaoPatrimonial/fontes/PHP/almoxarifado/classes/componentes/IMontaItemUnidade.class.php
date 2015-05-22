@@ -115,8 +115,8 @@ class  IMontaItemUnidade extends Objeto
 
         $obFormularioSpan = new Formulario;
         $obFormularioSpan->addComponente( $this->obLabelUnidadeMedida     );
-        $obFormularioSpan->addHidden    ( $this->obHiddenCodUnidadeMedida );
-        $obFormularioSpan->addHidden    ( $this->obHiddenNomUnidadeMedida );
+        #$obFormularioSpan->addHidden    ( $this->obHiddenCodUnidadeMedida );
+        #$obFormularioSpan->addHidden    ( $this->obHiddenNomUnidadeMedida );
         $obFormularioSpan->montaInnerHTML();
         $stHtmlSpan = $obFormularioSpan->getHTML();
 

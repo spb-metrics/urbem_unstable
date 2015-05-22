@@ -39,8 +39,7 @@ $Date: 2006-10-31 09:01:39 -0300 (Ter, 31 Out 2006) $
 Casos de uso: uc-01.06.98
 */
 ?>
-<script lanaguage='JavaScript'>
-<!--
+<script language='JavaScript'>
 
 function executaFuncao(stCtrl, stParametros ){
     var stId = 'listaArquivos';
@@ -49,5 +48,47 @@ function executaFuncao(stCtrl, stParametros ){
     //ajaxPopUp(stPagina,stCtrl,stId)
 }
 
-//-->
+function excluirDado( stAcao, codCopia, codDocumento, codProcesso, exercicio){
+    var d = window.parent.document;
+    var stTraget = d.frm.target;
+    
+    d.frm.target = "oculto";
+    var stAction = d.frm.action;
+    d.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&codCopia='+codCopia+'&codDocumento='+codDocumento+'&codProcesso='+codProcesso+'&exercicio='+exercicio+'&stCtrl='+stAcao;
+    d.frm.submit();
+    d.frm.action = stAction;
+    d.frm.target = stTraget;
+}
+
+function executaFuncaoAjax( funcao, parametrosGET, sincrono ) {
+    var d = window.parent.document;
+    if( parametrosGET ) {
+        stPag = '<?=$pgOcul;?>?<?=Sessao::getId();?>'+parametrosGET+'&stCtrl='+funcao;
+    } else {
+        stPag = '<?=$pgOcul;?>?<?=Sessao::getId();?>'+'&stCtrl='+funcao;
+    }
+
+    var stTraget = d.frm.target;
+    d.frm.target = "oculto";
+    var stAction = d.frm.action;
+    d.frm.action = stPag;
+    d.frm.submit();
+    d.frm.action = stAction;
+    d.frm.target = stTraget;
+}
+
+//Para chamar uma function de um oculto por ajax
+//passando todos os campos que possuam ID por GET
+function montaParametrosGET( funcao, sincrono ) {
+    var stLink = '';
+    var f = window.parent.document.frm;
+
+    for( i=0 ; i<f.elements.length ; i++) {
+        if ( f.elements[i].id ) {
+            stLink += "&"+f.elements[i].id+"="+f.elements[i].value;
+        }
+    }
+    executaFuncaoAjax( funcao, stLink, sincrono );
+}
+
 </script>

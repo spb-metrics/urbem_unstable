@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: OCIncluiProcesso.php 61966 2015-03-18 21:54:54Z jean $
+    $Id: OCIncluiProcesso.php 62525 2015-05-18 16:28:24Z michel $
 */
 
 include_once '../../../../../../config.php';
@@ -91,6 +91,52 @@ function montaListaInteressados($arInteressados, $vinculo = "")
 
 }
 
+
+function montaListaPermitidos($arInteressados, $vinculo = "")
+{
+    $stPrograma = "IncluiProcesso";
+    $pgOcul     = "OC".$stPrograma.".php";
+
+    $rsRecordSet = new RecordSet;
+
+    $rsRecordSet->setPrimeiroElemento();
+    $rsRecordSet->preenche( $arInteressados );
+
+    $table = new Table();
+    $table->setRecordset( $rsRecordSet );
+    $table->setSummary('CGM com Acesso ao Processo');
+
+    $table->Head->addCabecalho( 'CGM'          , 8  );
+    $table->Head->addCabecalho( 'Lista de Permissão' , 30 );
+
+    $stTitle = "[stTitle]";
+
+    $table->Body->addCampo( 'numCgmAcesso' , "C", $stTitle );
+    $table->Body->addCampo( 'nomCgmAcesso' , "E", $stTitle );
+
+    $table->Body->addAcao('EXCLUIR', "ajaxJavaScript('OCIncluiProcesso.php?inId=%d&vinculo=".$vinculo."', 'excluiPermitido');", array( 'numCgmAcesso' , $numCgmAcesso));
+
+    $table->montaHTML();
+    $html = $table->getHtml();
+
+    $html = str_replace("\n","",$html);
+    $html = str_replace("  ","",$html);
+    $html = str_replace("'","\'",$html);
+
+    $stJs = "";
+    $stJs .= " if ($('HdnnumCgmAcesso')) { $('HdnnumCgmAcesso').value = '';}\n";
+    $stJs .= " if ($('nomCgmAcesso')   ) { $('nomCgmAcesso').value = '';}\n";
+    $stJs .= " if ($('numCgmAcesso')   ) { $('numCgmAcesso').value= ''; }\n";
+    $stJs .= " if ($('nomCGMAcesso')   ) { $('nomCGMAcesso').innerHTML = '&nbsp;';}\n";
+
+    $stJs .= " if ($('spnPermitidos')) { $('spnPermitidos').innerHTML = '&nbsp;'; $('spnPermitidos').innerHTML = '".$html."';}\n";
+
+    $stJs .= "if (f.codClassificacao) { f.codClassificacao.focus(); } ";
+    $stJs .= "if (f.codProcesso) { f.codProcesso.focus(); } else { if (f.numCgmAcesso) { f.numCgmAcesso.focus(); } }";
+    
+    return $stJs;
+
+}
 switch ($stCtrl) {
     case 'imobiliaria':
             include_once( CAM_GT_CIM_MAPEAMENTO."TCIMProprietario.class.php");
@@ -324,6 +370,163 @@ switch ($stCtrl) {
             $stJs .= "jQuery('#spnEntidade').html('');\n";
         }
     break;
+
+    # 
+    case 'incluiAcessoCGM' :
+
+        $numCgmAcesso = $_REQUEST['numCgmAcesso'];
+        $nomCgmAcesso = $_REQUEST['nomCgmAcesso'];
+        $vinculo   = $_REQUEST['vinculo'];
+        $boIncluir = false;
+
+        $arInteressados = Sessao::getRequestProtocolo('arRequestProtocolo');
+
+        if (!empty($numCgmAcesso)) {
+            $nomCgmAcesso = (!empty($nomCgmAcesso)) ? $nomCgmAcesso : pegaDado("nom_cgm", "sw_cgm"," where numcgm = ".$numCgmAcesso);
+            $nomCgmAcesso = stripslashes($nomCgmAcesso);
+            
+            if(!empty($nomCgmAcesso)){
+                $inCountInteressados = count($arInteressados['permitidos']);
+    
+                if ($inCountInteressados > 0) {
+    
+                    foreach ($arInteressados['permitidos'] as $campo => $valor) {
+                        if ($numCgmAcesso == $arInteressados['permitidos'][$campo]['numCgmAcesso']) {
+                            $stJs .= "var mensagem = 'Esse CGM já está na lista de Permitidos! (CGM ".$numCgmAcesso.")';\n";
+                            $stJs .= "alertaAviso(mensagem,'form','erro','".Sessao::getId()."');";
+                            $boIncluir = false;
+                            break;
+                        }else
+                            $boIncluir = true;
+                    }
+                } else {
+                    $arInteressados['permitidos'][0]['nomCgmAcesso'] = $nomCgmAcesso;
+                    $arInteressados['permitidos'][0]['numCgmAcesso'] = $numCgmAcesso;
+                }
+    
+                if ($boIncluir) {
+                    $arInteressados['permitidos'][($inCountInteressados)]['nomCgmAcesso'] = $nomCgmAcesso;
+                    $arInteressados['permitidos'][($inCountInteressados)]['numCgmAcesso'] = $numCgmAcesso;
+                }
+    
+                Sessao::setRequestProtocolo($arInteressados);
+    
+                // Desabilita os campos de Inscrição Imobiliária e Economica.
+                switch ($vinculo) {
+                    case "imobiliaria" :
+                        $stJs .= "jQuery('#tdFrmnumMatricula').css('display', 'none');";
+                        $stJs .= "jQuery('#imgnumMatricula').css('display', 'none');";
+                        $stJs .= "jQuery('#tdLblnumMatricula').css('display', '');";
+                        $stJs .= "jQuery('#tdLblnumMatricula').html(jQuery('#numMatricula').attr('value'));";
+                    break;
+    
+                    case "inscricao" :
+                        $stJs .= "jQuery('#tdFrmnumInscricao').css('display', 'none');";
+                        $stJs .= "jQuery('#imgnumInscricao').css('display', 'none');";
+                        $stJs .= "jQuery('#tdLblnumInscricao').css('display', '');";
+                        $stJs .= "jQuery('#tdLblnumInscricao').html(jQuery('#numInscricao').attr('value'));";
+                    break;
+                }
+            
+                $stJs .= montaListaPermitidos($arInteressados['permitidos'], $vinculo);
+            } else {
+                $stJs .= "var mensagem = 'CGM informado inválido ou inexistente! (".$numCgmAcesso.")';\n";
+                $stJs .= "jQuery('#numCgmAcesso').attr('value', '');";
+                $stJs .= "jQuery('#nomCGMAcesso').html('&nbsp;');";
+                $stJs .= "jQuery('#nomCGMAcesso').attr('value', '');";
+                $stJs .= "jQuery('#HdnnumCgmAcesso').attr('value', '');";                
+                $stJs .= "alertaAviso(mensagem,'form','erro','".Sessao::getId()."');";
+            }
+        } else {
+            $stJs .= "var mensagem = 'Você deve selecionar o CGM para incluir na lista.';\n";
+            $stJs .= "alertaAviso(mensagem,'form','erro','".Sessao::getId()."');";
+        }
+
+    break;
+
+    case 'excluiPermitido':
+
+        $arTMP = array();
+        $id = $_REQUEST['inId'];
+        $vinculo = $_REQUEST['vinculo'];
+        $inCount = 0;
+
+        $arInteressados = Sessao::getRequestProtocolo('arRequestProtocolo');
+
+        foreach ($arInteressados['permitidos'] as $campo => $valor) {
+
+            if ($arInteressados['permitidos'][$campo]['numCgmAcesso'] == $id) {
+                unset($arInteressados['permitidos'][$campo]);
+                break;
+            }
+        }
+
+        sort($arInteressados['permitidos']);
+
+        if (count($arInteressados['permitidos']) == 0) {
+            // Desabilita os campos de Inscrição Imobiliária e Economica.
+        switch ($vinculo) {
+        case "imobiliaria" :
+                    $stJs .= "jQuery('#tdFrmnumMatricula').css('display', '');";
+                    $stJs .= "jQuery('#imgnumMatricula').css('display', '');";
+                    $stJs .= "jQuery('#tdLblnumMatricula').css('display', 'none');";
+                    $stJs .= "jQuery('#numMatricula').focus();";
+        break;
+
+        case "inscricao" :
+                    $stJs .= "jQuery('#tdFrmnumInscricao').css('display', '');";
+                    $stJs .= "jQuery('#imgnumInscricao').css('display', '');";
+                    $stJs .= "jQuery('#tdLblnumInscricao').css('display', 'none');";
+                    $stJs .= "jQuery('#numInscricao').focus();";
+                break;
+        }
+
+           $arInteressados['permitidos'] = array();
+        }
+
+        Sessao::setRequestProtocolo($arInteressados);
+        echo montaListaPermitidos( $arInteressados['permitidos'], $vinculo);
+    break;
+
+    case 'montaListaPermitidos' :
+
+            $vinculo = $_REQUEST['vinculo'];
+
+            $arInteressados = Sessao::getRequestProtocolo();
+
+            if (count($arInteressados['permitidos']) > 0) {
+                // Desabilita os campos de Inscrição Imobiliária e Economica.
+                switch ($vinculo) {
+                    case "imobiliaria" :
+                        $stJs .= "if (jQuery('#numMatricula').attr('value') != '') {
+                        jQuery('#tdFrmnumMatricula').css('display', 'none');
+                        jQuery('#imgnumMatricula').css('display', 'none');
+                        jQuery('#tdLblnumMatricula').css('display', '');
+                        jQuery('#tdLblnumMatricula').html(jQuery('#numMatricula').attr('value'));}";
+                    break;
+
+                    case "inscricao" :
+                        $stJs .= "if (jQuery('#numInscricao').attr('value') != '') {
+                        jQuery('#tdFrmnumInscricao').css('display', 'none');
+                        jQuery('#imgnumInscricao').css('display', 'none');
+                        jQuery('#tdLblnumInscricao').css('display', '');
+                        jQuery('#tdLblnumInscricao').html(jQuery('#numInscricao').attr('value')); }";
+                    break;
+                }
+            }
+
+        echo montaListaPermitidos($arInteressados['permitidos'], $vinculo);
+    break;
+
+    case 'limpaListaPermitidos' :
+
+        $arInteressados = Sessao::getRequestProtocolo();
+        $arInteressados['permitidos'] = array();
+
+        Sessao::setRequestProtocolo($arInteressados);
+        $stJs = " if ($('spnInteressados')) { $('spnInteressados').innerHTML = '&nbsp;'; }";
+    break;
+
 }
 
 if (!empty($stJs)) {

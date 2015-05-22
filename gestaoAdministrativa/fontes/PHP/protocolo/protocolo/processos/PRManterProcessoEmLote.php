@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: PRManterProcessoEmLote.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterProcessoEmLote.php 62418 2015-05-06 17:45:05Z diogo.zarpelon $
 
 */
 
@@ -103,6 +103,7 @@ while ( !$rsProcessos->eof() ) {
     $obTProcessoArquivado->setDado("cod_historico"      , $_POST['stHistorico'] );
     $obTProcessoArquivado->setDado("timestamp_arquivamento", date( "Y-m-d H:i:s.ms" ));
     $obTProcessoArquivado->setDado("texto_complementar" , $_POST['txtComplementar'] );
+    $obTProcessoArquivado->setDado("localizacao"        , $_POST['stLocalizacaoFisica'] );
     $obTProcessoArquivado->setDado("cgm_arquivador"     , Sessao::read("numCgm"));
     $obErro = $obTProcessoArquivado->inclusao();
 
@@ -113,6 +114,7 @@ while ( !$rsProcessos->eof() ) {
     $rsProcessos->proximo();
 
 }
+
 if ( !$obErro->ocorreu() ) {
     SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Processo(s) arquivado(s) com sucesso!","aviso","aviso", Sessao::getId(), "../");
 } else {

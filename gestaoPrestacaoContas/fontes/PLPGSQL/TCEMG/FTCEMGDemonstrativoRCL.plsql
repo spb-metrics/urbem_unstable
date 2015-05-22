@@ -27,7 +27,7 @@
     * @author Analista:      Eduardo Paculski Schitz
     * @author Desenvolvedor: Franver Sarmento de Moraes
     
-    $Id: FTCEMGDemonstrativoRCL.plsql 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FTCEMGDemonstrativoRCL.plsql 62441 2015-05-11 14:06:55Z jean $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_demostrativo_rcl(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -81,6 +81,7 @@ BEGIN
                  , contabilidade.lancamento            as lan
                  , contabilidade.lote                  as lote 
              WHERE ore.exercicio in ( '''||inExercicio||''', '''||inExercicio-1||''' )
+               AND ore.cod_entidade    IN ('|| stEntidades ||')
                AND ocr.cod_conta       = ore.cod_conta
                AND ocr.exercicio       = ore.exercicio
                -- join lancamento receita
@@ -126,6 +127,7 @@ BEGIN
                  , contabilidade.lancamento            as lan
                  , contabilidade.lote                  as lote 
              WHERE ore.exercicio in ( '''||inExercicio||''', '''||inExercicio-1||''' )
+               AND ore.cod_entidade    IN ('|| stEntidades ||')
                AND ocr.cod_conta       = ore.cod_conta
                AND ocr.exercicio       = ore.exercicio
                -- join lancamento receita

@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<library xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.7" id="1">
-    <property name="createdBy">uc-01.01.00</property>
+<library xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <property name="theme">defaultTheme</property>
     <parameters>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="exercicio" id="184">
             <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <text-property name="promptText">Exercicio</text-property>
-            <property name="allowBlank">true</property>
-            <property name="allowNull">false</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -28,21 +28,10 @@
         </scalar-parameter>
         <scalar-parameter name="cod_acao" id="186">
             <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <text-property name="promptText">Acao</text-property>
-            <property name="allowBlank">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="229">
-            <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <text-property name="promptText">JDBC Driver</text-property>
-            <property name="allowBlank">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -50,32 +39,10 @@
         </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="230">
             <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <text-property name="promptText">Connection URL</text-property>
-            <property name="allowBlank">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="231">
-            <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <text-property name="promptText">Database User</text-property>
-            <property name="allowBlank">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="232">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <text-property name="promptText">Database password</text-property>
-            <property name="allowBlank">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -84,6 +51,7 @@
         <scalar-parameter name="entidade" id="399">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">true</property>
             <property name="dataType">integer</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -93,6 +61,7 @@
         <scalar-parameter name="__format" id="718">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -101,21 +70,52 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="189">
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="189">
             <text-property name="displayName">Data Source</text-property>
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-                extensionProperties.odaPassword = params["db_password"].value;
-            }]]></method>
+            <method name="beforeOpen"><![CDATA[if ( params["db_conn_url"].value ){
+    extensionProperties.odaURL = params["db_conn_url"].value;
+}
+
+extensionProperties.charSet = "utf8";
+]]></method>
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
             <property name="odaDriverClass">org.postgresql.Driver</property>
             <property name="odaURL">jdbc:postgresql://[ip]:[port]/[data_base]</property>
+            <property name="odaUser">birt</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">NmM0Mzk0MmJjY2U0MzA3ZjA4NTc1ZjhlODM4YWUzZWY=</encrypted-property>
         </oda-data-source>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="prefeitura" id="190">
             <text-property name="displayName">prefeitura</text-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param1</property>
+                    <property name="nativeName">param1</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">params["exercicio"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -160,20 +160,7 @@
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Data Source</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param1</property>
-                    <property name="nativeName">param1</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">params["exercicio"]</expression>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -224,7 +211,7 @@
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT fone.*
+            <xml-property name="queryText"><![CDATA[SELECT fone.*
      , e_mail.e_mail
      , cnpj.cnpj
      , nom_prefeitura.nom_prefeitura
@@ -287,12 +274,10 @@ WHERE fone.exercicio = ?
   AND fone.exercicio = logotipo.exercicio
   AND fone.exercicio = endereco.exercicio
   AND fone.exercicio = cep.exercicio
-</property>
+]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="relatorio" id="223">
             <text-property name="displayName">relatorio</text-property>
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">Data Source</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param1</property>
@@ -306,7 +291,9 @@ WHERE fone.exercicio = ?
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT nom_acao
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[SELECT nom_acao
      , nom_funcionalidade
      , nom_modulo
      , versao
@@ -317,11 +304,9 @@ WHERE fone.exercicio = ?
 WHERE cod_acao = ?
   AND acao.cod_funcionalidade = funcionalidade.cod_funcionalidade
   AND funcionalidade.cod_modulo = modulo.cod_modulo
-  AND modulo.cod_gestao = gestao.cod_gestao</property>
+  AND modulo.cod_gestao = gestao.cod_gestao]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="entidade" id="398">
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">Data Source</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param1</property>
@@ -346,7 +331,9 @@ WHERE cod_acao = ?
                     <property name="isInput">true</property>
                 </structure>
             </list-property>
-            <property name="queryText">select
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[select
      cgm.nom_cgm
     ,cgm.fone_comercial
     ,cgm.e_mail
@@ -387,7 +374,7 @@ where
     and cgm.cod_municipio = municipio.cod_municipio
     and municipio.cod_uf = uf.cod_uf
     and entidade.exercicio = ?
-    and entidade.cod_entidade = ?</property>
+    and entidade.cod_entidade = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -417,7 +404,7 @@ where
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>params[&quot;entidade&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>params[&amp;quot;entidade&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -644,7 +631,7 @@ where
             
  			retorno=num[i]+retorno;
  			
-            if(  ( (num.length - i -(qtdeCasas-3)) % 3 ) == 0 && ( i != num.length ) && i != 0 && (num.length-i)>qtdeCasas+2 )
+            if(  ( (num.length - i -(qtdeCasas-3)) % 3 ) == 0 &amp;&amp; ( i != num.length ) &amp;&amp; i != 0 &amp;&amp; (num.length-i)>qtdeCasas+2 )
         {
              retorno="."+retorno;
         }
@@ -669,9 +656,9 @@ where
         <grid name="Cabecalho Retrato" id="719">
             <property name="width">190mm</property>
             <column id="720">
-                <property name="width">25mm</property>
                 <property name="textAlign">center</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">25mm</property>
             </column>
             <column id="721">
                 <property name="width">72mm</property>
@@ -1129,9 +1116,9 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
         <grid name="Cabecalho Retrato Entidade" id="1000">
             <property name="width">190mm</property>
             <column id="1001">
-                <property name="width">25mm</property>
                 <property name="textAlign">center</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1002">
                 <property name="width">72mm</property>
@@ -1587,9 +1574,9 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
         <grid name="Cabecalho Paisagem" id="936">
             <property name="width">280mm</property>
             <column id="937">
-                <property name="width">25mm</property>
                 <property name="textAlign">center</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">25mm</property>
             </column>
             <column id="938">
                 <property name="width">162mm</property>
@@ -2047,9 +2034,9 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
         <grid name="Cabecalho Paisagem Entidade" id="1066">
             <property name="width">280mm</property>
             <column id="1067">
-                <property name="width">25mm</property>
                 <property name="textAlign">center</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1068">
                 <property name="width">162mm</property>
@@ -2506,6 +2493,11 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
         </grid>
     </components>
     <page-setup>
-        <simple-master-page name="NewSimpleMasterPage" id="3"/>
+        <simple-master-page name="NewSimpleMasterPage" id="3">
+            <property name="topMargin">1in</property>
+            <property name="leftMargin">1.25in</property>
+            <property name="bottomMargin">1in</property>
+            <property name="rightMargin">1.25in</property>
+        </simple-master-page>
     </page-setup>
 </library>

@@ -25,53 +25,96 @@
 <?php
 /**
     * Página de Relatório Despesas SIOPE
-    * Data de Criação  : 20/06/2008
+    * Data de Criação  : 14/05/2015
 
-    * @author Rodrigo Soares Rodrigues
+    * @author Carlos Adriano Vernieri da Silva
 
     * Casos de uso : uc-02.01.40
 
-    * $Id: OCGeraDespesasSIOPE.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+    * $Id: OCGeraDespesasSIOPE.php 62527 2015-05-18 17:44:34Z carlos.silva $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
+include_once CAM_GPC_STN_MAPEAMENTO."TSTNVinculoRecurso.class.php";
 
-$preview = new PreviewBirt(6,61,1);
-$preview->setReturnURL(CAM_GPC_SIOPE_SIOPS_INSTANCIAS.'relatorio/FLDespesasSIOPE.php');
-$preview->setTitulo('Despesas Municipais com Educação - SIOPE');
-$preview->setVersaoBirt('2.5.0');
 
-$obTOrcamentoEntidade = new TOrcamentoEntidade();
-$obTOrcamentoEntidade->setDado('exercicio', Sessao::getExercicio());
-$obTOrcamentoEntidade->recuperaEntidades($rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")");
-
-$preview->addParametro('cod_entidade', implode(',', $_REQUEST['inCodEntidade']));
-
-$preview->addParametro('orgao'  , $_REQUEST['inCodOrgao']);
-$preview->addParametro('recurso', $_REQUEST['inCodRecurso']);
-$preview->addParametro('descricao_recurso', $_REQUEST['stDescricaoRecurso']);
-
-switch ($_REQUEST['inPeriodicidade']) {
-case '1':
-    $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
-    $preview->addParametro('data_final', $_REQUEST['stDataInicial']);
-    break;
-case '2':
-    $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
-    $preview->addParametro('data_final', $_REQUEST['stDataFinal']);
-    break;
-case '3':
-    $preview->addParametro('data_inicial', '01/01/'.Sessao::getExercicio());
-    $preview->addParametro('data_final', '31/12/'.Sessao::getExercicio());
-    break;
-case '4':
-    $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
-    $preview->addParametro('data_final', $_REQUEST['stDataFinal']);
-    break;
+if($_REQUEST['stValidado'] == 1) {
+    SistemaLegado::LiberaFrames();
+    
+    $preview = new PreviewBirt(6,61,1);
+    $preview->setReturnURL(CAM_GPC_SIOPE_SIOPS_INSTANCIAS.'relatorio/FLDespesasSIOPE.php');
+    $preview->setTitulo('Despesas Municipais com Educação - SIOPE');
+    $preview->setVersaoBirt('2.5.0');
+    
+    $preview->addParametro('cod_entidade', implode(',', $_REQUEST['inCodEntidade']));
+    $preview->addParametro('orgao'  , $_REQUEST['inCodOrgao']);
+    $preview->addParametro('descricao_recurso', $_REQUEST['stDescricaoRecurso']);
+    
+    switch ($_REQUEST['inPeriodicidade']) {
+    case '1':
+        $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
+        $preview->addParametro('data_final', $_REQUEST['stDataInicial']);
+        $preview->addParametro('periodicidade', $_REQUEST['stDia']);
+        break;
+    case '2':
+        $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
+        $preview->addParametro('data_final', $_REQUEST['stDataFinal']);
+        $preview->addParametro('periodicidade', SistemaLegado::mesExtensoBR((int)$_REQUEST['stMes']).'/'.Sessao::getExercicio());
+        break;
+    case '3':
+        $preview->addParametro('data_inicial', '01/01/'.Sessao::getExercicio());
+        $preview->addParametro('data_final', '31/12/'.Sessao::getExercicio());
+        $preview->addParametro('periodicidade', Sessao::getExercicio());
+        break;
+    case '4':
+        $preview->addParametro('data_inicial', $_REQUEST['stDataInicial']);
+        $preview->addParametro('data_final', $_REQUEST['stDataFinal']);
+        $preview->addParametro('periodicidade', $_REQUEST['stDataInicial'].' a '.$_REQUEST['stDataFinal']);
+        break;
+    }
+    
+    $preview->addAssinaturas(Sessao::read('assinaturas'));
+    $preview->preview();
+    
+// Se não estiver validado, executa este bloco    
+} else {
+    $obErro = new Erro();
+    $obTSTNVinculoRecurso = new TSTNVinculoRecurso();
+    $obTSTNVinculoRecurso->setDado('exercicio', Sessao::getExercicio());
+    $obTSTNVinculoRecurso->setDado('cod_entidade', implode(',', $_REQUEST['inCodEntidade']));
+    $obTSTNVinculoRecurso->setDado('num_orgao', $_REQUEST['inCodOrgao']);
+    
+    $obTSTNVinculoRecurso->setDado('cod_vinculo', 1);
+    $obTSTNVinculoRecurso->recuperaRelacionamento($rsVinculo);
+    if($rsVinculo->getNumLinhas() < 1) {
+        $obErro->setDescricao('Não há recursos vinculados para o FUNDEB');
+    }
+    
+    $obTSTNVinculoRecurso->setDado('cod_vinculo', 2);
+    $obTSTNVinculoRecurso->recuperaRelacionamento($rsVinculo);
+    if($rsVinculo->getNumLinhas() < 1) {
+        $obErro->setDescricao('Não há recursos vinculados para o MDE');
+    }
+    
+    $obTSTNVinculoRecurso->setDado('cod_vinculo', 3);
+    $obTSTNVinculoRecurso->recuperaRelacionamento($rsVinculo);
+    if($rsVinculo->getNumLinhas() < 1) {
+        $obErro->setDescricao('Não há recursos vinculados para o Salário Família');
+    }
+    
+    if(!$obErro->ocorreu()) {
+        $stJs = "f.target = 'telaPrincipal';";
+        $stJs.= "f.stValidado.value = '1';";
+        $stJs.= "f.submit();";
+        
+        sistemaLegado::executaFrameOculto($stJs);
+        
+    } else {
+        SistemaLegado::LiberaFrames();
+        SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+        die;
+    }
 }
-
-$preview->addAssinaturas(Sessao::read('assinaturas'));
-$preview->preview();

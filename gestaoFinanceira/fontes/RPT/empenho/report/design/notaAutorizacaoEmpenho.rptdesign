@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,30 +18,27 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="exercicio" id="1151" extends="urbem_250.exercicio"/>
         <scalar-parameter name="cod_acao" id="1152" extends="urbem_250.cod_acao"/>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver"/>
         <scalar-parameter name="db_conn_url" id="1154" extends="urbem_250.db_conn_url"/>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user"/>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password"/>
         <scalar-parameter name="entidade" id="1157" extends="urbem_250.entidade"/>
         <scalar-parameter name="cod_autorizacao" id="1434">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">491</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -50,12 +47,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">533</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -64,12 +61,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">2</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -78,12 +75,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">autorizacao</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -92,9 +89,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -103,9 +100,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -114,9 +111,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -125,9 +122,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -136,15 +133,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -1315,7 +1303,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">nom_cgm</property>
-                                <property name="displayName">nom_cgm</property>
+                                <text-property name="displayName">nom_cgm</text-property>
                                 <expression name="expression">dataSetRow["nom_cgm"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1330,7 +1318,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">cpf_cnpj</property>
-                                <property name="displayName">cpf_cnpj</property>
+                                <text-property name="displayName">cpf_cnpj</text-property>
                                 <expression name="expression">dataSetRow["cpf_cnpj"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1346,7 +1334,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">num_fornecedor</property>
-                                <property name="displayName">num_fornecedor</property>
+                                <text-property name="displayName">num_fornecedor</text-property>
                                 <expression name="expression">dataSetRow["num_fornecedor"]</expression>
                                 <property name="dataType">integer</property>
                             </structure>
@@ -1394,7 +1382,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">endereco</property>
-                                <property name="displayName">endereco</property>
+                                <text-property name="displayName">endereco</text-property>
                                 <expression name="expression">dataSetRow["endereco"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1409,7 +1397,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">telefone</property>
-                                <property name="displayName">telefone</property>
+                                <text-property name="displayName">telefone</text-property>
                                 <expression name="expression">dataSetRow["telefone"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1424,7 +1412,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">nom_municipio</property>
-                                <property name="displayName">nom_municipio</property>
+                                <text-property name="displayName">nom_municipio</text-property>
                                 <expression name="expression">dataSetRow["nom_municipio"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1439,7 +1427,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">sigla_uf</property>
-                                <property name="displayName">sigla_uf</property>
+                                <text-property name="displayName">sigla_uf</text-property>
                                 <expression name="expression">dataSetRow["sigla_uf"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1710,7 +1698,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">num_nom_orgao</property>
-                                <property name="displayName">num_nom_orgao</property>
+                                <text-property name="displayName">num_nom_orgao</text-property>
                                 <expression name="expression">dataSetRow["num_nom_orgao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1727,7 +1715,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">num_nom_unidade</property>
-                                <property name="displayName">num_nom_unidade</property>
+                                <text-property name="displayName">num_nom_unidade</text-property>
                                 <expression name="expression">dataSetRow["num_nom_unidade"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2740,7 +2728,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">descricao</property>
-                                <property name="displayName">descricao</property>
+                                <text-property name="displayName">descricao</text-property>
                                 <expression name="expression">dataSetRow["descricao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2779,7 +2767,7 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">observacao</property>
-                    <property name="displayName">justificativa</property>
+                    <text-property name="displayName">justificativa</text-property>
                     <expression name="expression">dataSetRow["observacao"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -3504,13 +3492,15 @@ FROM (
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">num_assinatura</property>
-                                <expression name="expression">1</expression>
+                                <simple-property-list name="expression">
+                                    <value>1</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">nom_cgm</property>
-                                <property name="displayName">nom_cgm</property>
+                                <text-property name="displayName">nom_cgm</text-property>
                                 <expression name="expression">dataSetRow["nom_cgm"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3527,13 +3517,15 @@ FROM (
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">num_assinatura</property>
-                                <expression name="expression">2</expression>
+                                <simple-property-list name="expression">
+                                    <value>2</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">nom_cgm</property>
-                                <property name="displayName">nom_cgm</property>
+                                <text-property name="displayName">nom_cgm</text-property>
                                 <expression name="expression">dataSetRow["nom_cgm"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3551,13 +3543,15 @@ FROM (
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">num_assinatura</property>
-                                <expression name="expression">1</expression>
+                                <simple-property-list name="expression">
+                                    <value>1</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">cargo</property>
-                                <property name="displayName">cargo</property>
+                                <text-property name="displayName">cargo</text-property>
                                 <expression name="expression">dataSetRow["cargo"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3574,13 +3568,15 @@ FROM (
                         <list-property name="paramBindings">
                             <structure>
                                 <property name="paramName">num_assinatura</property>
-                                <expression name="expression">2</expression>
+                                <simple-property-list name="expression">
+                                    <value>2</value>
+                                </simple-property-list>
                             </structure>
                         </list-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">cargo</property>
-                                <property name="displayName">cargo</property>
+                                <text-property name="displayName">cargo</text-property>
                                 <expression name="expression">dataSetRow["cargo"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3625,7 +3621,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_anulacao</property>
-                                <property name="displayName">dt_anulacao</property>
+                                <text-property name="displayName">dt_anulacao</text-property>
                                 <expression name="expression">'Autorização anulada em ' + dataSetRow["dt_anulacao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3653,7 +3649,7 @@ FROM (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">motivo</property>
-                                <property name="displayName">motivo</property>
+                                <text-property name="displayName">motivo</text-property>
                                 <expression name="expression">dataSetRow["motivo"]</expression>
                                 <property name="dataType">string</property>
                             </structure>

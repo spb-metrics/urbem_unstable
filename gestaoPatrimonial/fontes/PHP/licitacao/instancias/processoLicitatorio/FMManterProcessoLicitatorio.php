@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Fernando Zank Correa Evangelista
 
-    $Id: FMManterProcessoLicitatorio.php 62402 2015-05-04 20:19:28Z jean $
+    $Id: FMManterProcessoLicitatorio.php 62555 2015-05-19 19:30:22Z evandro $
 
     * Casos de uso : uc-03.04.15
 */
@@ -133,7 +133,7 @@ if ($stAcao == 'alterar') {
     }
 }
 // $compraJulgamento = false;
-if ($stAcao == 'alterar') {
+if ($stAcao == 'alterar') {    
     $stUnidadeOrcamentaria = $_REQUEST['stUnidadeOrcamentaria'];
     $jsOnload = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stEntidade=".$_REQUEST['stEntidade']."&stProcesso=".$_REQUEST['stProcesso']."&stMapaCompra=".$_REQUEST['stMapaCompra']."&inCodLicitacao=".$_REQUEST['inCodLicitacao']."&stModalidade=".$_REQUEST['stModalidade']."&stCodObjeto=".$_REQUEST['stCodObjeto']."&inCodTipoObjeto=".$_REQUEST['inCodTipoObjeto']."&inCodComissao=".$_REQUEST['inCodComissao']."&inCodTipoLicitacao=".$_REQUEST['inCodTipoLicitacao']."&inCodCriterio=".$_REQUEST['inCodCriterio']."&vlCotado=".$_REQUEST['vlCotado']."&stExercicioLicitacao=".$_REQUEST['stExercicioLicitacao']."&inCodRegime=".$_REQUEST['inCodRegime']."&boJulgamento=".$compraJulgamento."','preencheAlteracao');\n";
 }
@@ -267,9 +267,9 @@ if ($stAcao == 'incluir') {
 
     // Solicitado pelo Gelson que não aparece essas modalidades por enquanto.
     //$stFiltro = " WHERE	cod_modalidade NOT IN(4,5,6,7)  ";
-    $stFiltro = " WHERE	cod_modalidade NOT IN(4,5)  ";
+    $stFiltro = " WHERE	cod_modalidade NOT IN(4,5,10,11)  ";
 
-    $obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro);
+    $obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro,"ORDER BY cod_modalidade",$boTransacao);
 
     $obISelectModalidadeLicitacao = new Select();
     $obISelectModalidadeLicitacao->setRotulo     ("Modalidade"                            );

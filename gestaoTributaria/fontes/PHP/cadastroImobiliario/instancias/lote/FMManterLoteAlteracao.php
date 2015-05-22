@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterLoteAlteracao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterLoteAlteracao.php 62460 2015-05-12 19:04:30Z jean $
 
     * Casos de uso: uc-05.01.08
 */
@@ -49,7 +49,7 @@ include_once 'OCManterLote.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLote";
-$pgFilt = "FL".$stPrograma.".php";
+$pgFilt = "FL".$stPrograma.".php?".Sessao::getId().$stLink."&funcionalidade=".$_REQUEST["funcionalidade"];
 $pgList = "LS".$stPrograma.".php?".Sessao::getId().$stLink."&funcionalidade=".$_REQUEST["funcionalidade"];
 $pgListValidar = "LSValidarLote.php?".Sessao::getId().$stLink."&funcionalidade=".$_REQUEST["funcionalidade"];
 $pgForm = "FM".$stPrograma.".php";
@@ -534,7 +534,8 @@ $obMontaAtributosLote->geraFormulario ( $obFormulario );
 if ($stAcao == "validar") {
     $obFormulario->Cancelar( $pgListValidar);
 } else {
-    $obFormulario->Cancelar( $pgList);
+    //$obFormulario->Cancelar( $pgList);
+    $obFormulario->Cancelar( $pgFilt);
 }
 
 if ($stAcao == "alterar") {

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62411 2015-05-05 19:01:22Z lisiane $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62491 2015-05-14 13:55:34Z lisiane $
     *
     * $Name: $
     * $Date: $
@@ -66,14 +66,36 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
         $stSql = $this->montaRecuperaDadosConsultaPrincipal().$stCondicao.$stOrdem;
-        $this->setDebug( $stSql );
+        $this->setDebug( $stSql );    
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;
     }
 
     public function montaRecuperaDadosConsultaPrincipal() {
-        $stSql  = " SELECT DISTINCT *
+        $stSql  = "SELECT entidade
+                        , empenho
+                        , retorno.exercicio
+                        , cgm
+                        , credor
+                        , dt_empenho
+                        , valor
+                        , valor_anulado
+                        , descricao
+                        , cod_recurso
+                        , recurso::varchar
+                        , despesa
+                        , dotacao
+                        , stData
+                        , banco
+                        , num_documento
+                        , cod_nota
+                        , cod_orgao
+                        , cod_unidade
+                        , vl_total
+                        , vl_total_anulado
+                        , unidade.nom_unidade
+                        , orgao.nom_orgao     
                       FROM tcemg.razao_despesa('".$this->getDado('exercicio')."',                             
                                                '".$this->getDado('dt_inicial')."',                                    
                                                '".$this->getDado('dt_final')."',
@@ -82,7 +104,8 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                                '".$this->getDado('num_unidade')."',
                                                '".$this->getDado('num_pao')."',
                                                '".$this->getDado('cod_recurso')."',
-                                               'data'
+                                               '".$this->getDado('situacao')."',
+                                               '".$this->getDado('tipo_relatorio')."'
                                                ) as retorno( entidade            integer,        
                                                              empenho             integer,   
                                                              exercicio           char(4),  
@@ -90,25 +113,37 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                                                              credor              text,  
                                                              dt_empenho          text,   
                                                              valor               numeric,                                                                                       
-                                                             valor_pago          numeric,       
-                                                             valor_liquidado     numeric, 
+                                                             valor_anulado       numeric,       
                                                              descricao           varchar, 
                                                              cod_recurso         integer,                                                                                      
                                                              recurso             varchar,                                                                                       
                                                              despesa             text,
                                                              dotacao             text,
-                                                             dt_pagamento        text,  
+                                                             stData              text,  
                                                              banco               varchar, 
-                                                             cod_recurso_banco   integer,   
                                                              num_documento       varchar,
-                                                             cod_nota            integer, 
-                                                             vl_total_pago              numeric,
-                                                             vl_total_pago_anulado      numeric,
-                                                             vl_total_empenhado         numeric,
-                                                             vl_total_empenhado_anulado numeric,
-                                                             vl_total_liquidado         numeric,
-                                                             vl_total_liquidado_anulado numeric                                                                          
-                                                          ) ";
+                                                             cod_nota            integer,
+                                                             cod_orgao           integer,
+                                                             cod_unidade         integer,
+                                                             vl_total            numeric,
+                                                             vl_total_anulado    numeric
+                                                          )
+                      JOIN orcamento.unidade
+	                    ON unidade.num_unidade = retorno.cod_unidade
+	                   AND unidade.num_orgao   = retorno.cod_orgao
+	                   AND unidade.exercicio   = retorno.exercicio
+
+	                  JOIN orcamento.orgao
+	                    ON orgao.num_orgao   = retorno.cod_orgao
+	                   AND orgao.exercicio   = retorno.exercicio
+                                 
+                  ORDER BY cod_orgao
+                         , cod_unidade
+                         , cod_recurso
+                         , dt_empenho
+                         , entidade
+                         , empenho
+                         , cod_nota ";
         return $stSql;
     }
     public function recuperaDadosConsultaEmpenhoLiquidadoPago(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")

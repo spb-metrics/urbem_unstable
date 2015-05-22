@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: imprimeReciboProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: imprimeReciboProcesso.php 62581 2015-05-21 14:05:03Z michel $
 
     */
 
@@ -55,6 +55,7 @@ $registroFunc      = $_REQUEST['registroFunc'];
 
 $arInteressados = Sessao::getRequestProtocolo();
 $interessado    = $arInteressados['interessados'];
+$permitido      = $arInteressados['permitidos'];
 
 ?>
 
@@ -317,19 +318,32 @@ $stMensagemRecibo = pegaConfiguracao("mensagem_recibo_processo", 5);
 $botoesPDF  = new botoesPdfLegado;
 if (file_exists($caminhoRecibo)) {
 //	$botoesPDF->imprimeBotoes($sXML,$sSQL,'',$sSubTitulo);
-
-    print '
-   <table width="300">
-        <tr>
-            <td class="labelcenter" title="Salvar Relatório">
-            <a href="javascript:SalvarRecibo();"><img src="'.CAM_FW_IMAGENS.'botao_salvar.png" border=0></a>
-            <td class="labelcenter" title="Imprimir Etiqueta">
-            <a href="javascript:ImprimirEtiqueta();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
-            <td class="labelcenter" title="Imprimir Despachos do Processo">
-            <a href="javascript:ImprimeDespachos();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
-        </tr>
-    </table>
-    ';
+    if(isset($_REQUEST['stAcao'])&&$_REQUEST['stAcao']=='Incluir'){
+        print '
+            <table width="300">
+                <tr>
+                    <td class="labelcenter" title="Salvar Relatório">
+                    <a href="javascript:SalvarRecibo();"><img src="'.CAM_FW_IMAGENS.'botao_salvar.png" border=0></a>
+                    <td class="labelcenter" title="Imprimir Etiqueta">
+                    <a href="javascript:ImprimirEtiqueta();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
+                </tr>
+            </table>
+        '; 
+    }
+    else{
+        print '
+            <table width="300">
+                <tr>
+                    <td class="labelcenter" title="Salvar Relatório">
+                    <a href="javascript:SalvarRecibo();"><img src="'.CAM_FW_IMAGENS.'botao_salvar.png" border=0></a>
+                    <td class="labelcenter" title="Imprimir Etiqueta">
+                    <a href="javascript:ImprimirEtiqueta();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
+                    <td class="labelcenter" title="Imprimir Despachos do Processo">
+                    <a href="javascript:ImprimeDespachos();"><img src="'.CAM_FW_IMAGENS.'botao_imprimir.png" border=0></a>
+                </tr>
+            </table>
+        ';
+    }
 
 } else {
     echo "<script language='javascript'>
@@ -495,6 +509,50 @@ if ($vinculo == "funcionario") {
             <?=$nomAssunto?>
         </td>
     </tr>
+    
+    <?php
+    $centroCusto = pegaConfiguracao("centro_custo", 5);
+    
+    if($centroCusto=='true'){
+        $codCentroCusto = '';
+        $nomCentroCusto = '';
+        $stCentroCusto = '';
+        
+        $sSQL = "SELECT sw_processo.*
+                      , centro_custo.descricao as descricao_centro
+                   FROM sw_processo
+             INNER JOIN almoxarifado.centro_custo
+                     ON centro_custo.cod_centro=sw_processo.cod_centro
+                  WHERE ano_exercicio = '".$sAnoExercicio."'
+                    AND cod_processo = ".$iCodProcesso;
+        $dbConfig = new dataBaseLegado;
+        $dbConfig->abreBD();
+        $dbConfig->abreSelecao($sSQL);
+        $dbConfig->vaiPrimeiro();
+        while (!$dbConfig->eof()) {
+            $codCentroCusto  = $dbConfig->pegaCampo("cod_centro");
+            $nomCentroCusto  = trim($dbConfig->pegaCampo("descricao_centro"));
+            $dbConfig->vaiProximo();
+        }
+        $dbConfig->limpaSelecao();
+        $dbConfig->fechaBD();
+        
+        if($codCentroCusto!=''&&$nomCentroCusto!='')
+           $stCentroCusto = $codCentroCusto." - ".$nomCentroCusto;
+           
+        echo "
+        <tr>
+            <td class=label width='30%'>
+                Centro de Custo
+            </td>
+            <td class=field width='70%' colspan='2'>
+                ".$stCentroCusto."
+            </td>
+        </tr>
+        ";
+    }
+    ?>
+    
     <tr>
         <td class=label width="30%">
             Observações
@@ -510,27 +568,48 @@ if ($vinculo == "funcionario") {
             <?=$observacoes?>
         </td>
     </tr>
+
+    <tr>
+        <td class=label width="30%">Confidencial</td>
+        <td class=field width="70%" colspan="2"><?=(count($permitido) > 0) ? 'Sim' : 'Não';?>
+        </td>
+    </tr>
+
+    <?php
+        if (count($permitido) > 0) {
+            foreach ($permitido as $key => $valor) {
+    ?>
+            <tr>
+                <td class=label width="30%">CGM com Acesso ao Processo </td>
+                <td class=field width="70%" colspan="2"><?=$valor['numCgmAcesso']?> - <?=$valor['nomCgmAcesso']?>
+                </td>
+            </tr>
+    <?php
+            }
+        }
+    ?>
+
     <tr>
         <td class=alt_dados colspan="3">
             Encaminhamento de processo
         </td>
     </tr>
     </table>
-        <?php
+    <?php
 
-            $obFormulario = new Formulario;
-            $obFormulario->addForm(null);
-            $obFormulario->setLarguraRotulo(35);
+        $obFormulario = new Formulario;
+        $obFormulario->addForm(null);
+        $obFormulario->setLarguraRotulo(35);
 
-            $obIMontaOrganograma = new IMontaOrganograma(true);
-            $obIMontaOrganograma->setCodOrgao($codOrgao);
-            $obIMontaOrganograma->setComponenteSomenteLeitura(true);
-            $obIMontaOrganograma->geraFormulario($obFormulario);
+        $obIMontaOrganograma = new IMontaOrganograma(true);
+        $obIMontaOrganograma->setCodOrgao($codOrgao);
+        $obIMontaOrganograma->setComponenteSomenteLeitura(true);
+        $obIMontaOrganograma->geraFormulario($obFormulario);
 
-            $obFormulario->montaHTML();
-            echo $obFormulario->getHTML();
+        $obFormulario->montaHTML();
+        echo $obFormulario->getHTML();
 
-        ?>
+    ?>
     <table width='100%'>
         <tr>
             <td class=label width="35%">
@@ -544,4 +623,5 @@ if ($vinculo == "funcionario") {
 <?php
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

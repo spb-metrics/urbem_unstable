@@ -23,78 +23,59 @@
 */
 ?>
 <?php
-   /*
+
+ /*
     * Arquivo de geracao do arquivo sertTerceiros TCM/MG
-    * Data de Criação   : 20/01/2009
+    * Data de Criação   : 04/02/2009
 
     * @author Analista      Tonismar Régis Bernardo
-    * @author Desenvolvedor Eduardo Paculski Schitz
+    * @author Desenvolvedor Lucas Andrades Mendes
 
     * @package URBEM
     * @subpackage
 
     * @ignore
 
-    $Id:$
+    $Id: ativoPerm.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDespFuncaoSubfuncao.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGAtivoPerm.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obFTCEMGDespFuncaoSubfuncao = new FTCEMGDespFuncaoSubfuncao();
-    $obFTCEMGDespFuncaoSubfuncao->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGDespFuncaoSubfuncao->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDespFuncaoSubfuncao->setDado('mes'         , $arFiltros['inPeriodo']);
-    $obFTCEMGDespFuncaoSubfuncao->recuperaTodos($rsDespFuncaoSubFuncao);
+    $obFTCEMGAtivoPerm = new FTCEMGAtivoPerm();
+    $obFTCEMGAtivoPerm->setDado('exercicio'   , Sessao::read('exercicio'));
+    $obFTCEMGAtivoPerm->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGAtivoPerm->setDado('mes'         , $arFiltros['inPeriodo']);
 
-    $obExportador->roUltimoArquivo->addBloco($rsDespFuncaoSubFuncao);
+    $obFTCEMGAtivoPerm->recuperaTodos($rsDespesaCorrente);
+
+    $obExportador->roUltimoArquivo->addBloco($rsDespesaCorrente);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_vinculo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_funcao');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_subfuncao');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_entidade_relacionada');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(33);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_inicial');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('codtipo');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_atualizada');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorbensmov');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_empenhado');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorbensimo');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_liquidado');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorobrasinst');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_anulada');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valortitval');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valordivativa');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valortransrecebidas');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorreversaorpps');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+?>

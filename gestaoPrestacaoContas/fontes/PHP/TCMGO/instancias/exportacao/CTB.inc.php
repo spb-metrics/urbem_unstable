@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: CTB.inc.php 60775 2014-11-14 17:37:26Z franver $
+    $Id: CTB.inc.php 62499 2015-05-14 20:56:42Z lisiane $
 
     * Casos de uso: uc-06.04.00
 */
@@ -49,14 +49,14 @@ $obTMapeamento->setDado('cod_entidade', $stEntidades );
 $obTMapeamento->setDado('inMesGeracao', $arFiltroRelatorio['inMes']);
 
 if ( Sessao::getExercicio() >= '2014' ) {
-    $obTMapeamento->recuperaContasBancarias2014($rsContasBancarias);
+    $obTMapeamento->recuperaContasBancarias2014($rsContasBancarias); 
 } else {
     $obTMapeamento->recuperaContasBancarias($rsContasBancarias);
 }
 
 if (Sessao::getExercicio() > '2010') {
     if (Sessao::getExercicio() >= '2014') {
-        $obTMapeamento->recuperaContasBancariasFonteRecurso2014($rsFonteRecurso);
+        $obTMapeamento->recuperaContasBancariasFonteRecurso2014($rsFonteRecurso); 
     } else {
         $obTMapeamento->recuperaContasBancariasFonteRecurso($rsFonteRecurso);
     }
@@ -70,6 +70,11 @@ foreach ($rsContasBancarias->arElementos as $arContasBancarias) {
     }
     if ($arContasBancarias['saldo_final'] < 0) {
         $arContasBancarias['saldo_final'] = '-'.str_pad(abs($arContasBancarias['saldo_final']),12,'0','STR_PAD_LEFT');
+    }
+    
+    if ( Sessao::getExercicio() >= 2014 && $arFiltroRelatorio['inMes'] == 1) {
+        $arContasBancarias['vl_entradas'] = number_format(($arContasBancarias['vl_entradas'] + $arContasBancarias['saldo_inicial']), 2, '.', '');
+        $arContasBancarias['vl_saidas']   = number_format(($arContasBancarias['vl_saidas']   + $arContasBancarias['saldo_inicial']), 2, '.', ''); 
     }
 
     $arContasBancarias['espacador'] = '';
@@ -179,6 +184,7 @@ foreach ($rsContasBancarias->arElementos as $arContasBancarias) {
                 }
 
                 $arFonteRecurso['numero_registro'] = ++$inCount;
+       
                 // Fixando conta 203000 para registro 11
                 if ( Sessao::getExercicio() >= 2014 && $arFiltroRelatorio['inMes'] == 1) {
                     $arFonteRecursoTMP['tipo_registro'] = $arFonteRecurso['tipo_registro'];
@@ -194,8 +200,8 @@ foreach ($rsContasBancarias->arElementos as $arContasBancarias) {
                     $arFonteRecursoTMP['saldo_final'] = '0,00';
                     $arFonteRecursoTMP['fonte'] = '203000';
                     $arFonteRecursoTMP['tipo_conta'] = $arFonteRecurso['tipo_conta'];
-                    
-                    $arFonteRecurso['vl_entradas'] = $arFonteRecurso['vl_entradas'] + $arFonteRecurso['saldo_inicial'];
+                   
+                    $arFonteRecurso['vl_entradas'] = number_format(($arFonteRecurso['vl_entradas'] + $arFonteRecurso['saldo_inicial']), 2, '.', '');
                     $arFonteRecurso['saldo_inicial'] = '0,00';
                 }
                 

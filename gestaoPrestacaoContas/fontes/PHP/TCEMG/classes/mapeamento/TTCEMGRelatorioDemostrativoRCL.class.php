@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 61205 2014-12-16 12:31:49Z evandro $
-  $Date: 2014-12-16 10:31:49 -0200 (Ter, 16 Dez 2014) $
-  $Author: evandro $
-  $Rev: 61205 $
+  $Id: TTCEMGRelatorioDemostrativoRCL.class.php 62464 2015-05-12 20:53:54Z jean $
+  $Date: 2015-05-12 17:53:54 -0300 (Ter, 12 Mai 2015) $
+  $Author: jean $
+  $Rev: 62464 $
 */
 
 class TTCEMGRelatorioDemostrativoRCL extends Persistente
@@ -91,7 +91,7 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
                         , mes_10         numeric(14,2)
                         , mes_11         numeric(14,2)
                         , mes_12         numeric(14,2)
-                        );
+                        )
         ";
         
         return $stSql;
@@ -143,7 +143,7 @@ class TTCEMGRelatorioDemostrativoRCL extends Persistente
                            , mes_11         numeric(14,2)
                            , mes_12         numeric(14,2)
                            , total          numeric(14,2)
-                           );        
+                           )        
         ";
         return $stSql;
     }

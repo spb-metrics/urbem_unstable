@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: consultaProcesso.php 61785 2015-03-03 21:06:56Z evandro $
+    $Id: consultaProcesso.php 62418 2015-05-06 17:45:05Z diogo.zarpelon $
 
     */
 
@@ -1149,6 +1149,10 @@ FROM(
           ON  sw_processo_interessado.cod_processo = sw_processo.cod_processo
          AND  sw_processo_interessado.ano_exercicio = sw_processo.ano_exercicio
 
+   LEFT JOIN  sw_processo_confidencial
+          ON  sw_processo_confidencial.cod_processo = sw_processo.cod_processo
+         AND  sw_processo_confidencial.ano_exercicio = sw_processo.ano_exercicio
+
    LEFT JOIN  sw_assunto_atributo_valor
           ON  sw_assunto_atributo_valor.cod_processo  = sw_processo.cod_processo
          AND  sw_assunto_atributo_valor.exercicio     = sw_processo.ano_exercicio
@@ -1172,8 +1176,8 @@ FROM(
 
        WHERE  1=1
 
-         AND  sw_processo.confidencial         = 't'
-         AND  sw_andamento.cod_orgao           = ".Sessao::read('codOrgao')."
+         AND  sw_processo.confidencial = 't'
+         AND  (sw_andamento.cod_orgao = ".Sessao::read('codOrgao')." OR  sw_processo_confidencial.numcgm = ".Sessao::read('numCgm').") 
 
 ".$stFiltro."
 
@@ -1220,6 +1224,10 @@ FROM(
           ON  sw_processo_interessado.cod_processo = sw_processo.cod_processo
          AND  sw_processo_interessado.ano_exercicio = sw_processo.ano_exercicio
 
+   LEFT JOIN  sw_processo_confidencial
+          ON  sw_processo_confidencial.cod_processo = sw_processo.cod_processo
+         AND  sw_processo_confidencial.ano_exercicio = sw_processo.ano_exercicio
+
    LEFT JOIN  sw_assunto_atributo_valor
           ON  sw_assunto_atributo_valor.cod_processo  = sw_processo.cod_processo
          AND  sw_assunto_atributo_valor.exercicio     = sw_processo.ano_exercicio
@@ -1244,16 +1252,18 @@ FROM(
        WHERE  1=1
 
          AND  sw_processo.confidencial = 't'
-         AND  sw_andamento.cod_orgao   = ".Sessao::read('codOrgao')."";
+         AND  sw_andamento.cod_orgao   = ".Sessao::read('codOrgao')."
+         AND  (sw_andamento.cod_orgao = ".Sessao::read('codOrgao')." OR  sw_processo_confidencial.numcgm = ".Sessao::read('numCgm').") ";
 
     $sql .= $stFiltro;
 
-    $sql .= ")as resultado
-                GROUP BY cod_processo
-                        ,ano_exercicio
-                        ,nom_classificacao
-                        ,nom_assunto
-                        ,timestamp";
+    $sql .= " ) as resultado
+
+            GROUP BY cod_processo
+                    ,ano_exercicio
+                    ,nom_classificacao
+                    ,nom_assunto
+                    ,timestamp";
 
     $st_ordenacao = array(
                             1 => "cod_processo, ano_exercicio",

@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: OCManterConfiguracaoDirf.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterConfiguracaoDirf.php 62511 2015-05-15 17:45:15Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -93,6 +93,101 @@ function incluirPrestadoresDeServico()
     }
 
     return $stJs;
+}
+
+function incluirINSS()
+{
+    $arRetencaoINSS = Sessao::read("arPrestadoresServicoRetencaoINSS");
+
+    $obErro = validarINSS("incluir");
+    if (!$obErro->ocorreu()) {
+        $arINSS["inId"]          = count($arRetencaoINSS) + 1;
+        $arINSS["classificacao"] = $_REQUEST['inCodClassificacaoINSS'];
+        $arINSS["descricao"]     = $_REQUEST['stCodClassificacaoINSS'];
+
+        $arRetencaoINSS[] = $arINSS;
+        Sessao::write("arPrestadoresServicoRetencaoINSS", $arRetencaoINSS);
+
+        $stJs .= montaListaPrestadoresServicoRetencaoINSS();
+    }else{
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+    }
+    
+    return $stJs;
+}
+
+function validarINSS($origem)
+{
+    $obErro               = new Erro();
+    $arINSS               = Sessao::read('arPrestadoresServicoRetencaoINSS');
+    $inTotal              = 0;
+
+    if (is_array($arINSS) && count($arINSS)>0) {
+        foreach ($arINSS as $campo => $valor) {
+            if (trim($origem)=="alterar") {
+                if (trim($_REQUEST["inCodClassificacaoINSS"])==trim($valor["classificacao"])
+                    && trim($_REQUEST["stCodClassificacaoINSS"])==trim($valor["descricao"])
+                    && trim($_REQUEST["inId"]) != trim($valor["inId"])) {
+                        $obErro->setDescricao($obErro->getDescricao()."@A Classificação informada já está na lista.");
+                }
+           } else {
+                if (trim($_REQUEST["inCodClassificacaoINSS"])==trim($valor["classificacao"])
+                    && trim($_REQUEST["stCodClassificacaoINSS"])==trim($valor["descricao"])) {
+                    $obErro->setDescricao($obErro->getDescricao()."@A Classificação informada já está na lista.");
+               }
+            }
+        }
+    }
+
+    return $obErro;
+}
+
+function incluirIRRF()
+{
+    $arRetencaoIRRF = Sessao::read("arPrestadoresServicoRetencaoIRRF");
+
+    $obErro = validarIRRF("incluir");
+    if (!$obErro->ocorreu()) {
+        $arIRRF["inId"]              = count($arRetencaoIRRF) + 1;
+        $arIRRF["classificacao"]     = $_REQUEST['HdnEstruturalIRRF'];
+        $arIRRF["descricao"]         = $_REQUEST['stCodClassificacaoIRRF'];
+        $arIRRF["cod_receita_irrf"]  = $_REQUEST['inCodReceitaIRRF'];
+
+        $arRetencaoIRRF[] = $arIRRF;
+        Sessao::write("arPrestadoresServicoRetencaoIRRF", $arRetencaoIRRF);
+
+        $stJs .= montaListaPrestadoresServicoRetencaoIRRF();
+    }else{
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+    }
+    
+    return $stJs;
+}
+
+function validarIRRF($origem)
+{
+    $obErro               = new Erro();
+    $arIRRF = Sessao::read('arPrestadoresServicoRetencaoIRRF');
+    $inTotal              = 0;
+
+    if (is_array($arIRRF) && count($arIRRF)>0) {
+        foreach ($arIRRF as $campo => $valor) {
+            if (trim($origem)=="alterar") {
+                if (trim($_REQUEST["HdnEstruturalIRRF"])==trim($valor["classificacao"])
+                    && trim($_REQUEST["stCodClassificacaoIRRF"])==trim($valor["descricao"])
+                    && trim($_REQUEST["inId"]) != trim($valor["inId"])) {
+                        $obErro->setDescricao($obErro->getDescricao()."@A Classificação informada já está na lista.");
+                }
+           } else {
+                if (trim($_REQUEST["HdnEstruturalIRRF"])==trim($valor["classificacao"])
+                    && trim($_REQUEST["stCodClassificacaoIRRF"])==trim($valor["descricao"])) {
+                    $obErro->setDescricao($obErro->getDescricao()."@A Classificação informada já está na lista.");
+               }
+            }
+        }
+    }
+
+    return $obErro;
 }
 
 function montaListaPlanoSaude()
@@ -165,6 +260,146 @@ function montaListaPlanoSaude()
 
     $stJs = "jQuery('#spnListaPlanoSaude').html('".$stHtml."');";
 
+    return $stJs;
+}
+
+function montaListaPrestadoresServicoRetencaoINSS()
+{
+    $arRecordSet = Sessao::read("arPrestadoresServicoRetencaoINSS");    
+    $rsRecordSet = new Recordset;
+    $rsRecordSet->preenche( is_array($arRecordSet) ? $arRecordSet : array() );
+    
+
+    $stLink .= "&stAcao=".$_REQUEST["stAcao"];
+
+    if ($rsRecordSet->getNumLinhas() != 0) {
+        $obLista = new Lista;
+        $obLista->setMostraPaginacao( false );
+        $obLista->setTitulo( "Retenções - INSS" );
+        $obLista->setRecordSet( $rsRecordSet );
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+        $obLista->ultimoCabecalho->setWidth( 3 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Classificação" );
+        $obLista->ultimoCabecalho->setWidth( 20 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Descrição" );
+        $obLista->ultimoCabecalho->setWidth( 40 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Ação" );
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "[classificacao]");
+        $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "[descricao]");
+        $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+        $obLista->commitDado();
+
+        $obLista->addAcao();
+        $obLista->ultimaAcao->setAcao( "EXCLUIR" );
+        $obLista->ultimaAcao->setFuncaoAjax( true );
+        $obLista->ultimaAcao->addCampo("1","inId");
+        $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('excluirRetencaoINSS');");
+        $obLista->commitAcao();
+
+        $obLista->montaHTML();
+        $stHtml = $obLista->getHTML();
+        $stHtml = str_replace("\n","",$stHtml);
+        $stHtml = str_replace("  ","",$stHtml);
+        $stHtml = str_replace("'","\\'",$stHtml);
+    }
+    
+    $stJs .= "jQuery('#spnListaPrestadoresServicoRetencaoINSS').html('".$stHtml."');";
+    $stJs .= "jQuery('#inCodClassificacaoINSS').val('');";
+    $stJs .= "jQuery('#stCodClassificacaoINSS').html('&nbsp;');";
+    return $stJs;
+}
+
+function montaListaPrestadoresServicoRetencaoIRRF()
+{
+    $arRecordSet = Sessao::read("arPrestadoresServicoRetencaoIRRF");    
+    $rsRecordSet = new Recordset;
+    $rsRecordSet->preenche( is_array($arRecordSet) ? $arRecordSet : array() );
+
+    $stLink .= "&stAcao=".$_REQUEST["stAcao"];
+
+    if ($rsRecordSet->getNumLinhas() != 0) {
+        $obLista = new Lista;
+        $obLista->setMostraPaginacao( false );
+        $obLista->setTitulo( "Retenções - IRRF" );
+        $obLista->setRecordSet( $rsRecordSet );
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+        $obLista->ultimoCabecalho->setWidth( 3 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Código da Receita IRRF" );
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Classificação" );
+        $obLista->ultimoCabecalho->setWidth( 20 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Descrição" );
+        $obLista->ultimoCabecalho->setWidth( 30 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Ação" );
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "[cod_receita_irrf]");
+        $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "[classificacao]");
+        $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "[descricao]");
+        $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+        $obLista->commitDado();
+
+        $obLista->addAcao();
+        $obLista->ultimaAcao->setAcao( "EXCLUIR" );
+        $obLista->ultimaAcao->setFuncaoAjax( true );
+        $obLista->ultimaAcao->addCampo("1","inId");
+        $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('excluirRetencaoIRRF');");
+        $obLista->commitAcao();
+
+        $obLista->montaHTML();
+        $stHtml = $obLista->getHTML();
+        $stHtml = str_replace("\n","",$stHtml);
+        $stHtml = str_replace("  ","",$stHtml);
+        $stHtml = str_replace("'","\\'",$stHtml);
+    }
+    
+    $stJs .= "jQuery('#spnListaPrestadoresServicoRetencaoIRRF').html('".$stHtml."');";
+    $stJs .= "jQuery('#inCodReceitaIRRF').val('');";
+    $stJs .= "jQuery('#stCodClassificacaoIRRF').html('&nbsp;');";
+    
     return $stJs;
 }
 
@@ -324,6 +559,44 @@ function alterarPrestadoresDeServico()
     return $stJs;
 }
 
+function excluirRetencaoINSS()
+{
+    $arTMP = array ();
+    $id = $_REQUEST["inId"];
+
+    $arINSS = Sessao::read("arPrestadoresServicoRetencaoINSS");
+    Sessao::remove("arPrestadoresServicoRetencaoINSS");
+
+    foreach ($arINSS as $campo => $valor) {
+        if ($valor["inId"] != $id) {
+            $arTMP[] = $valor;
+        }
+    }
+    Sessao::write("arPrestadoresServicoRetencaoINSS", $arTMP);
+    $stJs .= montaListaPrestadoresServicoRetencaoINSS();
+
+    return $stJs;
+}
+
+function excluirRetencaoIRRF()
+{
+    $arTMP = array ();
+    $id = $_REQUEST["inId"];
+
+    $arIRRF = Sessao::read("arPrestadoresServicoRetencaoIRRF");
+    Sessao::remove("arPrestadoresServicoRetencaoIRRF");
+
+    foreach ($arIRRF as $campo => $valor) {
+        if ($valor["inId"] != $id) {
+            $arTMP[] = $valor;
+        }
+    }
+    Sessao::write("arPrestadoresServicoRetencaoIRRF", $arTMP);
+    $stJs .= montaListaPrestadoresServicoRetencaoIRRF();
+
+    return $stJs;
+}
+
 function excluirPrestadoresDeServico()
 {
     $arTMP = array ();
@@ -423,11 +696,12 @@ function limpaCodigosExercicio()
     if (trim($_GET["stAcao"])=="incluir") {
         Sessao::remove("arPrestadoresServico");
         $stJs .= montaListaPrestadoresServico();
+        $stJs .= montaListaPrestadoresServicoRetencaoINSS();
     }
     $stJs .= limpaCodigoRetencao();
     $stJs .= " jQuery('#inCodDespesa').val('');                     \n";
     $stJs .= " jQuery('#stDescricaoDespesa').html('&nbsp;');        \n";
-    $stJs .= " jQuery('#inCodClassificacaoIRRF').val('');           \n";
+    $stJs .= " jQuery('#inCodReceitaIRRF').val('');           \n";
     $stJs .= " jQuery('#stCodClassificacaoIRRF').html('&nbsp;');    \n";
 
     return $stJs;
@@ -470,32 +744,47 @@ function mascaraClassificacaoIRRF()
     include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoReceita.class.php" );
     $obROrcamentoReceita = new ROrcamentoReceita;
 
-    $inExercicio = (trim($_GET["inExercicio"])==""?Sessao::getExercicio():$_GET["inExercicio"]);
+    if ( !empty($_REQUEST['inCodReceitaIRRF']) ) {
+        $inExercicio = (trim($_GET["inExercicio"])==""?Sessao::getExercicio():$_GET["inExercicio"]);
+       
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio  ( $inExercicio                 );
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodReceita ( $_REQUEST['inCodReceitaIRRF'] );  
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaDescricaoReceitaIRRF ( $rsContaIRRF ,$obTransacao);
 
-    //Monta mascara da RUBRICA(ELEMENTO) DE DESPESA
-    $arMascClassificacao = Mascara::validaMascaraDinamica( $_GET['stMascClassificacao'] , $_GET['inCodClassificacaoIRRF'] );
+        if ( $rsContaIRRF->getNumLinhas() > 0 ) {                
+            $stJs .= "jQuery('#inCodReceitaIRRF').val('".$rsContaIRRF->getCampo('cod_receita')."'); \n";
+            $stJs .= "jQuery('#HdnEstruturalIRRF').val('".$rsContaIRRF->getCampo('cod_estrutural')."'); \n";
+            $stJs .= "retornaValorBscInner( 'inCodReceitaIRRF', 'stCodClassificacaoIRRF', 'frm', '".$rsContaIRRF->getCampo('descricao')."')";
+        } else {
+            include_once( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php"                            );        
+            $stFiltro  = " AND pa.cod_plano = ".$_REQUEST['inCodReceitaIRRF']." AND pa.exercicio = '".$inExercicio."'";                
+            $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+            $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsPlanoConta, $stFiltro,"",$boTransacao);                
 
-    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setMascara              ( $_GET['stMascClassificacao'] );
-    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setMascClassificacao    ( $arMascClassificacao[1]       );
-    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio            ( $inExercicio                 );
-    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaDescricaoReceita( $stDescricao );
-
-    $stJs .= "jQuery('#inCodClassificacaoIRRF').val('".$arMascClassificacao[1]."'); \n";
-
-    if ($stDescricao != "") {
-        $stJs .= "jQuery('#stCodClassificacaoIRRF').html('".$stDescricao."');     \n";
-    } else {
-        $null = "&nbsp;";
-        $stJs .= "jQuery('#inCodClassificacaoIRRF').val('');                \n";
-        $stJs .= "jQuery('#stCodClassificacaoIRRF').html('".$null."');      \n";
-        $stJs .= "alertaAviso('@Código Classificação IRRF é inválido para o exercício de ".$inExercicio.". (".$arMascClassificacao[1].")','form','erro','".Sessao::getId()."');\n";
+            if ($rsPlanoConta->getNumLinhas() > 0 ) {
+                $stJs .= "jQuery('#inCodReceitaIRRF').val('".$rsPlanoConta->getCampo('cod_plano')."'); \n";
+                $stJs .= "jQuery('#HdnEstruturalIRRF').val('".$rsPlanoConta->getCampo('cod_estrutural')."'); \n";
+                $stJs .= "retornaValorBscInner( 'inCodReceitaIRRF', 'stCodClassificacaoIRRF', 'frm', '".$rsPlanoConta->getCampo('nom_conta')."')";
+            }else{
+                $stJs .= "jQuery('#inCodReceitaIRRF').val('');                \n";
+                $stJs .= "jQuery('#stCodClassificacaoIRRF').html('&nbsp;');      \n";
+                $stJs .= "alertaAviso('@Código Classificação IRRF é inválido para o exercício de ".$inExercicio.".','form','erro','".Sessao::getId()."');\n";
+            }
+        }
+    }else{
+        $stJs .= "jQuery('#inCodReceitaIRRF').val('');                \n";
+        $stJs .= "jQuery('#stCodClassificacaoIRRF').html('&nbsp;');      \n";
     }
-
+    
     return $stJs;
 }
 
 function carregaPlanoSaude()
 {
+    if ( empty($_REQUEST['inCGMPlanoSaude']) || empty($_REQUEST['inRegistro']) || empty($_REQUEST['inCodigoEventoPlanoSaude']) ) {
+        echo "alertaAviso('@Preencha todos os campos de Plano Privado de Assistência à Saúde','form','erro','".Sessao::getId()."');\n";    
+    }
+
     $arPlanoSaude = Sessao::read('arPlanoSaude');
     $stChave = $_REQUEST['inExercicio'].'-'.$_REQUEST['inCGMPlanoSaude'].'-'.$_REQUEST['inRegistro'];
     foreach ($arPlanoSaude as $key => $arDados) {
@@ -527,7 +816,7 @@ function limparPlanoSaude()
     return $stJs;
 }
 
-switch ($_GET['stCtrl']) {
+switch ($_GET['stCtrl']) {    
     case "incluirPrestadoresDeServico":
         $stJs .= incluirPrestadoresDeServico();
         break;
@@ -548,6 +837,24 @@ switch ($_GET['stCtrl']) {
         break;
     case "montaListaPrestadoresServico":
         $stJs .= montaListaPrestadoresServico();
+        break;
+    case "incluirINSS":
+        $stJs .= incluirINSS();
+        break;
+    case "incluirIRRF":
+        $stJs .= incluirIRRF();
+        break;
+    case "montaListaPrestadoresServicoRetencaoINSS":        
+        $stJs .= montaListaPrestadoresServicoRetencaoINSS();
+        break;
+    case "montaListaPrestadoresServicoRetencaoIRRF":
+        $stJs .= montaListaPrestadoresServicoRetencaoIRRF();
+        break;
+    case "excluirRetencaoINSS":
+        $stJs .= excluirRetencaoINSS();
+        break;
+    case "excluirRetencaoIRRF":
+        $stJs .= excluirRetencaoIRRF();
         break;
     case "mascaraClassificacaoElementoDespesa":
         $stJs .= mascaraClassificacaoElementoDespesa();

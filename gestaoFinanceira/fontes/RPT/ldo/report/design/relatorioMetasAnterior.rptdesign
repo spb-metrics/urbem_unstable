@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.17" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.3.1.v20080911 Build &lt;2.3.1.v20080922-1151></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,11 +25,11 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -36,24 +37,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,82 +49,58 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.2.56:5432/des_ldo</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">gt</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.2.56:5432/des_ldo</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">123456</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_1" id="1388">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_2" id="1389">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="assinatura_3" id="1390">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -144,88 +108,89 @@
         <scalar-parameter name="cargo_1" id="1391">
             <property name="hidden">false</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_2" id="1392">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cargo_3" id="1393">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="ano_ldo" id="1550">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>https://www.facebook.com/video.php?v=758772744159598&set=vb.100000806381102&type=2&theater
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_nota_explicativa" id="1551">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="ano_anterior" id="1566">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.2.56:5432/des_ldo</property>
-            <property name="odaUser">gt</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIzNDU2</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="nota_explicativa" id="1547">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">cod_nota_explicativa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -241,18 +206,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">cod_nota_explicativa</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -267,12 +220,12 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">	SELECT ne.cod_nota_explicativa
+            <xml-property name="queryText"><![CDATA[	SELECT ne.cod_nota_explicativa
     	 , ne.descricao
    	  FROM ldo.nota_explicativa ne
 INNER JOIN ldo.anexo a
 		ON ne.cod_anexo = a.cod_anexo
-     WHERE ne.cod_nota_explicativa = ?</property>
+     WHERE ne.cod_nota_explicativa = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -292,8 +245,6 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="receita_total" id="1559">
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -316,6 +267,41 @@ INNER JOIN ldo.anexo a
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">rt_mp</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">rt_mp_pib</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">rt_mr</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">rt_mr_pib</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">rt_vl</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">rt_vt_pib</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -354,7 +340,7 @@ INNER JOIN ldo.anexo a
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(rt_metas_previstas) as rt_mp
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(rt_metas_previstas) as rt_mp
      , TO_REAL(rt_metas_previstas_ind) as rt_mp_pib
      , TO_REAL(rt_metas_realizadas) as rt_mr
      , TO_REAL(rt_metas_realizadas_ind) as rt_mr_pib
@@ -366,7 +352,7 @@ INNER JOIN ldo.anexo a
 		      , 0.00 as rt_metas_previstas_ind
 		      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(?) as (valor varchar) ) as rt_metas_realizadas 
 		      , 0.00 as rt_metas_realizadas_ind 
-       ) as rtotal</property>
+       ) as rtotal]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -397,6 +383,28 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="receitas_primarias" id="1567">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -432,28 +440,6 @@ INNER JOIN ldo.anexo a
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -492,7 +478,7 @@ INNER JOIN ldo.anexo a
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(rp_metas_previstas) as rp_mp
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(rp_metas_previstas) as rp_mp
      , TO_REAL(rp_metas_previstas_ind) as rp_mp_pib
      , TO_REAL(rp_metas_realizadas) as rp_mr
      , TO_REAL(rp_metas_realizadas_ind) as rp_mr_pib
@@ -504,7 +490,7 @@ INNER JOIN ldo.anexo a
 	      , 0.00 as rp_metas_previstas_ind
 	      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.receitasprimaria(), ?) as (valor varchar)) as rp_metas_realizadas 
 	      , 0.00 as rp_metas_realizadas_ind 
-       ) as rprimarias</property>
+       ) as rprimarias]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -535,8 +521,6 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="despesa_total" id="1576">
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -559,7 +543,9 @@ INNER JOIN ldo.anexo a
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(dt_metas_previstas) as dt_mp
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(dt_metas_previstas) as dt_mp
      , TO_REAL(dt_metas_previstas_ind) as dt_mp_pib
      , TO_REAL(dt_metas_realizadas) as dt_mr
      , TO_REAL(dt_metas_realizadas_ind) as dt_mr_pib
@@ -571,7 +557,7 @@ INNER JOIN ldo.anexo a
 	      , 0.00 as dt_metas_previstas_ind
 	      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(?,1) as (valor varchar)) as dt_metas_realizadas 
 	      , 0.00 as dt_metas_realizadas_ind 
-       ) as dtotal</property>
+       ) as dtotal]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -602,6 +588,28 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="despesa_primaria" id="1583">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -637,28 +645,6 @@ INNER JOIN ldo.anexo a
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -697,7 +683,7 @@ INNER JOIN ldo.anexo a
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(dp_metas_previstas) as dp_mp
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(dp_metas_previstas) as dp_mp
      --, TO_REAL(dp_metas_previstas_ind) as dp_mp_pib
      , TO_REAL(0.00) as dp_mp_pib
      , TO_REAL(dp_metas_realizadas) as dp_mr
@@ -710,7 +696,7 @@ INNER JOIN ldo.anexo a
 	      --, ( SELECT COALESCE(TO_NUMBER(valor, '99999999999999D99'), 0.00) from ldo.getdespesasprimaria(ldo.despesasprimaria(),?, 1) as (valor varchar) ) as dp_metas_previstas_ind
 	      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.despesasprimaria(), ?, 1) as (valor varchar) ) as dp_metas_realizadas  
 	      , 0.00 as dp_metas_realizadas_ind 
-       ) as dprimarias</property>
+       ) as dprimarias]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -741,8 +727,6 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="resultado_primario" id="1588">
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -785,7 +769,9 @@ INNER JOIN ldo.anexo a
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(rep_metas_previstas) as rep_mp
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(rep_metas_previstas) as rep_mp
      --, TO_REAL(rep_metas_previstas_ind) as rep_mp_pib
      , TO_REAL(0.00) as rep_mp_pib
      , TO_REAL(rep_metas_realizadas) as rep_mr
@@ -799,7 +785,7 @@ INNER JOIN ldo.anexo a
 	      , ( ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.receitasprimaria(), ?) as (valor varchar) ) - ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.despesasprimaria(), ?, 1) as (valor varchar) )) as rep_metas_realizadas 
 	      , 0.00 as rep_metas_realizadas_ind 
        ) as reprimario
-</property>
+]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -852,8 +838,6 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="divida_publica_consolidada" id="1612">
-            <structure name="cachedMetaData"/>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -876,7 +860,9 @@ INNER JOIN ldo.anexo a
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(dpc_metas_previstas) as dpc_mp
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(dpc_metas_previstas) as dpc_mp
      , TO_REAL(dpc_metas_previstas_ind) as dpc_mp_pib
      , TO_REAL(dpc_metas_realizadas) as dpc_mr
      , TO_REAL(dpc_metas_realizadas_ind) as dpc_mr_pib
@@ -888,7 +874,7 @@ INNER JOIN ldo.anexo a
 	      , 0.00 as dpc_metas_previstas_ind
 	      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.dividapublicaconsolidada(), ?) as (valor varchar) ) as dpc_metas_realizadas 
 	      , 0.00 as dpc_metas_realizadas_ind 
-       ) as dpc</property>
+       ) as dpc]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -919,41 +905,6 @@ INNER JOIN ldo.anexo a
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="resultado_nominal" id="1619">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">rn_mp</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">rn_mp_pib</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">rn_mr</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">rn_mr_pib</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">rn_vl</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">rn_vt_pib</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -998,6 +949,41 @@ campo;</expression>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">rn_mp</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">rn_mp_pib</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">rn_mr</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">rn_mr_pib</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">rn_vl</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">rn_vt_pib</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1036,7 +1022,7 @@ campo;</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL( dpcat.dpcat_metas_previstas - dpcan.dpcan_metas_previstas ) as rn_mp
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL( dpcat.dpcat_metas_previstas - dpcan.dpcan_metas_previstas ) as rn_mp
      , TO_REAL( dpcat.dpcat_metas_previstas_ind - dpcan.dpcan_metas_previstas_ind ) as rn_mp_pib
      , TO_REAL( dpcat.dpcat_metas_realizadas - dpcan.dpcan_metas_realizadas ) as rn_mr
      , TO_REAL( dpcat.dpcat_metas_realizadas_ind - dpcan.dpcan_metas_realizadas_ind ) as rn_mr_pib
@@ -1055,7 +1041,7 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
 	          , 0.00 as dpcan_metas_realizadas_ind 
 	          , 1 as campo
            ) as dpcan
-        ON dpcat.campo = dpcan.campo</property>
+        ON dpcat.campo = dpcan.campo]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1108,6 +1094,24 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="divida_liquida" id="1626">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">ano_anterior</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -1143,24 +1147,6 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
                 </list-property>
             </structure>
             <property name="dataSource">postgres</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">ano_anterior</property>
-                    <property name="dataType">string</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1199,7 +1185,7 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT TO_REAL(dcl_metas_previstas) as dcl_mp
+            <xml-property name="queryText"><![CDATA[SELECT TO_REAL(dcl_metas_previstas) as dcl_mp
      , TO_REAL(dcl_metas_previstas_ind) as dcl_mp_pib
      , TO_REAL(dcl_metas_realizadas) as dcl_mr
      , TO_REAL(dcl_metas_realizadas_ind) as dcl_mr_pib
@@ -1211,7 +1197,7 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
 	      , 0.00 as dcl_metas_previstas_ind
 	      , ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getmetasrealizadas(ldo.dividapublicaconsolidada(), ? ) as (valor varchar) ) as dcl_metas_realizadas 
 	      , 0.00 as dcl_metas_realizadas_ind 
-       ) as dpc</property>
+       ) as dpc]]></xml-property>
         </oda-data-set>
     </data-sets>
     <styles>
@@ -1508,7 +1494,7 @@ INNER JOIN ( SELECT ( SELECT TO_NUMBER(valor, '99999999999999D99') from ldo.getd
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">label_metas_previstas</property>
-                    <property name="displayName">label_metas_previstas</property>
+                    <text-property name="displayName">label_metas_previstas</text-property>
                     <expression name="expression">var valor = params["ano_ldo"].value - 2;
 var campo = 'Metas Previstas ' + valor + ' (a)';
 
@@ -1517,7 +1503,7 @@ campo;</expression>
                 </structure>
                 <structure>
                     <property name="name">label_metas_realizadas</property>
-                    <property name="displayName">label_metas_realizadas</property>
+                    <text-property name="displayName">label_metas_realizadas</text-property>
                     <expression name="expression">var valor = params["ano_ldo"].value - 2;
 var campo = 'Metas Realizadas ' + valor + ' (b)';
 
@@ -1526,8 +1512,8 @@ campo;</expression>
                 </structure>
             </list-property>
             <column id="1401">
-                <property name="width">45mm</property>
                 <property name="fontWeight">bold</property>
+                <property name="width">45mm</property>
             </column>
             <column id="1402">
                 <property name="width">60mm</property>
@@ -1741,7 +1727,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_mp</property>
-                                <property name="displayName">rt_mp</property>
+                                <text-property name="displayName">rt_mp</text-property>
                                 <expression name="expression">dataSetRow["rt_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1768,7 +1754,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_mp_pib</property>
-                                <property name="displayName">rt_mp_pib</property>
+                                <text-property name="displayName">rt_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["rt_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1795,7 +1781,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_mr</property>
-                                <property name="displayName">rt_mr</property>
+                                <text-property name="displayName">rt_mr</text-property>
                                 <expression name="expression">dataSetRow["rt_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1822,7 +1808,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_mr_pib</property>
-                                <property name="displayName">rt_mr_pib</property>
+                                <text-property name="displayName">rt_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["rt_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1849,7 +1835,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_vl</property>
-                                <property name="displayName">rt_vl</property>
+                                <text-property name="displayName">rt_vl</text-property>
                                 <expression name="expression">dataSetRow["rt_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1876,7 +1862,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rt_vt_pib</property>
-                                <property name="displayName">rt_vt_pib</property>
+                                <text-property name="displayName">rt_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["rt_vt_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1922,7 +1908,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_mp</property>
-                                <property name="displayName">rp_mp</property>
+                                <text-property name="displayName">rp_mp</text-property>
                                 <expression name="expression">dataSetRow["rp_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1949,7 +1935,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_mp_pib</property>
-                                <property name="displayName">rp_mp_pib</property>
+                                <text-property name="displayName">rp_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["rp_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1976,7 +1962,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_mr</property>
-                                <property name="displayName">rp_mr</property>
+                                <text-property name="displayName">rp_mr</text-property>
                                 <expression name="expression">dataSetRow["rp_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2003,7 +1989,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_mr_pib</property>
-                                <property name="displayName">rp_mr_pib</property>
+                                <text-property name="displayName">rp_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["rp_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2030,7 +2016,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_vl</property>
-                                <property name="displayName">rp_vl</property>
+                                <text-property name="displayName">rp_vl</text-property>
                                 <expression name="expression">dataSetRow["rp_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2057,7 +2043,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rp_vt_pib</property>
-                                <property name="displayName">rp_vt_pib</property>
+                                <text-property name="displayName">rp_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["rp_vt_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2103,7 +2089,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_mp</property>
-                                <property name="displayName">dt_mp</property>
+                                <text-property name="displayName">dt_mp</text-property>
                                 <expression name="expression">dataSetRow["dt_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2130,7 +2116,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_mp_pib</property>
-                                <property name="displayName">dt_mp_pib</property>
+                                <text-property name="displayName">dt_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["dt_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2157,7 +2143,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_mr</property>
-                                <property name="displayName">dt_mr</property>
+                                <text-property name="displayName">dt_mr</text-property>
                                 <expression name="expression">dataSetRow["dt_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2184,7 +2170,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_mr_pib</property>
-                                <property name="displayName">dt_mr_pib</property>
+                                <text-property name="displayName">dt_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["dt_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2211,7 +2197,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_vl</property>
-                                <property name="displayName">dt_vl</property>
+                                <text-property name="displayName">dt_vl</text-property>
                                 <expression name="expression">dataSetRow["dt_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2238,7 +2224,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_vt_pib</property>
-                                <property name="displayName">dt_vt_pib</property>
+                                <text-property name="displayName">dt_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["dt_vt_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2284,7 +2270,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_mp</property>
-                                <property name="displayName">dp_mp</property>
+                                <text-property name="displayName">dp_mp</text-property>
                                 <expression name="expression">dataSetRow["dp_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2311,7 +2297,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_mp_pib</property>
-                                <property name="displayName">dp_mp_pib</property>
+                                <text-property name="displayName">dp_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["dp_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2338,7 +2324,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_mr</property>
-                                <property name="displayName">dp_mr</property>
+                                <text-property name="displayName">dp_mr</text-property>
                                 <expression name="expression">dataSetRow["dp_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2365,7 +2351,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_mr_pib</property>
-                                <property name="displayName">dp_mr_pib</property>
+                                <text-property name="displayName">dp_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["dp_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2392,7 +2378,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_vl</property>
-                                <property name="displayName">dp_vl</property>
+                                <text-property name="displayName">dp_vl</text-property>
                                 <expression name="expression">dataSetRow["dp_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2419,7 +2405,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dp_vt_pib</property>
-                                <property name="displayName">dp_vt_pib</property>
+                                <text-property name="displayName">dp_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["dp_vt_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2465,7 +2451,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_mp</property>
-                                <property name="displayName">rep_mp</property>
+                                <text-property name="displayName">rep_mp</text-property>
                                 <expression name="expression">dataSetRow["rep_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2492,7 +2478,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_mp_pib</property>
-                                <property name="displayName">rep_mp_pib</property>
+                                <text-property name="displayName">rep_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["rep_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2519,7 +2505,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_mr</property>
-                                <property name="displayName">rep_mr</property>
+                                <text-property name="displayName">rep_mr</text-property>
                                 <expression name="expression">dataSetRow["rep_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2546,7 +2532,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_mr_pib</property>
-                                <property name="displayName">rep_mr_pib</property>
+                                <text-property name="displayName">rep_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["rep_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2573,7 +2559,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_vl</property>
-                                <property name="displayName">rep_vl</property>
+                                <text-property name="displayName">rep_vl</text-property>
                                 <expression name="expression">dataSetRow["rep_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2600,7 +2586,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rep_vt_pib</property>
-                                <property name="displayName">rep_vt_pib</property>
+                                <text-property name="displayName">rep_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["rep_vt_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2646,7 +2632,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_mp</property>
-                                <property name="displayName">rn_mp</property>
+                                <text-property name="displayName">rn_mp</text-property>
                                 <expression name="expression">dataSetRow["rn_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2673,7 +2659,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_mp_pib</property>
-                                <property name="displayName">rn_mp_pib</property>
+                                <text-property name="displayName">rn_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["rn_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2700,7 +2686,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_mr</property>
-                                <property name="displayName">rn_mr</property>
+                                <text-property name="displayName">rn_mr</text-property>
                                 <expression name="expression">dataSetRow["rn_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2727,7 +2713,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_mr_pib</property>
-                                <property name="displayName">rn_mr_pib</property>
+                                <text-property name="displayName">rn_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["rn_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2754,7 +2740,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_vl</property>
-                                <property name="displayName">rn_vl</property>
+                                <text-property name="displayName">rn_vl</text-property>
                                 <expression name="expression">dataSetRow["rn_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2781,7 +2767,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">rn_vt_pib</property>
-                                <property name="displayName">rn_vt_pib</property>
+                                <text-property name="displayName">rn_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["rn_vt_pib"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
@@ -2827,7 +2813,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_mp</property>
-                                <property name="displayName">dpc_mp</property>
+                                <text-property name="displayName">dpc_mp</text-property>
                                 <expression name="expression">dataSetRow["dpc_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2854,7 +2840,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_mp_pib</property>
-                                <property name="displayName">dpc_mp_pib</property>
+                                <text-property name="displayName">dpc_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["dpc_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2881,7 +2867,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_mr</property>
-                                <property name="displayName">dpc_mr</property>
+                                <text-property name="displayName">dpc_mr</text-property>
                                 <expression name="expression">dataSetRow["dpc_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2908,7 +2894,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_mr_pib</property>
-                                <property name="displayName">dpc_mr_pib</property>
+                                <text-property name="displayName">dpc_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["dpc_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2935,7 +2921,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_vl</property>
-                                <property name="displayName">dpc_vl</property>
+                                <text-property name="displayName">dpc_vl</text-property>
                                 <expression name="expression">dataSetRow["dpc_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -2962,7 +2948,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dpc_vt_pib</property>
-                                <property name="displayName">dpc_vt_pib</property>
+                                <text-property name="displayName">dpc_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["dpc_vt_pib"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
@@ -3008,7 +2994,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_mp</property>
-                                <property name="displayName">dcl_mp</property>
+                                <text-property name="displayName">dcl_mp</text-property>
                                 <expression name="expression">dataSetRow["dcl_mp"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3035,7 +3021,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_mp_pib</property>
-                                <property name="displayName">dcl_mp_pib</property>
+                                <text-property name="displayName">dcl_mp_pib</text-property>
                                 <expression name="expression">dataSetRow["dcl_mp_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3062,7 +3048,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_mr</property>
-                                <property name="displayName">dcl_mr</property>
+                                <text-property name="displayName">dcl_mr</text-property>
                                 <expression name="expression">dataSetRow["dcl_mr"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3089,7 +3075,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_mr_pib</property>
-                                <property name="displayName">dcl_mr_pib</property>
+                                <text-property name="displayName">dcl_mr_pib</text-property>
                                 <expression name="expression">dataSetRow["dcl_mr_pib"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3116,7 +3102,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_vl</property>
-                                <property name="displayName">dcl_vl</property>
+                                <text-property name="displayName">dcl_vl</text-property>
                                 <expression name="expression">dataSetRow["dcl_vl"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3143,7 +3129,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dcl_vt_pib</property>
-                                <property name="displayName">dcl_vt_pib</property>
+                                <text-property name="displayName">dcl_vt_pib</text-property>
                                 <expression name="expression">dataSetRow["dcl_vt_pib"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
@@ -3245,7 +3231,7 @@ campo;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">descricao</property>
-                                <property name="displayName">descricao</property>
+                                <text-property name="displayName">descricao</text-property>
                                 <expression name="expression">dataSetRow["descricao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -3490,8 +3476,8 @@ campo;</expression>
                             <property name="width">2%</property>
                         </column>
                         <column id="1334">
-                            <property name="width">53%</property>
                             <property name="fontWeight">normal</property>
+                            <property name="width">53%</property>
                         </column>
                         <row id="1335">
                             <cell id="1336">

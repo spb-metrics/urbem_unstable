@@ -33,7 +33,7 @@
 *
 * $Id:$
 */
-CREATE OR REPLACE FUNCTION tcemg.empenho_empenhado_liquidado(varchar,varchar,varchar,varchar,varchar, varchar, varchar,varchar,varchar,varchar, boolean) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.empenho_empenhado_liquidado(varchar,varchar,varchar,varchar,varchar, varchar, varchar,varchar,varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio                    ALIAS FOR $1;
     stDtInicial                    ALIAS FOR $2;
@@ -44,8 +44,7 @@ DECLARE
     stCodPao                       ALIAS FOR $7;
     stCodRecurso                   ALIAS FOR $8;
     stSituacao                     ALIAS FOR $9;
-    stOrdenacao                    ALIAS FOR $10;
-    boMostrarAnuladoMesmoPeriodo   ALIAS FOR $11;
+    stTipoRelatorio                ALIAS FOR $10; 
     
     stSql                          VARCHAR   := '';
     reRegistro                     RECORD;
@@ -58,7 +57,7 @@ BEGIN
                    , cgm
                    , cgm||'' - ''||razao_social::varchar AS credor
                    , cod_nota
-                   , stData
+                   , stData 
                    , ordem
                    , conta
                    , coalesce(nome_conta,''NÃO INFORMADO'') AS nome_conta
@@ -69,10 +68,11 @@ BEGIN
                    , despesa || '' - '' || descricao_despesa::varchar AS despesa
                    , ''''::VARCHAR AS num_documento
                    , ''''::VARCHAR AS banco
-                   , 0 AS cod_recurso_banco
                    , to_char(dt_empenho ,''dd/mm/yyyy'') as dt_empenho
                    , dotacao
                    , cod_recurso
+                   , num_orgao
+                   , num_unidade
               FROM ( SELECT e.cod_entidade as entidade
                           , categoria_empenho.descricao as descricao_categoria
                           , tipo_empenho.nom_tipo
@@ -83,7 +83,9 @@ BEGIN
                           , cast( pe.descricao as varchar ) as descricao
                           , e.dt_empenho
                           , ped_d_cd.dotacao
-                          , ped_d_cd.cod_recurso';
+                          , ped_d_cd.cod_recurso
+                          , ped_d_cd.num_unidade
+                          , ped_d_cd.num_orgao';
 
             if (stSituacao = '1') then            
                    stSql := stSql ||
@@ -129,15 +131,8 @@ BEGIN
                         FROM    empenho.empenho as e
                   INNER JOIN    empenho.item_pre_empenho as ipe
                           ON    e.exercicio       = ipe.exercicio
-                         AND    e.cod_pre_empenho = ipe.cod_pre_empenho ';
-                    IF boMostrarAnuladoMesmoPeriodo THEN
-                        stSql := stSql || '
-                        LEFT JOIN ';
-                    ELSE
-                        stSql := stSql || '
-                        INNER JOIN ';
-                    END IF;
-                   stSql := stSql || ' empenho.empenho_anulado ea
+                         AND    e.cod_pre_empenho = ipe.cod_pre_empenho
+                   LEFT JOIN  empenho.empenho_anulado ea
                           ON    ea.exercicio = e.exercicio
                          AND    ea.cod_entidade = e.cod_entidade
                          AND    ea.cod_empenho = e.cod_empenho
@@ -177,25 +172,15 @@ BEGIN
                     stSql := stSql || '
                     , empenho.nota_liquidacao nl
                     , empenho.nota_liquidacao_item nli
-                    ';
-                    
-                    IF boMostrarAnuladoMesmoPeriodo THEN
-                        stSql := stSql || '
-                        LEFT JOIN ';
-                    ELSE
-                        stSql := stSql || '
-                        INNER JOIN ';
-                    END IF;
-                    
-                    stSql := stSql ||
-                                  ' empenho.nota_liquidacao_item_anulado AS nlia
-                                 ON nli.exercicio       = nlia.exercicio
-                                AND nli.cod_nota        = nlia.cod_nota
-                                AND nli.cod_entidade    = nlia.cod_entidade
-                                AND nli.num_item        = nlia.num_item
-                                AND nli.cod_pre_empenho = nlia.cod_pre_empenho
-                                AND nli.exercicio_item  = nlia.exercicio_item
-                                AND to_date(to_char(nlia.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')';
+           
+            LEFT JOIN empenho.nota_liquidacao_item_anulado AS nlia
+                   ON nli.exercicio       = nlia.exercicio
+                  AND nli.cod_nota        = nlia.cod_nota
+                  AND nli.cod_entidade    = nlia.cod_entidade
+                  AND nli.num_item        = nlia.num_item
+                  AND nli.cod_pre_empenho = nlia.cod_pre_empenho
+                  AND nli.exercicio_item  = nlia.exercicio_item
+                  AND to_date(to_char(nlia.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'')';
                     
                 end if;
 
@@ -223,6 +208,7 @@ BEGIN
                         rec.cod_detalhamento,
                         ppa.acao.num_acao,
                         programa.num_programa,
+                        d.cod_subfuncao,
                         LPAD(d.num_orgao::VARCHAR, 2, ''0'')||''.''||LPAD(d.num_unidade::VARCHAR, 2, ''0'')||''.''||d.cod_funcao||''.''||d.cod_subfuncao||''.''||ppa.programa.num_programa||''.''||LPAD(d.num_pao::VARCHAR, 4, ''0'')||''.''||REPLACE(cd.cod_estrutural, ''.'', '''') AS dotacao
                         
                     FROM
@@ -267,13 +253,7 @@ BEGIN
               AND h.exercicio         = pe.exercicio   ';
 
                 if (stSituacao = '1') then
-                    IF boMostrarAnuladoMesmoPeriodo THEN
-                        stSql := stSql || ' AND e.dt_empenho BETWEEN ';
-                    ELSE
-                        stSql := stSql || ' AND e.dt_empenho NOT BETWEEN ';
-                    END IF;
-                    
-                    stSql := stSql || ' to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'') ';
+                    stSql := stSql || ' AND e.dt_empenho BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'') ';
                 end if;
 
                 if (stSituacao = '3') then
@@ -287,16 +267,7 @@ BEGIN
                         AND nl.exercicio    = nli.exercicio
                         AND nl.cod_nota     = nli.cod_nota
                         AND nl.cod_entidade = nli.cod_entidade
-                    ';   
-                        
-                    IF boMostrarAnuladoMesmoPeriodo THEN
-                        stSql := stSql || ' AND nl.dt_liquidacao BETWEEN ';
-                    ELSE
-                        stSql := stSql || ' AND nl.dt_liquidacao NOT BETWEEN ';
-                    END IF;
-                    
-                    stSql := stSql || ' to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'') ';
-                    
+                        AND nl.dt_liquidacao BETWEEN to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') AND to_date(''' || stDtFinal || ''',''dd/mm/yyyy'') ';
                 end if;
 
                 if (stCodOrgao is not null and stCodOrgao<>'') then
@@ -315,7 +286,14 @@ BEGIN
                 if (stCodRecurso is not null and stCodRecurso<>'' ) then
                     stSql := stSql || ' AND ped_d_cd.cod_recurso IN ('|| stCodRecurso ||') ';
                 end if;
-
+                
+                if (stTipoRelatorio = 'ensino_fundamental') then
+                    stSql := stSql || ' AND ped_d_cd.cod_subfuncao IN ( 361 ) ';
+                end if;
+                
+                if (stTipoRelatorio = 'gasto_25') then
+                    stSql := stSql || ' AND ped_d_cd.cod_subfuncao NOT IN ( 362,363,364 ) ';
+                end if;
             stSql := stSql || '
             GROUP BY ';
             
@@ -328,7 +306,10 @@ BEGIN
             end if;
 
             stSql := stSql || ' e.cod_entidade, e.cod_empenho , e.exercicio , pe.cgm_beneficiario, cgm.nom_cgm, pe.descricao
-            , ped_d_cd.cod_estrutural , ped_d_cd.nom_recurso, categoria_empenho.descricao, tipo_empenho.nom_tipo, ped_d_cd.descricao, e.dt_empenho, ped_d_cd.dotacao, ped_d_cd.cod_recurso  ORDER BY ';
+            , ped_d_cd.cod_estrutural , ped_d_cd.nom_recurso, categoria_empenho.descricao, tipo_empenho.nom_tipo, ped_d_cd.descricao, e.dt_empenho
+            , ped_d_cd.dotacao, ped_d_cd.cod_recurso,  ped_d_cd.num_orgao, ped_d_cd.num_unidade
+            
+              ORDER BY ';
 
             if (stSituacao = '1') then
                 stSql := stSql || 'e.dt_empenho,';
@@ -352,11 +333,19 @@ BEGIN
                             ) as tbl
             
                         WHERE valor <> ''0.00''
-            ';
-            if (stOrdenacao = 'data' ) then
-                stSql := stSql || ' ORDER BY to_date(stData,''dd/mm/yyyy''), entidade, empenho, exercicio, cgm, razao_social, cod_nota, ordem, conta, nome_conta';
-            end if;
-
+                     ORDER BY num_orgao
+                            , num_unidade
+                            , cod_recurso
+                            , to_date(stData,''dd/mm/yyyy'')
+                            , entidade
+                            , empenho
+                            , exercicio
+                            , cgm
+                            , razao_social
+                            , cod_nota
+                            , ordem
+                            , conta
+                            , nome_conta';
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN next reRegistro;

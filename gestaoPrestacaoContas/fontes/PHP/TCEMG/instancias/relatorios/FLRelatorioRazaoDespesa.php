@@ -28,7 +28,7 @@
     * Data de Criação   : 06/08/2004
     * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
     * @ignore
-    * $Id: FLRelatorioRazaoDespesa.php 62411 2015-05-05 19:01:22Z lisiane $
+    * $Id: FLRelatorioRazaoDespesa.php 62463 2015-05-12 20:26:16Z lisiane $
     * Casos de uso: uc-02.01.22
 */
 
@@ -242,6 +242,16 @@ $obCmbRecursos->setCampoId2   ('cod_recurso');
 $obCmbRecursos->setCampoDesc2 ('[cod_recurso] - [nom_recurso]');
 $obCmbRecursos->SetRecord2    ( $rsRecordsetRecursos );
 
+$obCmbSituacao= new Select;
+$obCmbSituacao->setRotulo              ( "Situação"                     );
+$obCmbSituacao->setName                ( "inSituacao"                   );
+$obCmbSituacao->setStyle               ( "width: 200px"                 );
+$obCmbSituacao->addOption              ( "", "Selecione"                );
+$obCmbSituacao->addOption              ( "1", "Empenhados"              );
+$obCmbSituacao->addOption              ( "2", "Pagos"                   );
+$obCmbSituacao->addOption              ( "3", "Liquidados"              );
+$obCmbSituacao->setNull                ( false );
+
 //Define objeto span para componentes de filtro
 $obSpan = new Span;
 $obSpan->setId( "spnFormularioFiltro" );
@@ -296,6 +306,7 @@ $obFormulario->addComponente($obCmbEntidades    );
 $obFormulario->addComponente($obPeriodicidade   );
 $obFormulario->addComponente($obCmbTipoRelatorio);
 $obFormulario->addSpan      ($obSpan            );
+$obFormulario->addComponente($obCmbSituacao     );
 $obFormulario->addComponente($obCmbRecursos     );
 
 // BOTÕES DE AÇÃO DO FORMULÁRIO (OK/LIMPAR)

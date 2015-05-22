@@ -31,14 +31,15 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: PRManterConfiguracaoDirf.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterConfiguracaoDirf.php 62511 2015-05-15 17:45:15Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php"                                );
 include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPrestador.class.php"                       );
-include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrf.class.php"                            );
+include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfPlanoConta.class.php"                     );
+include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfContaReceita.class.php"                 );
 include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfInss.class.php"                            );
 include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php"                           );
 include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoContaReceita.class.php"                               );
@@ -60,11 +61,12 @@ $arPrestadoresServico          = Sessao::read('arPrestadoresServico');
 $arPrestadoresServicoExcluidos = Sessao::read('arPrestadoresServicoExcluidos');
 $arPlanoSaude                  = Sessao::read('arPlanoSaude');
 
-$obTIMAConfiguracaoDirf          = new TIMAConfiguracaoDirf();
-$obTIMAConfiguracaoDirfPrestador = new TIMAConfiguracaoDirfPrestador();
-$obTIMAConfiguracaoDirfIrrf      = new TIMAConfiguracaoDirfIrrf();
-$obTIMAConfiguracaoDirfInss      = new TIMAConfiguracaoDirfInss();
-$obTIMAConfiguracaoDirfPlano     = new TIMAConfiguracaoDirfPlano();
+$obTIMAConfiguracaoDirf                 = new TIMAConfiguracaoDirf();
+$obTIMAConfiguracaoDirfPrestador        = new TIMAConfiguracaoDirfPrestador();
+$obTIMAConfiguracaoDirfIrrfPlanoConta   = new TIMAConfiguracaoDirfIrrfPlanoConta();
+$obTIMAConfiguracaoDirfIrrfContaReceita = new TIMAConfiguracaoDirfIrrfContaReceita();
+$obTIMAConfiguracaoDirfInss             = new TIMAConfiguracaoDirfInss();
+$obTIMAConfiguracaoDirfPlano            = new TIMAConfiguracaoDirfPlano();
 
 $obTIMAConfiguracaoDirfPrestador->obTIMAConfiguracaoDirf = &$obTIMAConfiguracaoDirf;
 
@@ -72,7 +74,7 @@ Sessao::setTrataExcecao(true);
 switch ($stAcao) {
     case "incluir":
         $obTIMAConfiguracaoDirf->setDado("exercicio",$_POST["inExercicio"]);
-        $obTIMAConfiguracaoDirf->recuperaPorChave($rsConfiguracao);
+        $obTIMAConfiguracaoDirf->recuperaPorChave($rsConfiguracao,$boTransacao);
         if ($rsConfiguracao->getNumLinhas() == -1) {
             $obTIMAConfiguracaoDirf->setDado("pagamento_mes_competencia", ($_POST['boPagamentoMes'] == 'Sim' ? 'true' : 'false'));
             $obTIMAConfiguracaoDirf->setDado("cod_natureza",$_POST["inNatureza"]);
@@ -83,7 +85,7 @@ switch ($stAcao) {
             $obTIMAConfiguracaoDirf->setDado("fax",str_replace("-","",$_POST["stFax"]));
             $obTIMAConfiguracaoDirf->setDado("email",$_POST["stMail"]);
             $obTIMAConfiguracaoDirf->setDado("cod_evento_molestia", $_POST['inCodigoEventoMolestia']);
-            $obTIMAConfiguracaoDirf->inclusao();
+            $obTIMAConfiguracaoDirf->inclusao($boTransacao);
 
             if (is_array($arPrestadoresServico) && count($arPrestadoresServico)>0) {
                 foreach ($arPrestadoresServico as $chave => $dadosPrestador) {
@@ -92,7 +94,7 @@ switch ($stAcao) {
                     $obTIMAConfiguracaoDirfPrestador->setDado("cod_dirf" , $dadosPrestador["codigo_retencao"]);
                     $obTIMAConfiguracaoDirfPrestador->setDado("tipo"     , $dadosPrestador["tipo"]);
                     $obTIMAConfiguracaoDirfPrestador->setDado("cod_conta", $dadosPrestador["cod_conta_despesa"]);
-                    $obTIMAConfiguracaoDirfPrestador->inclusao();
+                    $obTIMAConfiguracaoDirfPrestador->inclusao($boTransacao);
                 }
             }
 
@@ -100,35 +102,70 @@ switch ($stAcao) {
                 $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
                 foreach ($arPlanoSaude as $key => $arDados) {
                     $obTFolhaPagamentoEvento->setDado('codigo', $arDados['inCodigoEventoPlanoSaude']);
-                    $obTFolhaPagamentoEvento->listar($rsEvento);
+                    $obTFolhaPagamentoEvento->listar($rsEvento,$boTransacao);
                     $obTIMAConfiguracaoDirfPlano->setDado('exercicio', $_POST['inExercicio']);
                     $obTIMAConfiguracaoDirfPlano->setDado('numcgm', $arDados['inCGMPlanoSaude']);
                     $obTIMAConfiguracaoDirfPlano->setDado('cod_evento', $rsEvento->getCampo('cod_evento'));
                     $obTIMAConfiguracaoDirfPlano->setDado('registro_ans', $arDados['inRegistro']);
-                    $obTIMAConfiguracaoDirfPlano->inclusao();
+                    $obTIMAConfiguracaoDirfPlano->inclusao($boTransacao);
                 }
             }
 
-            if (trim($_POST["inCodClassificacaoIRRF"])!="") {
-                $stFiltro  = " WHERE trim(cod_estrutural) = '4.".trim($_POST["inCodClassificacaoIRRF"])."'";
-                $stFiltro .= "   AND exercicio = ".$_POST["inExercicio"];
-                $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
-                $obTContabilidadePlanoConta->recuperaTodos($rsPlanoConta, $stFiltro);
 
-                $obTIMAConfiguracaoDirfIrrf->setDado("exercicio", $_POST["inExercicio"]);
-                $obTIMAConfiguracaoDirfIrrf->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta"));
-                $obTIMAConfiguracaoDirfIrrf->inclusao();
+            $arINSS = Sessao::read('arPrestadoresServicoRetencaoINSS');            
+            if ( count($arINSS) > 0 ) {                
+                foreach ($arINSS as $value) {
+                    $stFiltro  = " WHERE trim(cod_estrutural) = '".trim($value["classificacao"])."'";
+                    $stFiltro .= "   AND exercicio = '".$_POST["inExercicio"]."'";
+                    $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+                    $obTContabilidadePlanoConta->recuperaTodos($rsPlanoConta, $stFiltro,$boTransacao);
+
+                    $obTIMAConfiguracaoDirfInss = new TIMAConfiguracaoDirfInss();
+                    $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
+                    $obTIMAConfiguracaoDirfInss->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta"));
+                    $obTIMAConfiguracaoDirfInss->inclusao($boTransacao);
+                }
             }
 
-            if (trim($_POST["inCodClassificacaoINSS"])!="") {
-                $stFiltro  = " WHERE trim(cod_estrutural) = '".trim($_POST["inCodClassificacaoINSS"])."'";
-                $stFiltro .= "   AND exercicio = ".$_POST["inExercicio"];
-                $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
-                $obTContabilidadePlanoConta->recuperaTodos($rsPlanoConta, $stFiltro);
-
-                $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
-                $obTIMAConfiguracaoDirfInss->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta"));
-                $obTIMAConfiguracaoDirfInss->inclusao();
+            $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("exercicio", $_POST["inExercicio"]);
+            $obTIMAConfiguracaoDirfIrrfContaReceita->exclusao($boTransacao);
+            
+            $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("exercicio", $_POST["inExercicio"]);
+            $obTIMAConfiguracaoDirfIrrfPlanoConta->exclusao($boTransacao);
+    
+            $arIRRF = Sessao::read('arPrestadoresServicoRetencaoIRRF');                            
+            if ( count($arIRRF) > 0 ) {           
+                include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoReceita.class.php" );
+                $obROrcamentoReceita = new ROrcamentoReceita;     
+                
+                foreach ($arIRRF as $value) {
+                    $stEstrutural = str_replace(".", "", $value['classificacao']);
+                    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio                 ( $_POST["inExercicio"]          );                
+                    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodReceita                ( $value['cod_receita_irrf']     );
+                    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodEstrutural             ( $stEstrutural );
+                    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaDescricaoReceitaIRRF ( $rsPlanoContaIRRF ,$boTransacao);
+    
+                    if ($rsPlanoContaIRRF->getNumLinhas() > 0) {
+                        $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("exercicio", $_POST["inExercicio"] );
+                        $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("cod_conta", $rsPlanoContaIRRF->getCampo("cod_conta") );
+                        $obTIMAConfiguracaoDirfIrrfContaReceita->inclusao($boTransacao);                    
+                    }else{
+                        $stFiltro  = " AND pa.cod_plano = ".$value['cod_receita_irrf']; 
+                        $stFiltro  .=" AND pa.exercicio = '".$_POST["inExercicio"]."'";
+                        $stFiltro  .=" AND REPLACE(pc.cod_estrutural,'.','') LIKE  '".$stEstrutural."%' ";
+                        $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+                        $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsPlanoConta, $stFiltro,"",$boTransacao);                
+                        
+                        if ($rsPlanoConta->getNumLinhas() > 0) {
+                            $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("exercicio", $_POST["inExercicio"] );
+                            $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta") );
+                            $obTIMAConfiguracaoDirfIrrfPlanoConta->inclusao($boTransacao);                          
+                        }else{
+                            $stMensagem = "Erro ao inserir os dados de Retenções IRRF!";
+                            SistemaLegado::alertaAviso($pgFilt,$stMensagem,$stAcao,"erro",Sessao::getId(),"../");
+                        }
+                    }
+                }
             }
 
             if (is_array($arPlanoSaude) && count($arPlanoSaude)>0) {
@@ -155,28 +192,22 @@ switch ($stAcao) {
         $obTIMAConfiguracaoDirf->setDado("fax",str_replace("-","",$_POST["stFax"]));
         $obTIMAConfiguracaoDirf->setDado("email",$_POST["stMail"]);
         $obTIMAConfiguracaoDirf->setDado("cod_evento_molestia", $rsEvento->getCampo('cod_evento'));
-        $obTIMAConfiguracaoDirf->alteracao();
+        $obTIMAConfiguracaoDirf->alteracao($boTransacao);
 
         //Excluindo todos os registros para o exercicio
         $stFiltro = " WHERE exercicio = '".$_POST["inExercicio"]."'";
-        $obTIMAConfiguracaoDirfPrestador->recuperaTodos($rsConfiguracaoDirfPrestador, $stFiltro);
+        $obTIMAConfiguracaoDirfPrestador->recuperaTodos($rsConfiguracaoDirfPrestador, $stFiltro,"",$boTransacao);
 
         while (!$rsConfiguracaoDirfPrestador->eof()) {
             $obTIMAConfiguracaoDirfPrestador->setDado("exercicio"     , $_POST["inExercicio"]);
             $obTIMAConfiguracaoDirfPrestador->setDado("cod_prestador" , $rsConfiguracaoDirfPrestador->getCampo("cod_prestador"));
-            $obTIMAConfiguracaoDirfPrestador->exclusao();
+            $obTIMAConfiguracaoDirfPrestador->exclusao($boTransacao);
 
             $rsConfiguracaoDirfPrestador->proximo();
         }
 
-        $obTIMAConfiguracaoDirfIrrf->setDado("exercicio", $_POST["inExercicio"]);
-        $obTIMAConfiguracaoDirfIrrf->exclusao();
-
-        $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
-        $obTIMAConfiguracaoDirfInss->exclusao();
-
         $obTIMAConfiguracaoDirfPlano->setDado('exercicio', $_POST['inExercicio']);
-        $obTIMAConfiguracaoDirfPlano->exclusao();
+        $obTIMAConfiguracaoDirfPlano->exclusao($boTransacao);
 
         $arPlanoSaude = Sessao::read('arPlanoSaude');
         if (is_array($arPlanoSaude) && count($arPlanoSaude)>0) {
@@ -187,7 +218,7 @@ switch ($stAcao) {
                    $obTIMAConfiguracaoDirfPlano->setDado('numcgm', $arDados['inCGMPlanoSaude']);
                    $obTIMAConfiguracaoDirfPlano->setDado('cod_evento', $rsEvento->getCampo('cod_evento'));
                    $obTIMAConfiguracaoDirfPlano->setDado('registro_ans', $arDados['inRegistro']);
-                   $obTIMAConfiguracaoDirfPlano->inclusao();
+                   $obTIMAConfiguracaoDirfPlano->inclusao($boTransacao);
                }
         }
 
@@ -199,30 +230,67 @@ switch ($stAcao) {
                 $obTIMAConfiguracaoDirfPrestador->setDado("cod_dirf"      , $dadosPrestador["codigo_retencao"]);
                 $obTIMAConfiguracaoDirfPrestador->setDado("tipo"          , $dadosPrestador["tipo"]);
                 $obTIMAConfiguracaoDirfPrestador->setDado("cod_conta"     , $dadosPrestador["cod_conta_despesa"]);
-                $obTIMAConfiguracaoDirfPrestador->inclusao();
+                $obTIMAConfiguracaoDirfPrestador->inclusao($boTransacao);
+
             }
         }
 
-        if (trim($_POST["inCodClassificacaoIRRF"])!="") {
-            $stFiltro  = " WHERE trim(cod_estrutural) = '4.".trim($_POST["inCodClassificacaoIRRF"])."'";
-            $stFiltro .= "   AND exercicio = ".$_POST["inExercicio"];
-            $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
-            $obTContabilidadePlanoConta->recuperaTodos($rsPlanoConta, $stFiltro);
-
-            $obTIMAConfiguracaoDirfIrrf->setDado("exercicio", $_POST["inExercicio"]);
-            $obTIMAConfiguracaoDirfIrrf->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta"));
-            $obTIMAConfiguracaoDirfIrrf->inclusao();
+        $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("exercicio", $_POST["inExercicio"]);
+        $obTIMAConfiguracaoDirfIrrfContaReceita->exclusao($boTransacao);
+            
+        $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("exercicio", $_POST["inExercicio"]);
+        $obTIMAConfiguracaoDirfIrrfPlanoConta->exclusao($boTransacao);
+    
+        $arIRRF = Sessao::read('arPrestadoresServicoRetencaoIRRF');                            
+        if ( count($arIRRF) > 0 ) {           
+            include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoReceita.class.php" );
+            $obROrcamentoReceita = new ROrcamentoReceita;     
+                
+            foreach ($arIRRF as $value) {
+                $stEstrutural = str_replace(".", "", $value['classificacao']);
+                $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio                 ( $_POST["inExercicio"]          );                
+                $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodReceita                ( $value['cod_receita_irrf']     );
+                $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodEstrutural             ( $stEstrutural );
+                $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaDescricaoReceitaIRRF ( $rsPlanoContaIRRF ,$boTransacao);
+    
+                if ($rsPlanoContaIRRF->getNumLinhas() > 0) {
+                    $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("exercicio", $_POST["inExercicio"] );
+                    $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("cod_conta", $rsPlanoContaIRRF->getCampo("cod_conta") );
+                    $obTIMAConfiguracaoDirfIrrfContaReceita->inclusao($boTransacao);                    
+                }else{
+                    $stFiltro  = " AND pa.cod_plano = ".$value['cod_receita_irrf']; 
+                    $stFiltro  .=" AND pa.exercicio = '".$_POST["inExercicio"]."'";
+                    $stFiltro  .=" AND REPLACE(pc.cod_estrutural,'.','') LIKE  '".$stEstrutural."%' ";
+                    $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+                    $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsPlanoConta, $stFiltro,"",$boTransacao);                
+                        
+                    if ($rsPlanoConta->getNumLinhas() > 0) {
+                        $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("exercicio", $_POST["inExercicio"] );
+                        $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta") );
+                        $obTIMAConfiguracaoDirfIrrfPlanoConta->inclusao($boTransacao);                          
+                    }else{
+                        $stMensagem = "Erro ao inserir os dados de Retenções IRRF!";
+                        SistemaLegado::alertaAviso($pgFilt,$stMensagem,$stAcao,"erro",Sessao::getId(),"../");
+                    }
+                }
+            }
         }
 
-        if (trim($_POST["inCodClassificacaoINSS"])!="") {
-            $stFiltro  = " WHERE trim(cod_estrutural) = '".trim($_POST["inCodClassificacaoINSS"])."'";
-            $stFiltro .= "   AND exercicio = ".$_POST["inExercicio"];
-            $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
-            $obTContabilidadePlanoConta->recuperaTodos($rsPlanoConta, $stFiltro);
+        $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
+        $obTIMAConfiguracaoDirfInss->exclusao($boTransacao);
+        
+        $arINSS = Sessao::read('arPrestadoresServicoRetencaoINSS');            
+        if ( count($arINSS) > 0 ) {                
+            foreach ($arINSS as $value) {
+                $stFiltro  = " WHERE trim(cod_estrutural) = '".trim($value["classificacao"])."'";
+                $stFiltro .= "   AND exercicio = '".$_POST["inExercicio"]."'";
+                $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+                $obTContabilidadePlanoConta->recuperaTodos($rsPlanoContaINSS, $stFiltro,"",$boTransacao);
 
-            $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
-            $obTIMAConfiguracaoDirfInss->setDado("cod_conta", $rsPlanoConta->getCampo("cod_conta"));
-            $obTIMAConfiguracaoDirfInss->inclusao();
+                $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_POST["inExercicio"]);
+                $obTIMAConfiguracaoDirfInss->setDado("cod_conta", $rsPlanoContaINSS->getCampo("cod_conta"));
+                $obTIMAConfiguracaoDirfInss->inclusao($boTransacao);
+            }
         }
 
         $pgRetorno = $pgFilt;
@@ -230,27 +298,30 @@ switch ($stAcao) {
         break;
     case "excluir":
         $stFiltro = " WHERE exercicio = '".$_GET["inExercicio"]."'";
-        $obTIMAConfiguracaoDirfPrestador->recuperaTodos($rsConfiguracaoDirfPrestador, $stFiltro);
+        $obTIMAConfiguracaoDirfPrestador->recuperaTodos($rsConfiguracaoDirfPrestador, $stFiltro,"",$boTransacao);
 
         while (!$rsConfiguracaoDirfPrestador->eof()) {
             $obTIMAConfiguracaoDirfPrestador->setDado("exercicio"     , $_POST["inExercicio"]);
             $obTIMAConfiguracaoDirfPrestador->setDado("cod_prestador" , $rsConfiguracaoDirfPrestador->getCampo("cod_prestador"));
-            $obTIMAConfiguracaoDirfPrestador->exclusao();
+            $obTIMAConfiguracaoDirfPrestador->exclusao($boTransacao);
 
             $rsConfiguracaoDirfPrestador->proximo();
         }
 
-        $obTIMAConfiguracaoDirfIrrf->setDado("exercicio", $_GET["inExercicio"]);
-        $obTIMAConfiguracaoDirfIrrf->exclusao();
+        $obTIMAConfiguracaoDirfIrrfContaReceita->setDado("exercicio", $_POST["inExercicio"]);
+        $obTIMAConfiguracaoDirfIrrfContaReceita->exclusao($boTransacao);
+            
+        $obTIMAConfiguracaoDirfIrrfPlanoConta->setDado("exercicio", $_POST["inExercicio"]);
+        $obTIMAConfiguracaoDirfIrrfPlanoConta->exclusao($boTransacao);
 
         $obTIMAConfiguracaoDirfInss->setDado("exercicio", $_GET["inExercicio"]);
-        $obTIMAConfiguracaoDirfInss->exclusao();
+        $obTIMAConfiguracaoDirfInss->exclusao($boTransacao);
 
         $obTIMAConfiguracaoDirfPlano->setDado('exercicio', $_GET['inExercicio']);
-        $obTIMAConfiguracaoDirfPlano->exclusao();
+        $obTIMAConfiguracaoDirfPlano->exclusao($boTransacao);
 
         $obTIMAConfiguracaoDirf->setDado("exercicio",$_GET["inExercicio"]);
-        $obTIMAConfiguracaoDirf->exclusao();
+        $obTIMAConfiguracaoDirf->exclusao($boTransacao);
 
         $pgRetorno = $pgFilt;
         $stMensagem = "A exclusão da configuração da DIRF para o exercício de ".$_GET["inExercicio"]." foi realizada com sucesso!";

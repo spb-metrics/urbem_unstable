@@ -58,7 +58,6 @@ $obCmbExercicioOrigem->addOption       ( "", "Selecione" );
 $obCmbExercicioOrigem->setCampoId      ( "ano_exercicio" );
 $obCmbExercicioOrigem->setCampoDesc    ( "ano_exercicio" );
 $obCmbExercicioOrigem->preencheCombo   ( $rsListaExercicios );
-$obCmbExercicioOrigem->setStyle        ( "width: 40%;" );
 $obCmbExercicioOrigem->setNULL         ( false );
 $obCmbExercicioOrigem->obEvento->setOnChange( $stOnChange );
 
@@ -71,7 +70,6 @@ $obCmbGrupo->addOption       ( "", "Selecione" );
 $obCmbGrupo->setCampoId      ( "cod_grupo" );
 $obCmbGrupo->setCampoDesc    ( "[cod_grupo] - [descricao]" );
 $obCmbGrupo->preencheCombo   ( $rsListaGrupos );
-$obCmbGrupo->setStyle        ( "width: 40%;" );
 $obCmbGrupo->setNULL         ( false );
 
 $obTxtNovoExercicio = new Exercicio;

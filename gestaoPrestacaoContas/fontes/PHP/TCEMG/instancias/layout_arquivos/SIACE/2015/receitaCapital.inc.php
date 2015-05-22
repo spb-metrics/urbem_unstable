@@ -35,7 +35,7 @@
 
  * @ignore
 
- $Id: receitaCapital.inc.php 62380 2015-04-29 19:12:23Z arthur $
+ $Id: receitaCapital.inc.php 62522 2015-05-18 14:22:51Z evandro $
  */
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGReceitaCapital.class.php';
 

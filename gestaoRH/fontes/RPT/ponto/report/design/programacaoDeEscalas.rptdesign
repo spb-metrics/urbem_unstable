@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.2.r222_v20071226 Build &lt;2.2.2.v20080227-1131></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,11 +25,11 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -36,24 +37,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -61,101 +49,68 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://[ip]:5432/[database]</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">[usuario]</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">[usuario]</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="stDescricao" id="1244">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="inCodEscala" id="1245">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">2</property>
+            <property name="dataType">integer</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="stEntidade" id="1270">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.3:5432/rh_uirauna_1_92_0</property>
-            <property name="odaUser">rgarbin</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MThiZWF1dHk=</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -163,27 +118,37 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">dt_turno</property>
-                    <property name="displayName">dt_turno</property>
+                    <text-property name="displayName">dt_turno</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">hora_entrada_1</property>
-                    <property name="displayName">hora_entrada_1</property>
+                    <text-property name="displayName">hora_entrada_1</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">hora_saida_1</property>
-                    <property name="displayName">hora_saida_1</property>
+                    <text-property name="displayName">hora_saida_1</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">hora_entrada_2</property>
-                    <property name="displayName">hora_entrada_2</property>
+                    <text-property name="displayName">hora_entrada_2</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">hora_saida_2</property>
-                    <property name="displayName">hora_saida_2</property>
+                    <text-property name="displayName">hora_saida_2</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">tipo_formatado</property>
-                    <property name="displayName">tipo_formatado</property>
+                    <text-property name="displayName">tipo_formatado</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">inCodEscala</property>
+                    <property name="paramName">inCodEscala</property>
+                    <property name="dataType">any</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -220,18 +185,8 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">postgres</property>
             <method name="beforeOpen"><![CDATA[this.queryText = this.queryText.replaceAll("ponto", "ponto" + params["stEntidade"]);]]></method>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">inCodEscala</property>
-                    <property name="paramName">inCodEscala</property>
-                    <property name="dataType">any</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -276,7 +231,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">     SELECT to_char(escala_turno.dt_turno, 'dd/mm/yyyy') as dt_turno
+            <xml-property name="queryText"><![CDATA[     SELECT to_char(escala_turno.dt_turno, 'dd/mm/yyyy') as dt_turno
           , to_char(escala_turno.hora_entrada_1, 'hh24:mi') as hora_entrada_1
           , to_char(escala_turno.hora_saida_1, 'hh24:mi') as hora_saida_1
           , to_char(escala_turno.hora_entrada_2, 'hh24:mi') as hora_entrada_2
@@ -292,17 +247,30 @@ extensionProperties.odaPassword = params["db_password"].value;
                            FROM ponto.escala_exclusao
                           WHERE escala.cod_escala = escala_exclusao.cod_escala )
         AND escala.cod_escala = ?
-   ORDER BY escala_turno.dt_turno   </property>
+   ORDER BY escala_turno.dt_turno   ]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="escala" id="1272">
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_escala</property>
-                    <property name="displayName">cod_escala</property>
+                    <text-property name="displayName">cod_escala</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao</property>
-                    <property name="displayName">descricao</property>
+                    <text-property name="displayName">descricao</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">params["inCodEscala"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -319,21 +287,8 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">postgres</property>
             <method name="beforeOpen"><![CDATA[this.queryText = this.queryText.replaceAll("ponto", "ponto" + params["stEntidade"]);]]></method>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">params["inCodEscala"]</expression>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -350,10 +305,10 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">SELECT lpad(cod_escala, 3, '0') as cod_escala
+            <xml-property name="queryText"><![CDATA[SELECT lpad(cod_escala, 3, '0') as cod_escala
      , descricao
   FROM ponto.escala
- WHERE cod_escala = ?</property>
+ WHERE cod_escala = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -368,7 +323,7 @@ extensionProperties.odaPassword = params["db_password"].value;
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>params[&quot;inCodEscala&quot;]</design:defaultScalarValue>
+          <design:defaultScalarValue>params[&amp;quot;inCodEscala&amp;quot;]</design:defaultScalarValue>
           <design:optional>false</design:optional>
         </design:elementAttributes>
       </design:inputAttributes>
@@ -593,6 +548,7 @@ extensionProperties.odaPassword = params["db_password"].value;
         <table id="1258">
             <property name="style">estilo_escala</property>
             <property name="width">200mm</property>
+            <property name="pageBreakInterval">50</property>
             <column id="1265"/>
             <header>
                 <row id="1259">
@@ -648,7 +604,7 @@ extensionProperties.odaPassword = params["db_password"].value;
                                 </structure>
                                 <structure>
                                     <property name="name">detalhe_escala</property>
-                                    <property name="displayName">detalhe_escala</property>
+                                    <text-property name="displayName">detalhe_escala</text-property>
                                     <expression name="expression">"Escala : "+ dataSetRow["cod_escala"] + " - " + dataSetRow["descricao"]</expression>
                                     <property name="dataType">any</property>
                                 </structure>
@@ -718,11 +674,12 @@ extensionProperties.odaPassword = params["db_password"].value;
                 </structure>
                 <structure>
                     <property name="name">tipo_formatado</property>
-                    <property name="displayName">tipo_formatado</property>
+                    <text-property name="displayName">tipo_formatado</text-property>
                     <expression name="expression">dataSetRow["tipo_formatado"]</expression>
                     <property name="dataType">any</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="1227"/>
             <column id="1194"/>
             <column id="1195"/>

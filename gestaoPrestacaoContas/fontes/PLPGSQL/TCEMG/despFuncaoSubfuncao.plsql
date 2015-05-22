@@ -34,26 +34,38 @@
     $Id:$
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_desp_funcao_subfuncao(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_desp_funcao_subfuncao(VARCHAR, VARCHAR, INTEGER, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
+    inPeriodo           ALIAS FOR $3;
+    inTipoPeriodo       ALIAS FOR $4;
+    
+    
     stSql               VARCHAR := '';
     stDtInicial         VARCHAR := '';
     stDtFinal           VARCHAR := '';
     stDtFinalDate       VARCHAR;
     reRegistro          RECORD;
+    arDatas             VARCHAR[];
 
 BEGIN
 
-    stDtInicial := '01/'||LPAD(inMes::varchar, 2, '0'::varchar)||'/'||stExercicio;
-    SELECT last_day (TO_DATE(stDtInicial, 'dd/mm/yyyy')) INTO stDtFinalDate;
-    stDtFinal := TO_CHAR(TO_DATE(stDtFinalDate, 'yyyy-mm-dd'), 'dd/mm/yyyy');
+    IF inTipoPeriodo = 'mensal' THEN
+        stDtInicial := '01/'||LPAD(inPeriodo::varchar, 2, '0'::varchar)||'/'||stExercicio;
+        SELECT last_day (TO_DATE(stDtInicial, 'dd/mm/yyyy')) INTO stDtFinalDate;
+        stDtFinal := TO_CHAR(TO_DATE(stDtFinalDate, 'yyyy-mm-dd'), 'dd/mm/yyyy');
+        
+    ELSE
+    
+        arDatas := publico.bimestre(inPeriodo::integer, stExercicio::integer);
+        stDtInicial := arDatas[0];
+        stDtFinal   := arDatas[1];
+    END IF;
 
     stSql := '
     CREATE TEMPORARY TABLE tmp_arquivo AS (
-        SELECT ' || inMes || ' AS mes
+        SELECT ' || inPeriodo || ' AS mes
              , CASE WHEN (sw_cgm.nom_cgm ILIKE ''%prefeitura%'') THEN CAST(''01'' AS VARCHAR)
                     WHEN (sw_cgm.nom_cgm ILIKE ''%instituto%'')  THEN CAST(''02'' AS VARCHAR)
                     WHEN (sw_cgm.nom_cgm ILIKE ''%câmara%'')     THEN CAST(''03'' AS VARCHAR)
@@ -144,4 +156,3 @@ BEGIN
 
 END;
 $$ LANGUAGE 'plpgsql';
-

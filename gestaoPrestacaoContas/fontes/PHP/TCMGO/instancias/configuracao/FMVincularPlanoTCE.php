@@ -48,6 +48,8 @@ $pgProc = 'PR'.$stPrograma.'.php';
 $pgOcul = 'OC'.$stPrograma.'.php';
 $pgJs   = 'JS'.$stPrograma.'.js';
 
+include_once $pgJs;
+
 $stAcao = $request->get('stAcao');
 
 $obForm = new Form;
@@ -98,11 +100,13 @@ $obTable->addLineNumber(true);
 $obTable->Head->addCabecalho('Cod. Reduzido', 5);
 $obTable->Head->addCabecalho('Estrutural', 10);
 $obTable->Head->addCabecalho('Descrição', 45);
-$obTable->Head->addCabecalho('Elenco Contas TCE', 40);
+$obTable->Head->addCabecalho('Obrig.', 1);
+$obTable->Head->addCabecalho('Elenco Contas TCE', 39);
 
 $obTable->Body->addCampo('[cod_plano]', 'C');
 $obTable->Body->addCampo('[cod_estrutural]', 'C');
 $obTable->Body->addCampo('[nom_conta]', 'E');
+$obTable->Body->addCampo('[desc_obrigatorio]', 'D');
 $obTable->Body->addCampo($obCmbElenco, 'E');
 
 $obTable->montaHTML(true);
@@ -112,13 +116,17 @@ $obSpnLista = new Span();
 $obSpnLista->setId('spnLista');
 $obSpnLista->setValue($stHTML);
 
+$obOk      = new Ok();
+$obOk->obEvento->setOnClick("if(validaCampos()){ Salvar(); }");
+$obLimpar  = new Limpar;
+
 $obFormulario = new Formulario();
 $obFormulario->addForm  ($obForm);
 $obFormulario->addHidden($obHdnAcao);
 $obFormulario->addHidden($obHdnMes);
 $obFormulario->addHidden($obHdnGrupo);
 $obFormulario->addSpan  ($obSpnLista);
-$obFormulario->Ok();
+$obFormulario->defineBarra( array( $obOk, $obLimpar ) );
 
 $obFormulario->show();
 

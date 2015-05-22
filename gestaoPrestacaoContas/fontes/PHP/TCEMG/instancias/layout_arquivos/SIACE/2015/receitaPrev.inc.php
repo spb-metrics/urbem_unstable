@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id:$
+    $Id: receitaPrev.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
     include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGReceitaPrev.class.php');
@@ -46,7 +46,7 @@
     $obFTCEMGReceitaPrev->setDado('exercicio'   , Sessao::read('exercicio'));
     $obFTCEMGReceitaPrev->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
     $obFTCEMGReceitaPrev->setDado('mes'         , $arFiltros['inPeriodo']);
-    $obFTCEMGReceitaPrev->recuperaTodos($rsReceitaPrev);
+    $obFTCEMGReceitaPrev->recuperaTodos($rsReceitaPrev, "", " ORDER BY cod_tipo ");
 
     $obExportador->roUltimoArquivo->addBloco($rsReceitaPrev);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');

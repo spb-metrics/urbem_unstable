@@ -113,4 +113,82 @@ function montaRecuperaCodEstrutural()
 
     return $stSql;
 }
+
+function recuperaDescricaoIRRF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaDescricaoIRRF().$stCondicao.$stOrdem;        
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaDescricaoIRRF()
+{
+    $stSql = "  SELECT *
+                FROM orcamento.conta_receita
+                JOIN orcamento.receita
+                    ON receita.exercicio    = conta_receita.exercicio
+                    AND receita.cod_conta   = conta_receita.cod_conta
+            ";
+    return $stSql;
+}
+
+function recuperaListaIRRF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaListaIRRF().$stCondicao.$stOrdem;        
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaListaIRRF()
+{
+    $stSql = "  SELECT * 
+                FROM (
+                    SELECT 
+                            plano_analitica.cod_plano as cod_receita_irrf
+                            ,plano_conta.cod_estrutural
+                            ,plano_conta.nom_conta as descricao                                          
+
+                    FROM contabilidade.plano_conta                                 
+                                                            
+                    INNER JOIN contabilidade.plano_analitica
+                         ON plano_analitica.exercicio = plano_conta.exercicio
+                        AND plano_analitica.cod_conta = plano_conta.cod_conta
+                    
+                    WHERE plano_conta.exercicio = '".$this->getDado('exercicio')."'
+
+                    AND NOT EXISTS (SELECT 1 
+                                    FROM orcamento.conta_receita
+                                    where plano_conta.cod_conta = conta_receita.cod_conta
+                                    AND plano_conta.exercicio = conta_receita.exercicio)
+
+                    UNION
+                    
+                    SELECT 
+                            receita.cod_receita as cod_receita_irrf
+                            ,conta_receita.cod_estrutural
+                            ,conta_receita.descricao
+                    FROM orcamento.receita 
+                    
+                    INNER JOIN orcamento.conta_receita
+                         ON conta_receita.cod_conta  = receita.cod_conta
+                        AND conta_receita.exercicio = receita.exercicio
+                    
+                    WHERE conta_receita.exercicio = '".$this->getDado('exercicio')."'
+                    
+                    ) as foo
+                    WHERE 1=1
+
+            ";
+    return $stSql;
+}
+
+
 }

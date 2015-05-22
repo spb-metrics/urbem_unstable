@@ -70,6 +70,7 @@ class TTCMGOElencoContasTCE extends Persistente
         if ($this->getDado('cod_estrutural') != '') {
             $stSql .= " AND plano_contas_tcmgo.estrutural LIKE '".$this->getDado('cod_estrutural')."%' \n";
         }
+        $stSql .= " ORDER BY plano_contas_tcmgo.estrutural ASC \n";
 
         return $stSql;
 

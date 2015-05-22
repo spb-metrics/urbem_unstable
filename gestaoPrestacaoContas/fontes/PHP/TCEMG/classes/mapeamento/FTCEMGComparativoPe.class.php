@@ -70,7 +70,7 @@ function montaRecuperaTodos()
                                                   descricao VARCHAR,
                                                   valor     NUMERIC
                                                  )";
-
+    
     return $stSql;
 }
 

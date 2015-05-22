@@ -470,7 +470,7 @@ BEGIN
                             ON publico.fn_mascarareduzida(conta_despesa.cod_estrutural) = SUBSTR(tmp_retorno.cod_elemento_despesa, 1, 10)
                            AND publico.fn_nivel(conta_despesa.cod_estrutural) = 5
                            AND conta_despesa.exercicio = tmp_retorno.exercicio
-                         WHERE conta_despesa.exercicio = ' || quote_lote(stExercicio) || '
+                         WHERE conta_despesa.exercicio = ' || quote_literal(stExercicio) || '
                            AND data_anulacao <> '''' ';
                             ELSE 
                             stSql := stSql || '

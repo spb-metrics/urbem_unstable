@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="layoutPreference">auto layout</property>
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -26,12 +26,12 @@
             <text-property name="promptText">Exercicio</text-property>
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">2010</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,27 +40,24 @@
             <text-property name="promptText">Acao</text-property>
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="12" extends="urbem_250.db_driver"/>
         <scalar-parameter name="db_conn_url" id="13" extends="urbem_250.db_conn_url"/>
-        <scalar-parameter name="db_user" id="14" extends="urbem_250.db_user"/>
-        <scalar-parameter name="db_password" id="15" extends="urbem_250.db_password"/>
         <scalar-parameter name="entidade" id="16" extends="urbem_250.entidade"/>
         <scalar-parameter name="exercicio_inventario" id="1631">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -68,9 +65,9 @@
         <scalar-parameter name="cod_almoxarifado" id="1495">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -78,9 +75,9 @@
         <scalar-parameter name="cod_inventario" id="1496">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -88,9 +85,9 @@
         <scalar-parameter name="tipo_ordenacao" id="1555">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -99,9 +96,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -146,9 +143,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -157,15 +154,6 @@
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="7"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-    extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -181,7 +169,105 @@
                     <property name="dataType">float</property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">exercicio</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">cod_almoxarifado</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">responsavel</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">almoxarifado</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">cod_inventario</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">dt_inventario</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">observacao</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">processado</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">cod_estrutural</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">processado_str</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">quantidade</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">qtde_estoque</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">descricao_resumida</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">cod_item</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">nom_unidade</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">classificacao_min</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">classificacao_max</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">dif_estoque</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">dif_estoque_19</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                </list-property>
+            </structure>
             <method name="beforeOpen"><![CDATA[var stFiltro="";
 if(params["exercicio"] != "") {
 	stFiltro = stFiltro + " AND inventario.exercicio = '" + params["exercicio_inventario"] + "'";
@@ -530,7 +616,7 @@ WHERE 1=1
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">qtde_itens</property>
-                    <property name="displayName">qtde_itens</property>
+                    <text-property name="displayName">qtde_itens</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -576,11 +662,11 @@ if(stFiltro != ""){
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_item</property>
-                    <property name="displayName">cod_item</property>
+                    <text-property name="displayName">cod_item</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">qtde_estoque</property>
-                    <property name="displayName">qtde_estoque</property>
+                    <text-property name="displayName">qtde_estoque</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -632,7 +718,7 @@ GROUP BY cod_item]]></xml-property>
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">dt_encerramento</property>
-                    <property name="displayName">dt_encerramento</property>
+                    <text-property name="displayName">dt_encerramento</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -1116,7 +1202,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">almoxarifado</property>
-                                <property name="displayName">almoxarifado</property>
+                                <text-property name="displayName">almoxarifado</text-property>
                                 <expression name="expression">dataSetRow["almoxarifado"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1142,7 +1228,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">responsavel</property>
-                                <property name="displayName">responsavel</property>
+                                <text-property name="displayName">responsavel</text-property>
                                 <expression name="expression">dataSetRow["responsavel"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1166,7 +1252,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">cod_inventario</property>
-                                <property name="displayName">cod_inventario</property>
+                                <text-property name="displayName">cod_inventario</text-property>
                                 <expression name="expression">dataSetRow["cod_inventario"]</expression>
                                 <property name="dataType">integer</property>
                             </structure>
@@ -1188,7 +1274,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">processado_str</property>
-                                <property name="displayName">processado_str</property>
+                                <text-property name="displayName">processado_str</text-property>
                                 <expression name="expression">dataSetRow["processado_str"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1212,7 +1298,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_inventario</property>
-                                <property name="displayName">dt_inventario</property>
+                                <text-property name="displayName">dt_inventario</text-property>
                                 <expression name="expression">dataSetRow["dt_inventario"]</expression>
                                 <property name="dataType">date</property>
                             </structure>
@@ -1238,7 +1324,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">dt_encerramento</property>
-                                <property name="displayName">dt_encerramento</property>
+                                <text-property name="displayName">dt_encerramento</text-property>
                                 <expression name="expression">dataSetRow["dt_encerramento"]</expression>
                                 <property name="dataType">date-time</property>
                             </structure>
@@ -1262,7 +1348,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">qtde_itens</property>
-                                <property name="displayName">qtde_itens</property>
+                                <text-property name="displayName">qtde_itens</text-property>
                                 <expression name="expression">dataSetRow["qtde_itens"]</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
@@ -1289,7 +1375,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">classificacao_min</property>
-                                <property name="displayName">classificacao_min</property>
+                                <text-property name="displayName">classificacao_min</text-property>
                                 <expression name="expression">dataSetRow["classificacao_min"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1311,7 +1397,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">classificacao_max</property>
-                                <property name="displayName">classificacao_max</property>
+                                <text-property name="displayName">classificacao_max</text-property>
                                 <expression name="expression">dataSetRow["classificacao_max"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1337,7 +1423,7 @@ WHERE assinatura.exercicio = ?]]></xml-property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">observacao</property>
-                                <property name="displayName">observacao</property>
+                                <text-property name="displayName">observacao</text-property>
                                 <expression name="expression">dataSetRow["observacao"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
@@ -1356,51 +1442,51 @@ WHERE assinatura.exercicio = ?]]></xml-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">cod_item</property>
-                    <property name="displayName">cod_item</property>
+                    <text-property name="displayName">cod_item</text-property>
                     <expression name="expression">dataSetRow["cod_item"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">quantidade</property>
-                    <property name="displayName">quantidade</property>
+                    <text-property name="displayName">quantidade</text-property>
                     <expression name="expression">dataSetRow["quantidade"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">descricao_resumida</property>
-                    <property name="displayName">descricao_resumida</property>
+                    <text-property name="displayName">descricao_resumida</text-property>
                     <expression name="expression">dataSetRow["descricao_resumida"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">cod_estrutural</property>
-                    <property name="displayName">cod_estrutural</property>
+                    <text-property name="displayName">cod_estrutural</text-property>
                     <expression name="expression">dataSetRow["cod_estrutural"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">nom_unidade</property>
-                    <property name="displayName">nom_unidade</property>
+                    <text-property name="displayName">nom_unidade</text-property>
                     <expression name="expression">dataSetRow["nom_unidade"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">qtde_estoque</property>
-                    <property name="displayName">qtde_estoque</property>
+                    <text-property name="displayName">qtde_estoque</text-property>
                     <expression name="expression">dataSetRow["qtde_estoque"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">dif_estoque</property>
-                    <property name="displayName">dif_estoque</property>
+                    <text-property name="displayName">dif_estoque</text-property>
                     <expression name="expression">dataSetRow["dif_estoque"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">0</property>
             <column id="1479">
-                <property name="width">0.6666666666666666in</property>
                 <property name="textAlign">right</property>
+                <property name="width">0.6666666666666666in</property>
             </column>
             <column id="1480">
                 <property name="width">0.8541666666666666in</property>

@@ -99,7 +99,6 @@ $obSlTipoPeriodo->setId      ('stTipoPeriodo');
 $obSlTipoPeriodo->setRotulo  ('Tipo de Periodo');
 $obSlTipoPeriodo->setTitle   ('Selecione o tipo de periodo');
 $obSlTipoPeriodo->addOption  ('','Selecione');
-$obSlTipoPeriodo->addOption  ('mensal','Mensal');
 $obSlTipoPeriodo->addOption  ('bimestral','Bimestral');
 $obSlTipoPeriodo->setNull    (false);
 $obSlTipoPeriodo->obEvento->setOnChange("montaParametrosGET('preenchePeriodo','stTipoPeriodo');
@@ -113,6 +112,7 @@ $obSlPeriodo->setRotulo  ('Período');
 $obSlPeriodo->setTitle   ('Selecione um período');
 $obSlPeriodo->addOption  ('','Selecione');
 $obSlPeriodo->setNull    (false);
+$obSlPeriodo->obEvento->setOnChange(" montaParametrosGET('validaArquivoPeriodo'); ");
 
 //Instancia um select multiplo para os arquivos
 $obCmbArquivos = new SelectMultiplo();
@@ -125,6 +125,21 @@ $obCmbArquivos->setRecord1    (new RecordSet());
 // lista de atributos selecionados
 $obCmbArquivos->SetNomeLista2 ('arArquivosSelecionado');
 $obCmbArquivos->setRecord2    (new RecordSet());
+
+// Tipo Arquivo Individual
+$obRdbTipoExportArqIndividual = new Radio;
+$obRdbTipoExportArqIndividual->setName   ('stTipoExport');
+$obRdbTipoExportArqIndividual->setLabel  ('Arquivos Individuais');
+$obRdbTipoExportArqIndividual->setValue  ('individuais');
+$obRdbTipoExportArqIndividual->setRotulo ('*Tipo de Exportação');
+$obRdbTipoExportArqIndividual->setTitle  ('Tipo de Exportação');
+$obRdbTipoExportArqIndividual->setChecked('checked');
+
+// Tipo Arquivo Compactado
+$obRdbTipoExportArqCompactado = new Radio;
+$obRdbTipoExportArqCompactado->setName ('stTipoExport');
+$obRdbTipoExportArqCompactado->setLabel('Compactados');
+$obRdbTipoExportArqCompactado->setValue('compactados');
 
 //Instancia o formulário
 $obForm = new Form();
@@ -144,9 +159,10 @@ $obFormulario->addComponente    ($obCmbEntidade);
 $obFormulario->addComponente    ($obSlTipoPeriodo);
 $obFormulario->addComponente    ($obSlPeriodo);
 $obFormulario->addComponente    ($obCmbArquivos);
+$obFormulario->agrupaComponentes(array($obRdbTipoExportArqIndividual, $obRdbTipoExportArqCompactado));
 
-$obFormulario->OK               ();
-$obFormulario->show             ();
+$obFormulario->OK  ();
+$obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 ?>

@@ -75,12 +75,13 @@ class TSTNVinculoRecurso extends Persistente
                         ,	vinculo_recurso.cod_vinculo
                     FROM 	stn.vinculo_recurso
                     WHERE true ";
+                    
         if ($this->getDado("exercicio")) {
             $stSql .= " AND vinculo_recurso.exercicio = '".$this->getDado("exercicio")."'";
         }
 
         if ($this->getDado("cod_entidade")) {
-            $stSql .= " AND vinculo_recurso.cod_entidade = '".$this->getDado("cod_entidade")."'";
+            $stSql .= " AND vinculo_recurso.cod_entidade IN ('".$this->getDado("cod_entidade")."') ";
         }
 
         if ($this->getDado("num_orgao")) {
@@ -93,6 +94,10 @@ class TSTNVinculoRecurso extends Persistente
 
         if ($this->getDado("cod_recurso")) {
             $stSql .= " AND vinculo_recurso.cod_recurso = ".$this->getDado("cod_recurso");
+        }
+        
+        if ($this->getDado("cod_vinculo")) {
+            $stSql .= " AND vinculo_recurso.cod_vinculo = ".$this->getDado("cod_vinculo");
         }
 
         return $stSql;

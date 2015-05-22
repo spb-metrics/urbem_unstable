@@ -292,7 +292,28 @@ class TTCEMGAOC extends Persistente
             $stSql  = " SELECT
                             '12' AS tiporegistro
                             ,LPAD(tabela.num_norma||tabela.cod_tipo, 8,'0' ) as codreduzidodecreto
-                            ,(SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 103 ORDER BY timestamp DESC LIMIT 1) AS nroleialteracao
+                            ,( SELECT DISTINCT atributo_norma_valor.valor
+                                            FROM normas.atributo_norma_valor
+                                      INNER JOIN normas.atributo_tipo_norma
+                                              ON atributo_tipo_norma.cod_tipo_norma = atributo_norma_valor.cod_tipo_norma
+                                             AND atributo_tipo_norma.cod_modulo     = atributo_norma_valor.cod_modulo
+                                             AND atributo_tipo_norma.cod_cadastro   = atributo_norma_valor.cod_cadastro
+                                             AND atributo_tipo_norma.cod_atributo   = atributo_norma_valor.cod_atributo
+                                      INNER JOIN administracao.atributo_dinamico
+                                              ON atributo_dinamico.cod_modulo     = atributo_tipo_norma.cod_modulo    
+                                             AND atributo_dinamico.cod_cadastro   = atributo_tipo_norma.cod_cadastro  
+                                             AND atributo_dinamico.cod_atributo   = atributo_tipo_norma.cod_atributo  
+                                           WHERE atributo_tipo_norma.ativo = TRUE
+                                             AND atributo_dinamico.cod_atributo = 103
+                                             AND atributo_norma_valor.cod_norma = tabela.cod_norma
+                                             AND atributo_norma_valor.timestamp = ( SELECT MAX(timestamp)
+                                                                                      FROM normas.atributo_norma_valor AS anv 
+                                                                                     WHERE cod_norma = atributo_norma_valor.cod_norma 
+                                                                                       AND cod_cadastro = atributo_norma_valor.cod_cadastro 
+                                                                                       AND cod_modulo =  atributo_norma_valor.cod_modulo 
+                                                                                       AND cod_atributo =  atributo_norma_valor.cod_atributo
+                                                                                       AND atributo_dinamico.cod_atributo = 103 )
+                            ) AS nroleialteracao
                             ,REPLACE((SELECT valor FROM normas.atributo_norma_valor WHERE cod_norma = tabela.cod_norma AND cod_atributo = 104 ORDER BY timestamp DESC LIMIT 1), '/', '') AS dataleialteracao
                             , SUBSTR(descricao,0,4) as tpleiorigdecreto
                             , tipo_lei_alteracao_orcamentaria as tipoleialteracao
@@ -348,8 +369,8 @@ class TTCEMGAOC extends Persistente
                         JOIN tcemg.norma_detalhe
                             ON norma_detalhe.cod_norma = norma.cod_norma
     
-                        JOIN tcemg.tipo_lei_origem_decreto
-                            ON  tipo_lei_origem_decreto.cod_tipo_lei = norma_detalhe.tipo_lei_origem_decreto
+                   LEFT JOIN tcemg.tipo_lei_origem_decreto
+                          ON  tipo_lei_origem_decreto.cod_tipo_lei = norma_detalhe.tipo_lei_origem_decreto
     
                         WHERE suplementacao.exercicio          = '".$this->getDado('exercicio')."'        
                         AND suplementacao.dt_suplementacao >= to_date('".$this->getDado('dt_inicial')."','dd/mm/yyyy')                  

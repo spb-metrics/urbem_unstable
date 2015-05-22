@@ -50,10 +50,11 @@ class  IPopUpEstrutural extends BuscaInner
 
         parent::BuscaInner();
 
-        $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao;
+        isset($_REQUEST['inExercicio']) ? $stExercicio = $_REQUEST['inExercicio'] : Sessao::getExercicio();
 
+        $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao;
         $obTAdministracaoConfiguracao->setDado( "cod_modulo", 9);
-        $obTAdministracaoConfiguracao->setDado( "exercicio", Sessao::getExercicio() );
+        $obTAdministracaoConfiguracao->setDado( "exercicio", $stExercicio );
         $obTAdministracaoConfiguracao->pegaConfiguracao( $stMascara, "masc_plano_contas" );
 
         $this->setRotulo               ( "Código Estrutural" );
@@ -70,10 +71,15 @@ class  IPopUpEstrutural extends BuscaInner
 
     public function montaHTML()
     {
+        
+        if( isset($_REQUEST['inExercicio']) )
+            $stExercicio = "&stExercicio=".$_REQUEST['inExercicio'];
+        else
+            $stExercicio ="";
 
-        $pgOcul = "'".CAM_GF_CONT_PROCESSAMENTO."OCEstruturalPlano.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+this.value+'&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."'";
+        $pgOcul = "'".CAM_GF_CONT_PROCESSAMENTO."OCEstruturalPlano.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+this.value+'".$stExercicio."&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."'";
         $this->obCampoCod->obEvento->setOnChange ( "ajaxJavaScript($pgOcul,'buscaPopup');" );
-        $this->setFuncaoBusca ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLEstrutural.php','frm','".$this->obCampoCod->getName()."','".$this->getId()."','estrutural','".Sessao::getId()."','800','550');");
+        $this->setFuncaoBusca ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLEstrutural.php','frm','".$this->obCampoCod->getName()."','".$this->getId()."','estrutural".$stExercicio."','".Sessao::getId()."','800','550');");
         parent::montaHTML();
     }
 }

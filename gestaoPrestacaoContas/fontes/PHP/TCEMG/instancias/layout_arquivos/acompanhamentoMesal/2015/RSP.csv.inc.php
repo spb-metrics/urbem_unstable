@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: RSP.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
-  * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
-  * $Author: franver $
-  * $Rev: 62269 $
+  * $Id: RSP.csv.inc.php 62438 2015-05-11 12:55:59Z michel $
+  * $Date: 2015-05-11 09:55:59 -0300 (Seg, 11 Mai 2015) $
+  * $Author: michel $
+  * $Rev: 62438 $
   *
 */
 /**
@@ -73,7 +73,9 @@ if ( $stMes == 1){
     $obTTCEMGRestosPagar->recuperaExportacao21($rsRecordSetRSP21);
     
     //Tipo Registro 22
-    $obTTCEMGRestosPagar->recuperaExportacao22($rsRecordSetRSP22);
+    //Comentado pois no manual informa que o Registro só deve ser gerado para os Tipos de Movimentações 2-Encampação ou 4-Restabelecimento
+    //O registro 20 está fixado com Tipo de Movimentação = 1-Cancelamento
+    //$obTTCEMGRestosPagar->recuperaExportacao22($rsRecordSetRSP22);
 }
 
 //Tipo Registro 99
@@ -251,10 +253,10 @@ if (count($rsRecordSetRSP10->getElementos()) > 0) {
          
             foreach ($rsRecordSetRSP20->getElementos() as $arRSP20) {
                 $stChave20 = $arRSP20['cod_reduzido'];
-                $stChave20_2 = $stChave20;
+                $stChave20_2 = $stChave20.$arRSP20['dt_movimentacao'];
                 $inCount++;            
                 if ($stChave10 == $stChave20) {
-                    $stChave20_2 = '20'.$stChave20;
+                    $stChave20_2 = '20'.$stChave20.$arRSP20['dt_movimentacao'];
                     $rsBloco = 'rsBloco_'.$inCount;
                     unset($$rsBloco);
                     $$rsBloco = new RecordSet();
@@ -357,7 +359,7 @@ if (count($rsRecordSetRSP10->getElementos()) > 0) {
                 if (count($rsRecordSetRSP21->getElementos()) > 0) {            
                     foreach ($rsRecordSetRSP21->getElementos() as $arRSP21) {
                         $stChave21 = $arRSP21['cod_reduzido'];
-                        $stChave21_2='20'.$stChave21;
+                        $stChave21_2='20'.$stChave21.$arRSP21['dt_movimentacao'];
                         if ($stChave10 == $stChave21 && $stChave21_2 ==$stChave20_2) {
                             $inCount++;                    
                             

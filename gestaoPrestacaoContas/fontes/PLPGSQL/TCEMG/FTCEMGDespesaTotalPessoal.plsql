@@ -27,7 +27,7 @@
     * @author Analista:      
     * @author Desenvolvedor: Arthur Cruz
     
-    $Id:
+    $Id: FTCEMGDespesaTotalPessoal.plsql 62451 2015-05-12 16:03:08Z michel $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_despesa_total_pessoal(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -1173,7 +1173,7 @@ BEGIN
                        )';
         EXECUTE stSql;
         
-        -- Calculando os valores referente a conta 3.1.90.01.00.00 + 3.1.90.03.00.00 da UG RPPS  Nível 6
+        -- Calculando os valores referente a conta 3.1.90.01.01 + 3.1.90.03.01 da UG RPPS  Nível 7
         stSql := '
             INSERT INTO tmp_tcemg_despesa_total_pessoal
              SELECT 4 AS ordem
@@ -1194,7 +1194,7 @@ BEGIN
                   , SUM( mes_12 ) AS mes_12
                   , SUM( total ) AS total
              FROM (
-                    -- Calculando os valores referente a conta 3.1.90.01.00.00  Nível 6
+                    -- Calculando os valores referente a conta 3.1.90.01.01  Nível 7
                     SELECT mes_1
                          , mes_2
                          , mes_3
@@ -1212,7 +1212,7 @@ BEGIN
                                                                                                                                 (SELECT valor FROM administracao.configuracao
                                                                                                                                               WHERE cod_modulo = 8 
 														                              AND parametro ilike 'cod_entidade_rpps'
-                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.01'',6,'
+                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.01.01'',7,'
                                                                                                                      ||quote_literal(stTipoSituacao)||')
                         AS retorno ( cod_conta      VARCHAR
                                    , nom_conta      VARCHAR
@@ -1233,7 +1233,7 @@ BEGIN
                 
                 UNION
                 
-                    -- Calculando os valores referente a conta 3.1.90.03.00.00  Nível 6
+                    -- Calculando os valores referente a conta 3.1.90.03.01  Nível 7
                     SELECT mes_1
                          , mes_2
                          , mes_3
@@ -1251,7 +1251,7 @@ BEGIN
                                                                                                                     ||(select valor from administracao.configuracao
                                                                                                                         WHERE cod_modulo = 8 
 														     AND parametro ilike 'cod_entidade_rpps'
-                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.03'', 6, '||quote_literal(stTipoSituacao)||')
+                                                                                                                     AND exercicio = stExercicio)||''',''3.3.1.9.0.03.01'', 7, '||quote_literal(stTipoSituacao)||')
                         AS retorno ( cod_conta      VARCHAR
                                    , nom_conta      VARCHAR
                                    , cod_estrutural VARCHAR
@@ -1269,7 +1269,7 @@ BEGIN
                                    , mes_12         NUMERIC
                                    , total          NUMERIC )
                 ) AS Inativos_pensionistas ';
-        
+                
         EXECUTE stSql;
 
          -- Valores a serem conferidos

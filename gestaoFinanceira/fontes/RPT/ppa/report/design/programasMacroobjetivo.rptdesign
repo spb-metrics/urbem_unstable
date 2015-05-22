@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,9 +28,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,24 +40,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -67,42 +52,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -111,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -122,13 +77,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -137,9 +92,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -148,9 +103,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -159,9 +114,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -170,9 +125,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -181,9 +136,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -192,12 +147,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">' '</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -206,12 +161,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -220,28 +175,19 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -786,13 +732,13 @@ from]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">descricao_tipo_programa</property>
-                    <property name="displayName">descricao_tipo_programa</property>
+                    <text-property name="displayName">descricao_tipo_programa</text-property>
                     <expression name="expression">dataSetRow["descricao_tipo_programa"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">titulo_relatorio</property>
-                    <property name="displayName">titulo_relatorio</property>
+                    <text-property name="displayName">titulo_relatorio</text-property>
                     <expression name="expression">if (row['cod_tipo_programa'] == 1) {
 	'Anexo II - Programas de Governo - Finalisticos'
 } else if (row['cod_tipo_programa'] == 2) {
@@ -804,7 +750,7 @@ from]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">cod_tipo_programa</property>
-                    <property name="displayName">cod_tipo_programa</property>
+                    <text-property name="displayName">cod_tipo_programa</text-property>
                     <expression name="expression">dataSetRow["cod_tipo_programa"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -857,7 +803,7 @@ from]]></xml-property>
                                         <list-property name="boundDataColumns">
                                             <structure>
                                                 <property name="name">nom_prefeitura</property>
-                                                <property name="displayName">nom_prefeitura</property>
+                                                <text-property name="displayName">nom_prefeitura</text-property>
                                                 <expression name="expression">dataSetRow["nom_prefeitura"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -927,19 +873,19 @@ from]]></xml-property>
                             <list-property name="boundDataColumns">
                                 <structure>
                                     <property name="name">plano_plurianual</property>
-                                    <property name="displayName">plano_plurianual</property>
+                                    <text-property name="displayName">plano_plurianual</text-property>
                                     <expression name="expression">'Plano Plurianual '+params["ano_inicio"].value+' - '+(Number(params["ano_inicio"].value)+3).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">descricao_setorial</property>
-                                    <property name="displayName">descricao_setorial</property>
+                                    <text-property name="displayName">descricao_setorial</text-property>
                                     <expression name="expression">dataSetRow["descricao_setorial"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">descricao_macro</property>
-                                    <property name="displayName">descricao_macro</property>
+                                    <text-property name="displayName">descricao_macro</text-property>
                                     <expression name="expression">dataSetRow["descricao_macro"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -990,7 +936,9 @@ from]]></xml-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">param_1</property>
-                                    <expression name="expression">row["cod_programa"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_programa"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1026,13 +974,13 @@ from]]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">programa</property>
-                                    <property name="displayName">programa</property>
+                                    <text-property name="displayName">programa</text-property>
                                     <expression name="expression">row["identificacao"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">orgao_responsavel</property>
-                                    <property name="displayName">orgao_responsavel</property>
+                                    <text-property name="displayName">orgao_responsavel</text-property>
                                     <expression name="expression">'Órgão Responsável  '+row["num_orgao"]+' - '+row["nom_orgao"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1192,7 +1140,9 @@ from]]></xml-property>
                                         <list-property name="paramBindings">
                                             <structure>
                                                 <property name="paramName">param_1</property>
-                                                <expression name="expression">row["cod_programa"]</expression>
+                                                <simple-property-list name="expression">
+                                                    <value>row["cod_programa"]</value>
+                                                </simple-property-list>
                                             </structure>
                                         </list-property>
                                         <list-property name="boundDataColumns">
@@ -1382,7 +1332,9 @@ from]]></xml-property>
                                         <list-property name="paramBindings">
                                             <structure>
                                                 <property name="paramName">param_1</property>
-                                                <expression name="expression">row["cod_programa"]</expression>
+                                                <simple-property-list name="expression">
+                                                    <value>row["cod_programa"]</value>
+                                                </simple-property-list>
                                             </structure>
                                         </list-property>
                                         <list-property name="boundDataColumns">
@@ -1485,7 +1437,9 @@ from]]></xml-property>
                                         <list-property name="paramBindings">
                                             <structure>
                                                 <property name="paramName">param_1</property>
-                                                <expression name="expression">row["cod_programa"]</expression>
+                                                <simple-property-list name="expression">
+                                                    <value>row["cod_programa"]</value>
+                                                </simple-property-list>
                                             </structure>
                                         </list-property>
                                         <list-property name="boundDataColumns">
@@ -1518,7 +1472,7 @@ from]]></xml-property>
                                             </structure>
                                             <structure>
                                                 <property name="name">agg_total_por_tipo</property>
-                                                <property name="displayName">agg_total_por_tipo</property>
+                                                <text-property name="displayName">agg_total_por_tipo</text-property>
                                                 <property name="dataType">float</property>
                                                 <simple-property-list name="aggregateOn">
                                                     <value>agg_tipo_orcamento</value>
@@ -1533,13 +1487,13 @@ from]]></xml-property>
                                             </structure>
                                             <structure>
                                                 <property name="name">total_por_tipo</property>
-                                                <property name="displayName">total_por_tipo</property>
+                                                <text-property name="displayName">total_por_tipo</text-property>
                                                 <expression name="expression">row["agg_total_por_tipo"]</expression>
                                                 <property name="dataType">float</property>
                                             </structure>
                                             <structure>
                                                 <property name="name">total_valores_programa</property>
-                                                <property name="displayName">total_valores_programa</property>
+                                                <text-property name="displayName">total_valores_programa</text-property>
                                                 <expression name="expression">Total.sum(dataSetRow["valor_total"])</expression>
                                                 <property name="dataType">float</property>
                                             </structure>
@@ -1707,7 +1661,9 @@ from]]></xml-property>
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">param_1</property>
-                                    <expression name="expression">row["cod_programa"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_programa"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -1801,37 +1757,37 @@ from]]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">tipo_acao</property>
-                                    <property name="displayName">tipo_acao</property>
+                                    <text-property name="displayName">tipo_acao</text-property>
                                     <expression name="expression">dataSetRow["tipo_acao"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">ano_1</property>
-                                    <property name="displayName">ano_1</property>
+                                    <text-property name="displayName">ano_1</text-property>
                                     <expression name="expression">params["exercicio"].value</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">ano_2</property>
-                                    <property name="displayName">ano_2</property>
+                                    <text-property name="displayName">ano_2</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+1).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">ano_3</property>
-                                    <property name="displayName">ano_3</property>
+                                    <text-property name="displayName">ano_3</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+2).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">ano_4</property>
-                                    <property name="displayName">ano_4</property>
+                                    <text-property name="displayName">ano_4</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+3).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">produto</property>
-                                    <property name="displayName">produto</property>
+                                    <text-property name="displayName">produto</text-property>
                                     <expression name="expression">if (dataSetRow["descricao"] != null) {
 	dataSetRow["descricao"]+' ('+dataSetRow["unidade_medida"]+')';
 }</expression>
@@ -1839,73 +1795,73 @@ from]]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">total_ano_1</property>
-                                    <property name="displayName">total_ano_1</property>
+                                    <text-property name="displayName">total_ano_1</text-property>
                                     <expression name="expression">Total.sum(dataSetRow["valor_ano_1"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">total_ano_2</property>
-                                    <property name="displayName">total_ano_2</property>
+                                    <text-property name="displayName">total_ano_2</text-property>
                                     <expression name="expression">Total.sum(dataSetRow["valor_ano_2"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">total_ano_3</property>
-                                    <property name="displayName">total_ano_3</property>
+                                    <text-property name="displayName">total_ano_3</text-property>
                                     <expression name="expression">Total.sum(dataSetRow["valor_ano_3"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">total_ano_4</property>
-                                    <property name="displayName">total_ano_4</property>
+                                    <text-property name="displayName">total_ano_4</text-property>
                                     <expression name="expression">Total.sum(dataSetRow["valor_ano_4"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">primeiro_ano</property>
-                                    <property name="displayName">primeiro_ano</property>
+                                    <text-property name="displayName">primeiro_ano</text-property>
                                     <expression name="expression">params["ano_inicio"].value</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">segundo_ano</property>
-                                    <property name="displayName">segundo_ano</property>
+                                    <text-property name="displayName">segundo_ano</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+1).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">terceiro_ano</property>
-                                    <property name="displayName">terceiro_ano</property>
+                                    <text-property name="displayName">terceiro_ano</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+2).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">quarto_ano</property>
-                                    <property name="displayName">quarto_ano</property>
+                                    <text-property name="displayName">quarto_ano</text-property>
                                     <expression name="expression">(Number(params["ano_inicio"].value)+3).toString().replace('/\./g', '')</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">meta_estimada</property>
-                                    <property name="displayName">meta_estimada</property>
+                                    <text-property name="displayName">meta_estimada</text-property>
                                     <expression name="expression">dataSetRow["meta_estimada"]</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">data_inicio</property>
-                                    <property name="displayName">data_inicio</property>
+                                    <text-property name="displayName">data_inicio</text-property>
                                     <expression name="expression">dataSetRow["data_inicio"]</expression>
                                     <property name="dataType">date</property>
                                 </structure>
                                 <structure>
                                     <property name="name">data_termino</property>
-                                    <property name="displayName">data_termino</property>
+                                    <text-property name="displayName">data_termino</text-property>
                                     <expression name="expression">dataSetRow["data_termino"]</expression>
                                     <property name="dataType">date</property>
                                 </structure>
                                 <structure>
                                     <property name="name">continuo</property>
-                                    <property name="displayName">continuo</property>
+                                    <text-property name="displayName">continuo</text-property>
                                     <expression name="expression">dataSetRow["continuo"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -2037,10 +1993,10 @@ from]]></xml-property>
                                             </text>
                                         </cell>
                                         <cell id="1546">
-                                            <property name="width">20%</property>
                                             <method name="onCreate"><![CDATA[if (this.getRowData().getColumnValue('tipo_acao') != 'Projeto') {	
 	this.Width = '15%';
 }]]></method>
+                                            <property name="width">20%</property>
                                             <text id="1572">
                                                 <property name="textAlign">center</property>
                                                 <property name="contentType">auto</property>

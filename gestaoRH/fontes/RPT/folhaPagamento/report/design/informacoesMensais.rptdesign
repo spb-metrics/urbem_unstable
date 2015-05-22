@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <method name="initialize"><![CDATA[/*
  * Define Funcao para verificar se mostra coluna ou não
  */
@@ -163,9 +163,9 @@ setaLegendasEventos();]]></method>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -175,9 +175,9 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -187,24 +187,9 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -214,42 +199,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -258,9 +213,9 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -269,9 +224,9 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -280,9 +235,9 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -291,12 +246,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -305,12 +260,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -319,12 +274,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -333,12 +288,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -347,12 +302,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -361,12 +316,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -375,12 +330,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -389,12 +344,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -403,12 +358,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -417,12 +372,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -431,12 +386,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -445,12 +400,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -459,12 +414,12 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -473,28 +428,19 @@ setaLegendasEventos();]]></method>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant"></value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -502,39 +448,39 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_contrato</property>
-                    <property name="displayName">cod_contrato</property>
+                    <text-property name="displayName">cod_contrato</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">registro</property>
-                    <property name="displayName">registro</property>
+                    <text-property name="displayName">registro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao</property>
-                    <property name="displayName">descricao</property>
+                    <text-property name="displayName">descricao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_orgao</property>
-                    <property name="displayName">cod_orgao</property>
+                    <text-property name="displayName">cod_orgao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">desc_orgao</property>
-                    <property name="displayName">desc_orgao</property>
+                    <text-property name="displayName">desc_orgao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_local</property>
-                    <property name="displayName">cod_local</property>
+                    <text-property name="displayName">cod_local</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">desc_local</property>
-                    <property name="displayName">desc_local</property>
+                    <text-property name="displayName">desc_local</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">atributo</property>
-                    <property name="displayName">atributo</property>
+                    <text-property name="displayName">atributo</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -1013,112 +959,112 @@ FROM pessoal.servidor_contrato_servidor
                 <property name="width">8mm</property>
             </column>
             <column id="1340">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(0);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1341">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(1);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1342">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(2);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1343">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(3);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1344">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(4);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1345">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(5);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1346">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(6);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1347">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(7);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1348">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(8);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1349">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(9);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1350">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(10);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1351">
-                <property name="width">14mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">mostrarColunaEvento(11);</expression>
                     </structure>
                 </list-property>
+                <property name="width">14mm</property>
             </column>
             <column id="1352"/>
             <header>

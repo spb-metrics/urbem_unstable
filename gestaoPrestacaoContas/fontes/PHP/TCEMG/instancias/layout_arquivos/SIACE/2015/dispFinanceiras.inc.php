@@ -38,7 +38,7 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDispFinanceiras.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/FTCEMGDispFinanceiras.class.php");
 
     $arFiltros = Sessao::read('filtroRelatorio');
 

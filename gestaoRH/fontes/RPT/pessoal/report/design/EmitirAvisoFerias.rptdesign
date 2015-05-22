@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">André Machado</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
-    <html-property name="description">uc-04.04.23
-$Log$
-Revision 1.12  2007/09/26 21:39:54  alex
-Bug#10029#
-
-Revision 1.11  2007/07/25 19:50:24  souzadl
-Bug#9650#</html-property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Emitir Aviso Férias</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -23,9 +16,9 @@ Bug#9650#</html-property>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -50,37 +43,7 @@ Bug#9650#</html-property>
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="189">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -209,18 +172,7 @@ Bug#9650#</html-property>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-            	extensionProperties.odaDriverClass = params["db_driver"].value;
-				extensionProperties.odaURL = params["db_conn_url"].value;
-				extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-			}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.3:5432/rh_mata_0811</property>
-            <property name="odaUser">alex</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">ZHJhY29uaWFub3M=</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>

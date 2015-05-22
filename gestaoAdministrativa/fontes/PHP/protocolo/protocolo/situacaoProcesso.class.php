@@ -41,125 +41,127 @@ Casos de uso: uc-01.06.98
     class situacaoProcesso
     {
         /*** Declaração das variáveis ***/
-            var $codigo;
-            var $nome;
-            var $historicoArquivamento;
-            var $anoE;
+        var $codigo;
+        var $nome;
+        var $historicoArquivamento;
+        var $anoE;
+        var $localizacaoFisica;
 
         /*** Método Construtor ***/
-            function situacaoProcesso()
-            {
-                $this->codigo = 0;
-                $this->nome = "";
-                $this->historicoArquivamento = "";
-                $this->anoE = "";
-            }
+        function situacaoProcesso()
+        {
+            $this->codigo = 0;
+            $this->nome = "";
+            $this->historicoArquivamento = "";
+            $this->anoE = "";
+        }
 
         /*** Método que seta Variáveis ***/
-            function setaVariaveis($nom)
-            {
-                $this->nome = $nom;
-            }
+        function setaVariaveis($nom)
+        {
+            $this->nome = $nom;
+        }
 
         /*** Método que gera o código do tipo de processo ***/
-            function geraCodigo()
-            {
-                $this->codigo = pegaID('cod_situacao',"sw_situacao_processo");
-            }
+        function geraCodigo()
+        {
+            $this->codigo = pegaID('cod_situacao',"sw_situacao_processo");
+        }
 
         /*** Método que inclui tipo de processo ***/
-            function incluiSituacaoProcesso()
-            {
-                $dbConfig = new dataBaseLegado;
-                $dbConfig->abreBd();
-                    if (isset($this->nome)) {
-                        $this->geraCodigo();
-                        $insert =   "insert into sw_situacao_processo (cod_situacao, nom_situacao)
-                                        values ($this->codigo, '$this->nome')"; //insere os dados na tabela
-                        $result = $dbConfig->executaSql($insert);
-                        if ($result) {
-                            return true;
-                            $dbConfig->fechaBd();
-                        } else {
-                            return false;
-                            $dbConfig->fechaBd();
-                        }
+        function incluiSituacaoProcesso()
+        {
+            $dbConfig = new dataBaseLegado;
+            $dbConfig->abreBd();
+                if (isset($this->nome)) {
+                    $this->geraCodigo();
+                    $insert =   "insert into sw_situacao_processo (cod_situacao, nom_situacao)
+                                    values ($this->codigo, '$this->nome')"; //insere os dados na tabela
+                    $result = $dbConfig->executaSql($insert);
+                    if ($result) {
+                        return true;
+                        $dbConfig->fechaBd();
+                    } else {
+                        return false;
+                        $dbConfig->fechaBd();
                     }
-            }
-
-            function listaSituacaoProcesso()
-            {
-                $dbSit = new dataBaseLegado;
-                $dbSit->abreBd();
-                $select =   "select cod_situacao, nom_situacao
-                                from sw_situacao_processo order by lower(nom_situacao)";
-                $dbSit->abreSelecao($select);
-                while (!$dbSit->eof()) {
-                    $cod = $dbSit->pegaCampo("cod_situacao");
-                    $lista[$cod] = $dbSit->pegaCampo("nom_situacao");
-                    $dbSit->vaiProximo();
                 }
+        }
+
+        function listaSituacaoProcesso()
+        {
+            $dbSit = new dataBaseLegado;
+            $dbSit->abreBd();
+            $select =   "select cod_situacao, nom_situacao
+                            from sw_situacao_processo order by lower(nom_situacao)";
+            $dbSit->abreSelecao($select);
+            while (!$dbSit->eof()) {
+                $cod = $dbSit->pegaCampo("cod_situacao");
+                $lista[$cod] = $dbSit->pegaCampo("nom_situacao");
+                $dbSit->vaiProximo();
+            }
+            $dbSit->limpaSelecao();
+
+            return $lista;
+            $dbSit->fechaBd();
+        }
+
+        function mostraSituacaoProcesso($cod)
+        {
+            $dbSit = new dataBaseLegado;
+            $dbSit->abreBd();
+            $select =   "select cod_situacao, nom_situacao
+                            from sw_situacao_processo where cod_situacao = '$cod'";
+            $dbSit->abreSelecao($select);
+            if (!$dbSit->eof()) {
+                $this->nome = $dbSit->pegaCampo("nom_situacao");
                 $dbSit->limpaSelecao();
-
-                return $lista;
-                $dbSit->fechaBd();
             }
+            $dbSit->fechaBd();
+        }
 
-            function mostraSituacaoProcesso($cod)
-            {
-                $dbSit = new dataBaseLegado;
-                $dbSit->abreBd();
-                $select =   "select cod_situacao, nom_situacao
-                                from sw_situacao_processo where cod_situacao = '$cod'";
-                $dbSit->abreSelecao($select);
-                if (!$dbSit->eof()) {
-                    $this->nome = $dbSit->pegaCampo("nom_situacao");
-                    $dbSit->limpaSelecao();
-                }
-                $dbSit->fechaBd();
+        function alteraSituacaoProcesso($codigo)
+        {
+            $dbConfig = new dataBaseLegado;
+            $dbConfig->abreBd();
+                    $update =   "update sw_situacao_processo set
+                                    nom_situacao = '$this->nome'
+                                    where cod_situacao = $codigo"; //altera os dados na tabela
+                    $result = $dbConfig->executaSql($update);
+                    if ($result) {
+                        return true;
+                        $dbConfig->fechaBd();
+                    } else {
+                        return false;
+                        $dbConfig->fechaBd();
+                    }
+        }
+        function excluiSituacaoProcesso($codigo)
+        {
+            $dbConfig = new dataBaseLegado;
+            $dbConfig->abreBd();
+            $delete =   "delete from sw_situacao_processo
+                            where cod_situacao = $codigo";
+            echo $delete."<br>";
+            $result = $dbConfig->executaSql($delete);
+            if ($result) {
+                $dbConfig->fechaBd();
+
+                return true;
+            } else {
+                $dbConfig->fechaBd();
+
+                return false;
             }
+        }
 
-            function alteraSituacaoProcesso($codigo)
-            {
-                $dbConfig = new dataBaseLegado;
-                $dbConfig->abreBd();
-                        $update =   "update sw_situacao_processo set
-                                        nom_situacao = '$this->nome'
-                                        where cod_situacao = $codigo"; //altera os dados na tabela
-                        $result = $dbConfig->executaSql($update);
-                        if ($result) {
-                            return true;
-                            $dbConfig->fechaBd();
-                        } else {
-                            return false;
-                            $dbConfig->fechaBd();
-                        }
-            }
-            function excluiSituacaoProcesso($codigo)
-            {
-                $dbConfig = new dataBaseLegado;
-                $dbConfig->abreBd();
-                $delete =   "delete from sw_situacao_processo
-                                where cod_situacao = $codigo";
-                echo $delete."<br>";
-                $result = $dbConfig->executaSql($delete);
-                if ($result) {
-                    $dbConfig->fechaBd();
-
-                    return true;
-                } else {
-                    $dbConfig->fechaBd();
-
-                    return false;
-                }
-            }
-
-        function setaVariaveisArquivamento($cod,$nom,$historicoArquivamento,$anoE)
+        function setaVariaveisArquivamento($cod,$nom,$historicoArquivamento,$anoE,$stLocalizacaoFisica)
         {
                 $this->codigo = $cod;
                 $this->nome = $nom;
                 $this->historicoArquivamento = $historicoArquivamento;
                 $this->anoE = $anoE;
+                $this->localizacaoFisica = $stLocalizacaoFisica;
             }
 
         function insereArquivamento()
@@ -171,7 +173,7 @@ Casos de uso: uc-01.06.98
 
             $inNumCgm = Sessao::read('numCgm');
 
-            $insert1 = "INSERT INTO sw_processo_arquivado (cod_processo,ano_exercicio,cod_historico,texto_complementar,cgm_arquivador) VALUES ('".$this->nome."','".$this->anoE."','".$this->historicoArquivamento."','".$texto_complementar."', $inNumCgm); ";
+            $insert1 = "INSERT INTO sw_processo_arquivado (cod_processo,ano_exercicio,cod_historico,texto_complementar,cgm_arquivador,localizacao) VALUES ('".$this->nome."','".$this->anoE."','".$this->historicoArquivamento."','".$texto_complementar."', $inNumCgm, '".$this->localizacaoFisica."'); ";
             $insert2 = "UPDATE sw_processo SET cod_situacao = $this->codigo WHERE cod_processo = $this->nome and ano_exercicio = '".$this->anoE."'";
             $insert = $insert1.$insert2;
 
@@ -180,7 +182,7 @@ Casos de uso: uc-01.06.98
             else
                 return false;
             $dbConfig->fechaBd();
-            }
+        }
 
         function apagaArquivamento()
         {
@@ -206,4 +208,5 @@ Casos de uso: uc-01.06.98
         }// fim da function
 
     }//fim da classe
+
 ?>

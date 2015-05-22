@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Diego Lemos de Souza</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">mm</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">mm</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -43,37 +43,7 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="189">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -150,18 +120,18 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">boolean</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">check-box</property>
-            <property name="distinct">true</property>
             <structure name="format"/>
         </scalar-parameter>
         <scalar-parameter name="boSomarMatriculas" id="2079">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">boolean</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">check-box</property>
-            <property name="distinct">true</property>
             <structure name="format"/>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="2068">
@@ -177,9 +147,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -188,9 +158,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">date</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -199,27 +169,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-   	extensionProperties.odaDriverClass = params["db_driver"].value;
- 	extensionProperties.odaURL = params["db_conn_url"].value;
-	extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/rh_mata_1_97_0</property>
-            <property name="odaUser">alex</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">c2lhbXdlYg==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -873,11 +832,15 @@ if(params["boAgrupar"].value == true){
                                                                     <list-property name="paramBindings">
                                                                         <structure>
                                                                             <property name="paramName">param1</property>
-                                                                            <expression name="expression">params["entidade"]</expression>
+                                                                            <simple-property-list name="expression">
+                                                                                <value>params["entidade"]</value>
+                                                                            </simple-property-list>
                                                                         </structure>
                                                                         <structure>
                                                                             <property name="paramName">param2</property>
-                                                                            <expression name="expression">params["exercicio"]</expression>
+                                                                            <simple-property-list name="expression">
+                                                                                <value>params["exercicio"]</value>
+                                                                            </simple-property-list>
                                                                         </structure>
                                                                     </list-property>
                                                                     <list-property name="boundDataColumns">
@@ -981,11 +944,15 @@ if(params["boAgrupar"].value == true){
                                                                     <list-property name="paramBindings">
                                                                         <structure>
                                                                             <property name="paramName">param1</property>
-                                                                            <expression name="expression">params["entidade"]</expression>
+                                                                            <simple-property-list name="expression">
+                                                                                <value>params["entidade"]</value>
+                                                                            </simple-property-list>
                                                                         </structure>
                                                                         <structure>
                                                                             <property name="paramName">param2</property>
-                                                                            <expression name="expression">params["exercicio"]</expression>
+                                                                            <simple-property-list name="expression">
+                                                                                <value>params["exercicio"]</value>
+                                                                            </simple-property-list>
                                                                         </structure>
                                                                     </list-property>
                                                                     <list-property name="boundDataColumns">
@@ -1971,7 +1938,9 @@ if(params["boAgrupar"].value == true){
                                                         <list-property name="paramBindings">
                                                             <structure>
                                                                 <property name="paramName">param_1</property>
-                                                                <expression name="expression">row["numcgm"]</expression>
+                                                                <simple-property-list name="expression">
+                                                                    <value>row["numcgm"]</value>
+                                                                </simple-property-list>
                                                             </structure>
                                                         </list-property>
                                                         <list-property name="boundDataColumns">
@@ -2392,7 +2361,7 @@ if(params["boAgrupar"].value == true){
                 EDUqSAMFkEjDvNwABhQwA7GvBUAQsEGGaPQSFVoYgxaItAH+AIAZgmjhGJ6BlzQkoIgM4xk2WkGGGcSg
                 Ea6FbXQBcAg4kKEIRYgDGajAJiWioYe1bN4Y8sWDBOiAR8W4ABzYIV32noQdnbCCGsTghh4UjKAWaykd
                 3OGO6IUjDQVrb4BPwowqoCAIeBkJCjZxWBd1whmd0IuAJczECVfYwhfGcIY1vGEOd9ilAQEAOw==
-            </property>
+</property>
         </structure>
     </list-property>
 </report>

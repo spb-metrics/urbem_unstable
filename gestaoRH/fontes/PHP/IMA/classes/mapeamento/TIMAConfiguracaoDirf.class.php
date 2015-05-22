@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: TIMAConfiguracaoDirf.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TIMAConfiguracaoDirf.class.php 62511 2015-05-15 17:45:15Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -169,7 +169,7 @@ function montaRecuperaExportarDirfPrestadorServicoPagamento()
 {
     $stSql .= "    SELECT uso_declarante                 \n";
     $stSql .= "         , sequencia                      \n";
-    $stSql .= "         , nome_beneficiario              \n";
+    $stSql .= "         , remove_acentos(nome_beneficiario) as nome_beneficiario              \n";
     $stSql .= "         , beneficiario                   \n";
     $stSql .= "         , ident_especializacao           \n";
     $stSql .= "         , codigo_retencao                \n";
@@ -281,6 +281,62 @@ function montaRecuperaExportarDirfPagamento()
     $stSql .= "            ,ident_especie_beneficiario;                                 \n";
 
     return $stSql;
+}
+
+function recuperaDadosIRRF(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    if (trim($stOrdem)) {
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    }
+    $stSql = $this->montaRecuperaDadosIRRF().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaDadosIRRF()
+{
+    $stSql = "  SELECT 
+                            plano_analitica.cod_plano as cod_receita_irrf
+                            ,plano_conta.cod_estrutural
+                            ,plano_conta.nom_conta as descricao                                          
+                    FROM ima.configuracao_dirf_irrf_plano_conta                                
+                    
+                    INNER JOIN contabilidade.plano_conta                                 
+                         ON configuracao_dirf_irrf_plano_conta.cod_conta = plano_conta.cod_conta  
+                        AND configuracao_dirf_irrf_plano_conta.exercicio = plano_conta.exercicio  
+                    
+                    INNER JOIN contabilidade.plano_analitica
+                         ON plano_analitica.exercicio = plano_conta.exercicio
+                        AND plano_analitica.cod_conta = plano_conta.cod_conta
+                    
+                    WHERE configuracao_dirf_irrf_plano_conta.exercicio = '".$this->getDado('exercicio')."'
+
+                    UNION
+                    
+                    SELECT 
+                            receita.cod_receita as cod_receita_irrf
+                            ,conta_receita.cod_estrutural
+                            ,conta_receita.descricao
+                    FROM orcamento.receita 
+                    
+                    INNER JOIN orcamento.conta_receita
+                         ON conta_receita.cod_conta  = receita.cod_conta
+                        AND conta_receita.exercicio = receita.exercicio
+                    
+                    INNER JOIN ima.configuracao_dirf_irrf_conta_receita
+                         ON ima.configuracao_dirf_irrf_conta_receita.cod_conta      = conta_receita.cod_conta
+                        AND ima.configuracao_dirf_irrf_conta_receita.exercicio     = conta_receita.exercicio
+
+                    WHERE conta_receita.exercicio = '".$this->getDado('exercicio')."'
+                ";
+
+        return $stSql;
+
 }
 
 }

@@ -32,7 +32,7 @@
         * @package URBEM
         * @subpackage Mapeamento
 
-        $Id: TTGOPCT.class.php 59612 2014-09-02 12:00:51Z gelson $
+        $Id: TTGOPCT.class.php 62528 2015-05-18 17:53:04Z franver $
 
         * Casos de uso: uc-06.04.00
 */
@@ -128,6 +128,7 @@ class TTGOPCT extends Persistente
                                                                                             , vl_saldo_creditos	           NUMERIC
                                                                                             , vl_saldo_atual               NUMERIC
                                                                                             , cod_estrutural               VARCHAR
+                                                                                            , obrigatorio_tcmgo            BOOLEAN
                                                                                         ) ";
 
         return $stSql;

@@ -23,46 +23,40 @@
 */
 ?>
 <?php
+/**
+    * Data de Criação: 10/09/2007
 
-    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGMedidas.class.php' );
+    * @author Analista: Gelson W. Gonçalves
+    * @author Desenvolvedor: Henrique Boaventura
 
-    $arFiltros = Sessao::read('filtroRelatorio');
+    $Id: TFrotaVeiculoDocumento.class.php 59612 2014-09-02 12:00:51Z gelson $
 
-    $obTTCEMGMedidas = new TTCEMGMedidas();
-    
-    $stFiltro = ' WHERE medidas.cod_mes ='.$arFiltros['inPeriodo'];
-    
-    $obTTCEMGMedidas->recuperaDados($rsArquivo, $stFiltro);
-    
-    while (  !$rsArquivo->eof() ) {
-        if($rsArquivo->getCampo('riscos_fiscais')=='t')
-            $rsArquivo->setCampo('riscos_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('riscos_fiscais', 'N');
+    * Casos de uso: uc-03.02.06
+*/
 
-        if($rsArquivo->getCampo('metas_fiscais')=='t')
-            $rsArquivo->setCampo('metas_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('metas_fiscais', 'N');
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once ( CLA_PERSISTENTE );
 
-        if($rsArquivo->getCampo('contratacao_aro')=='t')
-            $rsArquivo->setCampo('contratacao_aro', 'S'); 
-        else
-            $rsArquivo->setCampo('contratacao_aro', 'N');
-        
-        if($arFiltros['inPeriodo']!=12)
-            $rsArquivo->setCampo('contratacao_aro', '');
+class TFrotaVeiculoCessao extends Persistente
+{
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function TFrotaVeiculoCessao()
+    {
+        parent::Persistente();
+        $this->setTabela('frota.veiculo_cessao');
+        $this->setCampoCod('id');
+        $this->setComplementoChave('');
 
-        $rsArquivo->Proximo();
+        $this->AddCampo('id'            ,'integer'  ,true  ,''  ,true,false);
+        $this->AddCampo('cod_veiculo'   ,'integer'  ,true  ,''  ,false,true);
+        $this->AddCampo('cod_processo'  ,'integer'  ,true  ,''  ,false,true);
+        $this->AddCampo('exercicio'     ,'varchar'  ,true  ,'4' ,false,true);
+        $this->AddCampo('cgm_cedente'   ,'integer'  ,true  ,''  ,false,true);
+        $this->AddCampo('dt_inicio'     ,'date'     ,false ,''  ,false,false);
+        $this->AddCampo('dt_termino'    ,'date'     ,false ,''  ,false,false);
     }
-    $rsArquivo->setPrimeiroElemento();
 
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARATECER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(400);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+}

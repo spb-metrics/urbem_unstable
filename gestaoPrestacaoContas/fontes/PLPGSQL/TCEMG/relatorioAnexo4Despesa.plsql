@@ -689,27 +689,18 @@ BEGIN
                                 (
                                     SELECT
                                             ''01'' AS cod_estrutural,
-                                            COALESCE((SELECT SUM(empenhado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01%''),0.00) AS empenhado,
-                                            COALESCE((SELECT SUM(liquidado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01%''),0.00) AS liquidado,
-                                            COALESCE((SELECT SUM(pago_per)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01%''),0.00) AS pago,
+                                            COALESCE((SELECT SUM(empenhado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01.01%''),0.00) AS empenhado,
+                                            COALESCE((SELECT SUM(liquidado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01.01%''),0.00) AS liquidado,
+                                            COALESCE((SELECT SUM(pago_per)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01.01%''),0.00) AS pago,
                                             COALESCE((SELECT SUM(empenhado_ate_periodo)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.01%''),0.00) AS empenhado_ate_periodo
                                     UNION
                                     
                                     SELECT
                                             ''01'' AS cod_estrutural,
-                                            COALESCE((SELECT SUM(empenhado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.02%''),0.00) AS empenhado,
-                                            COALESCE((SELECT SUM(liquidado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.02%''),0.00) AS liquidado,
-                                            COALESCE((SELECT SUM(pago_per)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.02%''),0.00) AS pago,
+                                            COALESCE((SELECT SUM(empenhado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.03.01%''),0.00) AS empenhado,
+                                            COALESCE((SELECT SUM(liquidado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.03.01%''),0.00) AS liquidado,
+                                            COALESCE((SELECT SUM(pago_per)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.03.01%''),0.00) AS pago,
                                             COALESCE((SELECT SUM(empenhado_ate_periodo)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.02%''),0.00) AS empenhado_ate_periodo
-                                            
-                                    UNION
-                                    
-                                    SELECT
-                                            ''01'' AS cod_estrutural,
-                                            COALESCE((SELECT SUM(empenhado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.03%''),0.00) AS empenhado,
-                                            COALESCE((SELECT SUM(liquidado_per) FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.03%''),0.00) AS liquidado,
-                                            COALESCE((SELECT SUM(pago_per)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.03%''),0.00) AS pago,
-                                            COALESCE((SELECT SUM(empenhado_ate_periodo)      FROM tmp_balancete_despesa WHERE tmp_balancete_despesa.classificacao like ''3.1.9.0.05.03%''),0.00) AS empenhado_ate_periodo
                                 ) AS retorno
                                 
                             GROUP BY cod_estrutural, descricao, nivel, tipo

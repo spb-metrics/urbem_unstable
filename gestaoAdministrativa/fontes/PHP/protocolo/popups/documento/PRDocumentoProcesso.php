@@ -41,6 +41,15 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once CAM_GA_PROT_MAPEAMENTO."TPROCopiaDigital.class.php";
 
+$stPrograma = "DocumentoProcesso";
+$pgFilt = "FL".$stPrograma.".php";
+$pgList = "LS".$stPrograma.".php";
+$pgForm = "FM".$stPrograma.".php";
+$pgProc = "PR".$stPrograma.".php?".Sessao::getId();
+$pgOcul = "OC".$stPrograma.".php";
+$pgJs   = "JS".$stPrograma.".js";
+include_once($pgJs);
+
 $inCodProcesso  = $request->get('inCodProcesso'); 
 $stAnoProcesso  = $request->get('stAnoProcesso');
 $inCodDocumento = $request->get('inCodDocumento'); 
@@ -103,8 +112,11 @@ if ($_FILES['stArquivo']['type'] != 'image/jpeg' and $_POST['boImagem'] == 't') 
                 $obTPROCopiaDigital->setDado('anexo'         , $stNomeArquivo);
                 $obTPROCopiaDigital->inclusao();
             }
-            
+
             SistemaLegado::exibeAvisoTelaPrincipal("Arquivo enviado com sucesso!","","");
+            
+            $stJs = "<script>montaParametrosGET('montaListaAnexos');</script>";
+            echo ($stJs);            
         } else {
             SistemaLegado::exibeAviso("Erro no upload de arquivo!","","erro");
         }

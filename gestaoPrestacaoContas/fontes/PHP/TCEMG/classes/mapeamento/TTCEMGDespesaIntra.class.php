@@ -64,10 +64,11 @@ function montaRecuperaDadosArquivo()
 		  FROM tcemg.despesa_intra( '".Sessao::getExercicio()."','".$this->getDado('cod_entidade')."'
 					   ,'".$this->getDado('dataInicial')."'
 					   ,'".$this->getDado('dataFinal')."'
-					   ,'".$this->getDado('mes')."') as retorno( mes                     integer,
-                                                                                     demais_despesas_intra   numeric,          
-                                                                                     tipo_conta              text    
-                                                                                    ) ";
+					   ,'".$this->getDado('mes')."') as retorno( mes integer,
+                                                                 demais_despesas_intra numeric,          
+                                                                 tipo_conta  text ) ";
+																					
+	
     return $stSql;
 }
 

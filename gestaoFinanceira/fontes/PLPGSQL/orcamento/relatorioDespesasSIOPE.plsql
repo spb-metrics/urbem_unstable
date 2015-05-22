@@ -33,15 +33,19 @@
 
 */
 
-CREATE OR REPLACE FUNCTION orcamento.fn_educacao_despesas( VARCHAR,VARCHAR,VARCHAR,VARCHAR,VARCHAR,VARCHAR ) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION orcamento.fn_educacao_despesas( VARCHAR,VARCHAR,VARCHAR,VARCHAR,VARCHAR ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio    	ALIAS FOR $1;
     stDataInicial  	ALIAS FOR $2;
     stDataFinal  	ALIAS FOR $3;
     stCodEntidades 	ALIAS FOR $4;
     stCodOrgao   	ALIAS FOR $5;
-    stCodRecurso    ALIAS FOR $6;
     
+    stCodRecursoMDE             VARCHAR[];
+    stCodRecursoFUNDEB          VARCHAR[];
+    stCodRecursoSalarioEducacao VARCHAR[];
+    
+    stCodRecurso         VARCHAR := '';
     stExercicioPosterior VARCHAR := '';
     stSql 			     VARCHAR := '';
     stFiltro		     VARCHAR := '';
@@ -56,7 +60,7 @@ BEGIN
     -----------------------------------------
     CREATE TEMPORARY TABLE tmp_retorno(
         cod_subfuncao         INTEGER,
-        fundeb                BOOLEAN,
+        grupo                 VARCHAR,
         nivel                 INTEGER,
         nom_subfuncao         VARCHAR,
         cod_estrutural        VARCHAR,
@@ -68,27 +72,27 @@ BEGIN
         vl_despesa_orcada     NUMERIC(14,2)
     );
 
+    EXECUTE 'SELECT (array(SELECT cod_recurso FROM stn.vinculo_recurso WHERE exercicio = '''||stExercicio||''' AND cod_entidade IN ('||stCodEntidades||') AND num_orgao = '||stCodOrgao||' AND cod_vinculo = 2))' INTO stCodRecursoMDE;
+    EXECUTE 'SELECT (array(SELECT cod_recurso FROM stn.vinculo_recurso WHERE exercicio = '''||stExercicio||''' AND cod_entidade IN ('||stCodEntidades||') AND num_orgao = '||stCodOrgao||' AND cod_vinculo = 1))' INTO stCodRecursoFUNDEB;
+    EXECUTE 'SELECT (array(SELECT cod_recurso FROM stn.vinculo_recurso WHERE exercicio = '''||stExercicio||''' AND cod_entidade IN ('||stCodEntidades||') AND num_orgao = '||stCodOrgao||' AND cod_vinculo = 3))' INTO stCodRecursoSalarioEducacao;
+    
     ------------------------------------------------------
     -- recupera os valores das contas mae  do exercicio --
     ------------------------------------------------------
     stSql := '
         INSERT INTO tmp_retorno 
             SELECT d.cod_subfuncao
-                 , CASE WHEN EXISTS (SELECT d.cod_recurso, 1 
-                                      FROM stn.vinculo_recurso
-                                     WHERE vinculo_recurso.cod_recurso  = d.cod_recurso
-                                       AND vinculo_recurso.exercicio    = d.exercicio
-                                       AND vinculo_recurso.num_orgao    = d.num_orgao
-                                       AND vinculo_recurso.num_unidade  = d.num_unidade
-                                       AND vinculo_recurso.cod_entidade = d.cod_entidade
-                                       AND vinculo_recurso.cod_vinculo  = 1
-                                  GROUP BY d.cod_recurso
-                                    )
-                        THEN true
-                        ELSE false
-                   END AS fundeb
+                 , CASE WHEN d.cod_subfuncao NOT IN (362, 363, 364) THEN
+                       CASE WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                            WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                            WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                            ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                   ELSE
+                        ''4|Outros Recursos Vinculados a Educação''
+                   END AS grupo
+                   
                  , 0 AS nivel
-                 , sf.descricao            AS nom_subfuncao
+                 , sf.descricao AS nom_subfuncao
                  , conta_despesa.cod_estrutural 
                  , conta_despesa.descricao AS nom_estrutural
                  , (sum(coalesce(d.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))) AS vl_suplementacoes
@@ -97,7 +101,7 @@ BEGIN
                  , CAST(0.00 AS NUMERIC) AS vl_pago
                  , CAST(0.00 AS NUMERIC) AS vl_despesa_orcada
               FROM
-                   orcamento.despesa          as d
+                   orcamento.despesa  as d
                    LEFT JOIN ( SELECT ss.exercicio
                                     , ss.cod_despesa
                                     , sum(ss.valor)           as vl_suplementado
@@ -141,7 +145,7 @@ BEGIN
                AND d.num_orgao = ' || stCodOrgao || ' ';
 
         IF stCodRecurso <> '' THEN
-            stSql := stSql || ' AND d.cod_recurso = ' || stCodRecurso;
+            stSql := stSql || ' AND d.cod_recurso IN (' || stCodRecurso || ') ';
         END IF;
 
         stSql := stSql || '
@@ -166,7 +170,7 @@ BEGIN
     stSql := '
         INSERT INTO tmp_retorno
                 SELECT cod_subfuncao
-                     , fundeb
+                     , grupo
                      , 1
                      , ''''
                      , cod_estrutural
@@ -178,19 +182,16 @@ BEGIN
                      , CAST(0 AS NUMERIC)
                 FROM (
                             SELECT ode.cod_subfuncao
-                                 , CASE WHEN EXISTS (SELECT ode.cod_recurso, 1
-                                                      FROM stn.vinculo_recurso
-                                                     WHERE vinculo_recurso.cod_recurso  = ode.cod_recurso
-                                                       AND vinculo_recurso.exercicio    = ode.exercicio
-                                                       AND vinculo_recurso.num_orgao    = ode.num_orgao
-                                                       AND vinculo_recurso.num_unidade  = ode.num_unidade
-                                                       AND vinculo_recurso.cod_entidade = ode.cod_entidade
-                                                       AND vinculo_recurso.cod_vinculo  = 1
-                                                  GROUP BY ode.cod_recurso
-                                                    )
-                                        THEN true
-                                        ELSE false
-                                   END AS fundeb
+                                  
+                                , CASE WHEN ode.cod_subfuncao NOT IN (362, 363, 364) THEN
+                                      CASE WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                                           WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                                           WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                                           ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                                  ELSE
+                                       ''4|Outros Recursos Vinculados a Educação''
+                                  END AS grupo
+                                  
                                  , 1
                                  , ''''
                                  , ocd.cod_estrutural
@@ -222,7 +223,7 @@ BEGIN
                               AND ode.num_orgao = ' || stCodOrgao || ' ';
 
                             IF stCodRecurso <> '' THEN
-                                stSql := stSql || ' AND ode.cod_recurso = ' || stCodRecurso;
+                                stSql := stSql || ' AND ode.cod_recurso IN (' || stCodRecurso || ')';
                             END IF;
                     
                             stSql := stSql || '
@@ -239,19 +240,16 @@ BEGIN
                 
                 UNION
                         SELECT ode.cod_subfuncao
-                                 , CASE WHEN EXISTS (SELECT ode.cod_recurso, 1
-                                                      FROM stn.vinculo_recurso
-                                                     WHERE vinculo_recurso.cod_recurso  = ode.cod_recurso
-                                                       AND vinculo_recurso.exercicio    = ode.exercicio
-                                                       AND vinculo_recurso.num_orgao    = ode.num_orgao
-                                                       AND vinculo_recurso.num_unidade  = ode.num_unidade
-                                                       AND vinculo_recurso.cod_entidade = ode.cod_entidade
-                                                       AND vinculo_recurso.cod_vinculo  = 1
-                                                  GROUP BY ode.cod_recurso
-                                                    )
-                                        THEN true
-                                        ELSE false
-                                   END AS fundeb
+                                  
+                                , CASE WHEN ode.cod_subfuncao NOT IN (362, 363, 364) THEN
+                                      CASE WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                                           WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                                           WHEN ode.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                                           ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                                  ELSE
+                                       ''4|Outros Recursos Vinculados a Educação''
+                                  END AS grupo
+                                  
                                  , 1
                                  , ''''
                                  , ocd.cod_estrutural
@@ -293,7 +291,7 @@ BEGIN
                               AND ode.num_orgao = ' || stCodOrgao || ' ';
 
                             IF stCodRecurso <> '' THEN
-                                stSql := stSql || ' AND ode.cod_recurso = ' || stCodRecurso;
+                                stSql := stSql || ' AND ode.cod_recurso IN (' || stCodRecurso || ')';
                             END IF;
                     
                             stSql := stSql || '
@@ -309,7 +307,7 @@ BEGIN
                                 , ode.cod_entidade
                 ) as tabela
                 GROUP BY cod_subfuncao
-                       , fundeb
+                       , grupo
                        , cod_estrutural
                        , nom_estrutural
 
@@ -323,19 +321,16 @@ BEGIN
     stSql := '
     INSERT INTO tmp_retorno 
             SELECT despesa.cod_subfuncao
-                 , CASE WHEN EXISTS (SELECT despesa.cod_recurso, 1
-                                      FROM stn.vinculo_recurso
-                                     WHERE vinculo_recurso.cod_recurso  = despesa.cod_recurso
-                                       AND vinculo_recurso.exercicio    = despesa.exercicio
-                                       AND vinculo_recurso.num_orgao    = despesa.num_orgao
-                                       AND vinculo_recurso.num_unidade  = despesa.num_unidade
-                                       AND vinculo_recurso.cod_entidade = despesa.cod_entidade
-                                       AND vinculo_recurso.cod_vinculo  = 1
-                                  GROUP BY despesa.cod_recurso
-                                    )
-                        THEN true
-                        ELSE false
-                   END AS fundeb
+                   
+                , CASE WHEN despesa.cod_subfuncao NOT IN (362, 363, 364) THEN
+                      CASE WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                           WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                           WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                           ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                  ELSE
+                       ''4|Outros Recursos Vinculados a Educação''
+                  END AS grupo
+                   
                  , 1
                  , ''''
                  , conta_despesa.cod_estrutural
@@ -396,7 +391,7 @@ BEGIN
                AND despesa.num_orgao = ' || stCodOrgao || ' ';
 
              IF stCodRecurso <> '' THEN
-                 stSql := stSql || ' AND despesa.cod_recurso = ' || stCodRecurso;
+                 stSql := stSql || ' AND despesa.cod_recurso IN (' || stCodRecurso || ') ';
              END IF;
              
              stSql := stSql || '
@@ -419,19 +414,16 @@ BEGIN
     stSql := '
         INSERT INTO tmp_retorno
             SELECT despesa.cod_subfuncao
-                 , CASE WHEN EXISTS (SELECT despesa.cod_recurso, 1
-                                      FROM stn.vinculo_recurso
-                                     WHERE vinculo_recurso.cod_recurso  = despesa.cod_recurso
-                                       AND vinculo_recurso.exercicio    = despesa.exercicio
-                                       AND vinculo_recurso.num_orgao    = despesa.num_orgao
-                                       AND vinculo_recurso.num_unidade  = despesa.num_unidade
-                                       AND vinculo_recurso.cod_entidade = despesa.cod_entidade
-                                       AND vinculo_recurso.cod_vinculo  = 1
-                                  GROUP BY despesa.cod_recurso
-                                    )
-                        THEN true
-                        ELSE false
-                   END AS fundeb
+            
+                , CASE WHEN despesa.cod_subfuncao NOT IN (362, 363, 364) THEN
+                      CASE WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                           WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                           WHEN despesa.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                           ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                  ELSE
+                       ''4|Outros Recursos Vinculados a Educação''
+                  END AS grupo
+                  
                  , 1
                  , ''''
                  , conta_despesa.cod_estrutural
@@ -486,7 +478,7 @@ BEGIN
                AND despesa.num_orgao = ' || stCodOrgao || ' ';
 
              IF stCodRecurso <> '' THEN
-                 stSql := stSql || ' AND despesa.cod_recurso = ' || stCodRecurso;
+                 stSql := stSql || ' AND despesa.cod_recurso IN (' || stCodRecurso || ') ';
              END IF;
              
              stSql := stSql || '
@@ -509,19 +501,16 @@ BEGIN
     stSql := '
         INSERT INTO tmp_retorno 
             SELECT d.cod_subfuncao
-                 , CASE WHEN EXISTS (SELECT d.cod_recurso, count(1)
-                                      FROM stn.vinculo_recurso
-                                     WHERE vinculo_recurso.cod_recurso  = d.cod_recurso
-                                       AND vinculo_recurso.exercicio    = d.exercicio
-                                       AND vinculo_recurso.num_orgao    = d.num_orgao
-                                       AND vinculo_recurso.num_unidade  = d.num_unidade
-                                       AND vinculo_recurso.cod_entidade = d.cod_entidade
-                                       AND vinculo_recurso.cod_vinculo  = 1
-                                  GROUP BY d.cod_recurso
-                                    ) 
-                        THEN true
-                        ELSE false
-                   END AS fundeb
+            
+                , CASE WHEN d.cod_subfuncao NOT IN (362, 363, 364) THEN
+                      CASE WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoMDE, ',')||')             THEN ''1|Despesas Próprias Custeadas com Impostos e Transferencias - Exceto Fundeb''
+                           WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoFUNDEB, ',')||')          THEN ''2|FUNDEB''
+                           WHEN d.cod_recurso IN ('||array_to_string(stCodRecursoSalarioEducacao, ',')||') THEN ''3|Salário Educação''
+                           ELSE ''4|Outros Recursos Vinculados a Educação'' END
+                  ELSE
+                       ''4|Outros Recursos Vinculados a Educação''
+                  END AS grupo
+                   
                  , 0 AS nivel
                  , sf.descricao            AS nom_subfuncao
                  , conta_despesa.cod_estrutural 
@@ -532,7 +521,7 @@ BEGIN
                  , CAST(0.00 AS NUMERIC) AS vl_pago
                  , (sum(coalesce(d.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))) AS vl_despesa_orcada
               FROM
-                   orcamento.despesa          as d
+                   orcamento.despesa as d
                    LEFT JOIN ( SELECT ss.exercicio
                                     , ss.cod_despesa
                                     , sum(ss.valor)           as vl_suplementado
@@ -576,11 +565,10 @@ BEGIN
                AND d.num_orgao = ' || stCodOrgao || ' ';
 
              IF stCodRecurso <> '' THEN
-                 stSql := stSql || ' AND d.cod_recurso = ' || stCodRecurso;
+                 stSql := stSql || ' AND d.cod_recurso IN (' || stCodRecurso || ') ';
              END IF;
              
              stSql := stSql || '
-
 
                AND d.cod_funcao = 12
           GROUP BY d.cod_funcao
@@ -602,7 +590,7 @@ BEGIN
     -----------------
     stSql := '
             SELECT cod_subfuncao
-                 , fundeb               
+                 , grupo               
                  , nivel               
                  , nom_subfuncao      
                  , cod_estrutural    
@@ -614,7 +602,7 @@ BEGIN
                  , SUM(vl_despesa_orcada)
               FROM tmp_retorno
           GROUP BY cod_subfuncao
-                 , fundeb  
+                 , grupo  
                  , nivel        
                  , nom_subfuncao        
                  , cod_estrutural        

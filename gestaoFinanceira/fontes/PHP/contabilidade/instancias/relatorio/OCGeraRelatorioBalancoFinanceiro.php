@@ -28,6 +28,8 @@
     * Data de Criação   : 19/07/2013
     * @author Analista: Valtair
     * @author Desenvolvedor: Evandro Melos
+    *
+    $Id: OCGeraRelatorioBalancoFinanceiro.php 62444 2015-05-11 18:09:41Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -45,9 +47,9 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js";
 
 //Define Birt
-$preview = new PreviewBirt(2, 9,15);
+$preview = new PreviewBirt(2,9,15);
 $preview->setTitulo('Relatorio Balanco Financeiro');
-$preview->setVersaoBirt('2.5.0');
+$preview->setVersaoBirt('4.4.0');
 $preview->setExportaExcel(true);
 
 $obTOrcamentoEntidade = new TOrcamentoEntidade;

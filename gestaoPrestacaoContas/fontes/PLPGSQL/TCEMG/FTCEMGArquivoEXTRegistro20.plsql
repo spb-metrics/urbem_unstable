@@ -25,11 +25,11 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-* $Id: FTCEMGArquivoEXTRegistro20.plsql 62174 2015-04-02 18:59:14Z evandro $
-* $Revision: 62174 $
+* $Id: FTCEMGArquivoEXTRegistro20.plsql 62516 2015-05-15 19:50:54Z arthur $
+* $Revision: 62516 $
 * $Name$
-* $Author: evandro $
-* $Date: 2015-04-02 15:59:14 -0300 (Qui, 02 Abr 2015) $
+* $Author: arthur $
+* $Date: 2015-05-15 16:50:54 -0300 (Sex, 15 Mai 2015) $
 *
 */
 
@@ -249,6 +249,8 @@ BEGIN
                      , SUM(0.00) as vl_saldo_debitos
                      , SUM(0.00) as vl_saldo_creditos
                      , SUM(0.00) as vl_saldo_atual
+                     , nat_saldo_anterior_fonte
+                     , nat_saldo_atual_fonte
                   FROM ( SELECT pc.cod_estrutural
                               , 20 AS tipo_registro
                               , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
@@ -300,6 +302,16 @@ BEGIN
                               , 0.00 as vl_saldo_debitos
                               , 0.00 as vl_saldo_creditos
                               , 0.00 as vl_saldo_atual
+                              , (SELECT plano_analitica.natureza_saldo 
+                                   FROM contabilidade.plano_analitica
+                                  WHERE plano_analitica.exercicio = (' || quote_literal( stExercicio ) ||'::INTEGER - 1)::VARCHAR
+                                    AND plano_analitica.cod_plano = pa.cod_plano
+                              ) AS nat_saldo_anterior_fonte
+                              , (SELECT plano_analitica.natureza_saldo 
+                                   FROM contabilidade.plano_analitica
+                                  WHERE plano_analitica.exercicio = '|| quote_literal( stExercicio ) ||'
+                                    AND plano_analitica.cod_plano = pa.cod_plano
+                              ) AS nat_saldo_atual_fonte
                 
                            FROM contabilidade.plano_analitica as pa
                 
@@ -334,9 +346,8 @@ BEGIN
                                     AND conta_credito.tipo = valor_lancamento.tipo
                                     AND conta_credito.cod_lote = valor_lancamento.cod_lote
                                     AND conta_credito.sequencia = valor_lancamento.sequencia
-                                    
-                
-                                    WHERE lote.exercicio = '''||stExercicio||'''
+                                  
+                                  WHERE lote.exercicio = '''||stExercicio||'''
                                     AND lote.'||stFiltro||'
                                     AND valor_lancamento.'||stFiltro||'
                                     AND lote.dt_lote BETWEEN TO_DATE('''||stDtInicial||''', ''dd/mm/yyyy'') and TO_DATE('''||stDtFinal||''', ''dd/mm/yyyy'')
@@ -357,10 +368,11 @@ BEGIN
                             AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
                 
                           WHERE t_be.exercicio   = '''||stExercicio||'''
-                            
-                            
-                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento
+                          
+                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento, nat_saldo_anterior_fonte, nat_saldo_atual_fonte
+                       
                        UNION
+                       
                          SELECT pc.cod_estrutural
                               , 20 AS tipo_registro
                               , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
@@ -412,6 +424,16 @@ BEGIN
                               , 0.00 as vl_saldo_debitos
                               , 0.00 as vl_saldo_creditos
                               , 0.00 as vl_saldo_atual
+                              , (SELECT plano_analitica.natureza_saldo 
+                                   FROM contabilidade.plano_analitica
+                                  WHERE plano_analitica.exercicio = (' || quote_literal( stExercicio ) ||'::INTEGER - 1)::VARCHAR
+                                    AND plano_analitica.cod_plano = pa.cod_plano
+                              ) AS nat_saldo_anterior_fonte
+                              , (SELECT plano_analitica.natureza_saldo 
+                                   FROM contabilidade.plano_analitica
+                                  WHERE plano_analitica.exercicio = '|| quote_literal( stExercicio ) ||'
+                                    AND plano_analitica.cod_plano = pa.cod_plano
+                              ) AS nat_saldo_atual_fonte
                 
                            FROM contabilidade.plano_analitica as pa
                 
@@ -446,7 +468,6 @@ BEGIN
                                     AND conta_debito.tipo = valor_lancamento.tipo
                                     AND conta_debito.cod_lote = valor_lancamento.cod_lote
                                     AND conta_debito.sequencia = valor_lancamento.sequencia
-                                    
                 
                                   WHERE lote.exercicio = '''||stExercicio||'''
                                     AND lote.'||stFiltro||'
@@ -469,14 +490,14 @@ BEGIN
                             AND configuracao_entidade.parametro = ''tcemg_codigo_orgao_entidade_sicom''
                 
                           WHERE t_be.exercicio   = '''||stExercicio||'''
-                            
-                            
-                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento
+
+                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento, nat_saldo_anterior_fonte, nat_saldo_atual_fonte
+                       
                 ) AS registros
-                GROUP BY tipo_registro, cod_orgao, cod_ext , cod_recurso, cod_estrutural, cod_unidade, tipo_lancamento, sub_tipo
-                ORDER BY cod_ext
+          
+          GROUP BY tipo_registro, cod_orgao, cod_ext , cod_recurso, cod_estrutural, cod_unidade, tipo_lancamento, sub_tipo, nat_saldo_anterior_fonte, nat_saldo_atual_fonte
+          ORDER BY cod_ext
             ';
-   
     END IF;
     FOR reRegistro IN EXECUTE stSql
     LOOP

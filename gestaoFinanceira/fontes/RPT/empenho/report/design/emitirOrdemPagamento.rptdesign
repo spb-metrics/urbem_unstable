@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">fixed layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,9 +18,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +29,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -41,20 +41,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -63,31 +52,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -96,10 +63,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -109,13 +76,13 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">params["cod_ordem"]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -125,9 +92,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -136,9 +103,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -147,9 +114,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -158,10 +125,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -170,9 +137,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -181,9 +148,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -192,9 +159,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">></property>
                 <property name="pattern">></property>
@@ -204,9 +171,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -215,9 +182,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -226,9 +193,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -237,9 +204,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -248,9 +215,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -259,9 +226,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -270,9 +237,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -280,9 +247,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="mostrar_rodape" id="2558">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -291,9 +258,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -302,9 +269,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -313,9 +280,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -324,9 +291,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -335,9 +302,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -346,9 +313,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -357,14 +324,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -372,31 +331,31 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">exercicio</property>
-                    <property name="displayName">exercicio</property>
+                    <text-property name="displayName">exercicio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_entidade</property>
-                    <property name="displayName">cod_entidade</property>
+                    <text-property name="displayName">cod_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ordem</property>
-                    <property name="displayName">cod_ordem</property>
+                    <text-property name="displayName">cod_ordem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_assinatura</property>
-                    <property name="displayName">num_assinatura</property>
+                    <text-property name="displayName">num_assinatura</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numcgm</property>
-                    <property name="displayName">numcgm</property>
+                    <text-property name="displayName">numcgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cargo</property>
-                    <property name="displayName">cargo</property>
+                    <text-property name="displayName">cargo</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -613,31 +572,31 @@ INNER JOIN sw_cgm AS scgm USING (numcgm)
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">exercicio</property>
-                    <property name="displayName">exercicio</property>
+                    <text-property name="displayName">exercicio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_entidade</property>
-                    <property name="displayName">cod_entidade</property>
+                    <text-property name="displayName">cod_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ordem</property>
-                    <property name="displayName">cod_ordem</property>
+                    <text-property name="displayName">cod_ordem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_assinatura</property>
-                    <property name="displayName">num_assinatura</property>
+                    <text-property name="displayName">num_assinatura</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numcgm</property>
-                    <property name="displayName">numcgm</property>
+                    <text-property name="displayName">numcgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cargo</property>
-                    <property name="displayName">cargo</property>
+                    <text-property name="displayName">cargo</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -854,31 +813,31 @@ INNER JOIN sw_cgm AS scgm USING (numcgm)
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">exercicio</property>
-                    <property name="displayName">exercicio</property>
+                    <text-property name="displayName">exercicio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_entidade</property>
-                    <property name="displayName">cod_entidade</property>
+                    <text-property name="displayName">cod_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_ordem</property>
-                    <property name="displayName">cod_ordem</property>
+                    <text-property name="displayName">cod_ordem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_assinatura</property>
-                    <property name="displayName">num_assinatura</property>
+                    <text-property name="displayName">num_assinatura</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numcgm</property>
-                    <property name="displayName">numcgm</property>
+                    <text-property name="displayName">numcgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cargo</property>
-                    <property name="displayName">cargo</property>
+                    <text-property name="displayName">cargo</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -1095,39 +1054,39 @@ INNER JOIN sw_cgm AS scgm USING (numcgm)
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cpf_cnpj</property>
-                    <property name="displayName">cpf_cnpj</property>
+                    <text-property name="displayName">cpf_cnpj</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">logradouro</property>
-                    <property name="displayName">logradouro</property>
+                    <text-property name="displayName">logradouro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">bairro</property>
-                    <property name="displayName">bairro</property>
+                    <text-property name="displayName">bairro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cep</property>
-                    <property name="displayName">cep</property>
+                    <text-property name="displayName">cep</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_municipio</property>
-                    <property name="displayName">nom_municipio</property>
+                    <text-property name="displayName">nom_municipio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_uf</property>
-                    <property name="displayName">nom_uf</property>
+                    <text-property name="displayName">nom_uf</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numero</property>
-                    <property name="displayName">numero</property>
+                    <text-property name="displayName">numero</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">complemento</property>
-                    <property name="displayName">complemento</property>
+                    <text-property name="displayName">complemento</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -2691,39 +2650,39 @@ this.queryText += "\n  AND lancamento.cod_lancamento in ('"+params['cod_lancamen
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">num_entidade</property>
-                    <property name="displayName">num_entidade</property>
+                    <text-property name="displayName">num_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_entidade</property>
-                    <property name="displayName">nom_entidade</property>
+                    <text-property name="displayName">nom_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_entidade</property>
-                    <property name="displayName">cod_entidade</property>
+                    <text-property name="displayName">cod_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">e_mail</property>
-                    <property name="displayName">e_mail</property>
+                    <text-property name="displayName">e_mail</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">fone</property>
-                    <property name="displayName">fone</property>
+                    <text-property name="displayName">fone</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">logradouro</property>
-                    <property name="displayName">logradouro</property>
+                    <text-property name="displayName">logradouro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cep</property>
-                    <property name="displayName">cep</property>
+                    <text-property name="displayName">cep</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cnpj</property>
-                    <property name="displayName">cnpj</property>
+                    <text-property name="displayName">cnpj</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">logotipo</property>
-                    <property name="displayName">logotipo</property>
+                    <text-property name="displayName">logotipo</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -3222,19 +3181,19 @@ WHERE prefeitura.exercicio = ?]]></xml-property>
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">nom_acao</property>
-                    <property name="displayName">nom_acao</property>
+                    <text-property name="displayName">nom_acao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_funcionalidade</property>
-                    <property name="displayName">nom_funcionalidade</property>
+                    <text-property name="displayName">nom_funcionalidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_modulo</property>
-                    <property name="displayName">nom_modulo</property>
+                    <text-property name="displayName">nom_modulo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">versao</property>
-                    <property name="displayName">versao</property>
+                    <text-property name="displayName">versao</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -3431,19 +3390,19 @@ WHERE cod_acao = ?
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">nom_acao</property>
-                    <property name="displayName">nom_acao</property>
+                    <text-property name="displayName">nom_acao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_funcionalidade</property>
-                    <property name="displayName">nom_funcionalidade</property>
+                    <text-property name="displayName">nom_funcionalidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_modulo</property>
-                    <property name="displayName">nom_modulo</property>
+                    <text-property name="displayName">nom_modulo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">versao</property>
-                    <property name="displayName">versao</property>
+                    <text-property name="displayName">versao</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -3834,7 +3793,7 @@ WHERE cod_acao = ?
                 </structure>
                 <structure>
                     <property name="name">gera_codigo_barra</property>
-                    <property name="displayName">gera_codigo_barra</property>
+                    <text-property name="displayName">gera_codigo_barra</text-property>
                     <expression name="expression">params["codigo_barra"] = dataSetRow["codigo_barra"]</expression>
                     <property name="dataType">any</property>
                 </structure>
@@ -3872,18 +3831,18 @@ WHERE cod_acao = ?
                                 <property name="width">0.90625in</property>
                             </column>
                             <column id="2634">
-                                <property name="width">2.5in</property>
                                 <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">8pt</property>
+                                <property name="width">2.5in</property>
                             </column>
                             <column id="2635">
                                 <property name="width">3.875in</property>
                             </column>
                             <row id="2636">
-                                <property name="height">1.0104166666666667in</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">thin</property>
+                                <property name="height">1.0104166666666667in</property>
                                 <cell id="2637">
                                     <property name="textAlign">center</property>
                                     <property name="verticalAlign">middle</property>
@@ -4432,8 +4391,8 @@ else{
                                                         <property name="width">12mm</property>
                                                     </column>
                                                     <column id="2712">
-                                                        <property name="width">10mm</property>
                                                         <property name="fontFamily">"Sans"</property>
+                                                        <property name="width">10mm</property>
                                                     </column>
                                                     <column id="2713">
                                                         <property name="width">6mm</property>
@@ -4649,7 +4608,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">entidade</property>
-                                                <property name="displayName">entidade</property>
+                                                <text-property name="displayName">entidade</text-property>
                                                 <expression name="expression">dataSetRow["cod_entidade"]+" - "+dataSetRow["nom_entidade"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -4729,7 +4688,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">desc_tesouria</property>
-                                                <property name="displayName">desc_tesouria</property>
+                                                <text-property name="displayName">desc_tesouria</text-property>
                                                 <expression name="expression">if(dataSetRow["cpf_cnpj"] != null){
      stText = dataSetRow["cpf_cnpj"];
 } else {
@@ -4740,7 +4699,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">vl_extenso</property>
-                                                <property name="displayName">vl_extenso</property>
+                                                <text-property name="displayName">vl_extenso</text-property>
                                                 <expression name="expression">dataSetRow["vl_extenso"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -4862,7 +4821,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">data_extenso</property>
-                                                <property name="displayName">data_extenso</property>
+                                                <text-property name="displayName">data_extenso</text-property>
                                                 <expression name="expression">dataSetRow["nom_municipio"]+", "+dataSetRow["dt_extenso"]+"."</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -4940,7 +4899,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">visto</property>
-                                                <property name="displayName">visto</property>
+                                                <text-property name="displayName">visto</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["nom_cgm"]
 } else {
@@ -4993,7 +4952,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">cargo_visto</property>
-                                                <property name="displayName">cargo_visto</property>
+                                                <text-property name="displayName">cargo_visto</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["cargo"]
 } else {
@@ -5049,7 +5008,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">ordenador</property>
-                                                <property name="displayName">ordenador</property>
+                                                <text-property name="displayName">ordenador</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["nom_cgm"]
 } else {
@@ -5101,7 +5060,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">ordenador_cargo</property>
-                                                <property name="displayName">ordenador_cargo</property>
+                                                <text-property name="displayName">ordenador_cargo</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["cargo"]
 } else {
@@ -5239,7 +5198,7 @@ else{
                                 </structure>
                                 <structure>
                                     <property name="name">Column Binding</property>
-                                    <property name="displayName">descricao_empenho</property>
+                                    <text-property name="displayName">descricao_empenho</text-property>
                                     <expression name="expression">var descricaoEmpenho = row["empenho"];
 if (row["dotacao_reduzida"] != null &amp;&amp; row["dotacao_reduzida"] != '') {
     descricaoEmpenho += " - "+row["dotacao_reduzida"];
@@ -5256,7 +5215,7 @@ descricaoEmpenho;</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">recurso_pao</property>
-                                    <property name="displayName">recurso_pao</property>
+                                    <text-property name="displayName">recurso_pao</text-property>
                                     <expression name="expression">if (dataSetRow["num_acao"] != null &amp;&amp; row["nom_pao"] != null) {
 	"Recurso: " + row["recurso_formatado"] + " - " + row["nom_recurso"] +" / PAO: " + dataSetRow["num_acao"] + " - " + row["nom_pao"];
 } else {
@@ -5266,19 +5225,19 @@ descricaoEmpenho;</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">liquidacao</property>
-                                    <property name="displayName">liquidacao</property>
+                                    <text-property name="displayName">liquidacao</text-property>
                                     <expression name="expression">"Liquidação: " + row["cod_nota"] + "/" + row["exercicio_nota"] + " - " + row["dt_liquidacao"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">vl_total</property>
-                                    <property name="displayName">vl_total</property>
+                                    <text-property name="displayName">vl_total</text-property>
                                     <expression name="expression">Total.sum((dataSetRow["vl_pagamento"]-dataSetRow["vl_anulado"]))</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">nom_recurso</property>
-                                    <property name="displayName">nom_recurso</property>
+                                    <text-property name="displayName">nom_recurso</text-property>
                                     <expression name="expression">dataSetRow['nom_recurso']</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -5732,7 +5691,7 @@ descricaoEmpenho;</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">conta</property>
-                                    <property name="displayName">conta</property>
+                                    <text-property name="displayName">conta</text-property>
                                     <expression name="expression">row["cod_plano_despesa"]+" - "+row["nom_conta"]</expression>
                                     <property name="dataType">any</property>
                                 </structure>
@@ -6048,7 +6007,7 @@ descricaoEmpenho;</expression>
                                             </structure>
                                             <structure>
                                                 <property name="name">total_liquido</property>
-                                                <property name="displayName">total_liquido</property>
+                                                <text-property name="displayName">total_liquido</text-property>
                                                 <expression name="expression">params["valorTotalRetencao"] = Total.sum((row["vl_pagamento"]-row["vl_anulado"])) - params["valorTotalRetencao"];
  params["valorTotalRetencao"]</expression>
                                                 <property name="dataType">any</property>
@@ -6395,7 +6354,7 @@ _________________________]]></text-property>
                                             </structure>
                                             <structure>
                                                 <property name="name">tesoureiro</property>
-                                                <property name="displayName">tesoureiro</property>
+                                                <text-property name="displayName">tesoureiro</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["nom_cgm"]
 } else {
@@ -6447,7 +6406,7 @@ _________________________]]></text-property>
                                             </structure>
                                             <structure>
                                                 <property name="name">tesoureiro_cargo</property>
-                                                <property name="displayName">tesoureiro_cargo</property>
+                                                <text-property name="displayName">tesoureiro_cargo</text-property>
                                                 <expression name="expression">if (Total.count() > 0 ) {
 	dataSetRow["cargo"]
 } else {
@@ -6696,7 +6655,7 @@ _________________________]]></text-property>
                                             </structure>
                                             <structure>
                                                 <property name="name">data_preencher</property>
-                                                <property name="displayName">data_preencher</property>
+                                                <text-property name="displayName">data_preencher</text-property>
                                                 <expression name="expression">row["nom_municipio"]+", ___ de _________________________ de ______"</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -6855,7 +6814,7 @@ _________________________]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">credor</property>
-                    <property name="displayName">credor</property>
+                    <text-property name="displayName">credor</text-property>
                     <expression name="expression">"Credor: "+dataSetRow["cod_credor"]+" - "+dataSetRow["nom_cgm_credor"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -6866,13 +6825,13 @@ _________________________]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">conta_receita</property>
-                    <property name="displayName">conta_receita</property>
+                    <text-property name="displayName">conta_receita</text-property>
                     <expression name="expression">row["cod_estrutural"]+"                                "+row["cod_plano_despesa"]+"                                "+row["nom_conta"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">recurso</property>
-                    <property name="displayName">recurso</property>
+                    <text-property name="displayName">recurso</text-property>
                     <expression name="expression">if (dataSetRow["cod_recurso"] == null) {
 	"Recurso: "
 } else {
@@ -6892,19 +6851,19 @@ _________________________]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">codigo_barra</property>
-                    <property name="displayName">codigo_barra</property>
+                    <text-property name="displayName">codigo_barra</text-property>
                     <expression name="expression">dataSetRow["codigo_barra"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                     <expression name="expression">dataSetRow["nom_cgm"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">cargo</property>
-                    <property name="displayName">cargo</property>
+                    <text-property name="displayName">cargo</text-property>
                     <expression name="expression">dataSetRow["cargo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -6939,9 +6898,9 @@ _________________________]]></text-property>
                                 <property name="width">25mm</property>
                             </column>
                             <column id="1605">
-                                <property name="width">70mm</property>
                                 <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">8pt</property>
+                                <property name="width">70mm</property>
                             </column>
                             <column id="1606">
                                 <property name="width">90mm</property>
@@ -8003,8 +7962,8 @@ else{
                                                         <property name="width">12mm</property>
                                                     </column>
                                                     <column id="1683">
-                                                        <property name="width">10mm</property>
                                                         <property name="fontFamily">"Sans"</property>
+                                                        <property name="width">10mm</property>
                                                     </column>
                                                     <column id="1684">
                                                         <property name="width">6mm</property>
@@ -8163,7 +8122,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">entidade</property>
-                                                <property name="displayName">entidade</property>
+                                                <text-property name="displayName">entidade</text-property>
                                                 <expression name="expression">"Entidade: "+dataSetRow["cod_entidade"]+" - "+dataSetRow["nom_entidade"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -8452,7 +8411,7 @@ else{
                                             </structure>
                                             <structure>
                                                 <property name="name">cidade_data_extenso</property>
-                                                <property name="displayName">cidade_data_extenso</property>
+                                                <text-property name="displayName">cidade_data_extenso</text-property>
                                                 <expression name="expression">var x = row["nom_municipio"]+", "+row._outer["dt_extenso_recibo_extra"]+".";
 x;</expression>
                                                 <property name="dataType">string</property>
@@ -8516,25 +8475,25 @@ x;</expression>
                 </structure>
                 <structure>
                     <property name="name">receita</property>
-                    <property name="displayName">receita</property>
+                    <text-property name="displayName">receita</text-property>
                     <expression name="expression">dataSetRow["cod_receita"]+' - '+dataSetRow["descricao_receita"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">credito</property>
-                    <property name="displayName">credito</property>
+                    <text-property name="displayName">credito</text-property>
                     <expression name="expression">dataSetRow["cod_credito"]+' - '+dataSetRow["descricao_credito"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">dt_emissao</property>
-                    <property name="displayName">dt_emissao</property>
+                    <text-property name="displayName">dt_emissao</text-property>
                     <expression name="expression">dataSetRow["dt_emissao"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">codigo_barra</property>
-                    <property name="displayName">codigo_barra</property>
+                    <text-property name="displayName">codigo_barra</text-property>
                     <expression name="expression">dataSetRow["codigo_barra"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -8563,13 +8522,13 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                             <property name="pageBreakBefore">auto</property>
                             <property name="width">190mm</property>
                             <column id="2392">
-                                <property name="width">15%</property>
                                 <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">8pt</property>
+                                <property name="width">15%</property>
                             </column>
                             <column id="2393">
-                                <property name="width">85%</property>
                                 <property name="fontWeight">bold</property>
+                                <property name="width">85%</property>
                             </column>
                             <row id="2394">
                                 <cell id="2395">
@@ -8659,7 +8618,7 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                                             </structure>
                                             <structure>
                                                 <property name="name">nome_prefeitura</property>
-                                                <property name="displayName">nome_prefeitura</property>
+                                                <text-property name="displayName">nome_prefeitura</text-property>
                                                 <expression name="expression">row["nom_prefeitura"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -8716,7 +8675,7 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                                             </structure>
                                             <structure>
                                                 <property name="name">endereco_pref</property>
-                                                <property name="displayName">endereco_pref</property>
+                                                <text-property name="displayName">endereco_pref</text-property>
                                                 <expression name="expression">dataSetRow["endereco"]+' CEP '+dataSetRow["cep"]+' '+dataSetRow["nom_municipio"]+' '+dataSetRow["sigla_uf"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -8773,7 +8732,7 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                                             </structure>
                                             <structure>
                                                 <property name="name">fone_pref</property>
-                                                <property name="displayName">fone_pref</property>
+                                                <text-property name="displayName">fone_pref</text-property>
                                                 <expression name="expression">'Fone: '+dataSetRow["fone"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -8830,7 +8789,7 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                                             </structure>
                                             <structure>
                                                 <property name="name">cnpj_pref</property>
-                                                <property name="displayName">cnpj_pref</property>
+                                                <text-property name="displayName">cnpj_pref</text-property>
                                                 <expression name="expression">'CNPJ: '+dataSetRow["cnpj"]</expression>
                                                 <property name="dataType">string</property>
                                             </structure>
@@ -8865,10 +8824,10 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                             <column id="1982"/>
                             <column id="1983"/>
                             <row id="1984">
-                                <property name="height">0.7cm</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">thin</property>
+                                <property name="height">0.7cm</property>
                                 <cell id="1985">
                                     <property name="colSpan">4</property>
                                     <property name="rowSpan">1</property>
@@ -9002,10 +8961,10 @@ params["linha_digitavel_receita"] = this.getRowData().getColumnValue('linha_digi
                                 </cell>
                             </row>
                             <row id="1991">
-                                <property name="height">0.7cm</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">thin</property>
+                                <property name="height">0.7cm</property>
                                 <cell id="1992">
                                     <property name="borderRightColor">#000000</property>
                                     <property name="borderRightStyle">solid</property>
@@ -9182,12 +9141,12 @@ endereco</expression>
                             <column id="2062"/>
                             <column id="2063"/>
                             <row id="2094">
-                                <property name="height">0.4cm</property>
                                 <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">6pt</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">thin</property>
+                                <property name="height">0.4cm</property>
                                 <cell id="2095">
                                     <text id="2104">
                                         <property name="contentType">auto</property>
@@ -9423,10 +9382,10 @@ endereco</expression>
                                 <property name="width">30mm</property>
                             </column>
                             <row id="2121">
-                                <property name="height">0.7cm</property>
                                 <property name="borderBottomColor">#000000</property>
                                 <property name="borderBottomStyle">solid</property>
                                 <property name="borderBottomWidth">thin</property>
+                                <property name="height">0.7cm</property>
                                 <cell id="2122">
                                     <property name="borderRightColor">#000000</property>
                                     <property name="borderRightStyle">solid</property>
@@ -9653,7 +9612,7 @@ endereco</expression>
                                             </structure>
                                             <structure>
                                                 <property name="name">observacao_receita</property>
-                                                <property name="displayName">observacao_receita</property>
+                                                <text-property name="displayName">observacao_receita</text-property>
                                                 <expression name="expression">'Valor Retenção conforme OP '+dataSetRow["cod_ordem"]+'/'+dataSetRow["exercicio"]+' do dia '+dataSetRow["dt_formatada"]</expression>
                                                 <property name="dataType">any</property>
                                             </structure>
@@ -9823,7 +9782,7 @@ endereco</expression>
                                                         </structure>
                                                         <structure>
                                                             <property name="name">nome_prefeitura</property>
-                                                            <property name="displayName">nome_prefeitura</property>
+                                                            <text-property name="displayName">nome_prefeitura</text-property>
                                                             <expression name="expression">row["nom_prefeitura"].toUpperCase()</expression>
                                                             <property name="dataType">string</property>
                                                         </structure>
@@ -10480,7 +10439,7 @@ endereco</expression>
                                                                     </structure>
                                                                     <structure>
                                                                         <property name="name">observacao_receita</property>
-                                                                        <property name="displayName">observacao_receita</property>
+                                                                        <text-property name="displayName">observacao_receita</text-property>
                                                                         <expression name="expression">'Valor Retenção conf. OP '+dataSetRow["cod_ordem"]+'/'+dataSetRow["exercicio"]+' do dia '+dataSetRow["dt_formatada"]</expression>
                                                                         <property name="dataType">any</property>
                                                                     </structure>
@@ -10623,7 +10582,7 @@ endereco</expression>
                                                         </structure>
                                                         <structure>
                                                             <property name="name">nome_prefeitura</property>
-                                                            <property name="displayName">nome_prefeitura</property>
+                                                            <text-property name="displayName">nome_prefeitura</text-property>
                                                             <expression name="expression">row["nom_prefeitura"].toUpperCase()</expression>
                                                             <property name="dataType">string</property>
                                                         </structure>
@@ -11173,7 +11132,7 @@ endereco</expression>
                                                         </structure>
                                                         <structure>
                                                             <property name="name">observacao_receita</property>
-                                                            <property name="displayName">observacao_receita</property>
+                                                            <text-property name="displayName">observacao_receita</text-property>
                                                             <expression name="expression">'Valor Retenção conforme OP '+dataSetRow["cod_ordem"]+'/'+dataSetRow["exercicio"]+' do dia '+dataSetRow["dt_formatada"]</expression>
                                                             <property name="dataType">any</property>
                                                         </structure>

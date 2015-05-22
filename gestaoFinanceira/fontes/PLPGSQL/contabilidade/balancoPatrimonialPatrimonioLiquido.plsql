@@ -26,12 +26,10 @@
  * URBEM Soluções de Gestão Pública Ltda
  * www.urbem.cnm.org.br
  *
+ $Id: balancoPatrimonialPatrimonioLiquido.plsql 62473 2015-05-13 13:25:59Z michel $
+ *
  * Casos de uso: uc-02.02.11
  */
-
-/*
-
-*/
 
 CREATE OR REPLACE FUNCTION contabilidade.balanco_patrimonial_patrimonio_liquido (varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
 
@@ -188,10 +186,14 @@ BEGIN
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
              , nivel
              , CAST(nom_conta AS VARCHAR) as nom_conta
-             , SUM(valores[1] * multiplicador) as vl_saldo_anterior
-             , SUM(valores[2] * multiplicador) as vl_saldo_debitos
-             , SUM(valores[3] * multiplicador) as vl_saldo_creditos
-             , SUM(valores[4] * multiplicador) as vl_saldo_atual
+             , CASE WHEN SUM(valores[1] * multiplicador) < 0.00 THEN SUM(valores[1] * multiplicador * -1)
+                    ELSE SUM(valores[1] * multiplicador)
+               END AS vl_saldo_anterior
+             , SUM(valores[2] * multiplicador * -1) as vl_saldo_debitos
+             , SUM(valores[3] * multiplicador * -1) as vl_saldo_creditos
+             , CASE WHEN SUM(valores[4] * multiplicador) < 0.00 THEN SUM(valores[4] * multiplicador * -1)
+                    ELSE SUM(valores[4] * multiplicador)
+               END AS vl_saldo_atual
           FROM (
             
             --CONTA PATRIMÔNIO LIQUIDO
@@ -199,7 +201,7 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.0.0.0.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.0.0.0.00.00')||') as nivel
                      , ''Patrimônio Liquido'' as nom_conta
-                     , -1 as  multiplicador
+                     , 1 as  multiplicador
             
             UNION ALL
             
@@ -208,7 +210,7 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.1.0.0.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.1.0.0.00.00')||') as nivel
                      , ''Patrimônio Social e Capital Social'' as nom_conta
-                     , -1 as  multiplicador
+                     , 1 as  multiplicador
 
             UNION ALL
 

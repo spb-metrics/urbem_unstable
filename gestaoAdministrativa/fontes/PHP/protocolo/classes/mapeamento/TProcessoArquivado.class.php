@@ -21,26 +21,25 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?php
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TProcessoArquivado extends Persistente
 {
-function TProcessoArquivado()
-{
-    parent::Persistente();
-    $this->setTabela('sw_processo_arquivado');
-    $this->setCampoCod('ano_exercicio');
-    $this->setComplementoChave('cod_processo');
+    function TProcessoArquivado()
+    {
+        parent::Persistente();
+        $this->setTabela('sw_processo_arquivado');
+        $this->setCampoCod('ano_exercicio');
+        $this->setComplementoChave('cod_processo');
 
-    $this->AddCampo('cod_processo'			 , 'integer'   , true  , '', true  , true   );
-    $this->AddCampo('ano_exercicio'			 , 'char'      , true  , 4 , true  , true   );
-    $this->AddCampo('cod_historico'			 , 'integer'   , true  , '', false , true	);
-    $this->AddCampo('timestamp_arquivamento' , 'timestamp' , true  , '', false , false  );
-    $this->AddCampo('texto_complementar'	 , 'text'	   , false , 1 , false , false  );
-    $this->AddCampo('cgm_arquivador'	     , 'integer'   , false , true, '', false , false  );
-
-}
+        $this->AddCampo('cod_processo'			 , 'integer'   , true  , '', true  , true   );
+        $this->AddCampo('ano_exercicio'			 , 'char'      , true  , 4 , true  , true   );
+        $this->AddCampo('cod_historico'			 , 'integer'   , true  , '', false , true	);
+        $this->AddCampo('timestamp_arquivamento' , 'timestamp' , true  , '', false , false  );
+        $this->AddCampo('texto_complementar'	 , 'text'	   , false , 1 , false , false  );
+        $this->AddCampo('localizacao'            , 'char'      , false , 80 , false , false  );
+        $this->AddCampo('cgm_arquivador'	     , 'integer'   , false , true, '', false , false  );
+    }
 }

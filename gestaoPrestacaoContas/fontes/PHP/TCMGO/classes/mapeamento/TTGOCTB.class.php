@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 61133 $
+    $Revision: 62499 $
     $Name$
-    $Author: franver $
-    $Date: 2014-12-10 16:35:28 -0200 (Qua, 10 Dez 2014) $
+    $Author: lisiane $
+    $Date: 2015-05-14 17:56:42 -0300 (Qui, 14 Mai 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -1098,9 +1098,16 @@ class TTGOCTB extends Persistente
                                        ON lote.cod_lote = lancamento.cod_lote
                                       AND lote.exercicio = lancamento.exercicio
                                       AND lote.tipo = lancamento.tipo
-                                      AND lote.cod_entidade = lancamento.cod_entidade
-                                      AND lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
-                                    WHERE conta_debito.exercicio = pa.exercicio
+                                      AND lote.cod_entidade = lancamento.cod_entidade   ";
+                        if ($this->getDado('inMesGeracao') == '01') {
+                        $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                               AND  lote.exercicio = '".$this->getDado('exercicio')."'
+                               AND  lote.tipo = 'I'
+                        ";
+                        } else {
+                        $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
+                        }
+                        $stSql.=" WHERE conta_debito.exercicio = pa.exercicio
                                       AND conta_debito.cod_plano = pa.cod_plano
                                   )
                                   +
@@ -1124,8 +1131,16 @@ class TTGOCTB extends Persistente
                                       AND lote.exercicio = lancamento.exercicio
                                       AND lote.tipo = lancamento.tipo
                                       AND lote.cod_entidade = lancamento.cod_entidade
-                                      AND lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
-                                    WHERE conta_credito.exercicio = pa.exercicio
+                               ";
+                         if ($this->getDado('inMesGeracao') == '01') {
+                        $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                               AND  lote.exercicio = '".$this->getDado('exercicio')."'
+                               AND  lote.tipo = 'I'
+                        ";
+                        } else {
+                        $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
+                        }
+                        $stSql.=" WHERE conta_credito.exercicio = pa.exercicio
                                       AND conta_credito.cod_plano = pa.cod_plano
                                   )) AS vl_total
                          FROM contabilidade.plano_analitica AS pa
@@ -1387,7 +1402,6 @@ class TTGOCTB extends Persistente
              , tipo_conta
         HAVING SUM(saldo_inicial) + (SUM(vl_entradas) - SUM(vl_retencao)) + (SUM(vl_saidas) - SUM(vl_retencao)) + SUM(saldo_final) <> 0.00
         ";
-        
         return $stSql;
     }
 
@@ -1455,9 +1469,17 @@ class TTGOCTB extends Persistente
                                        ON lote.cod_lote = lancamento.cod_lote
                                       AND lote.exercicio = lancamento.exercicio
                                       AND lote.tipo = lancamento.tipo
-                                      AND lote.cod_entidade = lancamento.cod_entidade
-                                      AND lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
-                                    WHERE conta_debito.exercicio = pa.exercicio
+                                      AND lote.cod_entidade = lancamento.cod_entidade 
+                                ";
+                         if ($this->getDado('inMesGeracao') == '01') {
+                           $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                                      AND  lote.exercicio = '".$this->getDado('exercicio')."'
+                                      AND  lote.tipo = 'I'
+                        ";
+                        } else {
+                           $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
+                        }
+                          $stSql.=" WHERE conta_debito.exercicio = pa.exercicio
                                       AND conta_debito.cod_plano = pa.cod_plano
                                   )
                                   +
@@ -1481,9 +1503,17 @@ class TTGOCTB extends Persistente
                                       AND lote.exercicio = lancamento.exercicio
                                       AND lote.tipo = lancamento.tipo
                                       AND lote.cod_entidade = lancamento.cod_entidade
-                                      AND lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
-                                    WHERE conta_credito.exercicio = pa.exercicio
-                                      AND conta_credito.cod_plano = pa.cod_plano
+                            ";
+                         if ($this->getDado('inMesGeracao') == '01') {
+                        $stSql.= " AND  lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                                   AND  lote.tipo = 'I'
+                                   AND  lote.exercicio = '".$this->getDado('exercicio')."'
+                            ";
+                        } else {
+                        $stSql.= " AND  lote.dt_lote < TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') ";
+                        }
+                       $stSql.=" WHERE conta_credito.exercicio = pa.exercicio
+                                   AND conta_credito.cod_plano = pa.cod_plano
                                   )) AS vl_total
                          FROM contabilidade.plano_analitica AS pa
                         WHERE pa.cod_plano = plano_analitica.cod_plano
@@ -1754,7 +1784,6 @@ class TTGOCTB extends Persistente
              , fonte
         HAVING SUM(saldo_inicial) + (SUM(vl_entradas) - SUM(vl_retencao)) + (SUM(vl_saidas) - SUM(vl_retencao)) + SUM(saldo_final) <> 0.00
         ";
-        
         return $stSql;
     }
     

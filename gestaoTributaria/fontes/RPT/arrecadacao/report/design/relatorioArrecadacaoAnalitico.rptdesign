@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Tonismar</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -17,9 +17,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +29,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -41,24 +41,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -68,39 +53,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -109,9 +67,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -120,9 +78,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -131,9 +89,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -142,9 +100,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -153,9 +111,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -164,9 +122,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -175,9 +133,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -186,9 +144,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,9 +155,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,9 +166,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -219,9 +177,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -230,9 +188,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -241,9 +199,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -252,25 +210,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_250.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -1139,43 +1088,43 @@ WHERE assinatura.exercicio::integer = ?]]></xml-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">info_parcela</property>
-                    <property name="displayName">info_parcela</property>
+                    <text-property name="displayName">info_parcela</text-property>
                     <expression name="expression">dataSetRow["info_parcela"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">vencimento</property>
-                    <property name="displayName">vencimento</property>
+                    <text-property name="displayName">vencimento</text-property>
                     <expression name="expression">dataSetRow["vencimento"]</expression>
                     <property name="dataType">date</property>
                 </structure>
                 <structure>
                     <property name="name">valor_parcela</property>
-                    <property name="displayName">valor_parcela</property>
+                    <text-property name="displayName">valor_parcela</text-property>
                     <expression name="expression">dataSetRow["valor_parcela"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">valor_desconto_parcela</property>
-                    <property name="displayName">valor_desconto_parcela</property>
+                    <text-property name="displayName">valor_desconto_parcela</text-property>
                     <expression name="expression">dataSetRow["valor_desconto_parcela"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">juros_aberto</property>
-                    <property name="displayName">juros_aberto</property>
+                    <text-property name="displayName">juros_aberto</text-property>
                     <expression name="expression">dataSetRow["juros_aberto"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">multa_aberto</property>
-                    <property name="displayName">multa_aberto</property>
+                    <text-property name="displayName">multa_aberto</text-property>
                     <expression name="expression">dataSetRow["multa_aberto"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">correcao_aberto</property>
-                    <property name="displayName">correcao_aberto</property>
+                    <text-property name="displayName">correcao_aberto</text-property>
                     <expression name="expression">dataSetRow["correcao_aberto"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1186,37 +1135,37 @@ WHERE assinatura.exercicio::integer = ?]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">data_pagamento</property>
-                    <property name="displayName">data_pagamento</property>
+                    <text-property name="displayName">data_pagamento</text-property>
                     <expression name="expression">dataSetRow["data_pagamento"]</expression>
                     <property name="dataType">date</property>
                 </structure>
                 <structure>
                     <property name="name">valor_pago</property>
-                    <property name="displayName">valor_pago</property>
+                    <text-property name="displayName">valor_pago</text-property>
                     <expression name="expression">dataSetRow["valor_pago"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">juros_pago</property>
-                    <property name="displayName">juros_pago</property>
+                    <text-property name="displayName">juros_pago</text-property>
                     <expression name="expression">dataSetRow["juros_pago"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">multa_pago</property>
-                    <property name="displayName">multa_pago</property>
+                    <text-property name="displayName">multa_pago</text-property>
                     <expression name="expression">dataSetRow["multa_pago"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">correcao_pago</property>
-                    <property name="displayName">correcao_pago</property>
+                    <text-property name="displayName">correcao_pago</text-property>
                     <expression name="expression">dataSetRow["correcao_pago"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">diferenca_pago</property>
-                    <property name="displayName">diferenca_pago</property>
+                    <text-property name="displayName">diferenca_pago</text-property>
                     <expression name="expression">dataSetRow["diferenca_pago"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -1246,19 +1195,19 @@ WHERE assinatura.exercicio::integer = ?]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">origem</property>
-                    <property name="displayName">origem</property>
+                    <text-property name="displayName">origem</text-property>
                     <expression name="expression">dataSetRow["origem"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">exercicio</property>
-                    <property name="displayName">exercicio</property>
+                    <text-property name="displayName">exercicio</text-property>
                     <expression name="expression">dataSetRow["exercicio"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">inscricao</property>
-                    <property name="displayName">inscricao</property>
+                    <text-property name="displayName">inscricao</text-property>
                     <expression name="expression">dataSetRow["inscricao"]</expression>
                     <property name="dataType">integer</property>
                 </structure>

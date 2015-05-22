@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -22,9 +22,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -34,10 +34,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -48,24 +48,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -75,42 +60,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -119,9 +74,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -130,10 +85,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -143,10 +98,10 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -156,9 +111,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -167,9 +122,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -178,9 +133,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -189,9 +144,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -200,9 +155,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -211,9 +166,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -222,12 +177,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">null</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -237,9 +192,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -248,9 +203,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -259,9 +214,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -270,9 +225,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -281,9 +236,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -292,9 +247,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -303,9 +258,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -314,9 +269,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -325,9 +280,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -336,9 +291,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -346,9 +301,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="relatorio_novo" id="2883">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -357,9 +312,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -367,9 +322,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="data_emissao" id="2885">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -378,9 +333,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -389,25 +344,16 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_250.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -821,7 +767,7 @@ if (params['relatorio_novo'] == 'sim') {
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">saldo</property>
-                    <property name="displayName">saldo</property>
+                    <text-property name="displayName">saldo</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -911,7 +857,7 @@ this.queryText += "as saldo																										\n";]]></method>
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -1189,13 +1135,13 @@ ORÇAMENTOS FISCAL E DA SEGURIDADE SOCIAL<br>]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">total_previsao_atualizada</property>
-                    <property name="displayName">total_previsao_atualizada</property>
+                    <text-property name="displayName">total_previsao_atualizada</text-property>
                     <expression name="expression">Total.sum( row.previsao_atualizada, row.nom_conta == "Receitas De Capital" )</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">total_receitas_realizadas</property>
-                    <property name="displayName">total_receitas_realizadas</property>
+                    <text-property name="displayName">total_receitas_realizadas</text-property>
                     <expression name="expression">params["total_receita_realizada"] = Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capital" );
 
 Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capital" )</expression>
@@ -1203,7 +1149,7 @@ Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capital" )</ex
                 </structure>
                 <structure>
                     <property name="name">saldo</property>
-                    <property name="displayName">saldo</property>
+                    <text-property name="displayName">saldo</text-property>
                     <expression name="expression">var y = row["previsao_atualizada"];
 var x = row["receitas_realizadas"];
  (y - x)</expression>
@@ -1211,7 +1157,7 @@ var x = row["receitas_realizadas"];
                 </structure>
                 <structure>
                     <property name="name">total_saldo_realizar</property>
-                    <property name="displayName">total_saldo_realizar</property>
+                    <text-property name="displayName">total_saldo_realizar</text-property>
                     <expression name="expression">var d = Total.sum( row.previsao_atualizada, row.nom_conta == "Receitas De Capital" );
 var e = Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capital" );
 
@@ -1355,7 +1301,6 @@ var e = Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capita
             </detail>
             <footer>
                 <row id="2768">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -1363,6 +1308,7 @@ var e = Total.sum( row.receitas_realizadas, row.nom_conta == "Receitas De Capita
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.23958333333333334in</property>
                     <cell id="2769">
                         <label id="2781">
                             <property name="fontFamily">sans-serif</property>
@@ -1544,7 +1490,7 @@ dataSetRow["liquidado_ate_bimestre"]
                 </structure>
                 <structure>
                     <property name="name">total_dotacao_atualizada</property>
-                    <property name="displayName">total_dotacao_atualizada</property>
+                    <text-property name="displayName">total_dotacao_atualizada</text-property>
                     <expression name="expression">var x = Total.sum( row.dotacao_atualizada, row.descricao == "Despesas De Capital" );
 var y = Total.sum( row.dotacao_atualizada, row.descricao == "Despesas Correntes Dos Regimes De Previdência" );
 
@@ -1553,7 +1499,7 @@ var y = Total.sum( row.dotacao_atualizada, row.descricao == "Despesas Correntes 
                 </structure>
                 <structure>
                     <property name="name">total_liquidadas</property>
-                    <property name="displayName">total_liquidadas</property>
+                    <text-property name="displayName">total_liquidadas</text-property>
                     <expression name="expression">if ( (params["periodo"] == 6) &amp;&amp; ( params["virada"] == "T" ) ){
 var x = Total.sum( row.despesas_empenhadas, row.descricao == "Despesas De Capital" );
 var y = Total.sum( row.despesas_empenhadas, row.descricao == "Despesas Correntes Dos Regimes De Previdência" );
@@ -1571,7 +1517,7 @@ params["total_liquidadas"] = (x + y);
                 </structure>
                 <structure>
                     <property name="name">total_restos</property>
-                    <property name="displayName">total_restos</property>
+                    <text-property name="displayName">total_restos</text-property>
                     <expression name="expression">var y = Total.sum(dataSetRow["despesas_empenhadas"], row.descricao == "Despesas De Capital");
 var z = Total.sum(dataSetRow["despesas_empenhadas"], row.descricao == "Despesas Correntes Dos Regimes De Previdência");
 var a = (y + z);
@@ -1593,7 +1539,7 @@ params["restos"] = 0.00;
                 </structure>
                 <structure>
                     <property name="name">restos</property>
-                    <property name="displayName">restos</property>
+                    <text-property name="displayName">restos</text-property>
                     <expression name="expression">var y = dataSetRow["despesas_empenhadas"];
 var x = dataSetRow["liquidado_ate_bimestre"];
 
@@ -1607,7 +1553,7 @@ if ( (params["periodo"] == 6) &amp;&amp; ( params["virada"] == "T" ) ){
                 </structure>
                 <structure>
                     <property name="name">saldo_executar</property>
-                    <property name="displayName">saldo_executar</property>
+                    <text-property name="displayName">saldo_executar</text-property>
                     <expression name="expression">var y = dataSetRow["dotacao_atualizada"];
 var x = dataSetRow["despesas_empenhadas"];
 var z = ( dataSetRow["despesas_empenhadas"]  - dataSetRow["liquidado_ate_bimestre"] );
@@ -1622,7 +1568,7 @@ if ( (params["periodo"] == '6' ) &amp;&amp; ( params["virada"] == 'T' ) ){
                 </structure>
                 <structure>
                     <property name="name">total_saldo</property>
-                    <property name="displayName">total_saldo</property>
+                    <text-property name="displayName">total_saldo</text-property>
                     <expression name="expression">var d = Total.sum( row.dotacao_atualizada, row.descricao == "Despesas De Capital" );
 var g = Total.sum( row.dotacao_atualizada, row.descricao == "Despesas Correntes Dos Regimes De Previdência" );
 var h = (d + g);
@@ -1932,7 +1878,6 @@ Até o Bimestre]]></text-property>
             </detail>
             <footer>
                 <row id="2652">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -1940,6 +1885,7 @@ Até o Bimestre]]></text-property>
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.23958333333333334in</property>
                     <cell id="2653">
                         <label id="2680">
                             <property name="fontFamily">sans-serif</property>
@@ -2051,7 +1997,7 @@ Até o Bimestre]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_atual</property>
-                    <property name="displayName">saldo_exercicio_atual</property>
+                    <text-property name="displayName">saldo_exercicio_atual</text-property>
                     <expression name="expression">var x = params["total_receita_realizada"];
 var y = params["total_liquidadas"];
 var z = params["restos"];
@@ -2062,7 +2008,7 @@ params["total_saldo_exercicio_atual"] = ((x)-(y+z));
                 </structure>
                 <structure>
                     <property name="name">saldo_atual</property>
-                    <property name="displayName">saldo_atual</property>
+                    <text-property name="displayName">saldo_atual</text-property>
                     <expression name="expression">var x = row["saldo"];
 var y = params["total_saldo_exercicio_atual"];
 
@@ -2227,7 +2173,7 @@ var y = params["total_saldo_exercicio_atual"];
                 </structure>
                 <structure>
                     <property name="name">saldo_exercicio_atual</property>
-                    <property name="displayName">saldo_exercicio_atual</property>
+                    <text-property name="displayName">saldo_exercicio_atual</text-property>
                     <expression name="expression">var x = params["total_receita_realizada"];
 var y = params["total_liquidadas"];
 var z = params["restos"];
@@ -2238,7 +2184,7 @@ params["total_saldo_exercicio_atual"] = ((x)-(y+z));
                 </structure>
                 <structure>
                     <property name="name">saldo_atual</property>
-                    <property name="displayName">saldo_atual</property>
+                    <text-property name="displayName">saldo_atual</text-property>
                     <expression name="expression">var x = row["saldo"];
 var y = params["total_saldo_exercicio_atual"];
 
@@ -2430,7 +2376,7 @@ var y = params["total_saldo_exercicio_atual"];
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

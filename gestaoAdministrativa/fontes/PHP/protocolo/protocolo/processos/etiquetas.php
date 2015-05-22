@@ -31,7 +31,7 @@
 
     * Casos de uso : uc-01.06.98
 
-    $Id: etiquetas.php 61967 2015-03-18 21:59:24Z jean $
+    $Id: etiquetas.php 62581 2015-05-21 14:05:03Z michel $
 
     */
 
@@ -175,6 +175,8 @@ if ((strlen($_REQUEST['dataInicial']) > 0) && (strlen($_REQUEST['dataFinal']) > 
     $preview->addParametro( 'prmDataIni', '');
     $preview->addParametro( 'prmDataFim', '');
 }
+
+$preview->addParametro ('centroCusto', SistemaLegado::pegaConfiguracao("centro_custo", 5));
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 

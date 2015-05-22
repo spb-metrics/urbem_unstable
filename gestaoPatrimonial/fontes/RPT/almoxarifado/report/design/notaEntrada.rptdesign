@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,9 +28,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,24 +40,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -67,42 +52,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://172.16.30.4:5432/ga_mariana_1902_1932_1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sw.suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -111,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -122,9 +77,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -133,9 +88,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -144,9 +99,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -156,9 +111,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -167,9 +122,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -178,27 +133,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/ga_mariana_1902_1932_1</property>
-            <property name="odaUser">sw.suporte</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">c3Vwb3J0ZQ==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -889,44 +833,44 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">cod_processo</property>
-                    <property name="displayName">cod_processo</property>
+                    <text-property name="displayName">cod_processo</text-property>
                     <expression name="expression">dataSetRow["cod_processo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">codigo_requisicao</property>
-                    <property name="displayName">codigo_requisicao</property>
+                    <text-property name="displayName">codigo_requisicao</text-property>
                     <expression name="expression">dataSetRow["codigo_requisicao"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">nom_solicitante</property>
-                    <property name="displayName">nom_solicitante</property>
+                    <text-property name="displayName">nom_solicitante</text-property>
                     <expression name="expression">dataSetRow["nom_solicitante"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">nom_requisitante</property>
-                    <property name="displayName">nom_requisitante</property>
+                    <text-property name="displayName">nom_requisitante</text-property>
                     <expression name="expression">dataSetRow["nom_requisitante"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
             <column id="1161">
-                <property name="width">70mm</property>
                 <property name="fontFamily">sans-serif</property>
                 <property name="fontSize">9pt</property>
                 <property name="fontWeight">bold</property>
                 <property name="textAlign">left</property>
+                <property name="width">70mm</property>
             </column>
             <column id="1162">
-                <property name="width">215mm</property>
                 <property name="suppressDuplicates">true</property>
                 <property name="fontFamily">sans-serif</property>
                 <property name="fontSize">9pt</property>
                 <property name="fontWeight">normal</property>
                 <property name="textAlign">left</property>
+                <property name="width">215mm</property>
             </column>
             <header>
                 <row id="1350">
@@ -1097,7 +1041,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">fornecedor_nome</property>
-                                    <property name="displayName">fornecedor_nome</property>
+                                    <text-property name="displayName">fornecedor_nome</text-property>
                                     <expression name="expression">dataSetRow["fornecedor"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1234,7 +1178,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">numero_nota</property>
-                                    <property name="displayName">numero_nota</property>
+                                    <text-property name="displayName">numero_nota</text-property>
                                     <expression name="expression">dataSetRow["num_nota"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1371,7 +1315,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">nro_serie</property>
-                                    <property name="displayName">nro_serie</property>
+                                    <text-property name="displayName">nro_serie</text-property>
                                     <expression name="expression">dataSetRow["num_serie"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1512,7 +1456,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">dt_nota_fiscal</property>
-                                    <property name="displayName">dt_nota_fiscal</property>
+                                    <text-property name="displayName">dt_nota_fiscal</text-property>
                                     <expression name="expression">dataSetRow["dt_nota"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1654,7 +1598,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                                 </structure>
                                 <structure>
                                     <property name="name">codOrdem</property>
-                                    <property name="displayName">cod_ordem</property>
+                                    <text-property name="displayName">cod_ordem</text-property>
                                     <expression name="expression">dataSetRow["cod_ordem"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
@@ -1796,7 +1740,7 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">nro_linha</property>
-                    <property name="displayName">nro_linha</property>
+                    <text-property name="displayName">nro_linha</text-property>
                     <expression name="expression">row.__rownum+1</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -2018,10 +1962,10 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
             </header>
             <detail>
                 <row id="1181">
-                    <property name="height">0.4166666666666667in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
+                    <property name="height">0.4166666666666667in</property>
                     <cell id="1182">
                         <data id="1288">
                             <property name="fontFamily">sans-serif</property>
@@ -2226,13 +2170,13 @@ WHERE lancamento_material.tipo_natureza = 'E']]></xml-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">nom_requisitante</property>
-                    <property name="displayName">nom_requisitante</property>
+                    <text-property name="displayName">nom_requisitante</text-property>
                     <expression name="expression">dataSetRow["nom_requisitante"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">nom_solicitante</property>
-                    <property name="displayName">nom_solicitante</property>
+                    <text-property name="displayName">nom_solicitante</text-property>
                     <expression name="expression">dataSetRow["nom_solicitante"]</expression>
                     <property name="dataType">string</property>
                 </structure>

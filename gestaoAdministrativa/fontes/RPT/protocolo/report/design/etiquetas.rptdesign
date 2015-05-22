@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,9 +18,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +29,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,20 +40,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -62,31 +51,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -95,9 +62,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -107,9 +74,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -119,9 +86,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -131,9 +98,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -143,9 +110,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -154,9 +121,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -165,9 +132,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -176,9 +143,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -187,9 +154,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -198,9 +165,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -209,9 +176,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -220,9 +187,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -231,9 +198,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -242,9 +209,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -253,9 +220,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -264,9 +231,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -275,9 +242,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -286,9 +253,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -297,9 +264,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -308,9 +275,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -319,9 +286,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -330,9 +297,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -341,9 +308,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -352,9 +319,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -363,9 +330,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -374,9 +341,24 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="centroCusto" id="6920">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -384,17 +366,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-}]]></method>
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsEtiquetas" id="570">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if ((params["prmProcesso"] != "") &amp;&amp; (params["prmAnoExercicio"] != "")){
 	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcesso"];
@@ -461,6 +438,7 @@ this.queryText = this.queryText + " ) AS tabela ) AS resultado WHERE (indice % 2
 
 params['teste'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT *
 
 FROM (
@@ -475,8 +453,13 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
      ,  sw_classificacao.nom_classificacao
      ,  sw_assunto.nom_assunto
      ,  recuperaDescricaoOrgao(sw_ultimo_andamento.cod_orgao, sw_ultimo_andamento.timestamp::date) as nom_setor
-
+     ,  sw_processo.resumo_assunto
+     ,  centro_custo.cod_centro
+     ,  centro_custo.descricao as descricao_centro
+     
   FROM  sw_processo
+  		LEFT JOIN almoxarifado.centro_custo
+  		       ON centro_custo.cod_centro=sw_processo.cod_centro
      ,  sw_cgm
      ,  sw_classificacao
      ,  sw_assunto
@@ -499,6 +482,8 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
    AND  sw_processo_interessado.ano_exercicio = sw_processo.ano_exercicio]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsEtiquetasPar" id="6903">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if ((params["prmProcesso"] != "") &amp;&amp; (params["prmAnoExercicio"] != "")){
 	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcesso"];
@@ -565,6 +550,7 @@ this.queryText = this.queryText + " ) AS tabela ) AS resultado WHERE (indice % 2
 
 params['teste'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT *
 
 FROM (
@@ -579,8 +565,13 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
      ,  sw_classificacao.nom_classificacao
      ,  sw_assunto.nom_assunto
      ,  recuperaDescricaoOrgao(sw_ultimo_andamento.cod_orgao, sw_ultimo_andamento.timestamp::date) as nom_setor
-
+     ,  sw_processo.resumo_assunto
+     ,  centro_custo.cod_centro
+     ,  centro_custo.descricao as descricao_centro
+     
   FROM  sw_processo
+  		LEFT JOIN almoxarifado.centro_custo
+  		       ON centro_custo.cod_centro=sw_processo.cod_centro
      ,  sw_cgm
      ,  sw_classificacao
      ,  sw_assunto
@@ -821,14 +812,29 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
                                 <expression name="expression">dataSetRow['indice']</expression>
                                 <property name="dataType">integer</property>
                             </structure>
+                            <structure>
+                                <property name="name">assunto_reduzido</property>
+                                <expression name="expression">dataSetRow["resumo_assunto"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">centro_custo</property>
+                                <expression name="expression" type="javascript">if(dataSetRow["cod_centro"] !=null&amp;&amp;dataSetRow["descricao_centro"]!=null){
+	dataSetRow["cod_centro"] + ' - ' +dataSetRow["descricao_centro"]
+}else{
+	''
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
                         </list-property>
                         <property name="pageBreakInterval">8</property>
                         <column id="6796">
                             <property name="width">35%</property>
                         </column>
                         <column id="6797">
-                            <property name="width">65%</property>
                             <property name="textAlign">right</property>
+                            <property name="width">65%</property>
                         </column>
                         <detail>
                             <row id="6778">
@@ -890,6 +896,47 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
                                     <data id="6816">
                                         <property name="fontSize">9pt</property>
                                         <property name="resultSetColumn">nom_assunto</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="6927">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">if(params["centroCusto"]=='true'){
+	false
+}else{
+	true
+}</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6928">
+                                    <text id="6930">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Centro de Custo:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="6929">
+                                    <data id="6936">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="resultSetColumn">centro_custo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="6905">
+                                <property name="pageBreakBefore">avoid</property>
+                                <cell id="6906">
+                                    <text id="6908">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Assunto Reduzido:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="6907">
+                                    <data id="6913">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="resultSetColumn">assunto_reduzido</property>
                                     </data>
                                 </cell>
                             </row>
@@ -961,14 +1008,29 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
                                 <expression name="expression">dataSetRow['indice']</expression>
                                 <property name="dataType">integer</property>
                             </structure>
+                            <structure>
+                                <property name="name">resumo_assunto</property>
+                                <expression name="expression">dataSetRow["resumo_assunto"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">centro_custo</property>
+                                <expression name="expression" type="javascript">if(dataSetRow["cod_centro"] !=null&amp;&amp;dataSetRow["descricao_centro"]!=null){
+	dataSetRow["cod_centro"] + ' - ' +dataSetRow["descricao_centro"]
+}else{
+	''
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
                         </list-property>
                         <property name="pageBreakInterval">8</property>
                         <column id="6883">
                             <property name="width">35%</property>
                         </column>
                         <column id="6873">
-                            <property name="width">65%</property>
                             <property name="textAlign">right</property>
+                            <property name="width">65%</property>
                         </column>
                         <detail>
                             <row id="6854">
@@ -1030,6 +1092,46 @@ SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_
                                     <data id="6894">
                                         <property name="fontSize">9pt</property>
                                         <property name="resultSetColumn">nom_assunto</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="6931">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">if(params["centroCusto"]=='true'){
+	false
+}else{
+	true
+}</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6932">
+                                    <text id="6934">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Centro de Custo:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="6933">
+                                    <data id="6935">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="resultSetColumn">centro_custo</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="6909">
+                                <cell id="6910">
+                                    <text id="6912">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="contentType">auto</property>
+                                        <text-property name="content"><![CDATA[Assunto Reduzido:]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="6911">
+                                    <data id="6914">
+                                        <property name="fontSize">9pt</property>
+                                        <property name="resultSetColumn">resumo_assunto</property>
                                     </data>
                                 </cell>
                             </row>

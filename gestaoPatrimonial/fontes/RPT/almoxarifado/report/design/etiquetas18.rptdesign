@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by Eclipse BIRT 2.0 -->
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.6" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Diego Lemos de Souza</property>
-    <property name="createdBy">uc-01.01.00</property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem.rptlibrary</property>
@@ -15,10 +15,11 @@
     <parameters>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -26,8 +27,8 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -36,18 +37,8 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -56,28 +47,8 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -85,8 +56,8 @@
         </scalar-parameter>
         <scalar-parameter name="pAlmoxarifado" id="1175">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -94,8 +65,8 @@
         </scalar-parameter>
         <scalar-parameter name="pCodCatalogo" id="1178">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -103,8 +74,8 @@
         </scalar-parameter>
         <scalar-parameter name="pDescricao" id="1179">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -112,6 +83,7 @@
         </scalar-parameter>
         <scalar-parameter name="pSaldo" id="1180">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -120,8 +92,8 @@
         </scalar-parameter>
         <scalar-parameter name="pEstrutural" id="1181">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -129,19 +101,7 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
-            <method name="beforeOpen"><![CDATA[/*
-if ( params["db_driver"].value ){
-            	extensionProperties.odaDriverClass = params["db_driver"].value;
-				extensionProperties.odaURL = params["db_conn_url"].value;
-				extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-			}*/]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/des_alagoinhas_2808</property>
-            <property name="odaUser">bruce</property>
-            <encrypted-property name="odaPassword">YWdkYQ==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -160,7 +120,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Postgres</property>
             <method name="beforeOpen"><![CDATA[inTeste = 0;
 
 if ( params['pAlmoxarifado'] != '' ) {
@@ -178,6 +137,7 @@ if ( params['pSaldo'] != '' ){
 if ( params['pEstrutural'] != '' ){
 	this.queryText = this.queryText + " and catalogo_classificacao.cod_estrutural like '" + params['pEstrutural'] + "%'";
 }]]></method>
+            <property name="dataSource">Postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -194,7 +154,7 @@ if ( params['pEstrutural'] != '' ){
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
-            <property name="queryText">select --catalogo_item_barras.codigo_barras
+            <xml-property name="queryText"><![CDATA[select --catalogo_item_barras.codigo_barras
       catalogo_item.descricao_resumida
      , catalogo_item.cod_item as codigo_barras
   from almoxarifado.catalogo_item
@@ -209,7 +169,7 @@ left join almoxarifado.catalogo_item_barras
   join almoxarifado.catalogo_classificacao
     on (catalogo_item.cod_classificacao = catalogo_classificacao.cod_classificacao
    and  catalogo_item.cod_catalogo      = catalogo_classificacao.cod_catalogo  )   
- where not catalogo_item.cod_item is null</property>
+ where not catalogo_item.cod_item is null]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -291,6 +251,7 @@ left join almoxarifado.catalogo_item_barras
                                 <property name="dataType">integer</property>
                             </structure>
                         </list-property>
+                        <property name="pageBreakInterval">50</property>
                         <column id="1196">
                             <property name="width">99mm</property>
                         </column>
@@ -333,13 +294,14 @@ left join almoxarifado.catalogo_item_barras
                                 <property name="dataType">integer</property>
                             </structure>
                         </list-property>
+                        <property name="pageBreakInterval">50</property>
                         <column id="1204">
                             <property name="width">99mm</property>
                         </column>
                         <detail>
                             <row id="1200">
-                                <property name="height">32mm</property>
                                 <method name="onRender"><![CDATA[dsEtiquetas.next;]]></method>
+                                <property name="height">32mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>

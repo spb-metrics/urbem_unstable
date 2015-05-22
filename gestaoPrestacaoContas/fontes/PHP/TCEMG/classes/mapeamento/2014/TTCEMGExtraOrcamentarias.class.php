@@ -213,6 +213,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         , cod_font_recurso
                         , SUM(vl_saldo_ant) as vl_saldo_ant
                         , SUM(vl_saldo_atual)AS vl_saldo_atual
+                        , nat_saldo_anterior_fonte
+                        , nat_saldo_atual_fonte
                     FROM (
                             SELECT  tipo_registro
                                     , cod_orgao
@@ -221,35 +223,39 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                     , tipo_lancamento
                                     , sub_tipo
                                     , cod_recurso AS cod_font_recurso
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2') THEN
-                                             (vl_saldo_anterior * -1)
-                                        ELSE
-                                             vl_saldo_anterior
-                                     END AS vl_saldo_ant
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2') THEN
-			                                 (vl_saldo_atual * -1)
-			                            ELSE
-			                                 vl_saldo_atual
-		                             END AS vl_saldo_atual
-                            FROM tcemg.fn_arquivo_ext_registro20('".$this->getDado('exercicio')."'
-                                                                ,'cod_entidade IN (".$this->getDado('entidades').")'
-                                                                ,'".$this->getDado('dt_inicial')."'
-                                                                ,'".$this->getDado('dt_final')."'
-                                                                ,'A'::CHAR)
-                            AS retorno( cod_estrutural    VARCHAR
-                                        , tipo_registro     INTEGER
-                                        , cod_orgao         VARCHAR
-					                    , cod_unidade       TEXT
-                                        , tipo_lancamento   TEXT
-                                        , sub_tipo          TEXT
-                                        , cod_ext           VARCHAR
-                                        , cod_recurso       INTEGER
-                                        , vl_saldo_anterior NUMERIC
-                                        , vl_saldo_debitos  NUMERIC
-                                        , vl_saldo_creditos NUMERIC
-                                        , vl_saldo_atual    NUMERIC
+                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
+                                           THEN(vl_saldo_anterior * -1)
+                                           ELSE vl_saldo_anterior
+                                      END AS vl_saldo_ant
+                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
+                                           THEN (vl_saldo_atual * -1)
+			                    ELSE vl_saldo_atual
+		                      END AS vl_saldo_atual
+                                    , nat_saldo_anterior_fonte
+                                    , nat_saldo_atual_fonte
+                            
+                                  FROM tcemg.fn_arquivo_ext_registro20( '".$this->getDado('exercicio')."'
+                                                                       , 'cod_entidade IN (".$this->getDado('entidades').")'
+                                                                       , '".$this->getDado('dt_inicial')."'
+                                                                       , '".$this->getDado('dt_final')."'
+                                                                       , 'A'::CHAR )
+                            AS retorno(   cod_estrutural             VARCHAR
+                                        , tipo_registro              INTEGER
+                                        , cod_orgao                  VARCHAR
+					, cod_unidade                TEXT
+                                        , tipo_lancamento            TEXT
+                                        , sub_tipo                   TEXT
+                                        , cod_ext                    VARCHAR
+                                        , cod_recurso                INTEGER
+                                        , vl_saldo_anterior          NUMERIC
+                                        , vl_saldo_debitos           NUMERIC
+                                        , vl_saldo_creditos          NUMERIC
+                                        , vl_saldo_atual             NUMERIC
+                                        , nat_saldo_anterior_fonte   CHAR
+                                        , nat_saldo_atual_fonte      CHAR
                             )
-                    ) as registro20
+                            
+                    ) AS registro20
                 GROUP BY tipo_registro
                         , cod_orgao
                         , cod_unidade
@@ -257,8 +263,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         , sub_tipo
                         , cod_ext
                         , cod_font_recurso
-                        --, natsaldoanteriorfonte
-                        --, natsaldoatualfonte
+                        , nat_saldo_anterior_fonte
+                        , nat_saldo_atual_fonte
         ";     
         
         return $stSql;

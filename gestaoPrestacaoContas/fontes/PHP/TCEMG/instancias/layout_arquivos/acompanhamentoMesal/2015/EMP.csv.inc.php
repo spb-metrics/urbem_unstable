@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EMP.csv.inc.php 62410 2015-05-05 18:59:26Z jean $
-  * $Date: 2015-05-05 15:59:26 -0300 (Ter, 05 Mai 2015) $
+  * $Id: EMP.csv.inc.php 62412 2015-05-05 19:49:47Z jean $
+  * $Date: 2015-05-05 16:49:47 -0300 (Ter, 05 Mai 2015) $
   * $Author: jean $
-  * $Rev: 62410 $
+  * $Rev: 62412 $
   *
 */
 /**
@@ -102,7 +102,8 @@ $map = array(
     '"' => '',
     'ñ' => 'n',
     'Ñ' => 'N',
-    '–' => '-'
+    '–' => '-',
+    '¨' => ' '
 );
 
 $rsRecordSetEMP99 = new RecordSet();
@@ -116,7 +117,7 @@ if (count($rsRecordSetEMP10->getElementos()) > 0) {
         $stChave = $arEMP10['nroempenho'];
 
         $arEMP10['especificacaoempenho'] =  strtr($arEMP10['especificacaoempenho'], $map);
-        
+
         /* previstas no art. 24, I e II da Lei n. 8.666/93, nao demonstrar os campos nroProcessoLicitatorio, exercicioProcessoLicitatorio e tipoProcesso.
            A partir do somatório e pelo compras.compra_direta.cod_tipo_objeto -> compras.tipo_objeto, quando for "2 | Obras e Serviços de Engenharia"
            somente entra no arquivo com somatório acima de R$ 15.000,00 ou "1 | Materiais ou Serviços" somente entra no arquivo com somatório acima de R$ 8.000,00.*/ 

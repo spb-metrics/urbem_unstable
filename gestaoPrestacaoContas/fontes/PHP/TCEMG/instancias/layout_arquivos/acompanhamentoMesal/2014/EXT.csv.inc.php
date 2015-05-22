@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EXT.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
-  * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
-  * $Author: franver $
-  * $Rev: 62269 $
+  * $Id: EXT.csv.inc.php 62516 2015-05-15 19:50:54Z arthur $
+  * $Date: 2015-05-15 16:50:54 -0300 (Sex, 15 Mai 2015) $
+  * $Author: arthur $
+  * $Rev: 62516 $
   *
 */
 /**
@@ -184,24 +184,10 @@ if (count($rsRecordSetEXT20->getElementos()) > 0) {
                 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
 
-                if ( Sessao::getExercicio() >= '2015' ) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natsaldoanteriorfonte");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
-                }
-
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_atual");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
-
-                if ( Sessao::getExercicio() >= '2015' ) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natsaldoatualfonte");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
-                }
 
                 if (count($rsRecordSetEXT21->getElementos()) > 0) {
                     foreach ($rsRecordSetEXT21->getElementos() as $arEXT21) {

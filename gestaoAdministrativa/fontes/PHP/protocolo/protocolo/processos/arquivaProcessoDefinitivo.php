@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: arquivaProcessoDefinitivo.php 62351 2015-04-28 13:51:03Z arthur $
+    $Id: arquivaProcessoDefinitivo.php 62506 2015-05-15 16:23:58Z michel $
 
     */
 
@@ -41,7 +41,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once CAM_FW_LEGADO."funcoesLegado.lib.php";
 
 $preview = new PreviewBirt(1,5,8);
-$preview->setVersaoBirt('2.5.0');
+$preview->setVersaoBirt('4.4.0');
 
 $codProcesso           = $_REQUEST['codProcesso'] != 'undefined' ? $_REQUEST['codProcesso'] : '';
 $anoExercicio          = $_REQUEST['anoExercicio'] != 'undefined' ? $_REQUEST['anoExercicio'] : '';

@@ -31,7 +31,7 @@
 2
     * Casos de uso: uc-04.08.15
 
-    $Id: PRExportarDIRF.php 61346 2015-01-08 19:47:19Z dagiane $
+    $Id: PRExportarDIRF.php 62430 2015-05-07 20:35:00Z evandro $
 
 */
 
@@ -41,7 +41,9 @@ include_once ( CLA_EXPORTADOR                  );
 
 $stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
 $arSessaoLink = Sessao::read('link');
-$stLink = "&pg=".$arSessaoLink["pg"]."&pos=".$arSessaoLink["pos"];
+if (!empty($arSessaoLink)) {
+    $stLink = "&pg=".$arSessaoLink["pg"]."&pos=".$arSessaoLink["pos"];
+}
 
 foreach ($_POST as $key=>$value) {
     //Retira o JS que é inserido na URL
@@ -273,13 +275,14 @@ switch ($_POST["stTipoFiltro"]) {
         }
         break;
 }
-$stFiltroConfig = " AND exercicio = '". $_POST['inAnoCompetencia']."'";
-$obTIMAConfiguracaoDirf->recuperaRelacionamento($rsConfigDirf, $stFiltroConfig);
-$obTIMAConfiguracaoDirf->setDado("stTipoFiltro",$_POST["stTipoFiltro"]);
-$obTIMAConfiguracaoDirf->setDado("stCodigos",$stCodigos);
-$obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
 
-if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
+    $stFiltroConfig = " AND exercicio = '". $_POST['inAnoCompetencia']."'";
+    $obTIMAConfiguracaoDirf->recuperaRelacionamento($rsConfigDirf, $stFiltroConfig);
+    $obTIMAConfiguracaoDirf->setDado("stTipoFiltro",$_POST["stTipoFiltro"]);
+    $obTIMAConfiguracaoDirf->setDado("stCodigos",$stCodigos);
+    $obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
+
+if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {    
     $obTIMAConfiguracaoDirf->recuperaExportarDirfPagamento($rsTemp1);
 } else {
     $obTIMAConfiguracaoDirf->recuperaExportarDirf($rsTemp1);
@@ -288,9 +291,9 @@ if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
 if ($_POST["boPrestadoresServico"]) {
     $obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
     if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
-        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($_POST['inAnoCompetencia']-1));
-        $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamento($rsTemp2);
-    } else {
+        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($_POST['inAnoCompetencia']-1));        
+        $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamento($rsTemp2);        
+    } else {        
         $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServico($rsTemp2);
     }
 } else {
@@ -529,12 +532,13 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
     $linha = 'DECPJ|'.str_pad($rsTipo1->getCampo('cnpj_declarante'),14,0,STR_PAD_LEFT).'|'.$rsTipo1->getCampo('nome_empresarial').'|2|'.
             str_pad($rsTipo1->getCampo('cpf_responsavel_prefeitura'),11,0,STR_PAD_LEFT)."|N|N|N|N|".$hasPlano."|N|N||\n";
     fputs($file, $linha);
-
-    $linha = "IDREC|0561|\n";
-    fputs($file, $linha);
-    $beneficiario = '';
-
-    $rsTipo2->ordena('beneficiario');
+    
+    if ( $rsTipo2->getNumLinhas() > 0 ){
+        $rsTipo2->ordena('beneficiario');
+        $linha = "IDREC|0561|\n";
+        fputs($file, $linha);
+        $beneficiario = '';
+    }
 
     $arCPFs = array();
 
@@ -623,10 +627,12 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
                     $tag = 'BPJDEC';
                 }
                 if ( $rsTipo3->getCampo('codigo_retencao') == '1708' ) {
+                    
                     $linha = $tag.'|'.$beneficiario.'|'.rtrim(str_replace('.','',$rsTipo3->getCampo('nome_beneficiario')))."|\n";
                 } else {
                     $linha = $tag.'|'.$beneficiario.'|'.rtrim(str_replace('.','',$rsTipo3->getCampo('nome_beneficiario')))."||\n";
                 }
+                
                 fputs($file, $linha);
             }
 
@@ -644,24 +650,40 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
                 }
                 if( doEscrever($linhaRTRT) ) fputs($file, $linhaRTRT);
 
-                $linhaRTIRF = 'RTIRF|'.substr($rsTipo3->getCampo('jan'),13,13).'|'.substr($rsTipo3->getCampo('fev'),13,13).'|'.
-                    substr($rsTipo3->getCampo('mar'),13,13).'|'.substr($rsTipo3->getCampo('abr'),13,13).'|'.
-                    substr($rsTipo3->getCampo('mai'),13,13).'|'.substr($rsTipo3->getCampo('jun'),13,13).'|'.
-                    substr($rsTipo3->getCampo('jul'),13,13).'|'.substr($rsTipo3->getCampo('ago'),13,13).'|'.
-                    substr($rsTipo3->getCampo('set'),13,13).'|'.substr($rsTipo3->getCampo('out'),13,13).'|'.
-                    substr($rsTipo3->getCampo('nov'),13,13).'|'.substr($rsTipo3->getCampo('dez'),13,13).'|'.
-                    substr($rsTipo3->getCampo('dec'),13,13)."|\n";
+                if ( $rsTipo3->getCampo('codigo_retencao') != '1708' ) {
+                    $linhaRTPO = 'RTPO|'.substr($rsTipo3->getCampo('jan'),13,13).'|'.substr($rsTipo3->getCampo('fev'),13,13).'|'.
+                        substr($rsTipo3->getCampo('mar'),13,13).'|'.substr($rsTipo3->getCampo('abr'),13,13).'|'.
+                        substr($rsTipo3->getCampo('mai'),13,13).'|'.substr($rsTipo3->getCampo('jun'),13,13).'|'.
+                        substr($rsTipo3->getCampo('jul'),13,13).'|'.substr($rsTipo3->getCampo('ago'),13,13).'|'.
+                        substr($rsTipo3->getCampo('set'),13,13).'|'.substr($rsTipo3->getCampo('out'),13,13).'|'.
+                        substr($rsTipo3->getCampo('nov'),13,13).'|'.substr($rsTipo3->getCampo('dez'),13,13).'|'.
+                        substr($rsTipo3->getCampo('dec'),13,13)."|\n";
+                    if( doEscrever($linhaRTPO) ) fputs($file, $linhaRTPO);
+                }
+
+                $linhaRTIRF = 'RTIRF|'.substr($rsTipo3->getCampo('jan'),26,13).'|'.substr($rsTipo3->getCampo('fev'),26,13).'|'.
+                    substr($rsTipo3->getCampo('mar'),26,13).'|'.substr($rsTipo3->getCampo('abr'),26,13).'|'.
+                    substr($rsTipo3->getCampo('mai'),26,13).'|'.substr($rsTipo3->getCampo('jun'),26,13).'|'.
+                    substr($rsTipo3->getCampo('jul'),26,13).'|'.substr($rsTipo3->getCampo('ago'),26,13).'|'.
+                    substr($rsTipo3->getCampo('set'),26,13).'|'.substr($rsTipo3->getCampo('out'),26,13).'|'.
+                    substr($rsTipo3->getCampo('nov'),26,13).'|'.substr($rsTipo3->getCampo('dez'),26,13).'|';
+                if ( $rsTipo3->getCampo('codigo_retencao') == '1708' ) {
+                    $linhaRTIRF.= "|\n";
+                }else{
+                    $linhaRTIRF .= substr($rsTipo3->getCampo('dec'),26,13)."|\n";
+                }
+                
                 if( doEscrever($linhaRTIRF) ) fputs($file, $linhaRTIRF);
 
             } elseif ( $rsTipo3->getCampo('ident_especializacao') == 1 ) {
-                $linhaRTPO = 'RTPO|'.substr($rsTipo3->getCampo('jan'),0,13).'|'.substr($rsTipo3->getCampo('fev'),0,13).'|'.
-                    substr($rsTipo3->getCampo('mar'),0,13).'|'.substr($rsTipo3->getCampo('abr'),0,13).'|'.
-                    substr($rsTipo3->getCampo('mai'),0,13).'|'.substr($rsTipo3->getCampo('jun'),0,13).'|'.
-                    substr($rsTipo3->getCampo('jul'),0,13).'|'.substr($rsTipo3->getCampo('ago'),0,13).'|'.
-                    substr($rsTipo3->getCampo('set'),0,13).'|'.substr($rsTipo3->getCampo('out'),0,13).'|'.
-                    substr($rsTipo3->getCampo('nov'),0,13).'|'.substr($rsTipo3->getCampo('dez'),0,13).'|'.
-                    substr($rsTipo3->getCampo('dec'),0,13)."|\n";
-                if( doEscrever($linhaRTPO) ) fputs($file, $linhaRTPO);
+                // $linhaRTPO = 'RTPO|'.substr($rsTipo3->getCampo('jan'),0,13).'|'.substr($rsTipo3->getCampo('fev'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('mar'),0,13).'|'.substr($rsTipo3->getCampo('abr'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('mai'),0,13).'|'.substr($rsTipo3->getCampo('jun'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('jul'),0,13).'|'.substr($rsTipo3->getCampo('ago'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('set'),0,13).'|'.substr($rsTipo3->getCampo('out'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('nov'),0,13).'|'.substr($rsTipo3->getCampo('dez'),0,13).'|'.
+                //     substr($rsTipo3->getCampo('dec'),0,13)."|\n";
+                // if( doEscrever($linhaRTPO) ) fputs($file, $linhaRTPO);
 
                 $linhaRTDP = 'RTDP|'.substr($rsTipo3->getCampo('jan'),13,13).'|'.substr($rsTipo3->getCampo('fev'),13,13).'|'.
                     substr($rsTipo3->getCampo('mar'),13,13).'|'.substr($rsTipo3->getCampo('abr'),13,13).'|'.

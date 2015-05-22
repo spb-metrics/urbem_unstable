@@ -34,7 +34,8 @@
  $Id:$
  */
 
-CREATE OR REPLACE FUNCTION dirf_prestadores_servico_reduzida(VARCHAR,INTEGER,INTEGER) RETURNS SETOF colunasDirfPrestadoresServicoReduzida AS $$ 
+CREATE OR REPLACE FUNCTION dirf_prestadores_servico_reduzida(VARCHAR,INTEGER,INTEGER) RETURNS SETOF colunasDirfPrestadoresServicoReduzida AS $$
+
 DECLARE
     stEntidade                      ALIAS FOR $1;
     inCodEntidade                   ALIAS FOR $2;
@@ -50,7 +51,7 @@ BEGIN
 
   inSequencia := recuperarbufferinteiro('inSequencia');
 
-  stSql := ' SELECT nome_beneficiario      
+  stSql := ' SELECT remove_acentos(nome_beneficiario) as nome_beneficiario      
             , beneficiario
             , ''0'' as ident_especializacao    
             , ident_especie_beneficiario
@@ -101,7 +102,7 @@ BEGIN
             , cod_retencao
             , ident_especie_beneficiario
         UNION
-        SELECT nome_beneficiario      
+        SELECT remove_acentos(nome_beneficiario) as nome_beneficiario
             , beneficiario
             , ''1'' as ident_especializacao          
             , ident_especie_beneficiario
@@ -155,150 +156,150 @@ BEGIN
      ORDER BY nome_beneficiario, ident_especializacao';
 
     FOR reRegistro IN EXECUTE stSql LOOP    
-                
+
         IF inBeneficioarioAux != reRegistro.beneficiario THEN
             rwDirf.uso_declarante       := reRegistro.uso_declarante;
             rwDirf.nome_beneficiario    := reRegistro.nome_beneficiario;
-            rwDirf.beneficiario         := lpad(reRegistro.beneficiario,14,'0');
+            rwDirf.beneficiario         := lpad(reRegistro.beneficiario::VARCHAR,14,'0');
             rwDirf.sequencia            := inSequencia;
             rwDirf.ident_especializacao := reRegistro.ident_especializacao;
-            rwDirf.codigo_retencao      := lpad(reRegistro.cod_retencao,4,'0');
+            rwDirf.codigo_retencao      := lpad(reRegistro.cod_retencao::VARCHAR,4,'0');
             rwDirf.ident_especie_beneficiario := reRegistro.ident_especie_beneficiario;
-    
+            
             IF reRegistro.jan1 >= 0 THEN                
-                rwDirf.jan              := lpad(replace(trunc(reRegistro.jan1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jan2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jan3,2),'.',''),15,'0');
+                rwDirf.jan              := lpad(replace(reRegistro.jan1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jan2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jan3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.jan              := lpad('',45,'0');
+                rwDirf.jan              := lpad('',39,'0');
             END IF;
             IF reRegistro.fev1 >= 0 THEN        
-                rwDirf.fev              := lpad(replace(trunc(reRegistro.fev1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.fev2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.fev3,2),'.',''),15,'0');
+                rwDirf.fev              := lpad(replace(reRegistro.fev1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.fev2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.fev3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.fev              := lpad('',45,'0');
+                rwDirf.fev              := lpad('',39,'0');
             END IF;
             IF reRegistro.mar1 >= 0 THEN        
-                rwDirf.mar              := lpad(replace(trunc(reRegistro.mar1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mar2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mar3,2),'.',''),15,'0');
+                rwDirf.mar              := lpad(replace(reRegistro.mar1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mar2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mar3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.mar              := lpad('',45,'0');
+                rwDirf.mar              := lpad('',39,'0');
             END IF;
             IF reRegistro.abr1 >= 0 THEN        
-                rwDirf.abr              := lpad(replace(trunc(reRegistro.abr1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.abr2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.abr3,2),'.',''),15,'0');
+                rwDirf.abr              := lpad(replace(reRegistro.abr1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.abr2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.abr3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.abr              := lpad('',45,'0');
+                rwDirf.abr              := lpad('',39,'0');
             END IF;
             IF reRegistro.mai1 >= 0 THEN        
-                rwDirf.mai              := lpad(replace(trunc(reRegistro.mai1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mai2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mai3,2),'.',''),15,'0');
+                rwDirf.mai              := lpad(replace(reRegistro.mai1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mai2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mai3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.mai              := lpad('',45,'0');
+                rwDirf.mai              := lpad('',39,'0');
             END IF;
             IF reRegistro.jun1 >= 0 THEN        
-                rwDirf.jun              := lpad(replace(trunc(reRegistro.jun1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jun2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jun3,2),'.',''),15,'0');
+                rwDirf.jun              := lpad(replace(reRegistro.jun1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jun2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jun3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.jun              := lpad('',45,'0');
+                rwDirf.jun              := lpad('',39,'0');
             END IF;
             IF reRegistro.jul1 >= 0 THEN                
-                rwDirf.jul              := lpad(replace(trunc(reRegistro.jul1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jul2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jul3,2),'.',''),15,'0');
+                rwDirf.jul              := lpad(replace(reRegistro.jul1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jul2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jul3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.jul              := lpad('',45,'0');
+                rwDirf.jul              := lpad('',39,'0');
             END IF;
             IF reRegistro.ago1 >= 0 THEN        
-                rwDirf.ago              := lpad(replace(trunc(reRegistro.ago1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.ago2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.ago3,2),'.',''),15,'0');
+                rwDirf.ago              := lpad(replace(reRegistro.ago1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.ago2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.ago3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.ago              := lpad('',45,'0');
+                rwDirf.ago              := lpad('',39,'0');
             END IF;
             IF reRegistro.set1 >= 0 THEN        
-                rwDirf.set              := lpad(replace(trunc(reRegistro.set1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.set2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.set3,2),'.',''),15,'0');
+                rwDirf.set              := lpad(replace(reRegistro.set1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.set2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.set3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.set              := lpad('',45,'0');
+                rwDirf.set              := lpad('',39,'0');
             END IF;
             IF reRegistro.out1 >= 0 THEN        
-                rwDirf.out              := lpad(replace(trunc(reRegistro.out1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.out2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.out3,2),'.',''),15,'0');
+                rwDirf.out              := lpad(replace(reRegistro.out1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.out2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.out3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.out              := lpad('',45,'0');
+                rwDirf.out              := lpad('',39,'0');
             END IF;            
             IF reRegistro.nov1 >= 0 THEN        
-                rwDirf.nov              := lpad(replace(trunc(reRegistro.nov1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.nov2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.nov3,2),'.',''),15,'0');
+                rwDirf.nov              := lpad(replace(reRegistro.nov1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.nov2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.nov3::VARCHAR,'.',''),13,'0');
             ELSE
-                rwDirf.nov              := lpad('',45,'0');
+                rwDirf.nov              := lpad('',39,'0');
             END IF;
             IF reRegistro.dez1 >= 0 THEN
-                rwDirf.dez              := lpad(replace(trunc(reRegistro.dez1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dez2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dez3,2),'.',''),15,'0');                       
+                rwDirf.dez              := lpad(replace(reRegistro.dez1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dez2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dez3::VARCHAR,'.',''),13,'0');                       
             ELSE
-                rwDirf.dez              := lpad('',45,'0');
+                rwDirf.dez              := lpad('',39,'0');
             END IF;
-            rwDirf.dec                  := lpad(replace(trunc(reRegistro.dec1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dec2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dec3,2),'.',''),15,'0');
+            rwDirf.dec                  := lpad(replace(reRegistro.dec1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dec2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dec3::VARCHAR,'.',''),13,'0');
             RETURN NEXT rwDirf;        
             inSequencia := inSequencia + 1;
-        ELSE
+        ELSE            
             IF reRegistro.ident_especie_beneficiario = 1 THEN 
                 rwDirf.uso_declarante       := reRegistro.uso_declarante;
                 rwDirf.nome_beneficiario    := reRegistro.nome_beneficiario;
-                rwDirf.beneficiario         := lpad(reRegistro.beneficiario,14,'0');
+                rwDirf.beneficiario         := lpad(reRegistro.beneficiario::VARCHAR,14,'0');
                 rwDirf.sequencia            := inSequencia;
                 rwDirf.ident_especializacao := reRegistro.ident_especializacao;
-                rwDirf.codigo_retencao      := lpad(reRegistro.cod_retencao,4,'0');
+                rwDirf.codigo_retencao      := lpad(reRegistro.cod_retencao::VARCHAR,4,'0');
                 rwDirf.ident_especie_beneficiario := reRegistro.ident_especie_beneficiario;
-        
+
                 IF reRegistro.jan1 >= 0 THEN                
-                    rwDirf.jan              := lpad(replace(trunc(reRegistro.jan1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jan2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jan3,2),'.',''),15,'0');
+                    rwDirf.jan              := lpad(replace(reRegistro.jan1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jan2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jan3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.jan              := lpad('',45,'0');
+                    rwDirf.jan              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.fev1 >= 0 THEN        
-                    rwDirf.fev              := lpad(replace(trunc(reRegistro.fev1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.fev2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.fev3,2),'.',''),15,'0');
+                    rwDirf.fev              := lpad(replace(reRegistro.fev1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.fev2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.fev3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.fev              := lpad('',45,'0');
+                    rwDirf.fev              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.mar1 >= 0 THEN        
-                    rwDirf.mar              := lpad(replace(trunc(reRegistro.mar1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mar2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mar3,2),'.',''),15,'0');
+                    rwDirf.mar              := lpad(replace(reRegistro.mar1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mar2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mar3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.mar              := lpad('',45,'0');
+                    rwDirf.mar              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.abr1 >= 0 THEN        
-                    rwDirf.abr              := lpad(replace(trunc(reRegistro.abr1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.abr2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.abr3,2),'.',''),15,'0');
+                    rwDirf.abr              := lpad(replace(reRegistro.abr1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.abr2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.abr3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.abr              := lpad('',45,'0');
+                    rwDirf.abr              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.mai1 >= 0 THEN        
-                    rwDirf.mai              := lpad(replace(trunc(reRegistro.mai1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mai2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.mai3,2),'.',''),15,'0');
+                    rwDirf.mai              := lpad(replace(reRegistro.mai1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mai2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.mai3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.mai              := lpad('',45,'0');
+                    rwDirf.mai              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.jun1 >= 0 THEN        
-                    rwDirf.jun              := lpad(replace(trunc(reRegistro.jun1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jun2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jun3,2),'.',''),15,'0');
+                    rwDirf.jun              := lpad(replace(reRegistro.jun1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jun2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jun3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.jun              := lpad('',45,'0');
+                    rwDirf.jun              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.jul1 >= 0 THEN                
-                    rwDirf.jul              := lpad(replace(trunc(reRegistro.jul1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jul2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.jul3,2),'.',''),15,'0');
+                    rwDirf.jul              := lpad(replace(reRegistro.jul1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jul2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.jul3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.jul              := lpad('',45,'0');
+                    rwDirf.jul              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.ago1 >= 0 THEN        
-                    rwDirf.ago              := lpad(replace(trunc(reRegistro.ago1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.ago2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.ago3,2),'.',''),15,'0');
+                    rwDirf.ago              := lpad(replace(reRegistro.ago1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.ago2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.ago3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.ago              := lpad('',45,'0');
+                    rwDirf.ago              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.set1 >= 0 THEN        
-                    rwDirf.set              := lpad(replace(trunc(reRegistro.set1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.set2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.set3,2),'.',''),15,'0');
+                    rwDirf.set              := lpad(replace(reRegistro.set1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.set2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.set3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.set              := lpad('',45,'0');
+                    rwDirf.set              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.out1 >= 0 THEN        
-                    rwDirf.out              := lpad(replace(trunc(reRegistro.out1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.out2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.out3,2),'.',''),15,'0');
+                    rwDirf.out              := lpad(replace(reRegistro.out1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.out2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.out3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.out              := lpad('',45,'0');
+                    rwDirf.out              := lpad('',39,'0');
                 END IF;            
                 IF reRegistro.nov1 >= 0 THEN        
-                    rwDirf.nov              := lpad(replace(trunc(reRegistro.nov1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.nov2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.nov3,2),'.',''),15,'0');
+                    rwDirf.nov              := lpad(replace(reRegistro.nov1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.nov2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.nov3::VARCHAR,'.',''),13,'0');
                 ELSE
-                    rwDirf.nov              := lpad('',45,'0');
+                    rwDirf.nov              := lpad('',39,'0');
                 END IF;
                 IF reRegistro.dez1 >= 0 THEN
-                    rwDirf.dez              := lpad(replace(trunc(reRegistro.dez1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dez2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dez3,2),'.',''),15,'0');                       
+                    rwDirf.dez              := lpad(replace(reRegistro.dez1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dez2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dez3::VARCHAR,'.',''),13,'0');                       
                 ELSE
-                    rwDirf.dez              := lpad('',45,'0');
+                    rwDirf.dez              := lpad('',39,'0');
                 END IF;
-                rwDirf.dec                  := lpad(replace(trunc(reRegistro.dec1,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dec2,2),'.',''),15,'0')||lpad(replace(trunc(reRegistro.dec3,2),'.',''),15,'0');
+                rwDirf.dec                  := lpad(replace(reRegistro.dec1::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dec2::VARCHAR,'.',''),13,'0')||lpad(replace(reRegistro.dec3::VARCHAR,'.',''),13,'0');
                 RETURN NEXT rwDirf;        
                 inSequencia := inSequencia + 1;
             END IF;

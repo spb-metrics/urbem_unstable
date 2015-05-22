@@ -77,6 +77,12 @@ $obHdnCodIniEstrutural = new Hidden();
 $obHdnCodIniEstrutural->setName( 'inCodIniEstrutural' );
 $obHdnCodIniEstrutural->setValue( $_REQUEST['inCodIniEstrutural'] );
 
+$obHdnExercicio = new Hidden();
+$obHdnExercicio->setName("stExercicio");
+if ( isset($_REQUEST['stExercicio']) ) {
+    $obHdnExercicio->setValue($_REQUEST['stExercicio']);
+}
+
 $obHdnCampoNum = new Hidden;
 $obHdnCampoNum->setName( "campoNum" );
 $obHdnCampoNum->setValue( $_REQUEST['campoNum'] );
@@ -144,6 +150,7 @@ $obFormulario->addHidden            ( $obHdnTipoBusca2 );
 $obFormulario->addHidden            ( $obHdnTipoTransacao );
 $obFormulario->addHidden            ( $obHdnCodIniEstrutural );
 $obFormulario->addHidden            ( $obHdnCodEntidade );
+$obFormulario->addHidden            ( $obHdnExercicio );
 $obFormulario->addComponente        ( $obTxtDescricao );
 $obFormulario->addComponente        ( $obTxtCodEstrutural );
 $obFormulario->OK                   ();

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
     <list-property name="propertyBindings">
         <structure>
@@ -43,6 +42,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="id">1150</property>
         </structure>
     </list-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -57,9 +57,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -68,20 +68,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -90,31 +79,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -123,9 +90,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -133,9 +100,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <method name="getDefaultValueList"><![CDATA[this.queryText = this.queryText + params["stFiltro"];]]></method>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -145,9 +112,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -156,9 +123,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -167,14 +134,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -527,7 +486,7 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">exercicio_origem</property>
-                    <property name="displayName">ano</property>
+                    <text-property name="displayName">ano</text-property>
                     <expression name="expression">dataSetRow["exercicio_origem"];</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -538,7 +497,7 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">Total</property>
-                    <property name="displayName">total</property>
+                    <text-property name="displayName">total</text-property>
                     <expression name="expression">Total.sum(dataSetRow["valor_original"],null)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -554,7 +513,7 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">Aggregation</property>
-                    <property name="displayName">Total_Original</property>
+                    <text-property name="displayName">Total_Original</text-property>
                     <expression name="expression">dataSetRow["valor_original"]</expression>
                     <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
@@ -569,7 +528,7 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">Temp1</property>
-                    <property name="displayName">Temp1</property>
+                    <text-property name="displayName">Temp1</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[0]==null){stTemp1=null;}{
 stTemp = arTemp[0];
@@ -581,7 +540,7 @@ stTemp1[0];
                 </structure>
                 <structure>
                     <property name="name">Temp2</property>
-                    <property name="displayName">Temp2</property>
+                    <text-property name="displayName">Temp2</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[1]==null){stTemp2=null;}{
 stTemp = arTemp[1];
@@ -593,7 +552,7 @@ stTemp2[0];
                 </structure>
                 <structure>
                     <property name="name">Temp3</property>
-                    <property name="displayName">Temp3</property>
+                    <text-property name="displayName">Temp3</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[2]==null){stTemp3=null;}{
 stTemp = arTemp[2];
@@ -605,7 +564,7 @@ stTemp3[0];
                 </structure>
                 <structure>
                     <property name="name">Temp4</property>
-                    <property name="displayName">Temp4</property>
+                    <text-property name="displayName">Temp4</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[3]==null){stTemp4=null;}{
 stTemp = arTemp[3];
@@ -617,7 +576,7 @@ stTemp4[0];
                 </structure>
                 <structure>
                     <property name="name">Temp5</property>
-                    <property name="displayName">Temp5</property>
+                    <text-property name="displayName">Temp5</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[4]==null){stTemp5=null;}{
 stTemp = arTemp[4];
@@ -629,7 +588,7 @@ stTemp5[0];
                 </structure>
                 <structure>
                     <property name="name">Temp6</property>
-                    <property name="displayName">Temp6</property>
+                    <text-property name="displayName">Temp6</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[5]==null){stTemp6=null;}{
 stTemp = arTemp[5];
@@ -641,7 +600,7 @@ stTemp6[0];
                 </structure>
                 <structure>
                     <property name="name">Temp7</property>
-                    <property name="displayName">Temp7</property>
+                    <text-property name="displayName">Temp7</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[6]==null){stTemp7=null;}{
 stTemp = arTemp[6];
@@ -653,7 +612,7 @@ stTemp7[0];
                 </structure>
                 <structure>
                     <property name="name">Temp8</property>
-                    <property name="displayName">Temp8</property>
+                    <text-property name="displayName">Temp8</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[7]==null){stTemp8=null;}{
 stTemp = arTemp[7];
@@ -665,7 +624,7 @@ stTemp8[0];
                 </structure>
                 <structure>
                     <property name="name">Temp9</property>
-                    <property name="displayName">Temp9</property>
+                    <text-property name="displayName">Temp9</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[8]==null){stTemp9=null;}{
 stTemp = arTemp[8];
@@ -677,7 +636,7 @@ stTemp9[0];
                 </structure>
                 <structure>
                     <property name="name">Temp10</property>
-                    <property name="displayName">Temp10</property>
+                    <text-property name="displayName">Temp10</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[9]==null){stTemp10=null;}{
 stTemp = arTemp[9];
@@ -689,7 +648,7 @@ stTemp10[0];
                 </structure>
                 <structure>
                     <property name="name">Temp11</property>
-                    <property name="displayName">Temp11</property>
+                    <text-property name="displayName">Temp11</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[10]==null){stTemp11=null;}{
 stTemp = arTemp[10];
@@ -701,7 +660,7 @@ stTemp11[0];
                 </structure>
                 <structure>
                     <property name="name">Temp12</property>
-                    <property name="displayName">Temp12</property>
+                    <text-property name="displayName">Temp12</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[11]==null){stTemp12=null;}{
 stTemp = arTemp[11];
@@ -713,7 +672,7 @@ stTemp12[0];
                 </structure>
                 <structure>
                     <property name="name">Temp13</property>
-                    <property name="displayName">Temp13</property>
+                    <text-property name="displayName">Temp13</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[12]==null){stTemp13=null;}{
 stTemp = arTemp[12];
@@ -725,7 +684,7 @@ stTemp13[0];
                 </structure>
                 <structure>
                     <property name="name">Temp14</property>
-                    <property name="displayName">Temp14</property>
+                    <text-property name="displayName">Temp14</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[13]==null){stTemp14=null;}{
 stTemp = arTemp[13];
@@ -737,7 +696,7 @@ stTemp14[0];
                 </structure>
                 <structure>
                     <property name="name">Temp15</property>
-                    <property name="displayName">Temp15</property>
+                    <text-property name="displayName">Temp15</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[14]==null){stTemp15=null;}{
 stTemp = arTemp[14];
@@ -749,13 +708,13 @@ stTemp15[0];
                 </structure>
                 <structure>
                     <property name="name">TotalTemp</property>
-                    <property name="displayName">TotalTemp</property>
+                    <text-property name="displayName">TotalTemp</text-property>
                     <expression name="expression">row["Temp1"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">titTemp1</property>
-                    <property name="displayName">titTemp1</property>
+                    <text-property name="displayName">titTemp1</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[0]==null){stTemp1=null;}{
 stTemp = arTemp[0];
@@ -767,7 +726,7 @@ stTemp1[1];
                 </structure>
                 <structure>
                     <property name="name">titTemp2</property>
-                    <property name="displayName">titTemp2</property>
+                    <text-property name="displayName">titTemp2</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[1]==null){stTemp2=null;}{
 stTemp = arTemp[1];
@@ -779,7 +738,7 @@ stTemp2[1];
                 </structure>
                 <structure>
                     <property name="name">titTemp3</property>
-                    <property name="displayName">titTemp3</property>
+                    <text-property name="displayName">titTemp3</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[2]==null){stTemp3=null;}{
 stTemp = arTemp[2];
@@ -791,7 +750,7 @@ stTemp3[1];
                 </structure>
                 <structure>
                     <property name="name">titTemp4</property>
-                    <property name="displayName">titTemp4</property>
+                    <text-property name="displayName">titTemp4</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[3]==null){stTemp4=null;}{
 stTemp = arTemp[3];
@@ -803,7 +762,7 @@ stTemp4[1];
                 </structure>
                 <structure>
                     <property name="name">titTemp5</property>
-                    <property name="displayName">titTemp5</property>
+                    <text-property name="displayName">titTemp5</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[4]==null){stTemp5=null;}{
 stTemp = arTemp[4];
@@ -815,7 +774,7 @@ stTemp5[1];
                 </structure>
                 <structure>
                     <property name="name">TotalTemp1</property>
-                    <property name="displayName">TotalTemp1</property>
+                    <text-property name="displayName">TotalTemp1</text-property>
                     <expression name="expression">stTotal = 0;
 if( row["Temp1"] != null ){
     stTotal = stTotal + row["Temp1"];
@@ -867,7 +826,7 @@ stTotal + row["Aggregation"];</expression>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_1</property>
-                    <property name="displayName">titTemp6</property>
+                    <text-property name="displayName">titTemp6</text-property>
                     <expression name="expression">arTemp = dataSetRow["array_acrescimos"].split('#');
 if(arTemp[5]==null){stTemp6=null;}{
 stTemp = arTemp[5];
@@ -1084,103 +1043,103 @@ stTemp15[1];
                 </structure>
                 <structure>
                     <property name="name">total_origem</property>
-                    <property name="displayName">total_origem</property>
+                    <text-property name="displayName">total_origem</text-property>
                     <expression name="expression">Total.sum(row["valor_original"]);</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp1</property>
-                    <property name="displayName">Temp1</property>
+                    <text-property name="displayName">Temp1</text-property>
                     <expression name="expression">Total.sum(row["Temp1"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp2</property>
-                    <property name="displayName">Temp2</property>
+                    <text-property name="displayName">Temp2</text-property>
                     <expression name="expression">Total.sum(row["Temp2"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp3</property>
-                    <property name="displayName">Temp3</property>
+                    <text-property name="displayName">Temp3</text-property>
                     <expression name="expression">Total.sum(row["Temp3"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp4</property>
-                    <property name="displayName">Temp4</property>
+                    <text-property name="displayName">Temp4</text-property>
                     <expression name="expression">Total.sum(row["Temp4"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp5</property>
-                    <property name="displayName">Temp5</property>
+                    <text-property name="displayName">Temp5</text-property>
                     <expression name="expression">Total.sum(row["Temp5"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp6</property>
-                    <property name="displayName">Temp6</property>
+                    <text-property name="displayName">Temp6</text-property>
                     <expression name="expression">Total.sum(row["Temp6"]);</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp7</property>
-                    <property name="displayName">Temp7</property>
+                    <text-property name="displayName">Temp7</text-property>
                     <expression name="expression">Total.sum(row["Temp7"]);</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp8</property>
-                    <property name="displayName">Temp8</property>
+                    <text-property name="displayName">Temp8</text-property>
                     <expression name="expression">Total.sum(row["Temp8"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp9</property>
-                    <property name="displayName">Temp9</property>
+                    <text-property name="displayName">Temp9</text-property>
                     <expression name="expression">Total.sum(row["Temp9"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp10</property>
-                    <property name="displayName">Temp10</property>
+                    <text-property name="displayName">Temp10</text-property>
                     <expression name="expression">Total.sum(row["Temp10"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp11</property>
-                    <property name="displayName">Temp11</property>
+                    <text-property name="displayName">Temp11</text-property>
                     <expression name="expression">Total.sum(row["Temp11"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp12</property>
-                    <property name="displayName">Temp12</property>
+                    <text-property name="displayName">Temp12</text-property>
                     <expression name="expression">Total.sum(row["Temp12"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp13</property>
-                    <property name="displayName">Temp13</property>
+                    <text-property name="displayName">Temp13</text-property>
                     <expression name="expression">Total.sum(row["Temp13"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp14</property>
-                    <property name="displayName">Temp14</property>
+                    <text-property name="displayName">Temp14</text-property>
                     <expression name="expression">Total.sum(row["Temp14"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">SomaTemp15</property>
-                    <property name="displayName">Temp15</property>
+                    <text-property name="displayName">Temp15</text-property>
                     <expression name="expression">Total.sum(row["Temp15"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">TotalGeral</property>
-                    <property name="displayName">TotalTemp1</property>
+                    <text-property name="displayName">TotalTemp1</text-property>
                     <expression name="expression">stTotal = 0;
 if( row["SomaTemp1"] != null ){
     stTotal = stTotal + row["SomaTemp1"];
@@ -1554,146 +1513,146 @@ stTotal + row["total_origem"];</expression>
                                 <property name="height">100%</property>
                                 <property name="width">100%</property>
                                 <column id="2317">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp1"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2318">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp2"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2319">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp3"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2320">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp4"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2321">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp5"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2322">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp6"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2323">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp7"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2324">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp8"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2325">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp9"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2326">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp10"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2327">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp11"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2328">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp12"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2329">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp13"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2330">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp14"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2331">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp15"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2332">
                                     <property name="width">16mm</property>
                                 </column>
                                 <row id="2333">
-                                    <property name="height">5mm</property>
                                     <property name="textAlign">left</property>
+                                    <property name="height">5mm</property>
                                     <cell id="2334">
                                         <property name="borderBottomColor">#000000</property>
                                         <property name="borderBottomStyle">solid</property>
@@ -2491,139 +2450,139 @@ stTotal + row["total_origem"];</expression>
                                 <property name="marginTop">0pt</property>
                                 <property name="width">100%</property>
                                 <column id="2267">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp1"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2268">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp2"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2269">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp3"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2270">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp4"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2271">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp5"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2272">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp6"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2273">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp7"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2274">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp8"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2275">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp9"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2276">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp10"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2277">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp11"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2278">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp12"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2279">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp13"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2280">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp14"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2281">
-                                    <property name="width">14mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">row["Temp15"] == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">14mm</property>
                                 </column>
                                 <column id="2282">
                                     <property name="width">16mm</property>
@@ -3125,139 +3084,139 @@ stTotal + row["total_origem"];</expression>
                             <property name="marginTop">0pt</property>
                             <property name="width">100%</property>
                             <column id="2452">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp1"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2453">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp2"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2454">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp3"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2455">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp4"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2456">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp5"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2457">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp6"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2458">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp7"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2459">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp8"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2460">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp9"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2461">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp10"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2462">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp11"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2463">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp12"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2464">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp13"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2465">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp14"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2466">
-                                <property name="width">14mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Temp15"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">14mm</property>
                             </column>
                             <column id="2467">
                                 <property name="width">16mm</property>

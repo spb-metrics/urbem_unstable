@@ -594,6 +594,7 @@ $obFormulario->addSpan ( $obSpnLote );
 $obFormulario->addTitulo( "Dados do Item" );
 $obFormulario->addHidden($obHdnIdItem);
 $obFormulario->addComponente( $obDtContacao );
+$obFormulario->addSpan ( $obSpnItemBuscaInner );
 $obMontaItemUnidade->geraFormulario($obFormulario);
 $obFormulario->addComponente($obIntNumItem);
 $obMontaQuantidadeValores->geraFormulario($obFormulario);

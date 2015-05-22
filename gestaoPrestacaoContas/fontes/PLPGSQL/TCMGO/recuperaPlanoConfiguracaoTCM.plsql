@@ -208,6 +208,7 @@ BEGIN
                         , plano_conta.exercicio
                         , vinculo_plano_contas_tcmgo.cod_plano_tcmgo 
                         , plano_conta.nom_conta
+                        , plano_conta.obrigatorio_tcmgo
                         , 0.00                                                                                      AS vl_saldo_anterior
                         , 0.00                                                                                      AS vl_saldo_debitos
                         , 0.00                                                                                      AS vl_saldo_creditos
@@ -245,9 +246,9 @@ BEGIN
         reRegistro.vl_saldo_debitos  := arRetorno[2];
         reRegistro.vl_saldo_creditos := arRetorno[3];
         reRegistro.vl_saldo_atual    := arRetorno[4];
-        IF ( reRegistro.vl_saldo_anterior <> 0.00 ) OR
-           ( reRegistro.vl_saldo_debitos  <> 0.00 ) OR
-           ( reRegistro.vl_saldo_creditos <> 0.00 )
+        IF (( reRegistro.vl_saldo_anterior <> 0.00 ) OR
+            ( reRegistro.vl_saldo_debitos  <> 0.00 ) OR
+            ( reRegistro.vl_saldo_creditos <> 0.00 )) OR reRegistro.obrigatorio_tcmgo IS TRUE
         THEN
             RETURN NEXT reRegistro;
         END IF;

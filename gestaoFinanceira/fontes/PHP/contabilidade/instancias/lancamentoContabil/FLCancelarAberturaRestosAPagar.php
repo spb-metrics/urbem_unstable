@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: FLCancelarAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
+    $Id: FLCancelarAberturaRestosAPagar.php 62541 2015-05-18 21:39:12Z arthur $
 
     * Casos de uso:
 */
@@ -84,7 +84,7 @@ $obRConfiguracao->setCodModulo( 9 );
 $obRConfiguracao->consultar($boTransacao);
 
 if ( $obRConfiguracao->getValor() == 'T' ) {
-    $stObs = "Este processo é lento devido aos cálculos de restos a pagar.<BR>Recomenda-se que o mesmo seja executado após o término do expediente.";
+    $stObs = "Este processo é lento devido aos cálculos de restos a pagar.</br> Recomenda-se que o mesmo seja executado após o término do expediente.";
 } else {
     $stObs = "Este processo já foi executado! Se deseja prosseguir faça a Abertura de Restos à pagar primeiro!";
 }

@@ -226,6 +226,7 @@ function consultar($boTransacao = "")
     $this->obTConfiguracao->setDado("exercicio" , $this->stExercicio );
     $this->obTConfiguracao->setDado("parametro" , $this->stParametro );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsRecordSet, $boTransacao );
+    
     if ( !$obErro->ocorreu() ) {
         $this->stValor = $rsRecordSet->getCampo("valor");
     }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato Entidade</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -45,60 +45,17 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="565">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="566">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://172.16.30.4:5432/gp_mariana_virada_organograma</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="567">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sw.suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="568">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">suporte</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -306,29 +263,37 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="centroCusto" id="6672">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="562">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-	extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="562"
+ extends="urbem.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsEtiquetas" id="570">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if ((params["prmProcesso"] != "") &amp;&amp; (params["prmAnoExercicio"] != "")){
 	this.queryText = this.queryText + " AND sw_processo.cod_processo = " +params["prmProcesso"];
@@ -393,13 +358,18 @@ this.queryText = this.queryText + " ORDER BY sw_processo.cod_processo, sw_proces
 
 //params['teste'] = this.queryText;]]></method>
             <property name="dataSource">Data Source</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT  sw_processo.cod_processo || '/' || sw_processo.ano_exercicio as cod_ano_processo
      ,  initcap(LOWER(sw_cgm.nom_cgm)) as nom_cgm
      ,  sw_classificacao.nom_classificacao
      ,  sw_assunto.nom_assunto
      ,  recuperaDescricaoOrgao(sw_ultimo_andamento.cod_orgao, sw_ultimo_andamento.timestamp::date) as nom_setor
+     ,  centro_custo.cod_centro
+     ,  centro_custo.descricao AS descricao_centro
 
   FROM  sw_processo
+  		LEFT JOIN almoxarifado.centro_custo
+  		       ON centro_custo.cod_centro=sw_processo.cod_centro
      ,  sw_cgm
      ,  sw_classificacao
      ,  sw_assunto
@@ -471,12 +441,22 @@ this.queryText = this.queryText + " ORDER BY sw_processo.cod_processo, sw_proces
                     <expression name="expression">dataSetRow["nom_setor"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">centro_custo</property>
+                    <expression name="expression" type="javascript">if(dataSetRow["cod_centro"] !=null&amp;&amp;dataSetRow["descricao_centro"]!=null){
+	dataSetRow["cod_centro"] + ' - ' +dataSetRow["descricao_centro"]
+}else{
+	''
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
             </list-property>
             <property name="repeatHeader">false</property>
             <property name="pageBreakInterval">1</property>
             <column id="611">
-                <property name="width">28mm</property>
                 <property name="fontWeight">normal</property>
+                <property name="width">28mm</property>
             </column>
             <column id="612">
                 <property name="width">68mm</property>
@@ -562,6 +542,36 @@ this.queryText = this.queryText + " ORDER BY sw_processo.cod_processo, sw_proces
                         <data id="651">
                             <property name="textAlign">right</property>
                             <property name="resultSetColumn">nom_assunto</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="6667">
+                    <property name="height">2mm</property>
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">all</property>
+                            <expression name="valueExpr" type="javascript">if(params["centroCusto"]=='true'){
+	false
+}else{
+	true
+}</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="6668">
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">left</property>
+                        <text id="6670">
+                            <property name="textAlign">left</property>
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Centro de Custo:]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="6669">
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">left</property>
+                        <data id="6671">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">centro_custo</property>
                         </data>
                     </cell>
                 </row>

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.7" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Diego Lemos de Souza</property>
-    <property name="createdBy">uc-01.01.00</property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem.rptlibrary</property>
@@ -14,10 +15,11 @@
     <parameters>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -25,11 +27,12 @@
         <scalar-parameter name="exercicio" id="230">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowBlank">true</property>
-            <property name="allowNull">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2007</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">2007</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -37,67 +40,34 @@
         <scalar-parameter name="cod_acao" id="232">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowBlank">true</property>
-            <property name="allowNull">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">154</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">154</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="237">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <text-property name="promptText">JDBC Driver</text-property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="238">
             <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <text-property name="promptText">Connection URL</text-property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.30.4:5432/des_alagoinhas_1910</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="239">
-            <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <text-property name="promptText">Database User</text-property>
-            <property name="allowNull">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.30.4:5432/des_alagoinhas_1910</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">sw.adenor</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="240">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <text-property name="promptText">Database password</text-property>
-            <property name="allowNull">true</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">suporte</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="stPlaca" id="1067">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -105,8 +75,8 @@
         </scalar-parameter>
         <scalar-parameter name="stPrefixo" id="1068">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -114,8 +84,8 @@
         </scalar-parameter>
         <scalar-parameter name="inCodVeiculo" id="1069">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -123,8 +93,8 @@
         </scalar-parameter>
         <scalar-parameter name="echoQuery" id="1070">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -132,9 +102,8 @@
         </scalar-parameter>
         <scalar-parameter name="ordenacao" id="1098">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowBlank">false</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -142,9 +111,8 @@
         </scalar-parameter>
         <scalar-parameter name="baixado" id="1099">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowBlank">false</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -152,8 +120,8 @@
         </scalar-parameter>
         <scalar-parameter name="inCodEntidade" id="1100">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -161,18 +129,7 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-            	extensionProperties.odaDriverClass = params["db_driver"].value;
-				extensionProperties.odaURL = params["db_conn_url"].value;
-				extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-			}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/des_alagoinhas_1910</property>
-            <property name="odaUser">sw.adenor</property>
-            <encrypted-property name="odaPassword">c3Vwb3J0ZQ==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -231,7 +188,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Postgres</property>
             <method name="beforeOpen"><![CDATA[var stFiltro = '';
 if(params["inCodVeiculo"] != '' ) {
 	stFiltro = " AND veiculo.cod_veiculo = "+params["inCodVeiculo"]+" ";
@@ -273,6 +229,7 @@ if( stFiltro != '' ){
 	this.queryText = this.queryText + stFiltro;
 }
 params["echoQuery"] = this.queryText;]]></method>
+            <property name="dataSource">Postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -345,7 +302,7 @@ params["echoQuery"] = this.queryText;]]></method>
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
-            <property name="queryText">	SELECT veiculo.cod_veiculo
+            <xml-property name="queryText"><![CDATA[	SELECT veiculo.cod_veiculo
          , CASE WHEN veiculo.placa = ''
          		THEN ''
          		ELSE SUBSTR(veiculo.placa,1,3) || '-' || SUBSTR(veiculo.placa,4,4) 
@@ -368,7 +325,7 @@ INNER JOIN frota.modelo
        AND modelo.cod_modelo = veiculo.cod_modelo
  LEFT JOIN frota.veiculo_baixado
         ON veiculo_baixado.cod_veiculo = veiculo.cod_veiculo
-     WHERE 1 = 1</property>
+     WHERE 1 = 1]]></xml-property>
         </oda-data-set>
     </data-sets>
     <page-setup>
@@ -384,24 +341,69 @@ INNER JOIN frota.modelo
                     <property name="canShrink">false</property>
                     <property name="width">180mm</property>
                     <overridden-values>
-                        <ref-entry baseId="942" name="NewText6121"/>
-                        <ref-entry baseId="944" name="NewData2111"/>
-                        <ref-entry baseId="946" name="NewGrid1"/>
-                        <ref-entry baseId="955" name="NewData12121"/>
-                        <ref-entry baseId="957" name="NewData14121"/>
-                        <ref-entry baseId="960" name="NewData13121"/>
-                        <ref-entry baseId="962" name="NewData1521"/>
-                        <ref-entry baseId="965" name="NewData11121"/>
-                        <ref-entry baseId="968" name="NewData1621"/>
-                        <ref-entry baseId="971" name="NewText721"/>
-                        <ref-entry baseId="973" name="NewText1121"/>
-                        <ref-entry baseId="975" name="NewLabel2121"/>
-                        <ref-entry baseId="984" name="NewData6111"/>
-                        <ref-entry baseId="987" name="NewData3111"/>
-                        <ref-entry baseId="990" name="NewData8111"/>
-                        <ref-entry baseId="993" name="NewData4111"/>
-                        <ref-entry baseId="996" name="NewData5111"/>
-                        <ref-entry baseId="999" name="NewLabel8121"/>
+                        <ref-entry baseId="937" id="937"/>
+                        <ref-entry baseId="938" id="938"/>
+                        <ref-entry baseId="939" id="939"/>
+                        <ref-entry baseId="940" id="940"/>
+                        <ref-entry baseId="941" id="941"/>
+                        <ref-entry baseId="942" name="NewText6121" id="942"/>
+                        <ref-entry baseId="943" id="943"/>
+                        <ref-entry baseId="944" name="NewData2111" id="944"/>
+                        <ref-entry baseId="945" id="945"/>
+                        <ref-entry baseId="946" name="NewGrid1" id="946"/>
+                        <ref-entry baseId="947" id="947"/>
+                        <ref-entry baseId="948" id="948"/>
+                        <ref-entry baseId="949" id="949"/>
+                        <ref-entry baseId="950" id="950"/>
+                        <ref-entry baseId="951" id="951"/>
+                        <ref-entry baseId="952" id="952"/>
+                        <ref-entry baseId="953" id="953"/>
+                        <ref-entry baseId="954" id="954"/>
+                        <ref-entry baseId="955" name="NewData12121" id="955"/>
+                        <ref-entry baseId="956" id="956"/>
+                        <ref-entry baseId="957" name="NewData14121" id="957"/>
+                        <ref-entry baseId="958" id="958"/>
+                        <ref-entry baseId="959" id="959"/>
+                        <ref-entry baseId="960" name="NewData13121" id="960"/>
+                        <ref-entry baseId="961" id="961"/>
+                        <ref-entry baseId="962" name="NewData1521" id="962"/>
+                        <ref-entry baseId="963" id="963"/>
+                        <ref-entry baseId="964" id="964"/>
+                        <ref-entry baseId="965" name="NewData11121" id="965"/>
+                        <ref-entry baseId="966" id="966"/>
+                        <ref-entry baseId="967" id="967"/>
+                        <ref-entry baseId="968" name="NewData1621" id="968"/>
+                        <ref-entry baseId="969" id="969"/>
+                        <ref-entry baseId="970" id="970"/>
+                        <ref-entry baseId="971" name="NewText721" id="971"/>
+                        <ref-entry baseId="972" id="972"/>
+                        <ref-entry baseId="973" name="NewText1121" id="973"/>
+                        <ref-entry baseId="974" id="974"/>
+                        <ref-entry baseId="975" name="NewLabel2121" id="975"/>
+                        <ref-entry baseId="976" id="976"/>
+                        <ref-entry baseId="977" id="977"/>
+                        <ref-entry baseId="978" id="978"/>
+                        <ref-entry baseId="979" id="979"/>
+                        <ref-entry baseId="980" id="980"/>
+                        <ref-entry baseId="981" id="981"/>
+                        <ref-entry baseId="982" id="982"/>
+                        <ref-entry baseId="983" id="983"/>
+                        <ref-entry baseId="984" name="NewData6111" id="984"/>
+                        <ref-entry baseId="985" id="985"/>
+                        <ref-entry baseId="986" id="986"/>
+                        <ref-entry baseId="987" name="NewData3111" id="987"/>
+                        <ref-entry baseId="988" id="988"/>
+                        <ref-entry baseId="989" id="989"/>
+                        <ref-entry baseId="990" name="NewData8111" id="990"/>
+                        <ref-entry baseId="991" id="991"/>
+                        <ref-entry baseId="992" id="992"/>
+                        <ref-entry baseId="993" name="NewData4111" id="993"/>
+                        <ref-entry baseId="994" id="994"/>
+                        <ref-entry baseId="995" id="995"/>
+                        <ref-entry baseId="996" name="NewData5111" id="996"/>
+                        <ref-entry baseId="997" id="997"/>
+                        <ref-entry baseId="998" id="998"/>
+                        <ref-entry baseId="999" name="NewLabel8121" id="999"/>
                     </overridden-values>
                 </grid>
             </page-header>
@@ -409,7 +411,10 @@ INNER JOIN frota.modelo
                 <grid name="Rodape" id="229" extends="urbem.Rodape">
                     <property name="width">280cm</property>
                     <overridden-values>
-                        <ref-entry baseId="183" name="NewText2"/>
+                        <ref-entry baseId="180" id="180"/>
+                        <ref-entry baseId="181" id="181"/>
+                        <ref-entry baseId="182" id="182"/>
+                        <ref-entry baseId="183" name="NewText2" id="183"/>
                     </overridden-values>
                 </grid>
             </page-footer>
@@ -478,9 +483,10 @@ else{
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="1035">
-                <property name="width">20mm</property>
                 <property name="textAlign">right</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1036">
                 <property name="width">20mm</property>
@@ -498,19 +504,19 @@ else{
                 <property name="width">50mm</property>
             </column>
             <column id="1041">
-                <property name="width">20mm</property>
                 <property name="textAlign">center</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1042">
                 <property name="width">25mm</property>
             </column>
             <column id="1043">
-                <property name="width">20mm</property>
                 <property name="textAlign">right</property>
+                <property name="width">20mm</property>
             </column>
             <column id="1044">
-                <property name="width">15mm</property>
                 <property name="textAlign">center</property>
+                <property name="width">15mm</property>
             </column>
             <header>
                 <row id="1002">
@@ -801,9 +807,12 @@ else{
                                     <property name="name">total_veiculos</property>
                                     <expression name="expression">Total.count()</expression>
                                     <property name="dataType">integer</property>
-                                    <property name="aggregateOn">group_tipo</property>
+                                    <simple-property-list name="aggregateOn">
+                                        <value>group_tipo</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <column id="1084">
                                 <property name="width">3.4782608696in</property>
                             </column>
@@ -840,6 +849,9 @@ else{
                                 <property name="interval">none</property>
                                 <property name="sortDirection">asc</property>
                                 <expression name="keyExpr">row["nom_tipo"]</expression>
+                                <structure name="toc">
+                                    <expression name="expressionValue">row["nom_tipo"]</expression>
+                                </structure>
                                 <property name="repeatHeader">true</property>
                                 <property name="hideDetail">false</property>
                                 <property name="pageBreakAfter">auto</property>

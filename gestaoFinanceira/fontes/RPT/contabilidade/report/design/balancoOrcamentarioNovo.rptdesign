@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">mm</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <list-property name="userProperties">
         <structure>
             <property name="name">Data Cube.Despesas.x</property>
@@ -29,6 +28,7 @@
     <property name="Data Cube.Despesas.y">17</property>
     <property name="Data Cube.Despesas.width">150</property>
     <property name="Data Cube.Despesas.height">200</property>
+    <property name="units">mm</property>
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
         <structure>
@@ -40,9 +40,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -52,10 +52,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -66,10 +66,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -80,10 +80,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -93,10 +93,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -106,10 +106,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -119,10 +119,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -132,10 +132,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -145,10 +145,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -158,10 +158,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -171,10 +171,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -184,10 +184,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,10 +197,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -210,13 +210,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">Executivo</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -226,13 +226,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">TurnAround</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -242,13 +242,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -258,26 +258,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="2185">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="concealValue">true</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -287,36 +274,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="2187">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="concealValue">true</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="2188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="concealValue">true</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -326,12 +287,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -341,12 +302,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -359,9 +320,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -370,9 +331,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -381,9 +342,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -393,13 +354,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -409,13 +370,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -425,13 +386,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -441,13 +402,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -457,13 +418,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -473,12 +434,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -488,12 +449,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -503,12 +464,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -518,12 +479,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -533,12 +494,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -548,12 +509,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -563,12 +524,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -578,13 +539,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -594,13 +555,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -610,13 +571,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -626,13 +587,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -642,13 +603,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -658,13 +619,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -674,13 +635,13 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="concealValue">true</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -690,12 +651,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -705,12 +666,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -720,12 +681,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -735,12 +696,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -750,12 +711,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -763,9 +724,9 @@
         <scalar-parameter name="dt_inicial" id="6667">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -774,9 +735,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -785,9 +746,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -796,9 +757,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -807,9 +768,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -818,9 +779,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -829,9 +790,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -840,9 +801,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -851,29 +812,20 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
-        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dataExtenso" id="2374">
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dataExtenso" id="2374" >
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -2051,13 +2003,13 @@ valor</expression>
                 </structure>
                 <structure>
                     <property name="name">val_deficit</property>
-                    <property name="displayName">val_deficit</property>
+                    <text-property name="displayName">val_deficit</text-property>
                     <expression name="expression">params["deficit"]</expression>
                     <property name="dataType">any</property>
                 </structure>
                 <structure>
                     <property name="name">deficit_valor</property>
-                    <property name="displayName">deficit_valor</property>
+                    <text-property name="displayName">deficit_valor</text-property>
                     <expression name="expression">if (params["deficit"] > 0) {
 	params["deficit"];
 } else {
@@ -2253,10 +2205,10 @@ valor</expression>
             </header>
             <detail>
                 <row id="2414">
-                    <property name="height">4.526732673267326mm</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">4.526732673267326mm</property>
                     <cell id="2415">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2348,10 +2300,10 @@ valor</expression>
             </detail>
             <footer>
                 <row id="2431">
-                    <property name="height">3.772277227722772mm</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">3.772277227722772mm</property>
                     <cell id="2432">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -2468,10 +2420,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2448">
-                    <property name="height">3.772277227722772mm</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">3.772277227722772mm</property>
                     <cell id="2449">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -2542,12 +2494,12 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2763">
-                    <property name="height">15px</property>
                     <property name="newHandlerOnEachEvent">false</property>
                     <property name="marginRight">0pt</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2764">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
@@ -2659,10 +2611,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2754">
-                    <property name="height">15px</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2755">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
@@ -2774,10 +2726,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2773">
-                    <property name="height">15px</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2774">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
@@ -2889,10 +2841,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2782">
-                    <property name="height">15px</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2783">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
@@ -3004,10 +2956,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2794">
-                    <property name="height">15px</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2795">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
@@ -3119,10 +3071,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2803">
-                    <property name="height">15px</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15px</property>
                     <cell id="2804">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -3237,10 +3189,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2924">
-                    <property name="height">15pt</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15pt</property>
                     <cell id="2925">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -3345,10 +3297,10 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2475">
-                    <property name="height">15pt</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15pt</property>
                     <cell id="2476">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -3482,12 +3434,12 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2492">
-                    <property name="height">15pt</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="marginTop">0pt</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15pt</property>
                     <cell id="2493">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -3754,9 +3706,9 @@ valor</expression>
                     </cell>
                 </row>
                 <row id="2509">
-                    <property name="height">15pt</property>
                     <property name="paddingTop">0pt</property>
                     <property name="paddingBottom">0pt</property>
+                    <property name="height">15pt</property>
                     <cell id="2510">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -4379,7 +4331,7 @@ row["refin_atu"]-row["refin_liq_tot"];</expression>
                 </structure>
                 <structure>
                     <property name="name">superavit_valor</property>
-                    <property name="displayName">superavit_valor</property>
+                    <text-property name="displayName">superavit_valor</text-property>
                     <expression name="expression">if (params["superavit"] > 0) {
 	params["superavit"];
 } else {
@@ -4440,13 +4392,13 @@ row["refin_atu"]-row["refin_liq_tot"];</expression>
                 </structure>
                 <structure>
                     <property name="name">vl_pago_total</property>
-                    <property name="displayName">vl_pago_total</property>
+                    <text-property name="displayName">vl_pago_total</text-property>
                     <expression name="expression">dataSetRow["vl_pago_total"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">sub_pag_bim</property>
-                    <property name="displayName">sub_pag_bim</property>
+                    <text-property name="displayName">sub_pag_bim</text-property>
                     <expression name="expression">var w = Total.sum( row.vl_pago_total, row.descricao == "DESPESAS CORRENTES" );
 var x = Total.sum( row.vl_pago_total, row.descricao == "DESPESAS DE CAPITAL" );
 var y = Total.sum( row.vl_pago_total, row.descricao == "RESERVA DE CONTINGENCIA" );
@@ -4490,39 +4442,39 @@ var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
                 <property name="width">43mm</property>
             </column>
             <column id="2745">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <column id="2747">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <column id="2748">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <column id="2750">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <column id="6868">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <column id="2753">
-                <property name="width">17mm</property>
                 <property name="suppressDuplicates">false</property>
                 <property name="fontSize">5pt</property>
+                <property name="width">17mm</property>
             </column>
             <header>
                 <row id="2529">
-                    <property name="height">6.035643564356436mm</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6.035643564356436mm</property>
                     <cell id="2530">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -4691,8 +4643,8 @@ var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
             </header>
             <detail>
                 <row id="2576">
-                    <property name="height">4mm</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">4mm</property>
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
@@ -4792,8 +4744,8 @@ var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
             </detail>
             <footer>
                 <row id="2597">
-                    <property name="height">6mm</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6mm</property>
                     <cell id="2598">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -5472,8 +5424,8 @@ REFINANCIAMENTO (VII)]]></text-property>
                     </cell>
                 </row>
                 <row id="2681">
-                    <property name="height">6mm</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6mm</property>
                     <cell id="2682">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -5587,8 +5539,8 @@ REFINANCIAMENTO (VII)]]></text-property>
                     </cell>
                 </row>
                 <row id="2702">
-                    <property name="height">6mm</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6mm</property>
                     <cell id="2703">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -5678,9 +5630,9 @@ REFINANCIAMENTO (VII)]]></text-property>
                     </cell>
                 </row>
                 <row id="2723">
-                    <property name="height">6mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6mm</property>
                     <cell id="2724">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -6080,37 +6032,37 @@ REFINANCIAMENTO (VII)]]></text-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">exercicios_anteriores4</property>
-                    <property name="displayName">exercicios_anteriores4</property>
+                    <text-property name="displayName">exercicios_anteriores4</text-property>
                     <expression name="expression">dataSetRow["exercicios_anteriores"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">descricao4</property>
-                    <property name="displayName">descricao4</property>
+                    <text-property name="displayName">descricao4</text-property>
                     <expression name="expression">dataSetRow["descricao"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">exercicio_anterior4</property>
-                    <property name="displayName">exercicio_anterior4</property>
+                    <text-property name="displayName">exercicio_anterior4</text-property>
                     <expression name="expression">dataSetRow["exercicio_anterior"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">pagos4</property>
-                    <property name="displayName">pagos4</property>
+                    <text-property name="displayName">pagos4</text-property>
                     <expression name="expression">dataSetRow["pagos"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">cancelados4</property>
-                    <property name="displayName">cancelados4</property>
+                    <text-property name="displayName">cancelados4</text-property>
                     <expression name="expression">dataSetRow["cancelados"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">soma_exercicios_anteriores4</property>
-                    <property name="displayName">soma_exercicios_anteriores4</property>
+                    <text-property name="displayName">soma_exercicios_anteriores4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6123,7 +6075,7 @@ REFINANCIAMENTO (VII)]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">soma_exercicio_anterior4</property>
-                    <property name="displayName">soma_exercicio_anterior4</property>
+                    <text-property name="displayName">soma_exercicio_anterior4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6136,7 +6088,7 @@ REFINANCIAMENTO (VII)]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">soma_pagos4</property>
-                    <property name="displayName">soma_pagos4</property>
+                    <text-property name="displayName">soma_pagos4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6149,7 +6101,7 @@ REFINANCIAMENTO (VII)]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">soma_cancelados4</property>
-                    <property name="displayName">soma_cancelados4</property>
+                    <text-property name="displayName">soma_cancelados4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6162,13 +6114,13 @@ REFINANCIAMENTO (VII)]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">liquidados4</property>
-                    <property name="displayName">liquidados4</property>
+                    <text-property name="displayName">liquidados4</text-property>
                     <expression name="expression">dataSetRow["liquidados"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Aggregation</property>
-                    <property name="displayName">soma_liquidados4</property>
+                    <text-property name="displayName">soma_liquidados4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6181,13 +6133,13 @@ REFINANCIAMENTO (VII)]]></text-property>
                 </structure>
                 <structure>
                     <property name="name">saldo4</property>
-                    <property name="displayName">saldo4</property>
+                    <text-property name="displayName">saldo4</text-property>
                     <expression name="expression">(row["exercicios_anteriores4"]+row["exercicio_anterior4"]) -row["pagos4"]-row["cancelados4"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">soma_saldo4</property>
-                    <property name="displayName">soma_saldo4</property>
+                    <text-property name="displayName">soma_saldo4</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6219,9 +6171,9 @@ REFINANCIAMENTO (VII)]]></text-property>
             </column>
             <header>
                 <row id="6753">
-                    <property name="height">4mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">4mm</property>
                     <cell id="6754">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -6305,9 +6257,9 @@ REFINANCIAMENTO (VII)]]></text-property>
                     </cell>
                 </row>
                 <row id="6764">
-                    <property name="height">5.784158415841585mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">5.784158415841585mm</property>
                     <cell id="6765">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -6425,9 +6377,9 @@ REFINANCIAMENTO (VII)]]></text-property>
             </detail>
             <footer>
                 <row id="6782">
-                    <property name="height">15pt</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15pt</property>
                     <cell id="6783">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -6562,43 +6514,43 @@ REFINANCIAMENTO (VII)]]></text-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">descricao3</property>
-                    <property name="displayName">descricao3</property>
+                    <text-property name="displayName">descricao3</text-property>
                     <expression name="expression">dataSetRow["descricao"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">exercicios_anteriores</property>
-                    <property name="displayName">exercicios_anteriores</property>
+                    <text-property name="displayName">exercicios_anteriores</text-property>
                     <expression name="expression">dataSetRow["exercicios_anteriores"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">exercicio_anterior</property>
-                    <property name="displayName">exercicio_anterior</property>
+                    <text-property name="displayName">exercicio_anterior</text-property>
                     <expression name="expression">dataSetRow["exercicio_anterior"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">pagos</property>
-                    <property name="displayName">pagos</property>
+                    <text-property name="displayName">pagos</text-property>
                     <expression name="expression">dataSetRow["pagos"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">cancelados</property>
-                    <property name="displayName">cancelados</property>
+                    <text-property name="displayName">cancelados</text-property>
                     <expression name="expression">dataSetRow["cancelados"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">saldo</property>
-                    <property name="displayName">saldo</property>
+                    <text-property name="displayName">saldo</text-property>
                     <expression name="expression">dataSetRow["saldo"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">Aggregation</property>
-                    <property name="displayName">soma_exercicios_anteriores</property>
+                    <text-property name="displayName">soma_exercicios_anteriores</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -6675,9 +6627,9 @@ REFINANCIAMENTO (VII)]]></text-property>
             </column>
             <header>
                 <row id="6673">
-                    <property name="height">4mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">4mm</property>
                     <cell id="6674">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -6761,9 +6713,9 @@ REFINANCIAMENTO (VII)]]></text-property>
                     </cell>
                 </row>
                 <row id="6713">
-                    <property name="height">6.035643564356436mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">6.035643564356436mm</property>
                     <cell id="6715">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -6881,9 +6833,9 @@ REFINANCIAMENTO (VII)]]></text-property>
             </detail>
             <footer>
                 <row id="6687">
-                    <property name="height">15pt</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">15pt</property>
                     <cell id="6688">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -7004,7 +6956,7 @@ REFINANCIAMENTO (VII)]]></text-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">nota_explicativa</property>
-                    <property name="displayName">nota_explicativa</property>
+                    <text-property name="displayName">nota_explicativa</text-property>
                     <expression name="expression">dataSetRow["nota_explicativa"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -7065,7 +7017,7 @@ REFINANCIAMENTO (VII)]]></text-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

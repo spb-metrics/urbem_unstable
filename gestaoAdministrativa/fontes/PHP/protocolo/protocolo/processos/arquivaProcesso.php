@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: arquivaProcesso.php 61785 2015-03-03 21:06:56Z evandro $
+    $Id: arquivaProcesso.php 62506 2015-05-15 16:23:58Z michel $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -591,6 +591,16 @@ case 2:
                 </td>
             </tr>
 
+            <!-- Localização Física -->
+            <tr>
+                <td class=label>
+                    Localização Física do Arquivamento
+                </td>
+                <td class=field>
+                    <input type="text" id="localizacaoFisica" name="localizacaoFisica" size="80"></textarea>
+                </td>
+            </tr>
+
             <tr>
                 <td class=label>
                     Texto complementar
@@ -610,19 +620,22 @@ case 2:
 
 <?php
 break;
+
 case 3:
 
-include '../situacaoProcesso.class.php';
-$textoComplementar = $_REQUEST['textoComplementar'];
-Sessao::write('texto_complementar',$textoComplementar);
+    include '../situacaoProcesso.class.php';
+    $textoComplementar = $_REQUEST['textoComplementar'];
+    Sessao::write('texto_complementar',$textoComplementar);
 
-$codProcesso = $_REQUEST['codProcesso'];
-$arquivamento = $_REQUEST['arquivamento'];
-$historicoArquivamento = $_REQUEST['historicoArquivamento'];
-$anoE = $_REQUEST['anoE'];
+    $codProcesso           = $_REQUEST['codProcesso'];
+    $arquivamento          = $_REQUEST['arquivamento'];
+    $historicoArquivamento = $_REQUEST['historicoArquivamento'];
+    $anoE                  = $_REQUEST['anoE'];
+    $stLocalizacaoFisica   = $_REQUEST['localizacaoFisica'];
 
-$situacaoProcesso = new situacaoProcesso;
-$situacaoProcesso->setaVariaveisArquivamento($arquivamento,$codProcesso,$historicoArquivamento,$anoE);
+    $situacaoProcesso = new situacaoProcesso;
+    $situacaoProcesso->setaVariaveisArquivamento($arquivamento,$codProcesso,$historicoArquivamento,$anoE,$stLocalizacaoFisica);
+
     if ($situacaoProcesso->insereArquivamento()) {
         include(CAM_FW_LEGADO."auditoriaLegada.class.php");
         $audicao = new auditoriaLegada;
@@ -649,6 +662,7 @@ $situacaoProcesso->setaVariaveisArquivamento($arquivamento,$codProcesso,$histori
     }
 
 break;
+
 case 4:
 //echo $arquivamento;
 //*************************
@@ -887,9 +901,36 @@ echo "<br>";
             </td>
         </tr>
 
+        <?php
+            $select =   "SELECT
+                            localizacao
+                        FROM
+                            sw_processo_arquivado
+                        WHERE
+                            sw_processo_arquivado.cod_historico = ".$historicoArquivamento."
+                          AND
+                            sw_processo_arquivado.cod_processo = ".$codProcessoOriginal."
+                          AND
+                            sw_processo_arquivado.ano_exercicio = '".$anoExercicio."'";
+            $dbConfig = new dataBaseLegado;
+            $dbConfig->abreBd();
+            $dbConfig->abreSelecao($select);
+            $localizacao = $dbConfig->pegaCampo("localizacao");
+            $dbConfig->limpaSelecao();
+            $dbConfig->fechaBd();
+        ?>
         <tr>
             <td class=label>
-                Texto  Complementar
+                Localização Física do Arquivamento
+            </td>
+            <td class=field>
+                <?=$localizacao;?>
+            </td>
+        </tr>
+
+        <tr>
+            <td class=label>
+                Texto Complementar
             </td>
             <td class=field>
                 <?=nl2br(Sessao::read('texto_complementar'));?>
@@ -1139,6 +1180,32 @@ echo "<br>";
             </td>
             <td class=field>
                 <?=$historico;?>
+            </td>
+        </tr>
+        <?php
+            $select =   "SELECT
+                            localizacao
+                        FROM
+                            sw_processo_arquivado
+                        WHERE
+                            sw_processo_arquivado.cod_historico = ".$historicoArquivamento."
+                          AND
+                            sw_processo_arquivado.cod_processo = ".$codProcessoOriginal."
+                          AND
+                            sw_processo_arquivado.ano_exercicio = '".$anoExercicio."'";
+            $dbConfig = new dataBaseLegado;
+            $dbConfig->abreBd();
+            $dbConfig->abreSelecao($select);
+            $localizacao = $dbConfig->pegaCampo("localizacao");
+            $dbConfig->limpaSelecao();
+            $dbConfig->fechaBd();
+        ?>
+        <tr>
+            <td class=label>
+                Localização Física do Arquivamento
+            </td>
+            <td class=field>
+                <?=$localizacao;?>
             </td>
         </tr>
 

@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: reciboProcesso.php 62351 2015-04-28 13:51:03Z arthur $
+    $Id: reciboProcesso.php 62581 2015-05-21 14:05:03Z michel $
 
 */
 
@@ -64,6 +64,8 @@ $preview->addParametro ('pEntidadePrincipal'     , $stEntidadePrincipal);
 
 $stDataHoje = dataExtenso(date("Y-m-d"));
 $preview->addParametro ('pDataHoje', $stDataHoje);
+
+$preview->addParametro ('centroCusto', SistemaLegado::pegaConfiguracao("centro_custo", 5));
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 

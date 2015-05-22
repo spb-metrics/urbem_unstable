@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage 
 
-    $Id:$
+    $Id: despesaCorrente.plsql 62454 2015-05-12 17:57:26Z michel $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_despesa_corrente(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE
@@ -88,20 +88,20 @@ BEGIN
               SELECT 
                       ' || inMes || ' AS mes,
                       ''01'' AS cod_tipo,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%''),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'')),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'') AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
                       REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2.9.0.21.03.00.00.00'' OR classificacao ILIKE ''3.2.9.0.92.04.00.00.00''),0.00)::VARCHAR,''.'','''') AS despJurEncDivExt,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%''),0.00)::VARCHAR,''.'','''') AS despOutDespCor
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(saldo_inicial,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despOutDespCor
 
                UNION
 
               SELECT 
                       ' || inMes || ' AS mes,
                       ''02'' AS cod_tipo,
-                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%''),0.00)::VARCHAR, ''.'', '''') AS despPesEncSoc,
-                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'')),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
+                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%'' AND nivel = 5),0.00)::VARCHAR, ''.'', '''') AS despPesEncSoc,
+                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'') AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
                       REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2.9.0.21.03.00.00.00'' OR classificacao ILIKE ''3.2.9.0.92.04.00.00.00''),0.00)::VARCHAR,''.'','''') AS despJurEncDivExt,
-                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%''),0.00)::VARCHAR,''.'','''') AS despOutDespCor
+                      REPLACE(COALESCE((SELECT (SUM(COALESCE(saldo_inicial,0.00)) + SUM(COALESCE(suplementacoes,0.00)) - SUM(COALESCE(reducoes,0.00))) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despOutDespCor
 
                UNION
 
@@ -118,30 +118,30 @@ BEGIN
               SELECT 
                       ' || inMes || ' AS mes,
                       ''04'' AS cod_tipo,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%''),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'')),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'') AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
                       REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2.9.0.21.03.00.00.00'' OR classificacao ILIKE ''3.2.9.0.92.04.00.00.00''),0.00)::VARCHAR,''.'','''') AS despJurEncDivExt,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%''),0.00)::VARCHAR,''.'','''') AS despOutDespCor
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(empenhado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despOutDespCor
 
                UNION
 
               SELECT 
                       ' || inMes || ' AS mes,
                       ''05'' AS cod_tipo,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%''),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'')),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'') AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
                       REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2.9.0.21.03.00.00.00'' OR classificacao ILIKE ''3.2.9.0.92.04.00.00.00''),0.00)::VARCHAR,''.'','''') AS despJurEncDivExt,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%''),0.00)::VARCHAR,''.'','''') AS despOutDespCor
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(liquidado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despOutDespCor
 
                UNION
 
               SELECT 
                       ' || inMes || ' AS mes,
                       ''06'' AS cod_tipo,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%''),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'')),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.1%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despPesEncSoc,
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2%'' AND (classificacao NOT ILIKE ''3.2.9.0.21.03.00.00.00'' AND classificacao NOT ILIKE ''3.2.9.0.92.04.00.00.00'') AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despJurEncDivInt,
                       REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.2.9.0.21.03.00.00.00'' OR classificacao ILIKE ''3.2.9.0.92.04.00.00.00''),0.00)::VARCHAR,''.'','''') AS despJurEncDivExt,
-                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%''),0.00)::VARCHAR,''.'','''') AS despOutDespCor
+                      REPLACE(COALESCE((SELECT SUM(COALESCE(anulado_mes,0.00)) FROM tmp_elem_despesa WHERE classificacao ILIKE ''3.3%'' AND nivel = 5),0.00)::VARCHAR,''.'','''') AS despOutDespCor
           ';
           
     FOR reRegistro IN EXECUTE stSql

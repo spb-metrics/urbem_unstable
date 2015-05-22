@@ -49,13 +49,10 @@ BEGIN
                       FROM ima'||stEntidade||'.configuracao_dirf_prestador
                 INNER JOIN orcamento.conta_despesa
                         ON configuracao_dirf_prestador.exercicio = conta_despesa.exercicio
-                       AND configuracao_dirf_prestador.cod_conta = conta_despesa.cod_conta
-                INNER JOIN orcamento.despesa
-                        ON conta_despesa.exercicio = despesa.exercicio
-                       AND conta_despesa.cod_conta = despesa.cod_conta        
+                        AND configuracao_dirf_prestador.cod_conta = conta_despesa.cod_conta                
                 INNER JOIN empenho.pre_empenho_despesa
-                        ON despesa.exercicio = pre_empenho_despesa.exercicio
-                       AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                        ON configuracao_dirf_prestador.exercicio = pre_empenho_despesa.exercicio
+                        AND configuracao_dirf_prestador.cod_conta = pre_empenho_despesa.cod_conta
                 INNER JOIN empenho.pre_empenho
                         ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
                        AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
@@ -97,7 +94,7 @@ BEGIN
                 INNER JOIN contabilidade.plano_analitica
                         ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
                        AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
-                     WHERE ordem_pagamento_retencao.exercicio = '||inExercicio||'
+                     WHERE ordem_pagamento_retencao.exercicio = '''||inExercicio||'''
                        AND ordem_pagamento_retencao.cod_entidade = '||inCodEntidade||'
                        AND contabilidade.plano_analitica.cod_conta = '||inCodConta||'
                        AND pre_empenho.cgm_beneficiario = '||inCodCGM||'';

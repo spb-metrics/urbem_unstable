@@ -100,6 +100,7 @@ if ($_REQUEST['inCodPlanoFinal']) {
     $stLink .= '&inCodPlanoFinal='.$_REQUEST['inCodPlanoFinal'];
 }
 
+
 $stLink .= "&stAcao=".$stAcao;
 $stLink .= "&nomForm=".$_REQUEST['nomForm'];
 $stLink .= "&campoNum=".$_REQUEST['campoNum'];
@@ -107,7 +108,11 @@ $stLink .= "&campoNom=".$_REQUEST['campoNom'];
 $stLink .= "&tipoBusca=".$_REQUEST['tipoBusca'];
 $stLink .= "&inCodEntidade=".$_REQUEST['inCodEntidade'];
 
-$obRegra->setExercicio( Sessao::getExercicio() );
+if (isset($_REQUEST['stExercicio'])) {
+    $obRegra->setExercicio( $_REQUEST['stExercicio'] );    
+}else{
+    $obRegra->setExercicio( Sessao::getExercicio() );
+}
 
 if ($_REQUEST['stDescricao']) {
     $obRegra->setNomConta( $_REQUEST['stDescricao'] );

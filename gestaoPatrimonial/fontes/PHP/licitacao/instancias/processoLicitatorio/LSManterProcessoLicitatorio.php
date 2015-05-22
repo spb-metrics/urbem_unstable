@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: LSManterProcessoLicitatorio.php 61721 2015-02-27 16:19:16Z michel $
+    $Id: LSManterProcessoLicitatorio.php 62536 2015-05-18 19:53:51Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -163,6 +163,7 @@ if ($stAcao == 'consultar') {
 }
 
 $obTLicitacaoLicitacao->recuperaLicitacao($rsLicitacao,$stFiltro, $stOrder);
+
 $stFiltro = $stLink = "";
 
 $stLink .= "&stAcao=".$stAcao;
@@ -240,6 +241,7 @@ $obLista->ultimaAcao->addCampo( "&stExercicioLicitacao","exercicio");
 $obLista->ultimaAcao->addCampo( "&inCodModalidade","cod_modalidade");
 $obLista->ultimaAcao->addCampo( "&inCodEntidade","cod_entidade");
 $obLista->ultimaAcao->addCampo( "&dtHomologacao","dt_homologacao");
+$obLista->ultimaAcao->addCampo( "&boRegistroModalidade","tipo_chamada_publica");
 
 $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
 $obLista->setAjuda("UC-03.05.15");

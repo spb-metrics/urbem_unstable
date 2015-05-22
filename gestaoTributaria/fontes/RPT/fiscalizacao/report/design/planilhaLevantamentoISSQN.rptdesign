@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -27,9 +27,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -39,24 +39,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -66,42 +51,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">gt</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">123456</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -110,9 +65,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -121,10 +76,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -133,27 +88,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.2.56:5432/des_fiscalizacao</property>
-            <property name="odaUser">gt</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">MTIzNDU2</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -161,107 +105,107 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_processo</property>
-                    <property name="displayName">cod_processo</property>
+                    <text-property name="displayName">cod_processo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_fiscal</property>
-                    <property name="displayName">cod_fiscal</property>
+                    <text-property name="displayName">cod_fiscal</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_tipo_documento</property>
-                    <property name="displayName">cod_tipo_documento</property>
+                    <text-property name="displayName">cod_tipo_documento</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_documento</property>
-                    <property name="displayName">cod_documento</property>
+                    <text-property name="displayName">cod_documento</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">logradouro_f</property>
-                    <property name="displayName">logradouro_f</property>
+                    <text-property name="displayName">logradouro_f</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">logradouro_i</property>
-                    <property name="displayName">logradouro_i</property>
+                    <text-property name="displayName">logradouro_i</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numero_f</property>
-                    <property name="displayName">numero_f</property>
+                    <text-property name="displayName">numero_f</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numero_i</property>
-                    <property name="displayName">numero_i</property>
+                    <text-property name="displayName">numero_i</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">complemento_f</property>
-                    <property name="displayName">complemento_f</property>
+                    <text-property name="displayName">complemento_f</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">complemento_i</property>
-                    <property name="displayName">complemento_i</property>
+                    <text-property name="displayName">complemento_i</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_uf</property>
-                    <property name="displayName">nom_uf</property>
+                    <text-property name="displayName">nom_uf</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_municipio</property>
-                    <property name="displayName">nom_municipio</property>
+                    <text-property name="displayName">nom_municipio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_bairro</property>
-                    <property name="displayName">nom_bairro</property>
+                    <text-property name="displayName">nom_bairro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_bairro</property>
-                    <property name="displayName">cod_bairro</property>
+                    <text-property name="displayName">cod_bairro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_logradouro</property>
-                    <property name="displayName">cod_logradouro</property>
+                    <text-property name="displayName">cod_logradouro</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cep</property>
-                    <property name="displayName">cep</property>
+                    <text-property name="displayName">cep</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">caixa_postal</property>
-                    <property name="displayName">caixa_postal</property>
+                    <text-property name="displayName">caixa_postal</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">inscricao_municipal</property>
-                    <property name="displayName">inscricao_municipal</property>
+                    <text-property name="displayName">inscricao_municipal</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">inscricao_economica</property>
-                    <property name="displayName">inscricao_economica</property>
+                    <text-property name="displayName">inscricao_economica</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_atividade</property>
-                    <property name="displayName">nom_atividade</property>
+                    <text-property name="displayName">nom_atividade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_atividade</property>
-                    <property name="displayName">cod_atividade</property>
+                    <text-property name="displayName">cod_atividade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">endereco</property>
-                    <property name="displayName">endereco</property>
+                    <text-property name="displayName">endereco</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_modalidade</property>
-                    <property name="displayName">nom_modalidade</property>
+                    <text-property name="displayName">nom_modalidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_modalidade</property>
-                    <property name="displayName">cod_modalidade</property>
+                    <text-property name="displayName">cod_modalidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">numcgm</property>
-                    <property name="displayName">numcgm</property>
+                    <text-property name="displayName">numcgm</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_cgm</property>
-                    <property name="displayName">nom_cgm</property>
+                    <text-property name="displayName">nom_cgm</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -709,75 +653,75 @@ LEFT OUTER JOIN fiscalizacao.processo_fiscal_cancelado AS pfc
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_processo</property>
-                    <property name="displayName">cod_processo</property>
+                    <text-property name="displayName">cod_processo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">competencia</property>
-                    <property name="displayName">competencia</property>
+                    <text-property name="displayName">competencia</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">data</property>
-                    <property name="displayName">data</property>
+                    <text-property name="displayName">data</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">declarada</property>
-                    <property name="displayName">declarada</property>
+                    <text-property name="displayName">declarada</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">efetiva</property>
-                    <property name="displayName">efetiva</property>
+                    <text-property name="displayName">efetiva</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">pago</property>
-                    <property name="displayName">pago</property>
+                    <text-property name="displayName">pago</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">devido</property>
-                    <property name="displayName">devido</property>
+                    <text-property name="displayName">devido</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">devolver</property>
-                    <property name="displayName">devolver</property>
+                    <text-property name="displayName">devolver</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">pagar</property>
-                    <property name="displayName">pagar</property>
+                    <text-property name="displayName">pagar</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_d</property>
-                    <property name="displayName">total_d</property>
+                    <text-property name="displayName">total_d</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_p</property>
-                    <property name="displayName">total_p</property>
+                    <text-property name="displayName">total_p</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_d_num</property>
-                    <property name="displayName">total_d_num</property>
+                    <text-property name="displayName">total_d_num</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_p_num</property>
-                    <property name="displayName">total_p_num</property>
+                    <text-property name="displayName">total_p_num</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_indicador</property>
-                    <property name="displayName">cod_indicador</property>
+                    <text-property name="displayName">cod_indicador</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor_c</property>
-                    <property name="displayName">valor_c</property>
+                    <text-property name="displayName">valor_c</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">indice</property>
-                    <property name="displayName">indice</property>
+                    <text-property name="displayName">indice</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor_mora</property>
-                    <property name="displayName">valor_mora</property>
+                    <text-property name="displayName">valor_mora</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor_juros</property>
-                    <property name="displayName">valor_juros</property>
+                    <text-property name="displayName">valor_juros</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -1416,63 +1360,63 @@ LEFT JOIN ( SELECT fla.cod_processo
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_processo</property>
-                    <property name="displayName">cod_processo</property>
+                    <text-property name="displayName">cod_processo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_declarada</property>
-                    <property name="displayName">max_declarada</property>
+                    <text-property name="displayName">max_declarada</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_efetiva</property>
-                    <property name="displayName">max_efetiva</property>
+                    <text-property name="displayName">max_efetiva</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_pago</property>
-                    <property name="displayName">max_pago</property>
+                    <text-property name="displayName">max_pago</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_devido</property>
-                    <property name="displayName">max_devido</property>
+                    <text-property name="displayName">max_devido</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_devolver</property>
-                    <property name="displayName">max_devolver</property>
+                    <text-property name="displayName">max_devolver</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_pagar</property>
-                    <property name="displayName">max_pagar</property>
+                    <text-property name="displayName">max_pagar</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_total_d</property>
-                    <property name="displayName">max_total_d</property>
+                    <text-property name="displayName">max_total_d</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_total_p</property>
-                    <property name="displayName">max_total_p</property>
+                    <text-property name="displayName">max_total_p</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_valor_c</property>
-                    <property name="displayName">max_valor_c</property>
+                    <text-property name="displayName">max_valor_c</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_valor_mora</property>
-                    <property name="displayName">max_valor_mora</property>
+                    <text-property name="displayName">max_valor_mora</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">max_valor_juros</property>
-                    <property name="displayName">max_valor_juros</property>
+                    <text-property name="displayName">max_valor_juros</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_geral</property>
-                    <property name="displayName">total_geral</property>
+                    <text-property name="displayName">total_geral</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_geral_num</property>
-                    <property name="displayName">total_geral_num</property>
+                    <text-property name="displayName">total_geral_num</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">total_geral_real</property>
-                    <property name="displayName">total_geral_real</property>
+                    <text-property name="displayName">total_geral_real</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -1970,7 +1914,7 @@ LEFT JOIN ( SELECT fla.cod_processo
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">valor_extenso</property>
-                    <property name="displayName">valor_extenso</property>
+                    <text-property name="displayName">valor_extenso</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -2062,7 +2006,7 @@ LEFT JOIN ( SELECT fla.cod_processo
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">total_geral</property>
-                    <property name="displayName">total_geral</property>
+                    <text-property name="displayName">total_geral</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -2525,7 +2469,7 @@ LEFT JOIN ( SELECT fla.cod_processo
                 </structure>
                 <structure>
                     <property name="name">total_geral</property>
-                    <property name="displayName">total_geral</property>
+                    <text-property name="displayName">total_geral</text-property>
                     <expression name="expression">var total = Total.sum(dataSetRow["total_p_num"]) - Total.sum(dataSetRow["total_d_num"]);
 var max = new String();
 
@@ -2540,7 +2484,7 @@ max;</expression>
                 </structure>
                 <structure>
                     <property name="name">nome_total</property>
-                    <property name="displayName">nome_total</property>
+                    <text-property name="displayName">nome_total</text-property>
                     <expression name="expression">var total = Total.sum(dataSetRow["total_p_num"]) - Total.sum(dataSetRow["total_d_num"]);
 var nome = new String();
 
@@ -2555,7 +2499,7 @@ nome;</expression>
                 </structure>
                 <structure>
                     <property name="name">new_total</property>
-                    <property name="displayName">new_total</property>
+                    <text-property name="displayName">new_total</text-property>
                     <expression name="expression">var total = Total.sum(dataSetRow["total_p_num"]) - Total.sum(dataSetRow["total_d_num"]);
 var max = new String();
 
@@ -2571,56 +2515,56 @@ max;</expression>
             </list-property>
             <property name="pageBreakInterval">50</property>
             <column id="1208">
-                <property name="width">6.4%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">6.4%</property>
             </column>
             <column id="1209">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1210">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1211">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1212">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1213">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1214">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1215">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1216">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1217">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1218">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1219">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <column id="1220">
-                <property name="width">7.2%</property>
                 <property name="verticalAlign">middle</property>
+                <property name="width">7.2%</property>
             </column>
             <header>
                 <row id="1166">
@@ -3768,9 +3712,9 @@ max;</expression>
                         </list-property>
                         <property name="pageBreakInterval">50</property>
                         <column id="1567">
-                            <property name="width">10%</property>
                             <property name="textAlign">center</property>
                             <property name="verticalAlign">middle</property>
+                            <property name="width">10%</property>
                         </column>
                         <column id="1568">
                             <property name="width">90%</property>
@@ -3873,7 +3817,7 @@ max;</expression>
                                             </structure>
                                             <structure>
                                                 <property name="name">total_geral</property>
-                                                <property name="displayName">total_new_geral</property>
+                                                <text-property name="displayName">total_new_geral</text-property>
                                                 <expression name="expression">var total = Total.sum(dataSetRow["total_p_num"]) - Total.sum(dataSetRow["total_d_num"]);
 var max = new String();
 
@@ -3960,7 +3904,7 @@ max;</expression>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">data_extenso</property>
-                                <property name="displayName">data_extenso</property>
+                                <text-property name="displayName">data_extenso</text-property>
                                 <expression name="expression">var meses = new Array("Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro");
 var semana = new Array("Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado");
 var hoje = new Date();

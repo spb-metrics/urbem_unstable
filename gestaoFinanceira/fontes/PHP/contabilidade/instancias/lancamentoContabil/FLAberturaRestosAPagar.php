@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLAberturaRestosAPagar.php 62406 2015-05-05 14:43:16Z franver $
+    $Id: FLAberturaRestosAPagar.php 62541 2015-05-18 21:39:12Z arthur $
 
     $Revision: $
     $Name$
@@ -85,7 +85,7 @@ $obHdnEval->setValue ( $stEval             );
 if ( $obRConfiguracao->getValor() == 'T' ) {
     $stObs = "Este processo já foi executado! Se deseja prosseguir faça a Anulação de Restos à pagar primeiro!";
 } else {
-    $stObs = "Este processo é lento devido aos cálculos de restos a pagar.<BR>Recomenda-se que o mesmo seja executado após o término do expediente.";
+    $stObs = "Este processo é lento devido aos cálculos de restos a pagar. </br> Recomenda-se que o mesmo seja executado após o término do expediente.";
 }
 
 $obLblObs = new Label;

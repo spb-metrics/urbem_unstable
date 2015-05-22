@@ -35,7 +35,7 @@ $Name:  $
 $Author: lbbarreiro $
 $Date: 2007-10-31 15:55:22 -0200 (Qua, 31 Out 2007) $
 
- $Id: OCContaAnalitica.php 61128 2014-12-10 16:58:44Z silvia $
+ $Id: OCContaAnalitica.php 62521 2015-05-18 14:05:16Z arthur $
 
 Casos de uso: uc-02.02.02,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -513,18 +513,19 @@ switch ( $request->get('stCtrl') ) {
 
         if ($_GET[$_GET['stNomCampoCod']]) {
             include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoAnalitica.class.php"        );
-            $obTContabilidadePlanoAnalitica        = new TContabilidadePlanoAnalitica;
+            $obTContabilidadePlanoAnalitica = new TContabilidadePlanoAnalitica;
 
             $inExercicio =  Sessao::getExercicio();
 
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '". $inExercicio ."' AND ";
-            $stFiltro .= "\n pc.cod_estrutural like '1.1.%'  ";
+            $stFiltro .= "\n pc.cod_estrutural like '2.%' ";
 
             $stFiltro = ($stFiltro) ? " WHERE " . $stFiltro : "";
             $stOrder = ( $stOrder ) ?  $stOrder : 'cod_estrutural';
             $obErro = $obTContabilidadePlanoAnalitica->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+            
             if (!$obErro->ocorreu()) {
                 if ($rsRecordSet->getCampo('cod_plano') <> "")
                     $stDescricao = $rsRecordSet->getCampo( 'nom_conta' );

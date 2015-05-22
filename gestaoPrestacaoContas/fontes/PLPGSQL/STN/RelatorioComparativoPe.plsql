@@ -33,11 +33,12 @@
 
 CREATE OR REPLACE FUNCTION stn.fn_comparativoPe(stExercicio varchar, dtInicio varchar, dtFinal varchar, stEntidades varchar) RETURNS SETOF RECORD AS $$
 DECLARE
-  stSql         VARCHAR;
-  reRegistro    RECORD;  
-  inMes         INTEGER;
-  arCodPlanos   INTEGER[];
-  stCodContas   VARCHAR;
+  stSql          VARCHAR;
+  stSqlPrincipal VARCHAR;
+  reRegistro     RECORD;  
+  inMes          INTEGER;
+  arCodPlanos    INTEGER[];
+  stCodContas    VARCHAR;
 BEGIN
 
     inMes:= EXTRACT(month from TO_TIMESTAMP(dtInicio,'dd/mm/yyyy'));
@@ -54,9 +55,13 @@ BEGIN
         arCodPlanos := array_append(arCodPlanos, reRegistro.cod_plano);
     END LOOP;
 
-    stCodContas := array_to_string(arCodPlanos, ',');
+    IF arCodPlanos IS NOT NULL THEN
+        stCodContas := array_to_string(arCodPlanos, ',');
+    ELSE
+        RAISE EXCEPTION 'É necessário configurar a conta  Antecipações de Receita Orçamentária - ARO na configuração do STN';
+    END IF;
 
-    stSql = ' --Valor da despesa liquida inativos e pensionistas
+    stSqlPrincipal := '
             SELECT  descricao
                     , liquidado as valor
             FROM(
@@ -225,11 +230,9 @@ BEGIN
                                             , '''||dtFinal||'''
                                         ),0.00)
                              as valor4 --saldo_mes_recebido_interna_outro
-            ) as tbl4
+            ) as tbl4';
 
-        ';
-
-  FOR reRegistro IN EXECUTE stSql
+  FOR reRegistro IN EXECUTE stSqlPrincipal
   LOOP
       RETURN next reRegistro;
   END LOOP;

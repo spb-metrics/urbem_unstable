@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterVeiculo.php 62248 2015-04-14 12:36:52Z jean $
+    * $Id: OCManterVeiculo.php 62593 2015-05-21 18:35:18Z jean $
 
     * Casos de uso: uc-03.02.06
 */
@@ -52,6 +52,7 @@ include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php";
 include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
 include_once(CAM_GA_PROT_COMPONENTES.'IPopUpProcesso.class.php');
 include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoLocacao.class.php' );
+include_once ( CAM_GP_FRO_MAPEAMENTO.'TFrotaVeiculoCessao.class.php' );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterVeiculo";
@@ -149,6 +150,48 @@ function montaListaLocacoes($arLocacoes)
     $obTable->montaHTML( true );
 
     return "$('spnLocacaoDados').innerHTML = '".$obTable->getHtml()."';";
+
+}
+
+function montaListaCessoes($arCessoes)
+{
+    global $pgOcul;
+
+    if ( !is_array($arCessoes) ) {
+        $arCessoes = array();  
+    }
+
+    foreach ($arCessoes as $index => $val) {
+        $arAux = array_reverse(explode("/", $val['dt_inicio']));
+        $date = date('d/m/Y', strtotime(($arAux[0]."-".$arAux[1]."-".$arAux[2])));
+        $arCessoes[$index]['dt_inicio'] = $date;
+    }
+    
+    usort($arCessoes,"comparador");
+
+    $rsCessoes = new RecordSet();
+    $rsCessoes->preenche( $arCessoes );
+
+    $obTable = new Table();
+    $obTable->setRecordset( $rsCessoes );
+    $obTable->setSummary( 'Lista de Cessões do Veículo' );
+
+    $obTable->Head->addCabecalho( 'Processo', 10 );
+    $obTable->Head->addCabecalho( 'CGM Cedente', 30 );
+    $obTable->Head->addCabecalho( 'Início', 10 );
+    $obTable->Head->addCabecalho( 'Término', 10 );
+
+    $obTable->Body->addCampo( '[cod_processo]/[exercicio]', 'C' );
+    $obTable->Body->addCampo( '[cgm_cedente] - [nom_cedente]', 'C' );
+    $obTable->Body->addCampo( 'dt_inicio', 'C' );
+    $obTable->Body->addCampo( 'dt_termino', 'C' );
+
+    $obTable->Body->addAcao( 'alterar', "JavaScript:ajaxJavaScript(  '".CAM_GP_FRO_INSTANCIAS."veiculo/".$pgOcul."?".Sessao::getId()."&id=%s', 'montaAlterarCessao' );", array( 'id'));
+    $obTable->Body->addAcao( 'excluir', "JavaScript:ajaxJavaScript(  '".CAM_GP_FRO_INSTANCIAS."veiculo/".$pgOcul."?".Sessao::getId()."&id=%s', 'excluirCessao' );", array( 'id',));
+
+    $obTable->montaHTML( true );
+
+    return "$('spnListaCessao').innerHTML = '".$obTable->getHtml()."';";
 
 }
 
@@ -544,7 +587,7 @@ switch ($stCtrl) {
                     $stEval = $stEval.$obIMontaOrganograma->getScript();
                 }
 
-                 //cria um form
+                //cria um form
                 $obFormLocacao = new Form();
                 $obFormLocacao->setAction ($pgProc);
                 $obFormLocacao->setTarget ("oculto");
@@ -702,7 +745,8 @@ switch ($stCtrl) {
                 if ($rsVeiculoLocacoes->getNumLinhas() > 0) {
                     $arVeiculoLocacoes = array();
                     foreach ($rsVeiculoLocacoes->getElementos() as $i => $valor) {
-                        $arVeiculoLocacoes[$i]['id']                   = $valor['id'];
+                        $arVeiculoLocacoes[$i]['id']                   = $i+1;
+                        $arVeiculoLocacoes[$i]['id_locacao']           = $valor['id'];
                         $arVeiculoLocacoes[$i]['stProcessoLocacao']    = str_pad($valor['cod_processo'],5,'0',STR_PAD_LEFT)."/".$valor['ano_exercicio'];
                         $arVeiculoLocacoes[$i]['stExercicioLocacao']   = $valor['exercicio'];
                         $arVeiculoLocacoes[$i]['dtIniLocacao']         = $valor['dt_inicio'];
@@ -711,13 +755,12 @@ switch ($stCtrl) {
                         $arVeiculoLocacoes[$i]['dtContrato']           = $valor['dt_contrato'];
                         $arVeiculoLocacoes[$i]['inCodLocatario']       = $valor['cgm_locatario'];
                         $arVeiculoLocacoes[$i]['inNumEmpenhoLocacao']  = $valor['cod_empenho'];
-                        $arVeiculoLocacoes[$i]['inValorLocacao']       = $valor['vl_locacao'];
+                        $arVeiculoLocacoes[$i]['inValorLocacao']       = number_format($valor['vl_locacao'], 2, ",", ".");
                         $arVeiculoLocacoes[$i]['stNomLocatario']       = SistemaLegado::pegaDado('nom_cgm','sw_cgm',' WHERE numcgm = '.$valor['cgm_locatario'].'');
                     }
                     Sessao::write('arLocacoes',$arVeiculoLocacoes);
                     $stJs .= montaListaLocacoes($arVeiculoLocacoes);
                 }
-
             }
 
             $obFormulario->montaInnerHTML();
@@ -731,12 +774,17 @@ switch ($stCtrl) {
             $stJs .= "jq('#inCodEntidade').val(".$_REQUEST['inCodEntidade'].");"; 
             $stJs .= "montaParametrosGET( 'MontaUnidade');";
             $stJs .= "$('hdnOrigem').value = '".$stEval."'; ";
+
+            if ($_REQUEST['stOrigem'] == 'proprio') {
+                $stJs .= "$('spnLocacao').innerHTML = '';";
+
+                Sessao::remove('arLocacoes');
+            }
             
         } else {
             $stJs .= "$('spnOrigem').innerHTML = '';";
             $stJs .= "$('hdnOrigem').value = ''; ";
         }
-        //SistemaLegado::mostravar($stJs);die;
     break;
 
    case "MontaUnidade":
@@ -811,7 +859,7 @@ switch ($stCtrl) {
 
             if ($rsLista->getNumLinhas() > 0 ) {
                 $obREmpenhoEmpenho->setCodEmpenho ( $_REQUEST["inCodigoEmpenho"] );
-                $obREmpenhoEmpenho->consultar();
+                $obREmpenhoEmpenho->consultar($boTransacao);
                 $stNomFornecedor = ( $rsLista->getCampo( 'nom_fornecedor' ) ) ? str_replace( "'","\'",$rsLista->getCampo( "nom_fornecedor" )):'&nbsp;';
                 $stJs .= "d.getElementById('stNomFornecedor').innerHTML='".$stNomFornecedor."';";
             } else {
@@ -851,7 +899,7 @@ switch ($stCtrl) {
             $stMensagem = 'Informe a data de início da locação.';
         } 
 
-        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparadadatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
+        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparaDatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
             $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
         } 
 
@@ -859,7 +907,7 @@ switch ($stCtrl) {
             $stMensagem = 'Informe a data de término da locação.';
         } 
 
-        elseif ($_REQUEST['dtFimLocacao'] != '' && SistemaLegado::comparadatas($_REQUEST['dtIniLocacao'], $_REQUEST['dtFimLocacao'],true) == 1) {
+        elseif ($_REQUEST['dtFimLocacao'] != '' && SistemaLegado::comparaDatas($_REQUEST['dtIniLocacao'], $_REQUEST['dtFimLocacao'],true) == 1) {
             $stMensagem = 'A data de término da locação não pode ser menor ou igual que a data de início da locação.';
         }
 
@@ -871,7 +919,7 @@ switch ($stCtrl) {
             $stMensagem = 'Informe a data do contrato de locação.';
         }
 
-        elseif ($_REQUEST['dtContrato'] != '' && SistemaLegado::comparadatas($_REQUEST['dtContrato'],$_REQUEST['dtIniLocacao'],false) == 1) {
+        elseif ($_REQUEST['dtContrato'] != '' && SistemaLegado::comparaDatas($_REQUEST['dtContrato'],$_REQUEST['dtIniLocacao'],false) == 1) {
             $stMensagem = 'A data do contrato deve ser igual ou inferior que a data de início.';
         }
 
@@ -898,10 +946,10 @@ switch ($stCtrl) {
                     break;
                 }
 
-                if (SistemaLegado::comparadatas($arTemp['dtIniLocacao'],$_REQUEST['dtIniLocacao'],true) == 1) {
+                if (SistemaLegado::comparaDatas($arTemp['dtIniLocacao'],$_REQUEST['dtIniLocacao'],true) == 1) {
                     $stMensagem = "A data de início deve ser posterior à ".$arTemp['dtIniLocacao']."";
                     break;
-                } elseif (SistemaLegado::comparadatas($arTemp['dtFimLocacao'],$_REQUEST['dtFimLocacao'],true) == 1) {
+                } elseif (SistemaLegado::comparaDatas($arTemp['dtFimLocacao'],$_REQUEST['dtFimLocacao'],true) == 1) {
                     $stMensagem = "A data de término deve ser posterior à ".$arTemp['dtFimLocacao']."";
                     break;
                 }
@@ -912,6 +960,7 @@ switch ($stCtrl) {
             $arLocacoes = Sessao::read('arLocacoes');
             $inCount = count($arLocacoes);
             $arLocacoes[$inCount]['id']                   = $inCount + 1;
+            $arLocacoes[$inCount]['id_locacao']           = $arLocacoes[$inCount]['id_locacao'];
             $arLocacoes[$inCount]['stProcessoLocacao']    = $_REQUEST['stProcessoLocacao'];
             $arLocacoes[$inCount]['stExercicioLocacao']   = $_REQUEST['stExercicioLocacao'];
             $arLocacoes[$inCount]['dtIniLocacao']         = $_REQUEST['dtIniLocacao'];
@@ -922,7 +971,7 @@ switch ($stCtrl) {
             $arLocacoes[$inCount]['inNumEmpenhoLocacao']  = $_REQUEST['inNumEmpenhoLocacao'];
             $arLocacoes[$inCount]['inValorLocacao']       = $_REQUEST['inValorLocacao'];
             $arLocacoes[$inCount]['stNomLocatario']       = $_REQUEST['stNomLocatario'];
-
+            
             $stJs .= montaListaLocacoes( $arLocacoes );
             $stJs .= "jq('#stProcessoLocacao').val('');";
             $stJs .= "jq('#stExercicioLocacao').val('".Sessao::getExercicio()."');";
@@ -1003,6 +1052,80 @@ switch ($stCtrl) {
         }
     break;
 
+    case 'incluirDadosCessao' :
+        $stJs = isset($stJs) ? $stJs : null;
+
+        if ($_REQUEST['stProcessoCessao'] == '') {
+            $stMensagem = 'Informe o processo!';
+        } elseif ($_REQUEST['inCodCedente'] == '') {
+            $stMensagem = 'Informe o CGM cedente da cessão!';
+        } elseif ($_REQUEST['dtInicioCessao'] == '') {
+            $stMensagem = 'Informe a data de início da cessão!';
+        } elseif ($_REQUEST['dtTerminoCessao'] == '') {
+            $stMensagem = 'Informe a data de término da cessão!';
+        } elseif ( SistemaLegado::comparaDatas($_REQUEST['dtInicioCessao'],$_REQUEST['dtTerminoCessao'],true) == true ) {
+            $stMensagem = 'O início da cessão não pode ser maior ou igual ao término da cessão!';
+        }
+
+        if ( count( Sessao::read('arListaCessao') ) > 0 ) {
+           foreach ( Sessao::read('arListaCessao') AS $arTemp ) {
+                if ( (str_pad($arTemp['cod_processo'],5,'0',STR_PAD_LEFT)."/".$arTemp['exercicio'] == $_REQUEST['stProcessoCessao']) &&
+                     ($arTemp['cgm_cedente'] == $_REQUEST['inCodCedente'])                                                           &&
+                     ($arTemp['nom_cedente'] == $_REQUEST['stNomCedente'])                                                           &&
+                     ($arTemp['dt_inicio']   == $_REQUEST['dtInicioCessao'])                                                         &&
+                     ($arTemp['dt_termino']  == $_REQUEST['dtTerminoCessao']) 
+                    ) {
+                    $stMensagem = 'Esta cessão já está na lista.';
+                    break;
+                }
+
+                if ( $arTemp['dt_inicio'] == $_REQUEST['dtInicioCessao'] ) {
+                    $stMensagem = "O início da cessão não pode ser igual a ".$arTemp['dt_inicio']."";
+                    break;
+                } elseif ( $arTemp['dt_termino'] == $_REQUEST['dtTerminoCessao'] ) {
+                    $stMensagem = "O término da cessão não pode ser igual a ".$arTemp['dt_termino']."";
+                    break;
+                } elseif ( (SistemaLegado::comparaDatas($_REQUEST['dtInicioCessao'],$arTemp['dt_inicio'],false) == true) &&
+                           (SistemaLegado::comparaDatas($_REQUEST['dtInicioCessao'],$arTemp['dt_termino'],false) == false)
+                         ) {
+                    $stMensagem = "O início da cessão não pode estar entre ".$arTemp['dt_inicio']." e ".$arTemp['dt_termino']."";
+                    break;
+                } else if ((SistemaLegado::comparaDatas($_REQUEST['dtInicioCessao'],$arTemp['dt_inicio'],true) == false) &&
+                           (SistemaLegado::comparaDatas($_REQUEST['dtTerminoCessao'],$_REQUEST['dtInicioCessao'],true) == true)
+                          ) {
+                    $stMensagem = "O término da cessão não pode ser igual ou maior que ".$arTemp['dt_inicio']."";
+                    break;
+                }
+            }
+        }
+
+        if (!$stMensagem) {
+            $arListaCessao = Sessao::read('arListaCessao');
+            $inCount = count($arListaCessao);
+
+            $arListaCessao[$inCount]['id']            = $inCount + 1;
+            $arListaCessao[$inCount]['id_cessao']     = $arListaCessao[$inCount]['id_cessao'];
+            $arListaCessao[$inCount]['cod_processo']  = substr($_REQUEST['stProcessoCessao'], 0, 5);
+            $arListaCessao[$inCount]['exercicio']     = substr($_REQUEST['stProcessoCessao'], 6, 4);
+            $arListaCessao[$inCount]['cgm_cedente']   = $_REQUEST['inCodCedente'];
+            $arListaCessao[$inCount]['nom_cedente']   = $_REQUEST['stNomCedente'];
+            $arListaCessao[$inCount]['dt_inicio']     = $_REQUEST['dtInicioCessao'];
+            $arListaCessao[$inCount]['dt_termino']    = $_REQUEST['dtTerminoCessao'];
+
+            $stJs .= montaListaCessoes( $arListaCessao );
+            $stJs .= "jq('#hdnIdCessao').val('');";
+            $stJs .= "jq('#stProcessoCessao').val('');";
+            $stJs .= "jq('#inCodCedente').val('');";
+            $stJs .= "jq('#stNomCedente').html('&nbsp;');";
+            $stJs .= "jq('#dtInicioCessao').val('');";
+            $stJs .= "jq('#dtTerminoCessao').val('');";
+
+            Sessao::write('arListaCessao' , $arListaCessao);
+        } else {
+            $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
+        }
+    break;
+
     case 'montaAlteracaoDocumento' :
 
         $arDocumentos = Sessao::read('arDocumentos');
@@ -1048,7 +1171,25 @@ switch ($stCtrl) {
 
         $stJs .= "$('incluiDadosLocacao').value = 'Alterar';";
         $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'alterarLocacao\',\'hdnIdLocacao,stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodEntidadeLocacao,inCodLocatario,stNomLocatario,inNumEmpenhoLocacao,inValorLocacao\');');";
+        $stJs .= "jq('#incluiDadosLocacao').focus();";
         break;
+
+    case 'montaAlterarCessao' :
+        $arCessoes = Sessao::read('arListaCessao');
+        $inCount = $_REQUEST['id'];
+        $inCount = $inCount - 1;
+
+        $stJs .= "jq('#hdnIdCessao').val ('".$_REQUEST['id']."');";
+        $stJs .= "jq('#stProcessoCessao').val ('".$arCessoes[$inCount]['cod_processo']."/".$arCessoes[$inCount]['exercicio']."');";
+        $stJs .= "jq('#inCodCedente').val (".$arCessoes[$inCount]['cgm_cedente'].");";
+        $stJs .= "jq('#stNomCedente').html ('".$arCessoes[$inCount]['nom_cedente']."');";
+        $stJs .= "jq('#dtInicioCessao').val ('".$arCessoes[$inCount]['dt_inicio']."');";
+        $stJs .= "jq('#dtTerminoCessao').val ('".$arCessoes[$inCount]['dt_termino']."');";
+
+        $stJs .= "$('incluiDadosCessao').value = 'Alterar';";
+        $stJs .= "$('incluiDadosCessao').setAttribute( 'onclick','montaParametrosGET(\'alterarCessao\',\'hdnIdCessao,stProcessoCessao,inCodCedente,stNomCedente,dtInicioCessao,dtTerminoCessao\');');";
+        $stJs .= "jq('#incluiDadosCessao').focus();";
+    break;
 
     case 'alterarDocumento' :
         if ($_REQUEST['stDocumento'] == '') {
@@ -1155,7 +1296,7 @@ switch ($stCtrl) {
             $stMensagem = 'Informe a data de início da locação.';
         } 
     
-        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparadadatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
+        elseif ($_REQUEST['dtIniLocacao'] != '' && SistemaLegado::comparadatas('01/01/'.Sessao::getExercicio(), $_REQUEST['dtIniLocacao'],false) == 1) {
             $stMensagem = 'A data de início da locação não pode ser menor que o ano atual.';
         } 
 
@@ -1187,29 +1328,19 @@ switch ($stCtrl) {
             $stMensagem = 'Informe o valor da locação.';
         }
 
-        if ( count( Sessao::read('arLocacoes') ) > 0 ) {
-           foreach ( Sessao::read('arLocacoes') AS $arTemp ) {
-                if ( ($arTemp['stProcessoLocacao'] == $_REQUEST['stProcessoLocacao'])
-                     && ($arTemp['stExercicioLocacao'] == $_REQUEST['stExercicioLocacao'])
-                     && ($arTemp['dtIniLocacao']."&&".$arTemp['dtFimLocacao'] == $_REQUEST['dtIniLocacao']."&&".$_REQUEST['dtFimLocacao'])
-                     && ($arTemp['inCodEntidadeLocacao'] == $_REQUEST['inCodEntidadeLocacao'])
-                     && ($arTemp['dtContrato'] == $_REQUEST['dtContrato'])
-                     && ($arTemp['inCodLocatario'] == $_REQUEST['inCodLocatario'])
-                     && ($arTemp['inValorLocacao'] == $_REQUEST['inValorLocacao'])
-                     && ($arTemp['inNumEmpenhoLocacao'] == $_REQUEST['inNumEmpenhoLocacao'])
-                   ) {
-                    $stMensagem = 'Esta locação já está na lista.';
-                    break;
-                }
-            }
-        }
-
         if (!$stMensagem) {
             $arLocacoes = Sessao::read('arLocacoes');
+
+            if ($_REQUEST['stNomLocatario'] == '') {
+                $nomLocatario = SistemaLegado::pegaDado('nom_cgm', 'sw_cgm', ' WHERE numcgm = '.$_REQUEST['inCodLocatario']);
+            } else {
+                $nomLocatario = $_REQUEST['stNomLocatario'];
+            }
 
             $inCount = $_REQUEST['hdnIdLocacao'];
             $inCount = $inCount - 1;
             $arLocacoes[$inCount]['id']                   = $_REQUEST['hdnIdLocacao'];
+            $arLocacoes[$inCount]['id_locacao']           = $arLocacoes[$inCount]['id_locacao'];
             $arLocacoes[$inCount]['stProcessoLocacao']    = $_REQUEST['stProcessoLocacao'];
             $arLocacoes[$inCount]['stExercicioLocacao']   = $_REQUEST['stExercicioLocacao'];
             $arLocacoes[$inCount]['dtIniLocacao']         = $_REQUEST['dtIniLocacao'];
@@ -1219,7 +1350,7 @@ switch ($stCtrl) {
             $arLocacoes[$inCount]['inCodLocatario']       = $_REQUEST['inCodLocatario'];
             $arLocacoes[$inCount]['inNumEmpenhoLocacao']  = $_REQUEST['inNumEmpenhoLocacao'];
             $arLocacoes[$inCount]['inValorLocacao']       = $_REQUEST['inValorLocacao'];
-            $arLocacoes[$inCount]['stNomLocatario']       = $_REQUEST['stNomLocatario'];
+            $arLocacoes[$inCount]['stNomLocatario']       = $nomLocatario;
 
             $stJs .= montaListaLocacoes( $arLocacoes );
             $stJs .= "jq('#hdnId').val ('');";
@@ -1236,7 +1367,7 @@ switch ($stCtrl) {
             $stJs .= "jq('#inNumEmpenhoLocacao').val('');";
 
             $stJs .= "$('incluiDadosLocacao').value = 'Incluir';";
-            $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodLocatario,stNomLocatario,inValorLocacao,inCodEntidadeLocacao,stNomEntidadeLocacao,inNumEmpenhoLocacao\');');";
+            $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'st\,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodLocatario,stNomLocatario,inValorLocacao,inCodEntidadeLocacao,stNomEntidadeLocacao,inNumEmpenhoLocacao\');');";
             Sessao::write('arLocacoes' , $arLocacoes);
 
             //se estivesse excluido, remove das excluidas
@@ -1259,6 +1390,68 @@ switch ($stCtrl) {
             }
 
             Sessao::write('arLocacoesExcluidas' , $arAux);
+        } else {
+            $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
+        }
+
+    break;
+
+    case 'alterarCessao' :
+        if ($_REQUEST['stProcessoCessao'] == '') {
+            $stMensagem = 'Informe o processo!';
+        } elseif ($_REQUEST['inCodCedente'] == '') {
+            $stMensagem = 'Informe o CGM cedente da cessão!';
+        } elseif ($_REQUEST['dtInicioCessao'] == '') {
+            $stMensagem = 'Informe a data de início da cessão!';
+        } elseif ($_REQUEST['dtTerminoCessao'] == '') {
+            $stMensagem = 'Informe a data de término da cessão!';
+        } elseif ( SistemaLegado::comparaDatas($_REQUEST['dtInicioCessao'],$_REQUEST['dtTerminoCessao'],true) ) {
+            $stMensagem = 'A data de início não pode ser maior ou igual à data de término da cessão!';
+        }
+
+        if (!$stMensagem) {
+            $arCessoes = Sessao::read('arListaCessao');
+
+            $inCount = $_REQUEST['hdnIdCessao'];
+            $inCount = $inCount - 1;
+            $arCessoes[$inCount]['id']              = $_REQUEST['hdnIdCessao'];
+            $arCessoes[$inCount]['id_cessao']       = $arCessoes[$inCount]['id_cessao'];
+            $arCessoes[$inCount]['cod_processo']    = substr($_REQUEST['stProcessoCessao'], 0, 5);
+            $arCessoes[$inCount]['exercicio']       = substr($_REQUEST['stProcessoCessao'], 6, 4);
+            $arCessoes[$inCount]['cgm_cedente']     = $_REQUEST['inCodCedente'];
+            $arCessoes[$inCount]['nom_cedente']     = $_REQUEST['stNomCedente'];
+            $arCessoes[$inCount]['dt_inicio']       = $_REQUEST['dtInicioCessao'];
+            $arCessoes[$inCount]['dt_termino']      = $_REQUEST['dtTerminoCessao'];
+
+            $stJs .= montaListaCessoes( $arCessoes );
+            $stJs .= "jq('#hdnIdCessao').val ('');";
+            $stJs .= "jq('#stProcessoCessao').val('');";
+            $stJs .= "jq('#dtInicioCessao').val('');";
+            $stJs .= "jq('#dtTerminoCessao').val('');";
+            $stJs .= "jq('#inCodCedente').val('');";
+            $stJs .= "jq('#stNomCedente').html('&nbsp;');";
+
+            $stJs .= "$('incluiDadosCessao').value = 'Incluir';";
+            $stJs .= "$('incluiDadosCessao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosCessao\',\'st\,stProcessoCessao,dtInicioCessao,dtTerminoCessao,inCodCedente,stNomCedente\');');";
+
+            Sessao::write('arListaCessao' , $arCessoes);
+
+            //se estivesse excluido, remove das excluidas
+            if ( count( Sessao::read('arCessoesExcluidas') ) > 0 ) {
+                foreach ( Sessao::read('arCessoesExcluidas') AS $arTemp ) {
+                    if (($arTemp['cod_processo']    != substr($_REQUEST['stProcessoCessao'], 0, 5)) &&
+                        ($arTemp['exercicio']       != substr($_REQUEST['stProcessoCessao'], 6, 4)) &&
+                        ($arTemp['dt_inicio']       != $_REQUEST['dtInicioCessao']                ) &&
+                        ($arTemp['dt_termino']      != $_REQUEST['dtTerminoCessao']               ) &&
+                        ($arTemp['cgm_cedente']     != $_REQUEST['inCodCedente']                  ) &&
+                        ($arTemp['nom_cedente']     != $_REQUEST['stNomCedente']                  )
+                       ) {
+                        $arAux[] = $arTemp;
+                    }
+                }
+            }
+
+            Sessao::write('arCessoesExcluidas' , $arAux);
         } else {
             $stJs .= "alertaAviso('".$stMensagem."','frm','erro','".Sessao::getId()."'); \n";
         }
@@ -1291,6 +1484,7 @@ switch ($stCtrl) {
                 $arAux[] = $arTemp;
             } else {
                 $inCount = count($arLocacoesExcluidas);
+                $arLocacoesExcluidas[$inCount]['id_locacao']           = $arTemp['id_locacao'];
                 $arLocacoesExcluidas[$inCount]['stProcessoLocacao']    = $arTemp['stProcessoLocacao'];
                 $arLocacoesExcluidas[$inCount]['stExercicioLocacao']   = $arTemp['stExercicioLocacao'];
                 $arLocacoesExcluidas[$inCount]['dtIniLocacao']         = $arTemp['dtIniLocacao'];
@@ -1306,6 +1500,31 @@ switch ($stCtrl) {
         Sessao::write('arLocacoesExcluidas' , $arLocacoesExcluidas);
         Sessao::write('arLocacoes' , $arAux);
         $stJs .= montaListaLocacoes( Sessao::read('arLocacoes') );
+        $stJs .= "jq('#inCodResponsavel').focus();";
+    break;
+
+    case 'excluirCessao' :
+        $arAux = array();
+        $arCessoesExcluidas = Sessao::read('arCessoesExcluidas');
+
+        foreach ( Sessao::read('arListaCessao') AS $arTemp ) {
+            if ($arTemp['id'] !=  $_REQUEST['id']) {
+                $arAux[] = $arTemp;
+            } else {
+                $inCount = count($arCessoesExcluidas);
+                $arCessoesExcluidas[$inCount]['id_cessao']      = $arTemp['id_cessao'];
+                $arCessoesExcluidas[$inCount]['cod_processo']   = $arTemp['cod_processo'];
+                $arCessoesExcluidas[$inCount]['exercicio']      = $arTemp['exercicio'];
+                $arCessoesExcluidas[$inCount]['cgm_cedente']    = $arTemp['cgm_cedente'];
+                $arCessoesExcluidas[$inCount]['nom_cedente']    = $arTemp['nom_cedente'];
+                $arCessoesExcluidas[$inCount]['dt_inicio']      = $arTemp['dt_inicio'];
+                $arCessoesExcluidas[$inCount]['dt_termino']     = $arTemp['dt_termino'];
+            }
+        }
+        Sessao::write('arCessoesExcluidas' , $arCessoesExcluidas);
+        Sessao::write('arListaCessao' , $arAux);
+        $stJs .= montaListaCessoes( Sessao::read('arListaCessao') );
+        $stJs .= "jq('#stDocumento').focus();";
     break;
 
     case 'limparDocumentos' :
@@ -1318,7 +1537,6 @@ switch ($stCtrl) {
         $stJs .= "$('stSituacao2').checked = false;";
         $stJs .= "$('incluiDocumento').value = 'Incluir';";
         $stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'incluirDocumento\',\'stDocumento,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidadeOculto,inCodigoEmpenho\');');";
-        //$stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'incluirDocumento\',\'stDocumento,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidade,inCodigoEmpenho,stNomFornecedor\');');";
         $stJs .= "$('spnEmpenho').innerHTML = ''; ";
 
         break;
@@ -1343,8 +1561,21 @@ switch ($stCtrl) {
 
     break;
 
-    case 'montaAlterar' :
+    case 'limparDadosCessao' :
 
+        $stJs .= "jq('#hdnIdCessao').val('');";
+        $stJs .= "jq('#stProcessoCessao').val ('');";
+        $stJs .= "jq('#dtInicioCessao').val ('');";
+        $stJs .= "jq('#dtTerminoCessao').val ('');";
+        $stJs .= "jq('#inCodCedente').val ('');";
+        $stJs .= "jq('#stNomCedente').html ('');";
+
+        $stJs .= "$('incluiDadosCessao').value = 'Incluir';";
+        $stJs .= "$('incluiDadosCessao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosCessao\',\'hdnIdCessao,stProcessoCessao,inCodCedente,stNomCedente,dtInicioCessao,dtTerminoCessao\');');";
+
+    break;
+
+    case 'montaAlterar' :
         //seleciona a origem do bem
         if ($_REQUEST['stOrigem'] == 't') {
             $stJs .= "$('stOrigemBemProprio').checked = true;";
@@ -1352,11 +1583,33 @@ switch ($stCtrl) {
             $stJs .= "$('stOrigemBemTerceiros').checked = true;";
         }
 
+        //recupera as cessões do veículo
+        $obTFrotaVeiculoCessao = new TFrotaVeiculoCessao();
+        $obTFrotaVeiculoCessao->recuperaTodos($rsVeiculoCessao, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']);
+
+        $inCount = 1;
+        foreach ($rsVeiculoCessao->getElementos() as $indice => $campo) {
+            $arCessao[$indice]['id'] = $inCount;
+            $arCessao[$indice]['id_cessao'] = $campo['id'];
+            $arCessao[$indice]['cod_veiculo'] = $campo['cod_veiculo'];
+            $arCessao[$indice]['cod_processo'] = str_pad($campo['cod_processo'],5,'0',STR_PAD_LEFT);
+            $arCessao[$indice]['exercicio'] = $campo['exercicio'];
+            $arCessao[$indice]['cgm_cedente'] = $campo['cgm_cedente'];
+            $arCessao[$indice]['nom_cedente'] = SistemaLegado::pegaDado('nom_cgm','sw_cgm',' WHERE numcgm = '.$campo['cgm_cedente']);
+            $arCessao[$indice]['dt_inicio'] = $campo['dt_inicio'];
+            $arCessao[$indice]['dt_termino'] = $campo['dt_termino'];
+            $inCount++;
+        }
+
+        Sessao::write('arListaCessao', $arCessao);
+
+        $stJs .= montaListaCessoes( $arCessao );
+
         //recupera os documentos do banco
         $obTFrotaVeiculoDocumento = new TFrotaVeiculoDocumento();
         $obTFrotaVeiculoDocumento->setDado('cod_veiculo',$_REQUEST['inCodVeiculo'] );
         $obTFrotaVeiculoDocumento->recuperaDocumentos( $rsDocumentos );
-        
+
         //monta a lista
 
         $arDocumentos = Sessao::read('arDocumentos');
@@ -1380,7 +1633,6 @@ switch ($stCtrl) {
         }
         Sessao::write('arDocumentos' , $arDocumentos);
         $stJs .= montaListaDocumentos( $arDocumentos );
-
         break;
 
     case 'montaResponsavel' :

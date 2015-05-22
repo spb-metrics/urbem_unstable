@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2008 Confederação Nacional de Municípios</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Creates a blank report with no predefined content.</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Blank Report</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="layoutPreference">auto layout</property>
@@ -17,9 +17,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,42 +28,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="8">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="10">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="9">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -72,12 +39,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">1</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -87,10 +54,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -99,9 +66,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -110,12 +77,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">31/12/2008</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -124,9 +91,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -134,9 +101,9 @@
         <scalar-parameter name="intervalo" id="1780">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -144,9 +111,9 @@
         <scalar-parameter name="data_inicio" id="1797">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -157,16 +124,7 @@
         <scalar-parameter name="numero_assinatura" id="1801" extends="urbem_231.numero_assinatura"/>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="6">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="6" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -772,8 +730,8 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </column>
             <header>
                 <row id="1433">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
+                    <property name="height">0mm</property>
                     <cell id="1535">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -829,8 +787,8 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
                     </cell>
                 </row>
                 <row id="1397">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
+                    <property name="height">0mm</property>
                     <cell id="1537">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -904,12 +862,12 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
                     </cell>
                 </row>
                 <row id="1389">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">1px</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0mm</property>
                     <cell id="1539">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -1002,9 +960,9 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
                     </cell>
                 </row>
                 <row id="1770">
-                    <property name="height">0mm</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0mm</property>
                     <cell id="1771">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -1082,8 +1040,8 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </header>
             <detail>
                 <row id="1366">
-                    <property name="height">0in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0in</property>
                     <cell id="1368">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -1183,9 +1141,9 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </detail>
             <footer>
                 <row id="1374">
-                    <property name="height">0in</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0in</property>
                     <cell id="1375">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -1583,11 +1541,11 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </column>
             <header>
                 <row id="1630">
-                    <property name="height">0in</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="pageBreakAfter">auto</property>
                     <property name="pageBreakBefore">auto</property>
                     <property name="pageBreakInside">auto</property>
+                    <property name="height">0in</property>
                     <cell id="1632">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">3</property>
@@ -1655,11 +1613,11 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
                     </cell>
                 </row>
                 <row id="1622">
-                    <property name="height">0in</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="pageBreakAfter">auto</property>
                     <property name="pageBreakBefore">auto</property>
                     <property name="pageBreakInside">auto</property>
+                    <property name="height">0in</property>
                     <cell id="1625">
                         <property name="colSpan">2</property>
                         <property name="rowSpan">1</property>
@@ -1722,11 +1680,11 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
                     </cell>
                 </row>
                 <row id="1591">
-                    <property name="height">0in</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="pageBreakAfter">auto</property>
                     <property name="pageBreakBefore">auto</property>
                     <property name="pageBreakInside">auto</property>
+                    <property name="height">0in</property>
                     <cell id="1594">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -1819,10 +1777,10 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </header>
             <detail>
                 <row id="1599">
-                    <property name="height">0in</property>
                     <property name="pageBreakAfter">auto</property>
                     <property name="pageBreakBefore">auto</property>
                     <property name="pageBreakInside">auto</property>
+                    <property name="height">0in</property>
                     <cell id="1601">
                         <property name="borderRightColor">#000000</property>
                         <property name="borderRightStyle">solid</property>
@@ -1921,9 +1879,9 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             </detail>
             <footer>
                 <row id="1607">
-                    <property name="height">0in</property>
                     <property name="backgroundColor">#FFFFFF</property>
                     <property name="pageBreakInside">auto</property>
+                    <property name="height">0in</property>
                     <cell id="1608">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -2111,7 +2069,7 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as tbl
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

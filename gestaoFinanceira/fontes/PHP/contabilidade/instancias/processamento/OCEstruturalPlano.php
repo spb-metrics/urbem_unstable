@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-* $Id: OCEstruturalPlano.php 59612 2014-09-02 12:00:51Z gelson $
+* $Id: OCEstruturalPlano.php 62511 2015-05-15 17:45:15Z evandro $
 
 Casos de uso: uc-02.02.02
 */
@@ -43,10 +43,11 @@ function buscaPopup()
 {
     if ($_GET[$_GET['stNomCampoCod']]) {
 
+        isset($_REQUEST['stExercicio']) ? $stExercicio = $_REQUEST['stExercicio'] : Sessao::getExercicio();
+            
         $obRContabilidadePlanoContaAnalitica = new RContabilidadePlanoContaAnalitica;
-
         $obRContabilidadePlanoContaAnalitica->setCodEstrutural( $_GET[$_GET['stNomCampoCod']] );
-        $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
+        $obRContabilidadePlanoContaAnalitica->setExercicio( $stExercicio );
         $obRContabilidadePlanoContaAnalitica->consultar();
         $stDescricao = $obRContabilidadePlanoContaAnalitica->getNomConta();
     }

@@ -31,24 +31,22 @@
     * @package URBEM
     * @subpackage 
 
-    $Id: despesaTotalPessoalPE.plsql 61837 2015-03-09 16:48:00Z michel $
+    $Id: despesaTotalPessoalPE.plsql 62558 2015-05-19 20:36:20Z evandro $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_despesa_total_pessoal_pe(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_despesa_total_pessoal_pe(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
+    stDataInicial       ALIAS FOR $3;
+    stDataFinal         ALIAS FOR $4;
     stSql               VARCHAR := '';
     reRegistro          RECORD;
 
-
 BEGIN
 
-
- CREATE TEMPORARY TABLE tmp_arquivo (
-          mes                    INTEGER
-        , vencVantagens          NUMERIC(14,2)
+     CREATE TEMPORARY TABLE tmp_arquivo (          
+        vencVantagens          NUMERIC(14,2)
         , inativos               NUMERIC(14,2)
         , pensionistas           NUMERIC(14,2)
         , salarioFamilia         NUMERIC(14,2)
@@ -69,21 +67,41 @@ BEGIN
         , despCorres             NUMERIC(14,2)
         , despAnteriores         NUMERIC(14,2)
         , nadaDeclararPessoal    VARCHAR
+     );
+     
 
- );
+     stSql := ' 
+     INSERT INTO tmp_arquivo(                              
+                              vencVantagens,
+                              inativos,
+                              pensionistas,
+                              salarioFamilia,
+                              subsPrefeito,
+                              subsSecret,
+                              subsVice,
+                              obrigPatronais,
+                              repassePatronal,
+                              sentJudPessoal,
+                              indenDemissao,
+                              incDemVolunt,
+                              sentJudAnt,
+                              inatPensFontCustProp,
+                              outrasDespesasPessoal,
+                              despExercAnt,
+                              exclusaoDespAnteriores,
+                              corrPerApurac,
+                              despCorres,
+                              despAnteriores,
+                              nadaDeclararPessoal
+                            )
+     VALUES(
 
-
-
-
- stSql := ' 
-     INSERT INTO tmp_arquivo(mes,vencVantagens,inativos,pensionistas,salarioFamilia,subsPrefeito,subsSecret,subsVice,obrigPatronais,repassePatronal,sentJudPessoal,indenDemissao, incDemVolunt,sentJudAnt,inatPensFontCustProp,outrasDespesasPessoal,despExercAnt,exclusaoDespAnteriores,corrPerApurac,despCorres,despAnteriores,nadaDeclararPessoal )
-     VALUES( ' || inMes || ',
+-- vencVantagens
     (SELECT COALESCE(total_vencVantagens, 0.00) AS vencVantagens
       FROM (
          SELECT CAST(SUM(vl_vencVantagens) AS NUMERIC) AS total_vencVantagens
          
-           FROM ( SELECT SUM(nota_liquidacao_item.vl_total) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_vencVantagens
-                       , EXTRACT(month from nota_liquidacao.dt_liquidacao) AS mes
+           FROM ( SELECT SUM(nota_liquidacao_item.vl_total) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_vencVantagens                       
                     FROM empenho.empenho
                     JOIN empenho.nota_liquidacao
                       ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
@@ -100,7 +118,7 @@ BEGIN
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
                      AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -112,27 +130,26 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural like ''3.1.9.0%''
                        AND   cod_estrutural not like ''3.1.9.0.01%''
                        AND   cod_estrutural not like ''3.1.9.0.03%''
                        AND   cod_estrutural not like ''3.1.9.0.09%''
-                       AND   cod_estrutural != ''3.1.9.0.11.74.00.00.00''
-                       AND   cod_estrutural != ''3.1.9.0.04.15.00.00.00''
-                       AND   cod_estrutural != ''3.1.9.0.13.00.00.00.00''
-                       AND   cod_estrutural != ''3.1.9.0.07.03.00.00.00''
+                       AND   cod_estrutural not like ''3.1.9.0.11.74.00.00.00''
+                       AND   cod_estrutural not like ''3.1.9.0.04.15.00.00.00''
+                       AND   cod_estrutural not like ''3.1.9.0.13%''
+                       AND   cod_estrutural not like ''3.1.9.0.07.03.00.00.00''
                        AND   cod_estrutural not like ''3.1.9.0.91%''
-                       AND   cod_estrutural != ''3.1.9.0.94.01.01.00.00''
-                       AND   cod_estrutural != ''3.1.9.0.94.01.02.00.00''
+                       AND   cod_estrutural not like ''3.1.9.0.94.01.01.00.00''
+                       AND   cod_estrutural not like ''3.1.9.0.94.01.02.00.00''
                        AND   cod_estrutural not like ''3.1.9.0.92%''
                        )
   
                 GROUP BY nota_liquidacao.dt_liquidacao
-           ) AS total_vencVantagens
-
-  GROUP BY mes
+           ) AS total_vencVantagens  
           ) AS retorno),
   
+-- inativos
  (SELECT COALESCE(total_inativos, 0.00) AS inativos
       FROM (
          SELECT CAST(SUM(vl_inativos) AS NUMERIC) AS total_inativos
@@ -148,13 +165,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -166,12 +183,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.01%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_inativos)as retorno ),
 
+-- pensionistas
  (SELECT COALESCE(total_pensionistas, 0.00) AS pensionistas
       FROM (
          SELECT CAST(SUM(vl_pensionistas) AS NUMERIC) AS total_pensionistas
@@ -187,13 +205,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -205,12 +223,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.03%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_pensionistas)as retorno ),
 
+-- salarioFamilia
 (SELECT COALESCE(total_salarioFamilia, 0.00) AS salarioFamilia
       FROM (
          SELECT CAST(SUM(vl_salarioFamilia) AS NUMERIC) AS total_salarioFamilia
@@ -226,13 +245,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -244,12 +263,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.09%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_salarioFamilia)as retorno ),
 
+-- subsPrefeito
 (SELECT COALESCE(total_subsPrefeito, 0.00) AS subsPrefeito
       FROM (
          SELECT CAST(SUM(vl_subsPrefeito) AS NUMERIC) AS total_subsPrefeito
@@ -265,13 +285,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -283,14 +303,16 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.11.74%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_subsPrefeito)as retorno ),
 
-          (SELECT 0.00 as subsSecret),
+-- subsSecret
+(SELECT 0.00 as subsSecret),
 
+-- subsVice
 (SELECT COALESCE(total_subsPrefeito, 0.00) AS subsPrefeito
       FROM (
          SELECT CAST(SUM(vl_subsPrefeito) AS NUMERIC) AS total_subsPrefeito
@@ -306,13 +328,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -324,12 +346,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.11.74%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS subsVice)as retorno ),           
 
+-- obrigPatronais
 (SELECT COALESCE(total_obrigPatronais, 0.00) AS obrigPatronais
       FROM (
          SELECT CAST(SUM(vl_obrigPatronais) AS NUMERIC) AS total_obrigPatronais
@@ -345,13 +368,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -363,12 +386,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.04.15%'' OR cod_estrutural LIKE ''3.1.9.0.13%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_obrigPatronais)as retorno ),
 
+-- repassePatronal
  (SELECT COALESCE(total_repassePatronal, 0.00) AS repassePatronal
       FROM (
          SELECT CAST(SUM(vl_repassePatronal) AS NUMERIC) AS total_repassePatronal
@@ -384,13 +408,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -402,13 +426,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural LIKE ''3.1.9.0.07.03%'' OR cod_estrutural LIKE ''3.1.9.1.13%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_repassePatronal)as retorno ),
 
- 
+-- sentJudPessoal
 (SELECT COALESCE(total_sentJudPessoal, 0.00) AS sentJudPessoal
       FROM (
          SELECT CAST(SUM(vl_sentJudPessoal) AS NUMERIC) AS total_sentJudPessoal
@@ -424,13 +448,13 @@ BEGIN
                      AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
                      AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
                LEFT JOIN empenho.nota_liquidacao_item_anulado
-  ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
                      AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
                      AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
- AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -442,12 +466,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND ( cod_estrutural  LIKE ''3.1.9.0.91%'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_sentJudPessoal)as retorno ),
 
+-- indenDemissao
 (SELECT COALESCE(total_indenDemissao, 0.00) AS indenDemissao
       FROM (
          SELECT CAST(SUM(vl_indenDemissao) AS NUMERIC) AS total_indenDemissao
@@ -469,7 +494,7 @@ BEGIN
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
  AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -481,12 +506,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND cod_estrutural LIKE ''3.1.9.0.94.01.01.00.00%''
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_indenDemissao)as retorno ),
 
+-- incDemVolunt
 (SELECT COALESCE(total_incDemVolunt, 0.00) AS incDemVolunt
       FROM (
          SELECT CAST(SUM(vl_incDemVolunt) AS NUMERIC) AS total_incDemVolunt
@@ -508,7 +534,7 @@ BEGIN
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
  AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -520,13 +546,13 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND (  cod_estrutural LIKE ''3.1.9.0.94.01.02.00.00%'' )
   
                 GROUP BY nota_liquidacao.dt_liquidacao
            )AS total_incDemVolunt)as retorno ),
 
-
+-- sentJudAnt
 (SELECT COALESCE(total_sentJudAnt, 0.00) AS sentJudAnt
       FROM (
          SELECT CAST(SUM(vl_sentJudAnt) AS NUMERIC) AS total_sentJudAnt
@@ -548,7 +574,7 @@ BEGIN
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
  AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -560,7 +586,7 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND (  cod_estrutural LIKE ''3.1.9.0.92.91.00.00.00%'' )
   
                 GROUP BY nota_liquidacao.dt_liquidacao
@@ -569,6 +595,7 @@ BEGIN
            (SELECT 0.00 as total_inatPensFontCustProp),
            (SELECT 0.00 as outrasDespesasPessoal),
           
+-- inatPensFontCustProp
 (SELECT COALESCE(total_despExercAnt, 0.00) AS despExercAnt
       FROM (
          SELECT CAST(SUM(vl_despExercAnt) AS NUMERIC) AS total_despExercAnt
@@ -590,7 +617,7 @@ BEGIN
                      AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
  AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                      AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
-                     AND EXTRACT(month from nota_liquidacao_item_anulado."timestamp") =  ' || inMes || '
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                     JOIN empenho.pre_empenho
                       ON pre_empenho.exercicio       = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
@@ -602,7 +629,7 @@ BEGIN
                      AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
                    WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
                      AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
-                     AND EXTRACT(month from nota_liquidacao.dt_liquidacao) = ' || inMes || '
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
                      AND (  cod_estrutural  LIKE ''3.1.9.0.92%'' AND cod_estrutural != ''3.1.9.0.92.91.00.00.00'')
   
                 GROUP BY nota_liquidacao.dt_liquidacao
@@ -613,17 +640,14 @@ BEGIN
            (SELECT 0.00 as despCorres),
            (SELECT 0.00 as despAnteriores),
             ''S'' 
-
 )
-
-
 
 ';
 
     EXECUTE stSql;
 
-    stSql := 'SELECT mes
-                   , COALESCE(vencVantagens, 0.00)
+    stSql := 'SELECT 
+                     COALESCE(vencVantagens, 0.00)
                    , COALESCE(inativos, 0.00)
                    , COALESCE(pensionistas,0.00)
                    , COALESCE(salarioFamilia,0.00)

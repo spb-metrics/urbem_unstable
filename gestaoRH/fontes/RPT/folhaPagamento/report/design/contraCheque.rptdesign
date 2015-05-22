@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="bidiLayoutOrientation">ltr</property>
     <list-property name="libraries">
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -26,9 +26,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -37,20 +37,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -59,31 +48,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -92,10 +59,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -104,10 +71,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -115,9 +82,9 @@
         <scalar-parameter name="qtdEventos" id="51">
             <property name="valueType">static</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -125,9 +92,9 @@
         <scalar-parameter name="ordenacao" id="30">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -135,10 +102,10 @@
         <scalar-parameter name="codConfiguracao" id="28">
             <property name="valueType">static</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -147,10 +114,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -159,10 +126,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -171,9 +138,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -182,9 +149,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -193,9 +160,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -203,9 +170,9 @@
         <scalar-parameter name="situacao" id="25">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -214,9 +181,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -225,9 +192,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -236,9 +203,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -247,9 +214,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -258,10 +225,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -269,9 +236,9 @@
         <scalar-parameter name="timestamp_situacao" id="310">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -279,9 +246,9 @@
         <scalar-parameter name="dt_inicial" id="311">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -289,9 +256,9 @@
         <scalar-parameter name="dt_final" id="312">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -300,9 +267,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -311,9 +278,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -322,9 +289,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -333,9 +300,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -344,15 +311,6 @@
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -695,31 +653,31 @@ as retorno
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">base_salario</property>
-                    <property name="displayName">base_salario</property>
+                    <text-property name="displayName">base_salario</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">base_previdencia</property>
-                    <property name="displayName">base_previdencia</property>
+                    <text-property name="displayName">base_previdencia</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">base_fgts</property>
-                    <property name="displayName">base_fgts</property>
+                    <text-property name="displayName">base_fgts</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">fgts_mes</property>
-                    <property name="displayName">fgts_mes</property>
+                    <text-property name="displayName">fgts_mes</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">base_irrf</property>
-                    <property name="displayName">base_irrf</property>
+                    <text-property name="displayName">base_irrf</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">faixa_irrf</property>
-                    <property name="displayName">faixa_irrf</property>
+                    <text-property name="displayName">faixa_irrf</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dependentes_irrf</property>
-                    <property name="displayName">dependentes_irrf</property>
+                    <text-property name="displayName">dependentes_irrf</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -1736,7 +1694,6 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
             </column>
             <detail>
                 <row id="927">
-                    <property name="height">0.6875in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -1749,6 +1706,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.6875in</property>
                     <cell id="928">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -1798,8 +1756,8 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                                                 <property name="width">2.8854166666666665in</property>
                                             </column>
                                             <row id="938">
-                                                <property name="height">0.8125in</property>
                                                 <property name="pageBreakInside">auto</property>
+                                                <property name="height">0.8125in</property>
                                                 <cell id="939">
                                                     <property name="paddingTop">0pt</property>
                                                     <property name="paddingLeft">0pt</property>
@@ -1895,7 +1853,6 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     </cell>
                 </row>
                 <row id="40">
-                    <property name="height">0.6041666666666666in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -1908,6 +1865,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.6041666666666666in</property>
                     <cell id="41">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -2075,25 +2033,25 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                             <list-property name="boundDataColumns">
                                 <structure>
                                     <property name="name">codigo</property>
-                                    <property name="displayName">codigo</property>
+                                    <text-property name="displayName">codigo</text-property>
                                     <expression name="expression">dataSetRow["codigo"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">descricao</property>
-                                    <property name="displayName">descricao</property>
+                                    <text-property name="displayName">descricao</text-property>
                                     <expression name="expression">dataSetRow["descricao"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">desdobramento</property>
-                                    <property name="displayName">desdobramento</property>
+                                    <text-property name="displayName">desdobramento</text-property>
                                     <expression name="expression">dataSetRow["desdobramento"]</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">referencia</property>
-                                    <property name="displayName">referencia</property>
+                                    <text-property name="displayName">referencia</text-property>
                                     <expression name="expression">if (dataSetRow["natureza"] == 'I' ){
 	dataSetRow["valor"]+',00';
 } else {
@@ -2103,7 +2061,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                                 </structure>
                                 <structure>
                                     <property name="name">valor</property>
-                                    <property name="displayName">valor</property>
+                                    <text-property name="displayName">valor</text-property>
                                     <expression name="expression">if (dataSetRow["natureza"] =="P"){
 	dataSetRow["valor"]
 }else{
@@ -2165,9 +2123,9 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                             </column>
                             <header>
                                 <row id="828">
-                                    <property name="height">0.12871287128712872in</property>
                                     <property name="fontSize">9pt</property>
                                     <property name="textAlign">left</property>
+                                    <property name="height">0.12871287128712872in</property>
                                     <cell id="829">
                                         <label id="830">
                                             <property name="fontSize">8pt</property>
@@ -2223,9 +2181,9 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                             </header>
                             <detail>
                                 <row id="841">
-                                    <property name="height">0.13861386138613863in</property>
                                     <property name="fontSize">8pt</property>
                                     <property name="textAlign">center</property>
+                                    <property name="height">0.13861386138613863in</property>
                                     <cell id="842">
                                         <data id="843">
                                             <property name="fontSize">8pt</property>
@@ -2310,7 +2268,6 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     </cell>
                 </row>
                 <row id="860">
-                    <property name="height">0.5520833333333334in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -2323,6 +2280,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.5520833333333334in</property>
                     <cell id="861">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -2533,7 +2491,6 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     </cell>
                 </row>
                 <row id="1368">
-                    <property name="height">0.3541666666666667in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -2546,6 +2503,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.3541666666666667in</property>
                     <cell id="1369">
                         <property name="fontSize">10pt</property>
                         <table id="1370">
@@ -2597,12 +2555,12 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                             <column id="1401"/>
                             <header>
                                 <row id="1371">
-                                    <property name="height">0.16666666666666666in</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
                                     <property name="borderBottomWidth">thin</property>
                                     <property name="textAlign">left</property>
+                                    <property name="height">0.16666666666666666in</property>
                                     <cell id="1372">
                                         <label id="1420">
                                             <text-property name="text">Base Salario</text-property>
@@ -2642,8 +2600,8 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                             </header>
                             <detail>
                                 <row id="1412">
-                                    <property name="height">0.16666666666666666in</property>
                                     <property name="textAlign">left</property>
+                                    <property name="height">0.16666666666666666in</property>
                                     <cell id="1413">
                                         <data id="1421">
                                             <structure name="numberFormat">
@@ -2713,7 +2671,6 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     </cell>
                 </row>
                 <row id="901">
-                    <property name="height">0.5833333333333334in</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
                     <property name="borderBottomWidth">thin</property>
@@ -2726,6 +2683,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">0.5833333333333334in</property>
                     <cell id="902">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -2796,13 +2754,13 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                     </cell>
                 </row>
                 <row id="1358">
-                    <property name="height">0.125in</property>
                     <property name="fontWeight">normal</property>
                     <property name="textLineThrough">none</property>
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
                     <property name="verticalAlign">top</property>
+                    <property name="height">0.125in</property>
                     <cell id="1361">
                         <property name="fontSize">10pt</property>
                         <property name="textLineThrough">line-through</property>
@@ -2859,7 +2817,7 @@ if ((stLocal.toString() == 'null') || (stLocal.toString() == '')){
                 nr6RbM7h+qS2JxOnmk7ir+76m91TX+e2WQFVLcXhXHR0IixEkPzLri0VQP0xnIQguOmEMJsbRfxwOZ/y
                 a0vsDQvU2VQdj+KcimfV87DWaKDUH014apWE+17ZZXpPU1Qe6CxjAGgrK+YghfAKV7M+A3iF4HYGRixx
                 +i8vphxxwHHHHAccccBxxxwHHHHA/9k=
-            </property>
+</property>
         </structure>
     </list-property>
 </report>

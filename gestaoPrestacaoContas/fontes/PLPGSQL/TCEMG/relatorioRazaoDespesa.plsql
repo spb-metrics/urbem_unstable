@@ -34,7 +34,7 @@
 * $Date:$
 *
 */
-CREATE OR REPLACE FUNCTION tcemg.razao_despesa(varchar,varchar,varchar,varchar,varchar, varchar, varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.razao_despesa(varchar,varchar,varchar,varchar,varchar, varchar, varchar,varchar,varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio                 ALIAS FOR $1;
     stDtInicial                 ALIAS FOR $2;
@@ -44,20 +44,67 @@ DECLARE
     stCodUnidade                ALIAS FOR $6;
     stCodPao                    ALIAS FOR $7;
     stCodRecurso                ALIAS FOR $8;
-    stOrdenacao                 ALIAS FOR $9;
-    
+    stSituacao                  ALIAS FOR $9;
+    stTipoRelatorio             ALIAS FOR $10; 
 
     stSql                       VARCHAR   := '';
-    nuTotalValorPago            NUMERIC   := 0;
-    nuTotalValorPagoAnulado     NUMERIC   := 0;
-    nuTotalValorEmpenhado       NUMERIC   := 0;
-    nuTotalValorEmpenhadoAnulado NUMERIC   := 0;
-    nuTotalValorLiquidado        NUMERIC   := 0;
-    nuTotalValorLiquidadoAnulado NUMERIC   := 0;
+    nuValorTotal            NUMERIC   := 0;
+    nuValorTotalAnulado     NUMERIC   := 0;
+   
+   
+   -- nuTotalValorEmpenhado       NUMERIC   := 0;
+   -- nuTotalValorEmpenhadoAnulado NUMERIC   := 0;
+   -- nuTotalValorLiquidado        NUMERIC   := 0;
+   -- nuTotalValorLiquidadoAnulado NUMERIC   := 0;
     
     reRegistro          RECORD;
 
 BEGIN
+    --INICIO TABELA EMPENHOS EMPENHADOS
+    IF( stSituacao = '1' ) THEN
+        stSql := 'CREATE TEMPORARY TABLE tmp_empenhos AS (
+                  SELECT * 
+                    FROM tcemg.empenho_empenhado_liquidado(''' || stExercicio || ''',
+                                                          ''' || stDtInicial || ''',
+                                                          ''' || stDtFinal || ''',
+                                                          ''' || stCodEntidades || ''',
+                                                          ''' || stCodOrgao ||''' ,
+                                                          ''' || stCodUnidade ||''',
+                                                          ''' || stCodPao ||''',
+                                                          ''' || stCodRecurso ||''',
+                                                          ''' || stSituacao ||''',
+                                                          ''' || stTipoRelatorio ||'''
+                                                         ) as retorno( entidade            integer,                                           
+                                                                      descricao_categoria varchar,                                           
+                                                                      nom_tipo            varchar,                                           
+                                                                      empenho             integer,                                           
+                                                                      exercicio           char(4),                                           
+                                                                      cgm                 integer,                                           
+                                                                      credor              text,                                           
+                                                                      cod_nota            integer,                                           
+                                                                      stData                text,                                              
+                                                                      ordem               integer,                                           
+                                                                      conta               integer,                                           
+                                                                      nome_conta          varchar,                                           
+                                                                      valor               numeric,                                           
+                                                                      valor_anulado       numeric,                                           
+                                                                      descricao           varchar,                                           
+                                                                      recurso             varchar,                                           
+                                                                      despesa             text,
+                                                                      banco               varchar, 
+                                                                      num_documento       varchar,
+                                                                      dt_empenho          text,
+                                                                      dotacao             text,
+                                                                      cod_recurso         integer,
+                                                                      num_orgao           integer,
+                                                                      num_unidade         integer
+                                                        )
+        )';
+        EXECUTE stSql; 
+    END IF; ----FIM RELATORIO EMPENHOS EMPENHADOS
+    
+      --INICIO TABELA EMPENHOS PAGOS
+    IF( stSituacao = '2' ) THEN
         stSql := 'CREATE TEMPORARY TABLE tmp_pago AS (
             SELECT
                 p.cod_entidade as cod_entidade,
@@ -170,109 +217,29 @@ BEGIN
                        , plano_analitica.cod_plano
                        , plano_conta.nom_conta     )';
         EXECUTE stSql;
-        
-        stSql := 'CREATE TEMPORARY TABLE tmp_empenhos_empenhado AS (
-                  SELECT * 
-                    FROM tcemg.empenho_empenhado_liquidado(''' || stExercicio || ''',
-                                                          ''' || stDtInicial || ''',
-                                                          ''' || stDtFinal || ''',
-                                                          ''' || stCodEntidades || ''',
-                                                          ''' || stCodOrgao ||''' ,
-                                                          ''' || stCodUnidade ||''',
-                                                          ''' || stCodPao ||''',
-                                                          ''' || stCodRecurso ||''',
-                                                          ''1'', ''data'',
-                                                            true
-                                                        ) as retorno( entidade            integer,                                           
-                                                                      descricao_categoria varchar,                                           
-                                                                      nom_tipo            varchar,                                           
-                                                                      empenho             integer,                                           
-                                                                      exercicio           char(4),                                           
-                                                                      cgm                 integer,                                           
-                                                                      credor              text,                                           
-                                                                      cod_nota            integer,                                           
-                                                                      data                text,                                              
-                                                                      ordem               integer,                                           
-                                                                      conta               integer,                                           
-                                                                      nome_conta          varchar,                                           
-                                                                      valor               numeric,                                           
-                                                                      valor_anulado       numeric,                                           
-                                                                      descricao           varchar,                                           
-                                                                      recurso             varchar,                                           
-                                                                      despesa             text,
-                                                                      num_documento       varchar,
-                                                                      conta_bancaria      varchar,
-                                                                      cod_recurso_banco   integer,
-                                                                      dt_empenho          text ,
-                                                                      dotacao             text,
-                                                                      cod_recurso         integer               
-                                                        )                     
-             )';
-
-         EXECUTE stSql; 
-   
-         stSql := 'CREATE TEMPORARY TABLE tmp_empenhos_liquidado AS (
-                  SELECT * 
-                    FROM tcemg.empenho_empenhado_liquidado(''' || stExercicio || ''',
-                                                          ''' || stDtInicial || ''',
-                                                          ''' || stDtFinal || ''',
-                                                          ''' || stCodEntidades || ''',
-                                                          ''' || stCodOrgao ||''' ,
-                                                          ''' || stCodUnidade ||''',
-                                                          ''' || stCodPao ||''',
-                                                          ''' || stCodRecurso ||''',
-                                                          ''3'', ''data'',
-                                                            true
-                                                        ) as retorno( entidade            integer,                                           
-                                                                      descricao_categoria varchar,                                           
-                                                                      nom_tipo            varchar,                                           
-                                                                      empenho             integer,                                           
-                                                                      exercicio           char(4),                                           
-                                                                      cgm                 integer,                                           
-                                                                      credor              text,                                           
-                                                                      cod_nota            integer,                                           
-                                                                      data                text,                                              
-                                                                      ordem               integer,                                           
-                                                                      conta               integer,                                           
-                                                                      nome_conta          varchar,                                           
-                                                                      valor               numeric,                                           
-                                                                      valor_anulado       numeric,                                           
-                                                                      descricao           varchar,                                           
-                                                                      recurso             varchar,                                           
-                                                                      despesa             text,
-                                                                      num_documento       varchar,
-                                                                      conta_bancaria      varchar,
-                                                                      cod_recurso_banco   integer,
-                                                                      dt_empenho          text,
-                                                                      dotacao             text,
-                                                                      cod_recurso         integer
-                                                        )                     
-             )';
-         EXECUTE stSql;
-
-        stSql := 'CREATE TEMPORARY TABLE tmp_empenhos_pago AS (
+     
+        stSql := 'CREATE TEMPORARY TABLE tmp_empenhos AS (
                    SELECT entidade
-                        , descricao_categoria
-                        , nom_tipo
                         , empenho
                         , exercicio
                         , cgm
                         , cgm||'' - ''||razao_social::varchar AS credor
-                        , cod_nota
-                        , stData
-                        , ordem
-                        , conta
-                        , coalesce(nome_conta,''NÃO INFORMADO'') AS nome_conta
-                        , valor AS valor_pago
-                        , vl_anulado AS valor_pago_anulado
+                        , dt_empenho
+                        , valor 
+                        , vl_anulado AS valor_anulado
                         , descricao
+                        , tbl.cod_recurso
                         , recurso::varchar
                         , despesa || '' - '' || descricao_despesa::varchar AS despesa
-                        , num_documento
+                        , dotacao
+                        , stData 
                         , ''''::VARCHAR AS banco
                         , 0 AS cod_recurso_banco
-                        , dt_empenho
-                        , tbl.cod_recurso
+                        , num_documento
+                        , cod_nota
+                        , num_orgao
+                        , num_unidade
+                        , conta
                      FROM( SELECT e.cod_entidade as entidade
                                 , e.cod_empenho as empenho
                                 , e.exercicio as exercicio
@@ -292,9 +259,11 @@ BEGIN
                                 , ped_d_cd.cod_estrutural as despesa
                                 , ped_d_cd.descricao AS descricao_despesa
                                 , pagamento_tipo_documento.num_documento
-                                , tmp.cod_plano
                                 , to_char(e.dt_empenho ,''dd/mm/yyyy'') as dt_empenho
                                 , ped_d_cd.cod_recurso
+                                , ped_d_cd.num_unidade
+                                , ped_d_cd.num_orgao
+                                , ped_d_cd.dotacao
                              FROM empenho.empenho     as e 
                                 , empenho.categoria_empenho
                                 , empenho.tipo_empenho
@@ -354,7 +323,9 @@ BEGIN
                                             cd.cod_estrutural,
                                             ppa.acao.num_acao,
                                             cd.descricao, 
-                                            programa.num_programa
+                                            programa.num_programa,
+                                            d.cod_subfuncao,
+                                            LPAD(d.num_orgao::VARCHAR, 2, ''0'')||''.''||LPAD(d.num_unidade::VARCHAR, 2, ''0'')||''.''||d.cod_funcao||''.''||d.cod_subfuncao||''.''||ppa.programa.num_programa||''.''||LPAD(d.num_pao::VARCHAR, 4, ''0'')||''.''||REPLACE(cd.cod_estrutural, ''.'', '''') AS dotacao
                                        FROM empenho.pre_empenho_despesa as ped, 
                                             orcamento.despesa           as d
                                        JOIN orcamento.recurso(''' || stExercicio || ''') as rec
@@ -432,7 +403,14 @@ BEGIN
                                if (stCodRecurso is not null and stCodRecurso<>'') then
                                    stSql := stSql || ' AND ped_d_cd.cod_recurso IN ('|| stCodRecurso ||') ';
                                end if;
-                             
+                               
+                               if (stTipoRelatorio = 'ensino_fundamental') then
+                                   stSql := stSql || ' AND ped_d_cd.cod_subfuncao IN ( 361 ) ';
+                               end if;
+                               
+                               if (stTipoRelatorio = 'gasto_25') then
+                                  stSql := stSql || ' AND ped_d_cd.cod_subfuncao NOT IN ( 362,363,364 ) ';
+                               end if;
                stSql := stSql || 
                          'GROUP BY to_char(nlp.timestamp,''dd/mm/yyyy'')
                                  , nlp.cod_nota
@@ -453,7 +431,14 @@ BEGIN
                                  , e.dt_empenho
                                  , descricao_despesa
                                  , ped_d_cd.cod_recurso
-                          ORDER BY to_date(to_char(nlp.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'')
+                                 , ped_d_cd.num_orgao
+                                 , ped_d_cd.num_unidade
+                                 , ped_d_cd.dotacao
+                            --    , ped_d_cd.cod_subfuncao
+                          ORDER BY ped_d_cd.num_orgao
+                                 , ped_d_cd.num_unidade
+                                 , ped_d_cd.cod_recurso
+                                 , to_date(to_char(nlp.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'')
                                  , e.cod_entidade
                                  , e.cod_empenho
                                  , e.exercicio
@@ -464,25 +449,24 @@ BEGIN
                                  , pe.cgm_beneficiario
                                  , cgm.nom_cgm
                         ) as tbl where valor <> ''0.00'' 
-                 ORDER BY to_date(stData,''dd/mm/yyyy'')
-                        , entidade, empenho
-                        , exercicio
-                        , cgm
-                        , razao_social
-                        , cod_nota
-                        , ordem
-                        , conta
-                        , nome_conta )';
+                 ORDER BY num_orgao
+                      , num_unidade
+                      , cod_recurso
+                      , to_date(dt_empenho,''dd/mm/yyyy'')
+                      , entidade
+                      , empenho
+                      , exercicio
+                      , cod_nota )';
         EXECUTE stSql;
 
-        stSql := 'UPDATE tmp_empenhos_pago
+        stSql := 'UPDATE tmp_empenhos
                      SET banco = conta_bancaria
                        , cod_recurso_banco = registros.cod_recurso_banco
-                    FROM ( SELECT tmp_empenhos_pago.conta
-		                        , tmp_empenhos_pago.exercicio 
+                    FROM ( SELECT tmp_empenhos.conta
+		                        , tmp_empenhos.exercicio 
 		                        , conta_bancaria
                                 , COALESCE (ctb.cod_recurso, 100) AS cod_recurso_banco
-                             FROM tmp_empenhos_pago  
+                             FROM tmp_empenhos  
                              JOIN ( SELECT distinct conta_corrente.num_conta_corrente
                                          , agencia.num_agencia
                                          , banco.num_banco
@@ -503,121 +487,127 @@ BEGIN
                                  LEFT JOIN contabilidade.plano_recurso
                                         ON plano_recurso.exercicio = plano_banco.exercicio
                                        AND plano_recurso.cod_plano = plano_banco.cod_plano
-                                      JOIN tmp_empenhos_pago as tmp_empenhos_pago
+                                INNER JOIN tmp_empenhos as tmp_empenhos_pago
                                         ON plano_banco.exercicio = tmp_empenhos_pago.exercicio
                                        AND plano_banco.cod_plano = tmp_empenhos_pago.conta
                                    ) as ctb
-                               ON ctb.exercicio = tmp_empenhos_pago.exercicio
-                              AND ctb.cod_plano = tmp_empenhos_pago.conta) as registros
-                   WHERE tmp_empenhos_pago.conta = registros.conta
-	                 AND  tmp_empenhos_pago.exercicio = registros.exercicio ';
+                               ON ctb.exercicio = tmp_empenhos.exercicio
+                              AND ctb.cod_plano = tmp_empenhos.conta) as registros
+                   WHERE tmp_empenhos.conta = registros.conta
+	                 AND tmp_empenhos.exercicio = registros.exercicio ';
         EXECUTE stSql; 
-        
-       stSql := 'CREATE TEMPORARY TABLE tmp_empenhos_empenhados_pagos_liquidados AS (
-                 SELECT tmp_empenhos_empenhado.entidade
-                      , tmp_empenhos_empenhado.empenho
-                      , tmp_empenhos_empenhado.exercicio
-                      , tmp_empenhos_empenhado.cgm
-                      , tmp_empenhos_empenhado.credor
-                      , tmp_empenhos_empenhado.dt_empenho
-                      , tmp_empenhos_empenhado.valor AS valor
-                      , tmp_empenhos_pago.valor_pago
-                      , tmp_empenhos_liquidado.valor AS valor_liquidado
-                      , tmp_empenhos_empenhado.descricao
-                      , tmp_empenhos_empenhado.cod_recurso AS cod_recurso
-                      , tmp_empenhos_empenhado.recurso
-                      , tmp_empenhos_empenhado.despesa
-                      , tmp_empenhos_empenhado.dotacao
-                      , tmp_empenhos_pago.stData AS dt_pagamento
-                      , tmp_empenhos_pago.banco
-                      , tmp_empenhos_pago.cod_recurso_banco
-                      , tmp_empenhos_pago.num_documento
-                      , tmp_empenhos_pago.cod_nota::INTEGER
-                   FROM tmp_empenhos_empenhado
-              LEFT JOIN tmp_empenhos_pago
-                     ON tmp_empenhos_empenhado.entidade = tmp_empenhos_pago.entidade
-                    AND tmp_empenhos_empenhado.descricao_categoria = tmp_empenhos_pago.descricao_categoria
-                    AND tmp_empenhos_empenhado.nom_tipo = tmp_empenhos_pago.nom_tipo
-                    AND tmp_empenhos_empenhado.empenho = tmp_empenhos_pago.empenho
-                    AND tmp_empenhos_empenhado.exercicio = tmp_empenhos_pago.exercicio
-                    AND tmp_empenhos_empenhado.cgm = tmp_empenhos_pago.cgm
-                    AND tmp_empenhos_empenhado.credor = tmp_empenhos_pago.credor
-                    AND tmp_empenhos_empenhado.cod_recurso = tmp_empenhos_pago.cod_recurso
-              LEFT JOIN tmp_empenhos_liquidado
-                     ON tmp_empenhos_liquidado.entidade = tmp_empenhos_pago.entidade
-                    AND tmp_empenhos_liquidado.descricao_categoria = tmp_empenhos_pago.descricao_categoria
-                    AND tmp_empenhos_liquidado.nom_tipo = tmp_empenhos_pago.nom_tipo
-                    AND tmp_empenhos_liquidado.empenho = tmp_empenhos_pago.empenho
-                    AND tmp_empenhos_liquidado.exercicio = tmp_empenhos_pago.exercicio
-                    AND tmp_empenhos_liquidado.cgm = tmp_empenhos_pago.cgm
-                    AND tmp_empenhos_liquidado.credor = tmp_empenhos_pago.credor
-                    AND tmp_empenhos_liquidado.cod_nota = tmp_empenhos_pago.cod_nota
-                    AND tmp_empenhos_liquidado.cod_recurso = tmp_empenhos_empenhado.cod_recurso
-       )';
-        EXECUTE stSql; 
-        
-        --TOTAL VALORES PAGOS
-        stSql := ' SELECT COALESCE(SUM(valor_pago),0.0) AS total_valor_pago
-                        , COALESCE(SUM(valor_pago_anulado),0.0) AS total_valor_pago_anulado
-                      FROM tmp_empenhos_pago ';
-        EXECUTE stSql;  
-
+    END IF; ----FIM RELATORIO EMPENHOS PAGOS
+    
+    --INICIO TABELA EMPENHOS LIQUIDADO
+    IF( stSituacao = '3' ) THEN
+        stSql := 'CREATE TEMPORARY TABLE tmp_empenhos AS (
+                  SELECT * 
+                    FROM tcemg.empenho_empenhado_liquidado(''' || stExercicio || ''',
+                                                          ''' || stDtInicial || ''',
+                                                          ''' || stDtFinal || ''',
+                                                          ''' || stCodEntidades || ''',
+                                                          ''' || stCodOrgao ||''' ,
+                                                          ''' || stCodUnidade ||''',
+                                                          ''' || stCodPao ||''',
+                                                          ''' || stCodRecurso ||''',
+                                                          ''' || stSituacao ||''',
+                                                          ''' || stTipoRelatorio ||'''
+                                                         ) as retorno( entidade            integer,                                           
+                                                                      descricao_categoria varchar,                                           
+                                                                      nom_tipo            varchar,                                           
+                                                                      empenho             integer,                                           
+                                                                      exercicio           char(4),                                           
+                                                                      cgm                 integer,                                           
+                                                                      credor              text,                                           
+                                                                      cod_nota            integer,                                           
+                                                                      stData                text,                                              
+                                                                      ordem               integer,                                           
+                                                                      conta               integer,                                           
+                                                                      nome_conta          varchar,                                           
+                                                                      valor               numeric,                                           
+                                                                      valor_anulado       numeric,                                           
+                                                                      descricao           varchar,                                           
+                                                                      recurso             varchar,                                           
+                                                                      despesa             text,
+                                                                      banco               varchar, 
+                                                                      num_documento       varchar,
+                                                                      dt_empenho          text,
+                                                                      dotacao             text,
+                                                                      cod_recurso         integer,
+                                                                      num_orgao           integer,
+                                                                      num_unidade         integer
+                                                        )
+        )';
+        EXECUTE stSql;
+        ----TOTAL VALORES LIQUIDADO
+        stSql := '  SELECT COALESCE(SUM(valor),0.0) AS valor_total
+                            , COALESCE(SUM(valor_anulado),0.0) AS valor_total_anulado
+                      FROM tmp_empenhos';
         FOR reRegistro IN EXECUTE stSql
         LOOP
-           nuTotalValorPago := reRegistro.total_valor_pago;
-           nuTotalValorPagoAnulado := reRegistro.total_valor_pago_anulado;
+           nuValorTotal := reRegistro.valor_total;
+           nuValorTotalAnulado := reRegistro.valor_total_anulado;
         END LOOP;
         
-        --TOTAL VALORES EMPENHADO
-        stSql := ' SELECT  COALESCE(SUM(valor),0.0) AS total_valor_empenhado
-                        , COALESCE(SUM(valor_anulado),0.0) AS total_valor_empenhado_anulado
-                      FROM tmp_empenhos_empenhado ';
-        EXECUTE stSql;  
-
-        FOR reRegistro IN EXECUTE stSql
-        LOOP
-           nuTotalValorEmpenhado := reRegistro.total_valor_empenhado;
-           nuTotalValorEmpenhadoAnulado := reRegistro.total_valor_empenhado_anulado;
-        END LOOP;
-       
-       --TOTAL VALORES LIQUIDADO
-        stSql := ' SELECT COALESCE(SUM(valor),0.0) AS total_valor_liquidado
-                        , COALESCE(SUM(valor_anulado),0.0) AS total_valor_liquidado_anulado
-                      FROM tmp_empenhos_liquidado';
-        FOR reRegistro IN EXECUTE stSql
-        LOOP
-           nuTotalValorLiquidadoAnulado := reRegistro.total_valor_liquidado_anulado;
-        END LOOP;
+        IF (nuValorTotal != 0.0) THEN 
+           stSql := ' SELECT *
+                        FROM empenho.fn_empenho_liquidado_total('''  || stExercicio || ''', ''' || stCodEntidades || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''') AS vl_total_liquidado';
+           FOR reRegistro IN EXECUTE stSql
+           LOOP
+              nuValorTotal := reRegistro.vl_total_liquidado;
+           END LOOP;
+        END IF;
+    END IF; ----FIM RELATORIO EMPENHOS LIQUIDADO
         
-         stSql := ' SELECT *
-                     FROM empenho.fn_empenho_liquidado_total('''  || stExercicio || ''', ''' || stCodEntidades || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''') AS vl_total_liquidado';
-        FOR reRegistro IN EXECUTE stSql
-        LOOP
-           nuTotalValorLiquidado := reRegistro.vl_total_liquidado;
-        END LOOP;
-        
+        IF( stSituacao != '3' ) THEN
+            --TOTAL VALORES 
+            stSql := ' SELECT COALESCE(SUM(valor),0.0) AS valor_total
+                            , COALESCE(SUM(valor_anulado),0.0) AS valor_total_anulado
+                        FROM tmp_empenhos ';
+            EXECUTE stSql;  
+    
+            FOR reRegistro IN EXECUTE stSql
+            LOOP
+                nuValorTotal := reRegistro.valor_total;
+                nuValorTotalAnulado := reRegistro.valor_total_anulado;
+            END LOOP;
+        END IF ;
+  
         --RESULTADO FINAL
-        stSql := ' select tmp_empenhos_empenhados_pagos_liquidados.*
-                         , '|| nuTotalValorPago ||'
-                         , '|| nuTotalValorPagoAnulado ||'
-                         , '|| nuTotalValorEmpenhado ||'
-                         , '|| nuTotalValorEmpenhadoAnulado ||'
-                         , '|| nuTotalValorLiquidado ||'
-                         , '|| nuTotalValorLiquidadoAnulado ||'
-                     FROM tmp_empenhos_empenhados_pagos_liquidados
-                 ORDER BY to_date(dt_empenho,''dd/mm/yyyy''), entidade, empenho, exercicio, cgm, credor';
+        stSql := ' SELECT entidade
+                        , empenho
+                        , exercicio
+                        , cgm
+                        , credor
+                        , dt_empenho
+                        , valor
+                        , valor_anulado
+                        , descricao
+                        , cod_recurso
+                        , recurso::varchar
+                        , despesa
+                        , dotacao
+                        , stData
+                        , banco
+                        , num_documento
+                        , cod_nota
+                        , num_orgao
+                        , num_unidade
+                        , '|| nuValorTotal ||' AS vl_total
+                        , '|| nuValorTotalAnulado ||' AS vl_total_anulado
+                     FROM tmp_empenhos
+              ';
 
        FOR reRegistro IN EXECUTE stSql
        LOOP
            RETURN next reRegistro;
        END LOOP;
+    IF ( stSituacao = '2' ) THEN
+       DROP TABLE tmp_pago;
+       DROP TABLE tmp_estornado;
+    END IF;
     
-    DROP TABLE tmp_pago;
-    DROP TABLE tmp_estornado;
-    DROP TABLE tmp_empenhos_pago;
-    DROP TABLE tmp_empenhos_empenhado;
-    DROP TABLE tmp_empenhos_liquidado;
-    DROP TABLE tmp_empenhos_empenhados_pagos_liquidados;
+    DROP TABLE tmp_empenhos;
     
     RETURN;
 END;

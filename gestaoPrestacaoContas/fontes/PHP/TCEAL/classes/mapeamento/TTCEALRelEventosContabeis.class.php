@@ -66,8 +66,12 @@ class TTCEALRelEventosContabeis extends Persistente
                        ) AS codigo_ua
                      , ".$this->getDado('bimestre')." AS bimestre
                      , '".$this->getDado('stExercicio')."' AS exercicio
-                     , '' AS cod_evento
-                     , '' AS titulo_evento
+                     , CASE WHEN ccpc.cod_estrutural IS NOT NULL THEN SUBSTRING(REPLACE(ccpc.cod_estrutural, '.', ''), 1, 8)
+                            WHEN cdpc.cod_estrutural IS NOT NULL THEN SUBSTRING(REPLACE(cdpc.cod_estrutural, '.', ''), 1, 8)
+                       END AS cod_evento
+                     , CASE WHEN ccpc.nom_conta IS NOT NULL THEN REPLACE(ccpc.nom_conta, '.', '')
+                            WHEN cdpc.nom_conta IS NOT NULL THEN REPLACE(cdpc.nom_conta, '.', '')
+                       END AS titulo_evento
                      , CASE WHEN ccpc.tipo_valor = 'C' THEN 2
                             WHEN cdpc.tipo_valor = 'D' THEN 1
                        END AS id_debcred
@@ -98,7 +102,8 @@ class TTCEALRelEventosContabeis extends Persistente
                                  cc.tipo_valor,                                   
                                  cc.cod_entidade,                                 
                                  cc.cod_plano,                                    
-                                 pc.cod_estrutural                                
+                                 pc.cod_estrutural,  
+                                 pc.nom_conta                                      
                             FROM contabilidade.plano_analitica     AS pa          
                             JOIN contabilidade.conta_credito       AS cc          
                               ON cc.cod_plano    = pa.cod_plano
@@ -123,7 +128,8 @@ class TTCEALRelEventosContabeis extends Persistente
                                   cd.tipo_valor,                                   
                                   cd.cod_entidade,                                 
                                   cd.cod_plano,                                    
-                                  pc.cod_estrutural                                
+                                  pc.cod_estrutural,  
+                                  pc.nom_conta                                      
                              FROM contabilidade.plano_analitica     AS pa          
                              JOIN contabilidade.conta_debito        AS cd          
                                ON cd.cod_plano    = pa.cod_plano    

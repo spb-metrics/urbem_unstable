@@ -219,6 +219,16 @@ if ($rsLicitacao->getCampo('cod_modalidade') == 8 || $rsLicitacao->getCampo('cod
     $obLblChamadaPublica->setValue($rsTipoChamadaPublica->getCampo("cod_tipo")." - ".$rsTipoChamadaPublica->getCampo("descricao"));
 }
 
+if ($rsLicitacao->getCampo('cod_modalidade') == 3 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 6 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 7 ) {
+
+    # Define o Label de Registro de Preços
+    $obLblRegistroPreco = new Label;
+    $obLblRegistroPreco->setRotulo('Registro de Preços');
+    $obLblRegistroPreco->setValue($rsLicitacao->getCampo("registro_precos") == 't' ? 'Sim' : 'Não');
+}
+
 # Define o Label para tipo de Cotação
 $obLblTipoCotacao = new Label;
 $obLblTipoCotacao->setName ( 'txtTipoCotacao' );
@@ -359,9 +369,14 @@ $obFormulario->addComponente    ( $obLblModalidade	);
 
 if ($rsLicitacao->getCampo('cod_modalidade') == 8 ||
     $rsLicitacao->getCampo('cod_modalidade') == 9 ||
-    $rsLicitacao->getCampo('cod_modalidade') == 10
-   ) {
+    $rsLicitacao->getCampo('cod_modalidade') == 10 ) {
     $obFormulario->addComponente ( $obLblChamadaPublica );
+}
+
+if ($rsLicitacao->getCampo('cod_modalidade') == 3 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 6 ||
+    $rsLicitacao->getCampo('cod_modalidade') == 7 ) {
+    $obFormulario->addComponente ( $obLblRegistroPreco );
 }
 
 $obFormulario->addComponente    ( $obILblCriterioJulgamento);

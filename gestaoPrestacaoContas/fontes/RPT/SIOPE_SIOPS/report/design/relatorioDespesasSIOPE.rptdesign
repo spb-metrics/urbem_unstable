@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,9 +18,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,26 +29,23 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <text-property name="promptText">Exercicio</text-property>
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_acao" id="1152" extends="urbem_250.cod_acao"/>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver"/>
         <scalar-parameter name="db_conn_url" id="1154" extends="urbem_250.db_conn_url"/>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user"/>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password"/>
         <scalar-parameter name="entidade" id="1157" extends="urbem_250.entidade">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -58,9 +55,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -70,9 +67,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -82,9 +79,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -94,9 +91,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -106,12 +103,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">2</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -121,12 +118,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">01/01/2009</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -136,12 +133,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">30/04/2009</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -151,12 +148,12 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">7</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -166,9 +163,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -178,9 +175,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -189,9 +186,24 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="periodicidade" id="6675">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -199,17 +211,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsRelatorio" id="1168">
@@ -269,24 +271,13 @@ extensionProperties.odaPassword = params["db_password"].value;
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
-                <structure>
-                    <property name="name">param_6</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">6</property>
-                    <expression name="defaultValue">params["recurso"].value</expression>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
             </list-property>
             <structure name="cachedMetaData"/>
             <method name="afterClose"><![CDATA[params['query'] = this.queryText]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[select * from orcamento.fn_educacao_despesas(?, ?, ?, ?, ?, ?) as retorno (
+            <xml-property name="queryText"><![CDATA[select * from orcamento.fn_educacao_despesas(?, ?, ?, ?, ?) as retorno (
         cod_subfuncao         INTEGER,
-        fundeb                BOOLEAN,
+        grupo                 VARCHAR,
         nivel                 INTEGER,
         nom_subfuncao         VARCHAR,
         cod_estrutural        VARCHAR,
@@ -455,6 +446,684 @@ extensionProperties.odaPassword = params["db_password"].value;
             <property name="leftMargin">10mm</property>
             <property name="bottomMargin">20mm</property>
             <property name="rightMargin">10mm</property>
+            <page-header>
+                <grid name="cabecalho1" id="6676">
+                    <property name="borderRightColor">#000000</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">thin</property>
+                    <property name="marginTop">0pt</property>
+                    <property name="marginBottom">10pt</property>
+                    <property name="textAlign">left</property>
+                    <property name="width">190mm</property>
+                    <column id="6677">
+                        <property name="width">25mm</property>
+                    </column>
+                    <column id="6678">
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">8pt</property>
+                        <property name="width">73mm</property>
+                    </column>
+                    <column id="6679">
+                        <property name="width">92mm</property>
+                    </column>
+                    <row id="6680">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <cell id="6681">
+                            <property name="textAlign">left</property>
+                            <property name="verticalAlign">middle</property>
+                            <text name="NewText612211" id="6682">
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginRight">5px</property>
+                                <property name="dataSet">urbem_250.prefeitura</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">params["entidade"].value != null</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">logotipo</property>
+                                        <expression name="expression">dataSetRow["logotipo"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<img src="<VALUE-OF>row["logotipo"]</VALUE-OF>" border="0" height="55" width="60">
+
+]]></text-property>
+                            </text>
+                            <text name="NewText6121111" id="6683">
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginRight">5px</property>
+                                <property name="dataSet">urbem_250.entidade</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">params["entidade"].value == null</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">logotipo</property>
+                                        <expression name="expression">dataSetRow["logotipo"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<img src="<VALUE-OF>row["logotipo"]</VALUE-OF>" border="0" height="55" width="60">]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="6684">
+                            <grid name="NewGrid4" id="6685">
+                                <property name="fontFamily">sans-serif</property>
+                                <property name="marginTop">-1pt</property>
+                                <property name="width">100%</property>
+                                <column id="6686"/>
+                                <row id="6687">
+                                    <cell id="6688">
+                                        <data name="NewData14" id="6689">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="marginTop">-2pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="paddingTop">1pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">nom_prefeitura</property>
+                                                    <expression name="expression">dataSetRow["nom_prefeitura"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">nom_prefeitura</property>
+                                        </data>
+                                        <data name="NewData61" id="6690">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">nom_entidade</property>
+                                                    <expression name="expression">dataSetRow["nom_entidade"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">nom_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6691">
+                                    <cell id="6692">
+                                        <data name="NewData15" id="6693">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">fone</property>
+                                                    <expression name="expression">'Fone/Fax: ' + dataSetRow["fone"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">fone</property>
+                                        </data>
+                                        <data name="NewData71" id="6694">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">fone_entidade</property>
+                                                    <expression name="expression">if( (params["entidade"]+0) > 0 ){
+	'Fone: ' + dataSetRow["fone"]
+}
+else{
+	'Fone: '
+}</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">fone_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6695">
+                                    <cell id="6696">
+                                        <data name="NewData21" id="6697">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">email</property>
+                                                    <expression name="expression">'E-mail: '+dataSetRow["email"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">email</property>
+                                        </data>
+                                        <data name="NewData81" id="6698">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">email_entidade</property>
+                                                    <expression name="expression">if( (params["entidade"]+0) > 0 ){
+	'E-mail: ' + dataSetRow["e_mail"]
+}
+else{
+	'E-mail: '
+}</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">email_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6699">
+                                    <cell id="6700">
+                                        <data name="NewData31" id="6701">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">endereco</property>
+                                                    <expression name="expression">dataSetRow["endereco"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">endereco</property>
+                                        </data>
+                                        <data name="NewData91" id="6702">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">endereco_entidade</property>
+                                                    <expression name="expression">dataSetRow["logradouro"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">endereco_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6703">
+                                    <cell id="6704">
+                                        <data name="NewData41" id="6705">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">cep</property>
+                                                    <expression name="expression">'CEP: '+dataSetRow["cep"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">cep</property>
+                                        </data>
+                                        <data name="NewData101" id="6706">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">cep_entidade</property>
+                                                    <expression name="expression">if( (params["entidade"]+0) > 0 ){
+	'CEP: ' + dataSetRow["cep"]
+}
+else{
+	'CEP: '
+}</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">cep_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6707">
+                                    <cell id="6708">
+                                        <data name="NewData51" id="6709">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.prefeitura</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value != null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">cnpj</property>
+                                                    <expression name="expression">'CNPJ: '+dataSetRow["cnpj"]</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">cnpj</property>
+                                        </data>
+                                        <data name="NewData111" id="6710">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="dataSet">urbem_250.entidade</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">params["entidade"].value == null</expression>
+                                                </structure>
+                                            </list-property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">cnpj_entidade</property>
+                                                    <expression name="expression">if( (params["entidade"]+0) > 0 ){
+	'CNPJ: ' + dataSetRow["cnpj"]
+}
+else{
+	'CNPJ: '
+}</expression>
+                                                    <property name="dataType">any</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">cnpj_entidade</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="6711">
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderTopColor">#000000</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <grid name="NewGrid11" id="6712">
+                                <property name="marginTop">-1pt</property>
+                                <property name="marginLeft">-1pt</property>
+                                <property name="marginBottom">-1pt</property>
+                                <property name="width">92mm</property>
+                                <column id="6713"/>
+                                <row id="6714">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <cell id="6715">
+                                        <grid name="NewGrid32" id="6716">
+                                            <property name="marginTop">-2pt</property>
+                                            <property name="marginLeft">-1pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="marginRight">-2pt</property>
+                                            <property name="width">92mm</property>
+                                            <column id="6717">
+                                                <property name="width">46mm</property>
+                                            </column>
+                                            <column id="6718">
+                                                <property name="width">46mm</property>
+                                            </column>
+                                            <row id="6719">
+                                                <cell id="6720">
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <property name="paddingTop">1pt</property>
+                                                    <data name="NewData12121" id="6721">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="marginTop">0pt</property>
+                                                        <property name="marginLeft">2px</property>
+                                                        <property name="marginBottom">0pt</property>
+                                                        <property name="marginRight">2px</property>
+                                                        <property name="dataSet">urbem_250.relatorio</property>
+                                                        <list-property name="boundDataColumns">
+                                                            <structure>
+                                                                <property name="name">nom_funcionalidade</property>
+                                                                <expression name="expression">dataSetRow["nom_funcionalidade"]</expression>
+                                                                <property name="dataType">string</property>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">nom_funcionalidade</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="6722">
+                                                    <data name="NewData14121" id="6723">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <property name="paddingRight">2px</property>
+                                                        <property name="dataSet">urbem_250.relatorio</property>
+                                                        <list-property name="boundDataColumns">
+                                                            <structure>
+                                                                <property name="name">versao</property>
+                                                                <expression name="expression">'Versão: ' + dataSetRow["versao"]</expression>
+                                                                <property name="dataType">any</property>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">versao</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </grid>
+                                    </cell>
+                                </row>
+                                <row id="6724">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <cell id="6725">
+                                        <grid name="NewGrid311" id="6726">
+                                            <property name="marginTop">-2pt</property>
+                                            <property name="marginLeft">-1pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="marginRight">-2pt</property>
+                                            <property name="width">92mm</property>
+                                            <column id="6727">
+                                                <property name="width">46mm</property>
+                                            </column>
+                                            <column id="6728">
+                                                <property name="width">46mm</property>
+                                            </column>
+                                            <row id="6729">
+                                                <cell id="6730">
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <data name="NewData13121" id="6731">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="marginTop">0pt</property>
+                                                        <property name="marginLeft">2px</property>
+                                                        <property name="marginBottom">0pt</property>
+                                                        <property name="marginRight">2px</property>
+                                                        <property name="dataSet">urbem_250.relatorio</property>
+                                                        <list-property name="boundDataColumns">
+                                                            <structure>
+                                                                <property name="name">nom_modulo</property>
+                                                                <expression name="expression">dataSetRow["nom_modulo"]</expression>
+                                                                <property name="dataType">string</property>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">nom_modulo</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="6732">
+                                                    <data name="NewData1521" id="6733">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="fontWeight">bold</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <property name="paddingRight">2px</property>
+                                                        <list-property name="boundDataColumns">
+                                                            <structure>
+                                                                <property name="name">usuario</property>
+                                                                <expression name="expression">'Usuário: ' + params["term_user"]</expression>
+                                                                <property name="dataType">any</property>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">usuario</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </grid>
+                                    </cell>
+                                </row>
+                                <row id="6734">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <cell id="6735">
+                                        <data name="NewData11121" id="6736">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">8pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="marginLeft">2pt</property>
+                                            <property name="marginBottom">0pt</property>
+                                            <property name="marginRight">2px</property>
+                                            <property name="paddingTop">0px</property>
+                                            <property name="paddingLeft">0px</property>
+                                            <property name="paddingBottom">0px</property>
+                                            <property name="paddingRight">0px</property>
+                                            <property name="dataSet">urbem_250.relatorio</property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">nom_acao</property>
+                                                    <expression name="expression">dataSetRow["nom_acao"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">nom_acao</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6737">
+                                    <property name="borderBottomColor">#000000</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <cell id="6738">
+                                        <data name="NewData1621" id="6739">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">8pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="marginLeft">2px</property>
+                                            <property name="marginBottom">0pt</property>
+                                            <property name="marginRight">2px</property>
+                                            <property name="textAlign">left</property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">exercicio</property>
+                                                    <expression name="expression" type="javascript">params["periodicidade"];</expression>
+                                                    <property name="dataType">string</property>
+                                                    <property name="allowExport">true</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">exercicio</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="6740">
+                                    <cell id="6741">
+                                        <grid name="NewGrid21" id="6742">
+                                            <property name="marginTop">-2pt</property>
+                                            <property name="marginLeft">-2pt</property>
+                                            <property name="marginBottom">-2pt</property>
+                                            <property name="marginRight">-2pt</property>
+                                            <property name="display">inline</property>
+                                            <property name="width">92mm</property>
+                                            <structure name="toc"/>
+                                            <column id="6743">
+                                                <property name="width">32mm</property>
+                                            </column>
+                                            <column id="6744">
+                                                <property name="width">21mm</property>
+                                            </column>
+                                            <column id="6745">
+                                                <property name="width">12mm</property>
+                                            </column>
+                                            <column id="6746">
+                                                <property name="fontFamily">"Sans"</property>
+                                                <property name="width">10mm</property>
+                                            </column>
+                                            <column id="6747">
+                                                <property name="width">6mm</property>
+                                            </column>
+                                            <column id="6748">
+                                                <property name="width">10mm</property>
+                                            </column>
+                                            <row id="6749">
+                                                <property name="verticalAlign">top</property>
+                                                <cell id="6750">
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <text name="NewText721" id="6751">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="marginTop">-0.5px</property>
+                                                        <property name="paddingTop">1pt</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <property name="paddingRight">2px</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Emissão: <VALUE-OF>
+var obData = new Date();
+var stDia = obData.getDate();
+if( stDia < 10 ){
+	stDia = '0'+stDia;
+} 
+var stMes  = obData.getMonth()+1;
+if( stMes < 10 ){
+   stMes = "0"+stMes;
+}
+stDia+"/"+stMes+"/"+obData.getFullYear();
+</VALUE-OF>]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="6752">
+                                                    <property name="borderRightColor">#000000</property>
+                                                    <property name="borderRightStyle">solid</property>
+                                                    <property name="borderRightWidth">thin</property>
+                                                    <text name="NewText1121" id="6753">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <property name="paddingRight">2px</property>
+                                                        <property name="contentType">html</property>
+                                                        <text-property name="content"><![CDATA[Hora:
+<VALUE-OF>var obData = new Date();
+    var stHora = obData.getHours();
+    if(stHora < 10)
+    {
+        stHora = "0"+stHora;
+    }
+    var stMinutos = obData.getMinutes();
+    if(stMinutos < 10)
+    {
+        stMinutos = "0"+stMinutos;
+    }   
+    stHora+":"+stMinutos;
+</VALUE-OF>]]></text-property>
+                                                    </text>
+                                                </cell>
+                                                <cell id="6754">
+                                                    <label name="NewLabel2122" id="6755">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <text-property name="text">Página:</text-property>
+                                                    </label>
+                                                </cell>
+                                                <cell id="6756">
+                                                    <auto-text name="NewAutoText11" id="6757">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="textAlign">right</property>
+                                                        <property name="type">page-number</property>
+                                                    </auto-text>
+                                                </cell>
+                                                <cell id="6758">
+                                                    <label name="NewLabel21211" id="6759">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="paddingLeft">2px</property>
+                                                        <text-property name="text">de</text-property>
+                                                    </label>
+                                                </cell>
+                                                <cell id="6760">
+                                                    <auto-text name="NewAutoText2" id="6761">
+                                                        <property name="fontFamily">sans-serif</property>
+                                                        <property name="fontSize">8pt</property>
+                                                        <property name="marginTop">0pt</property>
+                                                        <property name="marginRight">5pt</property>
+                                                        <property name="paddingRight">1pt</property>
+                                                        <property name="textAlign">right</property>
+                                                        <property name="type">total-page</property>
+                                                    </auto-text>
+                                                </cell>
+                                            </row>
+                                        </grid>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
             <page-footer>
                 <grid name="rodape" id="1159" extends="urbem_250.rodape">
                     <overridden-values>
@@ -473,111 +1142,7 @@ extensionProperties.odaPassword = params["db_password"].value;
             <header>
                 <row id="6668">
                     <cell id="6669">
-                        <grid name="cabecalho" id="1158" extends="urbem_250.cabecalho_retrato">
-                            <overridden-values>
-                                <ref-entry baseId="1051" id="1051"/>
-                                <ref-entry baseId="1052" id="1052"/>
-                                <ref-entry baseId="1053" id="1053"/>
-                                <ref-entry baseId="1054" id="1054"/>
-                                <ref-entry baseId="1055" id="1055"/>
-                                <ref-entry baseId="1397" name="NewText61221" id="1397"/>
-                                <ref-entry baseId="1398" name="NewText612111" id="1398"/>
-                                <ref-entry baseId="1056" id="1056"/>
-                                <ref-entry baseId="1061" name="NewGrid" id="1061"/>
-                                <ref-entry baseId="1062" id="1062"/>
-                                <ref-entry baseId="1063" id="1063"/>
-                                <ref-entry baseId="1064" id="1064"/>
-                                <ref-entry baseId="1102" name="NewData" id="1102"/>
-                                <ref-entry baseId="1137" name="NewData6" id="1137"/>
-                                <ref-entry baseId="1065" id="1065"/>
-                                <ref-entry baseId="1066" id="1066"/>
-                                <ref-entry baseId="1103" name="NewData1" id="1103"/>
-                                <ref-entry baseId="1138" name="NewData7" id="1138"/>
-                                <ref-entry baseId="1067" id="1067"/>
-                                <ref-entry baseId="1068" id="1068"/>
-                                <ref-entry baseId="1105" name="NewData2" id="1105"/>
-                                <ref-entry baseId="1139" name="NewData8" id="1139"/>
-                                <ref-entry baseId="1069" id="1069"/>
-                                <ref-entry baseId="1070" id="1070"/>
-                                <ref-entry baseId="1106" name="NewData3" id="1106"/>
-                                <ref-entry baseId="1140" name="NewData9" id="1140"/>
-                                <ref-entry baseId="1071" id="1071"/>
-                                <ref-entry baseId="1072" id="1072"/>
-                                <ref-entry baseId="1107" name="NewData4" id="1107"/>
-                                <ref-entry baseId="1141" name="NewData10" id="1141"/>
-                                <ref-entry baseId="1073" id="1073"/>
-                                <ref-entry baseId="1074" id="1074"/>
-                                <ref-entry baseId="1108" name="NewData5" id="1108"/>
-                                <ref-entry baseId="1143" name="NewData11" id="1143"/>
-                                <ref-entry baseId="1057" id="1057"/>
-                                <ref-entry baseId="1075" name="NewGrid1" id="1075"/>
-                                <ref-entry baseId="1076" id="1076"/>
-                                <ref-entry baseId="1077" id="1077"/>
-                                <ref-entry baseId="1078" id="1078"/>
-                                <ref-entry baseId="1109" name="NewGrid3" id="1109"/>
-                                <ref-entry baseId="1110" id="1110"/>
-                                <ref-entry baseId="1111" id="1111"/>
-                                <ref-entry baseId="1112" id="1112"/>
-                                <ref-entry baseId="1113" id="1113"/>
-                                <ref-entry baseId="735" name="NewData1212" id="735"/>
-                                <ref-entry baseId="1114" id="1114"/>
-                                <ref-entry baseId="744" name="NewData1412" id="744"/>
-                                <ref-entry baseId="1079" id="1079"/>
-                                <ref-entry baseId="1080" id="1080"/>
-                                <ref-entry baseId="1115" name="NewGrid31" id="1115"/>
-                                <ref-entry baseId="1116" id="1116"/>
-                                <ref-entry baseId="1117" id="1117"/>
-                                <ref-entry baseId="1118" id="1118"/>
-                                <ref-entry baseId="1119" id="1119"/>
-                                <ref-entry baseId="747" name="NewData1312" id="747"/>
-                                <ref-entry baseId="1120" id="1120"/>
-                                <ref-entry baseId="756" name="NewData152" id="756"/>
-                                <ref-entry baseId="1081" id="1081"/>
-                                <ref-entry baseId="1082" id="1082"/>
-                                <ref-entry baseId="759" name="NewData1112" id="759"/>
-                                <ref-entry baseId="1083" id="1083"/>
-                                <ref-entry baseId="1084" id="1084"/>
-                                <ref-entry baseId="762" name="NewData162" id="762">
-                                    <property name="resultSetColumn">exercicio</property>
-                                    <property name="textAlign">left</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">exercicio</property>
-                                            <expression name="expression">var texto = params["exercicio"];
-
-if (params["recurso"] != "") {
-    texto += " - Recurso: "+params["recurso"] + " - "+params["descricao_recurso"];
-}
-
-texto;</expression>
-                                            <property name="dataType">string</property>
-                                        </structure>
-                                    </list-property>
-                                </ref-entry>
-                                <ref-entry baseId="1085" id="1085"/>
-                                <ref-entry baseId="1086" id="1086"/>
-                                <ref-entry baseId="1087" name="NewGrid2" id="1087"/>
-                                <ref-entry baseId="1088" id="1088"/>
-                                <ref-entry baseId="1089" id="1089"/>
-                                <ref-entry baseId="1090" id="1090"/>
-                                <ref-entry baseId="1091" id="1091"/>
-                                <ref-entry baseId="1092" id="1092"/>
-                                <ref-entry baseId="1093" id="1093"/>
-                                <ref-entry baseId="1094" id="1094"/>
-                                <ref-entry baseId="1095" id="1095"/>
-                                <ref-entry baseId="765" name="NewText72" id="765"/>
-                                <ref-entry baseId="1096" id="1096"/>
-                                <ref-entry baseId="767" name="NewText112" id="767"/>
-                                <ref-entry baseId="1097" id="1097"/>
-                                <ref-entry baseId="776" name="NewLabel212" id="776"/>
-                                <ref-entry baseId="1098" id="1098"/>
-                                <ref-entry baseId="778" name="NewAutoText1" id="778"/>
-                                <ref-entry baseId="1099" id="1099"/>
-                                <ref-entry baseId="1101" name="NewLabel2121" id="1101"/>
-                                <ref-entry baseId="1100" id="1100"/>
-                                <ref-entry baseId="782" name="NewAutoText" id="782"/>
-                            </overridden-values>
-                        </grid>
+                        <property name="textAlign">left</property>
                     </cell>
                 </row>
             </header>
@@ -596,9 +1161,10 @@ texto;</expression>
                                     <property name="dataType">integer</property>
                                 </structure>
                                 <structure>
-                                    <property name="name">fundeb</property>
-                                    <expression name="expression">dataSetRow["fundeb"]</expression>
-                                    <property name="dataType">integer</property>
+                                    <property name="name">grupo</property>
+                                    <expression name="expression" type="javascript">dataSetRow["grupo"]</expression>
+                                    <property name="dataType">string</property>
+                                    <property name="allowExport">true</property>
                                 </structure>
                                 <structure>
                                     <property name="name">nivel</property>
@@ -724,7 +1290,7 @@ texto;</expression>
                                     <property name="name">vlTotalizadorDotacaoAtualizada</property>
                                     <property name="dataType">float</property>
                                     <simple-property-list name="aggregateOn">
-                                        <value>fundebGroup</value>
+                                        <value>grupoGroup</value>
                                     </simple-property-list>
                                     <property name="aggregateFunction">SUM</property>
                                     <list-property name="arguments">
@@ -738,7 +1304,7 @@ texto;</expression>
                                     <property name="name">vlTotalizadorDespesaEmpenhada</property>
                                     <property name="dataType">float</property>
                                     <simple-property-list name="aggregateOn">
-                                        <value>fundebGroup</value>
+                                        <value>grupoGroup</value>
                                     </simple-property-list>
                                     <property name="aggregateFunction">SUM</property>
                                     <list-property name="arguments">
@@ -752,7 +1318,7 @@ texto;</expression>
                                     <property name="name">vlTotalizadorDespesaLiquidada</property>
                                     <property name="dataType">float</property>
                                     <simple-property-list name="aggregateOn">
-                                        <value>fundebGroup</value>
+                                        <value>grupoGroup</value>
                                     </simple-property-list>
                                     <property name="aggregateFunction">SUM</property>
                                     <list-property name="arguments">
@@ -766,7 +1332,7 @@ texto;</expression>
                                     <property name="name">vlTotalizadorDespesaPaga</property>
                                     <property name="dataType">float</property>
                                     <simple-property-list name="aggregateOn">
-                                        <value>fundebGroup</value>
+                                        <value>grupoGroup</value>
                                     </simple-property-list>
                                     <property name="aggregateFunction">SUM</property>
                                     <list-property name="arguments">
@@ -780,7 +1346,7 @@ texto;</expression>
                                     <property name="name">vlTotalizadorDespesaOrcadaProximo</property>
                                     <property name="dataType">float</property>
                                     <simple-property-list name="aggregateOn">
-                                        <value>fundebGroup</value>
+                                        <value>grupoGroup</value>
                                     </simple-property-list>
                                     <property name="aggregateFunction">SUM</property>
                                     <list-property name="arguments">
@@ -869,12 +1435,12 @@ texto;</expression>
                                 <property name="width">18mm</property>
                             </column>
                             <group id="1187">
-                                <property name="groupName">fundebGroup</property>
+                                <property name="groupName">grupoGroup</property>
                                 <property name="interval">none</property>
                                 <property name="sortDirection">asc</property>
-                                <expression name="keyExpr">row["fundeb"]</expression>
+                                <expression name="keyExpr">row["grupo"]</expression>
                                 <structure name="toc">
-                                    <expression name="expressionValue">row["fundeb"]</expression>
+                                    <expression name="expressionValue">row["grupo"]</expression>
                                 </structure>
                                 <property name="repeatHeader">true</property>
                                 <property name="hideDetail">false</property>
@@ -889,15 +1455,13 @@ texto;</expression>
                                             <property name="colSpan">7</property>
                                             <property name="rowSpan">1</property>
                                             <text-data id="1223">
+                                                <property name="fontSize">8pt</property>
                                                 <property name="fontWeight">bold</property>
                                                 <property name="marginTop">0pt</property>
+                                                <property name="paddingTop">10pt</property>
                                                 <property name="pageBreakAfter">auto</property>
                                                 <property name="pageBreakBefore">auto</property>
-                                                <expression name="valueExpr">if(row["fundeb"] == true){
-	'FUNDEB'
-} else {
-	'Despesas Próprias Custeadas com Impostos e Transferências - Exceto FUNDEB'
-}</expression>
+                                                <expression name="valueExpr">row["grupo"].split("|")[1];</expression>
                                                 <property name="contentType">html</property>
                                             </text-data>
                                         </cell>
@@ -905,9 +1469,9 @@ texto;</expression>
                                 </header>
                                 <footer>
                                     <row id="1275">
-                                        <property name="height">5mm</property>
                                         <property name="backgroundColor">#FFFFFF</property>
                                         <property name="pageBreakAfter">auto</property>
+                                        <property name="height">5mm</property>
                                         <cell id="1276"/>
                                         <cell id="1277"/>
                                         <cell id="1278"/>
@@ -1055,6 +1619,7 @@ texto;</expression>
                                             <property name="rowSpan">1</property>
                                             <data id="1240">
                                                 <property name="marginLeft">20pt</property>
+                                                <property name="paddingTop">5pt</property>
                                                 <property name="pageBreakAfter">auto</property>
                                                 <property name="pageBreakBefore">auto</property>
                                                 <property name="resultSetColumn">subFuncao</property>

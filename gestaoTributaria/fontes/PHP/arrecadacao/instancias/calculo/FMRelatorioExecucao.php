@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: FMRelatorioExecucao.php 62144 2015-03-31 17:39:32Z jean $
+    * $Id: FMRelatorioExecucao.php 62452 2015-05-12 16:56:06Z michel $
 
     Caso de uso: uc-05.03.05
 **/
@@ -143,7 +143,6 @@ if ($stTipoCalculo == 'Geral') {
 }
 
 if (!$stErro) {
-    SistemaLegado::mostravar('1');
     /*
         deve-se dividir a string de STCalculos em arrays de 1000 calculos,
         executar o lançamento de 1000 em 1000 e ir concatenando as

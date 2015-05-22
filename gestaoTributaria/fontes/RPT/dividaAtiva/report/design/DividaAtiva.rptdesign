@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,9 +18,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +29,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,20 +40,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -62,31 +51,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -95,9 +62,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -106,9 +73,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -117,9 +84,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -128,9 +95,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -139,9 +106,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -150,9 +117,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -161,9 +128,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -172,9 +139,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -183,9 +150,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -194,9 +161,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -205,9 +172,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -216,9 +183,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -227,9 +194,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -238,9 +205,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -249,9 +216,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -260,9 +227,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -271,9 +238,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -282,9 +249,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -293,9 +260,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -304,9 +271,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -315,9 +282,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -326,9 +293,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -336,9 +303,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="filtro_credito" id="6698">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -347,14 +314,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-    extensionProperties.odaPassword = params["db_password"].value;
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -707,7 +666,7 @@ from (
                 </structure>
                 <structure>
                     <property name="name">Column Binding_4</property>
-                    <property name="displayName">temp1</property>
+                    <text-property name="displayName">temp1</text-property>
                     <expression name="expression">arTemp = row["array_acrescimos"].split('#');
 if(arTemp[0]==null){stTemp1=null;}{
 stTemp = arTemp[0];
@@ -730,7 +689,7 @@ stTemp1[3];
                 </structure>
                 <structure>
                     <property name="name">Column Binding_6</property>
-                    <property name="displayName">temp2</property>
+                    <text-property name="displayName">temp2</text-property>
                     <expression name="expression">arTemp = row["array_acrescimos"].split('#');
 if(arTemp[1]==null){stTemp2=null;}{
 stTemp = arTemp[1];
@@ -1043,7 +1002,7 @@ stTemp15[0];
                 </structure>
                 <structure>
                     <property name="name">Column Binding_34</property>
-                    <property name="displayName">subTotal</property>
+                    <text-property name="displayName">subTotal</text-property>
                     <expression name="expression">Total.Sum(row["valor_original"], null, 1);</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -1134,7 +1093,7 @@ stTemp15[0];
                 </structure>
                 <structure>
                     <property name="name">total2</property>
-                    <property name="displayName">total2</property>
+                    <text-property name="displayName">total2</text-property>
                     <expression name="expression">Total.sum(row["Column Binding_6"]);</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -1205,20 +1164,20 @@ stTemp15[0];
                 </structure>
                 <structure>
                     <property name="name">Column Binding_51</property>
-                    <property name="displayName">valor_atualizado_pacial</property>
+                    <text-property name="displayName">valor_atualizado_pacial</text-property>
                     <expression name="expression">row["valor_original"]+row["Column Binding_4"]+row["Column Binding_6"]+row["Column Binding_8"]+row["Column Binding_10"]+row["Column Binding_11"]+row["Column Binding_12"]+row["Column Binding_13"]+row["Column Binding_14"]+row["Column Binding_15"]
 +row["Column Binding_28"]+row["Column Binding_29"]+row["Column Binding_30"]+row["Column Binding_31"]+row["Column Binding_32"]+row["Column Binding_33"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_52</property>
-                    <property name="displayName">valor_atualizado_total</property>
+                    <text-property name="displayName">valor_atualizado_total</text-property>
                     <expression name="expression">row["Column Binding_34"]+row["Column Binding_36"]+row["Column Binding_37"]+row["Column Binding_38"]+row["Column Binding_39"]+row["Column Binding_40"]+row["Column Binding_41"]+row["Column Binding_42"]+row["Column Binding_43"]+row["Column Binding_44"]+row["Column Binding_45"]+row["Column Binding_46"]+row["Column Binding_47"]+row["Column Binding_48"]+row["Column Binding_49"]+row["Column Binding_50"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">Column Binding_53</property>
-                    <property name="displayName">valor_atualizado_geral</property>
+                    <text-property name="displayName">valor_atualizado_geral</text-property>
                     <expression name="expression">row["Column Binding_35"]+row["total1"]+row["total2"]+row["total3"]+row["total4"]+row["total6"]+row["total5"]+row["total7"]+row["total8"]+row["total9"]+row["total10"]+row["total11"]+row["total12"]+row["total13"]+row["total14"]+row["total15"]</expression>
                     <property name="dataType">float</property>
                 </structure>
@@ -1231,8 +1190,8 @@ stTemp15[0];
                 <property name="width">24mm</property>
             </column>
             <column id="544">
-                <property name="width">20mm</property>
                 <property name="verticalAlign">bottom</property>
+                <property name="width">20mm</property>
             </column>
             <column id="690">
                 <property name="width">61mm</property>
@@ -1391,9 +1350,9 @@ stTemp15[0];
                         <cell id="649">
                             <property name="colSpan">3</property>
                             <property name="rowSpan">1</property>
-                            <property name="width">16%</property>
                             <property name="fontSize">8pt</property>
                             <property name="paddingTop">1pt</property>
+                            <property name="width">16%</property>
                             <grid id="2338">
                                 <property name="width">100%</property>
                                 <column id="2339">
@@ -1435,139 +1394,139 @@ stTemp15[0];
                             <grid id="1957">
                                 <property name="width">100%</property>
                                 <column id="1958">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp1 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1959">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp2 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1960">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp3 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1961">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp4 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1962">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp5 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1963">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp6 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1964">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp7 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1965">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp8 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1966">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp9 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1967">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp10 == null</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1968">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp11 == null || stTemp11 == ""</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1969">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp12 == null || stTemp13 == ""</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1970">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp13 == null || stTemp13 == ""</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1971">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp14 == null || stTemp15 == ""</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="1972">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
                                             <expression name="valueExpr">stTemp15 == null || stTemp15 == ""</expression>
                                         </structure>
                                     </list-property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <row id="1973">
                                     <property name="textAlign">center</property>
@@ -1733,7 +1692,6 @@ stTemp15[0];
                             <grid id="2238">
                                 <property name="width">100%</property>
                                 <column id="2239">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1741,9 +1699,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2240">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1751,9 +1709,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2241">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1761,9 +1719,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2242">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1771,9 +1729,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2243">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1781,9 +1739,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2244">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1791,9 +1749,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2245">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1801,9 +1759,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2246">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1811,9 +1769,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2247">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1821,9 +1779,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2248">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1831,9 +1789,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2249">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1841,9 +1799,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2250">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1851,9 +1809,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2251">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1861,9 +1819,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2252">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1871,9 +1829,9 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <column id="2253">
-                                    <property name="width">18mm</property>
                                     <list-property name="visibility">
                                         <structure>
                                             <property name="format">all</property>
@@ -1881,14 +1839,15 @@ stTemp15[0];
                                         </structure>
                                     </list-property>
                                     <property name="textAlign">right</property>
+                                    <property name="width">18mm</property>
                                 </column>
                                 <row id="2254">
                                     <property name="numberAlign">right</property>
                                     <property name="textAlign">right</property>
                                     <cell id="2255">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
                                         <property name="verticalAlign">middle</property>
+                                        <property name="width">7%</property>
                                         <data id="2270">
                                             <property name="marginTop">0pt</property>
                                             <property name="marginRight">0pt</property>
@@ -1901,9 +1860,9 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2256">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
                                         <property name="verticalAlign">middle</property>
+                                        <property name="width">7%</property>
                                         <data id="2271">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1913,9 +1872,9 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2257">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
                                         <property name="verticalAlign">middle</property>
+                                        <property name="width">7%</property>
                                         <data id="2272">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1925,8 +1884,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2258">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2273">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1936,8 +1895,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2259">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2274">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1947,8 +1906,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2260">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2275">
                                             <property name="paddingTop">1pt</property>
                                             <structure name="numberFormat">
@@ -1959,8 +1918,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2261">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2276">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1970,8 +1929,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2262">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2277">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1981,9 +1940,9 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2263">
-                                        <property name="width">7%</property>
                                         <property name="paddingTop">1pt</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2278">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -1993,8 +1952,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2264">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2279">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2004,9 +1963,9 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2265">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
                                         <property name="display">block</property>
+                                        <property name="width">7%</property>
                                         <data id="2280">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2016,8 +1975,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2266">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2281">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2027,8 +1986,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2267">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2282">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2038,8 +1997,8 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2268">
-                                        <property name="width">7%</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2283">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2049,9 +2008,9 @@ stTemp15[0];
                                         </data>
                                     </cell>
                                     <cell id="2269">
-                                        <property name="width">7%</property>
                                         <property name="numberAlign">right</property>
                                         <property name="textAlign">right</property>
+                                        <property name="width">7%</property>
                                         <data id="2284">
                                             <structure name="numberFormat">
                                                 <property name="category">Currency</property>
@@ -2088,12 +2047,12 @@ stTemp15[0];
             </group>
             <detail>
                 <row id="537">
-                    <property name="height">0.2in</property>
                     <property name="backgroundRepeat">repeat</property>
                     <property name="verticalAlign">top</property>
+                    <property name="height">0.2in</property>
                     <cell id="577">
-                        <property name="width">16%</property>
                         <property name="paddingTop">3pt</property>
+                        <property name="width">16%</property>
                         <data id="6696">
                             <property name="paddingTop">1pt</property>
                             <property name="verticalAlign">top</property>
@@ -2101,8 +2060,8 @@ stTemp15[0];
                         </data>
                     </cell>
                     <cell id="538">
-                        <property name="width">7%</property>
                         <property name="paddingTop">3pt</property>
+                        <property name="width">7%</property>
                         <data id="1597">
                             <property name="marginTop">0pt</property>
                             <property name="paddingTop">1pt</property>
@@ -2111,10 +2070,10 @@ stTemp15[0];
                         </data>
                     </cell>
                     <cell id="539">
-                        <property name="width">7%</property>
                         <property name="paddingTop">3pt</property>
                         <property name="numberAlign">right</property>
                         <property name="verticalAlign">top</property>
+                        <property name="width">7%</property>
                         <data id="560">
                             <property name="marginTop">0pt</property>
                             <property name="paddingTop">0pt</property>
@@ -2133,7 +2092,6 @@ stTemp15[0];
                         <grid id="1924">
                             <property name="width">100%</property>
                             <column id="1925">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2141,9 +2099,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">left</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1926">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2151,9 +2109,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1927">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2161,9 +2119,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1928">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2171,9 +2129,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1929">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2181,9 +2139,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1930">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2191,9 +2149,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1931">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2201,9 +2159,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1932">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2211,9 +2169,9 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1933">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
@@ -2221,69 +2179,70 @@ stTemp15[0];
                                     </structure>
                                 </list-property>
                                 <property name="textAlign">right</property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1934">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp10 == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1935">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp11 == null || stTemp11 == ""</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1936">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp12 == null || stTemp12 == ""</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1937">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp13 == null || stTemp13 == ""</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1938">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp14 == null || stTemp14 == ""</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="1939">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">stTemp15 == null || stTemp15 == ""</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <row id="1940">
                                 <property name="numberAlign">left</property>
                                 <property name="textAlign">right</property>
                                 <cell id="1941">
-                                    <property name="width">7%</property>
                                     <property name="paddingTop">1pt</property>
                                     <property name="textAlign">right</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="1956">
                                         <property name="backgroundAttachment">scroll</property>
                                         <property name="marginTop">0pt</property>
@@ -2300,8 +2259,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1942">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="1991">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2313,8 +2272,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1943">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="1993">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2327,8 +2286,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1944">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2167">
                                         <property name="marginTop">0pt</property>
                                         <property name="paddingTop">1pt</property>
@@ -2342,9 +2301,9 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1945">
-                                    <property name="width">7%</property>
                                     <property name="textTransform">none</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2168">
                                         <property name="borderBottomStyle">none</property>
                                         <property name="numberAlign">right</property>
@@ -2357,8 +2316,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1946">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2169">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2370,8 +2329,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1947">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2170">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2383,8 +2342,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1948">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2171">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2396,8 +2355,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1949">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2172">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2409,8 +2368,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1950">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2185">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2421,9 +2380,9 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1951">
-                                    <property name="width">7%</property>
                                     <property name="numberAlign">right</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2186">
                                         <structure name="numberFormat">
                                             <property name="category">Currency</property>
@@ -2433,8 +2392,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1952">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2187">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2445,8 +2404,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1953">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2188">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2457,8 +2416,8 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1954">
-                                    <property name="width">7%</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2189">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2469,9 +2428,9 @@ stTemp15[0];
                                     </data>
                                 </cell>
                                 <cell id="1955">
-                                    <property name="width">7%</property>
                                     <property name="textAlign">right</property>
                                     <property name="verticalAlign">middle</property>
+                                    <property name="width">7%</property>
                                     <data id="2190">
                                         <property name="numberAlign">right</property>
                                         <structure name="numberFormat">
@@ -2539,139 +2498,139 @@ stTemp15[0];
                         <grid id="2285">
                             <property name="width">100%</property>
                             <column id="2286">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_4"] == null;</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2287">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_6"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2288">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_8"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2289">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_10"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2290">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_11"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2291">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_12"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2292">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_13"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2293">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_14"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2294">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_15"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2295">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_28"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2296">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_29"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2297">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_30"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2298">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_31"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2299">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_32"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <column id="2300">
-                                <property name="width">18mm</property>
                                 <list-property name="visibility">
                                     <structure>
                                         <property name="format">all</property>
                                         <expression name="valueExpr">row["Column Binding_32"] == null</expression>
                                     </structure>
                                 </list-property>
+                                <property name="width">18mm</property>
                             </column>
                             <row id="2301">
                                 <property name="textAlign">right</property>

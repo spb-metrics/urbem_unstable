@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: processosLegado.class.php 61760 2015-03-02 17:50:02Z evandro $
+ $Id: processosLegado.class.php 62581 2015-05-21 14:05:03Z michel $
 
  */
 
@@ -476,7 +476,9 @@ class processosLegado
                                     ,$conf
                                     ,$valorAtributo
                                     ,$codMasSetor
-                                    ,$interessados)
+                                    ,$interessados
+                                    ,$permitidos
+                                    ,$centroCusto)
     {
         //Include da classes de mapeamento
         include_once CAM_GA_PROT_MAPEAMENTO."TProcesso.class.php";
@@ -484,14 +486,16 @@ class processosLegado
         include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloCopiaDigital.class.php";
         include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloDocumentoProcesso.class.php";
         include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloProcessoInteressado.class.php";
+        include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloProcessoConfidencial.class.php";
 
-        $obErro                             = new Erro();
-        $obTransacao                        = new Transacao();
-        $obTProcesso                        = new TProcesso();
-        $obTProtocoloAndamento              = new TProtocoloAndamento();
-        $obTProtocoloCopiaDigital           = new TProtocoloCopiaDigital();
-        $obTProtocoloDocumentoProcesso      = new TProtocoloDocumentoProcesso();
-        $obTProtocoloProcessoInteressado    = new TProtocoloProcessoInteressado();
+        $obErro                           = new Erro();
+        $obTransacao                      = new Transacao();
+        $obTProcesso                      = new TProcesso();
+        $obTProtocoloAndamento            = new TProtocoloAndamento();
+        $obTProtocoloCopiaDigital         = new TProtocoloCopiaDigital();
+        $obTProtocoloDocumentoProcesso    = new TProtocoloDocumentoProcesso();
+        $obTProtocoloProcessoInteressado  = new TProtocoloProcessoInteressado();
+        $obTProtocoloProcessoConfidencial = new TProtocoloProcessoConfidencial();
 
         // numeracao de processo em manual
         // deve retornar mensagem caso ja exista o processo.
@@ -504,27 +508,51 @@ class processosLegado
             }
         }
 
-        //Constroi a primeira query
-        $resumo      = preg_replace("/'/", "''", $resumo);
-        $observacoes = preg_replace("/'/", "''", $observacoes);
-        $obTProcesso->setDado( "cod_processo"       , $codProcesso      );
-        $obTProcesso->setDado( "cod_situacao"       , 2                 );
-        $obTProcesso->setDado( "ano_exercicio"      , $anoExercicio     );
-        $obTProcesso->setDado( "cod_classificacao"  , $codClassificacao );
-        $obTProcesso->setDado( "cod_assunto"        , $codAssunto       );
-        $obTProcesso->setDado( "cod_usuario"        , $codUsuario       );
-        $obTProcesso->setDado( "observacoes"        , $observacoes      );
-        $obTProcesso->setDado( "confidencial"       , $conf             );
-        $obTProcesso->setDado( "resumo_assunto"     , $resumo           );
-        $obErro = $obTProcesso->inclusao($obTransacao);
-
+        $obTProcesso_ = new TProcesso();
+        $obTProcesso_->recuperaTodos($rsProcesso_, " WHERE cod_processo = '".$codProcesso."' and ano_exercicio = '".$anoExercicio."' ");
+        if($rsProcesso_->getNumLinhas() > 0 ) {
+            $obErro->setDescricao('O processo número '.$codProcesso.'/'.$anoExercicio.' já existe na base de dados. O sistema não consegue inserir um mesmo número de processo/ano se já houver um cadastrado.');
+        }
+        
+        if ( !$obErro->ocorreu() ) {
+            //Constroi a primeira query
+            $resumo      = preg_replace("/'/", "''", $resumo);
+            $observacoes = preg_replace("/'/", "''", $observacoes);
+            $obTProcesso->setDado( "cod_processo"       , $codProcesso      );
+            $obTProcesso->setDado( "cod_situacao"       , 2                 );
+            $obTProcesso->setDado( "ano_exercicio"      , $anoExercicio     );
+            $obTProcesso->setDado( "cod_classificacao"  , $codClassificacao );
+            $obTProcesso->setDado( "cod_assunto"        , $codAssunto       );
+            $obTProcesso->setDado( "cod_usuario"        , $codUsuario       );
+            $obTProcesso->setDado( "observacoes"        , $observacoes      );
+            $obTProcesso->setDado( "confidencial"       , $conf             );
+            $obTProcesso->setDado( "resumo_assunto"     , $resumo           );
+            $obTProcesso->setDado( "cod_centro"         , $centroCusto      );
+            $obErro = $obTProcesso->inclusao($obTransacao);
+        }
+        
         // Inclusão de interessados na nova tabela de sw_processo_interessado
         foreach ($interessados as $chave => $valor) {
             if ( !$obErro->ocorreu() ) {
-                $obTProtocoloProcessoInteressado->setDado( "ano_exercicio" , $anoExercicio      );
-                $obTProtocoloProcessoInteressado->setDado( "cod_processo"  , $codProcesso       );
-                $obTProtocoloProcessoInteressado->setDado( "numcgm"        , $valor['numCgm']  );
+                $obTProtocoloProcessoInteressado->setDado( "ano_exercicio" , $anoExercicio );
+                $obTProtocoloProcessoInteressado->setDado( "cod_processo"  , $codProcesso  );
+                $obTProtocoloProcessoInteressado->setDado( "numcgm"        , $valor['numCgm'] );
                 $obErro = $obTProtocoloProcessoInteressado->inclusao($obTransacao);
+            }
+        }
+
+        # Foreach responsável por incluir na tabelas os CGMs que terão permissão para ver o processo
+        # caso o mesmo seja confidencial
+        if ((bool)$conf == true) {
+            if (is_array($permitidos) && count($permitidos) > 0) {
+                foreach ($permitidos as $chave => $valor) {
+                    if ( !$obErro->ocorreu() ) {
+                        $obTProtocoloProcessoConfidencial->setDado( "ano_exercicio" , $anoExercicio );
+                        $obTProtocoloProcessoConfidencial->setDado( "cod_processo"  , $codProcesso  );
+                        $obTProtocoloProcessoConfidencial->setDado( "numcgm"        , $valor['numCgmAcesso'] );
+                        $obErro = $obTProtocoloProcessoConfidencial->inclusao($obTransacao);
+                    }
+                }
             }
         }
 

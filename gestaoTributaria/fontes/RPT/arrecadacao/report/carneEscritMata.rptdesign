@@ -36,19 +36,7 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="srcCarneEconomico" id="704">
-            <text-property name="displayName">srcCarneEconomico</text-property>
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.5:5432/gt_mata_2501</property>
-            <property name="odaUser">cercato</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">bGl2cm9z</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="srcCarneEconomico" id="704" extends="urbem_250.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>

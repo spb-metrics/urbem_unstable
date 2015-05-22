@@ -32,7 +32,7 @@
 
      * Casos de uso: uc-01.06.98
 
-    $Id: interfaceProcessos.class.php 62399 2015-05-04 17:27:11Z jean $
+    $Id: interfaceProcessos.class.php 62581 2015-05-21 14:05:03Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -390,6 +390,11 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
         Sessao::write('arRequestProtocolo', $arInteressados);
     }
 
+    if (!$arInteressados['permitidos']) {
+        $arInteressados['permitidos'] = array();
+        Sessao::write('arRequestProtocolo', $arInteressados);
+    }
+
     if ( Sessao::getVoltarProtocolo() ) {
         $arRequestProcesso = Sessao::getRequestProtocolo();
 
@@ -413,6 +418,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
 
         // busca o nome do fornecedor a partir do codigo informado
         case 1:
+
             if ($numCgm) {
                 // busca nome do fornecedor atraves do cod_fornecedor informado
                 $sql  = "   SELECT                     ";
@@ -444,19 +450,69 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                 $js .= 'd.getElementById("inserirCgm").focus();';
             } else {
                 $js .= "erro = true;\n";
-                $js .= 'mensagem += "Interessado inválido ou inexistente! ('.$numCgm.')";';
+                $js .= 'mensagem += "@Interessado inválido ou inexistente! ('.$numCgm.')";';
                 $js .= 'f.numCgm.value = "";';
                 $js .= 'd.getElementById(\'nomCGM\').innerHTML = "&nbsp;";';
                 // Campo Hidden.
                 $js .= 'd.getElementById("nomCgm").value = "";';
                 $js .= 'window.parent.frames["telaPrincipal"].boSugerido = false;';
-                $js .= 'f.numCgm.focus()';
+                $js .= 'f.numCgm.focus();';
             }
 
             sistemaLegado::executaFrameOculto($js);
 
             exit();
 
+        break;
+        case 2:
+            # Procura pelo CGM informado que poderá ter acesso ao processo quando o mesmo for confidencial
+            if (!empty($numCgmAcesso)) {
+
+                $sql  = "   SELECT                     ";
+                $sql .= "         c.numcgm, c.nom_cgm  ";
+                $sql .= "     FROM                     ";
+                $sql .= "         sw_cgm as c         ";
+                $sql .= "     WHERE c.numcgm =".$numCgmAcesso;
+                $sql .= "       AND EXISTS ( select 1 from administracao.usuario as tabela_vinculo where tabela_vinculo.numcgm = c.numcgm )";
+
+                $conn = new dataBaseLegado;
+                $conn->abreBD();
+                $conn->abreSelecao($sql);
+                $conn->vaiPrimeiro();
+
+                $stCGMPermitido = stripslashes(trim($conn->pegaCampo("nom_cgm")));
+                $conn->limpaSelecao();
+                $conn->fechaBD();
+
+                if (!empty($stCGMPermitido)) {
+
+                    $stCGMPermitido = stripslashes(trim($stCGMPermitido));
+                    $js .= 'f.target = \'\';';
+                    $js .= 'f.ctrl.value = 0;';
+                    $js .= 'f.ctrl_frm.value = 0;';
+                    $js .= 'd.getElementById("nomCGMAcesso").innerHTML = "'.$stCGMPermitido.'";';
+                    $js .= 'jQuery("#nomCGMAcesso").html("'.$stCGMPermitido.'");';
+
+                    // Campo Hidden.
+                    $js .= 'd.getElementById("nomCgmAcesso").value = "'.$stCGMPermitido.'";';
+                    $js .= 'd.getElementById("inserirCgmAcesso").disabled = false;';
+                    $js .= 'd.getElementById("inserirCgmAcesso").focus();';
+                   
+                } else {
+                    $js .= "erro = true;\n";
+                    $js .= 'mensagem += "@CGM informado inválido ou inexistente! ('.$numCgmAcesso.')";';
+                    $js .= 'f.numCgmAcesso.value = "";';
+                    $js .= 'd.getElementById(\'nomCGMAcesso\').innerHTML = "&nbsp;";';
+                    // Campo Hidden.
+                    $js .= 'd.getElementById("nomCgmAcesso").value = "";';
+                    $js .= 'window.parent.frames["telaPrincipal"].boSugerido = false;';
+                    $js .= 'f.numCgmAcesso.focus();';
+                }
+            }
+
+            sistemaLegado::executaFrameOculto($js);
+
+            exit();
         break;
     }
     // encerra operacoes no frame oculto
@@ -573,7 +629,15 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                             erro = true;
                         }
                     "; } echo"
-
+                    
+                    if(document.frm.centroCusto){
+                         campo = document.frm.centroCusto.value;
+                         if (campo=='') {
+                             mensagem += '@O campo Centro de Custo é obrigatório';
+                             erro = true;
+                         }
+                    }
+                    
                     var expReg = /\\n/g;
                     campo = document.frm.observacoes.value.replace( expReg, '');
                     campo = trim(campo);
@@ -604,6 +668,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
 
                     if (erro) {
                         jq('#botaoOk').attr('disabled','disabled');
+                        LiberaFrames(true,true);
                         alertaAviso(mensagem,'form','erro','".Sessao::getId()."');
                     }
 
@@ -614,14 +679,13 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                 //A função salvar testa a validação, e se tudo ocorrer certo, envia o form
                 function SalvarProcesso()
                 {
-                    BloqueiaFrames(true,false);
+                    window.parent.frames['telaPrincipal'].BloqueiaFrames(true,false);
                     if (Valida()) {
                         if (ValidaProcesso()) {
                             document.frm.action = '".$action."?".Sessao::getId()."&controle=".($controle+1)."';
                             document.frm.submit();
                         }
                     }
-                    BloqueiaFrames(false,false);
                     document.getElementById('botaoOk').disabled = false;
                     document.getElementById('botaoLimpar').disabled = false;
                 }
@@ -639,6 +703,22 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         document.frm.numCgm.value = '';
                         document.frm.HdnnumCgm.value = '';
                         document.getElementById('nomCGM').innerHTML = '&nbsp;';
+                    }
+                }
+
+                // Preenche o nome do CGM que poderá visualizar o processo
+                function busca_cgm_acesso(cod)
+                {
+                    if (document.frm.numCgmAcesso.value != '') {
+                        document.frm.action = '".$action."?".Sessao::getId()."';
+                        var f = document.frm;
+                        f.target = 'oculto';
+                        f.ctrl_frm.value = cod;
+                        f.submit();
+                    } else {
+                        document.frm.numCgmAcesso.value = '';
+                        document.frm.HdnnumCgmAcesso.value = '';
+                        document.getElementById('nomCGMAcesso').innerHTML = '&nbsp;';
                     }
                 }
 
@@ -772,6 +852,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                 ";
                 } else {
                     $arInteressados['interessados'] = array();
+                    $arInteressados['permitidos'] = array();
                     Sessao::write('arRequestProtocolo', $arInteressados);
                 echo"
                     <td class=\"field\" width=\"70%\">
@@ -883,7 +964,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         <td class=\"label\" valign=\"top\">&nbsp;</td>
                         <td class=\"field\" style=\"text-align:left;\">
                             <input type=\"button\" id=\"inserirCgm\" name=\"Inserir\" value=\"Incluir\" onclick=\"ajaxJavaScript( 'OCIncluiProcesso.php?numCgm='+document.frm.numCgm.value+'&nomCgm='+document.frm.nomCgm.value+'&vinculo=".$vinculo."', 'incluiInteressado');\" >
-                            <input type=\"button\" name=\"Limpar\" value=\"Limpar\" onclick=\"$('nomCGM').innerHTML = '&nbsp;'; $('numCgm').value = ''; \" >
+                            <input type=\"button\" name=\"Limpar\" value=\"Limpar\" onclick=\"$('nomCgm').innerHTML = '&nbsp;'; $('numCgm').value = ''; \" >
                         </td>
                     ";
                     // PREENCHE O CAMPO INNER CASO EXISTA O NUMCGM
@@ -1177,6 +1258,51 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         ";
                         $anoExercicio=$anoExercicioManual;
                     }
+                    
+                    $sSQL = "SELECT * FROM administracao.configuracao where cod_modulo = 5 AND parametro = 'centro_custo' AND exercicio <= '".Sessao::getExercicio()."' ORDER BY exercicio DESC LIMIT 1 ";
+                    $dbCC = new dataBaseLegado;
+                    $dbCC->abreBD();
+                    $dbCC->abreSelecao($sSQL);
+                    $dbCC->vaiPrimeiro();
+                    while (!$dbCC->eof()) {
+                        $centroCusto  = trim($dbCC->pegaCampo("valor"));
+                        $dbCC->vaiProximo();
+                    }
+                    $dbCC->limpaSelecao();
+                    $dbCC->fechaBD();
+                        
+                    if($centroCusto=='true'){
+                         $sSQL = "SELECT * FROM almoxarifado.centro_custo ORDER BY descricao";
+                         $dbCC = new dataBaseLegado;
+                         $dbCC->abreBD();
+                         $dbCC->abreSelecao($sSQL);
+                         $dbCC->vaiPrimeiro();
+                         while (!$dbCC->eof()) {
+                             $listaCentroCusto[trim($dbCC->pegaCampo("cod_centro"))]  = trim($dbCC->pegaCampo("descricao"));
+                             $dbCC->vaiProximo();
+                         }
+                         $dbCC->limpaSelecao();
+                         $dbCC->fechaBD();
+                    
+                         echo"
+                         <tr>
+                             <td class=\"label\">
+                                 *Centro de Custo
+                             </td>
+                             <td class=\"field\">
+                                   <select name='centroCusto' style='width: 200px'><option value=''>Selecione</option> \n";
+                                   
+                                   foreach ($listaCentroCusto AS $key => $value) {
+                                     $selected = "";
+                                     echo "<option value='".$key."' ".$selected.">".$value."</option>\n";
+                                   }
+                                   
+                            echo "
+                                   </select>                     
+                             </td>
+                         </tr>";
+                    }
+                    
                     echo"
                     <tr>
                         <td class=\"label\" title=\"Informações adicionais do processo\">
@@ -1209,26 +1335,63 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         $confidencial = $dbConfig->pegaCampo("confidencial");
                         $dbConfig->limpaSelecao();
                         $dbConfig->fechaBd();
-                        if ($confidencial == 't'){
+                        if ($confidencial == 't' || $conf == 't'){
+                            $boMostraTable = 'table-row'; 
                             echo "<td class=\"field\">
-                                    <input type='radio' name='conf' value='t' checked>
-                                        Sim
-                                    <input type='radio' name='conf' value='f'>
-                                        Não
+                                    <input type='radio' name='conf' value='t' onClick='jQuery(\"#tablePermissao\").css(\"display\", \"table-row\");' checked>Sim
+                                    <input type='radio' name='conf' value='f' onClick='jQuery(\"#tablePermissao\").css(\"display\", \"none\");'>Não
                                 </td>
                             </tr>";
                         }else{
+                            $boMostraTable = 'none'; 
                             echo "<td class=\"field\">
-                                    <input type='radio' name='conf' value='t'>
-                                        Sim
-                                    <input type='radio' name='conf' value='f' checked>
-                                        Não
+                                    <input type='radio' name='conf' value='t' onClick='jQuery(\"#tablePermissao\").css(\"display\", \"table-row\");'>Sim
+                                    <input type='radio' name='conf' value='f' onClick='jQuery(\"#tablePermissao\").css(\"display\", \"none\");' checked>Não
                                     </td>
                                 </tr>";
                         }
                     }
+
+                    # CGM Visualizador. Quando confidencial quem pode visualizar o processo.
+                    echo "
+                    <tr id='tablePermissao' style='display:".$boMostraTable.";'>
+                        <td class='label' title='Informe o CGM que pode visualizar o processo' >CGM Visualizador</td>
+                        <td class='field'  >
+                            <table border=0>
+                                <tr>
+                                    <td class=\"field\" width=\"13%\">
+                                         <input name=\"numCgmAcesso\" id=\"numCgmAcesso\" onkeypress=\"JavaScript:return inteiro( event );\" onBlur=\"JavaScript:busca_cgm_acesso(2);alteraSugerido(this);\" maxlength=\"10\" size=\"11\" align=\"left\" type=\"text\" value=\"".$numCgm."\">
+                                         <input type='hidden' id=\"HdnnumCgmAcesso\" name='HdnnumCgmAcesso' value='' >
+                                         <input type='hidden' name='nomCgmAcesso' id='nomCgmAcesso' value='' >
+                                    </td>
+                                    <td id=\"nomCGMAcesso\" class=\"fakefield\" height=\"20\" width=\"60%\">
+                                        &nbsp;
+                                    </td>
+                                    <td class=\"fieldleft\" valign=\"top\">
+                                        &nbsp;<a href=\"JavaScript: abrePopUp('../../../CGM/popups/cgm/FLProcurarCgm.php','frm','numCgmAcesso','nomCGMAcesso','vinculado','PHPSESSID=".$PHPSESSID."&iURLRandomica=".$REQUEST['iURLRandomica']."&stTabelaVinculo=administracao.usuario&stCampoVinculo=numcgm','800','550');\" title=\"Buscar cgm\">
+                                        <img src=\"".CAM_FW_IMAGENS."botao_popup.png\" align=\"middle\" border=\"\" height=\"\" width=\"\"></a>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class='field' style='text-align:left;' colspan='3'>
+                                        <input type='button' id='inserirCgmAcesso' name='Inserir' value='Incluir' onclick=\"ajaxJavaScript( 'OCIncluiProcesso.php?numCgmAcesso='+document.frm.numCgmAcesso.value+'&nomCgmAcesso='+document.frm.nomCgmAcesso.value+'&vinculo=".$vinculo."', 'incluiAcessoCGM');\" >
+                                        <input type='button' name='Limpar' value='Limpar' onclick=\"$('nomCGMAcesso').innerHTML = '&nbsp;'; $('numCgmAcesso').value = ''; \" >
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr> 
+
+                    <!-- Listagem de CGM que pode visualizar o processo -->
+                    <tr>
+                        <td colspan='2' width=\"100%\">
+                            <span id=\"spnPermitidos\"></span>
+                        </td>
+                    </tr> ";
+
                     echo"
-                    </tr>
+
                     <tr>
                         <td class=alt_dados colspan=\"2\">
                             Atributos de processo
@@ -2024,6 +2187,50 @@ Exibe os dados de um processo
             <?=$assunto;?>
                 </td>
             </tr>
+            
+            <?php
+               $centroCusto = pegaConfiguracao("centro_custo", 5);
+               
+               if($centroCusto=='true'){
+                   $codCentroCusto = '';
+                   $nomCentroCusto = '';
+                   $stCentroCusto = '';
+                   
+                   $sSQL = "SELECT sw_processo.*
+                                 , centro_custo.descricao as descricao_centro
+                              FROM sw_processo
+                        INNER JOIN almoxarifado.centro_custo
+                                ON centro_custo.cod_centro=sw_processo.cod_centro
+                             WHERE ano_exercicio = '".$anoExercicio."'
+                               AND cod_processo = ".$codProcesso;
+                   $dbConfig = new dataBaseLegado;
+                   $dbConfig->abreBD();
+                   $dbConfig->abreSelecao($sSQL);
+                   $dbConfig->vaiPrimeiro();
+                   while (!$dbConfig->eof()) {
+                       $codCentroCusto  = $dbConfig->pegaCampo("cod_centro");
+                       $nomCentroCusto  = trim($dbConfig->pegaCampo("descricao_centro"));
+                       $dbConfig->vaiProximo();
+                   }
+                   $dbConfig->limpaSelecao();
+                   $dbConfig->fechaBD();
+                   
+                   if($codCentroCusto!=''&&$nomCentroCusto!='')
+                      $stCentroCusto = $codCentroCusto." - ".$nomCentroCusto;
+                      
+                   echo "
+                   <tr>
+                       <td class=label width='30%'>
+                           Centro de Custo
+                       </td>
+                       <td class=field width='70%' colspan='2'>
+                           ".$stCentroCusto."
+                       </td>
+                   </tr>
+                   ";
+               }
+               ?>
+            
             <tr>
                 <td class="label" width="30%">
                     Observações
@@ -2106,7 +2313,8 @@ Exibe os dados de um processo
                     $sqlRecuperaArquivador = "
                         SELECT
                             numcgm,
-                            nom_cgm
+                            nom_cgm,
+                            localizacao
                         FROM
                             sw_processo_arquivado,
                             sw_cgm
@@ -2120,6 +2328,7 @@ Exibe os dados de um processo
                     $dbConfig->abreSelecao($sqlRecuperaArquivador);
                     $numArquivador = $dbConfig->pegaCampo("numcgm");
                     $nomArquivador = $dbConfig->pegaCampo("nom_cgm");
+                    $localizacaoFisica = $dbConfig->pegaCampo("localizacao");
                     $dbConfig->limpaSelecao();
                     $dbConfig->fechaBd();
                 }
@@ -2142,6 +2351,16 @@ Exibe os dados de um processo
                     <?= $textoComplementar ?>
                 </td>
             </tr>
+
+            <tr>
+                <td class=label>
+                    Localização Física do Arquivamento
+                </td>
+                <td class=field colspan="<?=$colspan?>">
+                    <?= $localizacaoFisica ?>
+                </td>
+            </tr>
+
 <?php
                 } // FIM Processo Arquivado (temporário ou definitivo)
 

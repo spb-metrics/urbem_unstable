@@ -35,12 +35,12 @@
     * 
     * @ignore
     * 
-    $Id: OCManterOperacoesCreditoARO.php 61852 2015-03-10 16:39:19Z michel $
+    $Id: OCManterOperacoesCreditoARO.php 62529 2015-05-18 17:56:34Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGOperacoesCreditoARO.class.php';
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGOperacoesCreditoARO.class.php";
 
 $stPrograma = "ManterOperacoesCreditoARO";
 $pgFilt = "FL".$stPrograma.".php";

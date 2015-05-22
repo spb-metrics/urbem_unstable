@@ -59,6 +59,9 @@ switch ($ctrl) {
         $numeroCopias	 = pegaConfiguracao("copias_recibo_processo",       5);
         $mascaraProcesso = pegaConfiguracao("mascara_processo",             5);
         $mascaraAssunto  = pegaConfiguracao("mascara_assunto",              5);
+        $centroCusto     = pegaConfiguracao("centro_custo",                 5);
+        $centroCustoNao  = ($centroCusto=='true') ? '' : 'CHECKED';
+        $centroCustoSim  = ($centroCusto=='true') ? 'CHECKED' : '';
 
         ?>
         <script language="JavaScript1.2" type="text/javascript">
@@ -279,6 +282,22 @@ switch ($ctrl) {
                         <input type="hidden" name="mascaraAssuntoHdn" value="<?=$mascaraAssunto?>">
                     </td>
                 </tr>
+                
+                <tr>
+                    <td class=alt_dados colspan="2">
+                        Dados para Centro de Custo
+                    </td>
+                </tr>
+                <tr>
+                    <td class=label title="Centro de Custo Obrigatório">
+                        *Centro de Custo Obrigatório
+                    </td>
+                    <td class=field>
+                        <input type="radio" name="centroCusto" value="true" <?=$centroCustoSim?> >Sim
+                        <input type="radio" name="centroCusto" value="false" <?=$centroCustoNao?> >Não
+                        <input type="hidden" name="centroCustoHdn" value="<?=$centroCusto?>">
+                    </td>
+                </tr>
 
                 <tr>
                     <td class=field colspan=2 title="Botão OK salva as informações digitadas, botão limpar cancela as alterações">
@@ -385,6 +404,16 @@ document.frm.caminhoRecibo.focus();
                             parametro  = 'mascara_assunto'               AND
                             cod_modulo = 5;";
             $audit .= "Máscara do código de Classificação/Assunto<br>\n";
+        }
+        if ($_REQUEST["centroCustoHdn"] != $_REQUEST["centroCusto"]) {
+            $sql   .= 	"UPDATE
+                            administracao.configuracao
+                        SET
+                            valor      = '".$_REQUEST["centroCusto"]."'
+                        WHERE
+                            parametro  = 'centro_custo'               AND
+                            cod_modulo = 5;";
+            $audit .= "Centro de Custo Obrigatório<br>\n";
         }
 
         if ( !empty($sql) ) {

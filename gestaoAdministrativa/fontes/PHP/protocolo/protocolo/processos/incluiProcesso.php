@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: incluiProcesso.php 62399 2015-05-04 17:27:11Z jean $
+    $Id: incluiProcesso.php 62581 2015-05-21 14:05:03Z michel $
 
     */
 
@@ -118,6 +118,13 @@ switch ($controle) {
             }
         }
 
+        if ($_REQUEST['conf'] == 't') {
+            if (count($arInteressados['permitidos']) <= 0) {
+                exibeAviso("Informe ao menos um CGM que poderá visualizar o processo quando o processo for confidencial.","","erro");
+                $ok = false;
+            }
+        }
+
         if ($ok) {
             //Verifica o tipo de numeração de processo - manual ou automática
             $tipoNumeracao = pegaConfiguracao("tipo_numeracao_processo",5);
@@ -162,7 +169,7 @@ switch ($controle) {
                                           $_REQUEST['numInscricao'],$_REQUEST["observacoes"],$_REQUEST["resumo"],$refAnterior,$processosAnexos,
                                           Sessao::read('numCgm'),$codOrgao,$codUnidade,$codDpto,$codSetor,
                                           $anoExercicio,Sessao::read("anoExercicio"),$_REQUEST["codDocumentos"], $_REQUEST["conf"], $_REQUEST["valorAtributo"],
-                                          $_REQUEST["codMasSetor"], $arInteressados['interessados']);
+                                          $_REQUEST["codMasSetor"], $arInteressados['interessados'], $arInteressados['permitidos'],$_REQUEST["centroCusto"]);
             if( $boProcessoIncluido ){
                 # Insere auditoria
                 $audicao = new auditoriaLegada;
@@ -187,16 +194,17 @@ switch ($controle) {
                 $arParametros["nomAssunto"]       = $_REQUEST["nomAssunto"];
                 $arParametros["nomClassificacao"] = $_REQUEST["nomClassificacao"];
                 $arParametros["codOrgao"]         = $codOrgao;
+                $arParametros["centroCusto"]      = $_REQUEST["centroCusto"];
 
                 Sessao::write('arParametros', $arParametros);
-                $pag = "imprimeReciboProcesso.php?".Sessao::getId()."&stParametros=sessao&codMasSetor=".$_REQUEST["codMasSetor"]."&anoExercicioSetor=".$anoExercicioSetor."&codProcesso=".$codProcesso."&anoExercicio=".$anoExercicio;
+                $pag = "imprimeReciboProcesso.php?".Sessao::getId()."&stParametros=sessao&codMasSetor=".$_REQUEST["codMasSetor"]."&anoExercicioSetor=".$anoExercicioSetor."&codProcesso=".$codProcesso."&anoExercicio=".$anoExercicio."&stAcao=Incluir";
                 alertaAviso($pag,"Processo ".$codProcesso."/".$anoExercicio,"incluir","aviso", "'.Sessao::getId().'");
             } else {
 
                 if ($tipoNumeracao != 2) { //Não manual
                     exibeAviso($codProcesso."/".$anoExercicio,"n_incluir","erro");
                 } else {
-                    exibeAviso("Processo ".$codProcesso."/".$anoExercicio." duplicado)","n_incluir","erro");
+                    exibeAviso("Processo ".$codProcesso."/".$anoExercicio." duplicado","n_incluir","erro");
                     $stJs = "f.inCodOrganogramaClassificacao.value = '".$_REQUEST["inCodOrganogramaClassificacao"]."';";
                     $stJs .= " ajaxJavaScript('../../../../../../gestaoAdministrativa/fontes/PHP/administracao/instancias/processamento/OCIMontaOrganograma.php?".Sessao::getId();
                     $stJs .= "&inCodOrganogramaClassificacao='+jq('#inCodOrganogramaClassificacao').val()+'&hdninCodOrganograma='+jq('#hdninCodOrganograma').val()+'&inNumNiveis=7&stIdOrganograma=inCodOrganograma','preencheCombosOrgaos');";
@@ -211,6 +219,9 @@ switch ($controle) {
             $html = new interfaceProcessos;
             $html->formIncluiProcesso($_REQUEST,$_SERVER['PHP_SELF'],0);
         }
+
+        SistemaLegado::LiberaFrames(true,true);
+        
     break;
 
     case 100:

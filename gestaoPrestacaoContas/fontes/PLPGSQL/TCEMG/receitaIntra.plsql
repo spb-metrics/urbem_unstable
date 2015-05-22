@@ -76,39 +76,39 @@ BEGIN
     ';
 
     EXECUTE stSql;
-
+ 
     stSql :='
             SELECT 
                     *
             FROM (
                     SELECT 
                             ''01''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.%'') OR cod_estrutural LIKE (''8.%'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.%'' ) AS amortizacao_emprestimos
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.0.0.0.00.00.00.00.00'') OR cod_estrutural LIKE (''8.0.0.0.00.00.00.00.00'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.0.0.00.00.00.00.00'' ) AS amortizacao_emprestimos
                     
                     UNION
 
                     SELECT
                             ''02''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(arrecadado_ano),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.%'') OR cod_estrutural LIKE (''8.%'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
-                            ,( SELECT COALESCE(SUM(arrecadado_ano),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.%'' ) AS amortizacao_emprestimos
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.0.0.0.00.00.00.00.00'') OR cod_estrutural LIKE (''8.0.0.0.00.00.00.00.00'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.0.0.00.00.00.00.00'' ) AS amortizacao_emprestimos
 
                     UNION
 
                     SELECT
                             ''03''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.%'') OR cod_estrutural LIKE (''8.%'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.%'' ) AS amortizacao_emprestimos
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.0.0.0.00.00.00.00.00'') OR cod_estrutural LIKE (''8.0.0.0.00.00.00.00.00'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
+                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.0.0.00.00.00.00.00'' ) AS amortizacao_emprestimos
                     UNION
 
                     SELECT
                             ''04''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(diferenca),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.%'') OR cod_estrutural LIKE (''8.%'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
-                            ,( SELECT COALESCE(SUM(diferenca),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.%'' ) AS amortizacao_emprestimos
+                            ,( SELECT COALESCE(SUM(arrecadado_ano),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE (cod_estrutural LIKE (''7.0.0.0.00.00.00.00.00'') OR cod_estrutural LIKE (''8.0.0.0.00.00.00.00.00'')) AND cod_estrutural NOT LIKE ''8.3.%'') AS demais_receita_intra
+                            ,( SELECT COALESCE(SUM(arrecadado_ano),0)::VARCHAR as valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''8.3.0.0.00.00.00.00.00'' ) AS amortizacao_emprestimos
 
             ) AS retorno
     ';
-
+    
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN next reRegistro;

@@ -48,3 +48,12 @@ INSERT INTO licitacao.tipo_chamada_publica VALUES (2, 'Inexigibilidade por Chama
 ALTER TABLE licitacao.licitacao ADD COLUMN tipo_chamada_publica INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE licitacao.licitacao ADD CONSTRAINT fk_licitacao_11  FOREIGN KEY (tipo_chamada_publica)
                                                                 REFERENCES licitacao.tipo_chamada_publica (cod_tipo);
+
+
+
+---------------------------------------------------------------
+-- CORRECAO DAS PEMISSOES DE patrimonio.grupo_plano_depreciacao
+---------------------------------------------------------------
+
+GRANT ALL ON TABLE patrimonio.grupo_plano_depreciacao TO urbem;
+

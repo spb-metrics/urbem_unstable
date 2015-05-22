@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoClassificacaoReceita.class.php 60012 2014-09-25 17:09:54Z evandro $
+    $Id: ROrcamentoClassificacaoReceita.class.php 62443 2015-05-11 17:35:07Z evandro $
 
     * Casos de uso: uc-02.01.04, uc-02.01.06
 */
@@ -112,6 +112,16 @@ var $boDedutora;
     * @access Private
 */
 var $inCodTipoReceita;
+/**
+     * @access Public
+     * @param Object $valor
+*/
+var $inCodReceita;
+/**
+     * @access Public
+     * @param Object $valor
+*/
+function setCodReceita($valor) { $this->inCodReceita = $valor; }
 /**
      * @access Public
      * @param Object $valor
@@ -244,6 +254,10 @@ function getDedutora() { return $this->boDedutora;               }
      * @return Integer
 */
 function getTipoReceita() { return $this->inCodTipoReceita;         }
+
+function getCodReceita() { return $this->inCodReceita; }
+
+
 /**
     * Método Construtor
     * @access Private
@@ -569,6 +583,51 @@ function recuperaDescricaoReceita(&$stDescricaoReceita, $obTransacao = "")
         $stClassificacao .= $rsLista->getCampo('cod_classificacao').".";
         $rsLista->proximo();
     }
+
+    return $obErro;
+}
+
+
+function recuperaDescricaoReceitaIRRF(&$rsContaIRRF, $obTransacao = "")
+{
+
+    include_once ( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoContaReceita.class.php"         );
+    $obTOrcamentoContaReceita = new TOrcamentoContaReceita;
+    
+    $stFiltro = "WHERE conta_receita.exercicio  = '".$this->getExercicio()."'";
+
+    if ( $this->getCodReceita() != "" )
+        $stFiltro .= " AND receita.cod_receita = ".$this->getCodReceita();        
+
+    if ( $this->getCodEstrutural() != "" )
+        $stFiltro  .= " AND REPLACE(conta_receita.cod_estrutural,'.','') like '".$this->getCodEstrutural()."%'";
+
+    if ( $this->getDescricao() != "")
+        $stFiltro .= " AND conta_receita.descricao ilike '".$this->getDescricao()."'" ;
+
+    $obErro = $obTOrcamentoContaReceita->recuperaDescricaoIRRF($rsContaIRRF,$stFiltro,"",$boTransacao);
+
+    return $obErro;
+}
+
+function recuperaListaIRRF(&$rsContaIRRF, $obTransacao = "")
+{
+
+    include_once ( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoContaReceita.class.php"         );
+    $obTOrcamentoContaReceita = new TOrcamentoContaReceita;
+
+    $obTOrcamentoContaReceita->setDado('exercicio',$this->getExercicio());
+
+    if ( $this->getCodReceita() != "" )
+        $stFiltro .= " AND cod_receita_irrf = ".$this->getCodReceita();        
+
+    if ( $this->getCodEstrutural() != "" )
+        $stFiltro  .= " AND REPLACE(cod_estrutural,'.','') like '".$this->getCodEstrutural()."%'" ;
+
+    if ( $this->getDescricao() != "")
+        $stFiltro .= " AND descricao ilike '".$this->getDescricao()."'" ;
+
+    $obErro = $obTOrcamentoContaReceita->recuperaListaIRRF($rsContaIRRF,$stFiltro," ORDER BY cod_receita_irrf , cod_estrutural",$boTransacao);
 
     return $obErro;
 }

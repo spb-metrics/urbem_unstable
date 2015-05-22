@@ -34,7 +34,7 @@
 
  * Casos de uso : uc-03.05.21
 
- $Id: FLManterAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FLManterAutorizacao.php 62550 2015-05-19 18:21:57Z evandro $
 
  */
 
@@ -82,9 +82,9 @@ include_once(CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php");
 $obComprasModalidade = new TComprasModalidade();
 $rsRecordSet = new RecordSet;
 //$stFiltro = " WHERE cod_modalidade NOT IN(4,5,6,7)  ";
-$stFiltro = " WHERE cod_modalidade NOT IN(4,5)  ";
+$stFiltro = " WHERE cod_modalidade NOT IN(4,5,10,11)  ";
 
-$obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro," ORDER BY descricao ");
+$obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro," ORDER BY cod_modalidade ");
 
 $obISelectModalidadeLicitacao = new Select();
 $obISelectModalidadeLicitacao->setRotulo            ("Modalidade"                            );

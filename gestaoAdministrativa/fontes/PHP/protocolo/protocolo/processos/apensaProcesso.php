@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: apensaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: apensaProcesso.php 62562 2015-05-20 16:41:58Z michel $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -441,6 +441,11 @@ switch ($controle) {
                 document.frm.submit();
             }
         </script>';
+        
+            $inCodOrganograma = SistemaLegado::pegaDado('cod_organograma', 'organograma.vw_orgao_nivel', ' WHERE cod_orgao = '.Sessao::read('codOrgao'));
+            $boPermissaoHierarquica = SistemaLegado::pegaDado('permissao_hierarquica', 'organograma.organograma', ' WHERE cod_organograma = '.$inCodOrganograma);
+            $stLikeOrgao = ($boPermissaoHierarquica == 't') ? "||'%'" : "";
+    
             if (Sessao::read('filtro') != "") {
                 $vet = Sessao::read('filtro');
                 foreach ($vet AS $indice => $valor) {
@@ -459,6 +464,7 @@ switch ($controle) {
                       WHERE  cod_processo_pai=".(int) $codProcesso." and
                              exercicio_pai = '".$ExeProcesso."'  and
                              timestamp_desapensamento is null ";
+
             $dbProcs = new dataBaseLegado;
             $dbProcs->abreBD();
             $dbProcs->abreSelecao($sSQL);
@@ -501,7 +507,14 @@ switch ($controle) {
                     AND sw_assunto.cod_classificacao       = sw_classificacao.cod_classificacao
                     AND NOT (sw_processo.ano_exercicio          = '".$ExeProcesso."'
                     AND sw_processo.cod_processo                = $codProcesso)
-                    AND sw_ultimo_andamento.cod_orgao           = '".Sessao::read('codOrgao')."'
+                    AND sw_ultimo_andamento.cod_orgao IN (  SELECT cod_orgao
+                                                             FROM organograma.vw_orgao_nivel
+                                                            WHERE orgao_reduzido LIKE (
+                                                                                        SELECT distinct(vw_orgao_nivel.orgao_reduzido)
+                                                                                          FROM organograma.vw_orgao_nivel
+                                                                                         WHERE vw_orgao_nivel.cod_orgao = ".Sessao::read('codOrgao')."
+                                                                                       )".$stLikeOrgao."
+                                                            GROUP BY cod_orgao)
                     -- AND sw_ultimo_andamento.cod_unidade         = '".Sessao::read('codUnidade')."'
                     -- AND sw_ultimo_andamento.cod_departamento    = '".Sessao::read('codDpto')."'
                     -- AND sw_ultimo_andamento.cod_setor           = '".Sessao::read('codSetor')."'

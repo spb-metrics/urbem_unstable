@@ -23,48 +23,36 @@
 */
 ?>
 <?php
+/**
+    * Classe de mapeamento da tabela ima.configuracao_dirf_irrf_plano_conta
+    * Data de Criação: 14/05/2015
+    * @author Analista     : Dagiane
+    * @author Desenvolvedor: Evandro Melos
+    * @package URBEM
+    * @subpackage Mapeamento
+    * $Id: $
+*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CLA_PERSISTENTE                                                                      );
+include_once ( CLA_PERSISTENTE );
 
-class FTCEMGDespesaPrev extends Persistente
+class TIMAConfiguracaoDirfIrrfContaReceita extends Persistente
 {
-    public function FTCEMGDespesaPrev()
+    /**
+        * Método Construtor
+        * @access Private
+    */    
+    public function TIMAConfiguracaoDirfIrrfContaReceita()
     {
         parent::Persistente();
+        $this->setTabela("ima.configuracao_dirf_irrf_conta_receita");
 
-        $this->setTabela('tcemg.fn_despesa_prev');
+        $this->setCampoCod('');
+        $this->setComplementoChave('exercicio');
 
-        $this->AddCampo('exercicio'    , 'varchar' , false , '' , false , false );
-        $this->AddCampo('cod_entidade' , 'varchar' , false , '' , false , false );
-        $this->AddCampo('dt_inicial'   , 'integer' , false , '' , false , false );
-        $this->AddCampo('dt_final'     , 'integer' , false , '' , false , false );
+        $this->AddCampo('exercicio','char'   ,true  ,'4'  ,true,'');
+        $this->AddCampo('cod_conta','integer',true  ,''   ,false,'');
     }
-
-    public function montaRecuperaTodos()
-    {
-        $stSql  = "
-
-            SELECT *
-              FROM ".$this->getTabela()."('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."') as
-           retorno ( despAdmGeral               NUMERIC,
-                     despPrevSoci               NUMERIC,
-                     despPrevSocInatPens        NUMERIC,
-                     outrasDespCorrentes        NUMERIC, 
-                     despInvestimentos          NUMERIC,
-                     despInversoesFinanceiras   NUMERIC,
-                     despesasPrevIntra          NUMERIC,
-                     despReserva                NUMERIC,
-                     despOutrasReservas         NUMERIC,
-                     despCorrentes              NUMERIC,
-                     despCapital                NUMERIC,
-                     outrosBeneficios           NUMERIC,
-                     contPrevidenciaria         NUMERIC,
-                     outrasDespesas             NUMERIC,
-                     codTipo                    INTEGER
-                    );
-        ";
-        return $stSql;
-    }
+    
 }
 ?>

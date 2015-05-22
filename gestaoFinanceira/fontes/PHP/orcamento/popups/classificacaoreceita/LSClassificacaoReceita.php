@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: LSClassificacaoReceita.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSClassificacaoReceita.php 62443 2015-05-11 17:35:07Z evandro $
 
     * Casos de uso: uc-02.01.06
 */
@@ -133,48 +133,144 @@ if (trim($_REQUEST['inExercicio']) != "") {
 
 $stLink .= "&stAcao=".$stAcao;
 $obROrcamentoClassificacaoReceita->setListarAnaliticas('true');
-if($_REQUEST['tipoBusca'] == 'receitaDedutora')
+
+$rsLista = new RecordSet();
+
+if($_REQUEST['tipoBusca'] == 'receitaDedutora'){
     $obROrcamentoClassificacaoReceita->setDedutora (true);
-$obROrcamentoClassificacaoReceita->listar( $rsLista, " ORDER BY mascara_classificacao" );
 
-$obLista = new Lista;
-$obLista->obPaginacao->setFiltro("&stLink=".$stLink );
+}elseif ($_REQUEST['tipoBusca'] == 'receitaIRRF') {
+    include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoReceita.class.php" );
+    $obROrcamentoReceita = new ROrcamentoReceita;
+    
+    if($_REQUEST['inExercicio'] != "")
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio ( $_REQUEST['inExercicio']        );
+    
+    if($_REQUEST['inCodReceitaIRRF'] != "")
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodReceita ( $_REQUEST['inCodReceitaIRRF']   );  
+    
+    if($_REQUEST['inCodClassificacao'] != ""){
+        $stEstrutural = str_replace(".", "", $_REQUEST['inCodClassificacao']);                
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodEstrutural ( $stEstrutural );  
+    }
 
-$obLista->setRecordSet( $rsLista );
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo("&nbsp;");
-$obLista->ultimoCabecalho->setWidth( 5 );
-$obLista->commitCabecalho();
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo("Código");
-$obLista->ultimoCabecalho->setWidth( 20 );
-$obLista->commitCabecalho();
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo("Descrição ");
-$obLista->ultimoCabecalho->setWidth( 70 );
-$obLista->commitCabecalho();
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo("&nbsp;");
-$obLista->ultimoCabecalho->setWidth( 5 );
-$obLista->commitCabecalho();
+    if( $_REQUEST['stDescricao'] != "") 
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setDescricao ( $_REQUEST['stDescricao'] );  
 
-$obLista->addDado();
-$obLista->ultimoDado->setCampo( "mascara_classificacao" );
-$obLista->ultimoDado->setAlinhamento( 'DIREITA' );
-$obLista->commitDado();
-$obLista->addDado();
-$obLista->ultimoDado->setCampo( "descricao" );
-$obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
-$obLista->commitDado();
+        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaListaIRRF ( $rsContaIRRF ,$obTransacao     );
 
-$stAcao = "SELECIONAR";
-$obLista->addAcao();
-$obLista->ultimaAcao->setAcao( $stAcao );
-$obLista->ultimaAcao->setFuncao( true );
-$obLista->ultimaAcao->setLink( "JavaScript:insereClassReceita();" );
-$obLista->ultimaAcao->addCampo("1","mascara_classificacao");
-$obLista->ultimaAcao->addCampo("2","descricao");
-$obLista->commitAcao();
+    if ( $rsContaIRRF->getNumLinhas() > 0 ) {
+        foreach ($rsContaIRRF->getElementos() as $value) {
+            
+            $arTemp['codigo_receita']        = $value['cod_receita_irrf'];
+            $arTemp['mascara_classificacao'] = $value['cod_estrutural'];
+            $arTemp['descricao']             = $value['descricao'];
+                
+            $arAux[] = $arTemp;
+            unset($arTemp);
+        }
+        $rsLista->preenche($arAux);
+    }
+
+}else{
+    $obROrcamentoClassificacaoReceita->listar( $rsLista, " ORDER BY mascara_classificacao" );
+}
+
+if ($_REQUEST['tipoBusca'] != 'receitaIRRF') {
+    $obLista = new Lista;
+    $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
+
+    $obLista->setRecordSet( $rsLista );
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Código");
+    $obLista->ultimoCabecalho->setWidth( 20 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Descrição ");
+    $obLista->ultimoCabecalho->setWidth( 70 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "mascara_classificacao" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "descricao" );
+    $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obLista->commitDado();
+
+    $obLista->addAcao();
+    $obLista->ultimaAcao->setAcao( "SELECIONAR" );
+    $obLista->ultimaAcao->setFuncao( true );
+    $obLista->ultimaAcao->setLink( "JavaScript:insereClassReceita();" );
+    $obLista->ultimaAcao->addCampo("1","mascara_classificacao");
+    $obLista->ultimaAcao->addCampo("2","descricao");
+    $obLista->commitAcao();
+
+}else{
+    $obLista = new Lista;
+    $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
+
+    $obLista->setRecordSet( $rsLista );
+    
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+    
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Código da Receita");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+    
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Classificação");
+    $obLista->ultimoCabecalho->setWidth( 22 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Descrição ");
+    $obLista->ultimoCabecalho->setWidth( 70 );
+    $obLista->commitCabecalho();
+    
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "codigo_receita" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "mascara_classificacao" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
+    
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "descricao" );
+    $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obLista->commitDado();
+
+    $obLista->addAcao();
+    $obLista->ultimaAcao->setAcao( "SELECIONAR" );
+    $obLista->ultimaAcao->setFuncao( true );
+    $obLista->ultimaAcao->setLink( "JavaScript:insereClassReceita();" );
+    $obLista->ultimaAcao->addCampo("1","codigo_receita");
+    $obLista->ultimaAcao->addCampo("2","descricao");
+    $obLista->commitAcao();
+
+}
+
 $obLista->show();
 
 $obFormulario = new Formulario;

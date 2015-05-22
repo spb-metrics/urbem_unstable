@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamento.class.php 61219 2014-12-17 15:18:49Z michel $
+    $Id: TEmpenhoOrdemPagamento.class.php 62592 2015-05-21 17:46:11Z lisiane $
 
     * Casos de uso: uc-02.03.12,uc-02.03.16,uc-02.03.05,uc-02.04.05,uc-02.03.28
 */
@@ -457,7 +457,7 @@ class TEmpenhoOrdemPagamento extends Persistente
         $stSql .= "                                                          FROM empenho.nota_liquidacao_paga as nlp                        \n";
         $stSql .= "                                                         WHERE cod_entidade in ( ".$this->getDado('cod_entidade').")           \n";
         $stSql .= "                                                      GROUP BY exercicio, cod_entidade, cod_nota, timestamp                        \n";
-        $stSql .= "                                            ) as nlp ON (     nlp.exercicio = plnlp.exercicio                        \n";
+        $stSql .= "                                            ) as nlp ON (     nlp.exercicio =  plnlp.exercicio_liquidacao                        \n";
         $stSql .= "                                                          AND nlp.cod_entidade = plnlp.cod_entidade                        \n";
         $stSql .= "                                                          AND nlp.cod_nota = plnlp.cod_nota                        \n";
         $stSql .= "                                                          AND nlp.timestamp = plnlp.timestamp                        \n";

@@ -29,10 +29,10 @@
    * @author Desenvolvedor: Franver Sarmento de Moraes
    *
    * @ignore
-   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 61205 2014-12-16 12:31:49Z evandro $
-   * $Date: 2014-12-16 10:31:49 -0200 (Ter, 16 Dez 2014) $
-   * $Author: evandro $
-   * $Rev: 61205 $
+   * $Id: RTCEMGRelatorioDemostrativoRCL.class.php 62534 2015-05-18 19:27:57Z lisiane $
+   * $Date: 2015-05-18 16:27:57 -0300 (Seg, 18 Mai 2015) $
+   * $Author: lisiane $
+   * $Rev: 62534 $
    *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -125,7 +125,7 @@ class RTCEMGRelatorioDemostrativoRCL {
         $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_situacao"     , $this->getTipoSituacao());
         $obTTCEMGRelatorioDemostrativoRCL->setDado( "exercicio_restos"  , $this->getExercicioRestos());
         $obTTCEMGRelatorioDemostrativoRCL->recuperaReceitasDemonstrativoRCL( $rsReceitas );
-                
+
         // Inicio da tabela Receitas.
         $vlTotalMes1  = 0;
         $vlTotalMes2  = 0;
@@ -202,7 +202,7 @@ class RTCEMGRelatorioDemostrativoRCL {
         
         // Inicio de receitas de exclusao
         $obTTCEMGRelatorioDemostrativoRCL->setDado( "tipo_despesa" , 2);
-        $obTTCEMGRelatorioDemostrativoRCL->recuperaReceitasDemonstrativoRCL( $rsReceitasExclusoes );
+        $obTTCEMGRelatorioDemostrativoRCL->recuperaReceitasDemonstrativoRCL( $rsReceitasExclusoes ); 
                 
         $vlRecetaExclusaoTotalMes1  = 0;
         $vlRecetaExclusaoTotalMes2  = 0;
@@ -356,9 +356,12 @@ class RTCEMGRelatorioDemostrativoRCL {
         
         // Montando tabela de despesas.
         // Só vai trazer as deduções de despesa 2.
-        $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_despesa", 2);
-        $obTTCEMGRelatorioDemostrativoRCL->recuperaDespesasDemonstrativoRCL( $rsDespesasDeducoes );
 
+        $stFiltro = " WHERE cod_estrutural IN ('31900101', '31900301')";
+
+        $obTTCEMGRelatorioDemostrativoRCL->setDado("tipo_despesa", 2);
+        $obTTCEMGRelatorioDemostrativoRCL->recuperaDespesasDemonstrativoRCL( $rsDespesasDeducoes, $stFiltro );
+        
         $vlTotalDespesasDeducoesMes1  = 0;
         $vlTotalDespesasDeducoesMes2  = 0;
         $vlTotalDespesasDeducoesMes3  = 0;

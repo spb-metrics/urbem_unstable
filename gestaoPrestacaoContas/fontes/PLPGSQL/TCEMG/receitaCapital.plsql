@@ -27,7 +27,7 @@
  * @author Analista: Dagiane Vieira
  * @author Desenvolvedor: Michel Teixeira
  *
- * $Id: receitaCapital.plsql 62380 2015-04-29 19:12:23Z arthur $
+ * $Id: receitaCapital.plsql 62566 2015-05-20 18:49:20Z arthur $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.fn_receita_capital(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
@@ -70,16 +70,33 @@ stSql :='   SELECT
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.2.0.0.00.00.00.00.00%'' 
                             ) AS rec_alienacao
-                                                 
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.3%'' 
-                                 AND cod_estrutural NOT LIKE ''2.3.0.0.40%''
+                            
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3%'' 
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3.0.0.40%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_amort
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00'' 
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                  WHERE cod_estrutural LIKE ''2.4.7.0.00.00.00.00.00''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_transf_capital
                             
                             ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
@@ -92,9 +109,18 @@ stSql :='   SELECT
                                 WHERE cod_estrutural LIKE ''2.5%''                    
                             ) AS out_rec_cap
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.1.4.99%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_ret_op_cred
                             
                             ,0::VARCHAR AS rec_privat
@@ -120,15 +146,32 @@ stSql :='   SELECT
                                 WHERE cod_estrutural LIKE ''2.2.0.0.00.00.00.00.00%'' 
                             ) AS rec_alienacao
                                                  
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.3%'' 
-                                  AND cod_estrutural NOT LIKE ''2.3.0.0.40%''
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3%'' 
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3.0.0.40%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_amort
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00'' 
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                  WHERE cod_estrutural LIKE ''2.4.7.0.00.00.00.00.00''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_transf_capital
                             
                             ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
@@ -141,9 +184,18 @@ stSql :='   SELECT
                                 WHERE cod_estrutural LIKE ''2.5%''                    
                             ) AS out_rec_cap
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.1.4.99%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_ret_op_cred
                             
                             ,0::VARCHAR AS rec_privat
@@ -169,15 +221,32 @@ stSql :='   SELECT
                                 WHERE cod_estrutural LIKE ''2.2.0.0.00.00.00.00.00%'' 
                             ) AS rec_alienacao
                                                  
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.3%'' 
-                                AND cod_estrutural NOT LIKE ''2.3.0.0.40%''
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3%'' 
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3.0.0.40%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_amort
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00'' 
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                  WHERE cod_estrutural LIKE ''2.4.7.0.00.00.00.00.00''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_transf_capital
                             
                             ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
@@ -190,9 +259,18 @@ stSql :='   SELECT
                                 WHERE cod_estrutural LIKE ''2.5%''                    
                             ) AS out_rec_cap
                             
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(valor_previsto),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.1.4.99%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_ret_op_cred
                             
                             ,0::VARCHAR AS rec_privat
@@ -213,45 +291,71 @@ stSql :='   SELECT
 
                     SELECT
                             ''04''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo * -1),0)::VARCHAR as valor 
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.2.0.0.00.00.00.00.00%'' 
                             ) AS rec_alienacao
-                                                 
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.3%'' 
-                                AND cod_estrutural NOT LIKE ''2.3.0.0.40%''
+                           
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(arrecadado_periodo *-1 ),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3%'' 
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(arrecadado_periodo *-1 ),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.3.0.0.40%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_amort
-                            
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00'' 
+                                                        
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(arrecadado_periodo *-1 ),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.4.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(arrecadado_periodo *-1),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                  WHERE cod_estrutural LIKE ''2.4.7.0.00.00.00.00.00''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_transf_capital
                             
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo *-1),0)::VARCHAR as valor 
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.4.7.0%''          
                             ) AS rec_convenios
                             
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo *-1),0)::VARCHAR as valor 
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.5%''                    
                             ) AS out_rec_cap
-                            
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
-                                 FROM tmp_balancete_receita 
-                                WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                           
+                            ,( SELECT (totais.tabela1 - totais.tabela2)::varchar as valor
+                                 FROM (
+                                       SELECT ( SELECT COALESCE(SUM(arrecadado_periodo *-1),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.0.0.00.00.00.00.00''
+                                              ) AS tabela1
+                                            ,
+                                              ( SELECT COALESCE(SUM(arrecadado_periodo *-1),0) as valor 
+                                                  FROM tmp_balancete_receita 
+                                                 WHERE cod_estrutural LIKE ''2.1.1.4.99%''
+                                               ) AS tabela2
+                                     ) AS totais
                             ) AS rec_ret_op_cred
                             
                             ,0::VARCHAR AS rec_privat
                             
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo *-1),0)::VARCHAR as valor 
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.3.0.0.40%'' 
                             ) AS rec_ref_divida
                             
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR as valor 
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo *-1),0)::VARCHAR as valor 
                                  FROM tmp_balancete_receita 
                                 WHERE cod_estrutural LIKE ''2.1.1.4.99%''
                             ) AS rec_out_op_cred
@@ -260,7 +364,6 @@ stSql :='   SELECT
             ) as retorno
             ORDER BY cod_tipo
         ';
-
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -273,6 +376,3 @@ stSql :='   SELECT
     
 END;
 $$ LANGUAGE 'plpgsql';
-
-
-

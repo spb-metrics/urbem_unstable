@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,27 +18,24 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="exercicio" id="1151" extends="urbem_250.exercicio"/>
         <scalar-parameter name="cod_acao" id="1152" extends="urbem_250.cod_acao"/>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver"/>
         <scalar-parameter name="db_conn_url" id="1154" extends="urbem_250.db_conn_url"/>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user"/>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password"/>
         <scalar-parameter name="entidade" id="1157" extends="urbem_250.entidade"/>
         <scalar-parameter name="cod_empenho" id="1160">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -47,9 +44,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -58,18 +55,18 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">boolean</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">check-box</property>
-            <property name="distinct">true</property>
             <structure name="format"/>
         </scalar-parameter>
         <scalar-parameter name="dt_cabecalho" id="1757">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -78,9 +75,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -89,13 +86,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -2012,7 +2002,14 @@ this.queryText  += "  AND cod_entidade IN (" + params['cod_entidade'] +") ";
             <property name="bottomMargin">0.21in</property>
             <property name="rightMargin">0.1in</property>
             <page-footer>
-                <grid name="rodape" id="1159" extends="urbem_250.rodape"/>
+                <grid name="rodape" id="1159" extends="urbem_250.rodape">
+                    <overridden-values>
+                        <ref-entry baseId="180" id="180"/>
+                        <ref-entry baseId="181" id="181"/>
+                        <ref-entry baseId="182" id="182"/>
+                        <ref-entry baseId="183" name="NewText2" id="183"/>
+                    </overridden-values>
+                </grid>
             </page-footer>
         </simple-master-page>
     </page-setup>
@@ -2117,9 +2114,9 @@ params["hora_cabecalho"] = row._outer["hora_empenho"];
                                 <property name="width">25mm</property>
                             </column>
                             <column id="1767">
-                                <property name="width">74mm</property>
                                 <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">8pt</property>
+                                <property name="width">74mm</property>
                             </column>
                             <column id="1768">
                                 <property name="width">90mm</property>
@@ -2664,8 +2661,8 @@ else{
                                                         <property name="width">12mm</property>
                                                     </column>
                                                     <column id="1833">
-                                                        <property name="width">10mm</property>
                                                         <property name="fontFamily">"Sans"</property>
+                                                        <property name="width">10mm</property>
                                                     </column>
                                                     <column id="1834">
                                                         <property name="width">6mm</property>
@@ -2766,43 +2763,63 @@ else{
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">param_1</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_2</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_3</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_4</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_5</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_6</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_7</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_8</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_9</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">param_10</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -3900,15 +3917,21 @@ else{
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">exercicio</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">
@@ -4608,99 +4631,147 @@ else{
                             <list-property name="paramBindings">
                                 <structure>
                                     <property name="paramName">exercicio_1</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_1</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_1</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_2</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_3</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_4</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_5</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_6</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_7</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">exercicio_8</property>
-                                    <expression name="expression">row["exercicio"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["exercicio"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_2</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_3</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_4</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_5</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_6</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_7</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">entidade_8</property>
-                                    <expression name="expression">row["cod_entidade"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_entidade"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_2</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_3</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_4</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_5</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_6</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_7</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                                 <structure>
                                     <property name="paramName">empenho_8</property>
-                                    <expression name="expression">row["cod_empenho"]</expression>
+                                    <simple-property-list name="expression">
+                                        <value>row["cod_empenho"]</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <list-property name="boundDataColumns">

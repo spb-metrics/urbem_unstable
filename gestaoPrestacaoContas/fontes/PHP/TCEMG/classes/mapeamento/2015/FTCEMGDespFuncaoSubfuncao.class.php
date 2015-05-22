@@ -53,7 +53,8 @@ function FTCEMGDespFuncaoSubfuncao()
 
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
     $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
+    $this->AddCampo('tipo_periodo'  ,'varchar',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()

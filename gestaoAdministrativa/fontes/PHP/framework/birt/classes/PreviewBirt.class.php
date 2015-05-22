@@ -32,7 +32,7 @@
  * @author Analista: Lucas Stephanou
  * @author Desenvolvedor: Lucas Stephanou
  *
- * $Id: PreviewBirt.class.php 61606 2015-02-12 16:07:01Z diogo.zarpelon $
+ * $Id: PreviewBirt.class.php 62428 2015-05-07 20:12:43Z diogo.zarpelon $
  * Casos de uso: uc-01.00.00
  *
  ***********************************************************************/
@@ -286,7 +286,7 @@ class PreviewBirt
         $this->arParametros = array();
         $this->setFormato("html");
         $this->setNomeArquivo(null);
-        $this->setVersaoBirt("2.5.0");
+        $this->setVersaoBirt("4.4.0");
         $this->addParametro("inCodGestao", $inCodGestao);
         $this->addParametro("inCodModulo", $inCodModulo);
         $this->addParametro("inCodRelatorio", $inCodRelatorio);
@@ -310,12 +310,7 @@ class PreviewBirt
 
     public function addParametro($stNome, $stValor)
     {
-        #if ( mb_check_encoding($stValor, "UTF-8") ) {
-        #    $stValor = utf8_decode($stValor);
-        #}
-
         if (in_array(array(
-
             "fmt",
             "filename",
             "reportLayout"
@@ -397,9 +392,8 @@ class PreviewBirt
 
     public function preview()
     {
-        # Aguardando testes para envio do novo Viewer.
         # Todos os relatórios do Urbem serão exibidos no Viewer 4.4.0
-        # $this->setVersaoBirt('4.4.0');
+        $this->setVersaoBirt('4.4.0');
 
         # Instancia da classe Conexao
         $obConexao = new Conexao();
@@ -466,11 +460,7 @@ class PreviewBirt
 
             // conexao
             $stBirtPdfDireto.= "&db_driver=" . urlencode('org.postgresql.Driver') . "";
-            $stBirtPdfDireto.= "&db_host=" . urlencode($obConexao->stHost);
-            $stBirtPdfDireto.= "&db_port=" . urlencode($obConexao->inPort);
-            $stBirtPdfDireto.= "&db_user=" . urlencode($obConexao->stUser);
             $stBirtPdfDireto.= "&term_user=" .Sessao::read('stUsername');
-            $stBirtPdfDireto.= "&db_password=" . urlencode($obConexao->stPassWord);
             $stBirtPdfDireto.= "&cod_acao=" . Sessao::read('acao');
             $stBirtPdfDireto.= "&exercicio=" . Sessao::getExercicio();
             $stBirtPdfDireto.= "&db_conn_url=" . urlencode("jdbc:postgresql://" . $obConexao->stHost . ":" . $obConexao->inPort . "/" . $obConexao->stDbName . "");
@@ -573,12 +563,6 @@ class PreviewBirt
 
         # Formulário que submete ao relatório do Birt.
         $stFormBirt  = "<form  id='birtreport' name='relatorio' method='post'  target='iframe_birt' action='". $stBirt ."' accept-charset='utf-8'>";
-
-        $stFormBirt .= "<input type='hidden' name='db_driver'   value='org.postgresql.Driver' />\n";
-        $stFormBirt .= "<input type='hidden' name='db_host'     value='". $obConexao->stHost ."' />\n";
-        $stFormBirt .= "<input type='hidden' name='db_user'     value='". $obConexao->stUser ."' />\n";
-        $stFormBirt .= "<input type='hidden' name='db_password' value='". $obConexao->stPassWord."' />\n";
-        $stFormBirt .= "<input type='hidden' name='db_port'     value='". $obConexao->inPort ."' />\n";
         $stFormBirt .= "<input type='hidden' name='term_user'   value='".Sessao::read('stUsername')."' />\n";
         $stFormBirt .= "<input type='hidden' name='cod_acao'    value='".Sessao::read('acao')."' />\n";
         $stFormBirt .= "<input type='hidden' name='exercicio'   value='".Sessao::getExercicio()."' />\n";

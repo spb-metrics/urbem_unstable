@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRelatorioRazaoDespesa.php 62308 2015-04-20 19:41:57Z evandro $
+ * $Id: OCGeraRelatorioRazaoDespesa.php 62469 2015-05-13 11:44:13Z lisiane $
 
  * Casos de uso : uc-06.01.20
  */
@@ -54,19 +54,20 @@ $obTTCEMGRelatorioRazaoDespesa->setDado('num_pao'       , $_REQUEST['inCodPao'])
 $obTTCEMGRelatorioRazaoDespesa->setDado('exercicio'     , Sessao::getExercicio());
 $obTTCEMGRelatorioRazaoDespesa->setDado('entidade'      , implode(',', $_REQUEST['inCodEntidade']));
 $obTTCEMGRelatorioRazaoDespesa->setDado('cod_recurso'   , isset($_REQUEST['inCodRecurso']) ? implode(',', $_REQUEST['inCodRecurso']) : null);
+$obTTCEMGRelatorioRazaoDespesa->setDado('situacao'    , $_REQUEST['inSituacao']);
 
 //Seleciona consulta dependendo do tipo do relatório
 switch($_REQUEST['stTipoRelatorio']) {
     case 'educacao_receita_extra_orcamentaria':
-    $obTTCEMGRelatorioRazaoDespesa->recuperaDadosReceitaExtraOrcamentaria($rsData);
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosReceitaExtraOrcamentaria($rsData);
     break;
     
     case 'educacao_despesa_extra_orcamentaria':
-    $obTTCEMGRelatorioRazaoDespesa->recuperaDadosDespesaExtraOrcamentaria($rsData);
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosDespesaExtraOrcamentaria($rsData);
     break;
     
     case 'restos_pagar':
-    $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData);
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData);
     break;
 
     case 'empenhado':
@@ -83,11 +84,37 @@ switch($_REQUEST['stTipoRelatorio']) {
     break;
 }
 
+switch($_REQUEST['inSituacao']) {
+    case '1':
+        $stNomeRelatorio = "Empenhados";
+    break;
+
+    case '2':
+        $stNomeRelatorio = "Pagos";
+    break;
+
+    case '3':
+        $stNomeRelatorio = "Liquidados";
+    break;
+}
+
 //Preenche com campos de agrupamento
 foreach($rsData->getElementos() as $registro) {        
     $arEstrutural[]         = array_key_exists('despesa'         , $registro) ? $registro['despesa'] : null;
     $arData[]               = array_key_exists('dt_pagamento'    , $registro) ? $registro['dt_pagamento'] : null;
     $arDataReceita[]        = array_key_exists('dt_transferencia', $registro) ? $registro['dt_transferencia'] : null;
+}
+
+$incount = 0;
+foreach($rsData->getElementos() as $registro) {
+    if($orgao != $registro['cod_orgao'] or $unidade != $registro['cod_unidade']) {
+       $arOrgaoUnidade[$incount]['cod_orgao'] = $registro['cod_orgao'];
+       $arOrgaoUnidade[$incount]['cod_unidade'] = $registro['cod_unidade'];
+       
+       $incount ++;
+       $orgao = $registro['cod_orgao'];
+       $unidade = $registro['cod_unidade'];
+    }
 }
 
 //Seta variável título do relatório
@@ -155,7 +182,7 @@ $arDados = array(
     'arDataReceita'   => $arDataReceita,
     'arOrgaoUnidade'  => $arOrgaoUnidade,
 );
-        
+   
 // Switch necessário para selecionar template do relatório. Embora parecidos, há campos que constam num que não constam no outro.
 switch($_REQUEST['stTipoRelatorio']) {
     case 'restos_pagar':
@@ -182,7 +209,7 @@ switch($_REQUEST['stTipoRelatorio']) {
 }
 
 $obMPDF->setDataInicio($request->get("stDataInicial"));
-$obMPDF->setDataFinal($request->get("stDataFinal"));
+$obMPDF->setDataFinal($request->get("stDataFinal"). " - ".  $stNomeRelatorio);
 $obMPDF->setNomeRelatorio("Razão da Despesa");
 $obMPDF->setFormatoFolha("A4-L");
 $obMPDF->setConteudo($arDados);

@@ -37,8 +37,8 @@
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-include CAM_GPC_TCEMG_CONTROLE . 'CTCEMGExportacao.class.php';
-include CAM_GPC_TCEMG_NEGOCIO . 'RTCEMGExportacao.class.php';
+include CAM_GPC_TCEMG_CONTROLE.'CTCEMGExportacao.class.php';
+include CAM_GPC_TCEMG_NEGOCIO.'RTCEMGExportacao.class.php';
 
 $stAcao = $_REQUEST["stCtrl"];
 //Instancia o model

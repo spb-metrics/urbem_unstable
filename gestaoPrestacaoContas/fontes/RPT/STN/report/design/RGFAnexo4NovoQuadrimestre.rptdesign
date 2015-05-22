@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Tonismar Régis Bernardo</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">uc-06.01.23</html-property>
+    <property name="units">in</property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -42,34 +42,7 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="194">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="195">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="196">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="197">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
@@ -137,9 +110,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -148,9 +121,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -159,25 +132,16 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="3">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="3" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -546,13 +510,13 @@ dataSetRow["item"];
                 </structure>
                 <structure>
                     <property name="name">tabela</property>
-                    <property name="displayName">tabela</property>
+                    <text-property name="displayName">tabela</text-property>
                     <expression name="expression">dataSetRow["tabela"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor_no_quadrimestre</property>
-                    <property name="displayName">valor_no_quadrimestre</property>
+                    <text-property name="displayName">valor_no_quadrimestre</text-property>
                     <expression name="expression">if(dataSetRow["tabela"] == 1){
 dataSetRow["valor_no_quadrimestre"]
 }</expression>
@@ -560,7 +524,7 @@ dataSetRow["valor_no_quadrimestre"]
                 </structure>
                 <structure>
                     <property name="name">valor_ate_quadrimestre</property>
-                    <property name="displayName">valor_ate_quadrimestre</property>
+                    <text-property name="displayName">valor_ate_quadrimestre</text-property>
                     <expression name="expression">if(dataSetRow["tabela"] == 1){
 dataSetRow["valor_ate_quadrimestre"]
 }</expression>
@@ -579,8 +543,8 @@ dataSetRow["valor_ate_quadrimestre"]
             </column>
             <header>
                 <row id="292">
-                    <property name="height">0.22772277227722773in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.22772277227722773in</property>
                     <cell id="293">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -873,13 +837,13 @@ dataSetRow["item"];
                 </structure>
                 <structure>
                     <property name="name">tabela</property>
-                    <property name="displayName">tabela</property>
+                    <text-property name="displayName">tabela</text-property>
                     <expression name="expression">dataSetRow["tabela"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">valor_no_quadrimestre</property>
-                    <property name="displayName">valor_no_quadrimestre</property>
+                    <text-property name="displayName">valor_no_quadrimestre</text-property>
                     <expression name="expression">if(dataSetRow["tabela"] == 2){
     if (dataSetRow["item"] != '') {
         dataSetRow["valor_no_quadrimestre"];
@@ -889,7 +853,7 @@ dataSetRow["item"];
                 </structure>
                 <structure>
                     <property name="name">valor_ate_quadrimestre</property>
-                    <property name="displayName">valor_ate_quadrimestre</property>
+                    <text-property name="displayName">valor_ate_quadrimestre</text-property>
                     <expression name="expression">if(dataSetRow["tabela"] == 2){
     if (dataSetRow["item"] != '') {
         dataSetRow["valor_ate_quadrimestre"];
@@ -910,7 +874,6 @@ dataSetRow["item"];
             </column>
             <header>
                 <row id="2412">
-                    <property name="height">20px</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="borderBottomColor">#000000</property>
                     <property name="borderBottomStyle">solid</property>
@@ -918,6 +881,7 @@ dataSetRow["item"];
                     <property name="borderTopColor">#000000</property>
                     <property name="borderTopStyle">solid</property>
                     <property name="borderTopWidth">thin</property>
+                    <property name="height">20px</property>
                     <cell id="2408">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">1</property>
@@ -1431,7 +1395,7 @@ true
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

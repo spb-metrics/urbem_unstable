@@ -31,7 +31,7 @@
 
     * Casos de uso : uc-02.01.40
 
-    * $Id: FLDespesasSIOPE.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLDespesasSIOPE.php 62527 2015-05-18 17:44:34Z carlos.silva $
 
 */
 
@@ -39,7 +39,6 @@ require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GF_ORC_COMPONENTES."ISelectMultiploEntidadeUsuario.class.php" );
 require_once CAM_GF_ORC_COMPONENTES."ISelectOrgao.class.php";
-include_once CAM_GF_ORC_COMPONENTES."IMontaRecursoDestinacao.class.php";
 
 $stPrograma = "DespesasSIOPE";
 $pgFilt = "FL".$stPrograma.".php";
@@ -49,13 +48,18 @@ $pgGera = "OCGera".$stPrograma."php";
 Sessao::remove('filtro');
 
 $obForm = new Form;
-$obForm->setTarget ( 'telaPrincipal' );
+$obForm->setTarget ( 'oculto' );
 $obForm->setAction ( 'OCGeraDespesasSIOPE.php' );
 
 //Definição dos componentes
 $obHdnEval = new HiddenEval;
-$obHdnEval->setName  ( "stEval"            );
-$obHdnEval->setValue ( $stEval             );
+$obHdnEval->setName  ( "stEval" );
+$obHdnEval->setValue ( $stEval  );
+
+//Definição dos componentes
+$obHdnValidado = new HiddenEval;
+$obHdnValidado->setName  ( "stValidado" );
+$obHdnValidado->setValue ( 0 );
 
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName ( "stAcao" );
@@ -78,9 +82,6 @@ $obInCodOrgao = new ISelectOrgao;
 $obInCodOrgao->setExercicio( Sessao::getExercicio() );
 $obInCodOrgao->setNull(false);
 
-$obIMontaRecursoDestinacao = new IMontaRecursoDestinacao;
-$obIMontaRecursoDestinacao->setNull( true );
-
 $obPeriodicidade = new Periodicidade();
 $obPeriodicidade->setExercicio       ( Sessao::getExercicio() );
 $obPeriodicidade->setValue           ( 4                  );
@@ -96,15 +97,18 @@ $obFormulario = new Formulario;
 $obFormulario->addForm($obForm);
 $obFormulario->addHidden($obHdnAcao);
 $obFormulario->addHidden($obHdnStCtrl);
+$obFormulario->addHidden($obHdnValidado);
 $obFormulario->addHidden($obHdnCaminho);
 $obFormulario->addTitulo("Dados para o filtro");
 $obFormulario->addComponente($obISelectEntidade);
 $obFormulario->addComponente($obInCodOrgao);
-$obIMontaRecursoDestinacao->geraFormulario( $obFormulario );
 $obFormulario->addComponente($obPeriodicidade);
 $obMontaAssinaturas->geraFormulario($obFormulario);
 
-$obFormulario->OK();
+$obBtnOK = new Ok();
+$obBtnOK->obEvento->setOnClick("BloqueiaFrames(true,false);Salvar();");
+
+$obFormulario->defineBarra(array($obBtnOK));
 $obFormulario->show();
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

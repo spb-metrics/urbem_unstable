@@ -41,60 +41,43 @@ include_once ( CLA_PERSISTENTE );
 
 class FTCEMGReceitaCorrente extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FTCEMGReceitaCorrente()
-{
-    parent::Persistente();
-
-   $this->setTabela('stn.receitaCorrente');
-
-   $this->AddCampo('stExercicio'            , 'varchar', false, '', false, false);
-   $this->AddCampo('stFiltro'               , 'varchar', false, '', false, false);
-   $this->AddCampo('dtInicial'              , 'varchar', false, '', false, false);
-   $this->AddCampo('dtFinal'                , 'varchar', false, '', false, false);
-   $this->AddCampo('stCodEntidades'         , 'varchar', false, '', false, false);
-   $this->AddCampo('stCodEstruturalInicial' , 'varchar', false, '', false, false);
-   $this->AddCampo('stCodEstruturalFinal'   , 'varchar', false, '', false, false);
-   $this->AddCampo('stCodReduzidoInicial'   , 'varchar', false, '', false, false);
-   $this->AddCampo('stCodReduzidoFinal'     , 'varchar', false, '', false, false);
-   $this->AddCampo('inCodRecurso'           , 'varchar', false, '', false, false);
-   $this->AddCampo('stDestinacaoRecurso'    , 'varchar', false, '', false, false);
-   $this->AddCampo('inCodDetalhamento'      , 'varchar', false, '', false, false);
-
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    function FTCEMGReceitaCorrente()
+    {
+        parent::Persistente();
+    
+       $this->setTabela('tcemg.fn_receita_corrente');
+    
+       $this->AddCampo('stExercicio'            , 'varchar', false, '', false, false);
+       $this->AddCampo('stCodEntidades'         , 'varchar', false, '', false, false);
+       $this->AddCampo('inPeriodo'              , 'integer', false, '', false, false);
+    
+    }
+    
+    function montaRecuperaTodos()
+    {
+        $stSql  = "
+            
+            SELECT cod_estrutural
+                 , REPLACE ( valor_previsto::VARCHAR, '.', '' ) AS valor_previsto
+                 , REPLACE ( arrecadado_periodo::VARCHAR, '.', '' ) AS arrecadado_periodo
+                 , REPLACE ( arrecadado_ano::VARCHAR, '.', '' ) AS arrecadado_ano
+                 , REPLACE ( diferenca::VARCHAR, '.', '' ) AS diferenca
+             FROM ".$this->getTabela()." ( '".$this->getDado("stExercicio")."', '".$this->getDado("stCodEntidades")."', '".$this->getDado("stDataInicial")."', '".$this->getDado("stDataFinal")."')
+               AS retorno(                      
+                            cod_estrutural      VARCHAR ,                                           
+                            valor_previsto      NUMERIC ,                                           
+                            arrecadado_periodo  NUMERIC ,                                           
+                            arrecadado_ano      NUMERIC ,                                           
+                            diferenca           NUMERIC                                            
+                       )
+          ORDER BY cod_estrutural; ";
+          
+        return $stSql;
+    }
 }
 
-function montaRecuperaTodos()
-{
-    $stSql  = "
-        SELECT *
-          FROM ".$this->getTabela()."( '".$this->getDado("stExercicio")."'
-                                     , '".$this->getDado("stFiltro")."'
-                                     , '".$this->getDado("dtInicial")."'
-                                     , '".$this->getDado("dtFinal")."'
-                                     , '".$this->getDado("stCodEntidades")."'
-                                     , '".$this->getDado("stCodEstruturalInicial")."'
-                                     , '".$this->getDado("stCodEstruturalFinal")."'
-                                     , '".$this->getDado("stCodReduzidoInicial")."'
-                                     , '".$this->getDado("stCodReduzidoFinal")."'
-                                     , '".$this->getDado("inCodRecurso")."'
-                                     , '".$this->getDado("stDestinacaoRecurso")."'
-                                     , '".$this->getDado("inCodDetalhamento")."'
-                                     ) AS retorno(
-                                                  cod_estrutural      varchar,
-                                                  receita             integer,
-                                                  recurso             varchar,
-                                                  descricao           varchar,
-                                                  valor_previsto      numeric,
-                                                  arrecadado_periodo  numeric,
-                                                  arrecadado_ano      numeric,
-                                                  diferenca           numeric
-                                     )
-                                             ORDER BY cod_estrutural    ";
-
-    return $stSql;
-}
-
-}
+?>

@@ -41,21 +41,20 @@ class TTCEMGReceitaIntra extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql = "
-                    SELECT
-                            ".$this->getDado('mes')." AS mes,
-                            retorno.cod_tipo,
-                            REPLACE(retorno.demais_receita_intra,'.','') AS demais_receita_intra,
-                            REPLACE(retorno.amortizacao_emprestimos,'.','') AS amortizacao_emprestimos
+                    SELECT ".$this->getDado('mes')." AS mes
+                          , retorno.cod_tipo
+                          , REPLACE(retorno.demais_receita_intra,'.','') AS demais_receita_intra
+                          , REPLACE(retorno.amortizacao_emprestimos,'.','') AS amortizacao_emprestimos
 
                       FROM tcemg.fn_receita_intra('".$this->getDado('exercicio')."',  
-                                                      '".$this->getDado('cod_entidade')."',
-                                                       ".$this->getDado('mes')."
-                                                     )
-                            as retorno( cod_tipo                varchar,                                           
-                                        demais_receita_intra    varchar,                                           
-                                        amortizacao_emprestimos varchar
+                                                  '".$this->getDado('cod_entidade')."',
+                                                   ".$this->getDado('mes')."
+                                                 )
+                            AS retorno (  cod_tipo                varchar                                           
+                                        , demais_receita_intra    varchar                                           
+                                        , amortizacao_emprestimos varchar
                                       )
-                ORDER BY cod_tipo
+                      ORDER BY cod_tipo
         ";
         return $stSql;
     }

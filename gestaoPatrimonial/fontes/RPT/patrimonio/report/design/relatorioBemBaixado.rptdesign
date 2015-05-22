@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,9 +18,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +29,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -40,20 +40,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -62,31 +51,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -95,9 +62,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -106,9 +73,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -116,9 +83,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="data_final" id="1439">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -128,9 +95,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -140,9 +107,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -151,9 +118,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -162,9 +129,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -173,17 +140,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.3:5432/gf_mariana_0308_2001_testing</property>
-            <property name="odaUser">sw.suporte</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">c3Vwb3J0ZQ==</encrypted-property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -191,43 +147,43 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">cod_bem</property>
-                    <property name="displayName">cod_bem</property>
+                    <text-property name="displayName">cod_bem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">descricao</property>
-                    <property name="displayName">descricao</property>
+                    <text-property name="displayName">descricao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dt_aquisicao</property>
-                    <property name="displayName">dt_aquisicao</property>
+                    <text-property name="displayName">dt_aquisicao</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">vl_bem</property>
-                    <property name="displayName">vl_bem</property>
+                    <text-property name="displayName">vl_bem</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dt_baixa</property>
-                    <property name="displayName">dt_baixa</property>
+                    <text-property name="displayName">dt_baixa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">local</property>
-                    <property name="displayName">local</property>
+                    <text-property name="displayName">local</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor_atributo</property>
-                    <property name="displayName">valor_atributo</property>
+                    <text-property name="displayName">valor_atributo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_grupo</property>
-                    <property name="displayName">nom_grupo</property>
+                    <text-property name="displayName">nom_grupo</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_natureza</property>
-                    <property name="displayName">nom_natureza</property>
+                    <text-property name="displayName">nom_natureza</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">num_placa</property>
-                    <property name="displayName">num_placa</property>
+                    <text-property name="displayName">num_placa</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -759,7 +715,7 @@ INNER JOIN patrimonio.grupo ON grupo.cod_grupo = bem.cod_grupo
                 </structure>
                 <structure>
                     <property name="name">valor_atributo</property>
-                    <property name="displayName">valor_atributo</property>
+                    <text-property name="displayName">valor_atributo</text-property>
                     <expression name="expression">dataSetRow["valor_atributo"]</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -808,7 +764,7 @@ INNER JOIN patrimonio.grupo ON grupo.cod_grupo = bem.cod_grupo
                 </structure>
                 <structure>
                     <property name="name">VALOR_TOTAL</property>
-                    <property name="displayName">VALOR_TOTAL</property>
+                    <text-property name="displayName">VALOR_TOTAL</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -820,7 +776,7 @@ INNER JOIN patrimonio.grupo ON grupo.cod_grupo = bem.cod_grupo
                 </structure>
                 <structure>
                     <property name="name">TOTAL_ITENS</property>
-                    <property name="displayName">TOTAL_ITENS</property>
+                    <text-property name="displayName">TOTAL_ITENS</text-property>
                     <property name="dataType">float</property>
                     <property name="aggregateFunction">SUM</property>
                     <list-property name="arguments">
@@ -854,13 +810,13 @@ INNER JOIN patrimonio.grupo ON grupo.cod_grupo = bem.cod_grupo
                 <property name="width">65mm</property>
             </column>
             <column id="1448">
-                <property name="width">45mm</property>
                 <list-property name="visibility">
                     <structure>
                         <property name="format">all</property>
                         <expression name="valueExpr">params["cod_atributo"].value == ""</expression>
                     </structure>
                 </list-property>
+                <property name="width">45mm</property>
             </column>
             <header>
                 <row id="1399">

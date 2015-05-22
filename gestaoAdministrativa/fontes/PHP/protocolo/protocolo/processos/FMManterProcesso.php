@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: FMManterProcesso.php 61966 2015-03-18 21:54:54Z jean $
+    $Id: FMManterProcesso.php 62581 2015-05-21 14:05:03Z michel $
 
     */
 
@@ -48,6 +48,7 @@ include_once CAM_GA_PROT_COMPONENTES."IChkDocumentoProcesso.class.php";
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
 include_once CAM_GA_PROT_MAPEAMENTO."TProtocoloAndamento.class.php";
 include_once CAM_GA_PROT_MAPEAMENTO."TPROAtributoProtocolo.class.php";
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 
 Sessao::write('codigo_processo',$_REQUEST['inCodigoProcesso']);
 
@@ -66,6 +67,20 @@ $obTProtocoloAndamento = new TProtocoloAndamento;
 $obTProtocoloAndamento->recuperaTodos($rsRecordAndamento, " WHERE cod_processo = ".$_REQUEST['inCodigoProcesso']."
                                                               AND ano_exercicio = '".$_REQUEST['inAnoExercicio']."'",
                                                           " ORDER BY cod_andamento DESC LIMIT 1");
+
+$obTAdministracaoConfiguracao = new TAdministracaoConfiguracao;
+$obTAdministracaoConfiguracao->recuperaTodos($rsCentroCusto, " WHERE exercicio <= '".Sessao::getExercicio()."'
+                                                                 AND cod_modulo = 5
+                                                                 AND parametro = 'centro_custo'
+                                                            ORDER BY exercicio DESC LIMIT 1");
+
+$boCentroCusto = false;
+$rsListaCentroCusto = new RecordSet();
+while (!$rsCentroCusto->eof()) {
+    $boCentroCusto = $rsCentroCusto->getCampo("valor");
+
+    $rsCentroCusto->proximo();
+}
 
 $codOrgao = $rsRecordAndamento->getCampo('cod_orgao');
 $codAndamento = $rsRecordAndamento->getCampo('cod_andamento');
@@ -96,6 +111,12 @@ Sessao::write('filtro',array('inCodigoProcesso' => $_REQUEST['inCodigoProcesso']
 $obTProtocoloProcesso->setDado('cod_processo', $_REQUEST['inCodigoProcesso']);
 $obTProtocoloProcesso->setDado('ano_exercicio',$_REQUEST['inAnoExercicio']);
 $obTProtocoloProcesso->recuperaPorChave($rsProcesso);
+
+if($boCentroCusto=='true'){
+    include_once CAM_GP_ALM_MAPEAMENTO.'TAlmoxarifadoCentroCusto.class.php';
+    $obTAlmoxaridadoCentroCusto = new TAlmoxarifadoCentroCusto;
+    $obTAlmoxaridadoCentroCusto->recuperaTodos($rsListaCentroCusto, '', 'descricao');
+}
 
 $obTPROAtributoProtocolo = new TPROAtributoProtocolo;
 $obTPROAtributoProtocolo->setDado('cod_classificacao',$_REQUEST['inCodigoClassificacao']);
@@ -175,6 +196,17 @@ $obTxtResumo->setMaxLength(80);
 $obTxtResumo->setValue( $rsProcesso->getCampo('resumo_assunto') );
 $obTxtResumo->obEvento->setOnBlur ("montaParametrosGET('aaaa');"); 
 
+$obCmbCentroCusto = new Select();
+$obCmbCentroCusto->setName("centroCusto");
+$obCmbCentroCusto->setRotulo('Centro de Custo');
+$obCmbCentroCusto->setValue($rsProcesso->getCampo("cod_centro"));
+$obCmbCentroCusto->setNull(false);
+$obCmbCentroCusto->setCampoID( "[cod_centro]" );
+$obCmbCentroCusto->setCampoDesc( "descricao" );
+$obCmbCentroCusto->setStyle( "width: 200px" );
+$obCmbCentroCusto->addOption( '', 'Selecione' );
+$obCmbCentroCusto->preencheCombo( $rsListaCentroCusto );
+
 $obISelectClassificacaoAssunto = new ISelectClassificacaoAssunto;
 $obISelectClassificacaoAssunto->setNull                     ( false               );
 $obISelectClassificacaoAssunto->obTxtChave->setName         ( 'codClassifAssunto' );
@@ -226,6 +258,9 @@ $obFormulario->addComponente($obLblProcesso);
 $obFormulario->addComponente($obTxtObservacoes);
 $obFormulario->addComponente($obTxtResumo);
 $obISelectClassificacaoAssunto->geraFormulario($obFormulario);
+
+if($boCentroCusto=='true')
+    $obFormulario->addComponente($obCmbCentroCusto);
 
 if ($codSituacao == '2' || ($codSituacao == '3' && $codAndamento == 0)) {
     $obIMontaOrganograma->geraFormulario($obFormulario);

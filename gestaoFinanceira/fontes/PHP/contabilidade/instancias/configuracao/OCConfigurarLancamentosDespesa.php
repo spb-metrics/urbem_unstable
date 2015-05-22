@@ -113,9 +113,17 @@ function montaCombos($inCodDespesa, $stAba = "", $stValorRadio = "")
       $stComboDebito = "stLancamentoDebitoLiquidacao";
       $stComboCredito = "stLancamentoCreditoLiquidacao";
       $stFiltroCredito = '';
+     
       //seleciona o filtro dos elementos da combo debito
       switch ($stValorRadio) {
         case "despesaPessoal":
+          $stFiltroDebito = " AND pc.exercicio = '".Sessao::getExercicio()."'
+                              AND pc.cod_estrutural like '3.%' ";
+
+          $stFiltroCredito = " AND pc.exercicio = '".Sessao::getExercicio()."'
+                               AND pc.cod_estrutural like '2.1.1%' ";
+        break;
+      
         case "entidadeRPPS":
           $stFiltroDebito = " AND pc.exercicio = '".Sessao::getExercicio()."'
                            AND ( pc.cod_estrutural like '3.1.1%' OR pc.cod_estrutural like '3.1.2%' OR pc.cod_estrutural like '3.1.3%' OR pc.cod_estrutural like '3.1.8%' OR pc.cod_estrutural like '3.1.9%' OR pc.cod_estrutural like '3.2.0%' OR pc.cod_estrutural like '3.2.1%' OR pc.cod_estrutural like '3.2.2%' OR pc.cod_estrutural like '3.2.4%' OR pc.cod_estrutural like '3.2.5%' OR pc.cod_estrutural like '3.2.9%') ";
@@ -146,6 +154,7 @@ function montaCombos($inCodDespesa, $stAba = "", $stValorRadio = "")
       }
       break;
   }
+  
   $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsDebito, $stFiltroDebito, $stOrdem);
   $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsCredito, $stFiltroCredito, $stOrdem);
 

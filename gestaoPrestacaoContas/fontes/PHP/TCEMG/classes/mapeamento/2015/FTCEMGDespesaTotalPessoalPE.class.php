@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGDespesaTotalPessoalPE.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: FTCEMGDespesaTotalPessoalPE.class.php 62558 2015-05-19 20:36:20Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -52,14 +52,16 @@ function FTCEMGDespesaTotalPessoalPE()
     $this->setTabela('tcemg.fn_despesa_total_pessoal_pe');
 
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);    
+    $this->AddCampo('mes'           ,'varchar',false,''    ,false,false);
+    $this->AddCampo('data_inicial'  ,'varchar',false,''    ,false,false);
+    $this->AddCampo('data_final'    ,'varchar',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
  $stSql  = "
-        SELECT mes
+        SELECT ".$this->getDado('mes')." as mes
              , REPLACE(vencVantagens            ::TEXT, '.', '') AS vencVantagens
              , REPLACE(inativos                 ::TEXT, '.', '') AS inativos
              , REPLACE(pensionistas             ::TEXT, '.', '') AS pensionistas
@@ -82,10 +84,10 @@ function montaRecuperaTodos()
              , REPLACE(despCorres               ::TEXT, '.', '') AS despCorres
              , REPLACE(despAnteriores           ::TEXT, '.', '') AS despAnteriores
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
+                                     , '".$this->getDado("cod_entidade")."'                                     
+                                     , '".$this->getDado("data_inicial")."'
+                                     , '".$this->getDado("data_final")."'
                                      ) AS retorno(
-                                                  mes              INTEGER,
                                                   vencVantagens    NUMERIC,
                                                   inativos         NUMERIC,
                                                   pensionistas     NUMERIC,
@@ -112,3 +114,4 @@ function montaRecuperaTodos()
     return $stSql;
      }
    }
+

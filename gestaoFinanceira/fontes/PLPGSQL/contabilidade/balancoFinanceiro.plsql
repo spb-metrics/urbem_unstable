@@ -23,6 +23,7 @@
 /* Script de função PLPGSQL
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
+$Id: balancoFinanceiro.plsql 62477 2015-05-13 17:31:55Z michel $
 */
 
 
@@ -384,15 +385,13 @@ EXECUTE stSql;
     stSql := ' CREATE TEMPORARY TABLE fluxo_caixa_saldo AS
             SELECT 
             CASE
-		WHEN cod_estrutural         like ''1.1.3.1%'' AND indicador_superavit = ''financeiro''
+                WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''
                     THEN ''depositos_restituiveis_valores_vinculados''
-		WHEN cod_estrutural         like ''2.1.8.8.0%''
+                WHEN cod_estrutural         like ''2.1.8%'' AND indicador_superavit = ''financeiro''
                     THEN ''valores_restituiveis''
-		WHEN cod_estrutural         like ''1.1.1.0%''
+                WHEN cod_estrutural         like ''1.1.1.0%''
                     THEN ''caixa_equivalentes''
-		WHEN cod_estrutural         like ''1.1.3.8.1.00%''
-                    THEN ''outros_recebimentos''
-		WHEN cod_estrutural          like ''4.5.1.1.0%''
+                WHEN cod_estrutural          like ''4.5.1.1.0%''
                     THEN ''transferencias_recebidas_orcamentaria''
                 WHEN cod_estrutural          like ''3.5.1.1.0%''
                     THEN ''tranferencias_concedidas_orcamentaria''
@@ -409,7 +408,10 @@ EXECUTE stSql;
                 WHEN cod_estrutural          like ''6.3.1.4.0%''
                     THEN ''pagamento_restos_pagar_nao_processados''
             END as descricao
-            ,ABS(sum(vl_saldo_anterior)) as vl_saldo_anterior
+            ,CASE WHEN (select count(cod_lote) as lotes from contabilidade.lote where exercicio = '|| quote_literal(stExercicioAnterior) ||') > 0 THEN
+                            ABS(sum(vl_saldo_anterior))
+                  ELSE      0.00
+             END AS vl_saldo_anterior
             ,ABS(sum(vl_saldo_debitos)) as vl_saldo_debitos
             ,ABS(sum(vl_saldo_creditos)) as vl_saldo_creditos
             ,ABS(sum(vl_saldo_atual)) as vl_saldo_atual
@@ -559,7 +561,11 @@ END IF;
 --UPDATE para ajustar valores de acordo com a regra de negocio
     --Somando a Movimentacao dos restos a pagar
     UPDATE resultado_financeiro
-        SET valor = (SELECT (valor_debito - valor_credito) as valor from resultado_financeiro where descricao = 'pagamento_restos_pagar_processados')
+        SET valor = (SELECT CASE WHEN (valor_debito - valor_credito) < 0.00 THEN (valor_debito - valor_credito) * -1
+                                 ELSE (valor_debito - valor_credito)
+                            END AS valor 
+                       FROM resultado_financeiro 
+                      WHERE descricao = 'pagamento_restos_pagar_processados')
     WHERE descricao = 'pagamento_restos_pagar_processados';
 
 --CRIANDO TABELA PARA RESULTADO DO RELATORIO 
@@ -638,7 +644,7 @@ END IF;
     arDescricaoDespesas[25] := 'Depósitos Restituíveis e Valores Vinculados';
     arDescricaoDespesas[26] := 'Outros Recebimentos';
     arDescricaoDespesas[27] := '';
-    arDescricaoDespesas[28] := 'TOTAL (V) = (I+II+III+IV)';
+    arDescricaoDespesas[28] := 'TOTAL (X) = (VI+VII+VIII+IX)';
     
     --Armazenar valores da tabela resultado_financeiro em um array de acordo com a regra pra serem inseridos na tabela relatorio_financeiro
     arDescricaoValores[0] := 'receita_orcamentaria';
@@ -765,7 +771,8 @@ END IF;
     UPDATE relatorio_financeiro
     SET valor_dispendios = (SELECT valor FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
         ,valor_dispendios_anterior = (SELECT valor FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
-    WHERE ordem = 24; 
+    WHERE ordem = 24
+    AND (select count(cod_lote) as lotes from contabilidade.lote where exercicio = stExercicioAnterior) > 0; 
     
      --Adicionar Somatorio das deduções de receita orcamentarias
     UPDATE relatorio_financeiro

@@ -52,6 +52,7 @@ function TTCMGORecuperaPlanoConfiguracaoTCM()
     $this->AddCampo('exercicio'           ,'char'   ,false,'4'   ,false,false);
     $this->AddCampo('cod_plano_tcmgo'     ,'integer',false,''    ,false,false);
     $this->AddCampo('nom_conta'           ,'varchar',false,''    ,false,false);
+    $this->AddCampo('obrigatorio_tcmgo'   ,'boolean', true,''    ,false,false);
     $this->AddCampo('vl_saldo_anterior'   ,'numeric',false,'14.2',false,false);
     $this->AddCampo('vl_saldo_debitos'    ,'numeric',false,'14.2',false,false);
     $this->AddCampo('vl_saldo_creditos'   ,'numeric',false,'14.2',false,false);
@@ -60,17 +61,19 @@ function TTCMGORecuperaPlanoConfiguracaoTCM()
 
 function montaRecuperaTodos()
 {
-    $stSql  = " select * from ".$this->getTabela()."('".$this->getDado("exercicio")."',     \n";
+    $stSql  = " select * , CASE WHEN obrigatorio_tcmgo IS TRUE THEN '*' ELSE '' END AS desc_obrigatorio ";
+    $stSql .= "   from ".$this->getTabela()."('".$this->getDado("exercicio")."',     \n";
     $stSql .= "                                      '".$this->getDado("entidades")."',     \n";
     $stSql .= "                                      '".$this->getDado("data_inicial")."',  \n";
     $stSql .= "                                      '".$this->getDado("data_final")."',    \n";
     $stSql .= "                                      '".$this->getDado("grupo")."'  ) AS    \n";
-    $stSql .= "retorno (cod_conta           INTEGER,        \n";
-    $stSql .= "         cod_plano           INTEGER,        \n";
-    $stSql .= "         cod_estrutural      VARCHAR,        \n";
-    $stSql .= "         exercicio           CHAR(4),        \n";
-    $stSql .= "         cod_plano_tcmgo     INTEGER,        \n";
-    $stSql .= "         nom_conta           VARCHAR,        \n";
+    $stSql .= "retorno (cod_conta           INTEGER,  \n";
+    $stSql .= "         cod_plano           INTEGER,  \n";
+    $stSql .= "         cod_estrutural      VARCHAR,  \n";
+    $stSql .= "         exercicio           CHAR(4),  \n";
+    $stSql .= "         cod_plano_tcmgo     INTEGER,  \n";
+    $stSql .= "         nom_conta           VARCHAR,  \n";
+    $stSql .= "         obrigatorio_tcmgo   BOOLEAN,  \n";
     $stSql .= "         vl_saldo_anterior   NUMERIC,  \n";
     $stSql .= "         vl_saldo_debitos    NUMERIC,  \n";
     $stSql .= "         vl_saldo_creditos   NUMERIC,  \n";

@@ -57,7 +57,7 @@ class  ISelectModalidade extends Select
         $obComprasModalidade = new TComprasModalidade();
         $rsRecordSet = new RecordSet;
         //$stFiltro = " WHERE cod_modalidade NOT IN(4,5,6,7)  ";
-        $stFiltro = " WHERE cod_modalidade NOT IN(4,5)  ";
+        $stFiltro = " WHERE cod_modalidade NOT IN(4,5,10,11)  ";
         $stOrdem  = " ORDER BY cod_modalidade, descricao ";
         $obComprasModalidade->recuperaTodos($rsRecordSet, $stFiltro, $stOrdem);
 

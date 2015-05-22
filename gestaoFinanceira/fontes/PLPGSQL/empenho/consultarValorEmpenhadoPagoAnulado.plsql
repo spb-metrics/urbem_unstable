@@ -41,7 +41,7 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_empenhado_pago_anulado(VARCHAR,INTEGER,INTEGER) RETURNS NUMERIC AS '
+CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_empenhado_pago_anulado(VARCHAR,INTEGER,INTEGER) RETURNS NUMERIC AS $$
 
 DECLARE
     stExercicio                ALIAS FOR $1;
@@ -81,4 +81,4 @@ select
     RETURN nuValor;
 
 END;
-'LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

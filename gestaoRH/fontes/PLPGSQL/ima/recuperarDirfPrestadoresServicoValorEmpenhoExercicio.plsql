@@ -34,7 +34,7 @@
  $Id:$
  */
 
-CREATE OR REPLACE FUNCTION recuperarDirfPrestadoresServicoValorEmpenhoExercicio(VARCHAR, INTEGER, INTEGER, INTEGER, VARCHAR) RETURNS SETOF colunasDirfPrestadoresServicoValorEmpenhoExercicio AS $$ 
+CREATE OR REPLACE FUNCTION recuperarDirfPrestadoresServicoValorEmpenhoExercicio(VARCHAR, INTEGER, INTEGER, INTEGER, VARCHAR) RETURNS SETOF colunasDirfPrestadoresServicoValorEmpenhoExercicio AS $$
 DECLARE
     stEntidade     ALIAS FOR $1;
     inExercicio    ALIAS FOR $2;    
@@ -54,13 +54,10 @@ BEGIN
                       FROM ima'|| stEntidade ||'.configuracao_dirf_prestador
                 INNER JOIN orcamento.conta_despesa
                         ON configuracao_dirf_prestador.exercicio = conta_despesa.exercicio
-                    AND configuracao_dirf_prestador.cod_conta = conta_despesa.cod_conta
-                INNER JOIN orcamento.despesa
-                        ON conta_despesa.exercicio = despesa.exercicio
-                    AND conta_despesa.cod_conta = despesa.cod_conta        
+                        AND configuracao_dirf_prestador.cod_conta = conta_despesa.cod_conta                
                 INNER JOIN empenho.pre_empenho_despesa
-                        ON despesa.exercicio = pre_empenho_despesa.exercicio
-                    AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                        ON configuracao_dirf_prestador.exercicio = pre_empenho_despesa.exercicio
+                        AND configuracao_dirf_prestador.cod_conta = pre_empenho_despesa.cod_conta
                 INNER JOIN empenho.pre_empenho
                         ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
                     AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho

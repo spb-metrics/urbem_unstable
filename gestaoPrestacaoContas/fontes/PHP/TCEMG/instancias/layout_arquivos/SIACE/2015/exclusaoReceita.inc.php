@@ -23,73 +23,69 @@
 */
 ?>
 <?php
-/*
-Arquivo de geracao do arquivo despesaTotalPessoalPE TCM/MG
-    * Data de Criação   : 22/01/2009
+   /*
+    * Arquivo de geracao do arquivo exclusao receita TCM/MG
+    * Data de Criação   : 23/01/2009
 
     * @author Analista      Tonismar Régis Bernardo
-    * @author Desenvolvedor Lucas Andrades Mendes
+    * @author Desenvolvedor Henrique Boaventura
 
     * @package URBEM
     * @subpackage
 
     * @ignore
 
-    $Id: despesaTotalPessoalPE.inc.php 61837 2015-03-09 16:48:00Z michel $
+    $Id: exclusaoReceita.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDespesaTotalPessoalPE.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGExclusaoReceita.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obFTCEMGDespesaTotalPessoalPE = new FTCEMGDespesaTotalPessoalPE();
-    $obFTCEMGDespesaTotalPessoalPE->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGDespesaTotalPessoalPE->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDespesaTotalPessoalPE->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obFTCEMGExclusaoReceita = new FTCEMGExclusaoReceita();
+    $obFTCEMGExclusaoReceita->setDado('exercicio'   , Sessao::read('exercicio'));
+    $obFTCEMGExclusaoReceita->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGExclusaoReceita->setDado('mes'         , $arFiltros['inPeriodo']);
 
-    $obFTCEMGDespesaTotalPessoalPE->recuperaTodos($rsArquivo);
+    $obFTCEMGExclusaoReceita->recuperaTodos($rsArquivo);
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vencvantagens');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contr_serv');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('inativos');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('compens_reg_prev');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('pensionistas');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('out_duplic');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('salariofamilia');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contr_patronal');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('subsprefeito');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desc_outras_duplic");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('subsvice');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('subssecret');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('obrigpatronais');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('empestdep_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('repassepatronal');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('sentjudpessoal');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('indendemissao');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('incdemvolunt');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('empestdep_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('sentjudant');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('inatpensfontcustprop');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outrasdespesaspessoal');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nadadeclararpessoal');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despexercant');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('exclusaodespanteriores');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('corrperapurac');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despcorres');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despanteriores');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');

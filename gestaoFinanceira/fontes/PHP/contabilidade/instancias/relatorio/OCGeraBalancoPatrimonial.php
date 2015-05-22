@@ -31,6 +31,8 @@
     * @author Desenvolvedor Davi Aroldi
 
     * @ignore
+    
+    $Id: OCGeraBalancoPatrimonial.php 62473 2015-05-13 13:25:59Z michel $
 
     * Casos de uso: uc-02.03.18
 
@@ -43,7 +45,7 @@ include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php");
 
 $preview = new PreviewBirt(2,9,12);
 
-$preview->setVersaoBirt( '2.5.0' );
+$preview->setVersaoBirt( '4.4.0' );
 $preview->setNomeRelatorio( 'balancoPatrimonial' );
 $preview->setTitulo("Balanço Patrimonial");
 
@@ -106,17 +108,17 @@ switch ($mes) {
        $stPeriodo =  'Dezembro';
         break;
 }
-if ( ($_POST['stDataInicial'] == "01/01/".Sessao::getExercicio()) && ($_POST['stDataFinal'] == "31/12".Sessao::getExercicio()) ) {
+if ( ($_POST['stDataInicial'] == "01/01/".Sessao::getExercicio()) && ($_POST['stDataFinal'] == "31/12/".Sessao::getExercicio()) ) {
     $stPeriodo = "ANO - ".Sessao::getExercicio();
 }
 
-$preview->addParametro( "periodo"       , $stPeriodo );
-$preview->addParametro( 'dt_inicial'    , $_POST['stDataInicial'] );
-$preview->addParametro( 'dt_final'      , $_POST['stDataFinal'] );
-$preview->addParametro( 'cod_entidades' , implode(',', $_POST['inCodEntidade']) );
-$preview->addParametro( 'data_emissao'  , date('d/m/Y') );
-$preview->addParametro('data_inicial_nota',implode('-',array_reverse(explode('/', $_POST['stDataInicial']))));
-$preview->addParametro('data_final_nota'  ,implode('-',array_reverse(explode('/', $_POST['stDataFinal']))));
+$preview->addParametro( "periodo"            , $stPeriodo );
+$preview->addParametro( 'dt_inicial'         , $_POST['stDataInicial'] );
+$preview->addParametro( 'dt_final'           , $_POST['stDataFinal'] );
+$preview->addParametro( 'cod_entidades'      , implode(',', $_POST['inCodEntidade']) );
+$preview->addParametro( 'data_emissao'       , date('d/m/Y') );
+$preview->addParametro( 'data_inicial_nota'  , implode('-',array_reverse(explode('/', $_POST['stDataInicial']))));
+$preview->addParametro( 'data_final_nota'    , implode('-',array_reverse(explode('/', $_POST['stDataFinal']))));
 
 $preview->preview();
 

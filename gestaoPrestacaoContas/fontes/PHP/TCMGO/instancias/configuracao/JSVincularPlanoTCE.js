@@ -1,4 +1,4 @@
-<?php
+<script type="text/javascript">
 /*
     **********************************************************************************
     *                                                                                *
@@ -21,34 +21,51 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
+</script>
 <?php
-
-include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGReceitaIntra.class.php');
-
-$arFiltros = Sessao::read('filtroRelatorio');
-
-$obTTCEMGReceitaIntra = new TTCEMGReceitaIntra();
-$obTTCEMGReceitaIntra->setDado('exercicio'   , Sessao::read('exercicio'));
-$obTTCEMGReceitaIntra->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-$obTTCEMGReceitaIntra->setDado('mes'         , $arFiltros['inPeriodo']);
-
-$obTTCEMGReceitaIntra->setDado('dt_inicial', '01/'.str_pad($arFiltros['inPeriodo'],2,'0',STR_PAD_LEFT).'/'.Sessao::read('exercicio'));
-$obTTCEMGReceitaIntra->setDado('dt_final', SistemaLegado::retornaUltimoDiaMes($arFiltros['inPeriodo'],Sessao::read('exercicio')));
-
-$obTTCEMGReceitaIntra->recuperaTodos($rsArquivo);
-
-$obExportador->roUltimoArquivo->addBloco($rsArquivo);
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demais_receita_intra');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('amortizacao_emprestimos');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-
+/**
+  * Página de JavaScript da Configuração de Leis do PPA
+  * Data de Criação: 14/01/2014
+  
+  * @author Analista: Eduardo Schitz
+  * @author Desenvolvedor: Franver Sarmento de Moraes
+  
+  * @ignore
+  *
+  * $Id: JSVincularPlanoTCE.js 62528 2015-05-18 17:53:04Z franver $
+  
+  * $Revision: 62528 $
+  * $Name: $
+  * $Author: franver $
+  * $Date: 2015-05-18 14:53:04 -0300 (Seg, 18 Mai 2015) $
+  
+*/
 ?>
+<script language="JavaScript">
+
+function validaCampos() {
+    var jq = window.parent.frames["telaPrincipal"].jQuery;
+    var obErro = false;
+
+    jq("tr [name^='sw_table_1_row_']").each(function() {
+        if (jq("#"+jq(this).attr('name')+"_cell_5").attr('name') != undefined ) {
+            if (jq("#"+jq(this).attr('name')+"_cell_5").html() == '*' ) {
+                if (jq("#"+jq(this).attr('name')+"_cell_6 select").val() == '') {
+                    obErro = true;
+                    return false;
+                } else {                    
+                    return true;
+                }
+            }
+        } 
+    });
+
+    if (!obErro) {
+        return true;
+    } else {
+        alertaAviso('Campos com (*) são obrigatórios.', 'n_incluir', 'erro','<?=Sessao::getId();?>');
+        return false;
+    }
+}
+
+</script>

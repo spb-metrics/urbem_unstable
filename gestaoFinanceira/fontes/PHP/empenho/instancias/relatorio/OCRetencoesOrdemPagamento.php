@@ -86,6 +86,21 @@ case 'mostraSpanReceita':
             echo "jq('#spnReceitas').html('');";
     }
     break;
+
+case 'validaSituacao':
+    
+    if ($_REQUEST['inSituacao'] == 2) {
+        $stJs  = " jq('input:radio[name=boDataPagamento][value=S]').attr('checked','false'); ";    
+        $stJs .= " jq('input:radio[name=boDataPagamento][value=N]').attr('checked','true'); ";            
+        $stJs .= " jq('#boDataPagamento').attr('disabled','true'); ";    
+    }else{
+        $stJs = " jq('#boDataPagamento').removeAttr('disabled'); ";    
+    }
+
+    echo $stJs;
+    break;  
+
+
 }
 
 ?>

@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: FLClassificacaoReceita.php 60024 2014-09-25 18:10:15Z evandro $
+    $Id: FLClassificacaoReceita.php 62432 2015-05-08 18:08:12Z evandro $
 
     * Casos de uso: uc-02.01.06
 */
@@ -118,17 +118,32 @@ $obHdnMascClassificacao = new Hidden;
 $obHdnMascClassificacao->setName ( "stMascClassificacao" );
 $obHdnMascClassificacao->setValue( $mascara );
 
+if ( $_REQUEST['tipoBusca'] == 'receitaIRRF' ) {
+    $obTxtCodReceitaIRRF = new TextBox();
+    $obTxtCodReceitaIRRF->setRotulo     ('Código da Receita IRRF');
+    $obTxtCodReceitaIRRF->setTitle      ('Informe o código da receita IRRF');
+    $obTxtCodReceitaIRRF->setName       ('inCodReceitaIRRF');
+    $obTxtCodReceitaIRRF->setId         ('inCodReceitaIRRF');
+    $obTxtCodReceitaIRRF->setMaxLength  ( 5 );
+    $obTxtCodReceitaIRRF->setSize       ( 3 );
+}
+
 //Define o objeto TEXT para armazenar o NUMERO DO ORGAO NO ORCAMENTO
 $obTxtCodClassificacao = new TextBox;
 $obTxtCodClassificacao->setName     ( "inCodClassificacao" );
 $obTxtCodClassificacao->setValue    ( $_REQUEST['inCodClassificacao'] );
 $obTxtCodClassificacao->setRotulo   ( "Código" );
-$obTxtCodClassificacao->setSize     ( strlen($mascara) );
-$obTxtCodClassificacao->setMaxLength( strlen($mascara) );
 $obTxtCodClassificacao->setNull     ( true );
 $obTxtCodClassificacao->setTitle    ( 'Informe um código' );
-$obTxtCodClassificacao->obEvento->setOnKeyUp("mascaraDinamico('".$mascara."', this, event);");
-$obTxtCodClassificacao->obEvento->setOnChange("buscaValor();");
+if ( $_REQUEST['tipoBusca'] != 'receitaIRRF' ){
+    $obTxtCodClassificacao->setSize     ( strlen($mascara) );
+    $obTxtCodClassificacao->setMaxLength( strlen($mascara) );
+    $obTxtCodClassificacao->obEvento->setOnKeyUp("mascaraDinamico('".$mascara."', this, event);");
+    $obTxtCodClassificacao->obEvento->setOnChange("buscaValor();");
+}else{
+    $obTxtCodClassificacao->setSize     ( 24 );
+    $obTxtCodClassificacao->setMaxLength( 24 );
+}
 
 //Define o objeto TEXT para armazenar a DESCRICAO DO ORGAO
 $obTxtDescClassificacao = new TextBox;
@@ -165,11 +180,17 @@ $obFormulario->addHidden( $obHdnForm              );
 $obFormulario->addHidden( $obHdnCampoNum          );
 $obFormulario->addHidden( $obHdnCampoNom          );
 $obFormulario->addTitulo( "Dados para filtro de Classificação de Receita" );
-$obFormulario->addComponente( $obTxtCodClassificacao   );
-$obFormulario->addComponente( $obTxtDescClassificacao  );
+
+if ( $_REQUEST['tipoBusca'] == 'receitaIRRF' )
+    $obFormulario->addComponente( $obTxtCodReceitaIRRF );    
+    
+    $obFormulario->addComponente( $obTxtDescClassificacao  );
+    $obFormulario->addComponente( $obTxtCodClassificacao   );    
+
 if (trim($_REQUEST["inExercicio"])!="") {
     $obFormulario->addComponente($obTxtExercicio);
 }
+
 $obFormulario->addIFrameOculto("oculto");
 $obFormulario->OK();
 $obFormulario->show();

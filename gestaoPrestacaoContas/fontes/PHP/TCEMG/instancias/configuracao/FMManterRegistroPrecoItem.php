@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoItem.php 62200 2015-04-07 18:09:25Z michel $
-  * $Date: 2015-04-07 15:09:25 -0300 (Ter, 07 Abr 2015) $
-  * $Author: michel $
-  * $Rev: 62200 $
+  * $Id: FMManterRegistroPrecoItem.php 62567 2015-05-20 19:39:59Z evandro $
+  * $Date: 2015-05-20 16:39:59 -0300 (Qua, 20 Mai 2015) $
+  * $Author: evandro $
+  * $Rev: 62567 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/IMontaQuantidadeValores.class.php';
@@ -158,6 +158,9 @@ $obSpnLote->setId('spnLote');
 # Form Item
 $obSpnItem = new Span;
 $obSpnItem->setId('spnItem');
+
+$obSpnItemBuscaInner = new Span();
+$obSpnItemBuscaInner->setId ('spnBuscaInnerItem');
 
 # Table com Itens
 $obSpanListaItem = new Span();

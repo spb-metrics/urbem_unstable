@@ -31,7 +31,7 @@
 
   * Casos de uso: uc-03.05.15
 
-  $Id: OCManterProcessoLicitatorio.php 62402 2015-05-04 20:19:28Z jean $
+  $Id: OCManterProcessoLicitatorio.php 62579 2015-05-21 13:49:37Z evandro $
 
   */
 
@@ -1223,126 +1223,159 @@ switch ($stCtrl) {
             $rsComissaoLicitacao->proximo();
         }
         
-        if($_REQUEST['boJulgamento']!=1){
-            include_once(TLIC."TLicitacaoLicitacao.class.php");
-            $obLicitacaoLicitacao = new TLicitacaoLicitacao;
-            $obLicitacaoLicitacao->setDado('cod_licitacao' , $_REQUEST['inCodLicitacao']   );
-            $obLicitacaoLicitacao->setDado('cod_modalidade', $_REQUEST['inCodModalidade']  );
-            $obLicitacaoLicitacao->setDado('cod_entidade'  , trim($entidade[0])            );
-            $obLicitacaoLicitacao->setDado('exercicio'     , Sessao::getExercicio()        );
-            $obLicitacaoLicitacao->recuperaPorChave($rsLicitacao);
-    
-            $dtLicitacao = SistemaLegado::dataToBr(substr($rsLicitacao->getCampo("timestamp"),0,10));
-    
-            $stJs .= "f.stDtLicitacao.value='".$dtLicitacao."';";
+        
+        include_once(TLIC."TLicitacaoLicitacao.class.php");
+        $obLicitacaoLicitacao = new TLicitacaoLicitacao;
+        $obLicitacaoLicitacao->setDado('cod_licitacao' , $_REQUEST['inCodLicitacao']   );
+        $obLicitacaoLicitacao->setDado('cod_modalidade', $_REQUEST['inCodModalidade']  );
+        $obLicitacaoLicitacao->setDado('cod_entidade'  , trim($entidade[0])            );
+        $obLicitacaoLicitacao->setDado('exercicio'     , Sessao::getExercicio()        );
+        $obLicitacaoLicitacao->recuperaPorChave($rsLicitacao);
 
-            include_once(TLIC."TLicitacaoTipoChamadaPublica.class.php");
-            $obLicitacaoTipoChamadaPublica = new TLicitacaoTipoChamadaPublica;
-            $obLicitacaoTipoChamadaPublica->setDado('cod_tipo',$rsLicitacao->getCampo("tipo_chamada_publica"));
-            $obLicitacaoTipoChamadaPublica->recuperaPorChave($rsTipoChamadaPublica);
+        $dtLicitacao = SistemaLegado::dataToBr(substr($rsLicitacao->getCampo("timestamp"),0,10));
+    
+        $stJs .= "f.stDtLicitacao.value='".$dtLicitacao."';";
+
+        include_once(TLIC."TLicitacaoTipoChamadaPublica.class.php");
+        $obLicitacaoTipoChamadaPublica = new TLicitacaoTipoChamadaPublica;
+        $obLicitacaoTipoChamadaPublica->setDado('cod_tipo',$rsLicitacao->getCampo("tipo_chamada_publica"));
+        $obLicitacaoTipoChamadaPublica->recuperaPorChave($rsTipoChamadaPublica);
             
-            switch ($_REQUEST['inCodModalidade']) {
-                case 3:
-                case 6:
-                case 7:
-                    $obRadioRegistroPrecosSim = new Radio;
-                    $obRadioRegistroPrecosSim->setRotulo     ('Registro de Preços');
-                    $obRadioRegistroPrecosSim->setLabel      ('Sim');
-                    $obRadioRegistroPrecosSim->setName       ('boRegistroModalidade');
-                    $obRadioRegistroPrecosSim->setId         ('boRegistroModalidade');
-                    $obRadioRegistroPrecosSim->setTitle      ('Informe se existe registros de preços.');
-                    $obRadioRegistroPrecosSim->setValue      ('Sim');
-                    $obRadioRegistroPrecosSim->setNull       (false);
-                    $obRadioRegistroPrecosSim->setChecked    (false);
+        switch ($_REQUEST['inCodModalidade']) {
+            case 3:
+            case 6:
+            case 7:
+                $obRadioRegistroPrecosSim = new Radio;
+                $obRadioRegistroPrecosSim->setRotulo  ('Registro de Preços');
+                $obRadioRegistroPrecosSim->setLabel   ('Sim');
+                $obRadioRegistroPrecosSim->setName    ('boRegistroModalidade');
+                $obRadioRegistroPrecosSim->setId      ('boRegistroModalidade');
+                $obRadioRegistroPrecosSim->setTitle   ('Informe se existe registros de preços.');
+                $obRadioRegistroPrecosSim->setValue   (1);
+                $obRadioRegistroPrecosSim->setNull    (false);
+                $obRadioRegistroPrecosSim->setChecked (false);
         
-                    $obRadioRegistroPrecosNao = new Radio;
-                    $obRadioRegistroPrecosNao->setLabel   ('Não');
-                    $obRadioRegistroPrecosNao->setTitle   ('Informe se existe registros de preços.');
-                    $obRadioRegistroPrecosNao->setName    ('boRegistroModalidade');
-                    $obRadioRegistroPrecosNao->setId      ('boRegistroModalidade');
-                    $obRadioRegistroPrecosNao->setValue   (0);
-                    $obRadioRegistroPrecosNao->setNull    (false);
-                    $obRadioRegistroPrecosNao->setChecked (true);
+                $obRadioRegistroPrecosNao = new Radio;
+                $obRadioRegistroPrecosNao->setLabel   ('Não');
+                $obRadioRegistroPrecosNao->setTitle   ('Informe se existe registros de preços.');
+                $obRadioRegistroPrecosNao->setName    ('boRegistroModalidade');
+                $obRadioRegistroPrecosNao->setId      ('boRegistroModalidade');
+                $obRadioRegistroPrecosNao->setValue   (0);
+                $obRadioRegistroPrecosNao->setNull    (false);
+                $obRadioRegistroPrecosNao->setChecked (true);
 
-                    if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
-                        $obRadioRegistroPrecosSim->setChecked (true);
-                        $obRadioRegistroPrecosNao->setChecked (false);
-                    }
+                if ($rsLicitacao->getCampo('registro_precos') == 't') {
+                    $obRadioRegistroPrecosSim->setChecked (true);
+                    $obRadioRegistroPrecosNao->setChecked (false);
+                }
 
-                    $obFormulario = new Formulario();
-                    $obFormulario->agrupaComponentes(array($obRadioRegistroPrecosSim,$obRadioRegistroPrecosNao));
-                    $obFormulario->montaInnerHTML();
-                    $stHTML = $obFormulario->getHTML();
-                    $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-                break;
-                case 8:
-                case 9:
-                    $obRadioChamadaPublicaSim = new Radio;
-                    $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
-                    $obRadioChamadaPublicaSim->setLabel      ('Sim');
-                    $obRadioChamadaPublicaSim->setName       ('boChamadaPublica');
-                    $obRadioChamadaPublicaSim->setId         ('boChamadaPublica');
-                    $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
-                    $obRadioChamadaPublicaSim->setValue      ('Sim');
-                    $obRadioChamadaPublicaSim->setNull       (false);
-                    $obRadioChamadaPublicaSim->setChecked    (false);
+                $obFormulario = new Formulario();
+                $obFormulario->agrupaComponentes(array($obRadioRegistroPrecosSim,$obRadioRegistroPrecosNao));
+                $obFormulario->montaInnerHTML();
+                $stHTML = $obFormulario->getHTML();
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
+            break;
+
+            case 8:
+                $obRadioChamadaPublicaSim = new Radio;
+                $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
+                $obRadioChamadaPublicaSim->setLabel      ('Sim');
+                $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaSim->setValue      (1);
+                $obRadioChamadaPublicaSim->setNull       (false);
+                $obRadioChamadaPublicaSim->setChecked    (false);
         
-                    $obRadioChamadaPublicaNao = new Radio;
-                    $obRadioChamadaPublicaNao->setLabel   ('Não');
-                    $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
-                    $obRadioChamadaPublicaNao->setName    ('boChamadaPublica');
-                    $obRadioChamadaPublicaNao->setId      ('boChamadaPublica');
-                    $obRadioChamadaPublicaNao->setValue   (0);
-                    $obRadioChamadaPublicaNao->setNull    (false);
-                    $obRadioChamadaPublicaNao->setChecked (true);
+                $obRadioChamadaPublicaNao = new Radio;
+                $obRadioChamadaPublicaNao->setLabel   ('Não');
+                $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaNao->setName    ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setId      ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setValue   (0);
+                $obRadioChamadaPublicaNao->setNull    (false);
+                $obRadioChamadaPublicaNao->setChecked (true);
 
-                    if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
-                        $obRadioChamadaPublicaSim->setChecked (true);
-                        $obRadioChamadaPublicaNao->setChecked (false);
-                    }
+                if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
+                    $obRadioChamadaPublicaSim->setChecked (true);
+                    $obRadioChamadaPublicaNao->setChecked (false);
+                }
 
-                    $obFormulario = new Formulario();
-                    $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
-                    $obFormulario->montaInnerHTML();
-                    $stHTML = $obFormulario->getHTML();
-                    $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-                break;
-                case 10:
-                    $obRadioChamadaPublicaDispensa = new Radio;
-                    $obRadioChamadaPublicaDispensa->setRotulo     ('Tipo de Chamada Pública');
-                    $obRadioChamadaPublicaDispensa->setLabel      ('Dispensa por Chamada Pública');
-                    $obRadioChamadaPublicaDispensa->setName       ('boRegistroModalidade');
-                    $obRadioChamadaPublicaDispensa->setId         ('boRegistroModalidade');
-                    $obRadioChamadaPublicaDispensa->setTitle      ('Informe se é por dispensa.');
-                    $obRadioChamadaPublicaDispensa->setValue      (1);
-                    $obRadioChamadaPublicaDispensa->setNull       (false);
+                $obFormulario = new Formulario();
+                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
+                $obFormulario->montaInnerHTML();
+                $stHTML = $obFormulario->getHTML();
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
+            break;
+
+            case 9:
+                $obRadioChamadaPublicaSim = new Radio;
+                $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
+                $obRadioChamadaPublicaSim->setLabel      ('Sim');
+                $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaSim->setValue      (2);
+                $obRadioChamadaPublicaSim->setNull       (false);
+                $obRadioChamadaPublicaSim->setChecked    (false);
         
-                    $obRadioChamadaPublicaInexigibilidade = new Radio;
-                    $obRadioChamadaPublicaInexigibilidade->setLabel   ('Inexigibilidade por Chamada Pública');
-                    $obRadioChamadaPublicaInexigibilidade->setTitle   ('Informe se é por inexigibilidade.');
-                    $obRadioChamadaPublicaInexigibilidade->setName    ('boRegistroModalidade');
-                    $obRadioChamadaPublicaInexigibilidade->setId      ('boRegistroModalidade');
-                    $obRadioChamadaPublicaInexigibilidade->setValue   (2);
-                    $obRadioChamadaPublicaInexigibilidade->setNull    (false);
+                $obRadioChamadaPublicaNao = new Radio;
+                $obRadioChamadaPublicaNao->setLabel   ('Não');
+                $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaNao->setName    ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setId      ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setValue   (0);
+                $obRadioChamadaPublicaNao->setNull    (false);
+                $obRadioChamadaPublicaNao->setChecked (true);
 
-                    if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
-                        if ($rsTipoChamadaPublica->getCampo('cod_tipo') == 1) {
-                            $obRadioChamadaPublicaDispensa->setChecked(true);
-                        } else {
-                            $obRadioChamadaPublicaInexigibilidade->setChecked(true);
-                        }
+                if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
+                    $obRadioChamadaPublicaSim->setChecked (true);
+                    $obRadioChamadaPublicaNao->setChecked (false);
+                }
+
+                $obFormulario = new Formulario();
+                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
+                $obFormulario->montaInnerHTML();
+                $stHTML = $obFormulario->getHTML();
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
+            break;
+            
+            case 10:
+                $obRadioChamadaPublicaDispensa = new Radio;
+                $obRadioChamadaPublicaDispensa->setRotulo     ('Tipo de Chamada Pública');
+                $obRadioChamadaPublicaDispensa->setLabel      ('Dispensa por Chamada Pública');
+                $obRadioChamadaPublicaDispensa->setName       ('boRegistroModalidade');
+                $obRadioChamadaPublicaDispensa->setId         ('boRegistroModalidade');
+                $obRadioChamadaPublicaDispensa->setTitle      ('Informe se é por dispensa.');
+                $obRadioChamadaPublicaDispensa->setValue      (1);
+                $obRadioChamadaPublicaDispensa->setNull       (false);
+        
+                $obRadioChamadaPublicaInexigibilidade = new Radio;
+                $obRadioChamadaPublicaInexigibilidade->setLabel   ('Inexigibilidade por Chamada Pública');
+                $obRadioChamadaPublicaInexigibilidade->setTitle   ('Informe se é por inexigibilidade.');
+                $obRadioChamadaPublicaInexigibilidade->setName    ('boRegistroModalidade');
+                $obRadioChamadaPublicaInexigibilidade->setId      ('boRegistroModalidade');
+                $obRadioChamadaPublicaInexigibilidade->setValue   (2);
+                $obRadioChamadaPublicaInexigibilidade->setNull    (false);
+
+                if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
+                    if ($rsTipoChamadaPublica->getCampo('cod_tipo') == 1) {
+                        $obRadioChamadaPublicaDispensa->setChecked(true);
+                    } else {
+                        $obRadioChamadaPublicaInexigibilidade->setChecked(true);
                     }
+                }
 
-                    $obFormulario = new Formulario();
-                    $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaDispensa,$obRadioChamadaPublicaInexigibilidade));
-                    $obFormulario->montaInnerHTML();
-                    $stHTML = $obFormulario->getHTML();
-                    $stJs .= "d.getElementById('boRegistroModalidade').innerHTML = '".$stHTML."';\n";
-                break;
-                default:
-                    $stJs .= "d.getElementById('boRegistroModalidade').innerHTML = '';\n";
-                break;
-            }
+                $obFormulario = new Formulario();
+                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaDispensa,$obRadioChamadaPublicaInexigibilidade));
+                $obFormulario->montaInnerHTML();
+                $stHTML = $obFormulario->getHTML();
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
+            break;
+            
+            default:
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '';\n";
+            break;
         }
         
         include_once(TLIC."TLicitacaoMembroAdicional.class.php");
@@ -1620,6 +1653,7 @@ case 'validaDtLicitacao':
     break;
 
     case 'recuperaRegistroModalidade':
+        
         switch ($_REQUEST['inCodModalidade']) {
             case 3:
             case 6:
@@ -1630,7 +1664,7 @@ case 'validaDtLicitacao':
                 $obRadioRegistroPrecosSim->setName       ('boRegistroModalidade');
                 $obRadioRegistroPrecosSim->setId         ('boRegistroModalidade');
                 $obRadioRegistroPrecosSim->setTitle      ('Informe se existe registros de preços.');
-                $obRadioRegistroPrecosSim->setValue      ('Sim');
+                $obRadioRegistroPrecosSim->setValue      (1);
                 $obRadioRegistroPrecosSim->setNull       (false);
                 $obRadioRegistroPrecosSim->setChecked    (false);
         
@@ -1649,15 +1683,15 @@ case 'validaDtLicitacao':
                 $stHTML = $obFormulario->getHTML();
                 $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
             break;
-            case 8:
-            case 9:
+            
+            case 8:            
                 $obRadioChamadaPublicaSim = new Radio;
                 $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
                 $obRadioChamadaPublicaSim->setLabel      ('Sim');
                 $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
                 $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
                 $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
-                $obRadioChamadaPublicaSim->setValue      ('Sim');
+                $obRadioChamadaPublicaSim->setValue      (1);
                 $obRadioChamadaPublicaSim->setNull       (false);
                 $obRadioChamadaPublicaSim->setChecked    (false);
         
@@ -1676,6 +1710,34 @@ case 'validaDtLicitacao':
                 $stHTML = $obFormulario->getHTML();
                 $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
             break;
+            
+            case 9:
+                $obRadioChamadaPublicaSim = new Radio;
+                $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
+                $obRadioChamadaPublicaSim->setLabel      ('Sim');
+                $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
+                $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaSim->setValue      (2);
+                $obRadioChamadaPublicaSim->setNull       (false);
+                $obRadioChamadaPublicaSim->setChecked    (false);
+        
+                $obRadioChamadaPublicaNao = new Radio;
+                $obRadioChamadaPublicaNao->setLabel   ('Não');
+                $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
+                $obRadioChamadaPublicaNao->setName    ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setId      ('boRegistroModalidade');
+                $obRadioChamadaPublicaNao->setValue   (0);
+                $obRadioChamadaPublicaNao->setNull    (false);
+                $obRadioChamadaPublicaNao->setChecked (true);
+
+                $obFormulario = new Formulario();
+                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
+                $obFormulario->montaInnerHTML();
+                $stHTML = $obFormulario->getHTML();
+                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
+            break;
+            
             case 10:
                 $obRadioChamadaPublicaDispensa = new Radio;
                 $obRadioChamadaPublicaDispensa->setRotulo     ('Tipo de Chamada Pública');

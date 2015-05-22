@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
@@ -15,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -27,9 +27,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -40,12 +40,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">2007</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -55,12 +55,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">Executivo</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -69,12 +69,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">Prefeitura Municipal de Uiraúna</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -83,9 +83,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -95,10 +95,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -108,12 +108,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">01/01/2008</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -122,9 +122,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -135,24 +135,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -162,42 +147,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -207,9 +162,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -220,9 +175,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -233,9 +188,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -246,9 +201,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -259,9 +214,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -272,12 +227,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -288,12 +243,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -304,12 +259,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -320,12 +275,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -336,12 +291,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -352,12 +307,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -368,9 +323,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -380,12 +335,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -396,12 +351,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -411,12 +366,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -427,12 +382,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -443,12 +398,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -459,12 +414,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -475,12 +430,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -491,12 +446,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -507,12 +462,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -523,12 +478,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -539,12 +494,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">25.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -554,12 +509,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -570,12 +525,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -586,12 +541,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -602,12 +557,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0,00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -618,12 +573,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">0,00</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Currency</property>
                 <property name="pattern">#,##0.00</property>
@@ -633,9 +588,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -644,9 +599,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -655,9 +610,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -667,9 +622,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -679,9 +634,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -691,9 +646,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -702,9 +657,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -712,9 +667,9 @@
         <scalar-parameter name="nome_periodo" id="6668">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -722,9 +677,9 @@
         <scalar-parameter name="tipo_periodo" id="6670">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -734,9 +689,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -746,9 +701,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -758,9 +713,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -769,9 +724,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -780,9 +735,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -791,9 +746,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -802,9 +757,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -812,23 +767,14 @@
         <scalar-parameter name="bo_ultimo_bimestre" id="7957">
             <property name="valueType">static</property>
             <property name="dataType">boolean</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">check-box</property>
-            <property name="distinct">true</property>
             <structure name="format"/>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ) {
-	extensionProperties.odaDriverClass = params["db_driver"].value;
-	extensionProperties.odaURL = params["db_conn_url"].value;
-	extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_250.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -2799,7 +2745,7 @@ FROM
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">query</property>
-                    <property name="displayName">query</property>
+                    <text-property name="displayName">query</text-property>
                     <expression name="expression">params["query"].value</expression>
                     <property name="dataType">string</property>
                 </structure>
@@ -2878,8 +2824,8 @@ FROM
             <column id="1379"/>
             <header>
                 <row id="1373">
-                    <property name="height">12mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">12mm</property>
                     <cell id="1374">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -3508,19 +3454,19 @@ if(!x){
                 </structure>
                 <structure>
                     <property name="name">grupo</property>
-                    <property name="displayName">grupo</property>
+                    <text-property name="displayName">grupo</text-property>
                     <expression name="expression">dataSetRow["grupo"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">subgrupo</property>
-                    <property name="displayName">subgrupo</property>
+                    <text-property name="displayName">subgrupo</text-property>
                     <expression name="expression">dataSetRow["subgrupo"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">item</property>
-                    <property name="displayName">item</property>
+                    <text-property name="displayName">item</text-property>
                     <expression name="expression">dataSetRow["item"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -3531,25 +3477,25 @@ if(!x){
                 </structure>
                 <structure>
                     <property name="name">t_atu</property>
-                    <property name="displayName">t_atu</property>
+                    <text-property name="displayName">t_atu</text-property>
                     <expression name="expression">Total.sum(dataSetRow["atu"], dataSetRow["subgrupo"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_no_bi</property>
-                    <property name="displayName">t_no_bi</property>
+                    <text-property name="displayName">t_no_bi</text-property>
                     <expression name="expression">Total.sum(dataSetRow["no_bi"], dataSetRow["subgrupo"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_ate_bi</property>
-                    <property name="displayName">t_ate_bi</property>
+                    <text-property name="displayName">t_ate_bi</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bi"], dataSetRow["subgrupo"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_pct</property>
-                    <property name="displayName">t_pct</property>
+                    <text-property name="displayName">t_pct</text-property>
                     <expression name="expression">var x = (row["t_ate_bi"] / row["t_atu"]) * 100;
 params["res3_pct"] = x;
 
@@ -4036,7 +3982,7 @@ if (dataSetRow["subgrupo"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">ate_bi</property>
-                    <property name="displayName">ate_bi</property>
+                    <text-property name="displayName">ate_bi</text-property>
                     <expression name="expression">if ( dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 2 ) {
 	params['res25'] = dataSetRow["ate_bi"];
 }	
@@ -4053,7 +3999,7 @@ dataSetRow["ate_bi"]</expression>
                 </structure>
                 <structure>
                     <property name="name">t_ini</property>
-                    <property name="displayName">t_ini</property>
+                    <text-property name="displayName">t_ini</text-property>
                     <expression name="expression">params["res10_ini"] = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 0 &amp;&amp; dataSetRow["item"] == 0));
 var x = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 1 &amp;&amp; dataSetRow["item"] == 0));
 var y = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 11 &amp;&amp; dataSetRow["subgrupo"] == 0));
@@ -4062,7 +4008,7 @@ var y = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 11 &amp;&amp; dataS
                 </structure>
                 <structure>
                     <property name="name">t_atu</property>
-                    <property name="displayName">t_atu</property>
+                    <text-property name="displayName">t_atu</text-property>
                     <expression name="expression">params["res10_atu"] = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 0 &amp;&amp; dataSetRow["item"] == 0));
 var x = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 1 &amp;&amp; dataSetRow["item"] == 0));
 var y = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 11 &amp;&amp; dataSetRow["subgrupo"] == 0));
@@ -4071,7 +4017,7 @@ var y = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 11 &amp;&amp; dataS
                 </structure>
                 <structure>
                     <property name="name">t_no_bi</property>
-                    <property name="displayName">t_no_bi</property>
+                    <text-property name="displayName">t_no_bi</text-property>
                     <expression name="expression">params["res10_no_bi"] = Total.sum(dataSetRow["no_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 0 &amp;&amp; dataSetRow["item"] == 0));
 var x = Total.sum(dataSetRow["no_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 1 &amp;&amp; dataSetRow["item"] == 0));
 var y = Total.sum(dataSetRow["no_bi"], (dataSetRow["grupo"] == 11 &amp;&amp; dataSetRow["subgrupo"] == 0));
@@ -4080,7 +4026,7 @@ var y = Total.sum(dataSetRow["no_bi"], (dataSetRow["grupo"] == 11 &amp;&amp; dat
                 </structure>
                 <structure>
                     <property name="name">t_ate_bi</property>
-                    <property name="displayName">t_ate_bi</property>
+                    <text-property name="displayName">t_ate_bi</text-property>
                     <expression name="expression">params["res38_apl_finan"] = Total.sum(dataSetRow["ate_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 3 &amp;&amp; dataSetRow["item"] == 0));
 var x = Total.sum(dataSetRow["ate_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["subgrupo"] == 1 &amp;&amp; dataSetRow["item"] == 0));
 var y = Total.sum(dataSetRow["ate_bi"], (dataSetRow["grupo"] == 11 &amp;&amp; dataSetRow["subgrupo"] == 0));
@@ -4092,7 +4038,7 @@ params["res11"] = (x - y);
                 </structure>
                 <structure>
                     <property name="name">t_pct</property>
-                    <property name="displayName">t_pct</property>
+                    <text-property name="displayName">t_pct</text-property>
                     <expression name="expression">if (row["t_ate_bi"] > 0 &amp;&amp; row["t_atu"] > 0) {
 	(row["t_ate_bi"] / row["t_atu"]) * 100;
 } else {
@@ -4102,7 +4048,7 @@ params["res11"] = (x - y);
                 </structure>
                 <structure>
                     <property name="name">res11</property>
-                    <property name="displayName">res11</property>
+                    <text-property name="displayName">res11</text-property>
                     <expression name="expression">row["t_ate_bi"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -4740,7 +4686,7 @@ params["res11"] = (x - y);
                 </structure>
                 <structure>
                     <property name="name">nivel</property>
-                    <property name="displayName">nivel</property>
+                    <text-property name="displayName">nivel</text-property>
                     <expression name="expression">dataSetRow["nivel"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -4772,7 +4718,7 @@ Total.sum(dataSetRow["ate_bi"], dataSetRow["nivel"] == "0");</expression>
                 </structure>
                 <structure>
                     <property name="name">res15_ini</property>
-                    <property name="displayName">res15_ini</property>
+                    <text-property name="displayName">res15_ini</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_ini"] > 0) {
 	(w / params["res10_ini"]) * 100
@@ -4783,7 +4729,7 @@ if (w > 0 &amp;&amp; params["res10_ini"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_atu</property>
-                    <property name="displayName">res15_atu</property>
+                    <text-property name="displayName">res15_atu</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_atu"] > 0) {
 	(w / params["res10_atu"]) * 100
@@ -4794,7 +4740,7 @@ if (w > 0 &amp;&amp; params["res10_atu"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_ate_bi</property>
-                    <property name="displayName">res15_ate_bi</property>
+                    <text-property name="displayName">res15_ate_bi</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["ate_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
 	(w / params["res10_ate_bi"]) * 100
@@ -4805,7 +4751,7 @@ if (w > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_pct</property>
-                    <property name="displayName">res15_pct</property>
+                    <text-property name="displayName">res15_pct</text-property>
                     <expression name="expression">if (params["res12_ate_bi"] > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
 	(params["res12_ate_bi"] / params["res10_ate_bi"]) * 100
 } else {
@@ -4913,9 +4859,9 @@ if (params['res13_ate_bi'] != '')	{
             </column>
             <header>
                 <row id="1358">
-                    <property name="height">0.25in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.25in</property>
                     <cell id="1359">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -5033,8 +4979,8 @@ if (params['res13_ate_bi'] != '')	{
                     </cell>
                 </row>
                 <row id="1331">
-                    <property name="height">0.3229166666666667in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3229166666666667in</property>
                     <cell id="6732">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -5126,8 +5072,8 @@ if (params['res13_ate_bi'] != '')	{
                     </cell>
                 </row>
                 <row id="1713">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.23958333333333334in</property>
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
@@ -5981,7 +5927,7 @@ if (params['res13_ate_bi'] != '')	{
                 </structure>
                 <structure>
                     <property name="name">nivel</property>
-                    <property name="displayName">nivel</property>
+                    <text-property name="displayName">nivel</text-property>
                     <expression name="expression">dataSetRow["nivel"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -6013,7 +5959,7 @@ Total.sum(dataSetRow["ate_bi"], dataSetRow["nivel"] == "0");</expression>
                 </structure>
                 <structure>
                     <property name="name">res15_ini</property>
-                    <property name="displayName">res15_ini</property>
+                    <text-property name="displayName">res15_ini</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["ini"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_ini"] > 0) {
 	(w / params["res10_ini"]) * 100
@@ -6024,7 +5970,7 @@ if (w > 0 &amp;&amp; params["res10_ini"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_atu</property>
-                    <property name="displayName">res15_atu</property>
+                    <text-property name="displayName">res15_atu</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["atu"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_atu"] > 0) {
 	(w / params["res10_atu"]) * 100
@@ -6035,7 +5981,7 @@ if (w > 0 &amp;&amp; params["res10_atu"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_ate_bi</property>
-                    <property name="displayName">res15_ate_bi</property>
+                    <text-property name="displayName">res15_ate_bi</text-property>
                     <expression name="expression">var w = Total.sum(dataSetRow["ate_bi"], (dataSetRow["grupo"] == 12 &amp;&amp; dataSetRow["nivel"] == 0));
 if (w > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
 	(w / params["res10_ate_bi"]) * 100
@@ -6046,7 +5992,7 @@ if (w > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
                 </structure>
                 <structure>
                     <property name="name">res15_pct</property>
-                    <property name="displayName">res15_pct</property>
+                    <text-property name="displayName">res15_pct</text-property>
                     <expression name="expression">if (params["res12_ate_bi"] > 0 &amp;&amp; params["res10_ate_bi"] > 0) {
 	(params["res12_ate_bi"] / params["res10_ate_bi"]) * 100
 } else {
@@ -6157,9 +6103,9 @@ if (params['res13_ate_bi'] != '')	{
             </column>
             <header>
                 <row id="7601">
-                    <property name="height">0.6145833333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.6145833333333334in</property>
                     <cell id="7602">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -6295,8 +6241,8 @@ if (params['res13_ate_bi'] != '')	{
                     </cell>
                 </row>
                 <row id="7614">
-                    <property name="height">0.3229166666666667in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3229166666666667in</property>
                     <cell id="7615">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -6407,8 +6353,8 @@ if (params['res13_ate_bi'] != '')	{
                     </cell>
                 </row>
                 <row id="7625">
-                    <property name="height">0.23958333333333334in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.23958333333333334in</property>
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
@@ -7269,10 +7215,10 @@ if (params['res13_ate_bi'] != '')	{
             <column id="1396"/>
             <header>
                 <row id="2686">
-                    <property name="height">12mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="textAlign">center</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">12mm</property>
                     <cell id="2687">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -7296,7 +7242,7 @@ if (params['res13_ate_bi'] != '')	{
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">res16_ini</property>
-                    <property name="displayName">res16_ini</property>
+                    <text-property name="displayName">res16_ini</text-property>
                     <expression name="expression">if (params["res3_ini"] > 0.00) {
 	(params["res3_ini"] / 100) * params["pct_educacao"]
 } else {
@@ -7306,7 +7252,7 @@ if (params['res13_ate_bi'] != '')	{
                 </structure>
                 <structure>
                     <property name="name">res16_atu</property>
-                    <property name="displayName">res16_atu</property>
+                    <text-property name="displayName">res16_atu</text-property>
                     <expression name="expression">if (params["res3_atu"] > 0.00) {
 	(params["res3_atu"] / 100) * params["pct_educacao"]
 } else {
@@ -7316,7 +7262,7 @@ if (params['res13_ate_bi'] != '')	{
                 </structure>
                 <structure>
                     <property name="name">res16_no_bi</property>
-                    <property name="displayName">res16_no_bi</property>
+                    <text-property name="displayName">res16_no_bi</text-property>
                     <expression name="expression">if (params["res3_no_bi"] > 0.00) {
 	(params["res3_no_bi"] / 100) * params["pct_educacao"]
 } else {
@@ -7326,7 +7272,7 @@ if (params['res13_ate_bi'] != '')	{
                 </structure>
                 <structure>
                     <property name="name">res16_ate_bi</property>
-                    <property name="displayName">res16_ate_bi</property>
+                    <text-property name="displayName">res16_ate_bi</text-property>
                     <expression name="expression">if (params["res3_ate_bi"] > 0.00) {
 	(params["res3_ate_bi"] / 100) * params["pct_educacao"]
 } else {
@@ -7336,7 +7282,7 @@ if (params['res13_ate_bi'] != '')	{
                 </structure>
                 <structure>
                     <property name="name">res16_pct</property>
-                    <property name="displayName">res16_pct</property>
+                    <text-property name="displayName">res16_pct</text-property>
                     <expression name="expression">if (row["res16_ate_bi"] > 0.00 &amp;&amp; row["res16_atu"] > 0) {
 	(row["res16_ate_bi"] / row["res16_atu"]) * 100
 } else {
@@ -7701,7 +7647,7 @@ x</expression>
                 </structure>
                 <structure>
                     <property name="name">grupo</property>
-                    <property name="displayName">grupo</property>
+                    <text-property name="displayName">grupo</text-property>
                     <expression name="expression">dataSetRow["grupo"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -7763,8 +7709,8 @@ Total.sum(dataSetRow["vl_restos_inscritos"], dataSetRow["nivel"] == "0");</expre
             </column>
             <header>
                 <row id="1468">
-                    <property name="height">0.3645833333333333in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3645833333333333in</property>
                     <cell id="1469">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -7884,8 +7830,8 @@ Total.sum(dataSetRow["vl_restos_inscritos"], dataSetRow["nivel"] == "0");</expre
                     </cell>
                 </row>
                 <row id="1441">
-                    <property name="height">0.3645833333333333in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3645833333333333in</property>
                     <cell id="6790">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -8359,7 +8305,7 @@ x</expression>
                 </structure>
                 <structure>
                     <property name="name">grupo</property>
-                    <property name="displayName">grupo</property>
+                    <text-property name="displayName">grupo</text-property>
                     <expression name="expression">dataSetRow["grupo"]</expression>
                     <property name="dataType">integer</property>
                 </structure>
@@ -8424,8 +8370,8 @@ Total.sum(dataSetRow["vl_restos_inscritos"], dataSetRow["nivel"] == "0");</expre
             </column>
             <header>
                 <row id="7792">
-                    <property name="height">0.6041666666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.6041666666666666in</property>
                     <cell id="7793">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -8567,8 +8513,8 @@ Total.sum(dataSetRow["vl_restos_inscritos"], dataSetRow["nivel"] == "0");</expre
                     </cell>
                 </row>
                 <row id="7805">
-                    <property name="height">0.3645833333333333in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3645833333333333in</property>
                     <cell id="7806">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -9024,7 +8970,7 @@ Total.sum(dataSetRow["vl_restos_inscritos"], dataSetRow["nivel"] == "0");</expre
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">saldo</property>
-                    <property name="displayName">saldo</property>
+                    <text-property name="displayName">saldo</text-property>
                     <expression name="expression">params["res37_saldo"] = dataSetRow["saldo"];
 dataSetRow["saldo"]</expression>
                     <property name="dataType">decimal</property>
@@ -9077,43 +9023,43 @@ dataSetRow["cancelado"]</expression>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">res25</property>
-                    <property name="displayName">res25</property>
+                    <text-property name="displayName">res25</text-property>
                     <expression name="expression">params['res25'];</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res26</property>
-                    <property name="displayName">res26</property>
+                    <text-property name="displayName">res26</text-property>
                     <expression name="expression">0.00</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res27</property>
-                    <property name="displayName">res27</property>
+                    <text-property name="displayName">res27</text-property>
                     <expression name="expression">0.00</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res28</property>
-                    <property name="displayName">res28</property>
+                    <text-property name="displayName">res28</text-property>
                     <expression name="expression">params["res37_canc"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res29</property>
-                    <property name="displayName">res29</property>
+                    <text-property name="displayName">res29</text-property>
                     <expression name="expression">params['res29']</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res30</property>
-                    <property name="displayName">res30</property>
+                    <text-property name="displayName">res30</text-property>
                     <expression name="expression">params['res37_canc']</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res31</property>
-                    <property name="displayName">res31</property>
+                    <text-property name="displayName">res31</text-property>
                     <expression name="expression">var x = (params['res38']);
 var y = x / params["res3_ate_bi"];
 var y = y * 100;
@@ -9149,8 +9095,8 @@ if(!y){
             </column>
             <header>
                 <row id="1483">
-                    <property name="height">12mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">12mm</property>
                     <cell id="1484">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -9539,10 +9485,10 @@ if(!y){
             <column id="2737"/>
             <header>
                 <row id="2734">
-                    <property name="height">12mm</property>
                     <property name="backgroundColor">#F5F5F5</property>
                     <property name="textAlign">center</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">12mm</property>
                     <cell id="2735">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -9620,31 +9566,31 @@ if(!y){
                 </structure>
                 <structure>
                     <property name="name">t_ini</property>
-                    <property name="displayName">t_ini</property>
+                    <text-property name="displayName">t_ini</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ini"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_atu</property>
-                    <property name="displayName">t_atu</property>
+                    <text-property name="displayName">t_atu</text-property>
                     <expression name="expression">Total.sum(dataSetRow["atu"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_ini</property>
-                    <property name="displayName">res36_ini</property>
+                    <text-property name="displayName">res36_ini</text-property>
                     <expression name="expression">row["t_ini"] + params["res23_ini"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_ate_bi</property>
-                    <property name="displayName">t_ate_bi</property>
+                    <text-property name="displayName">t_ate_bi</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bi"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_pct</property>
-                    <property name="displayName">t_pct</property>
+                    <text-property name="displayName">t_pct</text-property>
                     <expression name="expression">if (row["t_ate_bi"] > 0 &amp;&amp; row["t_atu"] > 0) {
 	(row["t_ate_bi"] / row["t_atu"]) * 100
 } else {
@@ -9654,19 +9600,19 @@ if(!y){
                 </structure>
                 <structure>
                     <property name="name">res36_atu</property>
-                    <property name="displayName">res36_atu</property>
+                    <text-property name="displayName">res36_atu</text-property>
                     <expression name="expression">row["t_atu"] + params["res23_atu"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_ate_bi</property>
-                    <property name="displayName">res36_ate_bi</property>
+                    <text-property name="displayName">res36_ate_bi</text-property>
                     <expression name="expression">row["t_ate_bi"] + params["res23_ate_bi"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_pct</property>
-                    <property name="displayName">res36_pct</property>
+                    <text-property name="displayName">res36_pct</text-property>
                     <expression name="expression">var x = Math.round(params["res23_pct"] * 100);
 var y = Math.round(row["t_pct"] * 100);
 (x + y) / 100</expression>
@@ -9742,8 +9688,8 @@ var y = Math.round(row["t_pct"] * 100);
             </column>
             <header>
                 <row id="1524">
-                    <property name="height">0.3854166666666667in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.3854166666666667in</property>
                     <cell id="1525">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -10080,8 +10026,8 @@ var y = Math.round(row["t_pct"] * 100);
             </detail>
             <footer>
                 <row id="1889">
-                    <property name="height">0.28125in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.28125in</property>
                     <cell id="1890">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -10240,8 +10186,8 @@ var y = Math.round(row["t_pct"] * 100);
                     </cell>
                 </row>
                 <row id="1511">
-                    <property name="height">0.1875in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.1875in</property>
                     <cell id="1512">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -10400,8 +10346,8 @@ var y = Math.round(row["t_pct"] * 100);
                     </cell>
                 </row>
                 <row id="2740">
-                    <property name="height">0.3333333333333333in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.3333333333333333in</property>
                     <cell id="2741">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -10608,31 +10554,31 @@ var y = Math.round(row["t_pct"] * 100);
                 </structure>
                 <structure>
                     <property name="name">t_ini</property>
-                    <property name="displayName">t_ini</property>
+                    <text-property name="displayName">t_ini</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ini"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_atu</property>
-                    <property name="displayName">t_atu</property>
+                    <text-property name="displayName">t_atu</text-property>
                     <expression name="expression">Total.sum(dataSetRow["atu"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_ini</property>
-                    <property name="displayName">res36_ini</property>
+                    <text-property name="displayName">res36_ini</text-property>
                     <expression name="expression">row["t_ini"] + params["res23_ini"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_ate_bi</property>
-                    <property name="displayName">t_ate_bi</property>
+                    <text-property name="displayName">t_ate_bi</text-property>
                     <expression name="expression">Total.sum(dataSetRow["ate_bi"], dataSetRow["nivel"] == 0)</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">t_pct</property>
-                    <property name="displayName">t_pct</property>
+                    <text-property name="displayName">t_pct</text-property>
                     <expression name="expression">if (row["t_ate_bi"] > 0 &amp;&amp; row["t_atu"] > 0) {
 	(row["t_ate_bi"] / row["t_atu"]) * 100
 } else {
@@ -10642,19 +10588,19 @@ var y = Math.round(row["t_pct"] * 100);
                 </structure>
                 <structure>
                     <property name="name">res36_atu</property>
-                    <property name="displayName">res36_atu</property>
+                    <text-property name="displayName">res36_atu</text-property>
                     <expression name="expression">row["t_atu"] + params["res23_atu"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_ate_bi</property>
-                    <property name="displayName">res36_ate_bi</property>
+                    <text-property name="displayName">res36_ate_bi</text-property>
                     <expression name="expression">row["t_ate_bi"] + params["res23_ate_bi"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res36_pct</property>
-                    <property name="displayName">res36_pct</property>
+                    <text-property name="displayName">res36_pct</text-property>
                     <expression name="expression">var x = Math.round(params["res23_pct"] * 100);
 var y = Math.round(row["t_pct"] * 100);
 (x + y) / 100</expression>
@@ -10733,8 +10679,8 @@ var y = Math.round(row["t_pct"] * 100);
             </column>
             <header>
                 <row id="7860">
-                    <property name="height">0.5729166666666666in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.5729166666666666in</property>
                     <cell id="7861">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -11121,8 +11067,8 @@ var y = Math.round(row["t_pct"] * 100);
             </detail>
             <footer>
                 <row id="7901">
-                    <property name="height">0.28125in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.28125in</property>
                     <cell id="7902">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -11301,8 +11247,8 @@ var y = Math.round(row["t_pct"] * 100);
                     </cell>
                 </row>
                 <row id="7918">
-                    <property name="height">0.1875in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.1875in</property>
                     <cell id="7919">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -11481,8 +11427,8 @@ var y = Math.round(row["t_pct"] * 100);
                     </cell>
                 </row>
                 <row id="7935">
-                    <property name="height">0.3333333333333333in</property>
                     <property name="verticalAlign">middle</property>
+                    <property name="height">0.3333333333333333in</property>
                     <cell id="7936">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -11740,32 +11686,32 @@ dataSetRow["vl_pago"]</expression>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">exercicio_anterior</property>
-                    <property name="displayName">exercicio_anterior</property>
+                    <text-property name="displayName">exercicio_anterior</text-property>
                     <expression name="expression">var exAtual = params["exercicio"];
 exAtual.parseInt</expression>
                     <property name="dataType">integer</property>
                 </structure>
                 <structure>
                     <property name="name">res381_ate_bi</property>
-                    <property name="displayName">res381_ate_bi</property>
+                    <text-property name="displayName">res381_ate_bi</text-property>
                     <expression name="expression">params["res10_ate_bi"] - params["res38_apl_finan"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">res383</property>
-                    <property name="displayName">res383</property>
+                    <text-property name="displayName">res383</text-property>
                     <expression name="expression">params["res38_apl_finan"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res382</property>
-                    <property name="displayName">res382</property>
+                    <text-property name="displayName">res382</text-property>
                     <expression name="expression">params["res38_pagamentos"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="name">res38</property>
-                    <property name="displayName">res38</property>
+                    <text-property name="displayName">res38</text-property>
                     <expression name="expression">if (params["res38_saldo"] > 0.00) {
 	params["res38_saldo"];
 } else {
@@ -11775,7 +11721,7 @@ exAtual.parseInt</expression>
                 </structure>
                 <structure>
                     <property name="name">res39</property>
-                    <property name="displayName">res39</property>
+                    <text-property name="displayName">res39</text-property>
                     <expression name="expression">(row["res38"] + row["res381_ate_bi"] - row["res382"] + row["res383"])</expression>
                     <property name="dataType">decimal</property>
                 </structure>
@@ -11789,8 +11735,8 @@ exAtual.parseInt</expression>
             </column>
             <header>
                 <row id="2784">
-                    <property name="height">0.26732673267326734in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.26732673267326734in</property>
                     <cell id="2785">
                         <property name="colSpan">1</property>
                         <property name="rowSpan">2</property>
@@ -11837,8 +11783,8 @@ exAtual.parseInt</expression>
                     </cell>
                 </row>
                 <row id="2790">
-                    <property name="height">0.26732673267326734in</property>
                     <property name="backgroundColor">#F5F5F5</property>
+                    <property name="height">0.26732673267326734in</property>
                     <cell id="2791">
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
@@ -12042,14 +11988,50 @@ exAtual.parseInt</expression>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
             <property name="resultSetColumn">data_extenso</property>
         </data>
-        <grid name="assinaturas" id="6869" extends="urbem_250.assinaturas"/>
+        <grid name="assinaturas" id="6869" extends="urbem_250.assinaturas">
+            <overridden-values>
+                <ref-entry baseId="1215" id="7958"/>
+                <ref-entry baseId="1150" id="7959"/>
+                <ref-entry baseId="1151" id="7960"/>
+                <ref-entry baseId="1152" id="7961"/>
+                <ref-entry baseId="1218" id="7962"/>
+                <ref-entry baseId="1179" id="7963"/>
+                <ref-entry baseId="1213" id="7964"/>
+                <ref-entry baseId="1180" id="1180"/>
+                <ref-entry baseId="1183" name="NewTable2" id="1183"/>
+                <ref-entry baseId="1186" id="1186"/>
+                <ref-entry baseId="1187" id="1187"/>
+                <ref-entry baseId="1188" name="NewData122" id="1188"/>
+                <ref-entry baseId="1189" name="NewData132" id="7965"/>
+                <ref-entry baseId="1192" id="7966"/>
+                <ref-entry baseId="1216" id="7967"/>
+                <ref-entry baseId="1153" id="7968"/>
+                <ref-entry baseId="1214" id="7969"/>
+                <ref-entry baseId="1154" id="7970"/>
+                <ref-entry baseId="1157" name="NewTable" id="7971"/>
+                <ref-entry baseId="1160" id="7972"/>
+                <ref-entry baseId="1161" id="7973"/>
+                <ref-entry baseId="1167" name="NewData12" id="7974"/>
+                <ref-entry baseId="1168" name="NewData13" id="7975"/>
+                <ref-entry baseId="1164" id="1164"/>
+                <ref-entry baseId="1155" id="7976"/>
+                <ref-entry baseId="1156" id="7977"/>
+                <ref-entry baseId="1169" name="NewTable1" id="7978"/>
+                <ref-entry baseId="1172" id="7979"/>
+                <ref-entry baseId="1173" id="7980"/>
+                <ref-entry baseId="1174" name="NewData121" id="7981"/>
+                <ref-entry baseId="1175" name="NewData131" id="7982"/>
+                <ref-entry baseId="1178" id="7983"/>
+                <ref-entry baseId="1217" id="7984"/>
+            </overridden-values>
+        </grid>
         <text-data id="2598">
             <property name="fontFamily">sans-serif</property>
             <property name="fontSize">6pt</property>

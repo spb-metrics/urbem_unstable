@@ -30,7 +30,7 @@
  * @package     Tesouraria
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: CTCEMGExportacao.class.php 61974 2015-03-19 19:27:32Z jean $
+ * $Id: CTCEMGExportacao.class.php 62529 2015-05-18 17:56:34Z evandro $
  */
 
 class CTCEMGExportacao
@@ -195,11 +195,19 @@ class CTCEMGExportacao
                 foreach ($arArquivo['ambos'] as $arquivo) {
                     $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
                 }
+            } elseif ($arParams['stTipoPeriodo'] == 'bimestral') {
+                foreach ($arArquivo['ambos'] as $arquivo) {
+                    $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
+                }
             }
 
             break;
         case 'legislativo':
             if ($arParams['stTipoPeriodo'] == 'mensal') {
+                foreach ($arArquivo['legislativo'] as $arquivo) {
+                    $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
+                }
+            } elseif ($arParams['stTipoPeriodo'] == 'bimestral') {
                 foreach ($arArquivo['legislativo'] as $arquivo) {
                     $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
                 }
@@ -214,10 +222,11 @@ class CTCEMGExportacao
                     }
                 }
             } elseif ($arParams['stTipoPeriodo'] == 'bimestral') {
-                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][10] . "','" . $arArquivo['executivo'][10] . "');";
-                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][11] . "','" . $arArquivo['executivo'][11] . "');";
-                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][13] . "','" . $arArquivo['executivo'][13] . "');";
-                $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arArquivo['executivo'][17] . "','" . $arArquivo['executivo'][17] . "');";
+                foreach ($arArquivo['executivo'] as $arquivo) {
+                    if ($arquivo != 'metaArrecadacao.txt') {
+                        $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
+                    }
+                }
             }
 
             break;
@@ -243,8 +252,6 @@ class CTCEMGExportacao
 
         include_once( CLA_EXPORTADOR );
 
-        //SistemaLegado::BloqueiaFrames();
-
         $stAcao = $_REQUEST['stAcao'];
 
         $arFiltroRelatorio = Sessao::read('filtroRelatorio');
@@ -265,18 +272,38 @@ class CTCEMGExportacao
             $obExportador->addArquivo($arArquivo[0].'.'.$arArquivo[1]);
             $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
 
-            include( CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/SIACE/".$arArquivo[0] . ".inc.php");
+            include( CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/SIACE/".Sessao::getExercicio()."/".$arArquivo[0] . ".inc.php");
 
             $arRecordSet = null;
         }
 
-        //if ($arFiltroRelatorio['stTipoExport'] == 'compactados') {
-        //    $obExportador->setNomeArquivoZip('Balancete'.Sessao::getExercicio().$inMes.'.zip');
-        //}
+        if ($arFiltroRelatorio['stTipoExport'] == 'compactados') {
+            if($arFiltroRelatorio['stTipoPeriodo'] == 'bimestral') {
+                $obExportador->setNomeArquivoZip('SIACE_'.$arFiltroRelatorio['inPeriodo'].'bimestre_'.Sessao::getExercicio().'.zip');
+            } else {
+                $obExportador->setNomeArquivoZip('SIACE_'.$arFiltroRelatorio['inPeriodo'].'mes_'.Sessao::getExercicio().'.zip');
+            }
+        }
 
         $obExportador->show();
-        //SistemaLegado::LiberaFrames();
+    }
+
+
+    public function validaArquivoPeriodo($arParams)
+    {
+        if ( ($_REQUEST['stTipoPeriodo'] == 'bimestral') && ($_REQUEST['inPeriodo'] != 6) ) {
+            $stJs .= " jq('#arArquivosDisponivel option[value=\"operacoesCreditoARO.txt\"]').remove(); ";    
+            $stJs .= " jq('#arArquivosSelecionado option[value=\"operacoesCreditoARO.txt\"]').remove(); ";                
+        }elseif ( ($_REQUEST['stTipoPeriodo'] == 'mensal') && ($_REQUEST['inPeriodo'] != 12) ) {
+            $stJs .= " jq('#arArquivosDisponivel option[value=\"operacoesCreditoARO.txt\"]').remove(); ";    
+            $stJs .= " jq('#arArquivosSelecionado option[value=\"operacoesCreditoARO.txt\"]').remove(); ";                
+        }else{
+            $stJs .= "jq('#arArquivosDisponivel').addOption('operacoesCreditoARO.txt','operacoesCreditoARO.txt');";
+        }
+                
+        echo $stJs;
 
     }
+
 
 }

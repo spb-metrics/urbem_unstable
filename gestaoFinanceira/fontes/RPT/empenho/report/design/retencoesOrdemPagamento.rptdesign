@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 paisagem</html-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -18,27 +18,39 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="exercicio" id="1151" extends="urbem_250.exercicio"/>
+        <scalar-parameter name="exercicio" id="1151" extends="urbem_250.exercicio">
+            <text-property name="promptText">Exercicio</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
         <scalar-parameter name="cod_acao" id="1152" extends="urbem_250.cod_acao"/>
-        <scalar-parameter name="db_driver" id="1153" extends="urbem_250.db_driver"/>
         <scalar-parameter name="db_conn_url" id="1154" extends="urbem_250.db_conn_url"/>
-        <scalar-parameter name="db_user" id="1155" extends="urbem_250.db_user"/>
-        <scalar-parameter name="db_password" id="1156" extends="urbem_250.db_password"/>
         <scalar-parameter name="entidade" id="1157" extends="urbem_250.entidade"/>
         <scalar-parameter name="entidade_retencao" id="1312">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -47,9 +59,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -58,9 +70,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -69,9 +81,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -80,9 +92,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -91,9 +103,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -102,9 +114,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -113,9 +125,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -124,9 +136,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -135,9 +147,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -146,9 +158,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -157,9 +169,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -168,9 +180,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -179,9 +191,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -190,9 +202,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -201,9 +213,9 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -212,25 +224,42 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="numcgm_assinatura" id="2074" extends="urbem_250.numcgm_assinatura"/>
         <scalar-parameter name="timestamp_assinatura" id="2075" extends="urbem_250.timestamp_assinatura"/>
         <scalar-parameter name="numero_assinatura" id="2076" extends="urbem_250.numero_assinatura"/>
+        <scalar-parameter name="data_pagamento" id="6703">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">boolean</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">False</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">check-box</property>
+            <structure name="format"/>
+        </scalar-parameter>
+        <scalar-parameter name="exercicio_retencao" id="6752">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-    extensionProperties.odaDriverClass = params["db_driver"].value;
-    extensionProperties.odaURL = params["db_conn_url"].value;
-    extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ds_retencoes" id="1196">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[this.queryText = "\n        SELECT    ordem_pagamento.dt_emissao";
+            <method name="beforeOpen"><![CDATA[this.queryText = "\n        SELECT DISTINCT   ";
+this.queryText +="\n                  ordem_pagamento.dt_emissao";
 this.queryText +="\n              ,   ordem_pagamento_retencao.cod_plano";
 this.queryText +="\n              ,   receita_orcamentaria.nom_conta ";
 this.queryText +="\n              ,   receita.cod_receita";
@@ -251,8 +280,15 @@ this.queryText +="\n              ,   ordem_pagamento_retencao.vl_retencao";
 this.queryText +="\n              ,   case when receita.cod_receita is null then";
 this.queryText +="\n                       'E'";
 this.queryText +="\n                  else";
-this.queryText +="\n                       'O'";
-this.queryText +="\n                  end AS tipo";
+this.queryText +="\n                       'O' ";
+this.queryText +="\n                  end AS tipo ";
+this.queryText +="\n 			  , (SELECT  TO_CHAR(MAX(timestamp),'dd/mm/yyyy') ";
+this.queryText +="\n                        from empenho.nota_liquidacao_paga  ";
+this.queryText +="\n                        where nota_liquidacao_paga.cod_nota   = nota_liquidacao.cod_nota ";
+this.queryText +="\n                        AND nota_liquidacao_paga.exercicio    = nota_liquidacao.exercicio ";
+this.queryText +="\n                        AND nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade ";
+this.queryText +="\n                ) as data_pagamento ";
+
 this.queryText +="\n          FROM empenho.ordem_pagamento_retencao";
 this.queryText +="\n          ";
 
@@ -344,7 +380,7 @@ this.queryText += "\n      AND receita.exercicio = ordem_pagamento_retencao.exer
 // Filtros para realizar a busca
 this.queryText += "\n";
 this.queryText += "\n WHERE ordem_pagamento.dt_emissao BETWEEN to_date('"+params['data_inicial']+"', 'dd/mm/yyyy') AND to_date('"+params['data_final']+"', 'dd/mm/yyyy')";
-this.queryText += "\n  AND ordem_pagamento_retencao.exercicio = '"+params['exercicio']+"'";
+this.queryText += "\n  AND ordem_pagamento_retencao.exercicio = '"+params['exercicio_retencao']+"'";
 this.queryText += "\n  AND ordem_pagamento_retencao.cod_entidade IN ("+params['entidade_retencao']+")";
 
 // Retira os dados que são orçamentários
@@ -465,91 +501,19 @@ if (params['ordenacao'] == 'empenho') {
 	this.queryText += "\n ORDER BY receita.cod_receita, ordem_pagamento.dt_emissao";
 } else if (params['ordenacao'] == 'credor') {
 	this.queryText += "\n ORDER BY nom_credor, ordem_pagamento.dt_emissao";
+} else if ( (params['ordenacao'] == 'data_pagamento') &amp;&amp; (params['situacao'] == 2) ) {
+	this.queryText += "\n ORDER BY ordem_pagamento.dt_emissao, nota_liquidacao.cod_empenho";
+} else if (params['ordenacao'] == 'data_pagamento') {
+	this.queryText += "\n ORDER BY data_pagamento, nota_liquidacao.cod_empenho, ordem_pagamento.dt_emissao ";
 } else {
 	this.queryText += "\n ORDER BY ordem_pagamento.dt_emissao, nota_liquidacao.cod_empenho";
 }
 
 params['sql'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[      SELECT    ordem_pagamento.dt_emissao
-           ,   ordem_pagamento_retencao.cod_plano
-           ,   receita_orcamentaria.nom_conta 
-           ,   receita.cod_receita
-           ,   receita.descricao
-           ,   case when receita.cod_receita is null then
-                    ordem_pagamento_retencao.cod_plano||' - '||receita_orcamentaria.nom_conta
-               else
-                    receita.cod_receita||' - '||receita.descricao 
-               end AS receita
-           ,   nota_liquidacao.cod_empenho
-           ,   empenho.cod_empenho||'/'||empenho.exercicio AS empenho
-           ,   ordem_pagamento.cod_ordem
-           ,   ordem_pagamento.cod_ordem||'/'||ordem_pagamento_retencao.exercicio AS ordem
-           ,   pre_empenho.cgm_beneficiario AS cod_credor
-           ,   sw_cgm.nom_cgm AS nom_credor
-           ,	  pre_empenho.cgm_beneficiario||' - '||sw_cgm.nom_cgm AS credor
-           ,   ordem_pagamento_retencao.vl_retencao
-           ,   ordem_pagamento.tipo
-       FROM empenho.ordem_pagamento_retencao
-       
- INNER JOIN (
-                 SELECT  plano_analitica.cod_plano
-                     ,   receita.cod_receita
-                     ,   receita.cod_entidade
-                     ,   plano_analitica.exercicio
-                    ,   conta_receita.descricao
-                   FROM  orcamento.receita
-             INNER JOIN  orcamento.conta_receita
-                     ON  conta_receita.cod_conta = receita.cod_conta                                   
-                    AND  conta_receita.exercicio = receita.exercicio
-             INNER JOIN  contabilidade.plano_conta                            
-                     ON  plano_conta.cod_estrutural = '4.'||conta_receita.cod_estrutural 
-                    AND  plano_conta.exercicio      = conta_receita.exercicio            
-             INNER JOIN  contabilidade.plano_analitica                        
-                     ON  plano_analitica.cod_conta = plano_conta.cod_conta
-                    AND  plano_analitica.exercicio = plano_conta.exercicio
-             ) AS receita
-         ON receita.exercicio = ordem_pagamento_retencao.exercicio
-        AND receita.cod_plano = ordem_pagamento_retencao.cod_plano
-        
- INNER JOIN (
-                 SELECT  plano_analitica.cod_plano
-                     ,   plano_analitica.exercicio
-                     ,   plano_conta.nom_conta
-             	    FROM  contabilidade.plano_analitica   
-             INNER JOIN  contabilidade.plano_conta   
-                     ON  plano_analitica.cod_conta = plano_conta.cod_conta
-                    AND  plano_analitica.exercicio = plano_conta.exercicio
-             ) AS receita_orcamentaria
-         ON receita_orcamentaria.exercicio = ordem_pagamento_retencao.exercicio
-        AND receita_orcamentaria.cod_plano = ordem_pagamento_retencao.cod_plano
-        	
- INNER JOIN empenho.ordem_pagamento
-         ON ordem_pagamento.cod_ordem    = ordem_pagamento_retencao.cod_ordem    
-        AND ordem_pagamento.exercicio    = ordem_pagamento_retencao.exercicio    
-        AND ordem_pagamento.cod_entidade = ordem_pagamento_retencao.cod_entidade
-        
- INNER JOIN empenho.pagamento_liquidacao
-         ON pagamento_liquidacao.cod_ordem    = ordem_pagamento.cod_ordem    
-        AND pagamento_liquidacao.exercicio    = ordem_pagamento.exercicio    
-        AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
-        
- INNER JOIN empenho.nota_liquidacao
-         ON nota_liquidacao.exercicio    = pagamento_liquidacao.exercicio_liquidacao
-        AND nota_liquidacao.cod_entidade = pagamento_liquidacao.cod_entidade
-        AND nota_liquidacao.cod_nota     = pagamento_liquidacao.cod_nota
- 
- INNER JOIN empenho.empenho
-         ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
-        AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
-        AND empenho.cod_entidade = nota_liquidacao.cod_entidade
- 
- INNER JOIN empenho.pre_empenho
-         ON pre_empenho.exercicio       = empenho.exercicio
-        AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
- 
- INNER JOIN sw_cgm
-         ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[select 
+from ]]></xml-property>
         </oda-data-set>
     </data-sets>
     <styles>
@@ -716,7 +680,11 @@ params['sql'] = this.queryText;]]></method>
             <list-property name="visibility">
                 <structure>
                     <property name="format">all</property>
-                    <expression name="valueExpr">params['ordenacao'] != ''</expression>
+                    <expression name="valueExpr" type="javascript">if ( (params['ordenacao'] == '') || (params['ordenacao'] == 'data_pagamento') ){
+	false
+}else{
+	true
+}</expression>
                 </structure>
             </list-property>
             <list-property name="boundDataColumns">
@@ -787,7 +755,7 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">agg_total_dia</property>
-                    <property name="displayName">agg_total_dia</property>
+                    <text-property name="displayName">agg_total_dia</text-property>
                     <expression name="expression">row["vl_retencao"]</expression>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
@@ -797,19 +765,42 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">total_dia</property>
-                    <property name="displayName">total_dia</property>
+                    <text-property name="displayName">total_dia</text-property>
                     <expression name="expression">row["agg_total_dia"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">total_periodo</property>
-                    <property name="displayName">total_periodo</property>
+                    <text-property name="displayName">total_periodo</text-property>
                     <expression name="expression">Total.sum(dataSetRow['vl_retencao'])</expression>
                     <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_pagamento</property>
+                    <expression name="expression" type="javascript">if ( dataSetRow['data_pagamento'] == null ){
+ 	'À Pagar'
+}else{
+	dataSetRow['data_pagamento']
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
             <column id="1267">
+                <property name="width">7%</property>
+            </column>
+            <column id="6720">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">if ( (params['data_pagamento'] == true) &amp;&amp; (params['situacao'] != 2 ) ){
+	false
+}else{
+	true
+}</expression>
+                    </structure>
+                </list-property>
                 <property name="width">7%</property>
             </column>
             <column id="1268">
@@ -832,13 +823,20 @@ params['sql'] = this.queryText;]]></method>
             </column>
             <header>
                 <row id="1246">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1247">
                         <text id="1273">
                             <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Data]]></text-property>
+                            <text-property name="content"><![CDATA[Data Emissão]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="6715">
+                        <text id="6721">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Data Pagamento]]></text-property>
                         </text>
                     </cell>
                     <cell id="1248">
@@ -918,6 +916,7 @@ params['sql'] = this.queryText;]]></method>
                 </list-property>
                 <header>
                     <row id="1765">
+                        <property name="verticalAlign">middle</property>
                         <cell id="1766">
                             <data id="1781">
                                 <property name="paddingTop">1pt</property>
@@ -929,6 +928,7 @@ params['sql'] = this.queryText;]]></method>
                                 <property name="resultSetColumn">dt_emissao</property>
                             </data>
                         </cell>
+                        <cell id="6716"/>
                         <cell id="1767"/>
                         <cell id="1768"/>
                         <cell id="1769"/>
@@ -940,6 +940,7 @@ params['sql'] = this.queryText;]]></method>
                 <footer>
                     <row id="1773">
                         <cell id="1774"/>
+                        <cell id="6718"/>
                         <cell id="1775"/>
                         <cell id="1776"/>
                         <cell id="1777"/>
@@ -968,9 +969,54 @@ params['sql'] = this.queryText;]]></method>
                     </row>
                 </footer>
             </group>
+            <group id="6755">
+                <property name="groupName">groupDataPagamento</property>
+                <expression name="keyExpr" type="javascript">row["dt_pagamento"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_pagamento"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6756">
+                        <cell id="6757"/>
+                        <cell id="6758">
+                            <data id="6723">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                    <property name="locale">pt_BR</property>
+                                </structure>
+                                <structure name="stringFormat">
+                                    <property name="category">Custom</property>
+                                </structure>
+                                <property name="resultSetColumn">dt_pagamento</property>
+                            </data>
+                        </cell>
+                        <cell id="6759"/>
+                        <cell id="6760"/>
+                        <cell id="6761"/>
+                        <cell id="6762"/>
+                        <cell id="6763"/>
+                        <cell id="6764"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6765">
+                        <cell id="6766"/>
+                        <cell id="6767"/>
+                        <cell id="6768"/>
+                        <cell id="6769"/>
+                        <cell id="6770"/>
+                        <cell id="6771"/>
+                        <cell id="6772"/>
+                        <cell id="6773"/>
+                    </row>
+                </footer>
+            </group>
             <detail>
                 <row id="1253">
                     <cell id="1254"/>
+                    <cell id="6717"/>
                     <cell id="1255">
                         <data id="1782">
                             <property name="resultSetColumn">receita</property>
@@ -1015,6 +1061,7 @@ params['sql'] = this.queryText;]]></method>
                 <row id="1260">
                     <property name="height">0.4897959184in</property>
                     <cell id="1261"/>
+                    <cell id="6719"/>
                     <cell id="1262"/>
                     <cell id="1263"/>
                     <cell id="1264"/>
@@ -1129,7 +1176,7 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">agg_total_dia_empenho</property>
-                    <property name="displayName">agg_total_dia_empenho</property>
+                    <text-property name="displayName">agg_total_dia_empenho</text-property>
                     <expression name="expression">dataSetRow["vl_retencao"]</expression>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
@@ -1139,15 +1186,25 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">tota_dia</property>
-                    <property name="displayName">total_dia</property>
+                    <text-property name="displayName">total_dia</text-property>
                     <expression name="expression">row["agg_total_dia_empenho"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">total_periodo</property>
-                    <property name="displayName">total_periodo</property>
+                    <text-property name="displayName">total_periodo</text-property>
                     <expression name="expression">Total.sum(dataSetRow['vl_retencao'])</expression>
                     <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_pagamento</property>
+                    <expression name="expression" type="javascript">if ( dataSetRow['data_pagamento'] == null ){
+ 	'À Pagar'
+}else{
+	dataSetRow['data_pagamento']
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -1155,6 +1212,19 @@ params['sql'] = this.queryText;]]></method>
                 <property name="width">7.5%</property>
             </column>
             <column id="1854">
+                <property name="width">7%</property>
+            </column>
+            <column id="6731">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">if (params['data_pagamento'] == true){
+	false
+}else{
+	true
+}</expression>
+                    </structure>
+                </list-property>
                 <property name="width">7%</property>
             </column>
             <column id="1855">
@@ -1174,6 +1244,7 @@ params['sql'] = this.queryText;]]></method>
             </column>
             <header>
                 <row id="1794">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1795">
                         <text id="1800">
                             <property name="fontFamily">sans-serif</property>
@@ -1189,7 +1260,13 @@ params['sql'] = this.queryText;]]></method>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Data]]></text-property>
+                            <text-property name="content"><![CDATA[Data Emissão]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="6726">
+                        <text id="6732">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Data Pagamento]]></text-property>
                         </text>
                     </cell>
                     <cell id="1799">
@@ -1260,6 +1337,7 @@ params['sql'] = this.queryText;]]></method>
                 </list-property>
                 <header>
                     <row id="1810">
+                        <property name="verticalAlign">middle</property>
                         <cell id="1811">
                             <data id="1834">
                                 <property name="textAlign">center</property>
@@ -1267,6 +1345,7 @@ params['sql'] = this.queryText;]]></method>
                             </data>
                         </cell>
                         <cell id="1813"/>
+                        <cell id="6727"/>
                         <cell id="1814"/>
                         <cell id="1815"/>
                         <cell id="1816"/>
@@ -1278,6 +1357,7 @@ params['sql'] = this.queryText;]]></method>
                     <row id="1819">
                         <cell id="1820"/>
                         <cell id="1821"/>
+                        <cell id="6729"/>
                         <cell id="1822"/>
                         <cell id="1823"/>
                         <cell id="1824">
@@ -1305,20 +1385,95 @@ params['sql'] = this.queryText;]]></method>
                     </row>
                 </footer>
             </group>
+            <group id="6775">
+                <property name="groupName">groupDataEmissao</property>
+                <expression name="keyExpr" type="javascript">row["dt_emissao"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_emissao"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6776">
+                        <cell id="6777"/>
+                        <cell id="6778">
+                            <data id="1812">
+                                <property name="paddingTop">1pt</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                </structure>
+                                <property name="textAlign">center</property>
+                                <property name="resultSetColumn">dt_emissao</property>
+                            </data>
+                        </cell>
+                        <cell id="6779"/>
+                        <cell id="6780"/>
+                        <cell id="6781"/>
+                        <cell id="6782"/>
+                        <cell id="6783"/>
+                        <cell id="6784"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6785">
+                        <cell id="6786"/>
+                        <cell id="6787"/>
+                        <cell id="6788"/>
+                        <cell id="6789"/>
+                        <cell id="6790"/>
+                        <cell id="6791"/>
+                        <cell id="6792"/>
+                        <cell id="6793"/>
+                    </row>
+                </footer>
+            </group>
+            <group id="6836">
+                <property name="groupName">groupDataPagamento</property>
+                <expression name="keyExpr" type="javascript">row["dt_pagamento"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_pagamento"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6837">
+                        <cell id="6838"/>
+                        <cell id="6839"/>
+                        <cell id="6840">
+                            <data id="6734">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                    <property name="locale">pt_BR</property>
+                                </structure>
+                                <property name="resultSetColumn">dt_pagamento</property>
+                            </data>
+                        </cell>
+                        <cell id="6841"/>
+                        <cell id="6842"/>
+                        <cell id="6843"/>
+                        <cell id="6844"/>
+                        <cell id="6845"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6846">
+                        <cell id="6847"/>
+                        <cell id="6848"/>
+                        <cell id="6849"/>
+                        <cell id="6850"/>
+                        <cell id="6851"/>
+                        <cell id="6852"/>
+                        <cell id="6853"/>
+                        <cell id="6854"/>
+                    </row>
+                </footer>
+            </group>
             <detail>
                 <row id="1829">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1830"/>
-                    <cell id="1831">
-                        <data id="1812">
-                            <property name="paddingTop">1pt</property>
-                            <structure name="dateTimeFormat">
-                                <property name="category">Medium Date</property>
-                                <property name="pattern">Medium Date</property>
-                            </structure>
-                            <property name="textAlign">center</property>
-                            <property name="resultSetColumn">dt_emissao</property>
-                        </data>
-                    </cell>
+                    <cell id="1831"/>
+                    <cell id="6728"/>
                     <cell id="1833">
                         <data id="1832">
                             <property name="resultSetColumn">receita</property>
@@ -1358,6 +1513,7 @@ params['sql'] = this.queryText;]]></method>
                     <property name="height">0.4897959184in</property>
                     <cell id="1844"/>
                     <cell id="1845"/>
+                    <cell id="6730"/>
                     <cell id="1846"/>
                     <cell id="1847"/>
                     <cell id="1848">
@@ -1465,7 +1621,7 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">agg_total_dia_receita</property>
-                    <property name="displayName">agg_total_dia_receita</property>
+                    <text-property name="displayName">agg_total_dia_receita</text-property>
                     <expression name="expression">dataSetRow["vl_retencao"]</expression>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
@@ -1475,15 +1631,25 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">total_dia</property>
-                    <property name="displayName">total_dia</property>
+                    <text-property name="displayName">total_dia</text-property>
                     <expression name="expression">row["agg_total_dia_receita"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">total_periodo</property>
-                    <property name="displayName">total_periodo</property>
+                    <text-property name="displayName">total_periodo</text-property>
                     <expression name="expression">Total.sum(dataSetRow['vl_retencao'])</expression>
                     <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_pagamento</property>
+                    <expression name="expression" type="javascript">if ( dataSetRow['data_pagamento'] == null ){
+ 	'À Pagar'
+}else{
+	dataSetRow['data_pagamento']
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -1491,6 +1657,19 @@ params['sql'] = this.queryText;]]></method>
                 <property name="width">31.5%</property>
             </column>
             <column id="1923">
+                <property name="width">7%</property>
+            </column>
+            <column id="6740">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">if (params['data_pagamento'] == true){
+	false
+}else{
+	true
+}</expression>
+                    </structure>
+                </list-property>
                 <property name="width">7%</property>
             </column>
             <column id="1924">
@@ -1510,6 +1689,7 @@ params['sql'] = this.queryText;]]></method>
             </column>
             <header>
                 <row id="1863">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1864">
                         <text id="1869">
                             <property name="fontFamily">sans-serif</property>
@@ -1525,7 +1705,13 @@ params['sql'] = this.queryText;]]></method>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Data]]></text-property>
+                            <text-property name="content"><![CDATA[Data Emissão]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="6735">
+                        <text id="6741">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Data Pagamento]]></text-property>
                         </text>
                     </cell>
                     <cell id="1868">
@@ -1596,12 +1782,14 @@ params['sql'] = this.queryText;]]></method>
                 </list-property>
                 <header>
                     <row id="1930">
+                        <property name="verticalAlign">middle</property>
                         <cell id="1931">
                             <data id="1903">
                                 <property name="resultSetColumn">receita</property>
                             </data>
                         </cell>
                         <cell id="1932"/>
+                        <cell id="6736"/>
                         <cell id="1933"/>
                         <cell id="1934"/>
                         <cell id="1935"/>
@@ -1613,6 +1801,7 @@ params['sql'] = this.queryText;]]></method>
                     <row id="1938">
                         <cell id="1939"/>
                         <cell id="1940"/>
+                        <cell id="6738"/>
                         <cell id="1941"/>
                         <cell id="1942"/>
                         <cell id="1943">
@@ -1640,20 +1829,95 @@ params['sql'] = this.queryText;]]></method>
                     </row>
                 </footer>
             </group>
+            <group id="6795">
+                <property name="groupName">groupDataEmissao</property>
+                <expression name="keyExpr" type="javascript">row["dt_emissao"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_emissao"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6796">
+                        <cell id="6797"/>
+                        <cell id="6798">
+                            <data id="1901">
+                                <property name="paddingTop">1pt</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                </structure>
+                                <property name="textAlign">center</property>
+                                <property name="resultSetColumn">dt_emissao</property>
+                            </data>
+                        </cell>
+                        <cell id="6799"/>
+                        <cell id="6800"/>
+                        <cell id="6801"/>
+                        <cell id="6802"/>
+                        <cell id="6803"/>
+                        <cell id="6804"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6805">
+                        <cell id="6806"/>
+                        <cell id="6807"/>
+                        <cell id="6808"/>
+                        <cell id="6809"/>
+                        <cell id="6810"/>
+                        <cell id="6811"/>
+                        <cell id="6812"/>
+                        <cell id="6813"/>
+                    </row>
+                </footer>
+            </group>
+            <group id="6878">
+                <property name="groupName">groupDataPagamento</property>
+                <expression name="keyExpr" type="javascript">row["dt_pagamento"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_pagamento"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6879">
+                        <cell id="6880"/>
+                        <cell id="6881"/>
+                        <cell id="6882">
+                            <data id="6742">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                    <property name="locale">pt_BR</property>
+                                </structure>
+                                <property name="resultSetColumn">dt_pagamento</property>
+                            </data>
+                        </cell>
+                        <cell id="6883"/>
+                        <cell id="6884"/>
+                        <cell id="6885"/>
+                        <cell id="6886"/>
+                        <cell id="6887"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6888">
+                        <cell id="6889"/>
+                        <cell id="6890"/>
+                        <cell id="6891"/>
+                        <cell id="6892"/>
+                        <cell id="6893"/>
+                        <cell id="6894"/>
+                        <cell id="6895"/>
+                        <cell id="6896"/>
+                    </row>
+                </footer>
+            </group>
             <detail>
                 <row id="1898">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1899"/>
-                    <cell id="1900">
-                        <data id="1901">
-                            <property name="paddingTop">1pt</property>
-                            <structure name="dateTimeFormat">
-                                <property name="category">Medium Date</property>
-                                <property name="pattern">Medium Date</property>
-                            </structure>
-                            <property name="textAlign">center</property>
-                            <property name="resultSetColumn">dt_emissao</property>
-                        </data>
-                    </cell>
+                    <cell id="1900"/>
+                    <cell id="6737"/>
                     <cell id="1902">
                         <data id="1947">
                             <property name="textAlign">center</property>
@@ -1694,6 +1958,7 @@ params['sql'] = this.queryText;]]></method>
                     <property name="height">0.4897959184in</property>
                     <cell id="1913"/>
                     <cell id="1914"/>
+                    <cell id="6739"/>
                     <cell id="1915"/>
                     <cell id="1916"/>
                     <cell id="1917">
@@ -1801,7 +2066,7 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">agg_total_dia_credor</property>
-                    <property name="displayName">agg_total_dia_credor</property>
+                    <text-property name="displayName">agg_total_dia_credor</text-property>
                     <expression name="expression">dataSetRow["vl_retencao"]</expression>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
@@ -1811,21 +2076,31 @@ params['sql'] = this.queryText;]]></method>
                 </structure>
                 <structure>
                     <property name="name">total_dia</property>
-                    <property name="displayName">total_dia</property>
+                    <text-property name="displayName">total_dia</text-property>
                     <expression name="expression">row["agg_total_dia_credor"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">nom_credor</property>
-                    <property name="displayName">nom_credor</property>
+                    <text-property name="displayName">nom_credor</text-property>
                     <expression name="expression">dataSetRow['nom_credor']</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">total_periodo</property>
-                    <property name="displayName">total_periodo</property>
+                    <text-property name="displayName">total_periodo</text-property>
                     <expression name="expression">Total.sum(dataSetRow['vl_retencao'])</expression>
                     <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_pagamento</property>
+                    <expression name="expression" type="javascript">if ( dataSetRow['data_pagamento'] == null ){
+ 	'À Pagar'
+}else{
+	dataSetRow['data_pagamento']
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -1833,6 +2108,19 @@ params['sql'] = this.queryText;]]></method>
                 <property name="width">32.5%</property>
             </column>
             <column id="2012">
+                <property name="width">7%</property>
+            </column>
+            <column id="6748">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">if (params['data_pagamento'] == true){
+	false
+}else{
+	true
+}</expression>
+                    </structure>
+                </list-property>
                 <property name="width">7%</property>
             </column>
             <column id="2013">
@@ -1852,6 +2140,7 @@ params['sql'] = this.queryText;]]></method>
             </column>
             <header>
                 <row id="1952">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1953">
                         <text id="1962">
                             <property name="fontFamily">sans-serif</property>
@@ -1867,7 +2156,13 @@ params['sql'] = this.queryText;]]></method>
                             <property name="fontSize">7pt</property>
                             <property name="textAlign">center</property>
                             <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Data]]></text-property>
+                            <text-property name="content"><![CDATA[Data Emissão]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="6743">
+                        <text id="6749">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Data Pagamento]]></text-property>
                         </text>
                     </cell>
                     <cell id="1957">
@@ -1938,12 +2233,14 @@ params['sql'] = this.queryText;]]></method>
                 </list-property>
                 <header>
                     <row id="2019">
+                        <property name="verticalAlign">middle</property>
                         <cell id="2020">
                             <data id="1996">
                                 <property name="resultSetColumn">credor</property>
                             </data>
                         </cell>
                         <cell id="2021"/>
+                        <cell id="6744"/>
                         <cell id="2022"/>
                         <cell id="2023"/>
                         <cell id="2024"/>
@@ -1955,6 +2252,7 @@ params['sql'] = this.queryText;]]></method>
                     <row id="2027">
                         <cell id="2028"/>
                         <cell id="2029"/>
+                        <cell id="6746"/>
                         <cell id="2030"/>
                         <cell id="2031">
                             <property name="colSpan">2</property>
@@ -1983,20 +2281,95 @@ params['sql'] = this.queryText;]]></method>
                     </row>
                 </footer>
             </group>
+            <group id="6815">
+                <property name="groupName">groupDataEmissao</property>
+                <expression name="keyExpr" type="javascript">row["dt_emissao"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_emissao"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6816">
+                        <cell id="6817"/>
+                        <cell id="6818">
+                            <data id="1990">
+                                <property name="paddingTop">1pt</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                </structure>
+                                <property name="textAlign">center</property>
+                                <property name="resultSetColumn">dt_emissao</property>
+                            </data>
+                        </cell>
+                        <cell id="6819"/>
+                        <cell id="6820"/>
+                        <cell id="6821"/>
+                        <cell id="6822"/>
+                        <cell id="6823"/>
+                        <cell id="6824"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6825">
+                        <cell id="6826"/>
+                        <cell id="6827"/>
+                        <cell id="6828"/>
+                        <cell id="6829"/>
+                        <cell id="6830"/>
+                        <cell id="6831"/>
+                        <cell id="6832"/>
+                        <cell id="6833"/>
+                    </row>
+                </footer>
+            </group>
+            <group id="6857">
+                <property name="groupName">groupDataPagamento</property>
+                <expression name="keyExpr" type="javascript">row["dt_pagamento"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["dt_pagamento"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="6858">
+                        <cell id="6859"/>
+                        <cell id="6860"/>
+                        <cell id="6861">
+                            <data id="6750">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Medium Date</property>
+                                    <property name="pattern">Medium Date</property>
+                                    <property name="locale">pt_BR</property>
+                                </structure>
+                                <property name="resultSetColumn">dt_pagamento</property>
+                            </data>
+                        </cell>
+                        <cell id="6862"/>
+                        <cell id="6863"/>
+                        <cell id="6864"/>
+                        <cell id="6865"/>
+                        <cell id="6866"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="6867">
+                        <cell id="6868"/>
+                        <cell id="6869"/>
+                        <cell id="6870"/>
+                        <cell id="6871"/>
+                        <cell id="6872"/>
+                        <cell id="6873"/>
+                        <cell id="6874"/>
+                        <cell id="6875"/>
+                    </row>
+                </footer>
+            </group>
             <detail>
                 <row id="1987">
+                    <property name="verticalAlign">middle</property>
                     <cell id="1988"/>
-                    <cell id="1989">
-                        <data id="1990">
-                            <property name="paddingTop">1pt</property>
-                            <structure name="dateTimeFormat">
-                                <property name="category">Medium Date</property>
-                                <property name="pattern">Medium Date</property>
-                            </structure>
-                            <property name="textAlign">center</property>
-                            <property name="resultSetColumn">dt_emissao</property>
-                        </data>
-                    </cell>
+                    <cell id="1989"/>
+                    <cell id="6745"/>
                     <cell id="1991">
                         <data id="2036">
                             <property name="resultSetColumn">receita</property>
@@ -2037,6 +2410,7 @@ params['sql'] = this.queryText;]]></method>
                     <property name="height">0.4897959184in</property>
                     <cell id="2002"/>
                     <cell id="2003"/>
+                    <cell id="6747"/>
                     <cell id="2004"/>
                     <cell id="2005">
                         <property name="colSpan">2</property>
@@ -2135,7 +2509,9 @@ params['sql'] = this.queryText;]]></method>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">exercicio</property>
-                                <expression name="expression">params["exercicio"]</expression>
+                                <expression name="expression" type="javascript">params["exercicio_retencao"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="resultSetColumn">exercicio</property>
@@ -2342,7 +2718,7 @@ params['sql'] = this.queryText;]]></method>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">receita</property>
-                                <property name="displayName">receita</property>
+                                <text-property name="displayName">receita</text-property>
                                 <expression name="expression">if (params["receita"] == 'orcamentaria') {
 	'Orçamentária'
 } else {
@@ -2498,18 +2874,55 @@ params['sql'] = this.queryText;]]></method>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">ordenacao</property>
-                                <property name="displayName">Por Nro de OP</property>
-                                <expression name="expression">if (params['ordenacao'] == "empenho") {
+                                <text-property name="displayName">Por Nro de OP</text-property>
+                                <expression name="expression" type="javascript">if (params['ordenacao'] == "empenho") {
    'Empenho'
 }else if (params['ordenacao'] == "receita") {
 	'Receita'
 } else if (params['ordenacao'] == "credor"){
 	'Credor'
+} else if (params['ordenacao'] == "data_pagamento"){
+	'Data'
 }</expression>
                                 <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="resultSetColumn">ordenacao</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="6704">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr">params['ordenacao'] == ""</expression>
+                    </structure>
+                </list-property>
+                <cell id="6705">
+                    <text id="6707">
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">7pt</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="contentType">auto</property>
+                        <text-property name="content"><![CDATA[Mostrar data de pagamento : ]]></text-property>
+                    </text>
+                </cell>
+                <cell id="6706">
+                    <data id="6708">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">data_pagamento</property>
+                                <expression name="expression" type="javascript">if (params["data_pagamento"] == true){
+	'Sim'
+}else{
+ 	'Não'
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">data_pagamento</property>
                     </data>
                 </cell>
             </row>

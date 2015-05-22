@@ -148,21 +148,6 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
@@ -170,36 +155,6 @@
             <property name="dataType">string</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -732,17 +687,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ) {
-	extensionProperties.odaDriverClass = params["db_driver"].value;
-	extensionProperties.odaURL = params["db_conn_url"].value;
-	extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_231.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="receitas_ensino" id="1150">
@@ -752,8 +698,10 @@ this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_receitas";
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_ensino', '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_ensino', "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_ensino', "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	subgrupo INTEGER ,                       \n ";
 this.queryText += "	item INTEGER ,                           \n ";
@@ -853,8 +801,10 @@ this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_receitas";
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'outras_receitas_ensino', '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'outras_receitas_ensino', "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'outras_receitas_ensino', "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	subgrupo INTEGER ,                       \n ";
 this.queryText += "	item INTEGER ,                           \n ";
@@ -1129,8 +1079,10 @@ this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_receitas";
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_fundeb', '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_fundeb', "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 'receitas_fundeb', "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	subgrupo INTEGER ,                       \n ";
 this.queryText += "	item INTEGER ,                           \n ";
@@ -1405,8 +1357,10 @@ this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_despesas";
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 1, '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 1, "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 1, "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	nivel INTEGER ,                           \n ";
 this.queryText += "	descricao VARCHAR ,                 \n ";
@@ -1681,10 +1635,13 @@ params['query'] = this.queryText;]]></method>
             <method name="beforeOpen"><![CDATA[this.queryText  = "SELECT                                    \n ";
 this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_despesas";
+
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 2, '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 2, "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 2, "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	nivel INTEGER ,                           \n ";
 this.queryText += "	descricao VARCHAR ,                 \n ";
@@ -1952,8 +1909,10 @@ this.queryText += "	*                                        \n ";
 this.queryText += "FROM stn.fn_rreo_anexo10_despesas";
 if (params["exercicio"] > 2012) {
     this.queryText += "_novo";
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 3, '"+params["dt_inicio"]+"', '"+params["dt_final"]+"') AS (  \n ";
+} else {
+	this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 3, "+params["bimestre"]+") AS (  \n ";
 }
-this.queryText += "('"+params["exercicio"]+"', '"+params["entidade"]+"', 3, "+params["bimestre"]+") AS (  \n ";
 this.queryText += "	grupo INTEGER ,                          \n ";
 this.queryText += "	nivel INTEGER ,                           \n ";
 this.queryText += "	descricao VARCHAR ,                 \n ";
@@ -2227,9 +2186,9 @@ this.queryText += ");                                        \n ";]]></method>
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">bimestre</property>
+                    <property name="paramName">dt_final</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
@@ -2255,112 +2214,10 @@ this.queryText += ");                                        \n ";]]></method>
     saldo, 
     cancelado  
 FROM
-    stn.fn_rreo_anexo10_restos(?, ?, ?) AS (
+    stn.fn_rreo_anexo10_restos_novo(?, ?, ?) AS (
     saldo NUMERIC(14,2) ,
     cancelado NUMERIC(14,2) 
 );]]></xml-property>
-            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
-  <Version>1.0</Version>
-  <design:DataSetParameters>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>1</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-        <design:uiHints/>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultValues>
-            <design:values>JS_EXPR</design:values>
-          </design:defaultValues>
-          <design:optional>false</design:optional>
-          <design:masksValue>false</design:masksValue>
-          <design:uiHints>
-            <design:promptStyle>TextField</design:promptStyle>
-          </design:uiHints>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>2</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-        <design:uiHints/>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:optional>false</design:optional>
-          <design:masksValue>false</design:masksValue>
-          <design:uiHints>
-            <design:promptStyle>TextField</design:promptStyle>
-          </design:uiHints>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>3</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-        <design:uiHints/>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultValues>
-            <design:values>JS_EXPR</design:values>
-          </design:defaultValues>
-          <design:optional>false</design:optional>
-          <design:masksValue>false</design:masksValue>
-          <design:uiHints>
-            <design:promptStyle>TextField</design:promptStyle>
-          </design:uiHints>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-  </design:DataSetParameters>
-  <design:ResultSets derivedMetaData="true">
-    <design:resultSetDefinitions>
-      <design:resultSetColumns>
-        <design:resultColumnDefinitions>
-          <design:attributes>
-            <design:identifier>
-              <design:name>valor</design:name>
-              <design:position>1</design:position>
-            </design:identifier>
-            <design:nativeDataTypeCode>2</design:nativeDataTypeCode>
-            <design:precision>14</design:precision>
-            <design:scale>2</design:scale>
-            <design:nullability>Unknown</design:nullability>
-            <design:uiHints>
-              <design:displayName>valor</design:displayName>
-            </design:uiHints>
-          </design:attributes>
-          <design:usageHints>
-            <design:label>valor</design:label>
-            <design:formattingHints>
-              <design:displaySize>16</design:displaySize>
-            </design:formattingHints>
-          </design:usageHints>
-        </design:resultColumnDefinitions>
-      </design:resultSetColumns>
-    </design:resultSetDefinitions>
-  </design:ResultSets>
-</model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="saldo_financeiro_fundeb_ex_ant" id="2008">
             <list-property name="parameters">
@@ -2377,9 +2234,9 @@ FROM
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">bimestre</property>
+                    <property name="paramName">dt_final</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
@@ -2531,9 +2388,9 @@ FROM
                 </structure>
                 <structure>
                     <property name="name">param_2</property>
-                    <property name="paramName">bimestre</property>
+                    <property name="paramName">dt_final</property>
                     <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
                     <property name="nativeDataType">4</property>
                     <property name="position">2</property>
                     <property name="isOptional">false</property>
@@ -9958,41 +9815,6 @@ exAtual.parseInt</expression>
         </data>
         <grid name="assinaturas" id="2380" extends="urbem_231.assinaturas">
             <property name="marginTop">50pt</property>
-            <overridden-values>
-                <ref-entry baseId="1215" id="2381"/>
-                <ref-entry baseId="1150" id="2382"/>
-                <ref-entry baseId="1151" id="2383"/>
-                <ref-entry baseId="1152" id="2384"/>
-                <ref-entry baseId="1218" id="2385"/>
-                <ref-entry baseId="1179" id="2386"/>
-                <ref-entry baseId="1213" id="2387"/>
-                <ref-entry baseId="1180" id="1180"/>
-                <ref-entry baseId="1183" name="NewTable2" id="1183"/>
-                <ref-entry baseId="1186" id="1186"/>
-                <ref-entry baseId="1187" id="1187"/>
-                <ref-entry baseId="1188" name="NewData122" id="2388"/>
-                <ref-entry baseId="1189" name="NewData132" id="2389"/>
-                <ref-entry baseId="1192" id="2390"/>
-                <ref-entry baseId="1216" id="2391"/>
-                <ref-entry baseId="1153" id="2392"/>
-                <ref-entry baseId="1214" id="2393"/>
-                <ref-entry baseId="1154" id="2394"/>
-                <ref-entry baseId="1157" name="NewTable" id="2395"/>
-                <ref-entry baseId="1160" id="2396"/>
-                <ref-entry baseId="1161" id="2397"/>
-                <ref-entry baseId="1167" name="NewData12" id="2398"/>
-                <ref-entry baseId="1168" name="NewData13" id="2399"/>
-                <ref-entry baseId="1164" id="2400"/>
-                <ref-entry baseId="1155" id="2401"/>
-                <ref-entry baseId="1156" id="2402"/>
-                <ref-entry baseId="1169" name="NewTable1" id="2403"/>
-                <ref-entry baseId="1172" id="2404"/>
-                <ref-entry baseId="1173" id="2405"/>
-                <ref-entry baseId="1174" name="NewData121" id="2406"/>
-                <ref-entry baseId="1175" name="NewData131" id="2407"/>
-                <ref-entry baseId="1178" id="2408"/>
-                <ref-entry baseId="1217" id="2409"/>
-            </overridden-values>
         </grid>
     </body>
 </report>

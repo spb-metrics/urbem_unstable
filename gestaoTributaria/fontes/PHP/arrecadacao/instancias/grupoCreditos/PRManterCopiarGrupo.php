@@ -23,10 +23,26 @@
 */
 ?>
 <?php
+/**
+    * Página de Processamento de COPIA DE GRUPO DE CREDITO
+    * Data de Criação   : 23/05/2005
+
+    * @author Analista      : Fabio Bertoldi Rodrigues
+    * @author Desenvolvedor : Lucas Teixeira Stephanou
+
+    * @ignore
+
+    * $Id: PRManterCopiarGrupo.php 62471 2015-05-13 12:49:12Z michel $
+
+* Casos de uso: uc-05.03.02
+*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GT_ARR_MAPEAMENTO."TARRGrupoCredito.class.php"                                  );
+include_once CAM_GT_ARR_MAPEAMENTO.'TARRGrupoCredito.class.php';
+include_once CAM_GT_ARR_NEGOCIO.'RARRGrupo.class.php';
+include_once CAM_GT_ARR_MAPEAMENTO.'TARRRegraDesoneracaoGrupo.class.php';
+include_once CAM_GT_ARR_MAPEAMENTO.'TARRCreditoGrupo.class.php';
 
 $stAcao = $request->get('stAcao');
 
@@ -42,6 +58,8 @@ $pgJs          = "JS".$stPrograma.".js";
 switch ($stAcao) {
     case "alterar":
         $obTARRGrupoCredito = new TARRGrupoCredito;
+        $obRARRGrupo = new RARRGrupo;
+        
         $stFiltro = " WHERE ano_exercicio = '".$_REQUEST["inNovoExercicio"]."'";
 
         if ($_REQUEST["cmbGrupos"] > 0) {
@@ -72,9 +90,45 @@ switch ($stAcao) {
             $obTARRGrupoCredito->setDado( "cod_modulo", $val["cod_modulo"] );
             $obTARRGrupoCredito->setDado( "descricao", $val["descricao"] );
             $obTARRGrupoCredito->inclusao();
-        }
+            
+            $obTARRRegraDesoneracaoGrupo = new TARRRegraDesoneracaoGrupo;
+            $obTARRRegraDesoneracaoGrupo->setDado ( "cod_grupo", $val["cod_grupo"] );
+            $obTARRRegraDesoneracaoGrupo->setDado ( "ano_exercicio", $_REQUEST["cmbExercicio"] );
+            $obTARRRegraDesoneracaoGrupo->recuperaPorChave($rsLista);
 
-        $rsListaGrupos->proximo();
+            foreach ($rsLista->getElementos() as $key => $value ) {
+                $obTARRRegraDesoneracaoGrupo = new TARRRegraDesoneracaoGrupo;
+                $obTARRRegraDesoneracaoGrupo->setDado ( "cod_grupo"     , $val["cod_grupo"]             );
+                $obTARRRegraDesoneracaoGrupo->setDado ( "ano_exercicio" , $_REQUEST["inNovoExercicio"]  );
+                $obTARRRegraDesoneracaoGrupo->setDado ( "cod_modulo"    , $value["cod_modulo"]          );
+                $obTARRRegraDesoneracaoGrupo->setDado ( "cod_biblioteca", $value["cod_biblioteca"]      );
+                $obTARRRegraDesoneracaoGrupo->setDado ( "cod_funcao"    , $value["cod_funcao"]          );
+                $obTARRRegraDesoneracaoGrupo->inclusao();
+                
+                $rsLista->proximo();
+            }
+            
+            $obRARRGrupo->setCodGrupo( $val["cod_grupo"] );
+            $obRARRGrupo->setExercicio( $_REQUEST["cmbExercicio"] );
+            $obRARRGrupo->listarCreditos($rsCreditos);
+            
+            foreach ($rsCreditos->getElementos() as $key => $value ) {
+                $obTARRCreditoGrupo = new TARRCreditoGrupo;                
+                $obTARRCreditoGrupo->setDado ( "cod_grupo"      , $val["cod_grupo"]             );
+                $obTARRCreditoGrupo->setDado ( "cod_credito"    , $value["cod_credito"]         );
+                $obTARRCreditoGrupo->setDado ( "cod_especie"    , $value["cod_especie"]         );
+                $obTARRCreditoGrupo->setDado ( "cod_genero"     , $value["cod_genero"]          );
+                $obTARRCreditoGrupo->setDado ( "cod_natureza"   , $value["cod_natureza"]        );
+                $obTARRCreditoGrupo->setDado ( "ordem"          , $value["ordem"]  		        );
+                $obTARRCreditoGrupo->setDado ( "desconto"       , $value["desconto"]            );
+                $obTARRCreditoGrupo->setDado ( "ano_exercicio"  , $_REQUEST["inNovoExercicio"]  );
+                $obTARRCreditoGrupo->inclusao();
+                
+                $rsCreditos->proximo();
+            }
+            
+            $rsListaGrupos->proximo();
+        }
 
         Sessao::encerraExcecao();
         sistemaLegado::alertaAviso( "FMManterCopiarGrupo.php?".Sessao::getId()."&stAcao=alterar","Total de Grupos: ".$rsListaGrupos->getNumLinhas(),"incluir","aviso", Sessao::getId(), "../" );

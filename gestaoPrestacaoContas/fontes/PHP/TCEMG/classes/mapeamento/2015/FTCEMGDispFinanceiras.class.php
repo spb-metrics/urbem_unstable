@@ -81,18 +81,17 @@ class FTCEMGDispFinanceiras extends Persistente
                  , 0.00 AS aplicacoes_financeiras_vinc_rppsas
               FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
                                           ( mes                         INTEGER,
-                                            caixa                       DECIMAL(14,2) ,
-                                            conta_movimento             DECIMAL(14,2) ,
-                                            contas_vinculadas           DECIMAL(14,2) ,
-                                            aplicacoes_financeiras      DECIMAL(14,2) ,
-                                            compromissado               DECIMAL(14,2) ,
-                                            caixa_rpps                  DECIMAL(14,2) ,
-                                            contas_movimento_rpps       DECIMAL(14,2) ,
-                                            contas_vinculadas_rpps      DECIMAL(14,2) ,
-                                            aplicacoes_financeiras_rpps DECIMAL(14,2) ,
-                                            compromissado_rpps          DECIMAL(14,2)
+                                            caixa                       NUMERIC ,
+                                            conta_movimento             NUMERIC ,
+                                            contas_vinculadas           NUMERIC ,
+                                            aplicacoes_financeiras      NUMERIC ,
+                                            compromissado               NUMERIC ,
+                                            caixa_rpps                  NUMERIC ,
+                                            contas_movimento_rpps       NUMERIC ,
+                                            contas_vinculadas_rpps      NUMERIC ,
+                                            aplicacoes_financeiras_rpps NUMERIC ,
+                                            compromissado_rpps          NUMERIC
                                           )";
-SistemaLegado::mostravar($stSql);die;
         return $stSql;
     }
 

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPagamentoLiquidacao.class.php 62352 2015-04-28 14:51:38Z diogo.zarpelon $
+    $Id: REmpenhoPagamentoLiquidacao.class.php 62476 2015-05-13 14:50:56Z evandro $
 
     $Revision: 30805 $
     $Name:  $
@@ -1644,7 +1644,6 @@ function estornarOP($boTransacao = "")
 
                 $this->boEstorno = true;
                 $this->listarNotaLiquidacaoPaga( $rsLiquidacaoPaga, $boTransacao );
-
                 $arDataPagamento = explode("/",$this->stDataPagamento);
                 $arDataAnulacao = explode("/",$this->stDataAnulacao);
                 if ($arDataAnulacao[2].$arDataAnulacao[1].$arDataAnulacao[0] >= $arDataPagamento[2].$arDataPagamento[1].$arDataPagamento[0]) {
@@ -1685,10 +1684,17 @@ function estornarOP($boTransacao = "")
                             $inCodRecurso = $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso();
 
                             $boDestinacao = false;
-                            $obTOrcamentoConfiguracao = new TOrcamentoConfiguracao;
+                            $obTOrcamentoConfiguracao = new TOrcamentoConfiguracao;                            
                             $obTOrcamentoConfiguracao->setDado("exercicio", Sessao::getExercicio() );
                             $obTOrcamentoConfiguracao->setDado("parametro","recurso_destinacao");
-                            $obTOrcamentoConfiguracao->consultar($boTransacao);
+                            $obErro = $obTOrcamentoConfiguracao->consultar($boTransacao);
+                            
+                            //Validacao da configuracao de destino de recurso que poderá vir nulo
+                            if ($obErro->ocorreu()){
+                                $obErro->setDescricao("Necessário configurar Destinação de Recursos na ação Gestão Financeira :: Orçamento :: Configuração :: Alterar Configuração ");
+                                SistemaLegado::LiberaFrames('true','true');
+                            }
+
                             if($obTOrcamentoConfiguracao->getDado("valor") == 'true')
                                 $boDestinacao = true;
 

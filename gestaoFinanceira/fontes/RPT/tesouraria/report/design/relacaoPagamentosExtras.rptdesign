@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by Eclipse BIRT 2.0 -->
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.6" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">DiegoLemosSouza</property>
-    <property name="createdBy">uc-01.01.00</property>
-    <property name="units">in</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederação Nacional de Municípios>>
 Autor: Tonismar Régis Bernardo
 Data: 28/08/2007
 uc-02.04.38</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Paisagem</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem.rptlibrary</property>
@@ -18,10 +18,11 @@ uc-02.04.38</property>
     <parameters>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -29,9 +30,12 @@ uc-02.04.38</property>
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2007</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">2007</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -39,19 +43,12 @@ uc-02.04.38</property>
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">10001</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">10001</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -59,29 +56,12 @@ uc-02.04.38</property>
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.30.4:5432/gpc_petropolis</value>
+            </simple-property-list>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.30.4:5432/gpc_petropolis</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">sw.teste</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">suporte</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -89,11 +69,13 @@ uc-02.04.38</property>
         <scalar-parameter name="entidade" id="819">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2,3,1,7</value>
+            </simple-property-list>
             <property name="concealValue">true</property>
-            <property name="allowNull">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">2,3,1,7</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -101,9 +83,9 @@ uc-02.04.38</property>
         <scalar-parameter name="initial_date" id="820">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -112,11 +94,13 @@ uc-02.04.38</property>
         <scalar-parameter name="final_date" id="821">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">31/12/2007</value>
+            </simple-property-list>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">31/12/2007</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -124,9 +108,9 @@ uc-02.04.38</property>
         <scalar-parameter name="f_exercicio" id="1000">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -135,9 +119,9 @@ uc-02.04.38</property>
         <scalar-parameter name="f_entidade" id="1001">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -145,9 +129,9 @@ uc-02.04.38</property>
         </scalar-parameter>
         <scalar-parameter name="f_periodo" id="1002">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -156,9 +140,9 @@ uc-02.04.38</property>
         <scalar-parameter name="ccaixa" id="1054">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -167,9 +151,9 @@ uc-02.04.38</property>
         <scalar-parameter name="cdespesa" id="1055">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -177,9 +161,9 @@ uc-02.04.38</property>
         </scalar-parameter>
         <scalar-parameter name="f_ccaixa" id="1056">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -187,9 +171,9 @@ uc-02.04.38</property>
         </scalar-parameter>
         <scalar-parameter name="f_cdespesa" id="1057">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="concealValue">true</property>
-            <property name="allowNull">true</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -197,18 +181,7 @@ uc-02.04.38</property>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-            	extensionProperties.odaDriverClass = params["db_driver"].value;
-				extensionProperties.odaURL = params["db_conn_url"].value;
-				extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-			}]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/gpc_petropolis</property>
-            <property name="odaUser">sw.teste</property>
-            <encrypted-property name="odaPassword">c3Vwb3J0ZQ==</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -262,7 +235,6 @@ extensionProperties.odaPassword = params["db_password"].value;
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Postgres</property>
             <method name="beforeOpen"><![CDATA[this.queryText =  " SELECT                                                                                                 \n"; 
 this.queryText += "     to_char(pagamentos.timestamp, 'dd/mm/yyyy') as dt_emissao                                          \n";
 this.queryText += "     ,empenho.cod_entidade                                                                              \n";
@@ -507,6 +479,7 @@ if( params["ccaixa"] != "" ) {
 if( params["cdespesa"] != "" ) {	
 	this.queryText += " and transferencia.cod_plano_debito = "+params["cdespesa"]+" \n";
 }]]></method>
+            <property name="dataSource">Postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -572,7 +545,7 @@ if( params["cdespesa"] != "" ) {
                     <property name="nativeDataType">2</property>
                 </structure>
             </list-property>
-            <property name="queryText">    select
+            <xml-property name="queryText"><![CDATA[    select
         to_char(pagamentos.timestamp, 'dd/mm/yyyy') as dt_emissao
         ,empenho.cod_entidade
         ,conta_despesa.cod_estrutural as estrutural_despesa
@@ -708,7 +681,7 @@ if( params["cdespesa"] != "" ) {
     
         and cgm.numcgm = pre_empenho.cgm_beneficiario
         
---        and empenho.exercicio &lt; ?
+--        and empenho.exercicio < ?
 --       and (pagamentos.exercicio_liquidacao = ?)
 --        and empenho.cod_entidade = ?
 --        and ordem_pagamento.dt_emissao between to_date( ?, 'dd/mm/yyyy') and to_date( ?, 'dd/mm/yyyy')
@@ -800,7 +773,7 @@ if( params["cdespesa"] != "" ) {
 --        and transferencia.exercicio = ?
 --        and (transferencia.cod_entidade = ?)
 --        and transferencia.timestamp_transferencia between to_date( ?, 'dd/mm/yyyy') and to_date( ?, 'dd/mm/yyyy')
-limit 10</property>
+limit 10]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -879,6 +852,18 @@ limit 10</property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Entidades" id="1032">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param1</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">params["exercicio"]</expression>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -893,20 +878,8 @@ limit 10</property>
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Postgres</property>
             <method name="beforeOpen"><![CDATA[this.queryText += " and entidade.cod_entidade in ("+params["entidade"]+") ";]]></method>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param1</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">params["exercicio"]</expression>
-                    <property name="allowNull">false</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
+            <property name="dataSource">Postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -923,7 +896,7 @@ limit 10</property>
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">select 
+            <xml-property name="queryText"><![CDATA[select 
 	 cod_entidade
 	,sw_cgm.nom_cgm 
 from 
@@ -931,7 +904,7 @@ from
 	,sw_cgm 
 where
 	    entidade.numcgm = sw_cgm.numcgm 
-	and entidade.exercicio = ?</property>
+	and entidade.exercicio = ?]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1004,31 +977,79 @@ where
             <page-header>
                 <grid name="Cabecalho Paisagem" id="235" extends="urbem.Cabecalho Paisagem">
                     <overridden-values>
-                        <ref-entry baseId="942" name="NewText6121"/>
-                        <ref-entry baseId="944" name="NewData2111"/>
-                        <ref-entry baseId="946" name="NewGrid1"/>
-                        <ref-entry baseId="955" name="NewData12121"/>
-                        <ref-entry baseId="957" name="NewData14121"/>
-                        <ref-entry baseId="960" name="NewData13121"/>
-                        <ref-entry baseId="962" name="NewData1521"/>
-                        <ref-entry baseId="965" name="NewData11121"/>
-                        <ref-entry baseId="968" name="NewData1621"/>
-                        <ref-entry baseId="971" name="NewText721"/>
-                        <ref-entry baseId="973" name="NewText1121"/>
-                        <ref-entry baseId="975" name="NewLabel2121"/>
-                        <ref-entry baseId="984" name="NewData6111"/>
-                        <ref-entry baseId="987" name="NewData3111"/>
-                        <ref-entry baseId="990" name="NewData8111"/>
-                        <ref-entry baseId="993" name="NewData4111"/>
-                        <ref-entry baseId="996" name="NewData5111"/>
-                        <ref-entry baseId="999" name="NewLabel8121"/>
+                        <ref-entry baseId="937" id="937"/>
+                        <ref-entry baseId="938" id="938"/>
+                        <ref-entry baseId="939" id="939"/>
+                        <ref-entry baseId="940" id="940"/>
+                        <ref-entry baseId="941" id="941"/>
+                        <ref-entry baseId="942" name="NewText6121" id="942"/>
+                        <ref-entry baseId="943" id="943"/>
+                        <ref-entry baseId="944" name="NewData2111" id="944"/>
+                        <ref-entry baseId="945" id="945"/>
+                        <ref-entry baseId="946" name="NewGrid1" id="946"/>
+                        <ref-entry baseId="947" id="947"/>
+                        <ref-entry baseId="948" id="948"/>
+                        <ref-entry baseId="949" id="949"/>
+                        <ref-entry baseId="950" id="950"/>
+                        <ref-entry baseId="951" id="951"/>
+                        <ref-entry baseId="952" id="952"/>
+                        <ref-entry baseId="953" id="953"/>
+                        <ref-entry baseId="954" id="954"/>
+                        <ref-entry baseId="955" name="NewData12121" id="955"/>
+                        <ref-entry baseId="956" id="956"/>
+                        <ref-entry baseId="957" name="NewData14121" id="957"/>
+                        <ref-entry baseId="958" id="958"/>
+                        <ref-entry baseId="959" id="959"/>
+                        <ref-entry baseId="960" name="NewData13121" id="960"/>
+                        <ref-entry baseId="961" id="961"/>
+                        <ref-entry baseId="962" name="NewData1521" id="962"/>
+                        <ref-entry baseId="963" id="963"/>
+                        <ref-entry baseId="964" id="964"/>
+                        <ref-entry baseId="965" name="NewData11121" id="965"/>
+                        <ref-entry baseId="966" id="966"/>
+                        <ref-entry baseId="967" id="967"/>
+                        <ref-entry baseId="968" name="NewData1621" id="968"/>
+                        <ref-entry baseId="969" id="969"/>
+                        <ref-entry baseId="970" id="970"/>
+                        <ref-entry baseId="971" name="NewText721" id="971"/>
+                        <ref-entry baseId="972" id="972"/>
+                        <ref-entry baseId="973" name="NewText1121" id="973"/>
+                        <ref-entry baseId="974" id="974"/>
+                        <ref-entry baseId="975" name="NewLabel2121" id="975"/>
+                        <ref-entry baseId="976" id="976"/>
+                        <ref-entry baseId="977" id="977"/>
+                        <ref-entry baseId="978" id="978"/>
+                        <ref-entry baseId="979" id="979"/>
+                        <ref-entry baseId="980" id="980"/>
+                        <ref-entry baseId="981" id="981"/>
+                        <ref-entry baseId="982" id="982"/>
+                        <ref-entry baseId="983" id="983"/>
+                        <ref-entry baseId="984" name="NewData6111" id="984"/>
+                        <ref-entry baseId="985" id="985"/>
+                        <ref-entry baseId="986" id="986"/>
+                        <ref-entry baseId="987" name="NewData3111" id="987"/>
+                        <ref-entry baseId="988" id="988"/>
+                        <ref-entry baseId="989" id="989"/>
+                        <ref-entry baseId="990" name="NewData8111" id="990"/>
+                        <ref-entry baseId="991" id="991"/>
+                        <ref-entry baseId="992" id="992"/>
+                        <ref-entry baseId="993" name="NewData4111" id="993"/>
+                        <ref-entry baseId="994" id="994"/>
+                        <ref-entry baseId="995" id="995"/>
+                        <ref-entry baseId="996" name="NewData5111" id="996"/>
+                        <ref-entry baseId="997" id="997"/>
+                        <ref-entry baseId="998" id="998"/>
+                        <ref-entry baseId="999" name="NewLabel8121" id="999"/>
                     </overridden-values>
                 </grid>
             </page-header>
             <page-footer>
                 <grid name="Rodape" id="174" extends="urbem.Rodape">
                     <overridden-values>
-                        <ref-entry baseId="183" name="NewText2"/>
+                        <ref-entry baseId="180" id="180"/>
+                        <ref-entry baseId="181" id="181"/>
+                        <ref-entry baseId="182" id="182"/>
+                        <ref-entry baseId="183" name="NewText2" id="183"/>
                     </overridden-values>
                 </grid>
             </page-footer>
@@ -1086,6 +1107,7 @@ where
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["dt_emissao"]</expression>
@@ -1342,6 +1364,7 @@ where
                                                 <property name="dataType">string</property>
                                             </structure>
                                         </list-property>
+                                        <property name="pageBreakInterval">50</property>
                                         <column id="1044">
                                             <property name="width">4.6285714286in</property>
                                         </column>

@@ -293,23 +293,30 @@ function incluirLocal($boTransacao = "")
         # encontrado em pelo menos uma, não permite a exclusão do local.
         $arTable[] = 'administracao.impressora';
         $arTable[] = 'empenho.despesas_fixas';
-        $arTable[] = 'estagio.estagiario_estagio_local';
-        $arTable[] = 'estagio_3.estagiario_estagio_local';
-        $arTable[] = 'folhapagamento.configuracao_empenho_lla_local';
-        $arTable[] = 'folhapagamento.configuracao_empenho_local';
-        $arTable[] = 'folhapagamento_3.configuracao_empenho_lla_local';
-        $arTable[] = 'folhapagamento_3.configuracao_empenho_local';
+        //$arTable[] = 'estagio.estagiario_estagio_local';
+        $arTable[] = 'estagio'.Sessao::getEntidade().'.estagiario_estagio_local';
+        //$arTable[] = 'estagio_3.estagiario_estagio_local';
+        //$arTable[] = 'folhapagamento.configuracao_empenho_lla_local';
+        //$arTable[] = 'folhapagamento.configuracao_empenho_local';
+        $arTable[] = 'folhapagamento'.Sessao::getEntidade().'.configuracao_empenho_lla_local';
+        $arTable[] = 'folhapagamento'.Sessao::getEntidade().'.configuracao_empenho_local';
+        //$arTable[] = 'folhapagamento_3.configuracao_empenho_lla_local';
+        //$arTable[] = 'folhapagamento_3.configuracao_empenho_local';
         $arTable[] = 'frota.terceiros_historico';
-        $arTable[] = 'ima.configuracao_banpara_local';
-        $arTable[] = 'ima_3.configuracao_banpara_local';
+        //$arTable[] = 'ima.configuracao_banpara_local';
+        $arTable[] = 'ima'.Sessao::getEntidade().'.configuracao_banpara_local';
+        //$arTable[] = 'ima_3.configuracao_banpara_local';
         $arTable[] = 'organograma.de_para_local';
         $arTable[] = 'patrimonio.historico_bem';
-        $arTable[] = 'pessoal.adido_cedido_local';
-        $arTable[] = 'pessoal.contrato_servidor_local';
-        $arTable[] = 'pessoal.contrato_servidor_local_historico';
-        $arTable[] = 'pessoal_3.adido_cedido_local';
-        $arTable[] = 'pessoal_3.contrato_servidor_local';
-        $arTable[] = 'pessoal_3.contrato_servidor_local_historico';
+        //$arTable[] = 'pessoal.adido_cedido_local';
+        //$arTable[] = 'pessoal.contrato_servidor_local';
+        //$arTable[] = 'pessoal.contrato_servidor_local_historico';
+        $arTable[] = 'pessoal'.Sessao::getEntidade().'.adido_cedido_local';
+        $arTable[] = 'pessoal'.Sessao::getEntidade().'.contrato_servidor_local';
+        $arTable[] = 'pessoal'.Sessao::getEntidade().'.contrato_servidor_local_historico';
+        //$arTable[] = 'pessoal_3.adido_cedido_local';
+        //$arTable[] = 'pessoal_3.contrato_servidor_local';
+        //$arTable[] = 'pessoal_3.contrato_servidor_local_historico';
         # Deve ser retirado quando o script SQL excluir essa tabela do sistema.
         $arTable[] = 'organograma.de_para_local';
         ###
@@ -325,7 +332,7 @@ function incluirLocal($boTransacao = "")
             $stSql  = "  SELECT COUNT(cod_local) AS total";
             $stSql .= "    FROM ".$table;
             $stSql .= "   WHERE cod_local = ".$this->getCodLocal();
-
+            
             $this->obTOrganogramaLocal->executaRecuperaSql($stSql, $rsValidaOrgao);
 
             if ($rsValidaOrgao->getCampo('total') > 0) {

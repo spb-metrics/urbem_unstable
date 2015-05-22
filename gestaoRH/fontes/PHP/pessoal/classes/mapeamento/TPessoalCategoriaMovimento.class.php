@@ -60,7 +60,7 @@ class TPessoalCategoriaMovimento extends Persistente
 function TPessoalCategoriaMovimento()
 {
     parent::Persistente();
-    $this->setTabela('pessoal.mov_sefip_saida_categoria');
+    $this->setTabela('pessoal'.Sessao::getEntidade().'.mov_sefip_saida_categoria');
 
     $this->setCampoCod('');
     $this->setComplementoChave('cod_sefip_saida,cod_categoria');
@@ -100,6 +100,6 @@ function montaExcluirPorMovimento()
 
     return $stSql;
 
-}//function montaExcluirPorMovimento ()
+}
 
 }

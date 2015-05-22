@@ -79,6 +79,9 @@ $obHdnAnoProcesso = new Hidden();
 $obHdnAnoProcesso->setName('stAnoProcesso');
 $obHdnAnoProcesso->setValue($stAnoProcesso);
 
+$obSpnListaAnexos = new Span;
+$obSpnListaAnexos->setId ( "spnListaAnexos" );
+
 $obRdImagemSim = new Radio();
 $obRdImagemSim->setChecked( true );
 $obRdImagemSim->setName('boImagem');
@@ -118,13 +121,14 @@ $obFormulario->addTitulo($rsDocumento->getCampo('nom_documento'));
 $obFormulario->agrupaComponentes(array($obRdImagemSim, $obRdImagemNao));
 $obFormulario->addComponente($obFleArquivo);
 $obFormulario->defineBarra(array($obBtnOk,$obBtnFechar));
+$obFormulario->addSpan($obSpnListaAnexos);
 $obFormulario->show();
 
 $obIFrameOculto = new IFrame();
 $obIFrameOculto->setName('oculto');
 $obIFrameOculto->setHeight ('0%');
-$obIFrameOculto->setWidth  ('0%');
-$obIFrameOculto->setFrameBorder(1);
+$obIFrameOculto->setWidth  ('100%');
+$obIFrameOculto->setFrameBorder(0);
 $obIFrameOculto->show();
 
 $obIFrame = new IFrame();
@@ -132,7 +136,10 @@ $obIFrame->setName('telaMensagem');
 $obIFrame->setSrc(CAM_FW_INSTANCIAS.'index/mensagem.php?'.Sessao::getId());
 $obIFrame->setHeight('20%');
 $obIFrame->setWidth('100%');
-$obIFrame->setFrameBorder(1);
+$obIFrame->setFrameBorder(0);
 $obIFrame->show();
 
+$stJs = "<script>montaParametrosGET('montaListaAnexos');</script>";
+
+echo ($stJs);
 ?>

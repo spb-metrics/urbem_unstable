@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGExclusaoReceita.class.php 61833 2015-03-09 12:59:57Z michel $
+    $Id: FTCEMGExclusaoReceita.class.php 62467 2015-05-12 21:30:57Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -59,20 +59,20 @@ class FTCEMGExclusaoReceita extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT mes
-                 , REPLACE(ROUND(contr_serv,2)::TEXT                , '.', '') AS contr_serv
-                 , REPLACE(ROUND(compens_reg_prev,2)::TEXT          , '.', '') AS compens_reg_prev
-                 , REPLACE(ROUND(fundacoes_transf_corrente,2)::TEXT , '.', '') AS fundacoes_transf_corrente
-                 , REPLACE(ROUND(autarquias_transf_corrente,2)::TEXT, '.', '') AS autarquias_transf_corrente
-                 , REPLACE(ROUND(empestdep_transf_corrente,2)::TEXT , '.', '') AS empestdep_transf_corrente
-                 , REPLACE(ROUND(demaisent_transf_corrente,2)::TEXT , '.', '') AS demaisent_transf_corrente
-                 , REPLACE(ROUND(fundacoes_transf_capital,2)::TEXT  , '.', '') AS fundacoes_transf_capital
-                 , REPLACE(ROUND(autarquias_transf_capital,2)::TEXT , '.', '') AS autarquias_transf_capital
-                 , REPLACE(ROUND(empestdep_transf_capital,2)::TEXT  , '.', '') AS empestdep_transf_capital
-                 , REPLACE(ROUND(demaisent_transf_capital,2)::TEXT  , '.', '') AS demaisent_transf_capital
-                 , REPLACE(ROUND(out_duplic,2)::TEXT                , '.', '') AS out_duplic
-                 , REPLACE(ROUND(contr_patronal,2)::TEXT            , '.', '') AS contr_patronal
-                 , '' AS desc_outras_duplic
+            SELECT LPAD(mes::VARCHAR,2,'0') AS mes
+                 , REPLACE(COALESCE(ROUND(contr_serv,2),0.00)                ::TEXT ,'.', '') AS contr_serv
+                 , REPLACE(COALESCE(ROUND(compens_reg_prev,2),0.00)          ::TEXT ,'.', '') AS compens_reg_prev
+                 , REPLACE(COALESCE(ROUND(fundacoes_transf_corrente,2),0.00) ::TEXT ,'.', '') AS fundacoes_transf_corrente
+                 , REPLACE(COALESCE(ROUND(autarquias_transf_corrente,2),0.00)::TEXT ,'.', '') AS autarquias_transf_corrente
+                 , REPLACE(COALESCE(ROUND(empestdep_transf_corrente,2),0.00) ::TEXT , '.', '') AS empestdep_transf_corrente
+                 , REPLACE(COALESCE(ROUND(demaisent_transf_corrente,2),0.00) ::TEXT , '.', '') AS demaisent_transf_corrente
+                 , REPLACE(COALESCE(ROUND(fundacoes_transf_capital,2),0.00)  ::TEXT , '.', '') AS fundacoes_transf_capital
+                 , REPLACE(COALESCE(ROUND(autarquias_transf_capital,2),0.00) ::TEXT , '.', '') AS autarquias_transf_capital
+                 , REPLACE(COALESCE(ROUND(empestdep_transf_capital,2),0.00)  ::TEXT , '.', '') AS empestdep_transf_capital
+                 , REPLACE(COALESCE(ROUND(demaisent_transf_capital,2),0.00)  ::TEXT , '.', '') AS demaisent_transf_capital
+                 , REPLACE(COALESCE(ROUND(out_duplic,2),0.00)                ::TEXT , '.', '') AS out_duplic
+                 , REPLACE(COALESCE(ROUND(contr_patronal,2) ,0.00)           ::TEXT , '.', '') AS contr_patronal
+                 , '000' AS desc_outras_duplic
               FROM " . $this->getTabela() . "('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") as tabela
                                                ( mes                        INTEGER,
                                                  contr_serv                 NUMERIC(14,2),

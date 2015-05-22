@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: LSManterProcessoEmLote.php 60948 2014-11-26 11:28:25Z arthur $
+    $Id: LSManterProcessoEmLote.php 62418 2015-05-06 17:45:05Z diogo.zarpelon $
 
     */
 
@@ -281,12 +281,19 @@ $obCmbTipoHistorico = new Select;
 $obCmbTipoHistorico->setName            ( "stHistorico"                      	  );
 $obCmbTipoHistorico->setValue           ( $stHistorico                   		  );
 $obCmbTipoHistorico->setNull			( false									  );
-$obCmbTipoHistorico->setRotulo          ( "Motivo do Arquivamento"                             );
-$obCmbTipoHistorico->setTitle           ( "Selecione o Motivo do arquivamento" );
+$obCmbTipoHistorico->setRotulo          ( "Motivo do Arquivamento"                );
+$obCmbTipoHistorico->setTitle           ( "Selecione o Motivo do arquivamento"    );
 $obCmbTipoHistorico->addOption          ( "", "Selecione"    			          );
 $obCmbTipoHistorico->setCampoId		    ( "cod_historico"						  );
 $obCmbTipoHistorico->setCampoDesc	    ( "nom_historico" 						  );
 $obCmbTipoHistorico->preencheCombo	    ( $rsHistorico					 		  );
+
+$obTxtLocalizacaoFisica = new TextBox();
+$obTxtLocalizacaoFisica->setId('stLocalizacaoFisica');
+$obTxtLocalizacaoFisica->setName('stLocalizacaoFisica');
+$obTxtLocalizacaoFisica->setRotulo('Localização Física do Arquivamento');
+$obTxtLocalizacaoFisica->setSize(80);
+$obTxtLocalizacaoFisica->setMaxLength(80);
 
 $obChkMarcarTodos = new CheckBox;
 $obChkMarcarTodos->setName				( "chkMarcarTodos"						   );
@@ -304,13 +311,14 @@ $obTxtComplementar->setRotulo			( "Texto Complementar"					);
 
 //ADICIONANDO OS COMPONENTES AO FORMULARIO
 $obFormulario = new Formulario();
-$obFormulario->addForm					( $obForm								);
-$obFormulario->addSpan   				( $obSpanLancamentos 					);
-$obFormulario->addHidden                ( $obHdnEval, true                      );
-$obFormulario->addComponente			( $obChkMarcarTodos						);
-$obFormulario->addComponente			( $obCmbTipoArquivamento				);
-$obFormulario->addComponente			( $obCmbTipoHistorico					);
-$obFormulario->addComponente			( $obTxtComplementar					);
+$obFormulario->addForm		 ( $obForm				  );
+$obFormulario->addSpan   	 ( $obSpanLancamentos 	  );
+$obFormulario->addHidden     ( $obHdnEval, true        );
+$obFormulario->addComponente ( $obChkMarcarTodos		  );
+$obFormulario->addComponente ( $obCmbTipoArquivamento  );
+$obFormulario->addComponente ( $obCmbTipoHistorico	  );
+$obFormulario->addComponente ( $obTxtLocalizacaoFisica );
+$obFormulario->addComponente ( $obTxtComplementar	  );
 
 $obBtnOk = new Ok();
 $obBtnOk->setId( 'Ok' );

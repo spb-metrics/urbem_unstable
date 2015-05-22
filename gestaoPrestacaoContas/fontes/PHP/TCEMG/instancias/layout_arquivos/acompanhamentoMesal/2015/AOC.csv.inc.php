@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: AOC.csv.inc.php 62286 2015-04-20 13:19:06Z michel $
-  * $Date: 2015-04-20 10:19:06 -0300 (Seg, 20 Abr 2015) $
-  * $Author: michel $
-  * $Rev: 62286 $
+  * $Id: AOC.csv.inc.php 62413 2015-05-05 21:10:22Z arthur $
+  * $Date: 2015-05-05 18:10:22 -0300 (Ter, 05 Mai 2015) $
+  * $Author: arthur $
+  * $Rev: 62413 $
   *
 */
 /**
@@ -206,7 +206,7 @@ if (count($rsRecordSetAOC10->getElementos()) > 0) {
                                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
                                 
                                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipoleialteracao");
-                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                                 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
                                 

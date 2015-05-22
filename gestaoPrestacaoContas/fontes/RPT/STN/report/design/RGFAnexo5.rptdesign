@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="author">Bruce Cruz de Sena</property>
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">mm</property>
     <property name="comments">Copyright (c) 2006 &lt;&lt;CNM - Confederacao Nacional de Municipios>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">uc-06.01.20</html-property>
+    <property name="units">mm</property>
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
         <structure>
@@ -16,9 +16,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -28,10 +28,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <property name="autoSuggestThreshold">1</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -111,37 +111,7 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="db_driver" id="520">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="concealValue">false</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
         <scalar-parameter name="db_conn_url" id="522">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="concealValue">false</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="523">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="concealValue">false</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="524">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
@@ -174,9 +144,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -185,9 +155,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -198,16 +168,7 @@
         <scalar-parameter name="numero_assinatura" id="1449" extends="urbem_231.numero_assinatura"/>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-            	extensionProperties.odaDriverClass = params["db_driver"].value;
-				extensionProperties.odaURL = params["db_conn_url"].value;
-				extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-			}]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4" extends="urbem_231.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -555,7 +516,7 @@ FROM stn.fn_rgf_anexo5_geral ( ? , ? , ? , ? , 'false') as
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                 </structure>
             </list-property>
             <list-property name="parameters">
@@ -882,15 +843,15 @@ if ( (soma) >= 0 ){
                                 <property name="width">73mm</property>
                             </column>
                             <column id="950">
-                                <property name="width">25mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">25mm</property>
                             </column>
                             <column id="951">
                                 <property name="width">72mm</property>
                             </column>
                             <column id="952">
-                                <property name="width">25mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">25mm</property>
                             </column>
                             <row id="953">
                                 <property name="backgroundColor">#F5F5F5</property>
@@ -1506,8 +1467,8 @@ if ( (soma) >= 0 ){
                                 </cell>
                             </row>
                             <row id="1008">
-                                <property name="height">0.255in</property>
                                 <property name="backgroundColor">#F5F5F5</property>
+                                <property name="height">0.255in</property>
                                 <cell id="1009">
                                     <property name="colSpan">3</property>
                                     <property name="rowSpan">1</property>
@@ -1713,15 +1674,15 @@ if ( (soma) >= 0 ){
                                 <property name="width">73mm</property>
                             </column>
                             <column id="1092">
-                                <property name="width">25mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">25mm</property>
                             </column>
                             <column id="1093">
                                 <property name="width">72mm</property>
                             </column>
                             <column id="1094">
-                                <property name="width">25mm</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">25mm</property>
                             </column>
                             <row id="1095">
                                 <property name="backgroundColor">#F5F5F5</property>
@@ -2284,9 +2245,9 @@ if ( (soma) >= 0 ){
                                 </cell>
                             </row>
                             <row id="1170">
-                                <property name="height">0.255in</property>
                                 <property name="backgroundColor">#F5F5F5</property>
                                 <property name="verticalAlign">middle</property>
+                                <property name="height">0.255in</property>
                                 <cell id="1171">
                                     <property name="colSpan">3</property>
                                     <property name="rowSpan">1</property>
@@ -2347,7 +2308,7 @@ if ( (soma) >= 0 ){
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">data_extenso</property>
-                    <property name="displayName">data_extenso</property>
+                    <text-property name="displayName">data_extenso</text-property>
                     <expression name="expression">dataSetRow["data_extenso"] + '.'</expression>
                     <property name="dataType">string</property>
                 </structure>

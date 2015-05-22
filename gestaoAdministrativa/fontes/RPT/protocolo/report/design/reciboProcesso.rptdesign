@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.20" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.5.0.v20090603 Build &lt;2.5.0.v20090617-0630></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <list-property name="propertyBindings">
         <structure>
             <property name="name">queryText</property>
@@ -21,6 +20,7 @@
             <property name="id">1181</property>
         </structure>
     </list-property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -33,9 +33,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -45,9 +45,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -57,24 +57,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">org.postgresql.Driver</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -84,42 +69,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
                 <value type="constant">jdbc:postgresql://[ip]:5432/[database]</value>
             </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">[usuario]</value>
-            </simple-property-list>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -128,9 +83,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">integer</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -139,10 +94,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -151,9 +106,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -162,10 +117,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -174,10 +129,10 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="concealValue">false</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -186,9 +141,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -197,9 +152,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -208,9 +163,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -219,9 +174,9 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -233,29 +188,37 @@
         <scalar-parameter name="pEntidadePrincipal" id="6686">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="centroCusto" id="6825">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsReciboProcesso" id="1188">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if (params['pCodProcesso'] != ''){
 	this.queryText = this.queryText + " AND sw_processo.cod_processo = "+params['pCodProcesso'] ;
@@ -265,6 +228,7 @@ if (params['pAnoExercicio'] != ''){
 	this.queryText = this.queryText + " AND sw_processo.ano_exercicio = '"+params['pAnoExercicio']+"'";
 }]]></method>
             <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[    SELECT  sw_processo.cod_processo
          ,  sw_processo.ano_exercicio
          ,  sw_processo.timestamp
@@ -276,6 +240,8 @@ if (params['pAnoExercicio'] != ''){
          ,  sw_processo.cod_situacao
          ,  administracao.configuracao.valor
          ,  sw_processo_arquivado.texto_complementar
+         ,  centro_custo.cod_centro
+         ,  centro_custo.descricao AS descricao_centro
 
       FROM  sw_processo
 
@@ -296,18 +262,23 @@ INNER JOIN  sw_assunto
  LEFT JOIN  administracao.configuracao
 	    ON  sw_processo.ano_exercicio = administracao.configuracao.exercicio
        AND  administracao.configuracao.parametro = 'nom_prefeitura'
+       
+ LEFT JOIN  almoxarifado.centro_custo
+	    ON  centro_custo.cod_centro=sw_processo.cod_centro
 
      WHERE  1=1]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
-  <Version>1.0</Version>
+  <Version>2.0</Version>
   <design:ResultSets derivedMetaData="true">
     <design:resultSetDefinitions>
       <design:resultSetColumns>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>cod_processo</design:name>
-            <design:position>1</design:position>
+            <design:identifier>
+              <design:name>cod_processo</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
             <design:precision>10</design:precision>
             <design:scale>0</design:scale>
@@ -325,8 +296,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>ano_exercicio</design:name>
-            <design:position>2</design:position>
+            <design:identifier>
+              <design:name>ano_exercicio</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>4</design:precision>
             <design:scale>0</design:scale>
@@ -344,8 +317,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>numcgm</design:name>
-            <design:position>3</design:position>
+            <design:identifier>
+              <design:name>numcgm</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
             <design:precision>10</design:precision>
             <design:scale>0</design:scale>
@@ -363,8 +338,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>nom_cgm</design:name>
-            <design:position>4</design:position>
+            <design:identifier>
+              <design:name>nom_cgm</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>200</design:precision>
             <design:scale>0</design:scale>
@@ -382,8 +359,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>logradouro</design:name>
-            <design:position>5</design:position>
+            <design:identifier>
+              <design:name>logradouro</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>0</design:precision>
             <design:scale>0</design:scale>
@@ -401,8 +380,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>cep</design:name>
-            <design:position>6</design:position>
+            <design:identifier>
+              <design:name>cep</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>8</design:precision>
             <design:scale>0</design:scale>
@@ -420,8 +401,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>nom_municipio</design:name>
-            <design:position>7</design:position>
+            <design:identifier>
+              <design:name>nom_municipio</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>35</design:precision>
             <design:scale>0</design:scale>
@@ -439,8 +422,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>bairro</design:name>
-            <design:position>8</design:position>
+            <design:identifier>
+              <design:name>bairro</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>30</design:precision>
             <design:scale>0</design:scale>
@@ -458,8 +443,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>cpf</design:name>
-            <design:position>9</design:position>
+            <design:identifier>
+              <design:name>cpf</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>0</design:precision>
             <design:scale>0</design:scale>
@@ -477,8 +464,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>cnpj</design:name>
-            <design:position>10</design:position>
+            <design:identifier>
+              <design:name>cnpj</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>0</design:precision>
             <design:scale>0</design:scale>
@@ -496,8 +485,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>timestamp</design:name>
-            <design:position>11</design:position>
+            <design:identifier>
+              <design:name>timestamp</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
             <design:precision>29</design:precision>
             <design:scale>6</design:scale>
@@ -515,8 +506,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>nom_situacao</design:name>
-            <design:position>12</design:position>
+            <design:identifier>
+              <design:name>nom_situacao</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>60</design:precision>
             <design:scale>0</design:scale>
@@ -534,8 +527,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>nom_classificacao</design:name>
-            <design:position>13</design:position>
+            <design:identifier>
+              <design:name>nom_classificacao</design:name>
+              <design:position>13</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>60</design:precision>
             <design:scale>0</design:scale>
@@ -553,8 +548,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>nom_assunto</design:name>
-            <design:position>14</design:position>
+            <design:identifier>
+              <design:name>nom_assunto</design:name>
+              <design:position>14</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>60</design:precision>
             <design:scale>0</design:scale>
@@ -572,8 +569,10 @@ INNER JOIN  sw_assunto
         </design:resultColumnDefinitions>
         <design:resultColumnDefinitions>
           <design:attributes>
-            <design:name>observacoes</design:name>
-            <design:position>15</design:position>
+            <design:identifier>
+              <design:name>observacoes</design:name>
+              <design:position>15</design:position>
+            </design:identifier>
             <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
             <design:precision>0</design:precision>
             <design:scale>0</design:scale>
@@ -1394,7 +1393,7 @@ INNER JOIN  sw_municipio
                 </structure>
                 <structure>
                     <property name="name">Column Binding</property>
-                    <property name="displayName">cod_situacao</property>
+                    <text-property name="displayName">cod_situacao</text-property>
                     <expression name="expression">dataSetRow["cod_situacao"]</expression>
                     <property name="dataType">any</property>
                 </structure>
@@ -1402,6 +1401,16 @@ INNER JOIN  sw_municipio
                     <property name="name">texto_complementar</property>
                     <expression name="expression">dataSetRow["texto_complementar"]</expression>
                     <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">centro_custo</property>
+                    <expression name="expression" type="javascript">if(dataSetRow["cod_centro"] !=null&amp;&amp;dataSetRow["descricao_centro"]!=null){
+	dataSetRow["cod_centro"] + ' - ' +dataSetRow["descricao_centro"]
+}else{
+	''
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -1489,8 +1498,8 @@ INNER JOIN  sw_municipio
                             </list-property>
                             <property name="pageBreakInterval">50</property>
                             <column id="1227">
-                                <property name="width">1.6145833333in</property>
                                 <property name="textAlign">right</property>
+                                <property name="width">1.6145833333in</property>
                             </column>
                             <column id="1228">
                                 <property name="width">0.3229166667in</property>
@@ -1821,6 +1830,30 @@ INNER JOIN  sw_municipio
                                 <cell id="1306">
                                     <data id="1380">
                                         <property name="resultSetColumn">nom_assunto</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="6832">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">if(params["centroCusto"]=='true'){
+	false
+}else{
+	true
+}</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="6833">
+                                    <label id="6836">
+                                        <property name="textAlign">right</property>
+                                        <text-property name="text">Centro de Custo:</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="6834"/>
+                                <cell id="6835">
+                                    <data id="6837">
+                                        <property name="resultSetColumn">centro_custo</property>
                                     </data>
                                 </cell>
                             </row>
@@ -2212,16 +2245,16 @@ INNER JOIN  sw_municipio
                 <property name="width">20%</property>
             </column>
             <column id="6806">
-                <property name="width">25%</property>
                 <property name="textAlign">center</property>
+                <property name="width">25%</property>
             </column>
             <column id="6791">
-                <property name="width">10%</property>
                 <property name="textAlign">center</property>
+                <property name="width">10%</property>
             </column>
             <column id="6792">
-                <property name="width">25%</property>
                 <property name="textAlign">center</property>
+                <property name="width">25%</property>
             </column>
             <column id="6793">
                 <property name="width">20%</property>

@@ -27,7 +27,7 @@
  * @author Analista: Dagiane Vieira
  * @author Desenvolvedor: Michel Teixeira
  *
- * $Id: TTCEMGProjecaoAtuarial.class.php 62269 2015-04-15 18:28:39Z franver $
+ * $Id: TTCEMGProjecaoAtuarial.class.php 62549 2015-05-19 18:16:05Z jean $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -114,10 +114,10 @@ class TTCEMGProjecaoAtuarial extends Persistente
         $stSql = "SELECT exercicio
                        , cod_entidade
                        , exercicio_entidade
-                       , COALESCE(REPLACE(vl_patronal::text ,'.',''),'000') AS vl_patronal
-                       , COALESCE(REPLACE(vl_receita::text  ,'.',''),'000') AS vl_receita
-                       , COALESCE(REPLACE(vl_despesa::text  ,'.',''),'000') AS vl_despesa
-                       , COALESCE(REPLACE(vl_rpps::text     ,'.',''),'000') AS vl_rpps
+                       , LPAD(COALESCE(REPLACE(vl_patronal::text ,'.',''),'000'),16,'0') AS vl_patronal
+                       , LPAD(COALESCE(REPLACE(vl_receita::text  ,'.',''),'000'),16,'0') AS vl_receita
+                       , LPAD(COALESCE(REPLACE(vl_despesa::text  ,'.',''),'000'),16,'0') AS vl_despesa
+                       , LPAD(COALESCE(REPLACE(vl_rpps::text     ,'.',''),'000'),16,'0') AS vl_rpps
                     FROM tcemg.projecao_atuarial
                    WHERE exercicio_entidade = '".$this->getDado('exercicio_entidade')."'
                      AND cod_entidade = ".$this->getDado('cod_entidade');

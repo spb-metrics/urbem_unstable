@@ -24,43 +24,52 @@
 ?>
 <?php
    /*
-    * Arquivo de geracao do arquivo operacoesCreditoARO TCM/MG
-    * Data de Criação   : 19/01/2009
+    * Arquivo de geracao do arquivo sertTerceiros TCM/MG
+    * Data de Criação   : 29/01/2009
 
     * @author Analista      Tonismar Régis Bernardo
-    * @author Desenvolvedor André Machado
+    * @author Desenvolvedor Lucas Andrades Mendes
 
     * @package URBEM
     * @subpackage
 
     * @ignore
 
-    $Id: operacoesCreditoARO.inc.php 61854 2015-03-10 17:45:16Z michel $
+    $Id: despesaCorrente.inc.php 62522 2015-05-18 14:22:51Z evandro $
     */
 
-
-    include_once CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGOperacoesCreditoARO.class.php';
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDespesaCorrente.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obTTCEMGOperacoesCreditoARO = new TTCEMGOperacoesCreditoARO();
-    $obTTCEMGOperacoesCreditoARO->setDado("exercicio"   , Sessao::getExercicio()                                );
-    $obTTCEMGOperacoesCreditoARO->setDado("cod_entidade", implode(',',$arFiltros['inCodEntidadeSelecionado'])   );
+    $obFTCEMGDespesaCorrente = new FTCEMGDespesaCorrente();
+    $obFTCEMGDespesaCorrente->setDado('exercicio'   , Sessao::read('exercicio'));
+    $obFTCEMGDespesaCorrente->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGDespesaCorrente->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obFTCEMGDespesaCorrente->setDado('data_inicial', $arFiltros['inPeriodo']);
+    $obFTCEMGDespesaCorrente->setDado('data_final'  , $arFiltros['inPeriodo']);
 
-    $obTTCEMGOperacoesCreditoARO->recuperaPorEntidade($rsRecordSet);
+    $obFTCEMGDespesaCorrente->recuperaTodos($rsDespesaCorrente);
 
-    $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
+    //DOTAÇÃO ANUAL INICIAL
+
+    $obExportador->roUltimoArquivo->addBloco($rsDespesaCorrente);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('dt_contratacao');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_contratado');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desppesencsoc');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('dt_principal');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivint');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('dt_juros');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivext');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('dt_encargos');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_liquidacao');
-
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despoutdespcor');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+?>

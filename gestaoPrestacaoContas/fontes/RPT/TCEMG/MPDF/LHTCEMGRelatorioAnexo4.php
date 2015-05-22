@@ -124,7 +124,7 @@
         </tr>
         <tr>
             <td class='tabulacao_nivel_2 text_align_left' width='80%'>TOTAL DAS DESPESAS COM PESSOAL DO EXERCÍCIO ANTERIOR</td>
-            <td class='text_align_right' width='20%'><?php echo number_format($total_despesa_pessoal,2,',','.')?></td>
+            <td class='text_align_right' width='20%'><?php echo number_format($total_despesa_pessoal != '' ? $total_despesa_pessoal : 0,2,',','.')?></td>
         </tr>
         <tr>
             <td class='tabulacao_nivel_2 text_align_left' width='80%'>TOTAL DAS DESPESAS COM PESSOAL = BASE DE CÁLCULO</td>

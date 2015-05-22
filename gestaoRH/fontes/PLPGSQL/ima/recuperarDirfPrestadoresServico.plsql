@@ -34,66 +34,62 @@
  $Id:$
  */
 
-CREATE OR REPLACE FUNCTION recuperar_dirf_prestadores_servico(VARCHAR, INTEGER, INTEGER, INTEGER) RETURNS SETOF colunasDirfPrestadoresServico AS $$ 
+CREATE OR REPLACE FUNCTION recuperar_dirf_prestadores_servico(VARCHAR, INTEGER, INTEGER, INTEGER) RETURNS SETOF colunasDirfPrestadoresServico AS $$
 DECLARE
-    stEntidade          ALIAS FOR $1;
-    inExercicio         ALIAS FOR $2;    
-    inCodEntidade       ALIAS FOR $3;    
-    inSequenciaEventos  ALIAS FOR $4;
-    rwDirf              colunasDirfPrestadoresServico%ROWTYPE;
-    stSql               VARCHAR;
-    reRegistro          RECORD;
-    rePeriodos          RECORD;
-    nuTotalEmpenhoCGM   NUMERIC :=0.00;
-    nuTotalRetencoesCGM NUMERIC :=0.00;
-    inNumCGMAux         INTEGER :=0;
-    arMeses1            NUMERIC[];
-    arMeses2            NUMERIC[];
-    arMeses3            NUMERIC[];
+    stEntidade                          ALIAS FOR $1;
+    inExercicio                         ALIAS FOR $2;    
+    inCodEntidade                       ALIAS FOR $3;    
+    inSequenciaEventos                  ALIAS FOR $4;
+    rwDirf                              colunasDirfPrestadoresServico%ROWTYPE;
+    stSql                               VARCHAR;
+    reRegistro                          RECORD;
+    rePeriodos                          RECORD;
+    nuTotalEmpenhoCGM                   NUMERIC :=0.00;
+    nuTotalRetencoesCGM                 NUMERIC :=0.00;
+    inNumCGMAux                         INTEGER :=0;    
+    inMes                               INTEGER;
+    arMeses1                            NUMERIC[];
+    arMeses2                            NUMERIC[];
+    arMeses3                            NUMERIC[];
 BEGIN
     
     stSql := 'SELECT * FROM tmp_prestador_servico';
 
     FOR reRegistro IN EXECUTE stSql LOOP    
-
-        stSql := 'SELECT *, to_char(periodo_movimentacao.dt_final, ''mm'')::int as chave
-                       FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao 
-                      WHERE to_char(dt_final,''yyyy'') = '|| inExercicio ||'
-                      ORDER BY dt_final';
-
-        FOR rePeriodos IN EXECUTE stSql LOOP        
-            IF reRegistro.mes = rePeriodos.chave THEN
-                IF inSequenciaEventos = 1 THEN
-                    arMeses1[rePeriodos.chave] := reRegistro.vl_empenhado;
+        
+        FOR inMes IN 1..12 LOOP
+            IF reRegistro.mes = inMes THEN
+                IF inSequenciaEventos = 1 THEN                    
+                    arMeses1[inMes] := reRegistro.vl_empenhado;
                     IF reRegistro.vl_retencao_irrf > 0 THEN
                         IF reRegistro.ident_especie_beneficiario = 1 THEN
-                            arMeses2[rePeriodos.chave] := 0.00;
+                            arMeses2[inMes] := reRegistro.vl_retencao_inss;
                         ELSE
-                            arMeses2[rePeriodos.chave] := reRegistro.vl_retencao_inss;
+                            arMeses2[inMes] := 0.00;
                         END IF;
                     ELSE
-                        arMeses2[rePeriodos.chave] := 0.00;
+                        arMeses2[inMes] := 0.00;
                     END IF;
-                    arMeses3[rePeriodos.chave] := reRegistro.vl_retencao_irrf;
+                    arMeses3[inMes] := reRegistro.vl_retencao_irrf;
                 END IF;
 
-                IF inSequenciaEventos = 2 THEN
+                IF inSequenciaEventos = 2 THEN                    
                     IF reRegistro.vl_retencao_irrf > 0 THEN
                         IF reRegistro.ident_especie_beneficiario = 1 THEN
-                            arMeses1[rePeriodos.chave] := 0.00;
+                            arMeses1[inMes] := 0.00;
                         ELSE
-                            arMeses1[rePeriodos.chave] := reRegistro.vl_retencao_inss;
+                            arMeses1[inMes] := reRegistro.vl_retencao_inss;
                         END IF;
                     ELSE 
-                        arMeses1[rePeriodos.chave] := 0.00;
+                        arMeses1[inMes] := 0.00;
                     END IF;
-                    arMeses2[rePeriodos.chave] := 0.00;
-                    arMeses3[rePeriodos.chave] := 0.00;
+                    arMeses2[inMes] := 0.00;
+                    arMeses3[inMes] := 0.00;
                 END IF;
             ELSE 
-                arMeses1[rePeriodos.chave] := 0.00;
-                arMeses2[rePeriodos.chave] := 0.00;
-                arMeses3[rePeriodos.chave] := 0.00;
+                arMeses1[inMes] := 0.00;
+                arMeses2[inMes] := 0.00;
+                arMeses3[inMes] := 0.00;
             END IF;
         END LOOP;
 
@@ -103,10 +99,11 @@ BEGIN
                         FROM recuperarDirfPrestadoresServicoValorEmpenhoExercicio('|| quote_literal(stEntidade) ||', '|| inExercicio ||', '|| inCodEntidade ||', '|| reRegistro.numcgm ||', '|| quote_literal(reRegistro.tipo) ||')';
     
             nuTotalEmpenhoCGM   := selectintonumeric(stSql);
-
+            
             stSql := ' SELECT consultar_total_retencoes_cgm('|| inExercicio ||', '|| reRegistro.numcgm ||', '|| inCodEntidade ||', '|| reRegistro.cod_conta ||', '|| quote_literal(stEntidade) ||')';
 
             nuTotalRetencoesCGM := selectintonumeric(stSql);
+
         END IF;
 
         inNumCGMAux                := reRegistro.numcgm;
@@ -208,11 +205,8 @@ BEGIN
                 RETURN NEXT rwDirf;               
             END IF;
         END IF;
-    END LOOP;
+    
+    END LOOP;    
+    
 END;
 $$ LANGUAGE 'plpgsql';
-
-/*
-SELECT *
-  FROM dirf_prestadores_servico_reduzida('',1,2008);
-*/

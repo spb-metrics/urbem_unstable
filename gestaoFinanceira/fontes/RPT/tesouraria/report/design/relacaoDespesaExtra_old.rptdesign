@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.15" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.1.r22a_v20071101 Build &lt;2.2.1.v20071101-1439></property>
-    <property name="units">in</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="comments">Copyright (c) 2007 &lt;&lt;Your Company Name here>></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
+    <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_221.rptlibrary</property>
@@ -14,9 +15,9 @@
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -24,12 +25,14 @@
         <scalar-parameter name="exercicio" id="186">
             <property name="hidden">false</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">true</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">2008</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2008</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -37,24 +40,11 @@
         <scalar-parameter name="cod_acao" id="187">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_driver" id="188">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">org.postgresql.Driver</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -62,49 +52,25 @@
         <scalar-parameter name="db_conn_url" id="189">
             <property name="hidden">true</property>
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">jdbc:postgresql://172.16.30.4:5432/gf_livramento_2802</property>
-            <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_user" id="190">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <property name="defaultValue">eduardo</property>
             <property name="distinct">true</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="db_password" id="191">
-            <property name="hidden">true</property>
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://172.16.30.4:5432/gf_livramento_2802</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
-            <property name="isRequired">false</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">linuxx</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade" id="1123">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -112,94 +78,87 @@
         <scalar-parameter name="data_ini" id="1213">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">01/01/2008</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">01/01/2008</property>
-            <property name="distinct">true</property>
-            <structure name="format">
+            <structure nam2e="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="data_fim" id="1214">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">31/12/2008</value>
+            </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">31/12/2008</property>
-            <property name="distinct">true</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="tipo_relatorio" id="1301">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="cod_plano" id="1815">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="query" id="1816">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="conta_banco" id="1818">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
-                <property name="category">Unformatted</property>
+                <property 2name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="recurso" id="1819">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="paramType">simple</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
+            <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147">
-            <method name="beforeOpen"><![CDATA[if ( params["db_driver"].value ){
-                extensionProperties.odaDriverClass = params["db_driver"].value;
-                extensionProperties.odaURL = params["db_conn_url"].value;
-                extensionProperties.odaUser = params["db_user"].value;
-extensionProperties.odaPassword = params["db_password"].value;
- extensionProperties.charSet = "utf8";
-            }]]></method>
-            <property name="odaDriverClass">org.postgresql.Driver</property>
-            <property name="odaURL">jdbc:postgresql://172.16.30.4:5432/gf_livramento_2802</property>
-            <property name="odaUser">eduardo</property>
-            <encrypted-property name="odaPassword" encryptionID="base64">bGludXh4</encrypted-property>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -207,157 +166,61 @@ extensionProperties.odaPassword = params["db_password"].value;
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">exercicio</property>
-                    <property name="displayName">exercicio</property>
+                    <text-property name="displayName">exercicio</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">dt_pagamento</property>
-                    <property name="displayName">dt_pagamento</property>
+                    <text-property name="displayName">dt_pagamento</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_lote</property>
-                    <property name="displayName">cod_lote</property>
+                    <text-property name="displayName">cod_lote</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_plano_credito</property>
-                    <property name="displayName">cod_plano_credito</property>
+                    <text-property name="displayName">cod_plano_credito</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">valor</property>
-                    <property name="displayName">valor</property>
+                    <text-property name="displayName">valor</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">tipo_despesa</property>
-                    <property name="displayName">tipo_despesa</property>
+                    <text-property name="displayName">tipo_despesa</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_entidade</property>
-                    <property name="displayName">cod_entidade</property>
+                    <text-property name="displayName">cod_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_entidade</property>
-                    <property name="displayName">nom_entidade</property>
+                    <text-property name="displayName">nom_entidade</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_conta</property>
-                    <property name="displayName">nom_conta</property>
+                    <text-property name="displayName">nom_conta</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_recurso</property>
-                    <property name="displayName">cod_recurso</property>
+                    <text-property name="displayName">cod_recurso</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nom_recurso</property>
-                    <property name="displayName">nom_recurso</property>
+                    <text-property name="displayName">nom_recurso</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_plano_debito</property>
-                    <property name="displayName">cod_plano_debito</property>
+                    <text-property name="displayName">cod_plano_debito</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">cod_plano</property>
-                    <property name="displayName">cod_plano</property>
+                    <text-property name="displayName">cod_plano</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">nome_despesa</property>
-                    <property name="displayName">nome_despesa</property>
+                    <text-property name="displayName">nome_despesa</text-property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">exercicio</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">dt_pagamento</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">cod_lote</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">cod_plano_credito</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">valor</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">tipo_despesa</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">7</property>
-                        <property name="name">cod_entidade</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">8</property>
-                        <property name="name">nom_entidade</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">9</property>
-                        <property name="name">nom_conta</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">10</property>
-                        <property name="name">cod_recurso</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">11</property>
-                        <property name="name">nom_recurso</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">12</property>
-                        <property name="name">cod_plano_debito</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">13</property>
-                        <property name="name">cod_plano</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">nome_despesa</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <property name="dataSource">postgres</property>
-            <method name="beforeOpen"><![CDATA[if(params["entidade"] != "")
-{
-	this.queryText = this.queryText + " AND tabela.cod_entidade IN ("+params["entidade"]+") "
-}
-
-if( params["cod_plano"] != "")
-{
-	this.queryText = this.queryText + " AND tabela.cod_plano " + params["cod_plano"] + " "
-}
-
-if( params["conta_banco"] != "")
-{
-	this.queryText = this.queryText + " AND tabela.cod_plano_credito " + params["conta_banco"] + " "
-}
-
-if( params["recurso"] != "")
-{
-	this.queryText = this.queryText + " AND tabela.cod_recurso = " + params["recurso"] + " "
-}
-
-params["query"] = this.queryText]]></method>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -514,6 +377,102 @@ params["query"] = this.queryText]]></method>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">exercicio</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">dt_pagamento</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">cod_lote</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">cod_plano_credito</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">valor</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">tipo_despesa</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">cod_entidade</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">nom_entidade</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">nom_conta</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">cod_recurso</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">nom_recurso</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">cod_plano_debito</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">cod_plano</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">nome_despesa</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[if(params["entidade"] != "")
+{
+	this.queryText = this.queryText + " AND tabela.cod_entidade IN ("+params["entidade"]+") "
+}
+
+if( params["cod_plano"] != "")
+{
+	this.queryText = this.queryText + " AND tabela.cod_plano " + params["cod_plano"] + " "
+}
+
+if( params["conta_banco"] != "")
+{
+	this.queryText = this.queryText + " AND tabela.cod_plano_credito " + params["conta_banco"] + " "
+}
+
+if( params["recurso"] != "")
+{
+	this.queryText = this.queryText + " AND tabela.cod_recurso = " + params["recurso"] + " "
+}
+
+params["query"] = this.queryText]]></method>
+            <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -614,7 +573,7 @@ params["query"] = this.queryText]]></method>
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <property name="queryText">select * from (
+            <xml-property name="queryText"><![CDATA[select * from (
 SELECT
       plano_debito.exercicio
     , dt_pagamento
@@ -882,7 +841,7 @@ FROM
             ON (    nl.cod_nota     = nlp.cod_nota
                 AND nl.exercicio    = nlp.exercicio
                 AND nl.cod_entidade = nlp.cod_entidade
-                AND nl.exercicio_empenho &lt; ?
+                AND nl.exercicio_empenho < ?
             )
             JOIN contabilidade.pagamento as cp
             ON (    cp.cod_entidade         = nlp.cod_entidade
@@ -1010,7 +969,7 @@ FROM
             ON (    nl.cod_nota     = nlp.cod_nota
                 AND nl.exercicio    = nlp.exercicio
                 AND nl.cod_entidade = nlp.cod_entidade
-                AND nl.exercicio_empenho &lt; ?
+                AND nl.exercicio_empenho < ?
             )
             JOIN contabilidade.pagamento as cp
             ON (    cp.cod_entidade         = nlp.cod_entidade
@@ -1089,7 +1048,7 @@ GROUP BY
 
 ) as tabela
 where
-    1 = 1</property>
+    1 = 1]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1628,6 +1587,7 @@ where
                     <property name="aggregateFunction">SUM</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["dt_pagamento"]</expression>
@@ -1955,6 +1915,7 @@ where
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["dt_pagamento"]</expression>
@@ -2301,6 +2262,7 @@ where
                     <property name="dataType">decimal</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["dt_pagamento"]</expression>
@@ -2654,6 +2616,7 @@ else
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["dt_pagamento"]</expression>

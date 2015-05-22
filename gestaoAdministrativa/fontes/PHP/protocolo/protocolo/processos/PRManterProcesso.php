@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: PRManterProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
+    $Id: PRManterProcesso.php 62581 2015-05-21 14:05:03Z michel $
 
     */
 
@@ -106,12 +106,15 @@ switch ($stAcao) {
         $obTPROProcessoHistorico->inclusao();
 
         Sessao::getTransacao()->setMapeamento($obTPROProcesso);
+        
+        $centroCusto = (isset($_REQUEST["centroCusto"])) ? $_REQUEST["centroCusto"] : 'NULL';
 
         //FAZ A ALTERAÇÃO NOS DADOS DO PROCESSO
         $obTPROProcesso->setDado('observacoes',      $_REQUEST['stObservacoes']    );
         $obTPROProcesso->setDado('resumo_assunto',   $_REQUEST['stResumo']         );
         $obTPROProcesso->setDado('cod_classificacao',$_REQUEST['codClassificacao'] );
         $obTPROProcesso->setDado('cod_assunto',      $_REQUEST['codAssunto']       );
+        $obTPROProcesso->setDado('cod_centro',       $centroCusto                  );
         $obTPROProcesso->alteracao();
 
         //EXCLUI DA TABELA SW_DOCUMENTO_PROCESSO OS DOCUMENTO QUE NÃO TEM RELAÇÃO COM O ASSUNTO SELECIONADO
