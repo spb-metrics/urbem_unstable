@@ -293,7 +293,21 @@ DROP FUNCTION manutencao();
 -- Ticket #22098
 ----------------
 
-CREATE ROLE birt;
-GRANT urbem TO birt;
-UPDATE pg_autid SET rolpassword = 'md517e68e814c79648270e8a9c28b6386e7' WHERE rolname = 'birt';
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
 
+BEGIN
+    PERFORM 1
+       FROM pg_user
+      WHERE usename = 'birt'
+          ;
+    IF NOT FOUND THEN
+        CREATE ROLE birt;
+        GRANT urbem TO birt;
+        UPDATE pg_authid SET rolpassword = 'md517e68e814c79648270e8a9c28b6386e7' WHERE rolname = 'birt';
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
