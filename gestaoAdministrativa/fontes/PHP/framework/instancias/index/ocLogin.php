@@ -79,7 +79,7 @@ if (isset($_POST['usuario'])) { //Se houver post
 
     if ( !$obErro->ocorreu() ) {
     ?>
-    <script language="JavaScript" type="text/javascript">
+    <script type="text/javascript">
     function logar(sessao)
     {
         var x = "1";
@@ -100,7 +100,7 @@ if (isset($_POST['usuario'])) { //Se houver post
 <?php
     } else {
 ?>
-    <script language="JavaScript" type="text/javascript">
+    <script type="text/javascript">
     window.parent.frames["telaPrincipal"].document.getElementById("erro").style.display = 'block';
     window.parent.frames["telaPrincipal"].document.getElementById("erro").innerHTML = '<p><?=$obErro->getDescricao();?></p>';
     window.parent.frames["telaPrincipal"].document.getElementById("frm").reset();

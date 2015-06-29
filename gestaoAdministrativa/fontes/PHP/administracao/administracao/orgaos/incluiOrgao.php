@@ -57,7 +57,7 @@ $stMascaraOrgao = $arMascaraSetor[0]."/9999";
 switch ($ctrl) {
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function Valida()
     {
@@ -148,20 +148,20 @@ case 1:
                 $stCodOrgao = $arCodOrgao[1];
             }
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$stCodOrgao." - ".$nomOrgao.'","incluir","aviso","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$_SERVER['PHP_SELF'].'?'.Sessao::getId().'");
                 </script>';
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$nomOrgao.'","n_incluir","erro","'.Sessao::getId().'");
                 </script>';
                 executaFrameOculto("f.ok.disabled = false;");
         }
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("O Órgão '.$nomOrgao.' já existe","unica","erro","'.Sessao::getId().'");
             </script>';
             executaFrameOculto("f.ok.disabled = false;");

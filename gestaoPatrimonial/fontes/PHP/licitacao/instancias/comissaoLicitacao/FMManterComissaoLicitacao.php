@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMManterComissaoLicitacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterComissaoLicitacao.php 62654 2015-05-29 12:59:20Z evandro $
 
     * Casos de uso: uc-03.05.09
 */
@@ -301,7 +301,7 @@ $obTxtDataVigenciaMembro->setValue      ( ""                             );
 $obTxtDataVigenciaMembro->setRotulo     ( "Vigência"                     );
 
 $obTxtCargo = new TextBox;
-$obTxtCargo->setRotulo     ( "Cargo do membro"            );
+$obTxtCargo->setRotulo     ( "*Cargo do membro"            );
 $obTxtCargo->setTitle      ( "Informe o cargo do membro." );
 $obTxtCargo->setName       ( "stCargoMembro"              );
 $obTxtCargo->setId         ( "stCargoMembro"              );
@@ -317,7 +317,7 @@ $obTNaturezaCargo = new TLicitacaoNaturezaCargo;
 $obTNaturezaCargo->recuperaTodos( $rsNaturezaCargo );
 
 $obCmbNaturezaCargo = new Select;
-$obCmbNaturezaCargo->setRotulo    ( "Natureza do Cargo"                 );
+$obCmbNaturezaCargo->setRotulo    ( "*Natureza do Cargo"                 );
 $obCmbNaturezaCargo->setTitle     ( 'Selecione a Natureza do Cargo.'    );
 $obCmbNaturezaCargo->setName      ( "inNaturezaCargo"                   );
 $obCmbNaturezaCargo->setId        ( "inNaturezaCargo"                   );

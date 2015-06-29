@@ -38,7 +38,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function validaSessao(valor)
 {
     $('boAssinaturas').value = valor;

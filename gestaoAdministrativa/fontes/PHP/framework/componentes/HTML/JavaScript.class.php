@@ -34,7 +34,7 @@
 
     Casos de uso: uc-01.01.00
 
-    $Id: JavaScript.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JavaScript.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -929,7 +929,7 @@ function montaJavaScript()
 
     $stJavaScript .= $this->stSalvar." }\n";// $this->getSalvar();
     $stJavaScript .= $this->geraHabilitaLayer();
-    $stJS  = "<script language=\"JavaScript\">\n";
+    $stJS  = "<script type=\"text/javascript\">\n";
     $stJS .= $stJavaScript;
     $stJS .= "</script>\n";
     $this->setJavaScript( $stJS );

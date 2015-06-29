@@ -59,7 +59,7 @@ Revision 1.4  2006/07/06 12:09:53  diego
 */                          
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limparItem() {
    document.frm.inCodItem.value = '';

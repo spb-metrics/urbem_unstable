@@ -86,7 +86,7 @@ switch ($controle) {
 
     if ($ok) {
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         //window.opener.parent.frames['telaPrincipal'].document.location = "incluiProcesso.php?<?=Sessao::getId();?>&controle=1&codigo=<?=$codigo;?>&numCgm=<?=$numCgm;?>&processo=<?=$especieProcesso;?>&tipoProcesso=<?=$tipoProcesso;?>";
         window.opener.parent.frames['telaPrincipal'].document.frm.<?=$campo;?>.value=<?=$num;?>;
         window.opener.parent.frames['telaPrincipal'].document.frm.numCgm.value=<?=$numCgm;?>;

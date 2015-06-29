@@ -40,7 +40,7 @@ Casos de uso: uc-01.04.02
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function voltar(){
 <?php
 $stLink = "&pg=".Sessao::read('link_pg')."&pos=".Sessao::read('link_pos');

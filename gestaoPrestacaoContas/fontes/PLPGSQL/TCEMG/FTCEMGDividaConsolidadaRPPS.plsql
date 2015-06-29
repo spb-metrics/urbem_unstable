@@ -29,14 +29,12 @@
 * $Id: $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.arquivo_divida_consolidada_rpps(varchar,varchar,integer,varchar,varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.arquivo_divida_consolidada_rpps(varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
 
 stExercicio         ALIAS FOR $1;
-stTipoPeriodo       ALIAS FOR $2;
-inPeriodo           ALIAS FOR $3;
-stCodEntidade       ALIAS FOR $4;
-stCodEntidadeRPPS   ALIAS FOR $5;
+stCodEntidade       ALIAS FOR $2;
+stCodEntidadeRPPS   ALIAS FOR $3;
 stDtInicial         VARCHAR := '';
 stDtFinal           VARCHAR := '';
 stSql               VARCHAR := '';
@@ -45,12 +43,10 @@ boEntidadeRPPS      BOOLEAN;
 arDatas             VARCHAR[];
 reRegistro          RECORD;
 
-
 BEGIN
 
-arDatas     := publico.mes(stExercicio,inPeriodo);
-stDtInicial := arDatas[0];    
-stDtFinal   := arDatas[1];
+stDtInicial := '01/01/'||stExercicio||'';
+stDtFinal   := '31/12/'||stExercicio||'';
 
 --Se cod_entidade RPPS nao e vazio
 IF ( stCodEntidadeRPPS != '') THEN
@@ -71,7 +67,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_consolidada_rpps AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_rpps_novo_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidadeRPPS||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_rpps_novo_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidadeRPPS||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -108,7 +104,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_detalhamento_rpps AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidadeRPPS||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidadeRPPS||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -125,7 +121,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_consolidada_rpps AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_rpps_novo_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidadeRPPS||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_rpps_novo_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidadeRPPS||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -162,7 +158,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_detalhamento_rpps AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidadeRPPS||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidadeRPPS||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -176,7 +172,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_consolidada AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_novo_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidade||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_novo_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidade||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -213,7 +209,7 @@ IF ( boIncluirRPPS = TRUE ) THEN
         stSql := '  CREATE TEMPORARY TABLE tmp_divida_detalhamento AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidade||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidade||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -231,7 +227,7 @@ ELSE
     stSql := '  CREATE TEMPORARY TABLE tmp_divida_consolidada AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_novo_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidade||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_novo_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidade||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -268,7 +264,7 @@ ELSE
     stSql := '  CREATE TEMPORARY TABLE tmp_divida_detalhamento AS (
                         SELECT 
                                 *
-                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Mes'','||inPeriodo||','''||stCodEntidade||''') AS tbl 
+                        FROM stn.fn_rgf_anexo2_detalhamento_divida_mensal('''||stExercicio||''',''Ano'',0,'''||stCodEntidade||''') AS tbl 
                         (  descricao varchar 
                          , ordem integer 
                          , valor_exercicio_anterior numeric 
@@ -285,18 +281,18 @@ IF ( boIncluirRPPS = TRUE ) THEN
     --SE A ENTIDADE RPPS FOR A UNICA SELECIONADA
     IF ( boEntidadeRPPS = TRUE ) THEN
         stSql :='   SELECT
-                             0.00 as div_contratual_demais
-                            ,0.00 as div_contratual_ppp
-                            ,0.00 as div_mobiliaria
-                            ,0.00 as op_credito_inf_12
-                            ,0.00 as outras
-                            ,0.00 as parc_contr_sociais_prev
-                            ,0.00 as parc_contr_sociais_demais
-                            ,0.00 as parc_tributos
-                            ,0.00 as parc_fgts
-                            ,0.00 as precatorios_post
+                             CAST(0.00 AS NUMERIC(14,2)) as div_contratual_demais
+                            ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp
+                            ,CAST(0.00 AS NUMERIC(14,2)) as div_mobiliaria
+                            ,CAST(0.00 AS NUMERIC(14,2)) as op_credito_inf_12
+                            ,CAST(0.00 AS NUMERIC(14,2)) as outras
+                            ,CAST(0.00 AS NUMERIC(14,2)) as parc_contr_sociais_prev
+                            ,CAST(0.00 AS NUMERIC(14,2)) as parc_contr_sociais_demais
+                            ,CAST(0.00 AS NUMERIC(14,2)) as parc_tributos
+                            ,CAST(0.00 AS NUMERIC(14,2)) as parc_fgts
+                            ,CAST(0.00 AS NUMERIC(14,2)) as precatorios_post
                             ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2))     FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais_rpps
-                            ,0.00 as div_contratual_ppp_rpps
+                            ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp_rpps
                             ,(SELECT CAST(COALESCE(valor_mes,0.00)  AS NUMERIC(14,2))    FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria_rpps
                             ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC(14,2)) FROM tmp_balancete_verificacao_rpps ) as op_credito_inf_12_rpps
                             ,(SELECT CAST(COALESCE(valor_mes,0.00)  AS NUMERIC(14,2))    FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''Outras D%'') as outras_rpps
@@ -309,19 +305,19 @@ IF ( boIncluirRPPS = TRUE ) THEN
     --SE A ENTIDADE RPPS NAO FOR A UNICA SELECIONADA
     ELSE
         stSql :='   SELECT
-                             (SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais
-                            ,0.00 as div_contratual_ppp
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria
-                            ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC) FROM tmp_balancete_verificacao ) as op_credito_inf_12
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Outras D%'') as outras
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Previdenci%'') as parc_contr_sociais_prev
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Demais Contribui%'') as parc_contr_sociais_demais
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''De Tributos%'') as parc_tributos
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Do FGTS%'') as parc_fgts
-                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Precat%'') as precatorios_post
+                             (SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais
+                            ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria
+                            ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC(14,2)) FROM tmp_balancete_verificacao ) as op_credito_inf_12
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Outras D%'') as outras
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Previdenci%'') as parc_contr_sociais_prev
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Demais Contribui%'') as parc_contr_sociais_demais
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''De Tributos%'') as parc_tributos
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Do FGTS%'') as parc_fgts
+                            ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Precat%'') as precatorios_post
                             --ENTIDADE RPPS
                             ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2))     FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais_rpps
-                            ,0.00 as div_contratual_ppp_rpps
+                            ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp_rpps
                             ,(SELECT CAST(COALESCE(valor_mes,0.00)  AS NUMERIC(14,2))    FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria_rpps
                             ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC(14,2)) FROM tmp_balancete_verificacao_rpps ) as op_credito_inf_12_rpps
                             ,(SELECT CAST(COALESCE(valor_mes,0.00)  AS NUMERIC(14,2))    FROM tmp_divida_consolidada_rpps    WHERE descricao ILIKE ''Outras D%'') as outras_rpps
@@ -336,27 +332,27 @@ IF ( boIncluirRPPS = TRUE ) THEN
 ELSE
 
     stSql :='   SELECT
-                         (SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais
-                        ,0.00 as div_contratual_ppp
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria
-                        ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC) FROM tmp_balancete_verificacao ) as op_credito_inf_12
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Outras D%'') as outras
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Previdenci%'') as parc_contr_sociais_prev
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Demais Contribui%'') as parc_contr_sociais_demais
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''De Tributos%'') as parc_tributos
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Do FGTS%'') as parc_fgts
-                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Precat%'') as precatorios_post
+                         (SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Contratual%'') as div_contratual_demais
+                        ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''%vida Mobili%'') as div_mobiliaria
+                        ,(SELECT CAST(COALESCE(SUM(vl_saldo_atual),0.00) AS NUMERIC(14,2)) FROM tmp_balancete_verificacao ) as op_credito_inf_12
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Outras D%'') as outras
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Previdenci%'') as parc_contr_sociais_prev
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Demais Contribui%'') as parc_contr_sociais_demais
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''De Tributos%'') as parc_tributos
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_detalhamento   WHERE descricao ILIKE ''Do FGTS%'') as parc_fgts
+                        ,(SELECT CAST(COALESCE(valor_mes,0.00) AS NUMERIC(14,2)) FROM tmp_divida_consolidada    WHERE descricao ILIKE ''Precat%'') as precatorios_post
                         --ENTIDADE RPPS
-                        ,0.00 as div_contratual_demais_rpps
-                        ,0.00 as div_contratual_ppp_rpps
-                        ,0.00 as div_mobiliaria_rpps
-                        ,0.00 as op_credito_inf_12_rpps
-                        ,0.00 as outras_rpps
-                        ,0.00 as parc_contr_sociais_prev_rpps
-                        ,0.00 as parc_contr_sociais_demais_rpps
-                        ,0.00 as parc_tributos_rpps
-                        ,0.00 as parc_fgts_rpps
-                        ,0.00 as precatorios_post_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_demais_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as div_contratual_ppp_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as div_mobiliaria_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as op_credito_inf_12_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as outras_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as parc_contr_sociais_prev_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as parc_contr_sociais_demais_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as parc_tributos_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as parc_fgts_rpps
+                        ,CAST(0.00 AS NUMERIC(14,2)) as precatorios_post_rpps
             ';
 END IF;
 

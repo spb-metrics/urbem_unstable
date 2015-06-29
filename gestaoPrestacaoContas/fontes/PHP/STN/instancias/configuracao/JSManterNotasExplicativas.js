@@ -33,7 +33,7 @@
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 
 /**
  * Quando o formulário estiver pronto, ele adiciona ao click do botão incluir a chamada do metodo 'controleCadastro'

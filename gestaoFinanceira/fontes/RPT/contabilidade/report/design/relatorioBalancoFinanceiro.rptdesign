@@ -640,22 +640,22 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
                 </structure>
             </list-property>
             <column id="1436">
-                <property name="width">2.3304166666666665in</property>
+                <property name="width">2.2604166666666665in</property>
             </column>
             <column id="1437">
-                <property name="width">0.7316666666666666in</property>
+                <property name="width">0.7395833333333334in</property>
             </column>
             <column id="1438">
-                <property name="width">0.6616666666666666in</property>
+                <property name="width">0.7291666666666666in</property>
             </column>
             <column id="1439">
-                <property name="width">2.3525in</property>
+                <property name="width">2.28125in</property>
             </column>
             <column id="1462">
-                <property name="width">0.7254166666666666in</property>
+                <property name="width">0.71875in</property>
             </column>
             <column id="1457">
-                <property name="width">0.6670833333333334in</property>
+                <property name="width">0.7291666666666666in</property>
             </column>
             <header>
                 <row id="1421">

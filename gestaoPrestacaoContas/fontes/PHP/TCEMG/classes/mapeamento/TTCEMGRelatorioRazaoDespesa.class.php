@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62491 2015-05-14 13:55:34Z lisiane $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62788 2015-06-17 18:14:39Z evandro $
     *
     * $Name: $
     * $Date: $
@@ -536,25 +536,12 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
         return $obErro;
     }
     
-    public function montaRecuperaDadosRestosPagar() {
-        $stSql  = "
-                    SELECT                       
-                             tbl.empenho                                   
-                           , tbl.exercicio                                 
-                           , tbl.credor                                    
-                           , tbl.cod_estrutural                            
-                           , tbl.data AS dt_pagamento                      
-                           , tbl.banco                                     
-                           , tbl.valor AS valor_pago
-                           , to_char(empenho.dt_empenho, 'dd/mm/yyyy') AS dt_empenho
-                           , to_char(nota_liquidacao.dt_liquidacao, 'dd/mm/yyyy') AS dt_liquidacao
-                           , restos_pre_empenho.recurso	AS cod_recurso
-                           , LPAD(restos_pre_empenho.num_orgao::VARCHAR, 2, '0')||'.'||LPAD(restos_pre_empenho.num_unidade::VARCHAR, 2, '0')||'.'||restos_pre_empenho.cod_funcao||'.'||restos_pre_empenho.cod_subfuncao||'.'||restos_pre_empenho.cod_programa||'.'||LPAD(restos_pre_empenho.num_pao::VARCHAR, 4, '0')||'.'||REPLACE(restos_pre_empenho.cod_estrutural, '.', '') AS dotacao
-                           , plano_recurso.cod_recurso AS cod_recurso_banco
-                           
-                    
-                      FROM empenho.fn_empenho_restos_pagar_pagamento_estorno_credor                              
-                      (    ''
+    public function montaRecuperaDadosRestosPagar() 
+    {
+        $stSql  = " SELECT   
+                            *
+                    FROM tcemg.relatorio_restos_pagar_dotacao_credor
+                    (    ''
                          , ''                      
                          , '".$this->getDado('dt_inicial')."'
                          , '".$this->getDado('dt_final')."'
@@ -571,47 +558,14 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                          , 'true'
                          , ''
                          , ''
-                    ) as tbl (      
-                       entidade            integer,                             
-                       empenho             integer,                             
-                       exercicio           char(4),                             
-                       credor              varchar,                             
-                       cod_estrutural      varchar,                             
-                       cod_nota            integer,                             
-                       data                text,                                
-                       conta               integer,                             
-                       banco               varchar,                             
-                       valor               numeric                              
                     )
-                    
-        INNER JOIN empenho.empenho
-                ON empenho.cod_empenho  = tbl.empenho
-               AND empenho.cod_entidade = tbl.entidade
-               AND empenho.exercicio    = tbl.exercicio 
-   
-        INNER JOIN empenho.restos_pre_empenho
-                ON restos_pre_empenho.exercicio       = empenho.exercicio 
-               AND restos_pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-   
-        INNER JOIN empenho.nota_liquidacao 
-                ON nota_liquidacao.exercicio    = empenho.exercicio
-               AND nota_liquidacao.cod_entidade = empenho.cod_entidade
-               AND nota_liquidacao.cod_empenho  = empenho.cod_empenho          
-   
-       INNER JOIN contabilidade.plano_analitica
-               ON plano_analitica.exercicio = to_char(to_date(tbl.data, 'dd/mm/yyyy'), 'yyyy')
-              AND plano_analitica.cod_plano = tbl.conta
-   
-       INNER JOIN contabilidade.plano_recurso
-               ON plano_recurso.exercicio = plano_analitica.exercicio
-              AND plano_recurso.cod_plano = plano_analitica.cod_plano
               
-        WHERE 1=1 ";
+                    WHERE 1=1 ";
         
-        if($this->getDado('cod_recurso') != '') {
-           $stSql .= " AND plano_recurso.cod_recurso IN (".$this->getDado('cod_recurso').")";
-        }
-        
+            if($this->getDado('cod_recurso') != '') {
+               $stSql .= " AND cod_recurso IN (".$this->getDado('cod_recurso').")";
+            }
+
         return $stSql;
     }
 

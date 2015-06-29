@@ -41,7 +41,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

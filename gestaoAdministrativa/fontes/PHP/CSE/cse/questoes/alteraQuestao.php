@@ -185,7 +185,7 @@ $Date: 2007-01-03 09:33:57 -0200 (Qua, 03 Jan 2007) $
         $dbConfig->limpaSelecao();
         $dbConfig->fechaBd();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -340,12 +340,12 @@ $Date: 2007-01-03 09:33:57 -0200 (Qua, 03 Jan 2007) $
                 $audicao = new auditoriaLegada;
                 $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $nomQuestao);
                 $audicao->insereAuditoria();
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomQuestao.'","alterar","aviso","'.$sessao->id.'","");
                     window.location = "alteraQuestao.php?'.$sessao->id.'&pagina='.$pagina.'";
                     </script>';
             } else {
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomQuestao.'","n_alterar","erro","'.$sessao->id.'&pagina='.$pagina.'","");
                     window.location = "alteraQuestao.php?'.$sessao->id.'";
                     </script>';

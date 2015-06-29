@@ -31,12 +31,12 @@
 
     * Casos de uso: uc-04.05.41
 
-    $Id: FRConsultarAssentamentoGerado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FRConsultarAssentamentoGerado.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
       window.status = ":::::::: URBEM ::::::::";
 </script>
 <html>

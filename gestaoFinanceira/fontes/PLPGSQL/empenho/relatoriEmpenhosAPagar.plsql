@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatoriEmpenhosAPagar.plsql 62328 2015-04-24 13:35:46Z jean $
+* $Id: relatoriEmpenhosAPagar.plsql 62781 2015-06-17 16:45:30Z jean $
 *
 * Casos de uso: uc-02.03.07
 */
@@ -71,7 +71,7 @@ BEGIN
           AND ped.cod_despesa     = ode.cod_despesa
             
         WHERE
-            e.cod_entidade      IN (' || quote_literal(stCodEntidades) || ') AND
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
             e.exercicio         =   ' || quote_literal(stExercicio) || '::varchar AND ';
 
             if (stDataInicial is not null and stDataInicial <> '') then
@@ -202,7 +202,7 @@ BEGIN
         AND ped.cod_despesa     = ode.cod_despesa
         
         WHERE
-            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
             e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
         if (stDataInicial is not null and stDataInicial <> '') then
@@ -272,7 +272,7 @@ BEGIN
         AND ped.cod_despesa     = ode.cod_despesa
             
         WHERE
-            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
             e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
        if (stDataInicial is not null and stDataInicial <> '') then
@@ -349,7 +349,7 @@ BEGIN
         AND ped.cod_despesa     = ode.cod_despesa
         
         WHERE
-            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
             e.exercicio         =   ' || quote_literal( stExercicio    ) || '::varchar AND ';
 
        if (stDataInicial is not null and stDataInicial <> '') then
@@ -418,7 +418,7 @@ BEGIN
         AND ped.cod_despesa     = ode.cod_despesa
 
         WHERE
-            e.cod_entidade      IN (' || quote_literal( stCodEntidades ) || ') AND
+            e.cod_entidade      IN (' || stCodEntidades || ') AND
             e.exercicio         =   ' || stExercicio || '::varchar AND ';
 
        if (stDataInicial is not null and stDataInicial <> '' ) then
@@ -536,7 +536,7 @@ SELECT * FROM (
           ON ped.exercicio     = ode.exercicio
          AND  ped.cod_despesa  = ode.cod_despesa
 
-        WHERE   e.cod_entidade          IN (' || quote_literal( stCodEntidades ) || ')
+        WHERE   e.cod_entidade          IN (' || stCodEntidades || ')
                 AND e.exercicio         =   ' || quote_literal( stExercicio ) || '::varchar ';
 
                 if (stDataInicial is not null and stDataInicial<>'') then

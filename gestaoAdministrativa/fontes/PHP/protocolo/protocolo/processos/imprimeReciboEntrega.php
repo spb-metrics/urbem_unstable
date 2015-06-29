@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: imprimeReciboEntrega.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: imprimeReciboEntrega.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -59,7 +59,7 @@ $codClassificacao = $_REQUEST["codClassificacao"];
 $codAssunto       = $_REQUEST["codAssunto"];
 $mascaraProcesso  = pegaConfiguracao("mascara_processo", 5);
 ?>
-<script language="javascript">
+<script type="text/javascript">
      function zebra(id, classe)
      {
             var tabela = document.getElementById(id);
@@ -79,7 +79,7 @@ switch ($sOpcao) {
         imprimeRecibo($iNumRecibo, $iExercicio);
 
         ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 function SalvarImprimir()
                 {
                     document.frm.action = "reciboEntrega.php?<?=Sessao::getId()?>&sOpcao=imprimeRecibo&iNumRecibo=<?=$iNumRecibo?>&iExercicio=<?=$iExercicio?>";
@@ -132,7 +132,7 @@ function filtros()
 function montaFormulario()
 {
     print '
-    <script language="JavaScript">
+    <script type="text/javascript">
         function Valida()
         {
             var mensagem = "";
@@ -192,7 +192,7 @@ function montaFormulario()
 function montaFormularioReimpressao()
 {
     print '
-    <script language="JavaScript">
+    <script type="text/javascript">
         function Valida()
         {
             var mensagem = "";
@@ -277,7 +277,7 @@ function listaProcessos()
         }
 
         print '
-        <script language="JavaScript">
+        <script type="text/javascript">
         <!--
             function Reimpressao()
             {
@@ -617,7 +617,7 @@ function imprimeRecibo($iNumRecibo, $iExercicio, $codProcesso="", $codOrgao="")
 
     if (is_null($recibo)) {
 
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
               alertaAviso("Recibo não encontrado: '.$objeto.'/'.$iExercicio.'","unica","erro","'.Sessao::getId().'");
               mudaTelaPrincipal("imprimeReciboEntrega.php?'.Sessao::getId().'");
               </script>';
@@ -685,7 +685,7 @@ function imprimeRecibo($iNumRecibo, $iExercicio, $codProcesso="", $codOrgao="")
     $sXML       = CAM_PROTOCOLO.'protocolo/processos/imprimeReciboEntrega.xml';
 
     print '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function SalvarImprimir()
             {
                 document.frm.action = "reciboEntrega.php?'.Sessao::getId().'&sOpcao=imprimeRecibo&iNumRecibo='.$iNumRecibo.'&iExercicio='.$iExercicio.'";

@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.95
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function Ok(){
     document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
     document.frm.submit();

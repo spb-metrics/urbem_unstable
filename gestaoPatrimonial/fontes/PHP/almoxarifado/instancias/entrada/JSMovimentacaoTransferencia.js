@@ -41,7 +41,7 @@
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function validaUsuarioSecundario (clickForm) {
     BloqueiaFrames(true,false);

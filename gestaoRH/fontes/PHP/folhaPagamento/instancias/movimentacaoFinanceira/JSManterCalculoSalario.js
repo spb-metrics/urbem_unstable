@@ -55,7 +55,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function processarPopUp(inCodContrato,inRegistro,stNumCgm,stNomCgm){
     var width  = 800;

@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 59612 $
+    $Revision: 62658 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: evandro $
+    $Date: 2015-05-29 15:52:16 -0300 (Sex, 29 Mai 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -109,7 +109,7 @@ class TTGOALQ extends Persistente
                   END     AS      cod_subfuncao
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'
-                          ELSE    substr(despesa.num_pao::varchar,1,'1')
+                          ELSE    substr(despesa.num_acao::varchar,1,'1')
                   END     AS      cod_natureza
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'
@@ -274,7 +274,7 @@ class TTGOALQ extends Persistente
                   END     AS      cod_natureza
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'
-                          ELSE    substr(despesa.num_pao::varchar,2,3)
+                          ELSE    substr(despesa.num_acao::varchar,2,3)
                   END     AS      num_pao
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'
@@ -439,7 +439,7 @@ class TTGOALQ extends Persistente
                   END     AS      cod_natureza
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'
-                          ELSE    substr(despesa.num_pao::varchar,2,3)
+                          ELSE    substr(despesa.num_acao::varchar,2,3)
                   END     AS      num_pao
                ,  CASE    WHEN    pre_empenho.implantado = 't'  AND pre_empenho.exercicio <= '2001'
                           THEN    '0'

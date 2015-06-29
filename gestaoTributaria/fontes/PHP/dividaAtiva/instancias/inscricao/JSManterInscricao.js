@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSManterInscricao.js 61352 2015-01-09 18:14:18Z evandro $
+    * $Id: JSManterInscricao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-05.04.02
 */
@@ -60,7 +60,7 @@ adicionado trecho de log do CVS
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function verificaMarcados() {
     var cont = 0;

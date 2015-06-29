@@ -75,7 +75,7 @@ $pgJS = "JS".$stPrograma.".js";
 include_once( $pgJS );
 ini_set('max_input_vars', '10000');
 ?>
- <script language="JavaScript1.2" type="text/javascript">
+ <script type="text/javascript">
 
             function zebra(id, classe)
             {

@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 61769 $
+    $Revision: 62622 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-03-03 10:20:41 -0300 (Ter, 03 Mar 2015) $
+    $Author: carlos.silva $
+    $Date: 2015-05-25 16:52:18 -0300 (Seg, 25 Mai 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -97,187 +97,11 @@ class TTCMGOAFD extends Persistente
                            THEN '02'
                            ELSE '01'
                       END as tipo_conta
-                    , (   SELECT  SUM(
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_debito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_debito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_debito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_debito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_debito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_debito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote          = lancamento.cod_lote
-                                                  AND  lote.exercicio         = lancamento.exercicio
-                                                  AND  lote.tipo              = lancamento.tipo
-                                                  AND  lote.cod_entidade      = lancamento.cod_entidade
-                                           
-                                                WHERE  conta_debito.exercicio = pa.exercicio
-                                                  AND  conta_debito.cod_plano = pa.cod_plano
-                                           )
-                                           -
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_credito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_credito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_credito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_credito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_credito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_credito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote     = lancamento.cod_lote
-                                                  AND  lote.exercicio    = lancamento.exercicio
-                                                  AND  lote.tipo         = lancamento.tipo
-                                                  AND  lote.cod_entidade = lancamento.cod_entidade
-                                           
-                                                WHERE  conta_credito.exercicio = pa.exercicio
-                                                  AND  conta_credito.cod_plano = pa.cod_plano
-                                           )
-                                   )  as vl_total
-                             FROM  contabilidade.plano_analitica AS pa
-                            WHERE  pa.cod_plano = plano_analitica.cod_plano
-                              AND  pa.exercicio = plano_analitica.exercicio
-                       )   AS  saldo_inicial
-                       
-                    , (SELECT SUM(( SELECT COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                          FROM contabilidade.conta_debito
-                                         INNER JOIN  contabilidade.valor_lancamento
-                                            ON valor_lancamento.cod_lote = conta_debito.cod_lote
-                                           AND valor_lancamento.tipo = conta_debito.tipo
-                                           AND valor_lancamento.sequencia = conta_debito.sequencia
-                                           AND valor_lancamento.exercicio = conta_debito.exercicio
-                                           AND valor_lancamento.tipo_valor = conta_debito.tipo_valor
-                                           AND valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                         INNER JOIN contabilidade.lancamento
-                                            ON lancamento.sequencia = valor_lancamento.sequencia
-                                           AND lancamento.cod_lote = valor_lancamento.cod_lote
-                                           AND lancamento.tipo = valor_lancamento.tipo
-                                           AND lancamento.exercicio = valor_lancamento.exercicio
-                                           AND lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                         INNER JOIN contabilidade.lote
-                                            ON lote.cod_lote = lancamento.cod_lote
-                                           AND lote.exercicio = lancamento.exercicio
-                                           AND lote.tipo = lancamento.tipo
-                                           AND lote.cod_entidade = lancamento.cod_entidade                                           
-                                           AND lote.exercicio = '".$this->getDado('exercicio')."'
-                                           AND lote.tipo != 'I'
-                                         WHERE conta_debito.exercicio = pa.exercicio
-                                           AND conta_debito.cod_plano = pa.cod_plano
-                                    )) as vl_total
-                             FROM contabilidade.plano_analitica AS pa
-                            WHERE pa.cod_plano = plano_analitica.cod_plano
-                              AND pa.exercicio = plano_analitica.exercicio
-                           ) AS vl_entradas
-                           
-                    , (SELECT SUM(( SELECT COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                          FROM contabilidade.conta_credito
-                                         INNER JOIN contabilidade.valor_lancamento
-                                            ON valor_lancamento.cod_lote = conta_credito.cod_lote
-                                           AND valor_lancamento.tipo = conta_credito.tipo
-                                           AND valor_lancamento.sequencia = conta_credito.sequencia
-                                           AND valor_lancamento.exercicio = conta_credito.exercicio
-                                           AND valor_lancamento.tipo_valor = conta_credito.tipo_valor
-                                           AND valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                         INNER JOIN contabilidade.lancamento
-                                            ON lancamento.sequencia = valor_lancamento.sequencia
-                                           AND lancamento.cod_lote = valor_lancamento.cod_lote
-                                           AND lancamento.tipo = valor_lancamento.tipo
-                                           AND lancamento.exercicio = valor_lancamento.exercicio
-                                           AND lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                         INNER JOIN contabilidade.lote
-                                            ON lote.cod_lote = lancamento.cod_lote
-                                           AND lote.exercicio = lancamento.exercicio
-                                           AND lote.tipo = lancamento.tipo
-                                           AND lote.cod_entidade = lancamento.cod_entidade
-                                           AND lote.exercicio = '".$this->getDado('exercicio')."'
-                                           AND lote.tipo != 'I'
-                                         WHERE conta_credito.exercicio = pa.exercicio
-                                           AND conta_credito.cod_plano = pa.cod_plano
-                                         )) as vl_total
-                             FROM contabilidade.plano_analitica AS pa
-                            WHERE pa.cod_plano = plano_analitica.cod_plano
-                              AND pa.exercicio = plano_analitica.exercicio
-                           ) * -1  AS  vl_saidas
-                       
-                    ,  (   SELECT  SUM(
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_debito
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_debito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_debito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_debito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_debito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_debito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote          = lancamento.cod_lote
-                                                  AND  lote.exercicio         = lancamento.exercicio
-                                                  AND  lote.tipo              = lancamento.tipo
-                                                  AND  lote.cod_entidade      = lancamento.cod_entidade
-                                                WHERE  conta_debito.exercicio = pa.exercicio
-                                                  AND  conta_debito.cod_plano = pa.cod_plano
-                                           )
-                                           -
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_credito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_credito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_credito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_credito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_credito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_credito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote           = lancamento.cod_lote
-                                                  AND  lote.exercicio          = lancamento.exercicio
-                                                  AND  lote.tipo               = lancamento.tipo
-                                                  AND  lote.cod_entidade       = lancamento.cod_entidade
-                                                WHERE  conta_credito.exercicio = pa.exercicio
-                                                  AND  conta_credito.cod_plano = pa.cod_plano
-                                           )
-                                     )
-                                     
-                             FROM  contabilidade.plano_analitica AS pa
-                            WHERE  pa.cod_plano = plano_analitica.cod_plano
-                              AND  pa.exercicio = plano_analitica.exercicio
-                              
-                       )   AS  saldo_final
+                    
+                    , ABS(pl_balancete_verificacao.vl_saldo_anterior) AS saldo_inicial
+                    , ABS(pl_balancete_verificacao.vl_saldo_creditos) AS vl_saidas
+                    , ABS(pl_balancete_verificacao.vl_saldo_debitos)  AS vl_entradas
+                    , ABS(pl_balancete_verificacao.vl_saldo_atual)    AS saldo_final
                        
                  FROM  tcmgo.orgao_plano_banco
            
@@ -293,19 +117,42 @@ class TTCMGOAFD extends Persistente
                    ON  plano_conta.cod_conta = plano_analitica.cod_conta
                   AND  plano_conta.exercicio = plano_analitica.exercicio
                   
+          INNER JOIN (
+                        SELECT cod_estrutural  
+                              , vl_saldo_anterior
+                              , vl_saldo_debitos 
+                              , vl_saldo_creditos
+                              , vl_saldo_atual   
+                              , '".$this->getDado('exercicio')."'::varchar AS exercicio
+                          
+                         FROM contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."','cod_entidade IN (".$this->getDado('cod_entidade') .") ','01/01/".$this->getDado('exercicio')."','31/12/".$this->getDado('exercicio')."','A'::CHAR)
+                           AS retorno( cod_estrutural        VARCHAR
+                                ,nivel               INTEGER                                                        
+                                ,nom_conta           VARCHAR
+                                ,cod_sistema  	     INTEGER
+                                ,indicador_superavit CHAR(12)                                                
+                                ,vl_saldo_anterior   NUMERIC
+                                ,vl_saldo_debitos    NUMERIC
+                                ,vl_saldo_creditos   NUMERIC
+                                ,vl_saldo_atual      NUMERIC
+                            )  
+                      ) AS pl_balancete_verificacao
+                   ON pl_balancete_verificacao.cod_estrutural = plano_conta.cod_estrutural
+                  AND pl_balancete_verificacao.exercicio      = plano_conta.exercicio  
+                  
            INNER JOIN  monetario.agencia
                    ON  agencia.cod_banco   = plano_banco.cod_banco
                   AND  agencia.cod_agencia = plano_banco.cod_agencia
             
-            LEFT JOIN monetario.conta_corrente
-                   ON conta_corrente.cod_banco          = plano_banco.cod_banco
-                  AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
-                  AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
+            LEFT JOIN  monetario.conta_corrente
+                   ON  conta_corrente.cod_banco          = plano_banco.cod_banco
+                  AND  conta_corrente.cod_agencia        = plano_banco.cod_agencia
+                  AND  conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                                               
            INNER JOIN  monetario.banco
                    ON  banco.cod_banco = plano_banco.cod_banco
                 
-                WHERE  plano_banco.exercicio    = '".$this->getDado('exercicio')."'
+                WHERE  plano_banco.exercicio = '".$this->getDado('exercicio')."'
                   AND  plano_banco.cod_entidade IN (".$this->getDado('cod_entidade') .") ";
                  
         return $stSql;
@@ -326,7 +173,7 @@ class TTCMGOAFD extends Persistente
        $stSql = "
                SELECT '11' AS tipo_registro
                     , ( SELECT SUBSTR(valor,1,1)
-                                FROM administracao.configuracao_entidade 
+                                FROM administracao.configuracao_entidade
                                 WHERE configuracao_entidade.exercicio = plano_banco.exercicio
                                 AND configuracao_entidade.cod_entidade = plano_banco.cod_entidade
                                 AND  parametro = 'tc_ug_orgaounidade'
@@ -342,199 +189,11 @@ class TTCMGOAFD extends Persistente
                            ELSE '01'
                       END as tipo_conta
                     , recurso.cod_recurso AS cod_fonte_recurso
-                    , (   SELECT  SUM(
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_debito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_debito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_debito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_debito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_debito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_debito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote          = lancamento.cod_lote
-                                                  AND  lote.exercicio         = lancamento.exercicio
-                                                  AND  lote.tipo              = lancamento.tipo
-                                                  AND  lote.cod_entidade      = lancamento.cod_entidade
-                                           
-                                                WHERE  conta_debito.exercicio = pa.exercicio
-                                                  AND  conta_debito.cod_plano = pa.cod_plano
-                                           )
-                                           -
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_credito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_credito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_credito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_credito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_credito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_credito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote     = lancamento.cod_lote
-                                                  AND  lote.exercicio    = lancamento.exercicio
-                                                  AND  lote.tipo         = lancamento.tipo
-                                                  AND  lote.cod_entidade = lancamento.cod_entidade
-                                           
-                                                WHERE  conta_credito.exercicio = pa.exercicio
-                                                  AND  conta_credito.cod_plano = pa.cod_plano
-                                           )
-                                   )  as vl_total
-                             FROM  contabilidade.plano_analitica AS pa
-                            WHERE  pa.cod_plano = plano_analitica.cod_plano
-                              AND  pa.exercicio = plano_analitica.exercicio
-                       )   AS  saldo_inicial
-                       
-                    , (SELECT SUM(( SELECT COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                          FROM contabilidade.conta_debito
-                                    
-                                    INNER JOIN  contabilidade.valor_lancamento
-                                            ON valor_lancamento.cod_lote     = conta_debito.cod_lote
-                                           AND valor_lancamento.tipo         = conta_debito.tipo
-                                           AND valor_lancamento.sequencia    = conta_debito.sequencia
-                                           AND valor_lancamento.exercicio    = conta_debito.exercicio
-                                           AND valor_lancamento.tipo_valor   = conta_debito.tipo_valor
-                                           AND valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                    
-                                    INNER JOIN contabilidade.lancamento
-                                            ON lancamento.sequencia    = valor_lancamento.sequencia
-                                           AND lancamento.cod_lote     = valor_lancamento.cod_lote
-                                           AND lancamento.tipo         = valor_lancamento.tipo
-                                           AND lancamento.exercicio    = valor_lancamento.exercicio
-                                           AND lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                    
-                                    INNER JOIN contabilidade.lote
-                                            ON lote.cod_lote     = lancamento.cod_lote
-                                           AND lote.exercicio    = lancamento.exercicio
-                                           AND lote.tipo         = lancamento.tipo
-                                           AND lote.cod_entidade = lancamento.cod_entidade
-                                           AND lote.exercicio    = '".$this->getDado('exercicio')."'
-                                           AND lote.tipo        != 'I'
-                                    
-                                         WHERE conta_debito.exercicio = pa.exercicio
-                                           AND conta_debito.cod_plano = pa.cod_plano
-                                           
-                                    )) as vl_total
-                             FROM contabilidade.plano_analitica AS pa
-                            WHERE pa.cod_plano = plano_analitica.cod_plano
-                              AND pa.exercicio = plano_analitica.exercicio
-                           ) AS vl_entradas
-                           
-                    , (SELECT SUM(( SELECT COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                          FROM contabilidade.conta_credito
-                                    
-                                    INNER JOIN contabilidade.valor_lancamento
-                                            ON valor_lancamento.cod_lote     = conta_credito.cod_lote
-                                           AND valor_lancamento.tipo         = conta_credito.tipo
-                                           AND valor_lancamento.sequencia    = conta_credito.sequencia
-                                           AND valor_lancamento.exercicio    = conta_credito.exercicio
-                                           AND valor_lancamento.tipo_valor   = conta_credito.tipo_valor
-                                           AND valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                    
-                                    INNER JOIN contabilidade.lancamento
-                                            ON lancamento.sequencia    = valor_lancamento.sequencia
-                                           AND lancamento.cod_lote     = valor_lancamento.cod_lote
-                                           AND lancamento.tipo         = valor_lancamento.tipo
-                                           AND lancamento.exercicio    = valor_lancamento.exercicio
-                                           AND lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                    
-                                    INNER JOIN contabilidade.lote
-                                            ON lote.cod_lote     = lancamento.cod_lote
-                                           AND lote.exercicio    = lancamento.exercicio
-                                           AND lote.tipo         = lancamento.tipo
-                                           AND lote.cod_entidade = lancamento.cod_entidade
-                                           AND lote.exercicio = '".$this->getDado('exercicio')."'
-                                           AND lote.tipo        != 'I'
-                                         
-                                         WHERE conta_credito.exercicio = pa.exercicio
-                                           AND conta_credito.cod_plano = pa.cod_plano
-                                           
-                                         )) as vl_total
-                             FROM contabilidade.plano_analitica AS pa
-                            WHERE pa.cod_plano = plano_analitica.cod_plano
-                              AND pa.exercicio = plano_analitica.exercicio
-                           ) * -1  AS  vl_saidas
-                       
-                          ,  (   SELECT  SUM(
-                                            (  SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_debito
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_debito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_debito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_debito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_debito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_debito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_debito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote          = lancamento.cod_lote
-                                                  AND  lote.exercicio         = lancamento.exercicio
-                                                  AND  lote.tipo              = lancamento.tipo
-                                                  AND  lote.cod_entidade      = lancamento.cod_entidade
-                                                WHERE  conta_debito.exercicio = pa.exercicio
-                                                  AND  conta_debito.cod_plano = pa.cod_plano
-                                           )
-                                           -
-                                           (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
-                                                 FROM  contabilidade.conta_credito
-                                           
-                                           INNER JOIN  contabilidade.valor_lancamento
-                                                   ON  valor_lancamento.cod_lote     = conta_credito.cod_lote
-                                                  AND  valor_lancamento.tipo         = conta_credito.tipo
-                                                  AND  valor_lancamento.sequencia    = conta_credito.sequencia
-                                                  AND  valor_lancamento.exercicio    = conta_credito.exercicio
-                                                  AND  valor_lancamento.tipo_valor   = conta_credito.tipo_valor
-                                                  AND  valor_lancamento.cod_entidade = conta_credito.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lancamento
-                                                   ON  lancamento.sequencia    = valor_lancamento.sequencia
-                                                  AND  lancamento.cod_lote     = valor_lancamento.cod_lote
-                                                  AND  lancamento.tipo         = valor_lancamento.tipo
-                                                  AND  lancamento.exercicio    = valor_lancamento.exercicio
-                                                  AND  lancamento.cod_entidade = valor_lancamento.cod_entidade
-                                           
-                                           INNER JOIN  contabilidade.lote
-                                                   ON  lote.cod_lote           = lancamento.cod_lote
-                                                  AND  lote.exercicio          = lancamento.exercicio
-                                                  AND  lote.tipo               = lancamento.tipo
-                                                  AND  lote.cod_entidade       = lancamento.cod_entidade
-                                                
-                                                WHERE  conta_credito.exercicio = pa.exercicio
-                                                  AND  conta_credito.cod_plano = pa.cod_plano
-                                           )
-                                     )
-                                     
-                             FROM  contabilidade.plano_analitica AS pa
-                            WHERE  pa.cod_plano = plano_analitica.cod_plano
-                              AND  pa.exercicio = plano_analitica.exercicio
-                              
-                       )   AS  saldo_final
+
+                    , ABS(pl_balancete_verificacao.vl_saldo_anterior) AS saldo_inicial
+                    , ABS(pl_balancete_verificacao.vl_saldo_creditos) AS vl_saidas
+                    , ABS(pl_balancete_verificacao.vl_saldo_debitos)  AS vl_entradas
+                    , ABS(pl_balancete_verificacao.vl_saldo_atual)    AS saldo_final
                        
                  FROM  tcmgo.orgao_plano_banco
            
@@ -549,6 +208,29 @@ class TTCMGOAFD extends Persistente
            INNER JOIN  contabilidade.plano_conta
                    ON  plano_conta.cod_conta = plano_analitica.cod_conta
                   AND  plano_conta.exercicio = plano_analitica.exercicio
+                  
+          INNER JOIN (
+                        SELECT cod_estrutural  
+                              , vl_saldo_anterior
+                              , vl_saldo_debitos 
+                              , vl_saldo_creditos
+                              , vl_saldo_atual   
+                              , '".$this->getDado('exercicio')."'::varchar AS exercicio
+                          
+                         FROM contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."','cod_entidade IN (".$this->getDado('cod_entidade') .") ','01/01/".$this->getDado('exercicio')."','31/12/".$this->getDado('exercicio')."','A'::CHAR)
+                           AS retorno( cod_estrutural        VARCHAR
+                                ,nivel               INTEGER                                                        
+                                ,nom_conta           VARCHAR
+                                ,cod_sistema  	     INTEGER
+                                ,indicador_superavit CHAR(12)                                                
+                                ,vl_saldo_anterior   NUMERIC
+                                ,vl_saldo_debitos    NUMERIC
+                                ,vl_saldo_creditos   NUMERIC
+                                ,vl_saldo_atual      NUMERIC
+                            )  
+                      ) AS pl_balancete_verificacao
+                   ON pl_balancete_verificacao.cod_estrutural = plano_conta.cod_estrutural
+                  AND pl_balancete_verificacao.exercicio      = plano_conta.exercicio                  
                   
            INNER JOIN contabilidade.plano_recurso
                    ON plano_recurso.cod_plano = plano_analitica.cod_plano

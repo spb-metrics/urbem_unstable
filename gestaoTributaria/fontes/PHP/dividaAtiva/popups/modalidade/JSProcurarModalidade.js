@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Programador: Fernando Piccini Cercato
 
-    * $Id: JSProcurarModalidade.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSProcurarModalidade.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.04.07
 **/
@@ -46,7 +46,7 @@ popup de busca modalidade.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Insere( stR1, stR2  ){
     var stTraget = window.opener.parent.frames['telaPrincipal'].document.frm.target;

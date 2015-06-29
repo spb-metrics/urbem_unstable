@@ -51,7 +51,7 @@ Revision 1.1  2006/10/03 09:57:51  cercato
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function Cancelar () {
     <?php
         $link = Sessao::read( "link" );

@@ -120,6 +120,10 @@ if ($_REQUEST['inCodComissao']) {
     $obTLicitacaoParticipante->setDado( 'cod_comissao', $_REQUEST['inCodComissao'] );
 }
 
+if ($request->get('inCGM')) {
+    $obTLicitacaoParticipante->setDado( 'numcgm_representante', $request->get('inCGM') );
+}
+
 $obTLicitacaoParticipante->recuperaParticipanteLicitacaoHabilitacaoLista($rsLicitacaoParticipante);
 
 $obLista = new Lista;

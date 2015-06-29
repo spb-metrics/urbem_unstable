@@ -41,7 +41,7 @@ Casos de uso: uc-01.02.92
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function habilitaCampos( tipoHabilita ){
     var f = document.frm;

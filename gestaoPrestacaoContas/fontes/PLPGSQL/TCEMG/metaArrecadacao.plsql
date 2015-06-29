@@ -48,12 +48,15 @@ BEGIN
               SELECT previsao_receita.periodo AS bimestre
                    , SUM(previsao_receita.vl_periodo) AS valor_meta
                 FROM orcamento.previsao_receita
-                JOIN orcamento.receita
+                
+          INNER JOIN orcamento.receita
                   ON receita.cod_receita = previsao_receita.cod_receita
                  AND receita.exercicio   = previsao_receita.exercicio
-               WHERE previsao_receita.exercicio = ''' || stExercicio || '''
-                 AND previsao_receita.periodo = ' || inBimestre || '
+                 
+               WHERE previsao_receita.exercicio = '|| quote_literal(stExercicio) || '
+                 AND previsao_receita.periodo   = ' || inBimestre || '
                  AND receita.cod_entidade IN (' || stCodEntidade || ')
+                 
             GROUP BY previsao_receita.periodo
           ';
 

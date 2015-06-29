@@ -69,12 +69,12 @@ function recuperaDadosArquivo(&$rsRecordSet)
 function montaRecuperaDadosArquivo()
 {
     $stSql  = "
-        SELECT mes
+        SELECT (mes/2) AS periodo --divisão necessária para retornar o número do período bimestral ao invés do último mês do bimestre.
              , exercicio
              , observacao
           FROM tcemg.obs_meta_arrecadacao
          WHERE exercicio = '".Sessao::getExercicio()."'
-           AND mes = ".$this->getDado('mes')."
+           AND mes = ".$this->getDado('periodo')."
                ";
 
     return $stSql;

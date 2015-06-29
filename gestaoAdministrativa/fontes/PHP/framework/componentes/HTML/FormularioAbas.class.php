@@ -174,7 +174,7 @@ function montaHTML()
     }
     $stHTML .= $this->stHTML;
     $stHTML .= "\n<script>\n HabilitaLayer('".$this->stLayerAtivo."');\n</script>\n";
-    $stHTML .= "\n<script language='javascript'>\nexecuta();\n</script>\n";
+    $stHTML .= "\n<script type='text/javascript'>\nexecuta();\n</script>\n";
     $this->stHTML = $stHTML;
 }
 

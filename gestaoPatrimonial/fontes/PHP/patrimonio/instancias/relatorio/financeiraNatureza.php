@@ -49,7 +49,7 @@ $xsql = "Select min(cod_bem) as minBem, max(cod_bem) as maxBem From patrimonio.b
 $codMinimo = pegaValor($xsql,"minBem");
 $codMaximo = pegaValor($xsql,"maxBem");
 ?>
-   <script language="JavaScript1.2" type="text/javascript">
+   <script type="text/javascript">
 
       function Valida()
       {

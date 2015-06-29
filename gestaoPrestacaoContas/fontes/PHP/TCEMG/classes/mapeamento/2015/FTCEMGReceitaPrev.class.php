@@ -50,39 +50,36 @@ function FTCEMGReceitaPrev()
     parent::Persistente();
 
     $this->setTabela('tcemg.fn_receita_prev');
-
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
-                SELECT  ".$this->getDado("mes")." as mes
+                SELECT  EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS periodo
                         , cod_tipo
-                        , REPLACE(contrib_pat               ,'.','') as contrib_pat
-                        , REPLACE(contrib_serv_ativo        ,'.','') as contrib_serv_ativo
-                        , REPLACE(contrib_serv_inat_pens    ,'.','') as contrib_serv_inat_pens
-                        , REPLACE(rec_patrimoniais          ,'.','') as rec_patrimoniais
-                        , REPLACE(alienacao_bens            ,'.','') as alienacao_bens
-                        , REPLACE(outras_rec_cap            ,'.','') as outras_rec_cap
-                        , REPLACE(comp_prev                 ,'.','') as comp_prev
-                        , REPLACE(outras_rec                ,'.','') as outras_rec
-                        , REPLACE(deducoes_receita          ,'.','') as deducoes_receita
-                        , 0 as contrib_pat_anterior
-                        , 0 as repasses_prev
-                        , 0 as receitas_prev_intra
-                        , 0 as plano_fin_recursos_cobertura
-                        , 0 as plano_fin_repasse_pag_resp
-                        , 0 as plano_fin_rec_formacao_reserva
-                        , 0 as plano_fin_outros_aportes_rpps
-                        , 0 as plano_prev_rec_cob_def_fin
-                        , 0 as plano_prev_rec_cob_def_atuarial
-                        , 0 as plano_prev_outros_aportes_rpps
+                        , contrib_pat
+                        , contrib_serv_ativo
+                        , contrib_serv_inat_pens
+                        , rec_patrimoniais
+                        , alienacao_bens
+                        , outras_rec_cap
+                        , comp_prev
+                        , outras_rec
+                        , deducoes_receita
+                        , 0.00 as contrib_pat_anterior
+                        , 0.00 as repasses_prev
+                        , 0.00 as receitas_prev_intra
+                        , 0.00 as plano_fin_recursos_cobertura
+                        , 0.00 as plano_fin_repasse_pag_resp
+                        , 0.00 as plano_fin_rec_formacao_reserva
+                        , 0.00 as plano_fin_outros_aportes_rpps
+                        , 0.00 as plano_prev_rec_cob_def_fin
+                        , 0.00 as plano_prev_rec_cob_def_atuarial
+                        , 0.00 as plano_prev_outros_aportes_rpps
                 FROM tcemg.fn_receita_prev( '".$this->getDado("exercicio")."'
                                             , '".$this->getDado("cod_entidade")."'
-                                            , ".$this->getDado("mes")."
+                                            , '".$this->getDado("dt_inicial")."'
+                                            , '".$this->getDado("dt_final")."'
                 ) AS retorno(
                      cod_tipo                   VARCHAR
                     , contrib_pat               VARCHAR

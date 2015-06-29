@@ -31,7 +31,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    $Id: relatorioLocais.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: relatorioLocais.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Casos de uso: uc-01.03.94
 
@@ -40,7 +40,7 @@
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
  ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function SalvarRelatorio()
     {
         document.frm.action = "locais.php?<?=Sessao::getId()?>";

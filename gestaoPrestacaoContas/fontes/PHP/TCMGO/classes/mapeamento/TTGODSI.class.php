@@ -972,20 +972,15 @@ class TTGODSI extends Persistente
                      AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
                      AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
                      
-                    JOIN compras.mapa_cotacao
-                      ON mapa_cotacao.exercicio_cotacao = mapa.exercicio
-                     AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-                     
-                    JOIN compras.cotacao
-                      ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-                     AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-                     
-                    JOIN compras.cotacao_item
-                      ON cotacao_item.exercicio   = cotacao.exercicio
-                     AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
+                    JOIN compras.solicitacao_item
+                        ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
+                        AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+                        AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+                        AND solicitacao_item.cod_centro         = mapa_item.cod_centro
+                        AND solicitacao_item.cod_item           = mapa_item.cod_item
                     
                     JOIN almoxarifado.catalogo_item
-                        ON catalogo_item.cod_item   = cotacao_item.cod_item
+                        ON catalogo_item.cod_item   = solicitacao_item.cod_item
         
                     WHERE licitacao.exercicio = '" . $this->getDado('exercicio') . "'
                     AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
@@ -1003,31 +998,30 @@ class TTGODSI extends Persistente
 
     public function montaRecuperaDetalhamento13()
     {
-        $stSql = "
-            SELECT 13 AS tipo_registro
-                 , licitacao.num_orgao AS cod_orgao
-                 , licitacao.num_unidade AS cod_unidade
-                 , sw_processo.cod_processo AS num_processo
-                 , sw_processo.ano_exercicio AS ano_exercicio_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
-                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
-                        WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
-                   END AS tipo_processo
-                 , despesa.cod_funcao AS cod_funcao
-                 , despesa.cod_subfuncao AS cod_subfuncao
-                 , despesa.cod_programa AS cod_programa
-                 , SUBSTR(despesa.num_pao::varchar,1,1) AS natureza_acao
-                 , SUBSTR(despesa.num_pao::varchar,2,3) AS num_proj_ativ
-                 , SUBSTR(REPLACE(conta_despesa.cod_estrutural::varchar,'.',''),1,6) AS elemento_despesa
-                 , CASE WHEN( elemento_de_para.estrutural IS NOT NULL )
-                        THEN SUBSTR(REPLACE(elemento_de_para.estrutural::varchar,'.',''),7,2)
-                        ELSE '00'
-                 END AS subelemento
-                 , recurso.cod_recurso AS cod_fonte_recurso
-                 , despesa.vl_original AS valor_recurso
-                 , '' AS brancos
-                 , 0 AS numero_sequencial
+        $stSql = "SELECT 13 AS tipo_registro
+                        , licitacao.num_orgao AS cod_orgao
+                        , licitacao.num_unidade AS cod_unidade
+                        , sw_processo.cod_processo AS num_processo
+                        , sw_processo.ano_exercicio AS ano_exercicio_processo
+                        , CASE WHEN modalidade.cod_modalidade = 8 AND licitacao.tipo_chamada_publica = 0 THEN 1
+                               WHEN modalidade.cod_modalidade = 9 AND licitacao.tipo_chamada_publica = 0 THEN 2
+                               WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 2 THEN 3
+                               WHEN (modalidade.cod_modalidade = 9 OR modalidade.cod_modalidade = 10) AND licitacao.tipo_chamada_publica = 1 THEN 4
+                          END AS tipo_processo
+                        , despesa.cod_funcao AS cod_funcao
+                        , despesa.cod_subfuncao AS cod_subfuncao
+                        , despesa.cod_programa AS cod_programa
+                        , SUBSTR(despesa.num_pao::varchar,1,1) AS natureza_acao
+                        , SUBSTR(despesa.num_pao::varchar,2,3) AS num_proj_ativ
+                        , SUBSTR(REPLACE(conta_despesa.cod_estrutural::varchar,'.',''),1,6) AS elemento_despesa
+                        , CASE WHEN( elemento_de_para.estrutural IS NOT NULL )
+                               THEN SUBSTR(REPLACE(elemento_de_para.estrutural::varchar,'.',''),7,2)
+                               ELSE '00'
+                        END AS subelemento
+                        , recurso.cod_recurso AS cod_fonte_recurso
+                        , '' AS brancos
+                        , 0 AS numero_sequencial
+                        , SUM(despesa.vl_original) AS valor_recurso
                  
             FROM licitacao.licitacao
             
@@ -1082,38 +1076,27 @@ class TTGODSI extends Persistente
              AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
              AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
              
-            JOIN compras.mapa_cotacao
-              ON mapa_cotacao.exercicio_mapa = mapa.exercicio
-             AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-             
-            JOIN compras.cotacao
-              ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-             AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-            
-            JOIN empenho.item_pre_empenho_julgamento
-              ON item_pre_empenho_julgamento.exercicio = cotacao.exercicio
-             AND item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
-             
-            JOIN empenho.item_pre_empenho
-              ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
-             AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
-             AND item_pre_empenho.num_item = item_pre_empenho.num_item
-             
-            JOIN empenho.pre_empenho
-              ON pre_empenho.exercicio = item_pre_empenho.exercicio
-             AND pre_empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-             
-            JOIN empenho.pre_empenho_despesa
-              ON pre_empenho_despesa.exercicio  = pre_empenho.exercicio
-             AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-             
+             JOIN compras.solicitacao_item
+              ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
+             AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+             AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+             AND solicitacao_item.cod_centro         = mapa_item.cod_centro
+             AND solicitacao_item.cod_item           = mapa_item.cod_item
+
+            JOIN compras.solicitacao_item_dotacao
+              ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
+             AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
+             AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
+             AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
+             AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
+
             JOIN orcamento.despesa
-              ON despesa.exercicio = pre_empenho_despesa.exercicio
-             AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+              ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
+             AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
              
             JOIN orcamento.conta_despesa
-              ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
-             AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+              ON conta_despesa.exercicio = despesa.exercicio
+             AND conta_despesa.cod_conta = despesa.cod_conta
              
        LEFT JOIN tcmgo.elemento_de_para
               ON elemento_de_para.cod_conta = conta_despesa.cod_conta
@@ -1127,6 +1110,23 @@ class TTGODSI extends Persistente
               AND licitacao.timestamp BETWEEN TO_DATE('" . $this->getDado('dtInicio') . "','dd/mm/yyyy') AND TO_DATE('" . $this->getDado('dtFim') . "','dd/mm/yyyy')
               AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
               AND modalidade.cod_modalidade IN (8,9)
+
+            GROUP BY tipo_registro
+                     , cod_orgao
+                     , cod_unidade
+                     , num_processo
+                     , ano_exercicio_processo
+                     , tipo_processo
+                     , cod_funcao
+                     , cod_subfuncao
+                     , cod_programa
+                     , natureza_acao
+                     , num_proj_ativ
+                     , elemento_despesa
+                     , subelemento
+                     , cod_fonte_recurso
+                     , brancos
+                     , numero_sequencial
             ";
             
         return $stSql;
@@ -1246,8 +1246,9 @@ class TTGODSI extends Persistente
              
             JOIN licitacao.licitacao_documentos
               ON licitacao_documentos.cod_licitacao = licitacao.cod_licitacao
-             AND licitacao_documentos.cod_entidade = licitacao.cod_entidade
-             AND licitacao_documentos.exercicio = licitacao.exercicio
+             AND licitacao_documentos.cod_entidade   = licitacao.cod_entidade
+             AND licitacao_documentos.exercicio      = licitacao.exercicio
+             AND licitacao_documentos.cod_modalidade = licitacao.cod_modalidade
              
             JOIN licitacao.documento
               ON documento.cod_documento = licitacao_documentos.cod_documento

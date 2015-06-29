@@ -78,7 +78,7 @@ case 0:
    $dbEmp->abreBD();
    $dbEmp->abreSelecao($sSQL);
    if ($dbEmp->numeroDeLinhas == 0 && $pagina != 0) {
-        echo "<script language='javascript'>
+        echo "<script type='text/javascript'>
                 mudaTelaPrincipal('".$PHP_SELF."?".Sessao::getId()."');
               </script>";
     }
@@ -133,7 +133,7 @@ $tipo = $vetAtributo[0]['tipoValor'];
 $valorPadrao = $vetAtributo[0]['valorPadrao'];
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function Valida()
 {
@@ -219,7 +219,7 @@ function Cancela()
    </tr>
 </table>
 </form>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 document.frm.nomAtributo.focus();
 //-->

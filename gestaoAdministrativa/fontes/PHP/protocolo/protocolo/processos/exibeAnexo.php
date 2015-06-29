@@ -29,7 +29,7 @@ include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/val
 
 <html>
     <head>
-        <script language="JavaScript">
+        <script type="text/javascript">
 
             //desabilita BOTAO DIREITO do MOUSE
             window.captureEvents(Event.MOUSEDOWN);

@@ -37,7 +37,7 @@
  */
 ?>
 
-<script language="Javascript">
+<script type="text/javascript">
 
 jq(document).ready(function () {
     var verificador = '';

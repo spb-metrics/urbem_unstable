@@ -199,7 +199,7 @@ case 1:
         }
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -324,19 +324,19 @@ if (comparaValor("nom_departamento", $nomDepartamento, "administracao.departamen
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $nomDepartamento);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodDpto.' - '.$nomDepartamento.'","alterar","aviso","'.Sessao::getId().'");
                  mudaTelaPrincipal("alteraDepartamento.php?'.Sessao::getId().'&pagina='.$pagina.'");
                  </script>';
     } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodDpto.' - '.$nomDepartamento.'","n_alterar","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("O Departamento '.$nomDepartamento.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");

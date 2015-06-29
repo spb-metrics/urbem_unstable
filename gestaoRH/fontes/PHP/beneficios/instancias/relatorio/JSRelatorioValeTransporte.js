@@ -50,7 +50,7 @@ Adicionada tag log.
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limparPagina(){
     document.frm.reset();

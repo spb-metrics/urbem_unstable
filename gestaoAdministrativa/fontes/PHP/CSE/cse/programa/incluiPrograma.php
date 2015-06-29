@@ -55,7 +55,7 @@ switch ($controle) {
 //Formulário em HTML para entrada de dados
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -169,7 +169,7 @@ case 1:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

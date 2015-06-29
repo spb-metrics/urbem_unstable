@@ -52,7 +52,7 @@ construção
 Revision 1.2  2006/08/08 17:42:47  vandre
 */
 ?>
-<script language="javascript"> 
+<script type="text/javascript"> 
 function limpaFormularioEventoExtra(){
     f = document.frm;
     f.stCmbDesdobramento.value = '';

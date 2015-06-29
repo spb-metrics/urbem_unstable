@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Diego Bueno Coelho
 
-    * $Id: JSProcurarAutoridade.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSProcurarAutoridade.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.04.08
 **/
@@ -44,7 +44,7 @@ Revision 1.1  2006/09/26 11:15:13  dibueno
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Insere( stR1, stR2 ){
 //alert ( <?=$_REQUEST["campoNum"];?> );

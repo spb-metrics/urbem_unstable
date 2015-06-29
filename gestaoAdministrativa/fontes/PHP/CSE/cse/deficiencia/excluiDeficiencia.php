@@ -57,8 +57,8 @@ if (!isset($controle)) {
     $sessao->transf = "";
 }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -197,7 +197,7 @@ case 1:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

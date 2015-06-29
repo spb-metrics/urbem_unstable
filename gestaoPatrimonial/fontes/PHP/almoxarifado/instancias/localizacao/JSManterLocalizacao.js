@@ -61,7 +61,7 @@ Revision 1.5  2006/07/06 12:09:53  diego
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function VerificaLocalizacao(obj,vlr,prm){
     var tamanho = prm.length;

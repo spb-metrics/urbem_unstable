@@ -32,7 +32,7 @@
 
         Casos de uso: uc-01.06.98
 
-        $Id: recebeProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+        $Id: recebeProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
         */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -69,7 +69,7 @@ if ($ctrl == 2) {
 }
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Salvar()
     {
         document.frm.action = "recebeProcesso.php?<?=Sessao::getId()?>&controle=1";

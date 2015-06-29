@@ -155,7 +155,7 @@ $nomEmpresa = pegaDado("nom_empresa","cse.empresa","Where cod_empresa = '".$codE
 $cnpj = pegaDado("cnpj","cse.empresa","Where cod_empresa = '".$codEmpresa."' ");
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -260,7 +260,7 @@ case 2:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

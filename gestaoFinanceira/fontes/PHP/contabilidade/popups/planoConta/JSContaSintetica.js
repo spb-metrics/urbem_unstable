@@ -52,7 +52,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inEstrutural,stDescricao){
     if( eval( window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"]?>') != null ) ) {

@@ -101,7 +101,7 @@ switch ($_REQUEST["ctrl"]) {
     $descricao = str_replace('\\\'', '\'', str_replace(chr(13).chr(10)," ",$descricao));
 
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -237,7 +237,7 @@ geraCampoData2("*Data Agendamento", "dataAgenda", hoje(), false, "onKeyPress=\"r
                 //    if ($agenda->comparaNumCgm()) {
                 if ($agenda->incluiAgendamento()) {
 ?>
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso      ( "Bem: <?=$codbem;?> - Agendamento para <?=$dataAgenda;?>","incluir","aviso","<?=Sessao::getId();?>" );
                         mudaTelaPrincipal( "agendaManutencao.php?<?=Sessao::getId();?>&ctrl_frm=2&pagina=<?=$_REQUEST["pagina"];?>"            );
                     </script>
@@ -258,7 +258,7 @@ geraCampoData2("*Data Agendamento", "dataAgenda", hoje(), false, "onKeyPress=\"r
 
         if ($msgErro != "") {
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso( "<?=$msgErro;?>", "n_incluir", "erro", "<?=Sessao::getId();?>" );
             </script>
 <?php

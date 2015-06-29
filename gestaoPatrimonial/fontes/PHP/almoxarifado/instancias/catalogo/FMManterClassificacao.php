@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterClassificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterClassificacao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-03.03.05
 */
@@ -338,7 +338,7 @@ if ($stAcao == 'alterar') {
     echo "<script>BloqueiaFrames(true, false); $('Ok').disabled = true;</script>";
     sistemaLegado::ExecutaFrameOculto("redirecionaPagina( '$pgOcul?".Sessao::getId()."', 'frm' , 'MontaListaClassificacaoAlteracao'  );");
 } else {
-    echo "<script language='javaScript'>mudaCatalogo(document.getElementById('inCatalogo'),true);</script>";
+    echo "<script type='text/javascript'>mudaCatalogo(document.getElementById('inCatalogo'),true);</script>";
 }
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

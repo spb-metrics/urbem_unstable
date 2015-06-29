@@ -48,7 +48,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 //Para chamar uma function de um oculto por ajax
 function executaFuncaoAjax( funcao, parametrosGET, sincrono ) {
     if( parametrosGET ) {

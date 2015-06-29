@@ -51,7 +51,7 @@ construção
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function download(){
     stAction = document.frm.action;

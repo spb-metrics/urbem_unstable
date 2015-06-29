@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRelatorioRazaoDespesa.php 62469 2015-05-13 11:44:13Z lisiane $
+ * $Id: OCGeraRelatorioRazaoDespesa.php 62788 2015-06-17 18:14:39Z evandro $
 
  * Casos de uso : uc-06.01.20
  */
@@ -67,7 +67,7 @@ switch($_REQUEST['stTipoRelatorio']) {
     break;
     
     case 'restos_pagar':
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData);
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData,"","ORDER BY dt_pagamento, empenho",$boTransacao);
     break;
 
     case 'empenhado':
@@ -80,7 +80,7 @@ switch($_REQUEST['stTipoRelatorio']) {
     break;
 
     default:
-    $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaPrincipal($rsData);
+        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaPrincipal($rsData);
     break;
 }
 

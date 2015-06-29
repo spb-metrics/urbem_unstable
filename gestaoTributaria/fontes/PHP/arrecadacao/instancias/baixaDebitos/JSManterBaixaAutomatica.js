@@ -34,7 +34,7 @@
     * @supackage Regras
     * @package Urbem
 
-    * $Id: JSManterBaixaAutomatica.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterBaixaAutomatica.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.03.10
 */
@@ -48,7 +48,7 @@ adicionado trecho de log do CVS
 */
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 function Salvar(){
  if( Valida() ){

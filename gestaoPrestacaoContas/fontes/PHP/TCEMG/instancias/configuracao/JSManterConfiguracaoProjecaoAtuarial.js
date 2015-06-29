@@ -27,10 +27,10 @@
  * @author Analista: Dagiane Vieira
  * @author Desenvolvedor: Michel Teixeira
  *
- * $Id: JSManterConfiguracaoProjecaoAtuarial.js 61792 2015-03-04 16:58:54Z michel $
+ * $Id: JSManterConfiguracaoProjecaoAtuarial.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
  */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     var stTarget = document.frm.target;

@@ -61,7 +61,7 @@ function montaRecuperaTodos()
 {
     $stSql  = "
             SELECT
-                    mes
+                    mes --fixo 12
                     ,cod_tipo
                     ,REPLACE(valor,'.','') as valor
             FROM tcemg.fn_deducao_receita(
@@ -71,8 +71,8 @@ function montaRecuperaTodos()
                                            ,'".$this->getDado("cod_entidade")."'
                                            )
             as retorno(
-                mes         text
-                ,cod_tipo   text
+                mes         varchar
+                ,cod_tipo   varchar
                 ,valor      varchar
             )
 

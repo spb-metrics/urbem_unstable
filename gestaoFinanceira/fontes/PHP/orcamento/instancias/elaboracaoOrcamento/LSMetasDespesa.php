@@ -74,7 +74,7 @@ include_once( $pgJS );
 
 $stCaminho = CAM_GF_ORC_INSTANCIAS."elaboracaoOrcamento/";
 ?>
- <script language="JavaScript1.2" type="text/javascript">
+ <script type="text/javascript">
 
             function zebra(id, classe)
             {

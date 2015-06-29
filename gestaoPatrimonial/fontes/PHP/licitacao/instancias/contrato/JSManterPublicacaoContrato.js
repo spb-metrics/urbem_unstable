@@ -49,7 +49,7 @@ Caso de Uso 03.05.23
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
    var data  = new Date();
    function consultaContrato(inIndice){
     var campo = new String();

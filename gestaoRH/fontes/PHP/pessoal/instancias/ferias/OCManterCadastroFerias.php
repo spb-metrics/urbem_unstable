@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 61557 2015-02-04 18:53:54Z evandro $
+    $Id: OCManterCadastroFerias.php 62702 2015-06-09 20:53:34Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -593,7 +593,7 @@ function preencherQuantDiasGozo()
             $obTPessoalConfiguracaoFerias   = new TPessoalConfiguracaoFerias;
             $obTPessoalFormaPagamentoFerias->setDado("cod_forma",$_GET['inCodFormaPagamento']);
             $obTPessoalFormaPagamentoFerias->recuperaPorChave($rsFormas);
-
+            
             if (Sessao::read("boConcederFeriasLote") == FALSE) {
                 $stFiltro  = " WHERE ".$inQuantFaltas." BETWEEN faltas_inicial and faltas_final";
                 $stFiltro .= "   AND ferias_proporcionais = ".$inFeriasProporcionais;
@@ -604,9 +604,15 @@ function preencherQuantDiasGozo()
             $inQuantDiasAbono   = $rsFormas->getCampo("abono");
             $dtCompetencia      = Sessao::read('dtCompetencia');
 
-            if ( $inQuantFaltas >= $rsConfiguracaoFerias->getCampo("faltas_inicial") and $inQuantFaltas <= $rsConfiguracaoFerias->getCampo("faltas_final") ) {
+            if ( $inQuantFaltas >= $rsConfiguracaoFerias->getCampo("faltas_inicial") and $inQuantFaltas <= $rsConfiguracaoFerias->getCampo("faltas_final") and $inQuantDiasGozo != 10 and $inQuantDiasGozo != 15 ) {
                 $inQuantDiasGozo  = round($inQuantDiasGozo*$rsConfiguracaoFerias->getCampo("dias_gozo")/30);
                 $inQuantDiasAbono = round(round($rsConfiguracaoFerias->getCampo("dias_gozo")) - $inQuantDiasGozo, 2);
+            } elseif ($inQuantDiasGozo == 10) {
+                $inQuantDiasGozo    = 10;
+                $inQuantDiasAbono   = 0;
+            } elseif ($inQuantDiasGozo == 15) {
+                $inQuantDiasGozo    = 15;
+                $inQuantDiasAbono   = 0;
             }
 
             $inQuantDiasGozo  = ( $inQuantDiasGozo < 0 ) ? 0 : $inQuantDiasGozo;
@@ -812,6 +818,24 @@ function validaDatasInicialFinalPeriodoAquisitivo($stDataIncial, $stDataFinal, &
     $obTPessoalFerias->setDado("dt_inicial_aquisitivo", $stDataIncial);
     $obTPessoalFerias->setDado("dt_final_aquisitivo", $stDataFinal);
     $obTPessoalFerias->verificaDatasPeriodoAquisitivo($rsPeriodoAquisitivo,"","",$boTransacao);
+
+    //SistemaLegado::mostravar($rsPeriodoAquisitivo->getElementos());
+    
+    if($rsPeriodoAquisitivo->getCampo('dias_ferias') == 10) {
+        $numDias=0;
+        
+        while(!$rsPeriodoAquisitivo->eof()) {
+            $numDias+= $rsPeriodoAquisitivo->getCampo('dias_ferias');
+            $rsPeriodoAquisitivo->proximo();
+        }
+        
+        if($numDias < 30) {
+            return true;
+        } else {
+            $stJs .= "alertaAviso('Este servidor já retirou os 30 dias de férias no qual tem direito.','form','erro','".Sessao::getId()."');   \n";
+            return false;
+        }
+    }
 
     if($rsPeriodoAquisitivo->getNumLinhas() < 0)
         return true;

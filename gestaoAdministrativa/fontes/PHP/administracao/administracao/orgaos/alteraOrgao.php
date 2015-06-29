@@ -158,7 +158,7 @@ case 1:
     }
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -267,18 +267,18 @@ case 2:
                 $audicao = new auditoriaLegada;
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $objeto);
                 $audicao->insereAuditoria();
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$objeto.'","alterar","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("alteraOrgao.php?'.Sessao::getId().'&pagina='.$pagina.'&controle=0");
                     </script>';
         } else {
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomOrgao.'","n_alterar","erro","'.Sessao::getId().'");
                     </script>';
         }
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("O Órgão '.$nomOrgao.' já existe","unica","erro","'.Sessao::getId().'");
             </script>';
     }

@@ -52,7 +52,7 @@ construção
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function habilitaCampos( tipoHabilita ){
     var f = document.frm;

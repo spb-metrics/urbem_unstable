@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: LSManterEdital.php 59638 2014-09-03 14:59:15Z michel $
+    $Id: LSManterEdital.php 62651 2015-05-28 19:58:48Z jean $
 
     * Casos de uso: uc-03.05.16
 */
@@ -164,6 +164,8 @@ if ($stAcao == 'anular') {
 $obTLicitacaoEdital->recuperaListaEdital( $rsEdital,$stFiltro,$stOrder );
 
 $obLista = new Lista;
+
+$stLink .= "&stAcao=".$stAcao;
 
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
 

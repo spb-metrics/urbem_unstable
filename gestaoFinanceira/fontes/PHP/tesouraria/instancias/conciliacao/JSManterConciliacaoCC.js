@@ -33,13 +33,13 @@
 
     * @ignore
 
-    * $Id: JSManterConciliacaoCC.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterConciliacaoCC.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso:
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado )
 {

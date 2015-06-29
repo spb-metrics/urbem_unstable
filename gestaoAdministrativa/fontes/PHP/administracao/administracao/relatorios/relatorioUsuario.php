@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.03.94
 
-    $Id: relatorioUsuario.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: relatorioUsuario.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -46,7 +46,7 @@ setAjuda("UC-01.03.94");
 
 ?>
 
-<script language="javaScript" type="text/javascript">
+<script type="text/javascript">
     function validacao(cod)
     {
         var f = document.frm;

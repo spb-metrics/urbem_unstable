@@ -31,10 +31,11 @@
 
     * Casos de uso: uc-04.05.51
 
-    $Id: PRRelatorioCustomizavelEvento.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRRelatorioCustomizavelEvento.php 62661 2015-06-01 20:57:46Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once (CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php"                 );
 
@@ -56,73 +57,6 @@ $obTFolhaPagamentoPeriodoMovimentacao->recuperaPeriodoMovimentacaoDaCompetencia(
 if ($_REQUEST['inCodMes'] && $_REQUEST['inAno']) {
     $stCompetencia = str_pad($_REQUEST['inCodMes'], 2, "0", STR_PAD_LEFT)."/".$_REQUEST['inAno'];
 }
-
-// switch ($_POST["stTipoFiltro"]) {
-//     case "contrato_todos":
-//     case "cgm_contrato_todos":
-//         if ( count(Sessao::read("arContratos")) > 0 ) {
-//         	foreach ( Sessao::read("arContratos") as $stVal ) {
-//                 $stCodigos .= $stVal['cod_contrato'].',';
-//             }
-//             $stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//         break;
-//     case "reg_sub_fun_esp_grupo":
-//         if ( count($_REQUEST['inCodFuncaoSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodFuncaoSelecionados']); $inIndex++ ) {
-//         		$stCodigos .= $_REQUEST['inCodFuncaoSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//         if ( count($_REQUEST['inCodEspecialidadeSelecionadosFunc']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodEspecialidadeSelecionadosFunc']); $inIndex++ ) {
-//         		$stCodEspecialidades .= $_REQUEST['inCodEspecialidadeSelecionadosFunc'][$inIndex].',';
-//         	}
-//         	$stCodEspecialidades = substr($stCodEspecialidades, 0, strlen($stCodEspecialidades) - 1);
-//         }
-//
-//         break;
-//     case "reg_sub_car_esp_grupo":
-//         if ( count($_REQUEST['inCodCargoSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodCargoSelecionados']); $inIndex++ ) {
-//         		$stCodigos .= $_REQUEST['inCodCargoSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//
-//         if ( count($_REQUEST['inCodEspecialidadeSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodEspecialidadeSelecionados']); $inIndex++ ) {
-//         		$stCodEspecialidades .= $_REQUEST['inCodEspecialidadeSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodEspecialidades = substr($stCodEspecialidades, 0, strlen($stCodEspecialidades) - 1);
-//         }
-//         break;
-//     case "lotacao_grupo":
-//         if ( count($_REQUEST['inCodLotacaoSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodLotacaoSelecionados']); $inIndex++ ) {
-//         		$stCodigos .= $_REQUEST['inCodLotacaoSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//         break;
-//     case "local_grupo":
-//         if ( count($_REQUEST['inCodLocalSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodLocalSelecionados']); $inIndex++ ) {
-//         		$stCodigos .= $_REQUEST['inCodLocalSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//         break;
-//     case "padrao_grupo":
-//         if ( count($_REQUEST['inCodPadraoSelecionados']) > 0 ) {
-//         	for ( $inIndex = 0; $inIndex < count($_REQUEST['inCodPadraoSelecionados']); $inIndex++ ) {
-//         		$stCodigos .= $_REQUEST['inCodPadraoSelecionados'][$inIndex].',';
-//         	}
-//         	$stCodigos = substr($stCodigos, 0, strlen($stCodigos) - 1);
-//         }
-//         break;
-// }
-
 $stValoresFiltro = "";
 switch ($_REQUEST['stTipoFiltro']) {
     case "contrato_todos":
@@ -134,7 +68,7 @@ switch ($_REQUEST['stTipoFiltro']) {
         }
         $stValoresFiltro = substr($stValoresFiltro,0,strlen($stValoresFiltro)-1);
         break;
-    case "lotacao_grupo":
+    case "lotacao_grupo":        
         $stValoresFiltro = implode(",",$_REQUEST["inCodLotacaoSelecionados"]);
         break;
     case "local_grupo":

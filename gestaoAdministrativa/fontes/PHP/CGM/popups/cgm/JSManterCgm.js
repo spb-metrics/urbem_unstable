@@ -25,7 +25,7 @@
 <?php
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(valor,comp){
     var stTarget = document.frm.target;

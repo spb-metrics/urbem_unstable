@@ -52,7 +52,7 @@ if (!(isset($_REQUEST["ctrl"]))) {
 switch ($ctrl) {
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
       function Valida()
       {
         var mensagem = "";
@@ -112,13 +112,13 @@ case 1:
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["nomHistorico"]);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("'.$_REQUEST["nomHistorico"].'","incluir","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';
         } else
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("'.$_REQUEST["nomHistorico"].'","n_incluir","erro", "'.Sessao::getId().'");
                 //mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';

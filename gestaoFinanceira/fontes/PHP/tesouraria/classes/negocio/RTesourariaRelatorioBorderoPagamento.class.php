@@ -1060,4 +1060,223 @@ function geraRecordSetBorderoPagamento(&$arRecordSet , $stOrder = "")
 
 }
 
+function geraRecordSetBorderoPagamento2015(&$arRecordSet)
+{
+    $this->obRConfiguracao->consultarMunicipio();
+
+    $obRTesourariaBoletim = new RTesourariaBoletim();
+    $obRTesourariaBoletim->obROrcamentoEntidade->setExercicio( $this->arDadosBordero['stExercicio']);
+    $obRTesourariaBoletim->obROrcamentoEntidade->setCodigoEntidade($this->arDadosBordero['inCodEntidade'] );
+    $obRTesourariaBoletim->obROrcamentoEntidade->listar( $rsEntidade );
+
+    $obRContabilidadePlanoBanco = new RContabilidadePlanoBanco();
+
+    $obRContabilidadePlanoBanco->setExercicio($this->arDadosBordero['stExercicio'] );
+    $obRContabilidadePlanoBanco->setCodPlano($this->arDadosBordero['inCodConta'] );
+    $obRContabilidadePlanoBanco->consultar( $boTransacao );
+
+    switch ($this->arDadosBordero['stTipoTransacao']) {
+        case "2":
+                $stTipoTransacao = "Transferência Conta Corrente";
+            break;
+
+        case "3":
+                $stTipoTransacao = "Transferência Poupança";
+            break;
+
+        case "4":
+                $stTipoTransacao = "DOC";
+            break;
+
+        case "5":
+                $stTipoTransacao = "TED";
+            break;
+    }
+
+    $arDadosPagamento['dados_bordero'][0]['numero_bordero'] = str_pad($this->arDadosBordero['inNumBordero'], 3,"0",STR_PAD_LEFT). " / " . $this->arDadosBordero['stExercicio'];
+    $arDadosPagamento['dados_bordero'][0]['data_bordero']   = date("d/m/Y");
+    $arDadosPagamento['dados_bordero'][0]['entidade']       = $rsEntidade->getCampo("nom_cgm");
+    $arDadosPagamento['dados_bordero'][0]['tipo_bordero']   = $stTipoTransacao;
+    $arDadosPagamento['dados_bordero'][0]['conta_pagadora'] = $this->arDadosBordero['inCodConta'] . " - " . $this->arDadosBordero['stConta'];
+
+    list ( $inCodBoletim , $stDtBoletim , $stExercicioBoletim ) = explode ( ':' , $this->arDadosBordero["inCodBoletim"] );
+    $arDadosPagamento['dados_boletim'][0]['numero_boletim'] = str_pad($inCodBoletim, 3, "0", STR_PAD_LEFT) ." / ". $stExercicioBoletim;
+    $arDadosPagamento['dados_boletim'][0]['data_boletim']   = $stDtBoletim;
+
+    $arDadosPagamento['dados_banco_titulo'][0]['dados_banco'] = "Ao Banco ".$obRContabilidadePlanoBanco->obRMONAgencia->obRMONBanco->getNumBanco()." / ".$obRContabilidadePlanoBanco->obRMONAgencia->obRMONBanco->getNomBanco();
+    $arDadosPagamento['dados_banco'][0]['agencia']            = $obRContabilidadePlanoBanco->obRMONAgencia->getNumAgencia()." / ". $obRContabilidadePlanoBanco->obRMONAgencia->getNomAgencia();
+    $arDadosPagamento['dados_banco'][0]['conta_corrente']     = $obRContabilidadePlanoBanco->getContaCorrente();
+
+    $arDadosPagamento['autorizacao'] = "Autorizamos esta agência bancária a DEBITAR o valor total deste Borderô em nossa conta corrente acima especificada, 
+                                    e CREDITAR as respectivas contas bancárias dos credores abaixo relacionados.";
+
+    
+    include_once( CAM_GF_EMP_NEGOCIO."REmpenhoOrdemPagamento.class.php" );
+    $obREmpenhoOrdemPagamento = new REmpenhoOrdemPagamento;
+
+    //Função para ordenar o array pelo cod_credor para facilitar o somatorio dos pagamentos
+    usort($this->arDadosPagamento, function($a, $b) {
+            return $a['inCodCredor'] - $b['inCodCredor'];
+    });
+
+    foreach ($this->arDadosPagamento as $chave => $valor) {
+
+        if (strlen($valor["stCPF/CNPJ"]) == 14 ) {
+            $obMascara = new Mascara;
+            $obMascara->setMascara('99.999.999/9999-99');
+            $obMascara->mascaraDado($valor["stCPF/CNPJ"]);
+            $inscricao = $obMascara->getMascarado();
+        } elseif (strlen($valor["stCPF/CNPJ"]) == 11) {
+            $obMascara = new Mascara;
+            $obMascara->setMascara('999.999.999-99');
+            $obMascara->mascaraDado($valor["stCPF/CNPJ"]);
+            $inscricao = $obMascara->getMascarado();
+        } else {
+            $inscricao = "";
+        }
+
+        $obREmpenhoOrdemPagamento->setCodigoOrdem                           ( $valor['inNumOrdemPagamentoCredor'] );
+        $obREmpenhoOrdemPagamento->setExercicio                             ( $valor['stExercicioOrdem'] );
+        $obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade  ( $valor['inCodigoEntidade'] );
+        $obREmpenhoOrdemPagamento->listarDadosPagamentoBordero              ( $rsLista , $boTransacao );
+
+        $inValorOP = bcsub($rsLista->getCampo("valor_pagamento"),$rsLista->getCampo('vl_anulado'),2);
+
+        /* Retenções */
+        if ($obREmpenhoOrdemPagamento->getRetencao()) {
+            foreach ( $obREmpenhoOrdemPagamento->getRetencoes() as $arRetencoes ) {
+                $nuVlRetencoes = bcadd($arRetencoes['vl_retencao'],$nuVlRetencoes,2);
+            }
+            // Valor liquido da OP
+            $inValorLiquidoOP = bcsub($inValorOP,$nuVlRetencoes,2);
+        } else {
+            $nuVlRetencoes = 0.00;
+            // Valor liquido da OP
+            $inValorLiquidoOP = bcsub($inValorOP,$rsLista->getCampo("vl_pago_nota"),2);
+        }
+
+        //verificando se o mesmo credor ja foi inserido no array para fazer o somatorio por credor
+        if ( $chave != 0 ) {
+            if ( $inCodCredorAnterior == $valor['inCodCredor'] ){
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['op']             = $valor["stOrdemPagamento"];
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['empenho']        = $valor["stEmpenho"];
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['valor_bruto']    = $inValorOP;
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['valor_retencao'] = $nuVlRetencoes;
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['valor_liquido']  = $inValorLiquidoOP;
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['observacao']     = $valor['stObservacao'];
+                $inValorTotalCredor += $inValorLiquidoOP;
+                $arDadosPagamento['dados_pagamento'][($chave-1)]['total_credor'] = $inValorTotalCredor;
+
+            }else{
+                $arDadosPagamento['dados_pagamento'][$chave]['credor']                             = $valor["stCredor"];
+                $arDadosPagamento['dados_pagamento'][$chave]['cod_credor']                         = $valor["inCodCredor"];
+                $arDadosPagamento['dados_pagamento'][$chave]['cpf_cnpj']                           = $inscricao;
+                $arDadosPagamento['dados_pagamento'][$chave]['banco_agencia_cc']                   = $valor["inNumBancoCredor"]."/".$valor["inNumAgenciaCredor"]."/".$valor["stNumeroContaCredor"];
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['op']             = $valor["stOrdemPagamento"];
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['empenho']        = $valor["stEmpenho"];
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_bruto']    = $inValorOP;
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_retencao'] = $nuVlRetencoes;
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_liquido']  = $inValorLiquidoOP;
+                $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['observacao']     = $valor['stObservacao'];
+                $arDadosPagamento['dados_pagamento'][$chave]['total_credor']                       = $inValorLiquidoOP;
+            }
+        }else{
+            $arDadosPagamento['dados_pagamento'][$chave]['credor']                             = $valor["stCredor"];
+            $arDadosPagamento['dados_pagamento'][$chave]['cod_credor']                         = $valor["inCodCredor"];
+            $arDadosPagamento['dados_pagamento'][$chave]['cpf_cnpj']                           = $inscricao;
+            $arDadosPagamento['dados_pagamento'][$chave]['banco_agencia_cc']                   = $valor["inNumBancoCredor"]."/".$valor["inNumAgenciaCredor"]."/".$valor["stNumeroContaCredor"];
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['op']             = $valor["stOrdemPagamento"];
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['empenho']        = $valor["stEmpenho"];
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_bruto']    = $inValorOP;
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_retencao'] = $nuVlRetencoes;
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['valor_liquido']  = $inValorLiquidoOP;
+            $arDadosPagamento['dados_pagamento'][$chave]['dados_op'][$chave]['observacao']     = $valor['stObservacao'];
+            $arDadosPagamento['dados_pagamento'][$chave]['total_credor']                       = $inValorLiquidoOP;
+
+            $inValorTotalCredor += $inValorLiquidoOP;
+        }
+
+        $inCodCredorAnterior = $valor['inCodCredor'];
+        $inTotalBordero += $inValorLiquidoOP;
+
+    }
+    
+    $arDadosPagamento['total_bordero'] = $inTotalBordero;
+    
+    $stDataExtenso = $this->obRConfiguracao->getNomMunicipio() .", ".SistemaLegado::dataExtenso(date('Y-m-d'),false);
+
+    $arDadosPagamento['data_extenso'] = $stDataExtenso;
+   
+    $inCount = 0;
+
+    $stAssinantes = "";
+
+    for ($x=1; $x<=3; $x++) {
+
+        if ($this->arDadosBordero["inNumAssinante_".$x]) {
+
+            $stAssinantes .= $x . "#";
+
+            $inCount ++;
+        }
+    }
+
+    if ($stAssinantes) {
+
+        $stAssinantes = substr($stAssinantes,0,strlen($stAssinantes)-1);
+
+        $stAssinantes = explode("#",$stAssinantes);
+
+        if ($inCount == 1) {
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_1"] = "";
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_1"] = "";
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_1"] = "";
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_2"] = "";
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_2"] = "";
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_2"] = "";
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_3"] = $this->arDadosBordero["stNomAssinante_".$stAssinantes[0]];
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_3"] = $this->arDadosBordero["stCargo_".$stAssinantes[0]];
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_3"] = "Matr. " . $this->arDadosBordero["inNumMatricula_".$stAssinantes[0]];
+
+        }
+        if ($inCount == 2) {
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_1"] = $this->arDadosBordero["stNomAssinante_".$stAssinantes[1]];
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_1"] = $this->arDadosBordero["stCargo_".$stAssinantes[1]];
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_1"] = "Matr. " . $this->arDadosBordero["inNumMatricula_".$stAssinantes[1]];
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_2"] = "";
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_2"] = "";
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_2"] = "";
+
+            $arDadosPagamento['dados_assinatura'][0]["Assinante_3"] = $this->arDadosBordero["stNomAssinante_".$stAssinantes[0]];
+            $arDadosPagamento['dados_assinatura'][1]["Assinante_3"] = $this->arDadosBordero["stCargo_".$stAssinantes[0]];
+            $arDadosPagamento['dados_assinatura'][2]["Assinante_3"] = "Matr. " . $this->arDadosBordero["inNumMatricula_".$stAssinantes[0]];
+
+        }
+        if ($inCount == 3) {
+
+            for ($x=1; $x<=3; $x++) {
+
+                $arDadosPagamento['dados_assinatura'][0]["Assinante_".$x] =  $this->arDadosBordero["stNomAssinante_".$x];
+                $arDadosPagamento['dados_assinatura'][1]["Assinante_".$x] =  $this->arDadosBordero["stCargo_".$x];
+                $arDadosPagamento['dados_assinatura'][2]["Assinante_".$x] =  "Matr. " . $this->arDadosBordero["inNumMatricula_".$x];
+
+            }
+        }
+
+    } else {
+        $arDadosPagamento['dados_assinatura'] = array();
+    }
+
+    $arRecordSet = $arDadosPagamento;
+
+    return $obErro;
+}
+
+
+
 }

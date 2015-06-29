@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOPassivoFinanceiro.class.php 61684 2015-02-25 15:24:42Z michel $
+    $Id: TTCMGOPassivoFinanceiro.class.php 62673 2015-06-03 13:49:06Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -64,10 +64,10 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
         $stSql = "  SELECT 
                             '10' AS tipo_registro
                             , consulta.*
-                            , total_debitos
-                            , total_creditos
-                            , ( total_creditos - total_debitos ) as saldo_atual
+                            , COALESCE((( total_creditos - total_debitos ) + saldo_anterior ),0.00) as saldo_atual
                             , '' AS brancos
+                            , 0.00 AS vl_encampacao
+                            , 0.00 AS vl_cancelamento
                     from (
                             select 
                                 REPLACE(plano_conta.cod_estrutural,'.','') as cod_estrutural
@@ -90,10 +90,11 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                                where conta_debito.exercicio = plano_analitica.exercicio
                                                  and conta_debito.cod_plano = plano_analitica.cod_plano
                                                  and valor_lancamento.tipo <> 'I'
-                                                 and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ) 
-                                          , 0 ) as total_debitos
+                                                 and conta_debito.cod_entidade = configuracao_entidade.cod_entidade
+                                            ) 
+                                          , 0.00 ) as total_debitos
                                ---- soma dos creditos
-                               ,coalesce ( ( select sum ( vl_lancamento  )
+                               ,coalesce ( (( select sum ( vl_lancamento  )
                                               from contabilidade.conta_credito
                                               JOIN contabilidade.valor_lancamento
                                                 on ( conta_credito.exercicio    = valor_lancamento.exercicio
@@ -105,11 +106,13 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                              where conta_credito.exercicio = plano_analitica.exercicio
                                                and conta_credito.cod_plano = plano_analitica.cod_plano
                                                and valor_lancamento.tipo <> 'I'
-                                               and conta_credito.cod_entidade = configuracao_entidade.cod_entidade )
-                                          , 0 ) as total_creditos
+                                               and conta_credito.cod_entidade = configuracao_entidade.cod_entidade
+                                            )
+                                            *-1)
+                                          , 0.00 ) as total_creditos
 
                                 ---- saldo inicial
-                               , (
+                               , COALESCE(((
                                       coalesce(
                                       ( select sum ( vl_lancamento  )
                                                from contabilidade.conta_debito
@@ -123,7 +126,7 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                               where conta_debito.exercicio = plano_analitica.exercicio
                                                 and conta_debito.cod_plano = plano_analitica.cod_plano
                                                 and valor_lancamento.tipo = 'I'
-                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
+                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0.00 )
                                         +
                                        coalesce (
                                        ( select sum ( vl_lancamento  )
@@ -138,8 +141,8 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                           where conta_credito.exercicio = plano_analitica.exercicio
                                             and conta_credito.cod_plano = plano_analitica.cod_plano
                                             and valor_lancamento.tipo = 'I'
-                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
-                                  )  as saldo_anterior
+                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0.00 )
+                                  )*-1),0.00)  as saldo_anterior
                             from contabilidade.plano_conta
                             JOIN contabilidade.plano_analitica
                                 on ( plano_analitica.cod_conta = plano_conta.cod_conta
@@ -158,7 +161,6 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                     or total_debitos <> 0
                     or total_creditos <> 0
                     ORDER BY cod_estrutural ";
-
         return $stSql;
     }
 
@@ -176,11 +178,13 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
     public function montaRecuperaArquivoExportacao11()
     {
         $stSql = "  SELECT 
-                            '11' as tipo_registro
+                            '11' AS tipo_registro
                             , consulta.*
-                            , total_debitos
-                            , total_creditos
-                            , ( total_creditos - total_debitos ) as saldo_atual                            
+                            , COALESCE((( total_creditos - total_debitos ) + saldo_anterior ),0.00) as saldo_atual
+                            , '' AS brancos
+                            , 0.00 AS vl_encampacao
+                            , 0.00 AS vl_cancelamento
+
                     FROM (
                             select 
                                     REPLACE(plano_conta.cod_estrutural,'.','') as cod_estrutural
@@ -204,10 +208,10 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                                     where conta_debito.exercicio = plano_analitica.exercicio
                                                     and conta_debito.cod_plano = plano_analitica.cod_plano
                                                     and valor_lancamento.tipo <> 'I'
-                                                    and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ),0 
+                                                    and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ),0.00 
                                     ) as total_debitos
                                     ---- soma dos creditos
-                                    ,coalesce ( ( select sum ( vl_lancamento  )
+                                    ,coalesce ( (( select sum ( vl_lancamento  )
                                                    from contabilidade.conta_credito
                                                    JOIN contabilidade.valor_lancamento
                                                      on ( conta_credito.exercicio    = valor_lancamento.exercicio
@@ -219,10 +223,10 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                                   where conta_credito.exercicio = plano_analitica.exercicio
                                                     and conta_credito.cod_plano = plano_analitica.cod_plano
                                                     and valor_lancamento.tipo <> 'I'
-                                                    and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0
+                                                    and conta_credito.cod_entidade = configuracao_entidade.cod_entidade )*-1), 0.00
                                     ) as total_creditos
                                     ---- saldo inicial
-                                    , (
+                                    , COALESCE(((
                                         coalesce(
                                         ( select sum ( vl_lancamento  )
                                                from contabilidade.conta_debito
@@ -236,7 +240,7 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                               where conta_debito.exercicio = plano_analitica.exercicio
                                                 and conta_debito.cod_plano = plano_analitica.cod_plano
                                                 and valor_lancamento.tipo = 'I'
-                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
+                                                and conta_debito.cod_entidade = configuracao_entidade.cod_entidade ), 0.00 )
                                         +
                                         coalesce (
                                         ( select sum ( vl_lancamento  )
@@ -251,8 +255,8 @@ class TTCMGOPassivoFinanceiro extends TContabilidadeBalancoFinanceiro
                                           where conta_credito.exercicio = plano_analitica.exercicio
                                             and conta_credito.cod_plano = plano_analitica.cod_plano
                                             and valor_lancamento.tipo = 'I'
-                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0 )
-                                    )  as saldo_anterior
+                                            and conta_credito.cod_entidade = configuracao_entidade.cod_entidade ), 0.00 )
+                                    )*-1),0.00)  as saldo_anterior
                             FROM contabilidade.plano_conta
                             JOIN contabilidade.plano_analitica
                                 on plano_analitica.cod_conta = plano_conta.cod_conta

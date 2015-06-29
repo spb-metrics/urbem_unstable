@@ -30,7 +30,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Girardi dos Santos
 
-    $Id: OCMovimentacaoOrdemCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCMovimentacaoOrdemCompra.php 62703 2015-06-10 13:29:57Z michel $
 
 */
 
@@ -637,7 +637,7 @@ function montaFormDadosItem($inItemId)
 
     if (!$boAlterarItem) {
         // Faz a busca da marca para 'forçar' o valor setado
-        $obTComprasOrdemCompra->recuperaMarcaPorOrdemCompra( $rsOrdemCompraMarca );
+        $obTComprasOrdemCompra->recuperaMarcaPorOrdemCompra( $rsOrdemCompraMarca, $stFiltro );
     }
 
     $obCentroCusto = new Select();
@@ -1041,10 +1041,11 @@ case 'detalharItem' :
     $obForm->setName('detalharItem');
     $obForm->setId('detalharItem');
 
-    if ( !is_null($rsDetalheItem->getCampo('cod_item')) ) {
-    $obLblCodItem = new Label();
-    $obLblCodItem->setRotulo( 'Código do Item' );
-    $obLblCodItem->setValue( $rsDetalheItem->getCampo('cod_item') );
+    if (!is_null($rsDetalheItem->getCampo('cod_item')) || !is_null($rsDetalheItem->getCampo('cod_item_ordem'))) {
+        $obLblCodItem = new Label();
+        $obLblCodItem->setRotulo( 'Código do Item' );
+        $codItem = (!is_null($rsDetalheItem->getCampo('cod_item'))) ? $rsDetalheItem->getCampo('cod_item') : $rsDetalheItem->getCampo('cod_item_ordem');
+        $obLblCodItem->setValue( $codItem );
     }
     $obLblItem = new Label();
     $obLblItem->setRotulo( 'Descrição' );
@@ -1061,9 +1062,8 @@ case 'detalharItem' :
     $obFormulario = new Formulario();
     $obFormulario->addForm( $obForm );
     $obFormulario->addTitulo( 'Detalhe do Item' );
-    if ( !is_null($rsDetalheItem->getCampo('cod_item')) ) {
-    $obFormulario->addComponente( $obLblCodItem );
-    }
+    if (!is_null($rsDetalheItem->getCampo('cod_item')) || !is_null($rsDetalheItem->getCampo('cod_item_ordem')))
+        $obFormulario->addComponente( $obLblCodItem );
     $obFormulario->addComponente( $obLblItem );
     $obFormulario->addComponente( $obLblGrandeza );
     $obFormulario->addComponente( $obLblUnidade );

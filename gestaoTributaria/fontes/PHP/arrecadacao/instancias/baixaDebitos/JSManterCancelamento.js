@@ -33,7 +33,7 @@
     * @supackage Regras
     * @package Urbem
 
-    * $Id: JSManterCancelamento.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterCancelamento.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.03.10
 */
@@ -46,7 +46,7 @@ Bug#9762#
 */
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 function Salvar(){
     var mensagem = "";

@@ -30,7 +30,7 @@
 
     * @author Desenvolvedor: Anderson cAko Konze
 
-    $Id: PRAnularRestosAPagar.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRAnularRestosAPagar.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-02.02.31
 */
@@ -82,7 +82,7 @@ if ( !$obErro->ocorreu() ) {
 }
 
 $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRConfiguracaoConfiguracao->obTConfiguracao );
-echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
 if ( !$obErro->ocorreu() ) {
     SistemaLegado::alertaAviso($pgFilt, Sessao::getExercicio(), "incluir", "aviso", Sessao::getId(), "../");
 } else

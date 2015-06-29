@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-02.02.31
 
- $Id: PRLancamentosEncerramento.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRLancamentosEncerramento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -144,7 +144,7 @@ switch (true) {
             }
         }
         $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRConfiguracaoConfiguracao->obTConfiguracao );
-        echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+        echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
         if ( !$obErro->ocorreu() ) {
             SistemaLegado::alertaAviso($pgFilt.'?'.Sessao::getId()."&stAcao=".$stAcao,Sessao::getExercicio() , "incluir", "aviso", Sessao::getId(), "../");
         } else
@@ -277,7 +277,7 @@ switch (true) {
             }
         }
         $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRConfiguracaoConfiguracao->obTConfiguracao );
-        echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+        echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
         if ( !$obErro->ocorreu() ) {
             SistemaLegado::alertaAviso($pgFilt.'?'.Sessao::getId()."&stAcao=".$stAcao, Sessao::getExercicio() , "excluir", "aviso", Sessao::getId(), "../");
         } else

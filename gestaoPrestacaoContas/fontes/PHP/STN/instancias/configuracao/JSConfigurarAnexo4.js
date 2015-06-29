@@ -36,7 +36,7 @@
 */
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
         
     function excluirListaItens( cod_aporte,cod_receita ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&inCodReceita='+cod_receita+'&inCodAporte='+cod_aporte,'excluirListaItens');

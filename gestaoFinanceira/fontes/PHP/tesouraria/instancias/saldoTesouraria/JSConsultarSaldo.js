@@ -31,13 +31,13 @@
     * @author Analista: Tonismar R. Bernardo
     * @author Desenvolvedor: Henrique Girardi dos Santos
     
-    * $Id: JSConsultarSaldo.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSConsultarSaldo.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     
     * Casos de uso: uc-02.04.40   
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 function limpar(){

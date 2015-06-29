@@ -62,7 +62,7 @@ if (isset($pagina)) {
 }
 ?>
 
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -138,7 +138,7 @@ case 1:
 $configura = new configProtocolo;
 $configura->mostraHistoricoArquivamento($_REQUEST["codHistorico"]);
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -217,13 +217,13 @@ case 2:
         $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["nomHistorico"]);
         $audicao->insereAuditoria();
         echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("'.$_REQUEST["nomHistorico"].'","alterar","aviso", "'.Sessao::getId().'&pagina='.$pagina.'");
         mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&pagina='.$pagina.'");
         </script>';
     } else {
         echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             alertaAviso("'.$_REQUEST["nomHistorico"].'","n_alterar","erro", "'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
         </script>';

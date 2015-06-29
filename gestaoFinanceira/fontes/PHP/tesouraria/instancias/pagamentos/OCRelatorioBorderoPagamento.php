@@ -80,7 +80,10 @@ if (!$obErro->ocorreu()) {
 $obRTesourariaRelatorioBorderoPagamento->setDadosBordero($arFiltro);
 $obRTesourariaRelatorioBorderoPagamento->setDadosPagamento(Sessao::read('arItens'));
 
-$obRTesourariaRelatorioBorderoPagamento->geraRecordSet( $rsBorderoPagamento );
+if ( Sessao::getExercicio() >= '2015' )
+    $obRTesourariaRelatorioBorderoPagamento->geraRecordSetBorderoPagamento2015( $rsBorderoPagamento );
+else
+    $obRTesourariaRelatorioBorderoPagamento->geraRecordSet( $rsBorderoPagamento );
 
 Sessao::write('arDados', $rsBorderoPagamento);
 

@@ -34,23 +34,17 @@
     $Id:$
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_receita_prev(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_receita_prev(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio             ALIAS FOR $1;
     stCodEntidades          ALIAS FOR $2;
-    inMes                   ALIAS FOR $3;
+    dtInicial               ALIAS FOR $3;
+    dtFinal                 ALIAS FOR $4;
     stSql                   VARCHAR := '';
-    dtInicial               VARCHAR := '';
-    dtFinal                 VARCHAR := '';    
-    arDatas                 VARCHAR[];
     reRegistro              RECORD;
 
 BEGIN
     
-    arDatas   := publico.mes(stExercicio,inMes);
-    dtInicial := arDatas[0];    
-    dtFinal   := arDatas[1];
-
     stSql :='CREATE TEMPORARY TABLE tmp_balancete_receita AS 
             (
                 SELECT cod_estrutural                                                 
@@ -79,43 +73,43 @@ BEGIN
             FROM (
                     SELECT 
                             ''01''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
                     
                     UNION
 
                     SELECT
                             ''02''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
-                            ,( SELECT COALESCE(SUM(valor_previsto),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
+                            ,( SELECT COALESCE(SUM(valor_previsto),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
 
                     UNION
 
                     SELECT
                             ''04''::VARCHAR AS cod_tipo
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
-                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.01.00.00.00''  ) AS contrib_pat
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.07%''          ) AS contrib_serv_ativo
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.29.09%''          ) AS contrib_serv_inat_pens
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.3.0.0.00.00.00.00.00''  ) AS rec_patrimoniais
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.2%''                    ) AS alienacao_bens
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''2.5%''                    ) AS outras_rec_cap
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.2.1.0.99.00.10.00.00''  ) AS comp_prev
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''1.9.9.0.99%''             ) AS outras_rec
+                            ,( SELECT COALESCE(SUM(arrecadado_periodo),0.00)::VARCHAR AS valor FROM tmp_balancete_receita WHERE cod_estrutural LIKE ''9.0.0.0.0.00.00.00.00.00'') AS deducoes_receita
 
             ) AS retorno
     ';

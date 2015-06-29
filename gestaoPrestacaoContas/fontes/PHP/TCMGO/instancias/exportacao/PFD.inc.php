@@ -31,11 +31,11 @@
 
     * @ignore
 
-    $Id: PFD.inc.php 61684 2015-02-25 15:24:42Z michel $
-    $Revision: 61684 $
+    $Id: PFD.inc.php 62715 2015-06-11 18:23:27Z jean $
+    $Revision: 62715 $
     $Name$
-    $Author: michel $
-    $Date: 2015-02-25 12:24:42 -0300 (Qua, 25 Fev 2015) $
+    $Author: jean $
+    $Date: 2015-06-11 15:23:27 -0300 (Qui, 11 Jun 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -48,19 +48,6 @@ $obTTCMGOPassivoFinanceiro->setDado('inMes'      , $inMes );
 $obTTCMGOPassivoFinanceiro->setDado('stEntidades', $stEntidades );
 $obTTCMGOPassivoFinanceiro->recuperaArquivoExportacao10($rsRegistro10, $boTransacao);
 $obTTCMGOPassivoFinanceiro->recuperaArquivoExportacao11($rsRegistro11, $boTransacao);
-
-$i = 0;
-foreach ($rsRegistro10->arElementos as $stChave) {    
-    $rsRegistro10->arElementos[$i]['vl_cancelamento']    = 0;
-    $rsRegistro10->arElementos[$i]['vl_encampacao']      = 0;
-    $i++;
-}
-$i = 0;
-foreach ($rsRegistro11->arElementos as $stChave) {
-    $rsRegistro11->arElementos[$i]['vl_cancelamento']    = 0;
-    $rsRegistro11->arElementos[$i]['vl_encampacao']      = 0;
-    $i++;
-}
 
 $inCount = 0;
 if ($rsRegistro10->getNumLinhas() > 0) {
@@ -146,7 +133,7 @@ if ($rsRegistro10->getNumLinhas() > 0) {
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
                 $$rsBloco->preenche(array($stChave11));
-            
+                
                 $obExportador->roUltimoArquivo->addBloco($$rsBloco);
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");

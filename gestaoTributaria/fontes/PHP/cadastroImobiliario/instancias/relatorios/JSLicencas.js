@@ -31,14 +31,14 @@
     * @author Analista: Fábio Bertoldi
     * @author Programador: Carolina Schwaab Marçal
 
-    *$Id: JSLicencas.js 59891 2014-09-18 15:07:43Z carolina $
+    *$Id: JSLicencas.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     
 */
 
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function montaAtributosEdificacao(){
     

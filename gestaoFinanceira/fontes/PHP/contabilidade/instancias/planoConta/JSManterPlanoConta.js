@@ -51,7 +51,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function bloqueiaAbas(){
     window.parent.frames['telaPrincipal'].document.links['id_layer_2'].href = "javascript:buscaDado('exibeAviso')";

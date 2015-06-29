@@ -50,7 +50,7 @@ if (!(isset($_REQUEST["controle"]))) {
     $controle = $_REQUEST["controle"];
 }
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -136,7 +136,7 @@ $sSQL = "SELECT * FROM sw_documento WHERE cod_documento = ".$_REQUEST["codDocume
         $dbEmp->limpaSelecao();
         $dbEmp->fechaBD();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function Valida()
     {
@@ -210,12 +210,12 @@ $documento->setaVariaveis($_REQUEST["codDocumento"],$nomDocumento);
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $nomDocumento);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomDocumento.'","alterar","aviso", "'.Sessao::getId().'");
                  window.location = "alteraDocumento.php?'.Sessao::getId().'&pagina='.$_REQUEST["pagina"].'";
                  </script>';
         } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomDocumento.'","n_alterar","aviso", "'.Sessao::getId().'");
                  window.location = "alteraDocumento.php?'.Sessao::getId().'&pagina='.$_REQUEST["pagina"].'";
                  </script>';

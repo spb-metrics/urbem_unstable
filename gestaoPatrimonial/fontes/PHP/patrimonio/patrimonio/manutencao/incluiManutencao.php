@@ -172,7 +172,7 @@ switch ($ctrl) {
         $ArrData = explode("-", $inclui->dtAgendamento);
         $inclui->dtAgendamento = $ArrData[2] . "/" . $ArrData[1] . "/" . $ArrData[0];
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";
@@ -376,7 +376,7 @@ onBlur="buscaEmpenho();">-->
             $audicao->insereAuditoria();
 
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso      ( "Bem: <?=$codkey;?>", "incluir", "aviso", "<?=Sessao::getId()?>"          );
                 mudaTelaPrincipal( "incluiManutencao.php?<?=Sessao::getId();?>&ctrl=1&codbem=<?=$codkey;?>"  );
             </script>
@@ -384,7 +384,7 @@ onBlur="buscaEmpenho();">-->
 
         } else {
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso( "<?=$erro;?>", "n_incluir", "erro", "<?=Sessao::getId()?>" );
             </script>
 <?php

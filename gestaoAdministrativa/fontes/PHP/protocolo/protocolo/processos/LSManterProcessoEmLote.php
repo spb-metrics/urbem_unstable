@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-01.06.98
 
-    $Id: LSManterProcessoEmLote.php 62418 2015-05-06 17:45:05Z diogo.zarpelon $
+    $Id: LSManterProcessoEmLote.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -133,7 +133,7 @@ if ($_REQUEST['valorAtributoCmb']) {
 
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 
 function marcarTodos(componente)
 {

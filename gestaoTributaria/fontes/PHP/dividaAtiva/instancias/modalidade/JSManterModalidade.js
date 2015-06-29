@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-    * $Id: JSManterModalidade.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterModalidade.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.04.07
 */
@@ -54,7 +54,7 @@ implementacao dos formularios de acordo com interface abstrata.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

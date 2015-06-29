@@ -38,7 +38,7 @@ Casos de uso: uc-01.01.00
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inCodigo,stDescricao,stComplemento){
  if( inCodigo != '' ){

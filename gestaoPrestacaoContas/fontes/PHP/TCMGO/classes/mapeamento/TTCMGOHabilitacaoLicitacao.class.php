@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Arthur Cruz
 
     * @ignore
-    * $Id: TTCMGOHabilitacaoLicitacao.class.php 62344 2015-04-27 14:58:36Z michel $
+    * $Id: TTCMGOHabilitacaoLicitacao.class.php 62824 2015-06-24 17:24:58Z jean $
     * $Rev: $
     * $Author: $
     * $Date: $
@@ -59,8 +59,9 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
     }
 
     public function montarecuperaExportacao10()
-    {            
-        $stSql = " SELECT 10 AS tipo_registro
+    {   
+        $stSql = "
+                    SELECT 10 AS tipo_registro
                           , LPAD(despesa.num_orgao::VARCHAR, 2, '0') AS cod_orgao
                           , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                           , licitacao.exercicio_processo AS exercicio_licitacao
@@ -76,15 +77,15 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                           , sw_cgm_pessoa_juridica.num_registro_cvm
                           , sw_cgm_pessoa_juridica.insc_estadual AS num_inscricao_estadual
                           , sw_uf.sigla_uf AS uf_inscricao_estadual
-                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN certificacao_documentos_inss.num_documento ELSE NULL END AS num_certidao_regularidade_inss
-                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_inss.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_inss
-                          , CASE WHEN certificacao_documentos_inss.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_inss.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_inss
-                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN certificacao_documentos_fgts.num_documento ELSE NULL END AS num_certidao_regularidade_fgts
-                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_fgts.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_fgts
-                          , CASE WHEN certificacao_documentos_fgts.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_fgts.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_fgts
-                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN certificacao_documentos_cndt.num_documento ELSE NULL END AS num_cndt
-                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_cndt.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_cndt
-                          , CASE WHEN certificacao_documentos_cndt.cod_documento IS NOT NULL THEN TO_CHAR(certificacao_documentos_cndt.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_cndt
+                          , certificacao_documentos_inss.num_documento AS num_certidao_regularidade_inss
+                          , TO_CHAR(certificacao_documentos_inss.dt_emissao,'ddmmyyyy') AS dt_emissao_certidao_regularidade_inss
+                          , TO_CHAR(certificacao_documentos_inss.dt_validade,'ddmmyyyy') AS dt_validade_certidao_regularida_inss
+                          , certificacao_documentos_fgts.num_documento AS num_certidao_regularidade_fgts
+                          , TO_CHAR(certificacao_documentos_fgts.dt_emissao,'ddmmyyyy') AS dt_emissao_certidao_regularidade_fgts
+                          , TO_CHAR(certificacao_documentos_fgts.dt_validade,'ddmmyyyy') AS dt_validade_certidao_regularida_fgts
+                          , certificacao_documentos_cndt.num_documento AS num_cndt
+                          , TO_CHAR(certificacao_documentos_cndt.dt_emissao,'ddmmyyyy') AS dt_emissao_cndt
+                          , TO_CHAR(certificacao_documentos_cndt.dt_validade,'ddmmyyyy') AS dt_validade_cndt
                           , TO_CHAR(participante_certificacao.dt_registro,'ddmmyyyy') AS dt_habilitacao
                           , CASE WHEN participante_documentos.cgm_fornecedor::VARCHAR <> '' THEN 1 ELSE 2 END AS presenca_licitantes
                           , CASE WHEN participante.renuncia_recurso = 't' THEN 1 ELSE 2 END AS renuncia_recurso
@@ -152,44 +153,44 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                           ON participante_certificacao.cgm_fornecedor = participante_documentos.cgm_fornecedor
                          AND participante_certificacao.exercicio      = participante_documentos.exercicio
                         
-                   LEFT JOIN (SELECT *
-                                FROM licitacao.certificacao_documentos
-                               WHERE certificacao_documentos.cod_documento = 5
-                                 AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
-                                 AND certificacao_documentos.timestamp = (select MAX(timestamp)
-									    from licitacao.certificacao_documentos AS CD
-									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
-									    and CD.cod_documento = certificacao_documentos.cod_documento
-									    and CD.exercicio   = certificacao_documentos.exercicio)
-                             ) AS certificacao_documentos_inss
+                   LEFT JOIN ( SELECT *
+                                 FROM licitacao.certificacao_documentos
+                                WHERE certificacao_documentos.cod_documento = 9
+                                  AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
+                                  AND certificacao_documentos.timestamp = (select MAX(timestamp)
+                                         from licitacao.certificacao_documentos AS CD
+                                         where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+                                         and CD.cod_documento = certificacao_documentos.cod_documento
+                                         and CD.exercicio   = certificacao_documentos.exercicio)
+                   ) AS certificacao_documentos_inss
                           ON participante_certificacao.num_certificacao = certificacao_documentos_inss.num_certificacao
                          AND participante_certificacao.exercicio        = certificacao_documentos_inss.exercicio
                          AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_inss.cgm_fornecedor
                    
-                   LEFT JOIN (SELECT *
-                                FROM licitacao.certificacao_documentos
-                               WHERE certificacao_documentos.cod_documento = 6
-                                 AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
-                                 AND certificacao_documentos.timestamp = (select MAX(timestamp)
-									    from licitacao.certificacao_documentos AS CD
-									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
-									    and CD.cod_documento = certificacao_documentos.cod_documento
-									    and CD.exercicio   = certificacao_documentos.exercicio)
-                             ) AS certificacao_documentos_fgts
+                   LEFT JOIN ( SELECT *
+                                 FROM licitacao.certificacao_documentos
+                                WHERE certificacao_documentos.cod_documento = 10
+                                  AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
+                                  AND certificacao_documentos.timestamp = (select MAX(timestamp)
+                                         from licitacao.certificacao_documentos AS CD
+                                         where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+                                         and CD.cod_documento = certificacao_documentos.cod_documento
+                                         and CD.exercicio   = certificacao_documentos.exercicio)
+                   )  AS certificacao_documentos_fgts
                           ON participante_certificacao.num_certificacao = certificacao_documentos_fgts.num_certificacao
                          AND participante_certificacao.exercicio        = certificacao_documentos_fgts.exercicio
                          AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_fgts.cgm_fornecedor
 
-                   LEFT JOIN (SELECT *
-                                FROM licitacao.certificacao_documentos
-                               WHERE certificacao_documentos.cod_documento = 7
+                   LEFT JOIN ( SELECT *
+                                 FROM licitacao.certificacao_documentos
+                                 WHERE certificacao_documentos.cod_documento = 11
                                  AND certificacao_documentos.exercicio   = '" . $this->getDado('exercicio') . "'
                                  AND certificacao_documentos.timestamp = (select MAX(timestamp)
-									    from licitacao.certificacao_documentos AS CD
-									    where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
-									    and CD.cod_documento = certificacao_documentos.cod_documento
-									    and CD.exercicio   = certificacao_documentos.exercicio)
-                             ) AS certificacao_documentos_cndt
+                                         from licitacao.certificacao_documentos AS CD
+                                         where CD.cgm_fornecedor = certificacao_documentos.cgm_fornecedor
+                                         and CD.cod_documento = certificacao_documentos.cod_documento
+                                         and CD.exercicio   = certificacao_documentos.exercicio)
+                             )  AS certificacao_documentos_cndt
                           ON participante_certificacao.num_certificacao = certificacao_documentos_cndt.num_certificacao
                          AND participante_certificacao.exercicio        = certificacao_documentos_cndt.exercicio
                          AND participante_certificacao.cgm_fornecedor   = certificacao_documentos_cndt.cgm_fornecedor
@@ -467,90 +468,141 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                         , LPAD(licitacao.num_unidade::VARCHAR, 2, '0') AS cod_unidade
                         , licitacao.exercicio_processo AS exercicio_licitacao
                         , licitacao.exercicio::VARCHAR || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0') || LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo_licitatorio
-                        , documento_cgm.tipo AS tipo_documento
-                        , documento_cgm.numero AS num_documento
-                        , TO_CHAR (participante_certificacao.dt_registro, 'ddmmyyyy') AS dt_credenciamento
+                        , CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1 ELSE 2 END AS tipo_documento
+                        , CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf ELSE sw_cgm_pessoa_juridica.cnpj END AS num_documento
+                        , TO_CHAR (participante.dt_inclusao, 'ddmmyyyy') AS dt_credenciamento
                         , CASE WHEN mapa.cod_tipo_licitacao = 2
                                THEN mapa_cotacao.cod_cotacao::VARCHAR
                                ELSE ' '
                           END AS num_lote
-                        , julgamento_item.cod_item
+                        , cotacao_item.cod_item AS cod_item
                         , sw_cgm.nom_cgm AS nome_razao_social
-                        , documento_cgm.insc_estadual AS num_inscricao_estadual
+                        , sw_cgm_pessoa_juridica.insc_estadual AS num_inscricao_estadual
                         , sw_uf.sigla_uf AS uf_inscricao_estadual
-                        , CASE WHEN certificacao_documentos.cod_documento = 5 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_certidao_regularidade_inss
-                        , CASE WHEN certificacao_documentos.cod_documento = 5 THEN TO_CHAR(certificacao_documentos.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_inss
-                        , CASE WHEN certificacao_documentos.cod_documento = 5 THEN TO_CHAR(certificacao_documentos.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_inss
-                        , CASE WHEN certificacao_documentos.cod_documento = 6 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_certidao_regularidade_fgts
-                        , CASE WHEN certificacao_documentos.cod_documento = 6 THEN TO_CHAR(certificacao_documentos.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_certidao_regularidade_fgts
-                        , CASE WHEN certificacao_documentos.cod_documento = 6 THEN TO_CHAR(certificacao_documentos.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_certidao_regularida_fgts
-                        , CASE WHEN certificacao_documentos.cod_documento = 7 THEN certificacao_documentos.num_certificacao ELSE NULL END AS num_cndt
-                        , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_emissao,'ddmmyyyy') ELSE '' END AS dt_emissao_cndt
-                        , CASE WHEN certificacao_documentos.cod_documento = 7 THEN TO_CHAR(certificacao_documentos.dt_validade,'ddmmyyyy') ELSE '' END AS dt_validade_cndt
+                        , licitacao.exercicio::VARCHAR || cotacao.cod_cotacao::VARCHAR || homologacao.lote::VARCHAR || cotacao_item.cod_item::VARCHAR AS chave_item
+                        , ( SELECT retorno.num_documento
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 4) || ''
+                                                                      ) AS retorno
+                          ) AS num_certidao_inss
+                        , ( SELECT retorno.dt_emissao
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 4) || ''
+                                                                      ) AS retorno
+                          ) AS dt_emissao_inss
+                        , ( SELECT retorno.dt_validade
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 4) || ''
+                                                                      ) AS retorno
+                          ) AS dt_validade_inss
+                        , ( SELECT retorno.num_documento
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 5) || ''
+                                                                      ) AS retorno
+                          ) AS num_certidao_fgts
+                        , ( SELECT retorno.dt_emissao
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 5) || ''
+                                                                      ) AS retorno
+                          ) AS dt_emissao_fgts
+                        , ( SELECT retorno.dt_validade
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 5) || ''
+                                                                      ) AS retorno
+                          ) AS dt_validade_fgts
+                        , ( SELECT retorno.num_documento
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 6) || ''
+                                                                      ) AS retorno
+                          ) AS num_certidao_cndt
+                        , ( SELECT retorno.dt_emissao
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 6) || ''
+                                                                      ) AS retorno
+                          ) AS dt_emissao_cndt
+                        , ( SELECT retorno.dt_validade
+                              FROM fn_recupera_participante_documentos(participante.exercicio::VARCHAR,
+                                                                       participante.cod_entidade::VARCHAR,
+                                                                       ' participante_documentos.cod_licitacao = ' || participante.cod_licitacao || ' AND '
+                                                                       ' participante_documentos.cgm_fornecedor = ' || participante.cgm_fornecedor || ' AND '
+                                                                       ' participante_documentos.cod_modalidade = ' || participante.cod_modalidade || ' AND '
+                                                                       ' participante_documentos.cod_documento = ' || (SELECT cod_documento FROM tcmgo.documento_de_para WHERE cod_documento_tcm = 6) || ''
+                                                                      ) AS retorno
+                          ) AS dt_validade_cndt
                         
                     FROM licitacao.licitacao
                             
-                    JOIN licitacao.participante
+              INNER JOIN licitacao.participante
                       ON participante.cod_licitacao  = licitacao.cod_licitacao
                      AND participante.cod_modalidade = licitacao.cod_modalidade
                      AND participante.cod_entidade   = licitacao.cod_entidade
                      AND participante.exercicio      = licitacao.exercicio
                      
-                    JOIN sw_cgm
+              INNER JOIN sw_cgm
                       ON sw_cgm.numcgm = participante.cgm_fornecedor
                                           
-                    JOIN sw_uf
+              INNER JOIN sw_uf
                       ON sw_cgm.cod_uf = sw_uf.cod_uf
                       
-                    JOIN (SELECT numcgm
-                               , cpf AS numero
-                               , 1 AS tipo
-                               , '' AS insc_estadual
-                                
-                            FROM sw_cgm_pessoa_fisica
-                            
-                           UNION
-                            
-                          SELECT numcgm
-                               , cnpj AS numero
-                               , 2 AS tipo
-                               , '' AS insc_estadual
-                                  
-                            FROM sw_cgm_pessoa_juridica
-                            
-                        ) AS documento_cgm
-                      ON documento_cgm.numcgm = sw_cgm.numcgm
+               LEFT JOIN sw_cgm_pessoa_fisica
+                      ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+               LEFT JOIN sw_cgm_pessoa_juridica
+                      ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
         
-                    JOIN compras.objeto
+              INNER JOIN compras.objeto
                       ON objeto.cod_objeto = licitacao.cod_objeto
                       
-                    JOIN compras.modalidade
+              INNER JOIN compras.modalidade
                       ON modalidade.cod_modalidade = licitacao.cod_modalidade
                       
-                    JOIN licitacao.licitacao_documentos
-                      ON licitacao_documentos.cod_licitacao  = licitacao.cod_licitacao
-                     AND licitacao_documentos.cod_modalidade = licitacao.cod_modalidade
-                     AND licitacao_documentos.cod_entidade   = licitacao.cod_entidade
-                     AND licitacao_documentos.exercicio      = licitacao.exercicio
-                
-                   JOIN licitacao.documento
-                      ON documento.cod_documento = licitacao_documentos.cod_documento
-                      
-                    JOIN licitacao.certificacao_documentos
-                      ON certificacao_documentos.cod_documento = documento.cod_documento
-                      
-                    JOIN licitacao.participante_certificacao
-                      ON participante_certificacao.num_certificacao = certificacao_documentos.num_certificacao
-                     AND participante_certificacao.exercicio        = certificacao_documentos.exercicio
-                     AND participante_certificacao.cgm_fornecedor   = certificacao_documentos.cgm_fornecedor
-                      
-                    JOIN compras.mapa
+              INNER JOIN compras.mapa
                       ON mapa.exercicio = licitacao.exercicio_mapa
                      AND mapa.cod_mapa  = licitacao.cod_mapa
                      
-                    JOIN compras.mapa_cotacao
+              INNER JOIN compras.mapa_cotacao
                       ON mapa.exercicio = mapa_cotacao.exercicio_mapa
                      AND mapa.cod_mapa  = mapa_cotacao.cod_mapa
+
+              INNER JOIN compras.cotacao
+                      ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+                     AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+
+              INNER JOIN compras.cotacao_item
+                      ON cotacao_item.exercicio = cotacao.exercicio
+                     AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
                       
               INNER JOIN compras.julgamento
                       ON julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
@@ -580,17 +632,10 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                                 AND homologacao.cod_item                    = homologacao_anulada.cod_item
                                 AND homologacao.lote                        = homologacao_anulada.lote
                          ) IS NULL
-                      
-                    JOIN compras.mapa_solicitacao
-                      ON mapa_solicitacao.exercicio = mapa.exercicio
-                     AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
                      
                     JOIN compras.mapa_item
-                      ON mapa_item.exercicio             = mapa_solicitacao.exercicio
-                     AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
-                     AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
-                     AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
-                     AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+                      ON mapa_item.exercicio             = mapa.exercicio
+                     AND mapa_item.cod_mapa              = mapa.cod_mapa
                     
                     JOIN compras.mapa_item_dotacao
                         ON mapa_item_dotacao.exercicio              = mapa_item.exercicio
@@ -610,8 +655,6 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                       AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
                       AND licitacao.exercicio = '" . $this->getDado('exercicio') . "'
                       AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
-                      AND participante_certificacao.num_certificacao IN (SELECT num_certificacao FROM licitacao.participante_certificacao)
-                      AND licitacao.cod_modalidade = 10
                       AND licitacao.cod_modalidade NOT IN (8,9)
                       AND NOT EXISTS( SELECT 1 FROM licitacao.licitacao_anulada
                                        WHERE licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
@@ -619,10 +662,10 @@ class TTCMGOHabilitacaoLicitacao extends Persistente
                                          AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
                                          AND licitacao_anulada.exercicio      = licitacao.exercicio )
                        
-                       GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+                       GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
                        
                        ORDER BY num_processo_licitatorio, cod_item ";
-        return $stSql;
+        return $stSql; 
     }
     
     public function __destruct(){}

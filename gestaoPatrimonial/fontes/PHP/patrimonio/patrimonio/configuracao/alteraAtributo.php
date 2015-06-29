@@ -161,7 +161,7 @@ case 1:
     $dbEmp->fechaBD();
 
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         // valida campos do formularioZZ
         function Valida()
         {
@@ -292,13 +292,13 @@ case 2:
             $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $nomAtributo);
             $audicao->insereAuditoria();
 
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("'.$objeto.'","alterar","aviso","'.Sessao::getId().'");
             mudaTelaPrincipal("alteraAtributo.php?'.Sessao::getId().'");
             </script>';
 
        } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("'.$objeto.'","n_alterar","erro","'.Sessao::getId().'");
             mudaTelaPrincipal("alteraAtributo.php'.Sessao::getId().'");
             </script>';
@@ -308,7 +308,7 @@ case 2:
     } else {
         $js = "window.parent.frames['telaPrincipal'].document.frm.ok.disabled = false;";
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("O Atributo '.$nomAtributo.' já existe","unica","erro","'.Sessao::getId().'");
             </script>';
     }

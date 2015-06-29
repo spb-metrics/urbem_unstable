@@ -33,7 +33,7 @@
  * $Id:$        
  */         
 ?>                                                                                                                     
-<script language="JavaScript">
+<script type="text/javascript">
     function limpaFormularioAux(){
         jq('#flValor').val('');
         jq('#stPeriodo').selectOptions('', true);

@@ -75,10 +75,24 @@ function montaRecuperaISI()
                , cpf_responsavel.cpf AS cpf_responsavel
                , resp_tecnico.e_mail AS email_responsavel_tec
                , (SELECT valor FROM administracao.configuracao WHERE parametro ilike 'versao_sistema' and exercicio = '".$this->getDado('exercicio')."') AS versao
-               , 'URBEM'  AS nom_sistema
-               , '' AS numero_sequencial
+               , 'URBEM' AS nom_sistema
+	    ";
+	    
+    if ( Sessao::getExercicio() >= "2014" ) {
+	$stSql .= " , 1 AS bo_portal_transparencia
+		    , 'http://www.urbem.cnm.org.br/transparencia/' AS url_portal_transparencia
+		    , 1 AS bo_sistema_integrado
+		    , 1 AS bo_despesa
+		    , 1 AS bo_receita
+	";
+    }
+
+    $stSql  .= "
+                , '' AS numero_sequencial
+		
             FROM sw_cgm
-            JOIN (SELECT numcgm
+      
+      INNER JOIN (SELECT numcgm
 		       , cpf AS num_documento
                        , 1 AS tipo_pessoa                       
                     FROM sw_cgm_pessoa_fisica
@@ -89,27 +103,30 @@ function montaRecuperaISI()
                     FROM sw_cgm_pessoa_juridica 
                 ) AS dados_proprietario
               ON dados_proprietario.numcgm = sw_cgm.numcgm  
-            JOIN sw_municipio
+      
+      INNER JOIN sw_municipio
               ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
              AND sw_municipio.cod_uf = sw_cgm.cod_uf
-            JOIN sw_uf
+      
+      INNER JOIN sw_uf
               ON sw_uf.cod_uf = sw_cgm.cod_uf
+       
        LEFT JOIN tcmgo.responsavel_tecnico
               ON responsavel_tecnico.cod_entidade = '".$this->getDado('cod_entidade')."'
-             AND responsavel_tecnico.exercicio = '".$this->getDado('exercicio')."'
-            JOIN sw_cgm AS resp_tecnico
+             AND responsavel_tecnico.exercicio    = '".$this->getDado('exercicio')."'
+      
+      INNER JOIN sw_cgm AS resp_tecnico
               ON resp_tecnico.numcgm = responsavel_tecnico.cgm_responsavel
-            JOIN sw_cgm_pessoa_fisica AS cpf_responsavel
+      
+      INNER JOIN sw_cgm_pessoa_fisica AS cpf_responsavel
               ON cpf_responsavel.numcgm = responsavel_tecnico.cgm_responsavel       
-           WHERE sw_cgm.numcgm::TEXT = (SELECT valor 
+           
+	   WHERE sw_cgm.numcgm::TEXT = (SELECT valor 
                                           FROM administracao.configuracao 
                                          WHERE configuracao.exercicio = '".$this->getDado('exercicio')."'
                                            AND configuracao.cod_modulo = 42
                                            AND parametro = 'provedor_sistema')
        ";
-	   
-	//SistemaLegado::mostravar($stSql);
-	//die;
 
     return $stSql;
 }

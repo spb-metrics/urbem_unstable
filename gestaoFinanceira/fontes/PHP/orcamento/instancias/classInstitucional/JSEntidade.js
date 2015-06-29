@@ -50,7 +50,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaCGM(BuscaValor){
     document.frm.stCtrl.value = BuscaValor;

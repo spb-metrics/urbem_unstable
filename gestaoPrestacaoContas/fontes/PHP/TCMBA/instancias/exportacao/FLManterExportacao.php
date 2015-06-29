@@ -25,25 +25,19 @@
 <?php
 /**
     * Página de Filtro - Exportação Arquivos GF
-
     * Data de Criação   : 08/06/2007
-
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
-
     * @ignore
-
-    $Revision: 59612 $
-    $Name$
-    $Autor: $
-    $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
-
+    * $Revision: 62823 $
+    * $Name$
+    * $Autor: $
+    * $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
     * Casos de uso: uc-06.03.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-//include_once (CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php"              );
 include_once(CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
 
 //Define o nome dos arquivos PHP
@@ -71,7 +65,6 @@ $obHdnAcao->setValue( $stAcao );
 //Define o objeto que ira armazenar o nome da pagina oculta
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName ( "hdnPaginaExportacao" );
-#$obHdnAcao->setValue( "../TCEPB/".$pgOcul );
 $obHdnAcao->setValue( "../../../TCMBA/instancias/exportacao/".$pgOcul );
 
 /* Radio para selecionar tipo de exportacao*/
@@ -89,57 +82,115 @@ $obRdbTipoExportArqCompactado->setName  ( "stTipoExport"    );
 $obRdbTipoExportArqCompactado->setLabel ( "Compactados"     );
 $obRdbTipoExportArqCompactado->setValue ( "compactados"     );
 
-$arNomeArquivos = array(
-                            'AdCont.txt'
-                            ,'AdConv.txt'
-                            ,'BensAlmox.txt'
-                            ,'ContaCont.txt'
-                            ,'Combustivel.txt'
-                            ,'Contrato.txt'
-                            ,'Convenio.txt'
-                            ,'Cotacao.txt'
-                            ,'CertCont.txt'
-                            ,'ConvLict.txt'
-                            ,'CPartLic.txt'
-                            ,'Dispensa.txt'
-                            ,'Dotacao.txt'
-                            ,'DotCont.txt'
-                            ,'Empenho.txt'
-                            ,'EspDesp.txt'
-                            ,'EspRec.txt'
-                            ,'EstorEmp.txt'
-                            ,'Fonte.txt'
-                            ,'Frota.txt'
-                            ,'ItemLic.txt'
-                            ,'Licitaca.txt'
-                            ,'LiqEmp.txt'
-                            ,'NotaFisc.txt'
-                            ,'Orgao.txt'
-                            ,'PagEmp.txt'
-                            ,'PartConv.txt'
-                            ,'PartLic.txt'
-                            ,'Patrimonio.txt'
-                            ,'PrevRec.txt'
-                            ,'Programa.txt'
-                            ,'ProjAtv.txt'
-                            ,'PubLic.txt'
-                            ,'RecLanc.txt'
-                            ,'ResCont.txt'
-                            ,'Retencao.txt'
-                            ,'UnidOrca.txt'
-                            ,'MovConta.txt'
-                        );
+switch ($request->get('stAcao')) {
+    case 'basicos':
+        $arNomeArquivos = array( 
+                                    "Cargo.txt"
+                                    ,"Fonte.txt"
+                                    ,"ContaCont.txt"
+                                );
+    break;
+    case 'programa':
+        $arNomeArquivos = array( 
+                                    "ProgramaPPA.txt"
+                                    ,"IndProg.txt"
+                                );
+    break;
+    case 'orcamento':
+        $arNomeArquivos = array( 
+                                    "Orgao.txt"
+                                    ,"UnidOrca.txt"    
+                                    ,"Programa.txt"    
+                                    ,"ProjAtv.txt"     
+                                    ,"EspRec.txt"      
+                                    ,"EspDesp.txt"     
+                                    ,"PrevRec.txt"     
+                                    ,"Dotacao.txt"     
+                                );
+    break;
+    case 'consumo':
+        $arNomeArquivos = array( 
+                                    "Patrimonio.txt"
+                                    ,"Frota.txt"    
+                                );
+    break;
+    case 'consolidados':
+        $arNomeArquivos = array( 
+                                    "ConsContRazao.txt"
+                                    ,"ConsDesExtOrc.txt"
+                                    ,"ConsIngExtOrc.txt"
+                                    ,"ConsRecOrc.txt"
+                                    ,"ConsDespOrc.txt"
+                                );
+    break;
+    case 'ldo':
+        $arNomeArquivos = array( 
+                                    "MetasFisicas.txt"
+                                    ,"RiscosFiscais.txt"
+                                );
+    break;
+    case 'programacao':
+        $arNomeArquivos = array( 
+                                    "CronoDesemb.txt"
+                                    ,"MetasArrecada.txt"
+                                );
+    break;
+    case 'informes':
+        $arNomeArquivos = array( 
+                                    "Area.txt"  
+                                    ,"BenefPen.txt"    
+                                    ,"Bolsa.txt"       
+                                    ,"Concurso.txt"    
+                                    ,"FaixaSalario2.txt"   
+                                    ,"Pessoal.txt" 
+                                    ,"PreContPessoal.txt" 
+                                    ,"ProvApo.txt" 
+                                    ,"ResConc.txt" 
+                                    ,"Salario2.txt"
+                                    ,"AdCont.txt"   
+                                    ,"AdConv.txt"   
+                                    ,"AltOrc.txt"   
+                                    ,"CertCont.txt" 
+                                    ,"Combustivel.txt"  
+                                    ,"Contrato2.txt"    
+                                    ,"Convenio.txt" 
+                                    ,"ConvLic.txt"  
+                                    ,"Cotacao.txt"  
+                                    ,"CPartLic.txt" 
+                                    ,"Dispensa.txt" 
+                                    ,"DotCont.txt"  
+                                    ,"Empenho.txt"  
+                                    ,"EstorEmp.txt" 
+                                    ,"ItemLic.txt"  
+                                    ,"Licitaca.txt" 
+                                    ,"LiqEmp.txt"   
+                                    ,"MovConta.txt" 
+                                    ,"NotaFisc.txt" 
+                                    ,"PagEmp2.txt"  
+                                    ,"PartConv.txt" 
+                                    ,"PartLic.txt"  
+                                    ,"Public.txt"   
+                                    ,"RecLanc2.txt" 
+                                    ,"ResCont.txt"  
+                                    ,"Retencao.txt" 
+                                );
+    break;
+}
+
+//Manter ordem alfabetica dos arquivos
+sort($arNomeArquivos);
 
 for ($inCounter=0;$inCounter < count($arNomeArquivos);$inCounter++) {
     $arElementosArq[$inCounter]['Arquivo'  ]   = $arNomeArquivos[$inCounter]  ;
     $arElementosArq[$inCounter]['Nome'     ]   = $arNomeArquivos[$inCounter]  ;
 }
 
-//$obMes = new Mes();
-//$obMes->setNull( false );
-//$obMes->setValue('1');
 $obPeriodicidade = new Periodicidade();
+$obPeriodicidade->setExercicio   (  Sessao::getExercicio() );
 $obPeriodicidade->setNull(false);
+$obPeriodicidade->setValidaExercicio ( true );
+$obPeriodicidade->setNull            (false );
+$obPeriodicidade->setValue           ( 4);
 
 $obISelectEntidade = new ITextBoxSelectEntidadeGeral();
 $obISelectEntidade->setCodEntidade(1);
@@ -168,11 +219,9 @@ $obCmbArquivos->SetRecord2   ( $rsArqSelecionados );
 
 //Instancia o formulário
 $obForm = new Form;
-//$obForm->setAction      ( "../processamento/PRExportador.php"   );
 $obForm->setAction      ( "../../../exportacao/instancias/processamento/PRExportador.php"   );
 $obForm->setTarget      ( "telaPrincipal"                       ); //oculto - telaPrincipal
 
-//$obForm->setName    ( 'obFrmArquivosPrincipais');
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;

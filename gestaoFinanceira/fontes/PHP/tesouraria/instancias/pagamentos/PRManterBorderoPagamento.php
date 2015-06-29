@@ -104,13 +104,6 @@ switch ($stAcao) {
 
         $obRTesourariaBoletim->addBordero();
 
-/*        if ( $stDtBoletim == date( 'd/m/Y' ) ) {
-            $obRTesourariaBoletim->roUltimoBordero->setTimestampBordero( date( 'Y-m-d H:i:s.ms' ) );
-        } else {
-            list( $stDia, $stMes, $stAno ) = explode( '/', $stDtBoletim );
-            $obRTesourariaBoletim->roUltimoBordero->setTimestampBordero( $stAno.'-'.$stMes.'-'.$stDia.' '.date('H:i:s.ms') );
-        }*/
-
         $obRTesourariaBoletim->roUltimoBordero->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade'] );
         $obRTesourariaBoletim->roUltimoBordero->obRContabilidadePlanoBanco->setCodPlano($_REQUEST['inCodConta'] );
         $obRTesourariaBoletim->roUltimoBordero->roRTesourariaBoletim->setCodBoletim($inCodBoletim );
@@ -143,7 +136,6 @@ switch ($stAcao) {
                 $obRTesourariaBoletim->addPagamento();
                 $obRTesourariaBoletim->roUltimoPagamento->setTimestamp( $obRTesourariaBoletim->roUltimoBordero->getTimestampBordero() );
 
-//                $obErro = new Erro;
                 if (SistemaLegado::comparaDatas($arItens['stDtEmissaoOrdem'],$stDtBoletim)) {
                     $obErro->setDescricao("A data do pagamento é anterior à data de emissão da OP");
                 }
@@ -156,6 +148,7 @@ switch ($stAcao) {
                 $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio()   );
                 $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setObservacao( $historico );
                 $obErro = $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->listarItensPagamento ( $rsRecordSet );
+                
                 if (!$obErro->ocorreu()) {
                     $inCount = 0;
                     $arNotas = $rsRecordSet->getElementos();
@@ -167,7 +160,7 @@ switch ($stAcao) {
                         $stExercicioEmpenho     = $arNota['ex_empenho'];
                         $nuValorPagar           = $arNota['vl_pagamento'];
 
-                        if (SistemaLegado::comparaDatas($arNota['dt_nota'],$stDtBoletim)) {
+                        if (SistemaLegado::comparaDatas($arNota['dt_nota'],$stDtBoletim,true)) {
                             $obErro->setDescricao("A data do pagamento é anterior à data da liquidaçao");
                         }
 

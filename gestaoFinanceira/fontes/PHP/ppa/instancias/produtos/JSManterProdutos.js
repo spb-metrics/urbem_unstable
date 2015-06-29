@@ -43,7 +43,7 @@ uc 02.09.11
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpar(){
     document.frm.stNome.value = '';

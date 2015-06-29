@@ -202,265 +202,253 @@ DECLARE
    bolCriouLote         BOOLEAN := FALSE;
 
    intSeqIns            INTEGER := 0;
-
+   stSql                VARCHAR := '';
    bolEncerramentoOrcamento        BOOLEAN;
 BEGIN
 
-   IF NOT contabilidade.fezEncerramentoAnualLancamentosOrcamentario2013( varExercicio, intCodEntidade ) THEN
+    IF NOT contabilidade.fezEncerramentoAnualLancamentosOrcamentario2013( varExercicio, intCodEntidade ) THEN
 
-      IF bolEncerramentoOrcamento THEN
-         RAISE EXCEPTION 'Encerramento já realizado......';
-      END IF;
+        IF bolEncerramentoOrcamento THEN
+           RAISE EXCEPTION 'Encerramento já realizado......';
+        END IF;
 
-      INSERT INTO contabilidade.historico_contabil( cod_historico
-                                                  , exercicio
-                                                  , nom_historico
-                                                  , complemento)
-                                             SELECT intCodHistorico
-                                                  , varExercicio
-                                                  , 'Encerramento do exercício – Sistema Orçamentário'
-                                                  , 'f'
+        INSERT INTO contabilidade.historico_contabil( cod_historico
+                                                     , exercicio
+                                                     , nom_historico
+                                                     , complemento)
+                                                SELECT intCodHistorico
+                                                     , varExercicio
+                                                     , 'Encerramento do exercício – Sistema Orçamentário'
+                                                     , 'f'
                                                WHERE 0  = ( SELECT Count(1)
                                                               FROM contabilidade.historico_contabil
                                                              WHERE cod_historico = intCodHistorico
                                                                AND exercicio     = varExercicio);
 
-      For recLancamento IN SELECT plano_conta.cod_estrutural
-                                , plano_analitica.cod_plano
-                                , coalesce(total_credito.valor,0.00)            AS valor_cre
-                                , coalesce(total_debito.valor,0.00)             AS valor_deb
-                                , coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00) AS saldo
-                             FROM contabilidade.plano_conta
-                                , contabilidade.plano_analitica
-                        LEFT JOIN ( SELECT cod_plano, conta_debito.exercicio, SUM(vl_lancamento) AS valor
-                                      FROM contabilidade.valor_lancamento
-                                         , contabilidade.conta_debito
-                                     WHERE conta_debito.cod_lote     = valor_lancamento.cod_lote
-                                       AND conta_debito.tipo         = valor_lancamento.tipo
-                                       AND conta_debito.sequencia    = valor_lancamento.sequencia
-                                       AND conta_debito.exercicio    = valor_lancamento.exercicio
-                                       AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
-                                       AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
-                                       AND conta_debito.cod_entidade =  intCodEntidade
-                                  GROUP BY cod_plano,conta_debito.exercicio
-                                ) AS total_debito     
-                               ON contabilidade.plano_analitica.cod_plano = total_debito.cod_plano
-                              AND contabilidade.plano_analitica.exercicio = total_debito.exercicio
-                        LEFT JOIN ( SELECT cod_plano, conta_credito.exercicio, SUM(vl_lancamento) AS valor
-                                      FROM contabilidade.valor_lancamento
-                                         , contabilidade.conta_credito
-                                     WHERE conta_credito.cod_lote     = valor_lancamento.cod_lote
-                                       AND conta_credito.tipo         = valor_lancamento.tipo
-                                       AND conta_credito.sequencia    = valor_lancamento.sequencia
-                                       AND conta_credito.exercicio    = valor_lancamento.exercicio
-                                       AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
-                                       AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
-                                       AND conta_credito.cod_entidade = intCodEntidade
-                                  GROUP BY cod_plano,conta_credito.exercicio
-                                ) AS total_credito    
-                               ON contabilidade.plano_analitica.cod_plano = total_credito.cod_plano
-                              AND contabilidade.plano_analitica.exercicio = total_credito.exercicio
-                            WHERE plano_conta.cod_conta     = plano_analitica.cod_conta
-                              AND plano_conta.exercicio     = plano_analitica.exercicio
-                              AND plano_conta.cod_sistema   = 2
-                              AND plano_conta.exercicio     = varExercicio
-                              AND SUBSTR(plano_conta.cod_estrutural,01,01) IN ('5','6')
-
-                            -- Ticket #20198 pede para não zerar os saldos dessas contas específicas
-                          AND NOT
-                                (     plano_conta.cod_estrutural LIKE '5.3.1.7%'
-                                   OR plano_conta.cod_estrutural LIKE '5.3.2.7%'
-                                   OR plano_conta.cod_estrutural LIKE '6.3.1.7%'
-                                   OR plano_conta.cod_estrutural LIKE '6.3.2.7%'
-                                )
-
-                              -- estas contas mantém seus saldos para o próximo exercício
-                              -- 
-                              
-                              --AND NOT ( plano_conta.cod_estrutural LIKE '5.1.1%'
-                              --       OR plano_conta.cod_estrutural LIKE '5.3.1.2%'
-                              --       OR plano_conta.cod_estrutural LIKE '5.3.1.7%'
-                              --       OR plano_conta.cod_estrutural LIKE '5.3.2.2%'
-                              --       OR plano_conta.cod_estrutural LIKE '5.3.2.7%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.1.1%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.1.1%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.1.2%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.1.3%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.1.5%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.1.7%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.2.1%'
-                              --       OR plano_conta.cod_estrutural LIKE '6.3.2.7%' )
-                          AND NOT ( total_debito.valor IS NULL AND total_credito.valor IS NULL )
-                         ORDER BY plano_conta.cod_estrutural
-      LOOP
-         IF recLancamento.saldo != 0 THEN
-            IF NOT bolCriouLote  THEN
-               intCodLote  := contabilidade.fn_insere_lote( varExercicio
-                                                         , intCodEntidade
-                                                         , 'M'
-                                                         , 'Orçamentário/' || varExercicio
-                                                         , '31-12-' || varExercicio
-                                                            );
-               bolCriouLote := TRUE;
-            END IF;
-
-
-            varAux            := RecLancamento.cod_estrutural || ' Codigo plano => ' ||recLancamento.cod_plano;
-            intSeqIns         := intSeqIns  + 1;
-
-            INSERT INTO contabilidade.lancamento( sequencia
-                                                , cod_lote
-                                                , tipo
-                                                , exercicio
-                                                , cod_entidade
-                                                , cod_historico
-                                                , complemento)
-                                         VALUES ( intSeqIns
-                                                , intCodlote
-                                                , 'M'
-                                                , varExercicio
-                                                , intCodEntidade
-                                                , intCodHistorico
-                                                , '');
-   
-            -- VERIFICANDO SE DEVE FAZER LANCAMENTO DE DEBITO OU DE CREDITO
-            CASE SUBSTR(RecLancamento.cod_estrutural,01,01)
-                WHEN '5' THEN 
-                
-                    IF (RecLancamento.saldo > 0) THEN
-                        -- AS CONTAS DO GRUPO 5 DEVEM SER CREDITADAS
-                        INSERT INTO contabilidade.valor_lancamento( cod_lote
-                                                                  , tipo
-                                                                  , sequencia
-                                                                  , exercicio
-                                                                  , tipo_valor
-                                                                  , cod_entidade
-                                                                  , vl_lancamento)
-                                                           VALUES ( intCodlote
-                                                                  , 'M'
-                                                                  , intSeqIns
-                                                                  , varExercicio
-                                                                  , 'D'
-                                                                  , intCodEntidade
-                                                                  , RecLancamento.saldo);
-      
-                        INSERT INTO contabilidade.conta_debito( cod_lote
-                                                               , tipo
-                                                               , sequencia
-                                                               , exercicio
-                                                               , tipo_valor
-                                                               , cod_entidade
-                                                               , cod_plano)
-                                                        VALUES ( intCodlote
-                                                               , 'M'
-                                                               , intSeqIns
-                                                               , varExercicio
-                                                               , 'D'
-                                                               , intCodEntidade
-                                                               , RecLancamento.cod_plano);
-                    ELSE
-                        -- AS CONTAS DO GRUPO 5 DEVEM SER CREDITADAS
-                        INSERT INTO contabilidade.valor_lancamento( cod_lote
-                                                                  , tipo
-                                                                  , sequencia
-                                                                  , exercicio
-                                                                  , tipo_valor
-                                                                  , cod_entidade
-                                                                  , vl_lancamento)
-                                                           VALUES ( intCodlote
-                                                                  , 'M'
-                                                                  , intSeqIns
-                                                                  , varExercicio
-                                                                  , 'C'
-                                                                  , intCodEntidade
-                                                                  , RecLancamento.saldo);
-      
-                        INSERT INTO contabilidade.conta_credito( cod_lote
-                                                               , tipo
-                                                               , sequencia
-                                                               , exercicio
-                                                               , tipo_valor
-                                                               , cod_entidade
-                                                               , cod_plano)
-                                                        VALUES ( intCodlote
-                                                               , 'M'
-                                                               , intSeqIns
-                                                               , varExercicio
-                                                               , 'C'
-                                                               , intCodEntidade
-                                                               , RecLancamento.cod_plano);
+         -- Ticket #22953 pede para apurar o saldo e fazer o lancamento das contas  6.3.1.4, 5.3.1.1, 6.3.2.2, 5.3.2.1
+         IF ( varExercicio >= '2014' ) THEN
+        --APURA O SALDO E FAZ O LANCAMENTO DAS CONTAS 6.3.1.4 E 6.3.2.2 PARA CREDITAR NAS CONTAS 5.3.1.1 E 5.3.2.1 RESPECTIVAMENTE
+            stSql := ' SELECT plano_conta.cod_estrutural
+                            , plano_analitica.cod_plano
+                            , coalesce(total_credito.valor,0.00)            AS valor_cre
+                            , coalesce(total_debito.valor,0.00)             AS valor_deb
+                            , ABS(coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00)) AS saldo
+                        FROM contabilidade.plano_conta
+                            , contabilidade.plano_analitica
+                    LEFT JOIN ( SELECT cod_plano, conta_debito.exercicio, SUM(vl_lancamento) AS valor
+                                FROM contabilidade.valor_lancamento
+                                    , contabilidade.conta_debito
+                                WHERE conta_debito.cod_lote     = valor_lancamento.cod_lote
+                                AND conta_debito.tipo         = valor_lancamento.tipo
+                                AND conta_debito.sequencia    = valor_lancamento.sequencia
+                                AND conta_debito.exercicio    = valor_lancamento.exercicio
+                                AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                                AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                AND conta_debito.cod_entidade =  ' || intCodEntidade || '
+                            GROUP BY cod_plano,conta_debito.exercicio
+                            ) AS total_debito     
+                        ON contabilidade.plano_analitica.cod_plano = total_debito.cod_plano
+                        AND contabilidade.plano_analitica.exercicio = total_debito.exercicio
+                    LEFT JOIN ( SELECT cod_plano, conta_credito.exercicio, SUM(vl_lancamento) AS valor
+                                FROM contabilidade.valor_lancamento
+                                    , contabilidade.conta_credito
+                                WHERE conta_credito.cod_lote     = valor_lancamento.cod_lote
+                                AND conta_credito.tipo         = valor_lancamento.tipo
+                                AND conta_credito.sequencia    = valor_lancamento.sequencia
+                                AND conta_credito.exercicio    = valor_lancamento.exercicio
+                                AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
+                                AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                AND conta_credito.cod_entidade =  ' || intCodEntidade || '
+                            GROUP BY cod_plano,conta_credito.exercicio
+                            ) AS total_credito    
+                        ON contabilidade.plano_analitica.cod_plano = total_credito.cod_plano
+                        AND contabilidade.plano_analitica.exercicio = total_credito.exercicio
+                        WHERE plano_conta.cod_conta     = plano_analitica.cod_conta
+                        AND plano_conta.exercicio     = plano_analitica.exercicio
+                        AND plano_conta.cod_sistema   = 2
+                        AND plano_conta.exercicio     =  ' || quote_literal(varExercicio) || '
+                        AND ( plano_conta.cod_estrutural LIKE ''6.3.1.4%''
+                                OR plano_conta.cod_estrutural LIKE ''6.3.2.2%''
+                            )
+                        AND NOT ( total_debito.valor IS NULL AND total_credito.valor IS NULL )
+                    ORDER BY plano_conta.cod_estrutural '; 
+            For recLancamento IN EXECUTE stSql
+            LOOP
+                IF recLancamento.saldo != 0 THEN
+                    IF NOT bolCriouLote  THEN
+                        intCodLote  := contabilidade.fn_insere_lote( varExercicio
+                                                                , intCodEntidade
+                                                                , 'M' 
+                                                                , 'Orçamentário/' || varExercicio
+                                                                , '31-12-' || varExercicio
+                                                                );
+                        bolCriouLote := TRUE;
                     END IF;
-                            
-                WHEN '6' THEN
-                    IF (RecLancamento.saldo > 0) THEN
-                  
-                        -- AS CONTAS DO GRUPO 6 DEVEM SER DEBITADAS
-                        INSERT INTO contabilidade.valor_lancamento( cod_lote
-                                                                  , tipo
-                                                                  , sequencia
-                                                                  , exercicio
-                                                                  , tipo_valor
-                                                                  , cod_entidade
-                                                                  , vl_lancamento)
-                                                           VALUES ( intCodlote
-                                                                  , 'M'
-                                                                  , intSeqIns
-                                                                  , varExercicio
-                                                                  , 'D'
-                                                                  , intCodEntidade
-                                                                  , RecLancamento.saldo);
+                    
+                    IF substr(recLancamento.cod_estrutural,1,15) = '6.3.1.4.0.00.00' THEN 
+                        intSeqIns := FazerLancamento('6.3.1.4.0.00.00.00.00.00','5.3.1.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    ELSIF substr(recLancamento.cod_estrutural,1,15) = '6.3.2.2.0.00.00' THEN 
+                        intSeqIns := FazerLancamento('6.3.2.2.0.00.00.00.00.00','5.3.2.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    END IF;
+                END IF;
+            END LOOP; 
+            
+            --APURA O SALDO DAS CONTAS 5.3.1.2 E 5.3.2.2 JA COM OS LANCAMENTOS ACIMA REALIZADO, E FAZ OS LANCAMENTOS NECESSARIOS
+            stSql := ' SELECT plano_conta.cod_estrutural
+                            , plano_analitica.cod_plano
+                            , coalesce(total_credito.valor,0.00)            AS valor_cre
+                            , coalesce(total_debito.valor,0.00)             AS valor_deb
+                            , ABS(coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00)) AS saldo
+                        FROM contabilidade.plano_conta
+                            , contabilidade.plano_analitica
+                    LEFT JOIN ( SELECT cod_plano, conta_debito.exercicio, SUM(vl_lancamento) AS valor
+                                FROM contabilidade.valor_lancamento
+                                    , contabilidade.conta_debito
+                                WHERE conta_debito.cod_lote     = valor_lancamento.cod_lote
+                                AND conta_debito.tipo         = valor_lancamento.tipo
+                                AND conta_debito.sequencia    = valor_lancamento.sequencia
+                                AND conta_debito.exercicio    = valor_lancamento.exercicio
+                                AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                                AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                                AND conta_debito.cod_entidade =  ' || intCodEntidade || '
+                            GROUP BY cod_plano,conta_debito.exercicio
+                            ) AS total_debito     
+                        ON contabilidade.plano_analitica.cod_plano = total_debito.cod_plano
+                        AND contabilidade.plano_analitica.exercicio = total_debito.exercicio
+                    LEFT JOIN ( SELECT cod_plano, conta_credito.exercicio, SUM(vl_lancamento) AS valor
+                                FROM contabilidade.valor_lancamento
+                                    , contabilidade.conta_credito
+                                WHERE conta_credito.cod_lote     = valor_lancamento.cod_lote
+                                AND conta_credito.tipo         = valor_lancamento.tipo
+                                AND conta_credito.sequencia    = valor_lancamento.sequencia
+                                AND conta_credito.exercicio    = valor_lancamento.exercicio
+                                AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
+                                AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                                AND conta_credito.cod_entidade =  ' || intCodEntidade || '
+                            GROUP BY cod_plano,conta_credito.exercicio
+                            ) AS total_credito    
+                        ON contabilidade.plano_analitica.cod_plano = total_credito.cod_plano
+                        AND contabilidade.plano_analitica.exercicio = total_credito.exercicio
+                        WHERE plano_conta.cod_conta     = plano_analitica.cod_conta
+                        AND plano_conta.exercicio     = plano_analitica.exercicio
+                        AND plano_conta.cod_sistema   = 2
+                        AND plano_conta.exercicio     =  ' || quote_literal(varExercicio) || '
+                        AND (  plano_conta.cod_estrutural LIKE ''5.3.1.1%''
+                                OR plano_conta.cod_estrutural LIKE ''5.3.2.1%''
+                            )
+                        AND NOT ( total_debito.valor IS NULL AND total_credito.valor IS NULL )
+                    ORDER BY plano_conta.cod_estrutural';
+            
+            For recLancamento IN EXECUTE stSql
+            LOOP
+                IF recLancamento.saldo != 0 THEN
+                    IF NOT bolCriouLote  THEN
+                        intCodLote  := contabilidade.fn_insere_lote( varExercicio
+                                                                , intCodEntidade
+                                                                , 'M' 
+                                                                , 'Orçamentário/' || varExercicio
+                                                                , '31-12-' || varExercicio
+                                                                );
+                        bolCriouLote := TRUE;
+                    END IF;
+    
+                    IF substr(recLancamento.cod_estrutural,1,15) = '5.3.1.1.0.00.00' THEN 
+                        intSeqIns := FazerLancamento('5.3.1.2.0.00.00.00.00.00','5.3.1.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    ELSIF substr(recLancamento.cod_estrutural,1,15) = '5.3.2.1.0.00.00' THEN 
+                        intSeqIns := FazerLancamento('5.3.2.2.0.00.00.00.00.00','5.3.2.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    END IF;
+                END IF;
+            END LOOP;
+        END IF; ---- FIM Ticket #22953, APURACAO DE SALDOS E LANCAMENTOS
         
-                        INSERT INTO contabilidade.conta_debito( cod_lote
-                                                            , tipo
-                                                            , sequencia
-                                                            , exercicio
-                                                            , tipo_valor
-                                                            , cod_entidade
-                                                            , cod_plano)
-                                                     VALUES ( intCodlote
-                                                            , 'M'
-                                                            , intSeqIns
-                                                            , varExercicio
-                                                            , 'D'
-                                                            , intCodEntidade
-                                                            , RecLancamento.cod_plano);
+        stSql := ' SELECT plano_conta.cod_estrutural
+                        , plano_analitica.cod_plano
+                        , coalesce(total_credito.valor,0.00)            AS valor_cre
+                        , coalesce(total_debito.valor,0.00)             AS valor_deb
+                        , (coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00)) AS saldo
+                     FROM contabilidade.plano_conta
+                        , contabilidade.plano_analitica
+                LEFT JOIN ( SELECT cod_plano, conta_debito.exercicio, SUM(vl_lancamento) AS valor
+                              FROM contabilidade.valor_lancamento
+                                 , contabilidade.conta_debito
+                             WHERE conta_debito.cod_lote     = valor_lancamento.cod_lote
+                               AND conta_debito.tipo         = valor_lancamento.tipo
+                               AND conta_debito.sequencia    = valor_lancamento.sequencia
+                               AND conta_debito.exercicio    = valor_lancamento.exercicio
+                               AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                               AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                               AND conta_debito.cod_entidade =  ' || intCodEntidade || '
+                          GROUP BY cod_plano,conta_debito.exercicio
+                        ) AS total_debito     
+                       ON contabilidade.plano_analitica.cod_plano = total_debito.cod_plano
+                      AND contabilidade.plano_analitica.exercicio = total_debito.exercicio
+                LEFT JOIN ( SELECT cod_plano, conta_credito.exercicio, SUM(vl_lancamento) AS valor
+                              FROM contabilidade.valor_lancamento
+                                 , contabilidade.conta_credito
+                             WHERE conta_credito.cod_lote     = valor_lancamento.cod_lote
+                               AND conta_credito.tipo         = valor_lancamento.tipo
+                               AND conta_credito.sequencia    = valor_lancamento.sequencia
+                               AND conta_credito.exercicio    = valor_lancamento.exercicio
+                               AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
+                               AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                               AND conta_credito.cod_entidade =  ' || intCodEntidade || '
+                          GROUP BY cod_plano,conta_credito.exercicio
+                        ) AS total_credito    
+                       ON contabilidade.plano_analitica.cod_plano = total_credito.cod_plano
+                      AND contabilidade.plano_analitica.exercicio = total_credito.exercicio
+                    WHERE plano_conta.cod_conta     = plano_analitica.cod_conta
+                      AND plano_conta.exercicio     = plano_analitica.exercicio
+                      AND plano_conta.cod_sistema   = 2
+                      AND plano_conta.exercicio     =  ' || quote_literal(varExercicio) || '
+                      AND SUBSTR(plano_conta.cod_estrutural,01,01) IN (''5'',''6'')';
+                
+                  IF ( varExercicio <= '2013' ) THEN    
+                    -- Ticket #20198 pede para não zerar os saldos dessas contas específicas
+                    stSql := stSql || '
+                                      AND NOT ( plano_conta.cod_estrutural LIKE ''5.3.1.7%''
+                                              OR plano_conta.cod_estrutural LIKE ''5.3.2.7%''
+                                              OR plano_conta.cod_estrutural LIKE ''6.3.1.7%''
+                                              OR plano_conta.cod_estrutural LIKE ''6.3.2.7%''
+                                    )';
                 ELSE
-                        -- AS CONTAS DO GRUPO 6 DEVEM SER DEBITADAS
-                        INSERT INTO contabilidade.valor_lancamento( cod_lote
-                                                                  , tipo
-                                                                  , sequencia
-                                                                  , exercicio
-                                                                  , tipo_valor
-                                                                  , cod_entidade
-                                                                  , vl_lancamento)
-                                                           VALUES ( intCodlote
-                                                                  , 'M'
-                                                                  , intSeqIns
-                                                                  , varExercicio
-                                                                  , 'C'
-                                                                  , intCodEntidade
-                                                                  , RecLancamento.saldo);
-        
-                        INSERT INTO contabilidade.conta_credito( cod_lote
-                                                            , tipo
-                                                            , sequencia
-                                                            , exercicio
-                                                            , tipo_valor
-                                                            , cod_entidade
-                                                            , cod_plano)
-                                                     VALUES ( intCodlote
-                                                            , 'M'
-                                                            , intSeqIns
-                                                            , varExercicio
-                                                            , 'C'
-                                                            , intCodEntidade
-                                                            , RecLancamento.cod_plano);
+                    -- Ticket #22953 pede para não zerar os saldos dessas contas específicas, estas contas mantêm seus saldos para o próximo exercício
+                    stSql := stSql || '
+                                      AND NOT ( plano_conta.cod_estrutural LIKE ''5.3.1.2%''
+                                               OR plano_conta.cod_estrutural LIKE ''5.3.1.3%''
+                                               OR plano_conta.cod_estrutural LIKE ''5.3.1.6%''
+                                               OR plano_conta.cod_estrutural LIKE ''5.3.2.2%''
+                                               OR plano_conta.cod_estrutural LIKE ''5.3.1.7%''
+                                               OR plano_conta.cod_estrutural LIKE ''5.3.2.7%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.1%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.2%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.3%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.5%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.6%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.7.1%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.1.7.2%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.2.1%''
+                                               OR plano_conta.cod_estrutural LIKE ''6.3.2.7%''
+                                            )';
+                        END IF;
+                    stSql := stSql || '
+                    AND NOT ( total_debito.valor IS NULL AND total_credito.valor IS NULL )
+                   ORDER BY plano_conta.cod_estrutural '; 
+        For recLancamento IN EXECUTE stSql
+        LOOP
+            IF recLancamento.saldo != 0 THEN
+                IF NOT bolCriouLote  THEN
+                    intCodLote  := contabilidade.fn_insere_lote( varExercicio
+                                                               , intCodEntidade
+                                                               , 'M' 
+                                                               , 'Orçamentário/' || varExercicio
+                                                               , '31-12-' || varExercicio
+                                                             );
+                    bolCriouLote := TRUE;
                 END IF;
 
-            END CASE;
-  
-         END IF;
-      END LOOP;
+                intSeqIns := contabilidade.fn_insere_lancamentos(varExercicio, RecLancamento.cod_plano, 0,'', '', RecLancamento.saldo, intCodlote, intCodEntidade, intCodHistorico, CAST('M' AS VARCHAR), '');
+            END IF;
+        END LOOP;
 
       Insert Into administracao.configuracao ( exercicio
                                              , cod_modulo
@@ -472,9 +460,7 @@ BEGIN
                                               , 'TRUE');
 
    END IF;
-
    RETURN;
-
 END;  $$ LANGUAGE plpgsql;
 
 

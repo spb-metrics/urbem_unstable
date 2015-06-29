@@ -175,7 +175,7 @@ switch ($stAcao) {
                 $stFiltroLiquidacao .= "&pgDespesasFixas=FMManterDespesasMensaisFixas.php";
                 $stFiltroLiquidacao .= "&acao=812&modulo=10&funcionalidade=202&nivel=1&cod_gestao_pass=2&stNomeGestao=Financeira&modulos=Empenho";
                 $stFiltroLiquidacao .= "&acaoEmpenho=822&moduloEmpenho=10&funcionalidadeEmpenho=82";
-                print '<script language="JavaScript1.2" type="text/javascript">
+                print '<script type="text/javascript">
                             mudaMenu         ( "Liquidação","202" );
                        </script>';
                 SistemaLegado::alertaAviso($pgProx.'?'.Sessao::getId()."&stAcao=liquidar".$stFiltroLiquidacao, $obREmpenhoEmpenho->getCodEmpenho()."/".Sessao::getExercicio(), "incluir", "aviso", Sessao::getId(), "../");

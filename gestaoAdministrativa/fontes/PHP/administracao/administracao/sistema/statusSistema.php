@@ -60,7 +60,7 @@ Casos de uso: uc-01.03.91
         $atual = "Inativo";
       }
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -162,13 +162,13 @@ Casos de uso: uc-01.03.91
             $audicao->insereAuditoria();
 
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("'.$sMensagem.'","alterar","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&ctrl=0");
             </script>';
         } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("'.$sMensagem.'","n_alterar","erro", "'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&ctrl=0");
             </script>';

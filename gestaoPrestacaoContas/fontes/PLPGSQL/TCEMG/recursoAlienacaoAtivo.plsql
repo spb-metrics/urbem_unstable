@@ -27,61 +27,37 @@
     $Id:$
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_recurso_alienacao_ativo(varchar, integer ,varchar ) RETURNS SETOF RECORD AS $$
+
+-- CRIANDO O TYPE PARA A FUNÇÃO
+/*
+  CREATE TYPE tcemg_fn_recurso_alienacao_ativo AS (
+    cod_entidade    INTEGER,
+    cod_vinculo     INTEGER,
+    rec_realizada   NUMERIC,       
+    saldo_inicial   NUMERIC,        
+    empenhado_per   NUMERIC,        
+    pago_per        NUMERIC,        
+    liquidado_per   NUMERIC
+  );
+*/
+
+CREATE OR REPLACE FUNCTION tcemg.fn_recurso_alienacao_ativo(varchar,varchar,varchar,varchar) RETURNS SETOF tcemg_fn_recurso_alienacao_ativo AS $$
 DECLARE
-    stExercicio             ALIAS FOR $1;
-    inMes                   ALIAS FOR $2;
-    stCodEntidades          ALIAS FOR $3;
-    
-    stCodRecursos       VARCHAR   := '';
-    stSql               VARCHAR   := '';
-    dtInicial           varchar   := ''; 
-    dtFinal             varchar   := '';
-    dtInicioAnterior    VARCHAR   := '';
-    dtFimAnterior       VARCHAR   := '';
-    stExercicioAnterior VARCHAR   := '';
-    dtInicioAno         VARCHAR   := '';
-    
-    crCursor            REFCURSOR;
-    arCodEntidade       VARCHAR[];
-    stNomEntidade       VARCHAR := '';
-    reRegistro          RECORD;
+    stExercicio     ALIAS FOR $1;
+    stCodEntidades  ALIAS FOR $2;
+    dtInicial       ALIAS FOR $3;
+    dtFinal         ALIAS FOR $4;
 
-    arDatas varchar[] ;
+    stSql           VARCHAR := '';
+    stNomEntidade   VARCHAR := '';
+    arCodEntidade   VARCHAR[];
+    reRegistro      RECORD;
 
-BEGIN
-        dtInicioAno := '01/01/'||stExercicio;
-        arDatas := publico.mes ( stExercicio, inMes );
-        dtInicial := arDatas [ 0 ];
-        dtFinal   := arDatas [ 1 ];
-        
-        stExercicioAnterior := TO_CHAR((TO_DATE(stExercicio, 'yyyy') - 1),'yyyy');
-        
-        dtInicioAnterior := '01/01/'||stExercicioAnterior;
-        dtFimAnterior := '31/12/'||stExercicioAnterior;
-        arCodEntidade := string_to_array(stCodEntidades,',');
+    BEGIN
 
-     CREATE TEMPORARY TABLE tmp_retorno(
-        mes                 INTEGER,
-        saldo_anterior      NUMERIC(14,2),
-        rec_realizada       NUMERIC(14,2),
-        desp_emp            NUMERIC(14,2),
-        desp_liq            NUMERIC(14,2),
-        desp_paga           NUMERIC(14,2),
-        cod_vinc            INTEGER,
-        cod_entidade        INTEGER
-    );
-            
-    ----------------------------------------
-    -- Recupera os recursos para a consulta
-    ----------------------------------------
-    SELECT ARRAY_TO_STRING(ARRAY( SELECT cod_recurso
-                                    FROM stn.recurso_rreo_anexo_14
-                                   WHERE exercicio = stExercicio
-                                ),',' )
-    INTO stCodRecursos;
-        
-     ---------------------------------
+    arCodEntidade := string_to_array(stCodEntidades,',');
+
+    ---------------------------------
     -- Recupera o nome das entidades
     ---------------------------------
     stSql := '
@@ -96,84 +72,145 @@ BEGIN
         )      
     ';
 
-    EXECUTE stSql;    
-      
-    -----------------------------
-    -- Recupera o saldo anterior
-    -----------------------------
-    
-    stSql := 'CREATE TEMPORARY TABLE tmp_saldo_anterior AS (
-                        SELECT SUM(valor) AS saldo_anterior
-                             , cod_entidade
-                          FROM (SELECT SUM ( valor_lancamento.vl_lancamento )AS valor
-                                     , valor_lancamento.cod_entidade
-                                  FROM contabilidade.plano_conta																		
-                                  JOIN contabilidade.plano_analitica																	
-                                    ON ( plano_conta.exercicio = plano_analitica.exercicio												
-                                   AND   plano_conta.cod_conta = plano_analitica.cod_conta )											
-                                  JOIN contabilidade.conta_credito																		
-                                    ON ( plano_analitica.exercicio = conta_credito.exercicio											
-                                   AND   plano_analitica.cod_plano = conta_credito.cod_plano )											
-                                  JOIN contabilidade.plano_recurso																		
-                                    ON ( plano_analitica.exercicio = plano_recurso.exercicio											
-                                   AND   plano_analitica.cod_plano = plano_recurso.cod_plano )											
-                                  JOIN contabilidade.valor_lancamento																	
-                                    ON ( conta_credito.exercicio    = valor_lancamento.exercicio										
-                                   AND   conta_credito.cod_entidade = valor_lancamento.cod_entidade									
-                                   AND   conta_credito.tipo         = valor_lancamento.tipo											
-                                   AND   conta_credito.cod_lote     = valor_lancamento.cod_lote										
-                                   AND   conta_credito.sequencia    = valor_lancamento.sequencia										
-                                   AND   conta_credito.tipo_valor   = valor_lancamento.tipo_valor )									
-                                  JOIN contabilidade.lote																				
-                                    ON ( valor_lancamento.exercicio    = lote.exercicio												
-                                   AND   valor_lancamento.cod_entidade = lote.cod_entidade												
-                                   AND   valor_lancamento.tipo         = lote.tipo														
-                                   AND   valor_lancamento.cod_lote     = lote.cod_lote )												
-                                 WHERE  plano_conta.exercicio =  '''|| stExercicioAnterior ||'''									
-                                   AND plano_conta.cod_estrutural LIKE ''1.1.1.%''														
-                                   AND lote.dt_lote BETWEEN to_date( '''|| dtInicioAnterior ||''' , ''dd/mm/yyyy'' ) 			
-                                        AND   to_date( '''|| dtFimAnterior ||''' , ''dd/mm/yyyy'' )				
-                                   AND plano_recurso.cod_recurso IN ( '|| stCodRecursos ||' )										
-                                   AND valor_lancamento.cod_entidade IN ( '|| stCodEntidades ||' )
-                              GROUP BY valor_lancamento.cod_entidade 
-                     UNION ALL 																											
-                                SELECT SUM ( valor_lancamento.vl_lancamento ) AS valor
-                                      , valor_lancamento.cod_entidade														
-                                  FROM contabilidade.plano_conta plano_conta															
-                                  JOIN contabilidade.plano_analitica																	
-                                    ON ( plano_conta.exercicio = plano_analitica.exercicio 											
-                                   AND   plano_conta.cod_conta = plano_analitica.cod_conta ) 											
-                                  JOIN contabilidade.conta_debito																		
-                                    ON ( plano_analitica.exercicio = conta_debito.exercicio											
-                                   AND   plano_analitica.cod_plano = conta_debito.cod_plano )											
-                                  JOIN contabilidade.plano_recurso																		
-                                    ON ( plano_analitica.exercicio = plano_recurso.exercicio											
-                                   AND   plano_analitica.cod_plano = plano_recurso.cod_plano )											
-                                  JOIN contabilidade.valor_lancamento 																	
-                                    ON ( conta_debito.exercicio    = valor_lancamento.exercicio 										
-                                   AND   conta_debito.cod_entidade = valor_lancamento.cod_entidade 									
-                                   AND   conta_debito.tipo         = valor_lancamento.tipo         									
-                                   AND   conta_debito.cod_lote     = valor_lancamento.cod_lote     									
-                                   AND   conta_debito.sequencia    = valor_lancamento.sequencia    									
-                                   AND   conta_debito.tipo_valor   = valor_lancamento.tipo_valor )										
-                                  JOIN contabilidade.lote 																				
-                                    ON ( valor_lancamento.exercicio    = lote.exercicio     											
-                                   AND   valor_lancamento.cod_entidade = lote.cod_entidade  											
-                                   AND   valor_lancamento.tipo         = lote.tipo          											
-                                   AND   valor_lancamento.cod_lote     = lote.cod_lote )												
-                                 WHERE plano_conta.exercicio =  '''|| stExercicioAnterior ||''' 									
-                                   AND plano_conta.cod_estrutural like ''1.1.1.%''														
-                                   AND lote.dt_lote BETWEEN to_date( '''|| dtInicioAnterior ||''' , ''dd/mm/yyyy'' ) 			
-                                                      AND   to_date( '''|| dtFimAnterior ||''' , ''dd/mm/yyyy'' )				
-                                   AND plano_recurso.cod_recurso IN ( '|| stCodRecursos ||' )										
-                                   AND valor_lancamento.cod_entidade IN ( '|| stCodEntidades ||' )
-                              GROUP BY valor_lancamento.cod_entidade 
-                     ) AS saldo
-                GROUP BY saldo.cod_entidade )';
-   EXECUTE stSql; 
+    EXECUTE stSql;
+ 
+    stSql := 'CREATE TEMPORARY TABLE tmp_empenhado AS (
+        SELECT
+            e.dt_empenho as dataConsulta,
+            coalesce(ipe.vl_total,0.00) as valor,
+            cd.cod_estrutural as cod_estrutural,
+            od.num_orgao as num_orgao,
+            od.num_unidade as num_unidade--,
+            --od.cod_entidade
+        FROM
+            orcamento.despesa           as od,
+            orcamento.conta_despesa     as cd,
+            empenho.pre_empenho_despesa as ped,
+            empenho.empenho             as e,
+            empenho.pre_empenho         as pe,
+            empenho.item_pre_empenho    as ipe
+        WHERE
+                cd.cod_conta               = ped.cod_conta
+            AND cd.exercicio               = ped.exercicio
+            AND od.cod_despesa              = ped.cod_despesa
+            AND od.exercicio                = ped.exercicio
+            AND pe.exercicio               = ped.exercicio
+            AND pe.cod_pre_empenho         = ped.cod_pre_empenho
+            AND e.cod_entidade             IN (' || stCodEntidades || ')
+            AND e.exercicio                = ''' || stExercicio || '''
+            AND e.exercicio                = pe.exercicio
+            AND e.cod_pre_empenho          = pe.cod_pre_empenho
+            AND pe.exercicio               = ipe.exercicio
+            AND pe.cod_pre_empenho         = ipe.cod_pre_empenho )';
+        EXECUTE stSql;
 
+    stSql := 'CREATE TEMPORARY TABLE tmp_anulado AS (
+            SELECT to_date(to_char(EEAI.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') as dataConsulta,
+                   EEAI.vl_anulado as valor,
+                   OCD.cod_estrutural as cod_estrutural,
+                   OD.num_orgao,
+                   OD.num_unidade--,
+                   --OD.cod_entidade
 
-        
+               FROM orcamento.despesa           as OD,
+                    orcamento.conta_despesa     as OCD,
+                    empenho.pre_empenho_despesa as EPED,
+                    empenho.pre_empenho         as EPE,
+                    empenho.item_pre_empenho    as EIPE,
+                    empenho.empenho_anulado_item as EEAI
+
+               WHERE
+                     OCD.cod_conta            = EPED.cod_conta
+                 AND OCD.exercicio            = EPED.exercicio
+                 AND EPED.exercicio           = EPE.exercicio
+                 AND EPED.cod_pre_empenho     = EPE.cod_pre_empenho
+                 AND EPE.exercicio            = EIPE.exercicio
+                 AND EPE.cod_pre_empenho      = EIPE.cod_pre_empenho
+                 AND EIPE.exercicio           = EEAI.exercicio
+                 AND EIPE.cod_pre_empenho     = EEAI.cod_pre_empenho
+                 AND EIPE.num_item            = EEAI.num_item
+                 AND EEAI.exercicio           = '''|| stExercicio ||'''
+                 AND EEAI.cod_entidade        IN ('||stCodEntidades||')
+                 AND OD.cod_despesa           = EPED.cod_despesa
+                 AND OD.exercicio             = EPED.exercicio )';
+        EXECUTE stSql;
+
+    stSql := 'CREATE TEMPORARY TABLE tmp_pago AS (
+        SELECT
+            to_date(to_char(ENLP.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') as dataConsulta,
+            ENLP.vl_pago as valor,
+            OCD.cod_estrutural as cod_estrutural,
+            OD.num_orgao as num_orgao,
+            OD.num_unidade as num_unidade--,
+            --OD.cod_entidade
+        FROM
+            orcamento.despesa               as OD,
+            orcamento.conta_despesa         as OCD,
+            empenho.pre_empenho_despesa     as EPED,
+            empenho.empenho                 as EE,
+            empenho.pre_empenho             as EPE,
+            empenho.nota_liquidacao         as ENL,
+            empenho.nota_liquidacao_paga    as ENLP
+
+        WHERE
+                OCD.cod_conta            = EPED.cod_conta
+            AND OCD.exercicio            = EPED.exercicio
+            AND OD.cod_despesa           = EPED.cod_despesa
+            AND OD.exercicio             = EPED.exercicio
+            AND EPED.cod_pre_empenho     = EPE.cod_pre_empenho
+            AND EPED.exercicio           = EPE.exercicio
+            AND EPE.exercicio            = EE.exercicio
+            AND EPE.cod_pre_empenho      = EE.cod_pre_empenho
+            AND EE.exercicio             = '''|| stExercicio ||'''
+            AND EE.cod_entidade          IN ('||stCodEntidades||')
+            AND EE.cod_empenho           = ENL.cod_empenho
+            AND EE.exercicio             = ENL.exercicio_empenho
+            AND EE.cod_entidade          = ENL.cod_entidade
+            AND ENL.cod_nota             = ENLP.cod_nota
+            AND ENL.cod_entidade         = ENLP.cod_entidade
+            AND ENL.exercicio            = ENLP.exercicio )';
+        EXECUTE stSql;
+
+    stSql := 'CREATE TEMPORARY TABLE tmp_estornado AS (
+        SELECT
+            to_date(to_char(ENLPA.timestamp_anulada,''dd/mm/yyyy''),''dd/mm/yyyy'') as dataConsulta,
+            ENLPA.vl_anulado as valor,
+            OCD.cod_estrutural as cod_estrutural,
+            OD.num_orgao as num_orgao,
+            OD.num_unidade as num_unidade--,
+            --OD.cod_entidade
+        FROM
+            orcamento.despesa                    as OD,
+            orcamento.conta_despesa              as OCD,
+            empenho.pre_empenho_despesa          as EPED,
+            empenho.empenho                      as EE,
+            empenho.pre_empenho                  as EPE,
+            empenho.nota_liquidacao              as ENL,
+            empenho.nota_liquidacao_paga         as ENLP,
+            empenho.nota_liquidacao_paga_anulada as ENLPA
+        WHERE
+                OCD.cod_conta            = EPED.cod_conta
+            AND OCD.exercicio            = EPED.exercicio
+            AND OD.cod_despesa           = EPED.cod_despesa
+            AND OD.exercicio             = EPED.exercicio
+            AND EPED.exercicio           = EPE.exercicio
+            AND EPED.cod_pre_empenho     = EPE.cod_pre_empenho
+            AND EPE.exercicio            = EE.exercicio
+            AND EPE.cod_pre_empenho      = EE.cod_pre_empenho
+            AND EE.cod_entidade          IN ('||stCodEntidades||')
+            AND EE.exercicio             = '''|| stExercicio ||'''
+            AND EE.cod_empenho           = ENL.cod_empenho
+            AND EE.exercicio             = ENL.exercicio_empenho
+            AND EE.cod_entidade          = ENL.cod_entidade
+            AND ENL.exercicio            = ENLP.exercicio
+            AND ENL.cod_nota             = ENLP.cod_nota
+            AND ENL.cod_entidade         = ENLP.cod_entidade
+            AND ENLP.cod_entidade        = ENLPA.cod_entidade
+            AND ENLP.cod_nota            = ENLPA.cod_nota
+            AND ENLP.exercicio           = ENLPA.exercicio
+            AND ENLP.timestamp           = ENLPA.timestamp )';
+        EXECUTE stSql;
+
     stSql := 'CREATE TEMPORARY TABLE tmp_valor AS (
             SELECT
                   ocr.cod_estrutural as cod_estrutural
@@ -190,14 +227,8 @@ BEGIN
                 contabilidade.lancamento            as lan  ,
                 contabilidade.lote                  as lote
             WHERE
-
-                    ore.exercicio       = '|| quote_literal(stExercicio) ||' ';
-                if ( stCodEntidades != '' ) then
-                   stSql := stSql || ' AND ore.cod_entidade    IN (' || stCodEntidades || ') ';
-                end if;
-
-            stSql := stSql || '
-
+                    ore.exercicio       = '|| quote_literal(stExercicio) ||'
+                AND ore.cod_entidade    IN (' || stCodEntidades || ')
                 AND ocr.cod_conta       = ore.cod_conta
                 AND ocr.exercicio       = ore.exercicio
 
@@ -247,16 +278,10 @@ BEGIN
                 contabilidade.lote                  as lote
 
             WHERE
-                ore.exercicio       = '|| quote_literal(stExercicio) ||' ';  
-
-                if ( stCodEntidades != '' ) then
-                   stSql := stSql || ' AND ore.cod_entidade    IN (' || stCodEntidades || ') ';
-                end if;
-            stSql := stSql || '
-
+                ore.exercicio           = '|| quote_literal(stExercicio) ||'
+                AND ore.cod_entidade    IN (' || stCodEntidades || ')
                 AND ocr.cod_conta       = ore.cod_conta
                 AND ocr.exercicio       = ore.exercicio
-
 
                 -- join lancamento receita
                 AND lr.cod_receita      = ore.cod_receita
@@ -285,366 +310,489 @@ BEGIN
                 AND lote.cod_lote       = lan.cod_lote
                 AND lote.cod_entidade   = lan.cod_entidade
                 AND lote.exercicio      = lan.exercicio
-                AND lote.tipo           = lan.tipo ) '; 
+                AND lote.tipo           = lan.tipo ) ';
+        EXECUTE stSql;
 
-        EXECUTE stSql;        
+    stSql := 'CREATE TEMPORARY TABLE tmp_liquidado AS (
+                SELECT
+                    nl.dt_liquidacao as dataConsulta,
+                    nli.vl_total as valor,
+                    cd.cod_estrutural as cod_estrutural,
+                    od.num_orgao as num_orgao,
+                    od.num_unidade as num_unidade--,
+                    --od.cod_entidade
+                FROM
+                    orcamento.despesa             as od,
+                    orcamento.conta_despesa       as cd,
+                    empenho.pre_empenho_despesa   as ped,
+                    empenho.pre_empenho           as pe,
+                    empenho.empenho               as e,
+                    empenho.nota_liquidacao_item  as nli,
+                    empenho.nota_liquidacao       as nl
+                WHERE
+                        cd.cod_conta               = ped.cod_conta
+                    AND cd.exercicio               = ped.exercicio
+                    AND od.cod_despesa             = ped.cod_despesa
+                    AND od.exercicio               = ped.exercicio
+                    AND pe.exercicio               = ped.exercicio
+                    AND pe.cod_pre_empenho         = ped.cod_pre_empenho
+                    AND e.cod_entidade             IN (' || stCodEntidades || ')
+                    AND e.exercicio                = ''' || stExercicio || '''
+                    AND e.exercicio                = pe.exercicio
+                    AND e.cod_pre_empenho          = pe.cod_pre_empenho
+                    AND e.exercicio = nl.exercicio_empenho
+                    AND e.cod_entidade = nl.cod_entidade
+                    AND e.cod_empenho = nl.cod_empenho
+                    AND nl.exercicio = nli.exercicio
+                    AND nl.cod_nota = nli.cod_nota
+                    AND nl.cod_entidade = nli.cod_entidade )';
+        EXECUTE stSql;
 
+    stSql := 'CREATE TEMPORARY TABLE tmp_liquidado_estornado AS (
+        SELECT
+            to_date(to_char(ENLIA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') as dataConsulta,
+            ENLIA.vl_anulado as valor,
+            OCD.cod_estrutural as cod_estrutural,
+            OD.num_orgao,
+            OD.num_unidade--,
+            --OD.cod_entidade
 
-    -------------------------------------
-    --Recupera Receitas Realizadas
-    -------------------------------------
+        FROM orcamento.despesa                    as OD,
+             orcamento.conta_despesa              as OCD,
+             empenho.pre_empenho_despesa          as EPED,
+             empenho.pre_empenho                  as EPE,
+             empenho.empenho                      as EE,
+             empenho.nota_liquidacao              as ENL,
+             empenho.nota_liquidacao_item         as ENLI,
+             empenho.nota_liquidacao_item_anulado as ENLIA
+
+        WHERE OCD.cod_conta            = EPED.cod_conta
+          AND OCD.exercicio            = EPED.exercicio
+          AND EPE.cod_pre_empenho      = EE.cod_pre_empenho
+          AND EPE.exercicio            = EE.exercicio
+          AND EE.exercicio             = ENL.exercicio_empenho
+          AND EE.cod_entidade          = ENL.cod_entidade
+          AND EE.cod_empenho           = ENL.cod_empenho
+          AND EE.cod_entidade          IN ('||stCodEntidades||')
+          AND EE.exercicio             = '''|| stExercicio || '''
+          AND ENL.exercicio            = ENLI.exercicio
+          AND ENL.cod_nota             = ENLI.cod_nota
+          AND ENL.cod_entidade         = ENLI.cod_entidade
+          AND ENLI.exercicio           = ENLIA.exercicio
+          AND ENLI.cod_pre_empenho     = ENLIA.cod_pre_empenho
+          AND ENLI.num_item            = ENLIA.num_item
+          AND ENLI.cod_entidade        = ENLIA.cod_entidade
+          AND ENLI.exercicio_item      = ENLIA.exercicio_item
+          AND ENLI.cod_nota            = ENLIA.cod_nota
+          AND OD.cod_despesa           = EPED.cod_despesa
+          AND OD.exercicio             = EPED.exercicio
+          AND OD.cod_entidade          IN ('||stCodEntidades||')
+          AND EPED.exercicio           = EPE.exercicio
+          AND EPED.cod_pre_empenho     = EPE.cod_pre_empenho )';
+        EXECUTE stSql;
+
 stSql := '
-    CREATE TEMPORARY TABLE tmp_receitas_realizadas AS (
-        SELECT tbl.cod_entidade,
-               coalesce(SUM(tbl.receitas_realizadas),0.00)*-1 as receitas_realizadas
-          FROM( SELECT tmp_valor.cod_entidade
-                     , tmp_valor.valor AS receitas_realizadas
-                  FROM tmp_valor   
-                 WHERE tmp_valor.cod_estrutural like ''2.%''
-                   AND tmp_valor.recurso IN ( ' || stCodRecursos || ' )
-                   AND tmp_valor.data BETWEEN to_date(''' || dtInicial || ''',''dd/mm/yyyy'') AND 
-                                   to_date(''' || dtFinal || ''',''dd/mm/yyyy'')
-                   AND publico.fn_nivel(tmp_valor.cod_estrutural) >       1
-                   AND publico.fn_nivel(tmp_valor.cod_estrutural) <=      3
-               ) as tbl
-      GROUP BY tbl.cod_entidade)';
+    --CRIA TABELA TEMPORÁRIA COM TODOS AS DESPESAS DA DESPESA, SETA ELAS COMO MÃE
+    CREATE TEMPORARY TABLE tmp_pre_empenho_despesa AS
+        SELECT
+                  od.exercicio
+                 ,cod_conta
+                 ,cod_despesa
+                 ,cast(''M'' as varchar) as tipo_conta
+                 --,od.cod_entidade
+        FROM
+                 orcamento.despesa as od
+                 JOIN orcamento.recurso('''|| stExercicio ||''') as rec
+                   ON (  rec.exercicio   = od.exercicio
+                  AND rec.cod_recurso = od.cod_recurso )
+        WHERE
+                 cod_entidade IN ('||stCodEntidades||')';
+
+
+EXECUTE stSql;
+
+stSql := '
+     --ATUALIZA O TOPO DA SOMA PARA TODOS OS REGISTRO QUE ESTIVEREM NA TABELA PRE_EMPENHO
+        UPDATE tmp_pre_empenho_despesa SET tipo_conta=''D''
+            WHERE   exercicio||''-''||cod_conta IN (
+                        SELECT  exercicio||''-''||cod_conta
+                        FROM    empenho.pre_empenho_despesa
+                    )';
+EXECUTE stSql;
+
+stSql := '
+     --INSERE NA TABELA TEMPORARIA OS REGISTROS RESUTADOS DE UM SELECT
+     --ESTE SELECT PREVEM DA TABELA PRE_EMPENHO_DESPESA ONDE TODOS OS REGISTROS SÃO SETADOS COMO FILHAS
+        INSERT INTO tmp_pre_empenho_despesa
+            SELECT
+                    ped.exercicio
+                    ,ped.cod_conta
+                    ,ped.cod_despesa
+                    ,cast(''F'' as varchar) as tipo_conta
+            FROM
+                    empenho.pre_empenho_despesa ped,
+                    empenho.pre_empenho pe,
+                    empenho.empenho e
+            WHERE NOT EXISTS ( SELECT 1
+                                 FROM tmp_pre_empenho_despesa
+                                WHERE exercicio = ped.exercicio
+                                  AND cod_conta = ped.cod_conta
+                             )
+                    AND ped.exercicio       = pe.exercicio
+                    AND ped.cod_pre_empenho = pe.cod_pre_empenho
+
+                    AND pe.exercicio        = e.exercicio
+                    AND pe.cod_pre_empenho  = e.cod_pre_empenho
+
+                    AND e.cod_entidade IN ('||stCodEntidades||')';
+EXECUTE stSql;
+
+stSql := '
+    CREATE TEMPORARY TABLE tmp_despesa AS
+        SELECT
+                 cd.cod_estrutural,
+                 cd.exercicio,
+                 cd.cod_conta,
+                 cd.descricao,
+                 CASE WHEN tmp.tipo_conta> ''0'' THEN
+                    tmp.tipo_conta
+                 ELSE
+                    cast(''M'' as varchar)
+                 END as tipo_conta
+        FROM
+                 orcamento.conta_despesa as cd
+                 LEFT OUTER JOIN tmp_pre_empenho_despesa as tmp ON (
+                    cd.cod_conta = tmp.cod_conta AND
+                    cd.exercicio = tmp.exercicio
+                 )
+       WHERE cd.exercicio = '''|| stExercicio ||'''
+        GROUP BY
+            cd.cod_estrutural,
+            cd.exercicio,
+            cd.cod_conta,
+            cd.descricao,
+            tipo_conta ';
+EXECUTE stSql;
+
+stSql := '
+    CREATE TEMPORARY TABLE tmp_relacao AS
+        SELECT
+            --SELECIONA ORCAMENTO.DESPESA
+            od.exercicio        as exercicio,
+
+            --SELECIONA EMPENHO.PRE_EMPENHO_DESPESA
+            eped.tipo_conta     as tipo_conta,
+
+            --SELECIONA ORCAMENT.CONTA_DESPESA
+            ocd.cod_estrutural  as classificacao,
+            publico.fn_mascarareduzida(ocd.cod_estrutural) as cod_reduzido,
+            ocd.descricao       as descricao ,
+
+            --SELECIONA ORCAMENTO.SUPLEMENTACOES_SUPLEMENTADA
+            sum( oss.valor )          as suplementacoes,
+
+            --SELECIONA ORCAMENTO.SUPLEMENTACOES_REDUZIDA
+            sum( osr.valor )          as reducoes
+
+            , 0 as num_orgao
+            , eped.tipo_conta as nom_orgao
+            , 0 as num_unidade
+            , eped.tipo_conta AS nom_unidade
+            , od.cod_entidade
+        FROM
+            tmp_pre_empenho_despesa eped,
+            orcamento.conta_despesa ocd,
+            orcamento.despesa od
+                LEFT JOIN (
+                    SELECT
+                        cod_despesa as cod_despesa,
+                        max(oss1.exercicio) as exercicio,
+                        sum(valor) as valor
+                    FROM
+                        orcamento.suplementacao_suplementada as oss1,
+                        orcamento.suplementacao as os
+                    WHERE
+                        os.cod_suplementacao = oss1.cod_suplementacao AND
+                        os.exercicio         = oss1.exercicio AND
+                        os.cod_suplementacao || os.exercicio IN (
+                            SELECT
+                                cod_suplementacao || cl.exercicio
+                            FROM
+                                contabilidade.transferencia_despesa ctd,
+                                contabilidade.lote cl
+                            WHERE
+                                ctd.exercicio = cl.exercicio AND
+                                ctd.cod_lote  = cl.cod_lote AND
+                                ctd.tipo      = cl.tipo AND
+                                ctd.cod_entidade = cl.cod_entidade AND
+                                cl.dt_lote between  to_date('''|| dtInicial ||''',''dd/mm/yyyy'') And to_date('''|| dtFinal ||''',''dd/mm/yyyy'')
+                         )
+                         
+                        AND NOT EXISTS ( SELECT 1
+                                           FROM orcamento.suplementacao_anulada o_sa3
+                                          WHERE o_sa3.cod_suplementacao = os.cod_suplementacao
+                                            AND o_sa3.exercicio         = os.exercicio
+                                            AND o_sa3.exercicio         = ''' || stExercicio  || '''
+                        )
+                        AND NOT EXISTS ( SELECT 1
+                                           FROM orcamento.suplementacao_anulada o_sa4
+                                          WHERE o_sa4.cod_suplementacao_anulacao = os.cod_suplementacao
+                                            AND o_sa4.exercicio                  = os.exercicio
+                                            AND o_sa4.exercicio                  = ''' || stExercicio  || '''
+                        )
+
+                    GROUP BY
+                        oss1.exercicio, oss1.cod_despesa
+                ) AS oss ON (
+                    od.cod_despesa = oss.cod_despesa AND
+                    od.exercicio   = oss.exercicio
+                )
+                LEFT JOIN (
+                    SELECT
+                        cod_despesa,max(osr1.exercicio) as exercicio, sum(valor) as valor
+                    FROM
+                        orcamento.suplementacao_reducao as osr1,
+                        orcamento.suplementacao as os
+                    WHERE
+                        os.cod_suplementacao = osr1.cod_suplementacao AND
+                        os.exercicio         = osr1.exercicio AND
+                        os.cod_suplementacao || os.exercicio IN (
+                        
+                        
+                            SELECT
+                                cod_suplementacao || cl.exercicio
+                            FROM
+                                contabilidade.transferencia_despesa ctd,
+                                contabilidade.lote cl
+                            WHERE
+                                ctd.exercicio = cl.exercicio AND
+                                ctd.cod_lote  = cl.cod_lote AND
+                                ctd.tipo      = cl.tipo AND
+                                ctd.cod_entidade = cl.cod_entidade AND
+                                cl.dt_lote between to_date('''||  dtInicial ||''',''dd/mm/yyyy'') And to_date('''|| dtFinal ||''',''dd/mm/yyyy'')
+                        )
+                        AND NOT EXISTS ( SELECT 1
+                                           FROM orcamento.suplementacao_anulada o_sa
+                                          WHERE o_sa.cod_suplementacao = os.cod_suplementacao
+                                            AND o_sa.exercicio         = os.exercicio
+                                            AND o_sa.exercicio         = ''' || stExercicio  || '''
+                        )
+                        AND NOT EXISTS ( SELECT 1
+                                           FROM orcamento.suplementacao_anulada o_sa2
+                                          WHERE o_sa2.cod_suplementacao_anulacao = os.cod_suplementacao
+                                            AND o_sa2.exercicio                  = os.exercicio
+                                            AND o_sa2.exercicio                  = ''' || stExercicio  || '''
+                        )
+
+                    GROUP BY
+                        osr1.exercicio,cod_despesa
+                ) AS osr ON (
+                    od.cod_despesa        = osr.cod_despesa AND
+                    od.exercicio          = osr.exercicio
+                )
+                JOIN orcamento.recurso('''|| stExercicio ||''') as rec
+                ON ( od.cod_recurso = rec.cod_recurso
+                 AND od.exercicio   = rec.exercicio )
+        WHERE
+            eped.cod_despesa      = od.cod_despesa      AND
+            eped.exercicio        = od.exercicio        AND
+
+            eped.cod_conta        = ocd.cod_conta       AND
+            eped.exercicio        = ocd.exercicio       AND
+
+            od.cod_entidade       IN ('||stCodEntidades||') AND
+
+            od.exercicio          = ''' || stExercicio  || '''
+        GROUP BY
+            ocd.cod_estrutural,
+            od.exercicio ,
+            ocd.descricao,
+            eped.tipo_conta,
+            od.cod_entidade
+        ORDER BY
+            ocd.cod_estrutural
+';
+
     EXECUTE stSql;
-    
-  
-    -------------------------------------
-    --Recupera Despesas Empenhadas
-    -------------------------------------
-    stSql := '
-    CREATE TEMPORARY TABLE tmp_empenhado AS (
-        SELECT coalesce(sum(vl_total), 0.00) as vl_empenhado 
-    	     , e.cod_entidade	
-          FROM orcamento.conta_despesa ocd 
-    INNER JOIN orcamento.despesa ode
-            ON ode.exercicio = ocd.exercicio
-           AND ode.cod_conta = ocd.cod_conta 
-    INNER JOIN empenho.pre_empenho_despesa ped
-            ON ped.exercicio = ode.exercicio
-           AND ped.cod_despesa = ode.cod_despesa 
-    INNER JOIN empenho.pre_empenho pe
-            ON ped.exercicio = pe.exercicio
-           AND ped.cod_pre_empenho = pe.cod_pre_empenho 
-    INNER JOIN empenho.item_pre_empenho ipe
-            ON ipe.cod_pre_empenho = pe.cod_pre_empenho
-           AND ipe.exercicio = pe.exercicio 
-    INNER JOIN empenho.empenho e
-            ON e.exercicio = pe.exercicio
-           AND e.cod_pre_empenho = pe.cod_pre_empenho 
-         WHERE e.exercicio = ''' || stExercicio || '''
-           AND e.cod_entidade IN (' || stCodEntidades || ')
-           AND ode.cod_recurso IN (' || stCodRecursos || ')
-           AND e.dt_empenho BETWEEN to_date(''' || dtInicial || ''',''dd/mm/yyyy'')
-                                AND to_date(''' || dtFinal || ''',''dd/mm/yyyy'')
-           AND (ocd.cod_estrutural LIKE ''3.%'' OR ocd.cod_estrutural LIKE ''4.%'' )
-           AND SUBSTRING(ocd.cod_estrutural, 5, 3) <> ''9.1''
-      GROUP BY e.cod_entidade )
-        ';
-    EXECUTE stSql;
-    
-    ------------------------
-    --Recupera Despesas Empenhadas Anuladas
-    -----------------------
-    stSql := '
-    CREATE TEMPORARY TABLE tmp_empenhado_anulado AS (
-        SELECT coalesce(sum(eai.vl_anulado), 0.00) as valor_empenhado_anulado
-             , e.cod_entidade
-          FROM orcamento.conta_despesa ocd 
-    INNER JOIN orcamento.despesa ode
-            ON ode.exercicio = ocd.exercicio
-           AND ode.cod_conta = ocd.cod_conta 
-    INNER JOIN empenho.pre_empenho_despesa ped
-            ON ped.exercicio = ode.exercicio
-           AND ped.cod_despesa = ode.cod_despesa 
-    INNER JOIN empenho.pre_empenho pe
-            ON ped.exercicio = pe.exercicio
-           AND ped.cod_pre_empenho = pe.cod_pre_empenho
-    INNER JOIN empenho.empenho e
-            ON e.exercicio = pe.exercicio
-           AND e.cod_pre_empenho = pe.cod_pre_empenho 
-    INNER JOIN empenho.empenho_anulado ea
-            ON ea.exercicio = e.exercicio
-           AND ea.cod_entidade = e.cod_entidade
-           AND ea.cod_empenho = e.cod_empenho 		
-    INNER JOIN empenho.empenho_anulado_item eai
-            ON eai.exercicio = ea.exercicio
-           AND eai.cod_entidade = ea.cod_entidade
-           AND eai.cod_empenho = ea.cod_empenho
-           AND eai.timestamp = ea.timestamp  
-        WHERE e.exercicio = ''' || stExercicio || '''
-           AND e.cod_entidade IN (' || stCodEntidades || ')
-           AND ode.cod_recurso IN (' || stCodRecursos || ')
-           AND e.dt_empenho BETWEEN to_date(''' || dtInicial || ''',''dd/mm/yyyy'')
-                                AND to_date(''' || dtFinal || ''',''dd/mm/yyyy'')
-           AND (ocd.cod_estrutural LIKE ''3.%'' OR ocd.cod_estrutural LIKE ''4.%'' )
-           AND SUBSTRING(ocd.cod_estrutural, 5, 3) <> ''9.1''
-      GROUP BY e.cod_entidade )';
-    EXECUTE stSql;
-   
-    ----------------------------------
-    -- Recupera Despesas Liquidas
-    ----------------------------------
-    stSql := '
-    CREATE TEMPORARY TABLE tmp_liquidado AS (
-        SELECT coalesce(sum(vl_total), 0.00) as vl_liquidado
-             , e.cod_entidade
-	  FROM empenho.pre_empenho pe 
-     LEFT JOIN ( SELECT ped.exercicio, 
-			ped.cod_pre_empenho, 
-			cd.cod_estrutural,
-			d.cod_recurso 
-		   FROM orcamento.conta_despesa cd 
-	     INNER JOIN empenho.pre_empenho_despesa ped
-                     ON ped.cod_conta   = cd.cod_conta
-                    AND ped.exercicio   = cd.exercicio 
-	     INNER JOIN orcamento.despesa d
-                     ON ped.cod_despesa = d.cod_despesa
-                    AND ped.exercicio   = d.exercicio 
-		  WHERE ped.exercicio = ''' || stExercicio || '''
-	    ) AS pedcd
-            ON pe.exercicio = pedcd.exercicio
-           AND pe.cod_pre_empenho = pedcd.cod_pre_empenho 
-    INNER JOIN empenho.empenho e
-            ON e.exercicio = pe.exercicio
-           AND e.cod_pre_empenho = pe.cod_pre_empenho 
-    INNER JOIN empenho.nota_liquidacao nl
-            ON nl.exercicio_empenho = e.exercicio
-           AND nl.cod_entidade = e.cod_entidade
-           AND nl.cod_empenho = e.cod_empenho 
-    INNER JOIN empenho.nota_liquidacao_item nli
-            ON nli.exercicio = nl.exercicio
-           AND nli.cod_entidade = nl.cod_entidade
-           AND nli.cod_nota = nl.cod_nota 
-	 WHERE e.exercicio = ''' || stExercicio || '''
-           AND e.cod_entidade IN (' || stCodEntidades || ')
-           AND pedcd.cod_recurso IN (' || stCodRecursos || ')
-           AND nl.dt_liquidacao BETWEEN to_date(''' || dtInicial || ''', ''dd/mm/yyyy'') AND 
-					to_date(''' || dtFinal || ''', ''dd/mm/yyyy'') 
-	   AND (pedcd.cod_estrutural LIKE ''3.%'' OR pedcd.cod_estrutural LIKE ''4.%'' ) 
-	   AND SUBSTRING(pedcd.cod_estrutural, 5, 3) <> ''9.1''
-      GROUP BY e.cod_entidade )
+
+stSql := '
+CREATE TEMPORARY TABLE tmp_relatorio AS
+    SELECT sum( tbl.saldo_inicial ) as saldo_inicial,
+           tbl.empenhado_per,
+           tbl.pago_per,
+           tbl.liquidado_per,
+           0.00 AS rec_realizada,
+           tbl.cod_entidade,
+           tbl.classificacao
+    FROM (
+        SELECT
+            tbl.cod_entidade,
+            tbl.classificacao,
+            tbl.cod_despesa,
+            coalesce((tbl.saldo_inicial),0.00) as saldo_inicial,
+-- Empenhado
+            coalesce(orcamento.fn_consolidado_empenhado(''' || dtInicial || ''', ''' || dtFinal || ''', publico.fn_mascarareduzida(d.cod_estrutural),tbl.num_orgao,tbl.num_unidade),0.00) as empenhado_per,
+-- Pago
+            (coalesce(orcamento.fn_consolidado_pago(''' || dtInicial || ''', ''' || dtFinal || ''', publico.fn_mascarareduzida(d.cod_estrutural),tbl.num_orgao,tbl.num_unidade),0.00) - coalesce(orcamento.fn_consolidado_estornado(''' || dtInicial || ''', ''' || dtFinal || ''', publico.fn_mascarareduzida(d.cod_estrutural),tbl.num_orgao,tbl.num_unidade),0.00)) as pago_per,
+-- Liquidado
+            (coalesce(orcamento.fn_consolidado_liquidado(''' || dtInicial || ''', ''' || dtFinal || ''', publico.fn_mascarareduzida(d.cod_estrutural),tbl.num_orgao,tbl.num_unidade),0.00) - coalesce(orcamento.fn_consolidado_liquidado_estornado(''' || dtInicial || ''', ''' || dtFinal || ''', publico.fn_mascarareduzida(d.cod_estrutural),tbl.num_orgao,tbl.num_unidade),0.00)) as liquidado_per
+        FROM
+            tmp_despesa as d
+            INNER JOIN (
+            SELECT
+                CASE WHEN tr.classificacao IS NOT NULL THEN
+                    tr.classificacao
+                ELSE
+                    ocd.cod_estrutural
+                END as classificacao,
+                od.cod_despesa,
+                od.cod_entidade,
+                coalesce((od.vl_original),0.00) as  saldo_inicial,
+                0 as num_orgao,
+                0 as num_unidade
+            FROM
+                 orcamento.despesa        od
+                 JOIN orcamento.recurso('''|| stExercicio ||''') as rec
+                 ON ( rec.cod_recurso = od.cod_recurso  
+                  AND rec.exercicio   = od.exercicio )
+                ,orcamento.conta_despesa  ocd
+                    LEFT JOIN tmp_relacao tr ON(
+                        ocd.cod_estrutural = tr.classificacao AND
+                        ocd.exercicio   = tr.exercicio
+                    )
+            WHERE
+                od.exercicio          = ocd.exercicio       AND
+                od.cod_conta          = ocd.cod_conta       AND
+                od.cod_entidade       IN ('||stCodEntidades||') AND
+                od.exercicio          = ''' || stExercicio || '''
+            ORDER BY
+                classificacao,
+                od.num_orgao,
+                od.num_unidade
+        ) as tbl ON (
+            tbl.classificacao = d.cod_estrutural
+        )
+        WHERE d.cod_estrutural IS NOT NULL
+          AND d.cod_estrutural like ''4.%''
+
+        GROUP BY
+            d.cod_estrutural,
+            tbl.num_orgao,
+            tbl.num_unidade,
+            tbl.cod_entidade,
+            tbl.saldo_inicial,
+            tbl.classificacao,
+            tbl.cod_despesa
+        ORDER BY
+            d.cod_estrutural
+        ) as tbl
+    GROUP BY tbl.cod_entidade,
+             tbl.empenhado_per,
+             tbl.pago_per,
+             tbl.liquidado_per,
+             tbl.classificacao
+
+    UNION
+
+    SELECT 0.00 AS saldo_inicial,
+           0.00 AS empenhado_per,
+           0.00 AS pago_per,
+           0.00 AS liquidado_per,
+           tbl.arrecadado_periodo AS rec_realizada,
+           tbl.cod_entidade,
+           tbl.cod_estrutural AS classificacao
+
+      FROM (
+          SELECT
+              ocr.cod_estrutural as cod_estrutural,
+              r.cod_receita  as receita,
+              r.cod_entidade,
+              orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(ocr.cod_estrutural)
+                                                       ,'|| quote_literal(dtInicial) ||'
+                                                       ,'|| quote_literal(dtFinal)   ||'
+              ) as arrecadado_periodo
+          FROM
+              orcamento.conta_receita ocr
+                  INNER JOIN orcamento.receita as r ON
+                      ocr.exercicio = r.exercicio AND
+                      ocr.cod_conta = r.cod_conta AND
+                      r.cod_entidade    IN ('|| stCodEntidades ||') AND
+                      r.exercicio       = '|| quote_literal(stExercicio) ||'
+                  LEFT JOIN orcamento.recurso('|| quote_literal(stExercicio) ||') as rec ON
+                      rec.cod_recurso = r.cod_recurso AND
+                      rec.exercicio   = r.exercicio
+          WHERE
+                ocr.cod_conta = ocr.cod_conta
+            AND ocr.exercicio =  '|| quote_literal(stExercicio) ||'
+
+          ORDER BY ocr.cod_estrutural
+          ) as tbl
+
+      WHERE orcamento.fn_movimento_balancete_receita( '|| quote_literal(stExercicio) ||'
+                                                      ,publico.fn_mascarareduzida(tbl.cod_estrutural)
+                                                      ,'|| quote_literal(stCodEntidades) ||'
+                                                      ,'|| quote_literal(dtInicial) ||'
+                                                      ,'|| quote_literal(dtFinal) ||'
+                                                    ) = true
+        AND tbl.cod_estrutural IS NOT NULL
+        AND tbl.cod_estrutural like ''2.%''
+
+      GROUP BY tbl.cod_estrutural,
+               tbl.cod_entidade,
+               tbl.receita,
+               tbl.arrecadado_periodo
     ';
+
     EXECUTE stSql;
-    
-    ----------------------------------
-    -- Despesas Liquidadas Estornadas
-    ---------------------------------
-    stSql := '
-    CREATE TEMPORARY TABLE tmp_estornado_liquidacao AS (
-         SELECT coalesce(sum(vl_total), 0.00) as vl_liquidado_estornado
-                  , e.cod_entidade
-  	     FROM empenho.pre_empenho pe 
-          LEFT JOIN ( SELECT ped.exercicio, 
-  	   		     ped.cod_pre_empenho, 
-  	   		     cd.cod_estrutural,
-  	   		     d.cod_recurso 
-  	   	        FROM orcamento.conta_despesa cd 
-  	          INNER JOIN empenho.pre_empenho_despesa ped
-                          ON ped.cod_conta   = cd.cod_conta
-                         AND ped.exercicio   = cd.exercicio 
-  	          INNER JOIN orcamento.despesa d
-                          ON ped.cod_despesa = d.cod_despesa
-                         AND ped.exercicio   = d.exercicio 
-  	   	       WHERE ped.exercicio = ''' || stExercicio || '''
-  	       ) AS pedcd
-                 ON pe.exercicio = pedcd.exercicio
-                AND pe.cod_pre_empenho = pedcd.cod_pre_empenho 
-         INNER JOIN empenho.empenho e
-                 ON e.exercicio = pe.exercicio
-                AND e.cod_pre_empenho = pe.cod_pre_empenho 
-         INNER JOIN empenho.nota_liquidacao nl
-                 ON nl.exercicio_empenho = e.exercicio
-                AND nl.cod_entidade = e.cod_entidade
-                AND nl.cod_empenho = e.cod_empenho 
-         INNER JOIN empenho.nota_liquidacao_item nli
-                 ON nli.exercicio = nl.exercicio
-                AND nli.cod_entidade = nl.cod_entidade
-                AND nli.cod_nota = nl.cod_nota
-         INNER JOIN empenho.nota_liquidacao_item_anulado nlia
-                 ON nli.exercicio = nlia.exercicio
-                AND nli.cod_nota = nlia.cod_nota
-                AND nli.cod_entidade = nlia.cod_entidade
-                AND nli.num_item = nlia.num_item
-                AND nli.cod_pre_empenho = nlia.cod_pre_empenho
-                AND nli.exercicio_item = nlia.exercicio_item        
-  	      WHERE e.exercicio = ''' || stExercicio || '''
-                AND e.cod_entidade IN (' || stCodEntidades || ')
-                AND pedcd.cod_recurso IN (' || stCodRecursos || ')
-                AND to_date( to_char( nlia.timestamp,''dd/mm/yyyy''), ''dd/mm/yyyy'' ) BETWEEN to_date(''' || dtInicial || ''', ''dd/mm/yyyy'') AND 
-  	   				to_date(''' || dtFinal || ''', ''dd/mm/yyyy'') 
-  	      AND (pedcd.cod_estrutural LIKE ''3.%'' OR pedcd.cod_estrutural LIKE ''4.%'' ) 
-  	      AND SUBSTRING(pedcd.cod_estrutural, 5, 3) <> ''9.1''
-           GROUP BY e.cod_entidade )';
-    EXECUTE stSql;
-    
-    
-   --------------------------------
-    -- Recupera a despesa paga
-   --------------------------------
-   stSql := 'CREATE TABLE  tmp_pago AS (
-               SELECT nota_liquidacao_paga.vl_pago as vl_pago
-                    , despesa.cod_entidade as cod_entidade
-                 FROM orcamento.despesa 
-                 JOIN orcamento.recurso(''' || stExercicio || ''') as ORU
-                   ON ( ORU.cod_recurso = despesa.cod_recurso
-                  AND   ORU.exercicio   = despesa.exercicio )
-                    , orcamento.conta_despesa 
-                    , empenho.pre_empenho_despesa 
-                    , empenho.empenho 
-                    , empenho.pre_empenho 
-                    , empenho.nota_liquidacao 
-                    , empenho.nota_liquidacao_paga
-                WHERE conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
-                  AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
- 
-                  AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                  AND despesa.exercicio   = pre_empenho_despesa.exercicio
- 
-                  AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                  AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
- 
-                  AND pre_empenho.exercicio       = empenho.exercicio
-                  AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
- 
-                  AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
-                  AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
-                  AND empenho.cod_entidade = nota_liquidacao.cod_entidade
- 
-                  AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
-                  AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
-                  AND nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio
-                  AND nota_liquidacao_paga.timestamp BETWEEN to_date(''' || dtInicial || ''', ''dd/mm/yyyy'')
-                                                         AND to_date(''' || dtFinal || ''', ''dd/mm/yyyy'')
- 
-                  AND empenho.exercicio              = '''|| stExercicio || '''
-                  AND nota_liquidacao_paga.exercicio = '''|| stExercicio || ''' 
-                  AND despesa.cod_entidade          IN (' || stCodEntidades || ')
-                  AND despesa.cod_recurso           IN (' || stCodRecursos || ')
-                  AND conta_despesa.cod_estrutural like ''4.%'')' ;
 
-              EXECUTE stSql;
-
-
-   stSql := 'CREATE TABLE tmp_pago_anulado  AS(
-              SELECT nota_liquidacao_paga_anulada.vl_anulado as vl_anulado
-                   , despesa.cod_entidade as cod_entidade
-                FROM orcamento.despesa 
-                JOIN orcamento.recurso(''' || stExercicio || ''') as ORU
-                  ON ( ORU.cod_recurso = despesa.cod_recurso
-                 AND   ORU.exercicio   = despesa.exercicio )
-                   , orcamento.conta_despesa 
-                   , empenho.pre_empenho_despesa 
-                   , empenho.empenho
-                   , empenho.pre_empenho 
-                   , empenho.nota_liquidacao 
-                   , empenho.nota_liquidacao_paga
-                   , empenho.nota_liquidacao_paga_anulada 
-               WHERE conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
-                 AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
-
-                 AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                 AND despesa.exercicio   = pre_empenho_despesa.exercicio
-
-                 AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-                 AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-
-                 AND pre_empenho.exercicio       = empenho.exercicio
-                 AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-
-                 AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
-                 AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
-                 AND empenho.cod_entidade = nota_liquidacao.cod_entidade
-
-                 AND nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio
-                 AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
-                 AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
-
-                 AND nota_liquidacao_paga.cod_entidade = nota_liquidacao_paga_anulada.cod_entidade
-                 AND nota_liquidacao_paga.cod_nota     = nota_liquidacao_paga_anulada.cod_nota
-                 AND nota_liquidacao_paga.exercicio    = nota_liquidacao_paga_anulada.exercicio
-                 AND nota_liquidacao_paga.timestamp    = nota_liquidacao_paga_anulada.timestamp
-                 AND nota_liquidacao_paga_anulada.timestamp_anulada BETWEEN to_date(''' || dtInicial || ''', ''dd/mm/yyyy'')
-                                                                        AND to_date(''' || dtFinal || ''', ''dd/mm/yyyy'')
-
-                 AND empenho.exercicio              = '''|| stExercicio || '''
-                 AND nota_liquidacao_paga.exercicio = '''|| stExercicio || ''' 
-                 AND despesa.cod_entidade          IN (' || stCodEntidades || ')
-                 AND despesa.cod_recurso           IN (' || stCodRecursos || ')
-                 AND conta_despesa.cod_estrutural like ''4.%'' )' ;
-              EXECUTE stSql;
-        --------------------------------
-        -- Fim Recupera a despesa paga
-        --------------------------------
-        
-   ---------------------------------------
-    -- Faz as consultas para cada entidade 
+-- Faz as consultas para cada entidade 
     ---------------------------------------
     FOR i IN 1..ARRAY_UPPER(arCodEntidade,1) LOOP
         stCodEntidades := arCodEntidade[i];
         SELECT nom_entidade 
           INTO stNomEntidade
           FROM tmp_entidade
-         WHERE cod_entidade::VARCHAR = arCodEntidade[i];    
+         WHERE cod_entidade::VARCHAR = arCodEntidade[i];
 
-        INSERT INTO tmp_retorno VALUES ( inMes  
-                                        , ( SELECT COALESCE(saldo_anterior,0.00)
-                                                FROM tmp_saldo_anterior
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i])
-                                        , ( SELECT COALESCE(SUM(receitas_realizadas),0.00)*(-1)
-                                              FROM tmp_receitas_realizadas
-                                             WHERE cod_entidade::VARCHAR = arCodEntidade[i] )
-                                         , ( ( SELECT COALESCE(SUM(vl_empenhado), 0.00) 
-                                                FROM tmp_empenhado
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] )
-                                          - ( SELECT COALESCE(SUM(valor_empenhado_anulado), 0.00)
-                                                FROM tmp_empenhado_anulado
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] ) )    
-                                         , ( ( SELECT COALESCE(SUM(vl_liquidado), 0.00) 
-                                                FROM tmp_liquidado
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] )
-                                          - ( SELECT COALESCE(SUM(vl_liquidado_estornado), 0.00)
-                                                FROM tmp_estornado_liquidacao
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] ) )
-                                        , ( ( SELECT COALESCE(SUM(vl_pago), 0.00)
-                                                FROM tmp_pago
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] )
-                                          - ( SELECT COALESCE(SUM(vl_anulado), 0.00)
-                                                FROM tmp_pago_anulado
-                                               WHERE cod_entidade::VARCHAR = arCodEntidade[i] ) )
-                                        , CASE WHEN (stNomEntidade ILIKE '%prefeitura%')
-                                               THEN 1
-                                               WHEN (stNomEntidade ILIKE '%camara%' OR stNomEntidade ILIKE '%câmara%')
-                                               THEN 3
-                                               ELSE 2
-                                          END
-                                        , arCodEntidade[i]::INTEGER
-                                       );           
+        stSql := '
+                    SELECT 
+                         cod_entidade,
+                         0 AS cod_vinculo,
+                         COALESCE(SUM(rec_realizada),0.00)*-1 AS rec_realizada,
+                         COALESCE(SUM(saldo_inicial),0.00) AS saldo_inicial,
+                         COALESCE(SUM(empenhado_per),0.00) AS empenhado_per,
+                         COALESCE(SUM(pago_per),0.00) AS pago_per,
+                         COALESCE(SUM(liquidado_per),0.00) AS liquidado_per
+                    FROM
+                        tmp_relatorio
+                    WHERE cod_entidade = ' || arCodEntidade[i] || '
+                    GROUP BY cod_entidade
+                  ';
 
-    END LOOP;
-    
-
-stSql := 'SELECT * FROM tmp_retorno';                                                 
-
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        RETURN next reRegistro;
+        FOR reRegistro IN EXECUTE stSql
+          LOOP
+            IF (stNomEntidade ILIKE '%prefeitura%') THEN reRegistro.cod_vinculo := 1;
+              ELSIF (stNomEntidade ILIKE '%camara%' OR stNomEntidade ILIKE '%câmara%') THEN reRegistro.cod_vinculo := 3;
+              ELSE reRegistro.cod_vinculo := 2;
+            END IF;
+            RETURN NEXT reRegistro;
+          END LOOP;
     END LOOP;
 
-    DROP TABLE tmp_valor;
-    DROP TABLE tmp_receitas_realizadas;
     DROP TABLE tmp_entidade;
+    DROP TABLE tmp_pre_empenho_despesa;
+    DROP TABLE tmp_despesa;
+    DROP TABLE tmp_relacao;
+    DROP TABLE tmp_relatorio;
+    DROP TABLE tmp_estornado;
+    DROP TABLE tmp_liquidado_estornado;
+    DROP TABLE tmp_valor;
     DROP TABLE tmp_empenhado;
-    DROP TABLE tmp_empenhado_anulado;
-    DROP TABLE tmp_liquidado;
-    DROP TABLE tmp_estornado_liquidacao;
+    DROP TABLE tmp_anulado;
     DROP TABLE tmp_pago;
-    DROP TABLE tmp_pago_anulado;
-    DROP TABLE tmp_retorno;
-    DROP TABLE tmp_saldo_anterior;
+    DROP TABLE tmp_liquidado;
+
     RETURN;
 END;
-$$ language 'plpgsql';
 
+$$ language 'plpgsql';

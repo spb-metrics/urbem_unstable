@@ -39,7 +39,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function marcarDesmarcarTodos(obj){
     if(jQuery(obj).attr('checked') == false){

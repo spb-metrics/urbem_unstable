@@ -43,7 +43,7 @@ Inclusão
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 
 function excluiFornecedor(stControle, inId, sincrono ){
     param = '&inId='+inId;

@@ -28,13 +28,13 @@
     * @author Analista: Fábio Bertoldi
     * @author Programador: Carolina Schwaab Marçal
 
-    *$Id: JSRelatorioLancamentoAutomatico.js 61508 2015-01-27 19:54:30Z carolina $
+    *$Id: JSRelatorioLancamentoAutomatico.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

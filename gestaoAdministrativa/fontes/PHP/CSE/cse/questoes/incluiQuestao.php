@@ -53,7 +53,7 @@ $Date: 2005-11-29 14:45:45 -0200 (Ter, 29 Nov 2005) $
         case 0:
         $anoExercicio = pegaConfiguracao("ano_exercicio");
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -187,12 +187,12 @@ $Date: 2005-11-29 14:45:45 -0200 (Ter, 29 Nov 2005) $
                 $audicao = new auditoriaLegada;
                 $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $nomQuestao);
                 $audicao->insereAuditoria();
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomQuestao.'","incluir","aviso","'.$sessao->id.'","");
                     window.location = "incluiQuestao.php?'.$sessao->id.'";
                     </script>';
             } else {
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomQuestao.'","n_incluir","erro","'.$sessao->id.'","");
                     window.location = "incluiQuestao.php?'.$sessao->id.'";
                     </script>';

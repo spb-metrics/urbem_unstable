@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage 
 
-    $Id: despesaTotalPessoalPE.plsql 62558 2015-05-19 20:36:20Z evandro $
+    $Id: despesaTotalPessoalPE.plsql 62814 2015-06-23 14:42:37Z evandro $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.fn_despesa_total_pessoal_pe(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
@@ -310,7 +310,44 @@ BEGIN
            )AS total_subsPrefeito)as retorno ),
 
 -- subsSecret
-(SELECT 0.00 as subsSecret),
+(SELECT COALESCE(total_subsSecret, 0.00) AS subsSecret
+      FROM (
+         SELECT CAST(SUM(vl_subsSecret) AS NUMERIC) AS total_subsSecret
+         
+           FROM ( SELECT SUM(nota_liquidacao_item.vl_total) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_subsSecret
+                    FROM empenho.empenho
+                    JOIN empenho.nota_liquidacao
+                      ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                     AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                     AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
+                    JOIN empenho.nota_liquidacao_item
+                      ON nota_liquidacao_item.exercicio    = nota_liquidacao.exercicio
+                     AND nota_liquidacao_item.cod_nota     = nota_liquidacao.cod_nota
+                     AND nota_liquidacao_item.cod_entidade = nota_liquidacao.cod_entidade
+               LEFT JOIN empenho.nota_liquidacao_item_anulado
+                    ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                     AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
+                     AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
+                     AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
+                    AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                     AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
+                     AND nota_liquidacao_item_anulado.timestamp BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
+                    JOIN empenho.pre_empenho
+                      ON pre_empenho.exercicio       = empenho.exercicio
+                     AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                    JOIN empenho.pre_empenho_despesa
+                      ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                     AND pre_empenho_despesa.exercicio = pre_empenho.exercicio
+                    JOIN orcamento.conta_despesa
+                      ON conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+                     AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                   WHERE empenho.exercicio    = '|| quote_literal(stExercicio) ||'
+                     AND empenho.cod_entidade IN ( ' || stCodEntidade || ' )
+                     AND nota_liquidacao.dt_liquidacao BETWEEN '''||stDataInicial||''' AND '''||stDataFinal||'''
+                     AND ( cod_estrutural LIKE ''3.1.9.0.11.09%'')
+  
+                GROUP BY nota_liquidacao.dt_liquidacao
+           )AS total_subsSecret)as retorno ),
 
 -- subsVice
 (SELECT COALESCE(total_subsPrefeito, 0.00) AS subsPrefeito

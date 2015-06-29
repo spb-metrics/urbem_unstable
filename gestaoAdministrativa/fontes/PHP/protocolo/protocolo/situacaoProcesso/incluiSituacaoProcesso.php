@@ -45,7 +45,7 @@ Casos de uso: uc-01.06.98
     $inclui->setaVariaveis($nom);
     if (!(isset($nom))) {
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -105,12 +105,12 @@ Casos de uso: uc-01.06.98
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $inclui->nome);
             $audicao->insereAuditoria();
             echo'
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$inclui->nome.'","incluir","aviso", "'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';        } else
             echo'
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$inclui->nome.'","n_incluir","erro", "'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';

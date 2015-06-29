@@ -53,7 +53,7 @@ Adicionada tag log.
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
     //formata a data do formato dd/mm/aaaa para mm/dd/aaaa
     function formataData( str ) {

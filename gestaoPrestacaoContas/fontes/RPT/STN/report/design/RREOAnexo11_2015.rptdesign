@@ -326,11 +326,15 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="teste" id="2938">
+        <scalar-parameter name="query" id="2938">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -339,8 +343,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_250.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dataExtenso" id="2374">
@@ -770,7 +774,7 @@ params["teste"] = this.queryText;]]></method>
                     <structure>
                         <property name="position">1</property>
                         <property name="name">saldo</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">decimal</property>
                     </structure>
                 </list-property>
             </structure>
@@ -835,14 +839,17 @@ this.queryText += "         AND lote.dt_lote BETWEEN to_date( '"+params["data_in
 this.queryText += "                            AND   to_date( '"+params["data_final_anterior"]+"' , 'dd/mm/yyyy' )				\n";
 this.queryText += "         AND plano_recurso.cod_recurso IN ( "+params["cod_recurso"]+" )										\n";
 this.queryText += "         AND valor_lancamento.cod_entidade IN ( "+params["cod_entidade"]+" ) ) , 0.00 )						\n";
-this.queryText += "as saldo																										\n";]]></method>
+this.queryText += "as saldo																										\n";
+
+
+params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
                     <property name="name">saldo</property>
                     <property name="nativeName">saldo</property>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">decimal</property>
                     <property name="nativeDataType">4</property>
                 </structure>
             </list-property>
@@ -1617,6 +1624,17 @@ var y = Total.sum( row.restos_pagar, row.descricao == "Despesas Correntes Dos Re
                     <expression name="expression">dataSetRow["despesas_empenhadas"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
+                <structure>
+                    <property name="name">bbb</property>
+                    <expression name="expression" type="javascript">var x = Total.sum( row.despesas_empenhadas, row.descricao == "Despesas De Capital" );
+var y = Total.sum( row.despesas_empenhadas, row.descricao == "Despesas Correntes Dos Regimes De Previdência" );
+
+params["total_empenhadas"] = (x + y);
+
+params["total_empenhadas"];</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
             <column id="2658">
@@ -2215,7 +2233,7 @@ PAGAS
                             <property name="pageBreakInside">auto</property>
                             <property name="showIfBlank">false</property>
                             <property name="canShrink">false</property>
-                            <property name="resultSetColumn">total_empenhada</property>
+                            <property name="resultSetColumn">bbb</property>
                         </data>
                     </cell>
                     <cell id="2655">
@@ -2580,7 +2598,7 @@ var y = params["total_saldo_exercicio_atual"];
                             <property name="fontSize">5pt</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">#,##0.00</property>
+                                <property name="pattern">#,##0.00{RoundingMode=UNNECESSARY}</property>
                             </structure>
                             <property name="textAlign">right</property>
                             <property name="dataSet">dsSaldo</property>

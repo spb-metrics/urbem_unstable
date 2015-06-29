@@ -183,7 +183,7 @@ BEGIN
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
 
-    stSql := '
+    stSql := ' CREATE TEMPORARY TABLE tmp_total_passivo AS
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
              , nivel
              , CAST(nom_conta AS VARCHAR) as nom_conta
@@ -408,6 +408,46 @@ BEGIN
              , tipo_conta
     ';
 
+    EXECUTE stSql;
+
+    stSql := '
+                
+                SELECT 
+                        ''01''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_passivo
+                WHERE cod_estrutural = ''2.1.3.0.0.00.00''
+
+            UNION 
+
+                SELECT 
+                        ''03''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_passivo
+                WHERE cod_estrutural = ''2.1.8.0.0.00.00''
+
+            UNION 
+
+                SELECT 
+                        ''05''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_passivo
+                WHERE tipo_conta = 5
+            
+            UNION 
+
+                SELECT 
+                        ''06''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_passivo
+                WHERE tipo_conta = 6
+
+            ';
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;
@@ -424,6 +464,7 @@ BEGIN
     DROP TABLE tmp_credito;
     DROP TABLE tmp_totaliza_debito;
     DROP TABLE tmp_totaliza_credito;
+    DROP TABLE tmp_total_passivo;
 
     RETURN;
 END;

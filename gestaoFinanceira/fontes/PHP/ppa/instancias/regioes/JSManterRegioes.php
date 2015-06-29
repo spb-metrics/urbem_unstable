@@ -38,7 +38,7 @@
     * Casos de uso: uc-02.09.03
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function CancelarCL()
 {

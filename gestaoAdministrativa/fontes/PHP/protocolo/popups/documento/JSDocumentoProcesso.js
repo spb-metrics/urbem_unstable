@@ -39,7 +39,7 @@ $Date: 2006-10-31 09:01:39 -0300 (Ter, 31 Out 2006) $
 Casos de uso: uc-01.06.98
 */
 ?>
-<script language='JavaScript'>
+<script type='text/javascript'>
 
 function executaFuncao(stCtrl, stParametros ){
     var stId = 'listaArquivos';

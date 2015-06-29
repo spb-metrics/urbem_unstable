@@ -32,13 +32,13 @@
     * @author Desenvolvedor:  Lucas Teixeira Stephanou
     * @ignore
 
-    $Id: JSManterConvenios.js 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JSManterConvenios.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     *Casos de uso: uc-03.05.14
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

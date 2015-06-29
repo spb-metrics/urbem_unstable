@@ -33,10 +33,10 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: HBL.inc.php 61932 2015-03-16 18:12:24Z evandro $
-    * $Rev: 61932 $
-    * $Author: evandro $
-    * $Date: 2015-03-16 15:12:24 -0300 (Seg, 16 Mar 2015) $
+    * $Id: HBL.inc.php 62816 2015-06-23 19:03:30Z jean $
+    * $Rev: 62816 $
+    * $Author: jean $
+    * $Date: 2015-06-23 16:03:30 -0300 (Ter, 23 Jun 2015) $
 
 */
 
@@ -62,23 +62,28 @@ $obTTCMGOHabilitacaoLicitacao->recuperaExportacao11($rsRecordSetHBL11);
 //Tipo Registro 20
 $obTTCMGOHabilitacaoLicitacao->recuperaExportacao20($rsRecordSetHBL20);
 
+/*
 $i = 0;
 foreach ($rsRecordSetHBL10->arElementos as $stChave) {
-        $rsRecordSetHBL10->arElementos[$i]['nro_sequencial'] = $i+1;
         $i++;
+        $rsRecordSetHBL10->arElementos[$i]['nro_sequencial'] = $i;
 }
 
-$i = 0;
+//$i = 0;
 foreach ($rsRecordSetHBL11->arElementos as $stChave) {
-        $rsRecordSetHBL11->arElementos[$i]['nro_sequencial'] = $i+1;
         $i++;
+        $rsRecordSetHBL11->arElementos[$i]['nro_sequencial'] = $i;
 }
 
-$i = 0;
+//$i = 0;
+$inSeqItem = 0;
 foreach ($rsRecordSetHBL20->arElementos as $stChave) {
+        $inSeqItem = $inSeqItem+1;
+        $rsRecordSetHBL20->arElementos[$i]['cod_item'] = $inSeqItem;
         $rsRecordSetHBL20->arElementos[$i]['nro_sequencial'] = $i+1;
         $i++;
 }
+*/
 
 //Tipo Registro 99
 $arRecordSetHBL99 = array(
@@ -93,6 +98,7 @@ $rsRecordSetHBL99 = new RecordSet();
 $rsRecordSetHBL99->preenche($arRecordSetHBL99);
 
 $inCount = 0;
+$i = 0;
 
     if ( $rsRecordSetHBL10->getNumLinhas() > 0 ) {
         $stChave10 = '';
@@ -121,6 +127,10 @@ $inCount = 0;
                             .$arHBL10['num_processo_licitatorio']
                             .$arHBL10['tipo_documento']
                             .$arHBL10['num_documento'];
+
+                $i++;
+
+                $arHBL10['nro_sequencial'] = $i;
             
                 $$rsBloco10 = 'rsBloco10_'.$inCount;
                 unset($$rsBloco10);
@@ -242,7 +252,7 @@ $inCount = 0;
                 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
     
                 // Registro 11
                 if ( $rsRecordSetHBL11->getNumLinhas() > 0 && $arHBL10['tipo_documento'] = 2) {
@@ -258,6 +268,10 @@ $inCount = 0;
                                         .$arHBL11['cod_unidade']
                                         .$arHBL11['exercicio_licitacao']
                                         .$arHBL11['num_processo_licitatorio'];
+
+                            $i++;
+
+                            $arHBL11['nro_sequencial'] = $i;
                         
                             $rsBloco11 = 'rsBloco11_'.$inCount;
                             unset($$rsBloco11);
@@ -314,13 +328,15 @@ $inCount = 0;
                             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
                         }
                     }
-                }//Fim if registro 11
+                }//Fim if registro 11 
             }
         }//Fim foreach 10
         
         if ( $rsRecordSetHBL20->getNumLinhas() > 0 ) {
             $stChave20 = '';
-            
+            $stChaveItem = '';
+            $inSeqItem = 0;
+
             foreach ($rsRecordSetHBL20->getElementos() as $arHBL20){
                 $stChave20Aux = $arHBL20['cod_orgao']
                                 .$arHBL20['cod_unidade']
@@ -331,16 +347,21 @@ $inCount = 0;
                                 .$arHBL20['num_lote']
                                 .$arHBL20['cod_item'];
 
+                $stChaveItemAux = $arHBL20['chave_item'];
+
                 if ($stChave20 != $stChave20Aux) {
-                    $stChave20 = $arHBL20['cod_orgao']
-                                .$arHBL20['cod_unidade']
-                                .$arHBL20['exercicio_licitacao']
-                                .$arHBL20['num_processo_licitatorio']
-                                .$arHBL20['tipo_documento']
-                                .$arHBL20['num_documento']
-                                .$arHBL20['num_lote']
-                                .$arHBL20['cod_item'];
-                    
+                    $stChave20 = $stChave20Aux;
+
+                    if ($stChaveItem != $stChaveItemAux) {
+                        $stChaveItem = $stChaveItemAux;
+                        $inSeqItem++;
+                    }
+
+                    $arHBL20['nro_item'] = $inSeqItem;
+
+                    $i++;
+                    $arHBL20['nro_sequencial'] = $i;
+
                     $rsBloco20 = 'rsBloco20_'.$inCount;
                     unset($$rsBloco20);
                     $$rsBloco20 = new RecordSet();
@@ -383,7 +404,7 @@ $inCount = 0;
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_item");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_item");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
                     
@@ -399,31 +420,31 @@ $inCount = 0;
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_certidao_regularidade_inss");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_certidao_inss");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_emissao_certidao_regularidade_inss");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_emissao_inss");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_validade_certidao_regularidade_inss");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_validade_inss");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_certidao_regularidade_fgts");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_certidao_fgts");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_emissao_certidao_regularidade_fgts");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_emissao_fgts");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_validade_certidao_regularidade_fgts");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_validade_fgts");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
                     
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_cndt");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_certidao_cndt");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
                     

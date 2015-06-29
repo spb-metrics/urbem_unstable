@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: tonismar R. Bernardo
 
-    * $Id: OCImpressaoPDFEmissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCImpressaoPDFEmissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.04.04
 **/
@@ -70,7 +70,7 @@ $obFormulario->addHidden( $obHdnCaminho );
 $obFormulario->ok();
 $obFormulario->show();
 
-echo "<script language=\"javaScript\">\r\n";
+echo "<script type=\"text/javascript\">\r\n";
 echo "  Salvar();\r\n";
 echo "  window.close();\r\n";
 echo "</script>\r\n";

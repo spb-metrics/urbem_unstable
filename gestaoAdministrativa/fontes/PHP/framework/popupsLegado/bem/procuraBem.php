@@ -68,7 +68,7 @@ $dbEmp->fechaBD();
 
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function alertaAviso(objeto,tipo,chamada)
     {
         var x = 350;
@@ -107,7 +107,7 @@ switch ($ctrl) {
     case 0:
 ?>
 
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         function Valida()
         {
         var mensagem = "";
@@ -410,7 +410,7 @@ switch ($ctrl) {
     }
     $sSQLs .= " ORDER by ".$ordem;
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         function Insere(num)
         {
             var sNum;

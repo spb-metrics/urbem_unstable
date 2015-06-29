@@ -39,7 +39,7 @@ Casos de uso: uc-01.01.00, uc-02.02.02, uc-03.01.04
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inCodigo,inEstrutural,stDescricao){
 <? if( $tipoBusca=='estrutural'){ ?>

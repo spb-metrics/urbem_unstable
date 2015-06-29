@@ -32,10 +32,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 62838 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: diogo.zarpelon $
+    $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
 
     * Casos de uso : uc-06.04.00
 */
@@ -54,7 +54,7 @@ Arquivos para geração do TCMGO
 
 */
 ?>
-<script language="javascript">
+<script type="text/javascript">
         
     function excluirListaItens( id,tipo_lancamento,tipo_conta ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+id+'&tipo_lancamento='+tipo_lancamento+'&tipo_conta='+tipo_conta,'excluirListaItens');

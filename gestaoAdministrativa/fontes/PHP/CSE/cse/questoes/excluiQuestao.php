@@ -55,8 +55,8 @@ $Date: 2007-01-03 09:33:57 -0200 (Qua, 03 Jan 2007) $
         $ctrl = 1;
     }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -192,12 +192,12 @@ onClick=\"alertaQuestao('".CAM_CSE."cse/questoes/excluiQuestao.php?".$sessao->id
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $codQuestao);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                 alertaAviso("'.$codQuestao.'","excluir","aviso","'.$sessao->id.'");
                 window.location = "excluiQuestao.php?'.$sessao->id.'&pagina='.$pagina.'";
                 </script>';
         } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                 alertaAviso("'.$codQuestao.'","n_excluir","erro","'.$sessao->id.'");
                 window.location = "excluiQuestao.php?'.$sessao->id.'&pagina='.$pagina.'";
                 </script>';

@@ -49,7 +49,7 @@ Adicionada tag log.
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function habilitaCombo(combo){
     if((combo.value == 'Ponto facultativo') || (combo.value == 'Dia compensado')){

@@ -74,7 +74,7 @@ include_once (CAM_FW_LEGADO."funcoesLegado.lib.php"         );
     }
     </script>
     <?php
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                  alertaAviso("Sem PERMISSÃO para download de anexo!","n_incluir","erro","'.Sessao::getId().'");
                </script>';
 ?>

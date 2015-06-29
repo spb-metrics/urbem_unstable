@@ -58,7 +58,7 @@ Bug #7350#
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Limpar(  ){
     executaFuncaoAjax('limpar');

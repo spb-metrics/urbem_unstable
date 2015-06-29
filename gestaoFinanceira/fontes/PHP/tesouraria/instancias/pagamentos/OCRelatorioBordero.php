@@ -78,18 +78,34 @@ if ($arFiltroRelatorio['stTipoBordero'] == "T") {
 
     include_once( CAM_GF_TES_NEGOCIO."RTesourariaRelatorioBorderoPagamento.class.php"  );
 
-    $obRRelatorio                           = new RRelatorio;
+    $obRRelatorio                          = new RRelatorio;
     $obRTesourariaRelatorioBorderoPagamento = new RTesourariaRelatorioBorderoPagamento;
+    $arFiltro = Sessao::read('filtroRelatorio');
 
-    $obRTesourariaRelatorioBorderoPagamento->setCodBordero($arFiltroRelatorio['inCodBordero']);
-    $obRTesourariaRelatorioBorderoPagamento->setCodEntidade($arFiltroRelatorio['inCodEntidade']);
-    $obRTesourariaRelatorioBorderoPagamento->setExercicio($arFiltroRelatorio['stExercicio']);
-    $obRTesourariaRelatorioBorderoPagamento->setCodOrdem($arFiltroRelatorio['stCodOrdem']);
+    $obRTesourariaBoletim = new RTesourariaBoletim();
+    $obRTesourariaBoletim->addBordero();
+    $obRTesourariaBoletim->roUltimoBordero->setExercicio($arFiltro['stExercicio'] );
+    $obRTesourariaBoletim->roUltimoBordero->obROrcamentoEntidade->setCodigoEntidade($arFiltro['inCodEntidade']);
 
-    $obRTesourariaRelatorioBorderoPagamento->geraRecordSetBorderoPagamento( $rsBorderoPagamento );
+    $obErro = $obRTesourariaBoletim->roUltimoBordero->buscaProximoCodigo($boTransacao);
 
-    Sessao::write('filtro', $rsBorderoPagamento);
+    if (!$obErro->ocorreu()) {
+        $arFiltro['inNumBordero'] = $obRTesourariaBoletim->roUltimoBordero->getCodBordero();
+    } else {
+        $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'));
+        SistemaLegado::exibeAviso(urlencode("Erro ao executar ação: ".$nomAcao." (".$obErro->getDescricao().")"),"","erro");
+    }
 
-    $obRRelatorio->executaFrameOculto( "../../../../../../gestaoFinanceira/fontes/PHP/tesouraria/instancias/pagamentos/OCGeraRelatorioBorderoPagamento.php" );
+    $obRTesourariaRelatorioBorderoPagamento->setDadosBordero($arFiltro);
+    $obRTesourariaRelatorioBorderoPagamento->setDadosPagamento(Sessao::read('arItens'));
+
+    if ( Sessao::getExercicio() >= '2015' )
+        $obRTesourariaRelatorioBorderoPagamento->geraRecordSetBorderoPagamento2015( $rsBorderoPagamento );
+    else
+        $obRTesourariaRelatorioBorderoPagamento->geraRecordSet( $rsBorderoPagamento );
+
+    Sessao::write('arDados', $rsBorderoPagamento);
+
+    $obRRelatorio->executaFrameOculto( "OCGeraRelatorioBorderoPagamento.php" );
 }
 ?>

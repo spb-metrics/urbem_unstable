@@ -60,7 +60,7 @@ function montaRecuperaTodos()
 {
     $stSql  = "
         SELECT bimestre
-             , valor_meta
+              , REPLACE( valor_meta::VARCHAR, '.', '' ) AS valor_meta
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
                                      , ".$this->getDado("bimestre")."

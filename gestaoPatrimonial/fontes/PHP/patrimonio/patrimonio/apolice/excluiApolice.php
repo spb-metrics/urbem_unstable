@@ -72,7 +72,7 @@ Revision 1.8  2006/07/06 12:11:27  diego
         $audicao->insereAuditoria();
 
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("Apólice '.$codigo.' - '.$sessao->seguradora.'","excluir","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("listaApolice.php?ctrl=1&pagina='.$pagina.'&'.Sessao::getId().'&acao=74");
             </script>';
@@ -80,7 +80,7 @@ Revision 1.8  2006/07/06 12:11:27  diego
     // caso ocorra erro na exclusao, exibe msg de erro
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("Apólice '.$codigo.' - '.$sessao->seguradora. ' está sendo utilizada.' .   ' ","n_excluir","erro", "'.Sessao::getId().'");
                 mudaTelaPrincipal("listaApolice.php?'.Sessao::getId().'&acao=74");
             </script>';

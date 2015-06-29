@@ -199,17 +199,17 @@ Casos de uso: uc-01.03.91
         $envia->corpo = $solicita->corpo;
         if ($envia->remetente != "") {
             if ($envia->enviaEmail()) {
-                 echo '<script language="JavaScript1.2" type="text/javascript">
+                 echo '<script type="text/javascript">
                  alertaAviso("Solicitação de Suporte","incluir","aviso","'.Sessao::getId().'");
                  window.location = "solicitaSuporte.php?'.Sessao::getId().'";
                  </script>';
             } else
-                 echo '<script language="JavaScript1.2" type="text/javascript">
+                 echo '<script type="text/javascript">
                  alertaAviso("Solicitação de Suporte","n_incluir","erro","'.Sessao::getId().'");
                  window.location = "solicitaSuporte.php?'.Sessao::getId().'";
                  </script>';
         } else
-                 echo '<script language="JavaScript1.2" type="text/javascript">
+                 echo '<script type="text/javascript">
                  alertaAviso("Solicitação de Suporte","n_incluir","erro","'.Sessao::getId().'");
                  window.location = "solicitaSuporte.php?'.Sessao::getId().'";
                  </script>';

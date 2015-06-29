@@ -31,17 +31,16 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: REGADESAO.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
-  * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
-  * $Author: franver $
-  * $Rev: 62269 $
+  * $Id: REGADESAO.csv.inc.php 62842 2015-06-26 17:29:59Z michel $
+  * $Date: 2015-06-26 14:29:59 -0300 (Sex, 26 Jun 2015) $
+  * $Author: michel $
+  * $Rev: 62842 $
   *
 */
 /**
 * REGADESAO.csv | Autor : Diogo Zarpelon
 */
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGRegistroPrecos.class.php";
-
 
 $rsRecordSetREGADESAO10 = new RecordSet();
 $rsRecordSetREGADESAO11 = new RecordSet();
@@ -89,13 +88,12 @@ $arRecordSetREGADESAO99 = array(
 $rsRecordSetREGADESAO99 = new RecordSet();
 $rsRecordSetREGADESAO99->preenche($arRecordSetREGADESAO99);
 
-        
 if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
     $inCount = 0;
     foreach ($rsRecordSetREGADESAO10->getElementos() as $arREGADESAO10) {
 
         $inCount++;
-        $stChave10 = $arREGADESAO10['chave10'];
+        $stChave10 = $arREGADESAO10['chave10'].$arREGADESAO10['cod_unidade_sub'];
 
         $rsBloco = 'rsBloco_'.$inCount;
         unset($$rsBloco);
@@ -148,7 +146,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
         
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_processo_licitacao");
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codigo_modalidade_licitacao");
@@ -208,7 +206,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
 
                 foreach ($rsRecordSetREGADESAO11->getElementos() as $arREGADESAO11) {
 
-                    $stChave11 = $arREGADESAO11['chave11'];
+                    $stChave11 = $arREGADESAO11['chave11'].$arREGADESAO11['cod_unidade_sub'];
                 
                     if ($stChave10 == $stChave11) {
                         $inCount++;
@@ -270,7 +268,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
            
             foreach ($rsRecordSetREGADESAO12->getElementos() as $arREGADESAO12) {
             
-                $stChave12 = $arREGADESAO12['chave12'];
+                $stChave12 = $arREGADESAO12['chave12'].$arREGADESAO12['cod_unidade_sub'];
             
                 if ($stChave10 == $stChave12) {
 
@@ -330,7 +328,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
                
                 foreach ($rsRecordSetREGADESAO13->getElementos() as $arREGADESAO13) {
                 
-                    $stChave13 = $arREGADESAO13['chave13'];
+                    $stChave13 = $arREGADESAO13['chave13'].$arREGADESAO13['cod_unidade_sub'];
                 
                     if ($stChave10 == $stChave13) {
 
@@ -389,7 +387,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
            
             foreach ($rsRecordSetREGADESAO14->getElementos() as $arREGADESAO14) {
             
-                $stChave14 = $arREGADESAO14['chave14'];
+                $stChave14 = $arREGADESAO14['chave14'].$arREGADESAO14['cod_unidade_sub'];
             
                 if ($stChave10 == $stChave14) {
 
@@ -431,10 +429,13 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
 
                     if ($arREGADESAO10['processo_lote'] == 1) {
                         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_lote");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
+                    }else{
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     }
+                    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_item");
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
@@ -464,7 +465,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
            
             foreach ($rsRecordSetREGADESAO15->getElementos() as $arREGADESAO15) {
             
-                $stChave15 = $arREGADESAO15['chave15'];
+                $stChave15 = $arREGADESAO15['chave15'].$arREGADESAO15['cod_unidade_sub'];
             
                 if ($stChave10 == $stChave15) {
 
@@ -550,7 +551,7 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
                
                 foreach ($rsRecordSetREGADESAO20->getElementos() as $arREGADESAO20) {
                 
-                    $stChave20 = $arREGADESAO20['chave20'];
+                    $stChave20 = $arREGADESAO20['chave20'].$arREGADESAO20['cod_unidade_sub'];
                 
                     if ($stChave10 == $stChave20) {
 
@@ -590,12 +591,16 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
                         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
 
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_lote");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);                        
-
                         if ($arREGADESAO10['processo_lote'] == 1) {
+                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_lote");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
+                            
+                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);                             
 
                             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("percentual_desconto_lote");
                             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
@@ -603,6 +608,10 @@ if (count($rsRecordSetREGADESAO10->getElementos()) > 0) {
                             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(6);
 
                         } else {
+                            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4);
                             
                             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_item");
                             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');

@@ -160,7 +160,7 @@ switch ($ctrl) {
         include_once '../consulta.class.php';
         $consulta = new consulta;
 ?>
-       <script language="JavaScript1.2" type="text/javascript">
+       <script type="text/javascript">
 
             function Valida()
             {
@@ -907,7 +907,7 @@ switch ($ctrl) {
                         if ($dtFinal < $dtInicial) {
 
                             echo '
-                                <script language="JavaScript1.2" type="text/javascript">
+                                <script type="text/javascript">
                                     alertaAviso("Data final não pode ser menor que data inicial","unica","erro","'.Sessao::getId().'");
                                     window.location = "consultaBens.php?'.Sessao::getId().'&ctrl=1";
                                 </script>';

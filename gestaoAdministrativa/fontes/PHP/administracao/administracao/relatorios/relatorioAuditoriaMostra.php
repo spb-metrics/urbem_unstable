@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.03.94
 
-    $Id: relatorioAuditoriaMostra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: relatorioAuditoriaMostra.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -53,7 +53,7 @@ $orderby   = $_REQUEST['orderby'];
 $pagina    = $_REQUEST['pagina'];
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Salvar()
     {
         document.frm.action = "auditoria.php?<?=Sessao::getId()?>&moduloCod=<?=$moduloCod?>&numCgm=<?=$numCgm?>&nomCgm=<?=$nomCgm?>&sDataIni=<?=$sDataIni?>&sDataFim=<?=$sDataFim?>&orderby=<?=$orderby?>";

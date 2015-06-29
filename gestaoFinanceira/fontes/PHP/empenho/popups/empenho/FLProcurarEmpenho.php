@@ -210,7 +210,7 @@ $obFormulario->OK                   ();
 $obFormulario->show                 ();
 
 if ($_REQUEST['stNomEntidade']) {
-    echo "<script language='javascript' type='text/javascript'>\r\n";
+    echo "<script type='text/javascript'>\r\n";
     echo "var cod  = opener.document.getElementById('inCodEntidadeEmpenho').value;\r\n";
     echo "var sel = opener.document.getElementById('stNomEntidade'); \r\n";
     echo "var tex = sel.options[sel.selectedIndex].text;\r\n";

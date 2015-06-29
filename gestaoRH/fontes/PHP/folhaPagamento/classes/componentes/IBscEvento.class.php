@@ -237,6 +237,7 @@ class IBscEvento
         $this->obBscInnerEvento = new BuscaInner;
         $this->obBscInnerEvento->setRotulo              ( "Evento"   );
         $this->obBscInnerEvento->setId                  ( $stCampoNomEvento );
+        $this->obBscInnerEvento->setName                ( $stCampoNomEvento );
         $this->obBscInnerEvento->setTitle               ( "Informe o evento a ser lançado." );
         $this->obBscInnerEvento->obCampoCod->setName    ( $stCampoCodEvento );
         $this->obBscInnerEvento->obCampoCod->setId      ( $stCampoCodEvento );

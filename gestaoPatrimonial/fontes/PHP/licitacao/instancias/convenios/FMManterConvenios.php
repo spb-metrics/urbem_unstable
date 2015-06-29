@@ -31,7 +31,7 @@
  * @author Desenvolvedor:  Lucas Teixeira Stephanou
  * @ignore
 
- $Id: FMManterConvenios.php 59803 2014-09-11 20:53:06Z lisiane $
+ $Id: FMManterConvenios.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  *Casos de uso: uc-03.05.14
 */
@@ -697,12 +697,12 @@ $obFormulario->Ok();
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumConvenio=".$_REQUEST['inNumConvenio']. "', 'montaListas');     \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodLei=".$rsConvenio->getCampo("cod_norma_autorizativa"). "', 'montaBuscaNorma');     \r\n";
     echo "</script>                                                             \r\n";
 } if ($stAcao == 'rescindir') {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumConvenio=".$_REQUEST['inNumConvenio']."&inExercicio=".$_REQUEST['inExercicio']."', 'montaListasPublicidadeRescisao');     \r\n";
     echo "</script>                                                             \r\n";
 }

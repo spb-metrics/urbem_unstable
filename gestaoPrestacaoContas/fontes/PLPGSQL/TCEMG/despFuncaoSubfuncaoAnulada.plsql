@@ -59,7 +59,7 @@ BEGIN
     			BETWEEN to_date(''' || stDtIni || ''', ''dd/mm/yyyy'') 
                     AND to_date(''' || stDtFim || ''', ''dd/mm/yyyy'') 
            AND orcamento.despesa.cod_despesa = ' || inCodDespesa || '
-           AND SUBSTRING(ocd.cod_estrutural, 5, 3) <> ''9.1''
+           AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
     ';
 	
     OPEN crCursor FOR EXECUTE stSql;

@@ -74,7 +74,7 @@ if ($obErro->ocorreu()) {
     principal.Salvar();';
 }
 
-print '<script language="JavaScript1.2" type="text/javascript">
+print '<script type="text/javascript">
            function executa()
            {
                 var mensagem = "";

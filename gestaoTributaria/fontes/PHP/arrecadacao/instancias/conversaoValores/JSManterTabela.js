@@ -33,7 +33,7 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-    * $Id: JSManterTabela.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterTabela.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     *Casos de uso: uc-05.03.23
 
@@ -45,7 +45,7 @@ $Log$
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 function validar(e) {

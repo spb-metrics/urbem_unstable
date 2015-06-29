@@ -63,7 +63,7 @@ $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 ?>
 <html><head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function alertaAviso(objeto,tipo,chamada)
 {
     var x = 350;
@@ -235,7 +235,7 @@ unset($sessao->transf4);
     break;
     case 1:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function Insere(codDomicilio,logradouro, numero, complemento)
 {
     //var iCodDomicilio;

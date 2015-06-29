@@ -33,6 +33,8 @@
 * @package framework
 * @subpackage componentes
 
+$Id: ArquivoExportadorBlocoColuna.class.php 62759 2015-06-16 18:00:15Z jean $
+
 Casos de uso: uc-01.01.00
 */
 
@@ -340,12 +342,16 @@ function FormataTipoDado($stCampo)
                 case 'TCE_MG':
                     $stCampo = str_replace (".", ",", $stCampo);
                 break;
+                case 'TCE_MG_SIACE':
+                    $stCampo = ($stCampo=='') ? '0.00' : $stCampo;
+                    $stCampo = str_replace("-","",(str_replace(".", "", $stCampo)));
+                break;
 
                 case 'TCE_AM':
                     $stCampo = number_format((float) $stCampo,2,',','');
                 break;
                 
-                case 'TCE_GO':
+                case 'TCM_GO':
                     $stCampo = str_replace(" ","",str_replace (".", ",", $stCampo));
                     if ($stCampo<0) {
                         $stCampo = str_replace('-','',$stCampo);
@@ -396,7 +402,7 @@ function FormataTipoDado($stCampo)
             $stCampo = $arCampo[2].$arCampo[1].$arCampo[0];
             
             switch ( trim($this->roBloco->roArquivo->getTipoDocumento()) ) {
-                case "TCE_MG":
+                case "TCM_GO":
                     $this->stPreenchimento  = ' ';
                     
                     if ( $stCampo == '' ) {

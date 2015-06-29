@@ -54,29 +54,29 @@ class FTCEMGRecursoAlienacaoAtivo extends Persistente
         $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
         $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
         $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+        $this->AddCampo('dt_inicial'    ,'varchar',false,''    ,false,false);
+        $this->AddCampo('dt_final'      ,'varchar',false,''    ,false,false);
     }
 
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT mes
-                 , ROUND(saldo_anterior,2) AS saldo_anterior
-                 , ROUND(rec_realizada,2) AS rec_realizada
-                 , ROUND(desp_emp,2) AS desp_emp
-                 , ROUND(desp_liq,2) AS desp_liq
-                 , ROUND(desp_paga,2) AS desp_paga
-                 , LPAD(cod_vinc::VARCHAR,2,'0') AS cod_vinc
-                 , ' ' AS cod_entidade
-              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "'," . $this->getDado('mes') . ",'" . $this->getDado('cod_entidade') . "') AS retorno
-                                          (  mes                 INTEGER,
-                                             saldo_anterior      NUMERIC(14,2),
-                                             rec_realizada       NUMERIC(14,2),
-                                             desp_emp            NUMERIC(14,2),
-                                             desp_liq            NUMERIC(14,2),
-                                             desp_paga           NUMERIC(14,2),
-                                             cod_vinc            INTEGER,
-                                             cod_entidade        INTEGER
-                                          )";
+                        SELECT 12 AS mes,
+                               cod_vinculo,
+                               cod_entidade AS cod_entidade,
+                               empenhado_per as desp_emp,
+                               liquidado_per as desp_liq,
+                               pago_per as desp_paga,
+                               rec_realizada as rec_realizada,
+                               saldo_inicial as saldo_anterior
+
+                          FROM tcemg.fn_recurso_alienacao_ativo('".$this->getDado('exercicio')."',
+                                                                '".$this->getDado('cod_entidade')."',
+                                                                '".$this->getDado('dt_inicial')."',
+                                                                '".$this->getDado('dt_final')."'
+                                                                ) AS retorno
+                        ORDER BY cod_entidade
+            ";
         return $stSql;
     }
 

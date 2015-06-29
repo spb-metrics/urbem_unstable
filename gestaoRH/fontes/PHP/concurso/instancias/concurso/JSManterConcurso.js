@@ -49,7 +49,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 //Definições das funções de formulário
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

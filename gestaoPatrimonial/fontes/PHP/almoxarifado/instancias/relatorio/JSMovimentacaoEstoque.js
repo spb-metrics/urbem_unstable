@@ -46,7 +46,7 @@ uc_03-03-24
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Salvar(){
 	if( Valida() ){

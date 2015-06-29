@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterOrdemCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
 
     * Casos de uso: uc-03.04.24
 */
@@ -177,7 +177,6 @@ if ( strpos($stAcao,'incluir') !== false ) {
     $obComprasOrdem->recuperaListagemEmpenho($rsLista);
 
 } else {
-    //$stOrdem = ' ORDER BY ordem.exercicio, ordem.cod_ordem ';
     $stOrdem = ' ORDER BY empenho.cod_empenho DESC ';
 
     // Filtro utilizado para não listar Ordem anuladas na alteração ou anulação.
@@ -320,6 +319,7 @@ $obLista->ultimaAcao->addCampo("&inCodFornecedor", "cgm_fornecedor");
 $obLista->ultimaAcao->addCampo("&stFornecedor", "fornecedor");
 $obLista->ultimaAcao->addCampo("&stCondicoesPagamento", "condicoes_pagamento");
 $obLista->ultimaAcao->addCampo("&stLocalEntregaMaterial", "local_entrega_material");
+$obLista->ultimaAcao->addCampo("&cgm_entrega_material", "cgm_entrega_material");
 $obLista->ultimaAcao->addCampo("&stTipo", "tipo");
 $obLista->ultimaAcao->addCampo("&stTipoOrdem", "tipo_ordem");
 if ( strpos($stAcao,'incluir') === false ) {

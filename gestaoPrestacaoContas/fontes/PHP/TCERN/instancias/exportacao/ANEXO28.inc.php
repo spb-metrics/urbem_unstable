@@ -30,18 +30,16 @@
     $obTTRNAnexo28->setDado('inBimestre'   , $inBimestre);
     $obTTRNAnexo28->setDado('inCodEntidade', $inCodEntidade);
     $obTTRNAnexo28->setDado('exercicio'    , Sessao::getExercicio());
-    $obTTRNAnexo28->setDado('dtInicial'    , Sessao::getExercicio()."/01/01" );
-
-    $mes = $inBimestre * 2;
-    $dtFinal = date('Y/m/d',strtotime(Sessao::getExercicio()."-$mes-1 +1 month -1 day"));
+        
+    SistemaLegado::periodoInicialFinalBimestre($stDtInicial, $stDtFinal, $inBimestre, Sessao::getExercicio());
+    $obTTRNAnexo28->setDado('dtInicial', $stDtInicial);    
+    $obTTRNAnexo28->setDado('dtFinal'  , $stDtFinal);
     
-    $obTTRNAnexo28->setDado('dtFinal', $dtFinal);
-
     $obTTRNAnexo28->recuperaRegistro1($rsRegistro1);
     $obTTRNAnexo28->recuperaRegistro2($rsRegistro2);
     $obTTRNAnexo28->recuperaRegistro3($rsRegistro3);
     $obTTRNAnexo28->recuperaRegistro4($rsRegistro4);
-
+        
     //AQUISIÇÃO DE VEICULOS
     foreach ($rsRegistro1->arElementos as $arRegistro1) {
 
@@ -191,4 +189,5 @@
             } 
         } 
     }
+    
 ?>

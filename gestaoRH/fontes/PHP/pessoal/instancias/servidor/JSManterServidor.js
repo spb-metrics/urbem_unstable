@@ -49,7 +49,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function incluirFoto(){
     document.frm.stCtrl.value = 'incluirFoto';
     document.frm.action = '<?=$pgOculIdentificacao;?>?<?=Sessao::getId();?>';

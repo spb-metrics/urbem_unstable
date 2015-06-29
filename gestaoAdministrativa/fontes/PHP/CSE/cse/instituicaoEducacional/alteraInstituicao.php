@@ -167,7 +167,7 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
     $dbConfig->limpaSelecao();
     $dbConfig->fechaBd();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -242,20 +242,20 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
                 $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $var[nomInstituicao]);
                 $audicao->insereAuditoria();
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("'.$var[nomInstituicao].'","alterar","aviso","'.$sessao->id.'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'&pagina='.$pagina.'");
                     </script>';
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("'.$var[nomInstituicao].'","n_alterar","erro","'.$sessao->id.'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'");
                     </script>';
             }
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("A Instituição '.$var[nomInstituicao].' já existe","unica","erro","'.$sessao->id.'");
                 mudaTelaPrincipal("alteraInstituicao.php?'.$sessao->id.'&codInstituicao='.$var[codInsituicao].'&nomInstituicao='.$var[nomInstituicao].'&ctrl=0");
                 </script>';

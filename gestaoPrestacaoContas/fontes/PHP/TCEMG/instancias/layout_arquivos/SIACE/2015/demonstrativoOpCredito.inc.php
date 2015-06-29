@@ -39,75 +39,114 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGDemostrativoOpCredito.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGDemostrativoOpCredito.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
     $obTTCEMGDemostrativoOpCredito = new TTCEMGDemostrativoOpCredito();
-    $obTTCEMGDemostrativoOpCredito->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obTTCEMGDemostrativoOpCredito->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obTTCEMGDemostrativoOpCredito->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obTTCEMGDemostrativoOpCredito->setDado('stExercicio'   , Sessao::read('exercicio'));
+    $obTTCEMGDemostrativoOpCredito->setDado('stCodEntidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obTTCEMGDemostrativoOpCredito->setDado('inBimestre'    , $arFiltros['inPeriodo']);
 
     $obTTCEMGDemostrativoOpCredito->recuperaTodos($rsDemostrativoOpCredito);
-
+    
     $obExportador->roUltimoArquivo->addBloco($rsDemostrativoOpCredito);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nada_declarar');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_imobiliaria_interna');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_imobiliaria_externa');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_abertura_credito');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_deriv_ppp');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_aquis_fin');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_pela_venda_ter_bs');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_dem_antec_receita');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_assuncao_rec_conf_div');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_outras_pper_credito');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_contrat_externa');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_parc_div_trib');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_parc_div_prev');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_parc_div_dem_cs');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_parc_div_fgts');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_melhoria_adm_rec_gffp');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_prog_ilum_pub');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_amp_art9');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_oper_vedadas');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 

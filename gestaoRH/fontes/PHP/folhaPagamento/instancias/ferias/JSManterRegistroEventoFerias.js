@@ -51,7 +51,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="javascript"> 
+<script type="text/javascript"> 
 function limpaFormularioEventoExtra(){
     f = document.frm;
     f.stCmbDesdobramento.value = '';

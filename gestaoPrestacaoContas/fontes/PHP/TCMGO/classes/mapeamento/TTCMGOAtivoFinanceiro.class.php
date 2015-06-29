@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoFinanceiro.class.php 61525 2015-01-29 19:21:26Z evandro $
+    $Id: TTCMGOAtivoFinanceiro.class.php 62844 2015-06-26 20:33:35Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -58,31 +58,32 @@ class TTCMGOAtivoFinanceiro extends TContabilidadeBalancoFinanceiro
     {
         $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
         $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
-        $stSql = "SELECT
-                            *
+        
+        $stSql = "  SELECT
+                            10 as tipo_registro
+                            ,0.00 as vl_cancelamento
+                            ,0.00 as vl_encampacao
+                            ,'".$this->getDado( 'exercicio' )."' as exercicio
                             , '' AS brancos
-                            , 10 as tipo_registro
-                     FROM
-                        tcmgo.arquivo_afr_exportacao10( '" .$this->getDado( 'exercicio' ) .  "'
-                                                     , 'cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." )
-                                                    and tipo <> ''I''
-                                                    and cod_estrutural like ''1.%''
-                                                    ' ,'$stDataIni','$stDataFim','')
-                         as retorno (  cod_estrutural varchar
-                                     ,nivel integer
-                                     ,nom_conta varchar
-                                     ,num_orgao integer
-                                     ,num_unidade integer
-                                     ,vl_saldo_anterior numeric
-                                     ,vl_saldo_debitos  numeric
-                                     ,vl_saldo_creditos numeric
-                                     ,vl_saldo_atual    numeric
-                                     ,nom_sistema varchar
-                                     ,tipo_lancamento integer
-                                    )
-                    where vl_saldo_anterior <> 0
-                       or vl_saldo_debitos <> 0
-                       or vl_saldo_creditos <> 0
+                            ,* 
+                            , row_number() OVER (ORDER BY cod_estrutural) as rownumber
+                    FROM tcmgo.arquivo_afr_exportacao10( '".$this->getDado( 'exercicio' ) .  "'
+                                                        ,'".$this->getDado( 'stEntidades' )."' 
+                                                        ,'".$stDataIni."'
+                                                        ,'".$stDataFim."')
+                    as retorno (    tipo_lancamento        varchar,
+                                    num_orgao              varchar,
+                                    num_unidade            varchar,
+                                    cod_estrutural         varchar,
+                                    nivel                  integer,
+                                    nom_conta              varchar,
+                                    cod_sistema            integer,
+                                    indicador_superavit    char(12),
+                                    vl_saldo_anterior      numeric,
+                                    vl_saldo_debitos       numeric,
+                                    vl_saldo_creditos      numeric,
+                                    vl_saldo_atual         numeric
+                                )
                     ORDER BY cod_estrutural ";
 
         return $stSql;
@@ -97,33 +98,32 @@ class TTCMGOAtivoFinanceiro extends TContabilidadeBalancoFinanceiro
     {
         $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
         $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
-        $stSql = "SELECT
-                            *
-                            , 11 as tipo_registro                 
-                     FROM
-                        tcmgo.arquivo_afr_exportacao11( '" .$this->getDado( 'exercicio' ) .  "'
-                                                     , 'cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." )
-                                                    and tipo <> ''I''
-                                                    and cod_estrutural like ''1.%''
-                                                    ' ,'$stDataIni','$stDataFim','')
-                         as retorno (  cod_estrutural varchar
-                                     ,nivel integer
-                                     ,nom_conta varchar
-                                     ,num_orgao integer
-                                     ,num_unidade integer
-                                     ,vl_saldo_anterior numeric
-                                     ,vl_saldo_debitos  numeric
-                                     ,vl_saldo_creditos numeric
-                                     ,vl_saldo_atual    numeric
-                                     ,nom_sistema varchar
-                                     ,tipo_lancamento integer
-                                     ,cod_fonte VARCHAR(13)
-                                    )
-                    where vl_saldo_anterior <> 0
-                       or vl_saldo_debitos <> 0
-                       or vl_saldo_creditos <> 0
-                    ORDER BY cod_estrutural ";
-
+        $stSql = "  SELECT
+                            11 as tipo_registro
+                            ,0.00 as vl_cancelamento
+                            ,0.00 as vl_encampacao
+                            ,'".$this->getDado( 'exercicio' )."' as exercicio
+                            ,*
+                            , row_number() OVER (ORDER BY cod_estrutural) as rownumber
+                    FROM tcmgo.arquivo_afr_exportacao11( '".$this->getDado( 'exercicio' ) .  "'
+                                                        ,'".$this->getDado( 'stEntidades' )."' 
+                                                        ,'".$stDataIni."'
+                                                        ,'".$stDataFim."')
+                    as retorno (    tipo_lancamento        varchar,
+                                    num_orgao              varchar,
+                                    num_unidade            varchar,
+                                    cod_fonte              integer,
+                                    cod_estrutural         varchar,
+                                    nivel                  integer,
+                                    nom_conta              varchar,
+                                    cod_sistema            integer,
+                                    indicador_superavit    char(12),
+                                    vl_saldo_anterior      numeric,
+                                    vl_saldo_debitos       numeric,
+                                    vl_saldo_creditos      numeric,
+                                    vl_saldo_atual         numeric
+                                )
+                    ORDER BY cod_estrutural";
         return $stSql;
     }
 

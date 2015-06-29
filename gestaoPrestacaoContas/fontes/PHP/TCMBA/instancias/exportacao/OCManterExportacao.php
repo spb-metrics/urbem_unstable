@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 62823 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
@@ -55,7 +55,7 @@ Primeira versão.
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAConfiguracao.class.php" );
+include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAConfiguracao.class.php" );
 include_once( CLA_EXPORTADOR );
 
 $stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
@@ -74,56 +74,15 @@ $obTMapeamento->setDado( 'cod_entidade', $stEntidades );
 $obTMapeamento->recuperaUnidadeGestoraEntidade( $rsEntidade );
 $inCodUnidadeGestora = $rsEntidade->getCampo('cod_unidade_gestora');
 
+$stDataInicial = $arFiltro['stDataInicial'];
+$stDataFinal   = $arFiltro['stDataFinal'];
+
 Sessao::write('cod_unidade_gestora',$rsEntidade->getCampo('cod_unidade_gestora'));
 Sessao::write('nom_unidade'        ,$rsEntidade->getCampo('nom_entidade'));
 
 foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
 
-//    $obExportador->addArquivo($stArquivo);
-//    $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
-//
-//    $arArquivo = explode('.',$stArquivo);
-
-//    $arCabecalho = array();
-//    $arCabecalho[0]['dt_geracao']   = date('d/m/Y',time());
-//    $arCabecalho[0]['hr_geracao']   = date('H:i:s',time());
-//    $arCabecalho[0]['versao_layout']= '1';
-//    $arCabecalho[0]['sistema']      = 'SIGA';
-//    $arCabecalho[0]['cod_unidade']  = $rsEntidade->getCampo('cod_unidade_gestora');
-//    $arCabecalho[0]['nom_unidade']  = $rsEntidade->getCampo('nom_entidade');
-//
-//    $rsCabecalho->preenche($arCabecalho);
-//
-//    $obExportador->roUltimoArquivo->addBloco($rsCabecalho);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]0");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna( "[]".$arArquivo[0] );
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_geracao");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("hr_geracao");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("versao_layout");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sistema");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_unidade");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
-//    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-//    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-
-    include( substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
+    include( CAM_GPC_TCMBA_INSTANCIAS."layout_arquivos/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
 
     $arRecordSet = null;
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterLote.php 62230 2015-04-10 17:35:05Z michel $
+    * $Id: PRManterLote.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.08
 */
@@ -72,7 +72,7 @@ include_once( $pgJS );
 function alertaAvisoRedirect($location="", $objeto="", $tipo="n_validar", $chamada="erro", $sessao, $caminho="", $func="", $acao="")
 {
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso ( "'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
            </script>';
 
@@ -83,7 +83,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_validar", $chama
     Sessao::write('acaoLote', $acao);
     Sessao::write('modulo', "12" );
 
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal( "'.$location.'" );
                 mudaMenu         ( "'.$func.'"     );
            </script>';

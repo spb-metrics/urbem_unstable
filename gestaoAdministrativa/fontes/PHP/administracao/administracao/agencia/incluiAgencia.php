@@ -86,7 +86,7 @@ if (!isset($controle)) {
 switch ($controle) {
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function retornaCodBanco(cod)
     {
         var f;

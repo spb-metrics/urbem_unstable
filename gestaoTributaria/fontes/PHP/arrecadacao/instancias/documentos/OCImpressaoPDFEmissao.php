@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: tonismar R. Bernardo
 
-    * $Id: OCImpressaoPDFEmissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCImpressaoPDFEmissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.11
 **/
@@ -63,7 +63,7 @@ $obFormulario->addHidden( $obHdnCaminho );
 $obFormulario->ok();
 $obFormulario->show();
 ?>
-<script language="javaScript">
+<script type="text/javascript">
       jQuery(document).ready(function () {
           Salvar();
           window.close();

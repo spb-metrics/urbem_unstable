@@ -155,7 +155,7 @@ if ($stAcao == 'consultar') {
     Sessao::write('consulta', true);
 }
 
-$obTLicitacaoLicitacao->recuperaLicitacao($rsLicitacao,$stFiltro, $stOrder);
+$obTLicitacaoLicitacao->recuperaLicitacaoResponsavelTCMGO($rsLicitacao,$stFiltro, $stOrder);
 
 $stFiltro = $stLink = "";
 

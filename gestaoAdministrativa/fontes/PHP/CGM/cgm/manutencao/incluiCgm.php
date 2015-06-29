@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: incluiCgm.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: incluiCgm.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -433,7 +433,7 @@ switch ($controle) {
                 $html->formCgm($dados,$_SERVER['PHP_SELF'],0);
             } else {
 ?>
-        <script language='javascript'>
+        <script type='text/javascript'>
         <!--
             document.frm2.pessoa.focus();
         //-->
@@ -714,7 +714,7 @@ switch ($controle) {
                 }
             } else {
                 //echo '
-                //    <script language="JavaScript1.2" type="text/javascript">
+                //    <script type="text/javascript">
                 //    alertaAviso("O CPF '.$cpf.' já existe.","unica","erro","'.Sessao::getId().'");
                 //    </script>';
                 //$html->formCgm($dadosCgm,$PHP_SELF,0);
@@ -741,7 +741,7 @@ switch ($controle) {
                 }
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("O CNPJ '.$cnpj.' já existe.","unica","erro","'.Sessao::getId().'");
                     </script>';
                     $html->formCgm($dadosCgm,$_SERVER['PHP_SELF'],0);

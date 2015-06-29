@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: consultaProcesso.php 62418 2015-05-06 17:45:05Z diogo.zarpelon $
+    $Id: consultaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -77,7 +77,7 @@ $dataInicial      = $request->get('dataInicial');
 $dataFinal        = $request->get('dataFinal');
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
      function zebra(id, classe)
      {

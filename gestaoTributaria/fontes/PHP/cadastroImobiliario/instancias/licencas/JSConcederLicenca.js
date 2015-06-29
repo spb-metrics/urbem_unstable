@@ -31,7 +31,7 @@
     * @author Analista: Fábio Bertoldi
     * @author Programador: Fernando Piccini Cercato
 
-    *$Id: JSConcederLicenca.js 59612 2014-09-02 12:00:51Z gelson $
+    *$Id: JSConcederLicenca.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.28
 */
@@ -41,7 +41,7 @@ $Log$
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function montaAtributosEdificacao(){
     

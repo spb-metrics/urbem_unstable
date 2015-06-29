@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoPermanenteCreditos.class.php 61679 2015-02-25 13:07:38Z evandro $
+    $Id: TTCMGOAtivoPermanenteCreditos.class.php 62759 2015-06-16 18:00:15Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -48,27 +48,42 @@ class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
         $this->setDado('exercicio', Sessao::getExercicio() );
     }
 
-    public function montaRecuperaTodos()
+    function recuperaRegistro10(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql = $this->montaRecuperaRegistro10().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+    public function montaRecuperaRegistro10()
     {
         $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
         $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
         $stSql = "
                     SELECT
-                        0::integer AS numero_registro
-                       , 10::integer AS tipo_registro
-                       , 0.00 AS vl_cancelamento
-                       , 0.00 AS vl_encampacao
-                        ,*
+                        0 AS numero_registro
+                       , 10 AS tipo_registro
+                       , LPAD('0,00'::VARCHAR,13,'0')::VARCHAR AS vl_cancelamento
+                       , LPAD('0,00'::VARCHAR,13,'0')::VARCHAR AS vl_encampacao
+                       ,*
                      FROM
-                       tcmgo.ativo_permanente_creditos ( '" .$this->getDado( 'exercicio' ) .  "'
-                                                        , ' cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." ) and cod_estrutural like ''1.%'' ' 
-                                                        ,'".$stDataIni."'
-                                                        ,'".$stDataFim."')
+                       tcmgo.ativo_permanente_creditos ( '" .$this->getDado( 'exercicio' ) .  "'::VARCHAR
+                                                        , ' cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." ) and cod_estrutural like ''1.2%'' '::VARCHAR
+                                                        ,'".$stDataIni."'::VARCHAR
+                                                        ,'".$stDataFim."'::VARCHAR
+                                                        ,'".$this->getDado ( 'stEntidades' )."'::VARCHAR
+                                                       )
                          as retorno ( cod_estrutural varchar
                                      ,nivel integer
                                      ,nom_conta varchar
-                                     ,num_orgao text
-                                     ,cod_unidade text
+                                     ,num_orgao VARCHAR
+                                     ,cod_unidade VARCHAR
                                      ,vl_saldo_anterior numeric
                                      ,vl_saldo_debitos  numeric
                                      ,vl_saldo_creditos numeric
@@ -80,7 +95,6 @@ class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
                        or vl_saldo_debitos <> 0
                        or vl_saldo_creditos <> 0
                     ORDER BY cod_estrutural ";
-
         return $stSql;
     }
 

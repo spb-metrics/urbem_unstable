@@ -38,105 +38,41 @@ DECLARE
     stCodEntidade       ALIAS FOR $2;
     inMes               ALIAS FOR $3;
     stSql               VARCHAR := '';
+    arDatas             VARCHAR[];
     reRegistro          RECORD;
 
 BEGIN
 
+arDatas := publico.mes(stExercicio,inMes);
 
-
-
-CREATE TEMPORARY TABLE tmp_arquivo (
-          mes         INTEGER
-        , deficit     NUMERIC(14,2)
-        , superavit   NUMERIC(14,2) 
-    );
-
-stSql := '
-INSERT INTO tmp_arquivo(mes,deficit,superavit)VALUES( '|| inMes||', 
-       
---DEFICIT
-
- (SELECT
-            coalesce(sum(vl.vl_lancamento),0)
-        FROM
-             contabilidade.plano_conta      as pc
-            ,contabilidade.plano_analitica  as pa
-            ,contabilidade.conta_debito     as cd
-            ,contabilidade.valor_lancamento as vl
-            ,contabilidade.lancamento       as la
-            ,contabilidade.lote             as lo
-        WHERE   pc.cod_conta = pa.cod_conta
-        AND     pc.exercicio = pa.exercicio
-        AND     pa.cod_plano = cd.cod_plano
-        AND     pa.exercicio = cd.exercicio
-        AND     cd.cod_lote  = vl.cod_lote
-        AND     cd.tipo      = vl.tipo
-        AND     cd.sequencia = vl.sequencia
-        AND     cd.exercicio = vl.exercicio
-        AND     cd.tipo_valor= vl.tipo_valor
-        AND     cd.cod_entidade= vl.cod_entidade
-
-        AND     vl.cod_lote  = la.cod_lote
-        AND     vl.tipo      = la.tipo
-        AND     vl.sequencia = la.sequencia
-        AND     vl.exercicio = la.exercicio
-        AND     vl.tipo      = la.tipo
-        AND     vl.cod_entidade= la.cod_entidade
-        AND     la.cod_lote  = lo.cod_lote
-        AND     la.exercicio = lo.exercicio
-        AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.cod_estrutural like ''3%''),
-        
-
--- SUPERAVIT
-    (SELECT
-            coalesce(sum(vl.vl_lancamento),0)
-        FROM
-             contabilidade.plano_conta      as pc
-            ,contabilidade.plano_analitica  as pa
-            ,contabilidade.conta_debito     as cd
-            ,contabilidade.valor_lancamento as vl
-            ,contabilidade.lancamento       as la
-            ,contabilidade.lote             as lo
-        WHERE   pc.cod_conta = pa.cod_conta
-        AND     pc.exercicio = pa.exercicio
-        AND     pa.cod_plano = cd.cod_plano
-        AND     pa.exercicio = cd.exercicio
-        AND     cd.cod_lote  = vl.cod_lote
-        AND     cd.tipo      = vl.tipo
-        AND     cd.sequencia = vl.sequencia
-        AND     cd.exercicio = vl.exercicio
-        AND     cd.tipo_valor= vl.tipo_valor
-        AND     cd.cod_entidade= vl.cod_entidade
-
-        AND     vl.cod_lote  = la.cod_lote
-        AND     vl.tipo      = la.tipo
-        AND     vl.sequencia = la.sequencia
-        AND     vl.exercicio = la.exercicio
-        AND     vl.tipo      = la.tipo
-        AND     vl.cod_entidade= la.cod_entidade
-        AND     la.cod_lote  = lo.cod_lote
-        AND     la.exercicio = lo.exercicio
-        AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.cod_estrutural like ''4%'' )
-
-
-)
-';
-
-
-
-
+CREATE TEMPORARY TABLE tmp_arquivo AS
+            SELECT * 
+            FROM contabilidade.fn_rl_balancete_verificacao( stExercicio
+                                                            , ' cod_entidade IN  (2) '
+                                                            , arDatas[0]
+                                                            , arDatas[1]
+                                                            ,'A'::CHAR)
+            as retorno
+                        ( cod_estrutural varchar                                                    
+                        ,nivel integer                                                               
+                        ,nom_conta varchar                                                           
+                        ,cod_sistema integer                                                         
+                        ,indicador_superavit char(12)                                                    
+                        ,vl_saldo_anterior numeric                                                   
+                        ,vl_saldo_debitos  numeric                                                   
+                        ,vl_saldo_creditos numeric                                                   
+                        ,vl_saldo_atual    numeric                                                   
+                        )
+            WHERE cod_estrutural like '3.0%'
+            OR cod_estrutural like '4.0%' ;
 
 EXECUTE stSql;
 
-
-
-stSql := ' SELECT mes, COALESCE(deficit, 0.00),COALESCE(superavit, 0.00)  FROM tmp_arquivo; ';
+    stSql := '  SELECT   '||inMes||'
+                        ,(SELECT vl_saldo_atual FROM tmp_arquivo WHERE cod_estrutural like ''3.0%'' ) as deficit
+                        ,(SELECT vl_saldo_atual FROM tmp_arquivo WHERE cod_estrutural like ''4.0%'' ) as superavit
+                FROM tmp_arquivo LIMIT 1; 
+            ';
 
 FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -146,7 +82,6 @@ FOR reRegistro IN EXECUTE stSql
     DROP TABLE tmp_arquivo;
 
     RETURN;
-
 
 END;
 $$ LANGUAGE 'plpgsql';

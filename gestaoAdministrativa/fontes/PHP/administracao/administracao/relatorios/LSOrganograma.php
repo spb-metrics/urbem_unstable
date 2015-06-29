@@ -44,7 +44,7 @@ include (CAM_FW_LEGADO."mascarasLegado.lib.php"   );
 include (CAM_FW_LEGADO."botoesPdfLegado.class.php");
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function SalvarRelatorio()
     {
         document.frm.action = "organograma.php?<?=Sessao::getId()?>";

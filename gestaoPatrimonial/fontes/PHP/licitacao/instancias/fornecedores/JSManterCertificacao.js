@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: JSManterCertificacao.js 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JSManterCertificacao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     $Revision: 19180 $
     $Name$
     $Autor: $
@@ -47,7 +47,7 @@ $Log:
 */
 ?>
 
-<script language="javaScript">
+<script type="text/javascript">
 
 function validaData(obj){
    var dtAtual = new Number(<?=date('Ymd')?>);

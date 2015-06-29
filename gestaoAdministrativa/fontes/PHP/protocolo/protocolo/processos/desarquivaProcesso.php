@@ -30,7 +30,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    $Id: desarquivaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: desarquivaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Casos de uso: uc-01.06.98
 */
@@ -52,7 +52,7 @@ if (!(isset($ctrl))) {
     $ctrl = 0;
 }
 ?>
-<script language="javascript">
+<script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -66,7 +66,7 @@ if (!(isset($ctrl))) {
 switch ($ctrl) {
 case 0:
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Valida()
     {
         var erro = false;
@@ -107,7 +107,7 @@ case 0:
 break;
 case 1:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function mudarPag(y)
     {
     window.location.replace(y);
@@ -411,12 +411,12 @@ if ($situacaoProcesso->apagaArquivamento()) {
                     $audicao = new auditoriaLegada;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codProcesso."/".$anoExercicio);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("Processo '.$codProcesso.'/'.$anoExercicio.' desarquivado com sucesso","unica","aviso", "'.Sessao::getId().'");
                     window.location="desarquivaProcesso.php?'.Sessao::getId().'&ctrl=1";
                     </script>';
     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("Não foi possível desarquivar o Processo '.$codProcesso.'/'.$anoExercicio.'","unica","erro", "'.Sessao::getId().'");
                     window.location = "desarquivaProcesso.php?'.Sessao::getId().'&ctrl=1";
                     </script>';

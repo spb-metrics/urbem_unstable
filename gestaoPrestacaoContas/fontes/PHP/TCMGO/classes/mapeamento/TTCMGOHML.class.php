@@ -102,7 +102,7 @@ public function montaRecupera10()
                             , despesa.num_orgao AS cod_orgao
                             , despesa.num_unidade AS cod_unidadesub
                             , homologacao.exercicio_licitacao
-                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') AS nro_processolicitatorio
+                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') || LPAD(licitacao.tipo_chamada_publica::VARCHAR,2,'0') AS nro_processolicitatorio
                             , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN
                                 homologacao.lote
                               ELSE
@@ -299,7 +299,7 @@ public function montaRecupera20()
                             , despesa.num_orgao AS cod_orgao
                             , despesa.num_unidade AS cod_unidadesub
                             , homologacao.exercicio_licitacao
-                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') as nro_processolicitatorio
+                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') || LPAD(licitacao.tipo_chamada_publica::VARCHAR,2,'0') as nro_processolicitatorio
                             , documento_pessoa.tipo_documento
                             , documento_pessoa.num_documento as nro_documento
                             , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN
@@ -478,7 +478,7 @@ public function recupera30(&$rsRecordSet, $boTransacao = "")
                             , despesa.num_orgao AS cod_orgao
                             , despesa.num_unidade AS cod_unidadesub
                             , homologacao.exercicio_licitacao
-                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') as nro_processolicitatorio
+                            , homologacao.exercicio_licitacao || LPAD(homologacao.cod_entidade::VARCHAR,2,'0') || LPAD(homologacao.cod_modalidade::VARCHAR,2,'0') || LPAD(homologacao.cod_licitacao::VARCHAR,4,'0') || LPAD(licitacao.tipo_chamada_publica::VARCHAR,2,'0') as nro_processolicitatorio
                             , TO_CHAR(TO_DATE(homologacao.timestamp::varchar, 'YYYY-MM-DD'),'DDMMYYYY') as dt_homologacao
                             , TO_CHAR(TO_DATE(adjudicacao.timestamp::varchar, 'YYYY-MM-DD'),'DDMMYYYY') as dt_adjudicacao
                             , documento_pessoa.tipo_documento

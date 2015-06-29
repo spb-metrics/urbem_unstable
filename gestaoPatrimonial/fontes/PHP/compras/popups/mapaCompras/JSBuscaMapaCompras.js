@@ -40,7 +40,7 @@ Casos de uso: uc-03.04.05
 */
 ?>
 
-<script language="Javascript">
+<script type="text/javascript">
 
 function Insere( stMapa ){
 	

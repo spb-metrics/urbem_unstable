@@ -38,7 +38,7 @@
     * Casos de uso: uc-06.07.00
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 /**
 * montaArrayOutrasRemuneracoes

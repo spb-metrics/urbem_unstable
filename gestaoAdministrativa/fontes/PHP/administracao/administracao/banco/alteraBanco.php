@@ -116,7 +116,7 @@ echo $html;
 case 1:
 $nomBanco = pegaDado("nom_banco","administracao.banco","Where cod_banco = '".$codBanco."'");
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";

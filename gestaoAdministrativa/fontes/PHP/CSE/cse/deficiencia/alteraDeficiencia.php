@@ -145,7 +145,7 @@ $conn->vaiPrimeiro();
 case 1:
 $nomDeficiencia = pegaDado("nom_deficiencia","cse.deficiencia","Where cod_deficiencia = '".$codDeficiencia."' ");
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -247,7 +247,7 @@ case 2:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

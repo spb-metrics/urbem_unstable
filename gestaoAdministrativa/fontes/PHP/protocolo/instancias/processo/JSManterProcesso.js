@@ -39,5 +39,5 @@ $Date: 2006-09-18 08:38:09 -0300 (Seg, 18 Set 2006) $
 Casos de uso: uc-01.06.98
 */
 ?>
-<script language='javascript'>
+<script type='text/javascript'>
 </script>

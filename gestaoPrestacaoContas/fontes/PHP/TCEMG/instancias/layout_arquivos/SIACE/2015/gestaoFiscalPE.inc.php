@@ -35,49 +35,40 @@
 
     * @ignore
 
-    $Id: gestaoFiscalPE.inc.php 62522 2015-05-18 14:22:51Z evandro $
+    $Id: gestaoFiscalPE.inc.php 62778 2015-06-17 13:49:46Z jean $
     */
 
-    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGMedidas.class.php' );
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGGestaoFiscalPE.class.php' );
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obTTCEMGMedidas = new TTCEMGMedidas();
-    
-    $stFiltro = ' WHERE medidas.cod_mes ='.$arFiltros['inPeriodo'];
-    
-    $obTTCEMGMedidas->recuperaDados($rsArquivo, $stFiltro);
-    
-    while (  !$rsArquivo->eof() ) {
-        if($rsArquivo->getCampo('riscos_fiscais')=='t')
-            $rsArquivo->setCampo('riscos_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('riscos_fiscais', 'N');
+    foreach ($arDatasInicialFinal as $stDatas) {
+        $obTTCEMGGestaoFiscalPE = new TTCEMGGestaoFiscalPE();
 
-        if($rsArquivo->getCampo('metas_fiscais')=='t')
-            $rsArquivo->setCampo('metas_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('metas_fiscais', 'N');
+        list($inDia, $inMes, $inAno) = explode('/',$stDatas['stDtInicial']);
 
-        if($rsArquivo->getCampo('contratacao_aro')=='t')
-            $rsArquivo->setCampo('contratacao_aro', 'S'); 
-        else
-            $rsArquivo->setCampo('contratacao_aro', 'N');
-        
-        if($arFiltros['inPeriodo']!=12)
-            $rsArquivo->setCampo('contratacao_aro', '');
+        $stFiltro = " WHERE medidas.cod_mes = ".(integer)$inMes;
 
-        $rsArquivo->Proximo();
+        $obTTCEMGGestaoFiscalPE->setDado('periodo', (integer)$inMes);
+        $obTTCEMGGestaoFiscalPE->recuperaDados($rsArquivo, $stFiltro);
+
+        $rsArquivo->setPrimeiroElemento();
+    
+        $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('periodo');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(10000);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contratacao_aro');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     }
-    $rsArquivo->setPrimeiroElemento();
-
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contratacao_aro');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('riscos_fiscais');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('metas_fiscais');    
+?>

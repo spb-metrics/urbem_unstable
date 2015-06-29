@@ -305,13 +305,6 @@ function show()
     $this->inNumeroImpressoes = $arFiltroRelatorio['inNumCopias'];
 
     if ($this->stFilaImpressao) {
-        //RECUPERA O CAMINHO ONDE DO ACROBATREADER
-      //  $this->obTConfiguracao->setComplementoChave('cod_modulo,parametro');
-      //  $this->obTConfiguracao->setDado( "cod_nodulo", 1 );
-      //  $this->obTConfiguracao->setDado( "exercicio", Sessao::getExercicio() );
-      //  $obErro = $this->obTConfiguracao->pegaConfiguracao( $sAcrobatReader , "caminho_acrobat" );
-      //  $sAcrobatReader .= "/acroread";
-        //FIM
         $stParams = '';
         if (  strtolower($this->DefOrientation) == 'l' ) {
             $stParams .= '-landscape ';
@@ -321,7 +314,6 @@ function show()
         $sFilePDF = $sFile.".pdf";
         $sFilePS  = $sFile.".ps";
         $this->Output($sFilePDF);
-//        $cmdo = "cat $sFile | $sAcrobatReader -toPostScript -fast $stParams | lpr -P $this->stFilaImpressao -#$this->inNumeroImpressoes ";
         $cmdo  = " pdf2ps ".$sFilePDF." ".$sFilePS." && ";
         $cmdo .= " lpr -r -P$this->stFilaImpressao ".$sFilePS." -#$this->inNumeroImpressoes";
         $aAux = array();

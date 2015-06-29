@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-    $Id: IAppletTerminal.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IAppletTerminal.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-02.04.18,uc-02.04.05,uc-02.04.04,uc-02.04.09,uc-02.04.17
 
@@ -175,7 +175,7 @@ class IAppletTerminal extends Applet
         $stHtml .= $obHdnTimestampTerminal->getHtml();
         $stHtml .= $obHdnTimestampUsuario->getHtml();
 
-        $stHtml .= "<script language=\"JavaScript\">                                                                   \n";
+        $stHtml .= "<script type=\"text/javascript\">                                                                   \n";
         $stHtml .= "var stHashMac; \n";
         $stHtml .= "function handleHttpResponse() {                                                         \n";
         $stHtml .= "  if (http.readyState == 4) {                                                                      \n";

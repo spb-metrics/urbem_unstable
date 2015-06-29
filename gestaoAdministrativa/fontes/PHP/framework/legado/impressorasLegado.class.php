@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-01.01.00
 
-    $Id: impressorasLegado.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: impressorasLegado.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -228,7 +228,7 @@ class impressorasLegado
         $dbEmp->vaiPrimeiro();
         $lista="";
     ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
       function Valida()
       {

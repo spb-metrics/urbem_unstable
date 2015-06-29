@@ -40,7 +40,7 @@ Casos de uso: uc-01.04.01
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 	function focusIncluir(){
     	document.frm.stNomeTipoNorma.focus();
 	}

@@ -75,7 +75,7 @@ switch ($ctrl) {
     case 0:
         $sessao->transf = '';
 ?>
-      <script language="JavaScript1.2" type="text/javascript">
+      <script type="text/javascript">
             function Valida()
             {
                   var mensagem = "";
@@ -279,7 +279,7 @@ switch ($ctrl) {
                $dbEmp->vaiProximo();
             }
 ?>
-      <script language="JavaScript1.2" type="text/javascript">
+      <script type="text/javascript">
             function Valida()
             {
                   var mensagem = "";
@@ -542,7 +542,7 @@ switch ($ctrl) {
                     $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $codApolice);
                     $audicao->insereAuditoria();
 ?>
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Apólice(<?=$numApolice;?>) alterada com sucesso.","alterar","aviso","<?=Sessao::getId();?>");
                         document.target = "telaPrincipal";
                         parent.window.frames['telaPrincipal'].location = "incluiBens.php?<?=Sessao::getId();?>&ctrl=1&codApolice=<?=$codApolice;?>";
@@ -551,7 +551,7 @@ switch ($ctrl) {
 <?php
                 } else {
 ?>
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Apólice: <?=$numApolice;?>","n_alterar","erro","<?=Sessao::getId();?>");
                     </script>
 <?php

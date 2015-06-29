@@ -31,7 +31,7 @@
 
     Casos de uso: uc-01.06.97
 
-    $Id: incluiAndamentoPadrao.php 60901 2014-11-21 17:53:35Z carolina $
+    $Id: incluiAndamentoPadrao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -53,7 +53,7 @@ case 0:
 Sessao::write('ordem', 0);
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function ValidaForm()
 {
@@ -297,7 +297,7 @@ case 1:
             $obFormulario->montaHtml();
             echo $obFormulario->getHTML();
         ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     <!--
     function ValidaForm()
     {
@@ -424,7 +424,7 @@ case 1:
     }
 ?>
 
-    <script language="JavaScript">
+    <script type="text/javascript">
     <!--
     <?php
 

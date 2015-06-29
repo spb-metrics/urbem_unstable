@@ -53,23 +53,23 @@ class FTCEMGDispFinanceiras extends Persistente
 
         $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
         $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-        $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+        $this->AddCampo('bimestre'      ,'integer',false,''    ,false,false);
     }
 
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT mes
-                 , ROUND(caixa,2) AS caixa
-                 , ROUND(conta_movimento,2) AS conta_movimento
-                 , ROUND(contas_vinculadas,2) AS contas_vinculadas
-                 , ROUND(aplicacoes_financeiras ,2) AS aplicacoes_financeiras
-                 , ROUND(compromissado,2) AS compromissado
-                 , ROUND(caixa_rpps,2) AS caixa_rpps
-                 , ROUND(contas_movimento_rpps,2) AS contas_movimento_rpps
-                 , ROUND(contas_vinculadas_rpps,2) AS contas_vinculadas_rpps
-                 , ROUND(aplicacoes_financeiras_rpps,2) AS aplicacoes_financeiras_rpps
-                 , ROUND(compromissado_rpps,2) AS compromissado_rpps
+            SELECT ".$this->getDado('bimestre')." AS bimestre
+                 , caixa
+                 , conta_movimento
+                 , contas_vinculadas
+                 , aplicacoes_financeiras
+                 , compromissado
+                 , caixa_rpps
+                 , contas_movimento_rpps
+                 , contas_vinculadas_rpps
+                 , aplicacoes_financeiras_rpps
+                 , compromissado_rpps
                  , 'S' AS nada_declarar
                  , 0.00 AS caixa_rppsas
                  , 0.00 AS conta_movimento_rppsas
@@ -79,9 +79,8 @@ class FTCEMGDispFinanceiras extends Persistente
                  , 0.00 AS aplicacoes_financeiras_vinc
                  , 0.00 AS aplicacoes_financeiras_vinc_rpps
                  , 0.00 AS aplicacoes_financeiras_vinc_rppsas
-              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
-                                          ( mes                         INTEGER,
-                                            caixa                       NUMERIC ,
+              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "','".$this->getDado('dtInicio')."','".$this->getDado('dtFinal')."') AS retorno
+                                          ( caixa                       NUMERIC ,
                                             conta_movimento             NUMERIC ,
                                             contas_vinculadas           NUMERIC ,
                                             aplicacoes_financeiras      NUMERIC ,

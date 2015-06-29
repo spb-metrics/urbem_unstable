@@ -201,7 +201,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbTipoTransacao = new Select;
     $obCmbTipoTransacao->setRotulo ( "*Tipo"                             );
     $obCmbTipoTransacao->setName   ( "stTipoTransacao"                   );
-    $obCmbTipoTransacao->addOption ( "2","Não Informado"                 );
+    $obCmbTipoTransacao->addOption ( "1","Não Informado"                 );
     $obCmbTipoTransacao->addOption ( "2","Transferência - C/C"           );
     $obCmbTipoTransacao->addOption ( "3" ,"Transferência - Poupança"     );
     $obCmbTipoTransacao->addOption ( "4","DOC"                           );

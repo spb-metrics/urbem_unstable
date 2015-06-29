@@ -198,8 +198,8 @@ if ($codigomodulo != 0) {
 <meta http-equiv='Pragma' content='no-cache'>
 <meta http-equiv='Cache-Control' content='no-store, no-cache, must-revalidate'>
 <META HTTP-EQUIV="expires" CONTENT="Tue, 23 Jun 2002 01:46:05 GMT">
-<script language="JavaScript1.2" src="<?=$stCaminho;?>includes/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" type="text/javascript">
+<script src="<?=$stCaminho;?>includes/ifuncoesJs.js" type="text/javascript"></script>
+<script type="text/javascript">
       MontaCSS("<?=$stCaminho?>");
 </script>
 
@@ -215,7 +215,7 @@ if ($codigomodulo != 0) {
 </head><body leftmargin=0 topmargin=0>
 <?php
 if (!(session_is_registered("sessao")))
-        echo "<script language=JavaScript type=text/JavaScript>
+        echo "<script type='text/javascript'>
                 window.location='".$stCaminho."index.php'
                 </script>";
 ?>
@@ -227,7 +227,7 @@ if (!$mostraTitulo) {
 ?>
 
 <!-- *******************  Layers para bloquear frames ******************************** -->
-<script language="javascript">
+<script type="text/javascript">
     function anulaTecla()
     {
     }

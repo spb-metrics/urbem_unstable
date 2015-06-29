@@ -278,7 +278,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
 
             $arTodasMovimentacaoes = array_merge($arTodasMovimentacaoes,$rsMovimentacoes->getElementos());
             
-            $saldoAnterior = $saldoAnterior + $rsSaldoAnteriorAtual->getCampo("fn_saldo_conta_tesouraria");
+            $saldoAnterior = bcadd($saldoAnterior, $rsSaldoAnteriorAtual->getCampo("fn_saldo_conta_tesouraria"),4);
         
             $rsDadosBancarios->proximo();
         }

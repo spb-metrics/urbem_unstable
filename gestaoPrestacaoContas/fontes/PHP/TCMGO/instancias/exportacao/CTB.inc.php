@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: CTB.inc.php 62499 2015-05-14 20:56:42Z lisiane $
+    $Id: CTB.inc.php 62759 2015-06-16 18:00:15Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -87,7 +87,7 @@ foreach ($rsContasBancarias->arElementos as $arContasBancarias) {
     $$rsBloco->preenche(array($arContasBancarias));
 
     $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
-    $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+    $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);

@@ -29,29 +29,30 @@ Arquivo de mapeamento para a função que busca os dados de variação patrimoni
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_passivo_perm(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_passivo_perm(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
+    stDtInicial         ALIAS FOR $3;
+    stDtFinal           ALIAS FOR $4;
     stSql               VARCHAR := '';
     reRegistro          RECORD;
 
 BEGIN 
 
 CREATE TEMPORARY TABLE tmp_arquivo (
-          mes                  INTEGER
-        , codTipo              INTEGER
-        , valorEmp         NUMERIC(14,2)
-        , valorTransConcedidas NUMERIC(14,2)
-        , valorProvisaoRPPS NUMERIC(14,2)
+          mes                   INTEGER
+        , codTipo               INTEGER
+        , valorEmp              NUMERIC
+        , valorTransConcedidas  NUMERIC
+        , valorProvisaoRPPS     NUMERIC
     );
 
 stSql := '
-INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALUES(' || inMes || ' ,
+INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALUES(''12'' ,
 
  (SELECT
             coalesce(sum(vl.vl_lancamento),0.00)
@@ -72,7 +73,6 @@ INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALU
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -82,13 +82,12 @@ INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALU
         AND     la.cod_lote  = lo.cod_lote
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     la.cod_entidade=lo.cod_entidade        
+        AND     la.tipo <> ''I''
+        AND     pc.exercicio  = '''|| stExercicio|| '''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
         AND     cod_estrutural like  ''2.1.2%''
         AND     pc.indicador_superavit like ''p%''),
-        
 
  (SELECT
             coalesce(sum(vl.vl_lancamento),0.00)
@@ -109,7 +108,6 @@ INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALU
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -120,12 +118,11 @@ INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALU
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     la.tipo <> ''I''
+        AND     pc.exercicio  = '''|| stExercicio|| '''  
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
         AND     cod_estrutural like  ''3.5%''
         AND     pc.indicador_superavit like ''p%''),
-       
 
   (SELECT
             coalesce(sum(vl.vl_lancamento),0.00)
@@ -157,27 +154,67 @@ INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALU
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     la.tipo <> ''I''
+        AND     pc.exercicio  = '''|| stExercicio|| '''  
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
         AND     cod_estrutural like  ''2.2.7.2%''
         AND     pc.indicador_superavit like ''p%'')
 )';
 
-
 EXECUTE stSql;
 
-stSql := ' SELECT mes,COALESCE(valorEmp, 0.00),COALESCE(valorTransConcedidas),COALESCE(valorProvisaoRPPS),COALESCE(codTipo, 00)   FROM tmp_arquivo; ';
+--lançamento a débito com sinal positivo, então será com o codtipo 01 - acréscimo)
+--lançamento a débito com sinal negativo, então será com o codtipo 02 - redução)
+stSql := '  SELECT  mes
+                    , CASE WHEN SIGN(valorEmp) > 0.00 THEN
+                            valorEmp
+                        ELSE
+                            0.00
+                    END as valorEmp
+                    , CASE WHEN SIGN(valorTransConcedidas) > 0 THEN
+                            valorTransConcedidas
+                        ELSE
+                            0.00
+                    END as valorTransConcedidas
+                    , CASE WHEN SIGN(valorProvisaoRPPS) > 0 THEN
+                            valorProvisaoRPPS
+                        ELSE
+                            0.00
+                    END as valorProvisaoRPPS
+                    , 1 as codTipo
+            FROM tmp_arquivo
+
+        UNION
+
+            SELECT  mes
+                    , CASE WHEN SIGN(valorEmp) < 0 THEN
+                            valorEmp
+                        ELSE
+                            0.00
+                    END as valorEmp
+                    , CASE WHEN SIGN(valorTransConcedidas) < 0 THEN
+                            valorTransConcedidas
+                        ELSE
+                            0.00
+                    END as valorTransConcedidas
+                    , CASE WHEN SIGN(valorProvisaoRPPS) < 0 THEN
+                            valorProvisaoRPPS
+                        ELSE
+                            0.00
+                    END as valorProvisaoRPPS
+                    , 2 as codTipo
+            FROM tmp_arquivo
+ 
+        ';
 
 FOR reRegistro IN EXECUTE stSql
-    LOOP
-        RETURN NEXT reRegistro;
-    END LOOP;
+LOOP
+    RETURN NEXT reRegistro;
+END LOOP;
 
-    DROP TABLE tmp_arquivo;
+DROP TABLE tmp_arquivo;
 
-    RETURN;
-
+RETURN;
 
 END;
 $$ LANGUAGE 'plpgsql';

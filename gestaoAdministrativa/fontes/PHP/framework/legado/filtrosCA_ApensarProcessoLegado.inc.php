@@ -39,7 +39,7 @@ Casos de uso: uc-01.01.00
     $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
     //echo $mascaraAssunto;
 ?>
-    <script language="javascript">
+    <script type="text/javascript">
         function preenche_combos(campo_a, campo_b)
         {
             document.frm.action = "<?=$action;?>?<?=Sessao::getId()?>&controle=<?=$ctrl;?>";

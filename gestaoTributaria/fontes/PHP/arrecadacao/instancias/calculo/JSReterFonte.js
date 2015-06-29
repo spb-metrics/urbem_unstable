@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-    * $Id: JSReterFonte.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSReterFonte.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.03.22
 */
@@ -45,7 +45,7 @@ Revision 1.1  2006/10/30 13:00:16  cercato
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

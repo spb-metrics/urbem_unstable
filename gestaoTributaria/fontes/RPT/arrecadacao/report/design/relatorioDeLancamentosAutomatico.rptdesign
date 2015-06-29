@@ -79,64 +79,95 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="query" id="6730">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150" extends="urbem_250.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="rs_lancamentos" id="6667">
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[this.queryText   = "        SELECT * \n"
-this.queryText  += "          FROM ( SELECT DISTINCT lancamento.cod_lancamento \n"
-this.queryText  += "                       , to_char( lancamento.vencimento, 'dd/mm/yyyy' ) AS vencimento \n"
-this.queryText  += "                       , lancamento.total_parcelas \n"
-this.queryText  += "                       , replace(lancamento.valor::VARCHAR, '.', ',') AS valor \n"
-this.queryText  += "                       , CAST((SELECT array_to_string( ARRAY( select numcgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS numcgm \n"
-this.queryText  += "                       , CAST((SELECT array_to_string( ARRAY( select nom_cgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS nom_cgm \n"
-this.queryText  += "                       , COALESCE ( cadastro_economico_calculo.inscricao_economica, imovel_calculo.inscricao_municipal, 0 ) AS inscricao \n"
-this.queryText  += "                       , CASE WHEN parcela_desconto.valor IS NOT NULL THEN \n"
-this.queryText  += "                                 parcela_desconto.valor \n"
-this.queryText  += "                         ELSE \n"
-this.queryText  += "                                 parcela.valor \n"
-this.queryText  += "                         END AS valor_parcela \n"
-this.queryText  += "                       , COALESCE ( carne.numeracao::varchar, '    -    ' ) AS numeracao \n"
-this.queryText  += "                       , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN \n"
-this.queryText  += "                                              'única'::text \n"
-this.queryText  += "                                      ELSE \n"
-this.queryText  += "                                              parcela.nr_parcela||'/'||lancamento.total_parcelas::text \n"
-this.queryText  += "                                      END \n"
-this.queryText  += "                                    ), ' - ' ) AS nr_parcela \n"
-this.queryText  += "                       , COALESCE( to_char( parcela.vencimento, 'dd/mm/yyyy' ), ' - ' ) AS data_vencimento \n"
-this.queryText  += "                       , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN 0 \n"
-this.queryText  += "                                      ELSE parcela.nr_parcela \n"
-this.queryText  += "                                      END \n"
-this.queryText  += "                                    ), 0) AS ordenacao \n"
-this.queryText  += "                        , grupo_credito.ano_exercicio \n"
-this.queryText  += "                        , grupo_credito.cod_grupo \n"
-this.queryText  += "                        , COALESCE ( imovel_calculo.inscricao_municipal, 0 ) as inscricao_municipal \n"
-this.queryText  += "                        , COALESCE ( cadastro_economico_calculo.inscricao_economica, 0 ) AS inscricao_economica \n"
-this.queryText  += "                        , lancamento_calculo.dt_lancamento as dt_lancamento \n"
-this.queryText  += "                    FROM arrecadacao.lancamento \n" 
-this.queryText  += "              INNER JOIN arrecadacao.lancamento_calculo \n"
-this.queryText  += "                      ON lancamento_calculo.cod_lancamento = lancamento.cod_lancamento \n"
-this.queryText  += "              LEFT JOIN arrecadacao.imovel_calculo \n"
-this.queryText  += "                     ON imovel_calculo.cod_calculo = lancamento_calculo.cod_calculo \n"
-this.queryText  += "              LEFT JOIN arrecadacao.cadastro_economico_calculo \n"
-this.queryText  += "                     ON cadastro_economico_calculo.cod_calculo = lancamento_calculo.cod_calculo \n"
-this.queryText  += "              LEFT JOIN arrecadacao.parcela \n"
-this.queryText  += "                     ON parcela.cod_lancamento = lancamento.cod_lancamento \n"
-this.queryText  += "              LEFT JOIN arrecadacao.parcela_desconto \n"
-this.queryText  += "                     ON parcela_desconto.cod_parcela = parcela.cod_parcela \n"
-this.queryText  += "              LEFT JOIN arrecadacao.carne \n"
-this.queryText  += "                     ON carne.cod_parcela = parcela.cod_parcela \n"
-this.queryText  += "                   JOIN arrecadacao.calculo_grupo_credito  \n"
-this.queryText  += "                     ON calculo_grupo_credito.cod_calculo = lancamento_calculo.cod_calculo \n"
-this.queryText  += "                   JOIN arrecadacao.grupo_credito \n"
-this.queryText  += "                     ON grupo_credito.ano_exercicio = calculo_grupo_credito.ano_exercicio \n"
-this.queryText  += "                    AND grupo_credito.cod_grupo = calculo_grupo_credito.cod_grupo \n"
-this.queryText  += "            ) AS lancamento \n"
+            <method name="beforeOpen"><![CDATA[this.queryText   = "        SELECT * "
+this.queryText  += "          FROM ( SELECT DISTINCT lancamento.cod_lancamento "
+this.queryText  += "                       , to_char( lancamento.vencimento, 'dd/mm/yyyy' ) AS vencimento "
+this.queryText  += "                       , lancamento.total_parcelas "
+this.queryText  += "                       , replace(lancamento.valor::VARCHAR, '.', ',') AS valor "
+this.queryText  += "                       , CAST((SELECT array_to_string( ARRAY( select numcgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS numcgm "
+this.queryText  += "                       , CAST((SELECT array_to_string( ARRAY( select nom_cgm from sw_cgm where numcgm IN ( SELECT numcgm FROM arrecadacao.calculo_cgm WHERE cod_calculo = lancamento_calculo.cod_calculo)), '/' ) ) AS VARCHAR) AS nom_cgm "
+this.queryText  += "                       , COALESCE ( cadastro_economico_calculo.inscricao_economica, imovel_calculo.inscricao_municipal, 0 ) AS inscricao "
+this.queryText  += "                       , CASE WHEN parcela_desconto.valor IS NOT NULL THEN "
+this.queryText  += "                                 parcela_desconto.valor "
+this.queryText  += "                         ELSE "
+this.queryText  += "                                 parcela.valor "
+this.queryText  += "                         END AS valor_parcela "
+this.queryText  += "                       , COALESCE ( carne.numeracao::varchar, '    -    ' ) AS numeracao "
+this.queryText  += "                       , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN "
+this.queryText  += "                                              'única'::text "
+this.queryText  += "                                      ELSE "
+this.queryText  += "                                              parcela.nr_parcela||'/'||lancamento.total_parcelas::text "
+this.queryText  += "                                      END "
+this.queryText  += "                                    ), ' - ' ) AS nr_parcela "
+this.queryText  += "                       , COALESCE( to_char( parcela.vencimento, 'dd/mm/yyyy' ), ' - ' ) AS data_vencimento "
+this.queryText  += "                       , COALESCE ( ( CASE WHEN parcela.nr_parcela = 0 THEN 0 "
+this.queryText  += "                                      ELSE parcela.nr_parcela "
+this.queryText  += "                                      END "
+this.queryText  += "                                    ), 0) AS ordenacao "
+this.queryText  += "                        , grupo_credito.ano_exercicio "
+this.queryText  += "                        , grupo_credito.cod_grupo "
+this.queryText  += "                        , COALESCE ( imovel_calculo.inscricao_municipal, 0 ) as inscricao_municipal "
+this.queryText  += "                        , COALESCE ( cadastro_economico_calculo.inscricao_economica, 0 ) AS inscricao_economica "
+this.queryText  += "                        , lancamento_calculo.dt_lancamento as dt_lancamento "
+this.queryText  += "                    FROM arrecadacao.lancamento " 
+this.queryText  += "              INNER JOIN arrecadacao.lancamento_calculo "
+this.queryText  += "                      ON lancamento_calculo.cod_lancamento = lancamento.cod_lancamento "
+this.queryText  += "              LEFT JOIN arrecadacao.imovel_calculo "
+this.queryText  += "                     ON imovel_calculo.cod_calculo = lancamento_calculo.cod_calculo "
+this.queryText  += "              LEFT JOIN arrecadacao.cadastro_economico_calculo "
+this.queryText  += "                     ON cadastro_economico_calculo.cod_calculo = lancamento_calculo.cod_calculo "
+this.queryText  += "              LEFT JOIN arrecadacao.parcela "
+this.queryText  += "                     ON parcela.cod_lancamento = lancamento.cod_lancamento "
+this.queryText  += "              LEFT JOIN arrecadacao.parcela_desconto "
+this.queryText  += "                     ON parcela_desconto.cod_parcela = parcela.cod_parcela "
+this.queryText  += "              LEFT JOIN ( SELECT parcela.cod_parcela, ";
+this.queryText  += "                				 parcela.valor, ";
+this.queryText  += "                			     carne.numeracao ";
+this.queryText  += "           				    FROM arrecadacao.parcela ";
+this.queryText  += "           					JOIN ( SELECT MAX(carne.timestamp) AS timestamp, ";
+this.queryText  += "                         				  carne.cod_parcela ";
+this.queryText  += "                        			 FROM arrecadacao.carne ";
+this.queryText  += "                				 GROUP BY cod_parcela ";
+this.queryText  += "                   				 ) AS carne_max ";
+this.queryText  += "            	 	          ON carne_max.cod_parcela = parcela.cod_parcela ";
+this.queryText  += "           		   			JOIN arrecadacao.carne ";
+this.queryText  += "         		     		  ON carne.cod_parcela = parcela.cod_parcela ";
+this.queryText  += "                    		 AND carne.timestamp   = carne_max.timestamp ";
+this.queryText  += "       		           ) AS carne ";
+this.queryText  += "        			 ON carne.cod_parcela = parcela.cod_parcela ";
+this.queryText  += "                   JOIN arrecadacao.calculo_grupo_credito  "
+this.queryText  += "                     ON calculo_grupo_credito.cod_calculo = lancamento_calculo.cod_calculo "
+this.queryText  += "                   JOIN arrecadacao.grupo_credito "
+this.queryText  += "                     ON grupo_credito.ano_exercicio = calculo_grupo_credito.ano_exercicio "
+this.queryText  += "                    AND grupo_credito.cod_grupo = calculo_grupo_credito.cod_grupo "
+this.queryText  += "            ) AS lancamento "
 this.queryText  +=              params['filtro'] 
+ 
+ 
+params['query'] =  this.queryText;
  
 
 ]]></method>
@@ -339,8 +370,13 @@ from ]]></xml-property>
                 </structure>
                 <structure>
                     <property name="name">inscricao</property>
-                    <expression name="expression">dataSetRow["inscricao_municipal"]</expression>
+                    <expression name="expression" type="javascript">if (dataSetRow["inscricao_municipal"] != '' ){
+	dataSetRow["inscricao_municipal"];
+} else {
+	dataSetRow["inscricao_economica"];
+}</expression>
                     <property name="dataType">integer</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">numeracao</property>

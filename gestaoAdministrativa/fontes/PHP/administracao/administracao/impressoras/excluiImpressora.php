@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-01.03.92
 
-    $Id: excluiImpressora.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: excluiImpressora.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -60,8 +60,8 @@ if (isset($excluir)) {
 }
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 
 if (!(isset($ctrl)))
@@ -71,7 +71,7 @@ if (!isset($pagina)) {
     $pagina = 0;
 }
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);

@@ -7,7 +7,7 @@
   * @author Desenvolvedor: Evandro Melos
   *
   * @ignore
-  * $Id: JSManterConsideracao.js 57486 2014-03-12 17:17:06Z evandro $
+  * $Id: JSManterConsideracao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -15,7 +15,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;
     document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';

@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Fernando Piccini Cercato
 
-    * $Id: JSCondominios.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSCondominios.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.27 
 */
@@ -45,7 +45,7 @@ adicionado trecho de log do CVS
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function submeteFiltro(){
     selecionaTodosSelect(document.frm.inCodAtributosSelecionados2); //funcao que seleciona todos no combo multiplo

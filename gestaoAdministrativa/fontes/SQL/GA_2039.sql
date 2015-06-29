@@ -302,7 +302,7 @@ BEGIN
       WHERE usename = 'birt'
           ;
     IF NOT FOUND THEN
-        CREATE ROLE birt;
+        CREATE ROLE birt login;
         GRANT urbem TO birt;
         UPDATE pg_authid SET rolpassword = 'md517e68e814c79648270e8a9c28b6386e7' WHERE rolname = 'birt';
     END IF;

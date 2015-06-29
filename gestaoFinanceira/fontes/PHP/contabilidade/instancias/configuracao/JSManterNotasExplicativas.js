@@ -38,7 +38,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function incluirCadastro(prm){
     var erro     = new Boolean(false);

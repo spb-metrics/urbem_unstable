@@ -33,14 +33,14 @@
 
     * @ignore
 
-    * $Id: JSConsultaInscricao.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSConsultaInscricao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Limpar(){
     document.frm.reset();

@@ -77,8 +77,7 @@ $stFncJavaScript .= " }                          \n";
 
 $obREmpenhoOrdemPagamento = new REmpenhoOrdemPagamento;
 $stFiltro = "";
-$stLink   = "";
-
+$stLink  .= "&stAcao=".$_REQUEST['stAcao'];
 //Definição do filtro de acordo com os valores informados
 $stLink .= "&stTipoPessoa=".$_REQUEST["stTipoPessoa"];
 
@@ -105,13 +104,33 @@ if ($_REQUEST["inCodOrdemPagamento"]) {
     $stLink   .= "&inCodOrdemPagamento=".$_REQUEST["inCodOrdemPagamento"];
 }
 
-$stLink .= "&stAcao=".$stAcao;
 $rsLista = new RecordSet;
-
 $obREmpenhoOrdemPagamento->setListarNaoPaga( true );
-if($_REQUEST['stTipoBusca'] == 'bordero')
-    $obREmpenhoOrdemPagamento->listarDadosPagamentoBordero( $rsLista );
-else $obREmpenhoOrdemPagamento->listarDadosPagamento( $rsLista );
+switch ($_REQUEST['stTipoBusca']){
+    case 'bordero':
+        $obREmpenhoOrdemPagamento->listarDadosPagamentoBordero( $rsLista, $boTransacao );
+    break;
+
+    case "bordero_recurso":
+        include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoRecurso.class.php"          );
+        $obTContabilidadePlanoRecurso          = new TContabilidadePlanoRecurso;
+        $obTContabilidadePlanoRecurso->setDado('exercicio', $_REQUEST["stExercicio"] );
+        $obTContabilidadePlanoRecurso->setDado('cod_plano', $_REQUEST['hdnCodPlano'] );
+        $obTContabilidadePlanoRecurso->recuperaPorChave($rsRecurso,"","",$boTransacao);
+
+        $stLink .= "&inCodRecurso=".$rsRecurso->getCampo('cod_recurso');
+        $stLink .= "&hdnCodPlano=".$_REQUEST['hdnCodPlano'];
+        $stLink .= "&stTipoBusca=bordero_recurso";
+        $obREmpenhoOrdemPagamento->stExercicio = $_REQUEST["stExercicio"];
+        $obREmpenhoOrdemPagamento->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso($rsRecurso->getCampo('cod_recurso'));
+            
+        $obREmpenhoOrdemPagamento->listarDadosPagamentoBorderoContaRecurso( $rsLista, $boTransacao);
+    break;
+    
+    default:
+        $obREmpenhoOrdemPagamento->listarDadosPagamento( $rsLista );
+    break;
+} 
 
 $obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );

@@ -52,7 +52,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function alterarEvento( inId ) {
     executaFuncaoAjax( 'montaAlterarEvento', '&inId='+inId );

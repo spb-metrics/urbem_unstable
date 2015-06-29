@@ -385,7 +385,7 @@ $obFormulario->show();
 if (count($arValoresSessao) > 0) {
    $jsOnLoad = "montaParametrosGET('preencheSpanListaItens')";
    if ($boBloqueiaOk) {
-      $stJs = "<script language='javaScript'>";
+      $stJs = "<script type='text/javascript'>";
       $stJs.= "alertaAviso('Não é possível processar a Nota de Transferência pois existe item sem saldo.','form','erro','".Sessao::getId()."');";
       $stJs.= "jQuery('#Ok').attr('disabled', 'disabled')";
       $stJs.= "</script>";

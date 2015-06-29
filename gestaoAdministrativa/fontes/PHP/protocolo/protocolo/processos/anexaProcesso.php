@@ -74,7 +74,7 @@ switch ($controle) {
 
 </table>
 </form>
- <script language="JavaScript1.2" type="text/javascript">
+ <script type="text/javascript">
     placeFocus();
  </script>
 <?php
@@ -110,7 +110,7 @@ switch ($controle) {
 
     if ($ok) {
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     var combo = window.opener.parent.frames['telaPrincipal'].document.frm.processosAnexos;
     var sNumAnexos = window.opener.parent.frames['telaPrincipal'].document.frm.processosAnexos.options.length;
     var codProcesso = "<?=$codProcesso;?>";

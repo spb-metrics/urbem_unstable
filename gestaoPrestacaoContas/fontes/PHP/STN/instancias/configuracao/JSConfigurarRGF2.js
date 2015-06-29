@@ -33,7 +33,7 @@
 */
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
         
     function excluirListaItens( cod_conta,cod_plano ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&inCodPlano='+cod_plano+'&inCodConta='+cod_conta,'excluirListaItens');

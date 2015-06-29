@@ -44,7 +44,7 @@ $ctrl = 0;
 switch ($ctrl) {
 case 0:
 ?>
-   <script language="JavaScript1.2" type="text/javascript">
+   <script type="text/javascript">
 
       function Valida()
       {
@@ -121,12 +121,12 @@ if ($chaves ==  0) { //Verifica a exist^ncia de registros iguais
                     $audicao = new auditoria;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $nomFuncao);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$nomFuncao.'","incluir","aviso","'.Sessao::getId().'");
                     window.location = "incluiFuncao.php?'.Sessao::getId().'";
                     </script>';
                     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$nomFuncao.'","n_incluir","aviso","'.Sessao::getId().'");
                     window.location = "incluiFuncao.php?'.Sessao::getId().'";
                     </script>';
@@ -136,7 +136,7 @@ if ($chaves ==  0) { //Verifica a exist^ncia de registros iguais
 } else {
 //******************************************************************
 //Se já existir algum registro com esse nome
-echo '<script language="JavaScript1.2" type="text/javascript">
+echo '<script type="text/javascript">
                     alertaAviso("Já existe uma função com esse nome","unica","erro","'.Sessao::getId().'");
                     window.location = "incluiClassificacao.php?'.Sessao::getId().'";
                     </script>';

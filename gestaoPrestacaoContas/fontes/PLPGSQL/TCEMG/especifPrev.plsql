@@ -30,39 +30,63 @@
     * @package URBEM
     * @subpackage
 
-    $Id: especifPrev.plsql 61835 2015-03-09 14:28:12Z michel $
+    $Id: especifPrev.plsql 62821 2015-06-24 14:24:21Z jean $
 */
-CREATE OR REPLACE FUNCTION tcemg.especifPrev(stExercicio varchar, dtInicio varchar, dtFinal varchar, stEntidades varchar, stRpps varchar) returns RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.especifPrev(stExercicio varchar, dtInicio varchar, dtFinal varchar, stEntidades varchar) RETURNS SETOF RECORD AS $$
 DECLARE
 	stSql varchar;
 	reRegistro RECORD;
-BEGIN
-	stSql := 'SELECT  stn.pl_saldo_contas (   '|| quote_literal(stExercicio) ||'
-                            , '|| quote_literal(dtInicio) ||'
-                            , '|| quote_literal(dtFinal) ||'
-                            , '' ( plano_conta.cod_estrutural like ''''1.1.1.1.1.50%'''' OR plano_conta.cod_estrutural like ''''1.1.4%'''' )''
-                            , '|| quote_literal(stEntidades) ||'
-                            , '|| quote_literal(stRpps) ||'
-		    ) as aplicacoes_financeiras
-			,      stn.pl_saldo_contas (     '|| quote_literal(stExercicio) ||'
-                            , '|| quote_literal(dtInicio) ||'
-                            , '|| quote_literal(dtFinal) ||'
-                            , '' plano_conta.cod_estrutural like ''''1.1.1.1.1%'''' ''
-                            , '|| quote_literal(stEntidades) ||'
-                            , '|| quote_literal(stRpps) ||'
-		    ) as caixa
-            ,      stn.pl_saldo_contas (     '|| quote_literal(stExercicio) ||'
-                            , '|| quote_literal(dtInicio) ||'
-                            , '|| quote_literal(dtFinal) ||'
-                            , '' plano_conta.cod_estrutural like ''''1.1.1.1.1.06%'''' ''
-                            , '|| quote_literal(stEntidades) ||'
-                            , '|| quote_literal(stRpps) ||'
-		    ) as banco';
+
+    BEGIN
+
+    stSql := 'CREATE TEMPORARY TABLE tmp_balancete_verificacao AS (
+                SELECT *
+
+                  FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||',
+                                                                 ''cod_entidade IN (' || stEntidades || ')'',
+                                                                 '|| quote_literal(dtInicio) ||',
+                                                                 '|| quote_literal(dtFinal) ||',
+                                                                 ''A''
+                                                                ) AS balancete
+                        (
+                            cod_estrutural         VARCHAR,
+                            nivel                  INTEGER,
+                            nom_conta              VARCHAR,
+                            cod_sistema            INTEGER,
+                            indicador_superavit    CHAR(12),
+                            vl_saldo_anterior      NUMERIC,
+                            vl_saldo_debitos       NUMERIC,
+                            vl_saldo_creditos      NUMERIC,
+                            vl_saldo_atual         NUMERIC
+                        )
+            )
+        ';
+
+    EXECUTE stSql;
+
+    stSql := ' SELECT
+                (
+                (SELECT COALESCE(SUM(vl_saldo_atual),0.00) FROM tmp_balancete_verificacao WHERE cod_estrutural ilike ''1.1.1.1.1.50.00.00.00.00'')
+                +
+                (SELECT COALESCE(SUM(vl_saldo_atual),0.00) FROM tmp_balancete_verificacao WHERE cod_estrutural ilike ''1.1.4.0.0.00.00.00.00.00'')
+                ) AS aplicacoes_financeiras,
+                
+                (SELECT COALESCE(SUM(vl_saldo_atual),0.00) FROM tmp_balancete_verificacao WHERE cod_estrutural ilike ''1.1.1.1.1.00.00.00.00.00''
+                ) AS caixa,
+
+                (SELECT COALESCE(SUM(vl_saldo_atual),0.00) FROM tmp_balancete_verificacao WHERE cod_estrutural ilike ''1.1.1.1.1.06.00.00.00.00''
+                ) AS banco
+            ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
-        RETURN reRegistro;
+        RETURN NEXT reRegistro;
     END LOOP;
+
+
+    DROP TABLE tmp_balancete_verificacao;
+
+    RETURN;
 
 END;
 $$ LANGUAGE 'plpgsql';

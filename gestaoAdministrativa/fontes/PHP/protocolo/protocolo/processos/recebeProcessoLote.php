@@ -32,7 +32,7 @@
 
   Casos de uso: uc-01.06.98
 
-  $Id: recebeProcessoLote.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: recebeProcessoLote.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -70,7 +70,7 @@ if ($ctrl == 2) {
 }
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function zebra(id, classe)
     {
        var tabela = document.getElementById(id);

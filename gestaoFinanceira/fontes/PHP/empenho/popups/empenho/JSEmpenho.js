@@ -49,7 +49,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inCodEmpenho,stBeneficiario){
     window.opener.parent.frames['telaPrincipal'].document.<?=$_REQUEST['nomForm']?>.<?=$_REQUEST['campoNum']?>.value = inCodEmpenho;

@@ -53,19 +53,19 @@ function FTCEMGComparativoPL()
 
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
     $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('periodo'           ,'integer',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
-        SELECT mes
-             , valor
+        SELECT periodo
+             , REPLACE(ROUND(valor,2)::TEXT,'.','') AS valor
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
+                                     , ".$this->getDado("periodo")."
                                      ) AS retorno(
-                                                  mes       INTEGER,
+                                                  periodo   INTEGER ,
                                                   valor     NUMERIC
                                                  )";
 

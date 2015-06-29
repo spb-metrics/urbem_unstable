@@ -149,7 +149,7 @@ $descricao = pegaDado("descricao","cse.programa_social","
              Where cod_programa = '".$codPrograma."' And exercicio = '".$exercicio."' ");
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -273,7 +273,7 @@ case 2:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

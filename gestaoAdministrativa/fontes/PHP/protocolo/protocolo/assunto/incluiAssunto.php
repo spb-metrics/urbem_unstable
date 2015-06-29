@@ -90,7 +90,7 @@ switch ($ctrl) {
     case 0:
         $montaDocs = $inclui->listaDocumentos();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function Valida()
 {
         var mensagem = "";
@@ -222,13 +222,13 @@ case 1:
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $inclui->codigo);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$inclui->nome.'","incluir","aviso", "'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&ctrl=0&codClass='.$codClass.'");
             </script>';
         } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$inclui->nome.'","n_incluir","erro", "'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&ctrl=0&codClass='.$codClass.'");
             </script>';

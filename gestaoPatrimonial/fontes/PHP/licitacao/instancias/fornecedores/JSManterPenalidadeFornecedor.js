@@ -45,7 +45,7 @@ $Log:
 
 */
 ?>
-<script language="javaScript">
+<script type="text/javascript">
 
 function limpaFormularioPenalidadeExtra(){
 	frm.stObservacao.value = '';

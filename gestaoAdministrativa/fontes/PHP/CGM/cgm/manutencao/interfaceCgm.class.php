@@ -35,7 +35,7 @@
 
 * Casos de uso: uc-01.02.92, uc-01.02.93
 
-  $Id: interfaceCgm.class.php 60504 2014-10-24 15:51:44Z michel $
+  $Id: interfaceCgm.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -192,7 +192,7 @@ Monta o formulário de busca por CGM
     public function formBuscaCgm($action="",$ctrl=0,$formAcao="")
     {
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     //A função Valida() faz a verfificação dos campos, monte-a conforme a sua necessidade.
     function Valida()
@@ -316,7 +316,7 @@ if ($formAcao == "CGA") {
         </tr>
     </table>
     </form>
-    <script language='javascript'>
+    <script type='text/javascript'>
     <!--
         document.frm.numCgm.focus();
     //-->
@@ -330,7 +330,7 @@ Monta o formulário de busca por CGM
     public function formBuscaCgmConverte($action="",$ctrl=0,$formAcao="")
     {
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     //A função Valida() faz a verfificação dos campos, monte-a conforme a sua necessidade.
     function Valida()
@@ -418,7 +418,7 @@ if ($formAcao == "CGA") {
         </tr>
     </table>
     </form>
-    <script language='javascript'>
+    <script type='text/javascript'>
     <!--
         document.frm.numCgm.focus();
     //-->
@@ -464,7 +464,7 @@ Recebe os dados em forma de matriz
         }
         $cont = $paginacao->contador();
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function excluirCgm(cgm)
             {
                 var bem = cgm;
@@ -488,11 +488,11 @@ Recebe os dados em forma de matriz
         $msg = urlencode("Nenhum registro encontrado! Deseja fazer uma busca por CGA?");
         if ( $dbEmp->eof() ) {
             if ($_GET['volta'] == 'true') {
-                echo    "<script language='javascript'>
+                echo    "<script type='text/javascript'>
                             mudaTelaPrincipal('".$_SERVER['PHP_SELF']."?".Sessao::getId()."');
                         </script>";
             } elseif ( $dbEmp->eof() and $formulario != "cga" ) {
-               echo '<script language="JavaScript1.2" type="text/javascript">
+               echo '<script type="text/javascript">
                        alertaQuestao("'.CAM_CGM.'cgm/manutencao/buscaCga.php?'.Sessao::getId().'&stDescQuestao='.$msg.'","controle","'.$ctrl.'","","unica","'.Sessao::getId().'");
                       document.location = "'.$_SERVER['PHP_SELF'].'?'.Sessao::getId().'";
                       </script>';
@@ -1097,7 +1097,7 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
             }
         }
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function habilitaEnderecoCorrespondencia()
             {
                 if ( document.getElementById('endCorresp').style.display=="none" ) {
@@ -2665,7 +2665,7 @@ if ($stAcao == "inclui") {
         </tr>
     </table>
     </form>
-    <script language='javascript'>
+    <script type='text/javascript'>
     <!--
         document.frm.nomCgm.focus();
     //-->
@@ -2849,7 +2849,7 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
             }
         }
 ?>
-    <script language="JavaScript">
+    <script type="text/javascript">
     <!--
     function Voltar()
     {
@@ -3167,7 +3167,7 @@ Monta tela com os dados do CGM a ser excluido
 
         }
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function excluirCgm()
             {
                 var cgm = <?=$numCgm;?>;
@@ -3346,7 +3346,7 @@ Monta tela com os dados do CGA
             }
         }
 ?>
-    <script language="JavaScript">
+    <script type="text/javascript">
     <!--
     function Voltar()
     {

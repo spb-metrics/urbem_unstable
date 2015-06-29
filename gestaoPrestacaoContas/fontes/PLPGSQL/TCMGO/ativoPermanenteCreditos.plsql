@@ -26,10 +26,10 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 61679 $
+* $Revision: 62759 $
 * $Name$
-* $Author: evandro $
-* $Date: 2015-02-25 10:07:38 -0300 (Qua, 25 Fev 2015) $
+* $Author: jean $
+* $Date: 2015-06-16 15:00:15 -0300 (Ter, 16 Jun 2015) $
 *
 * Casos de uso: uc-02.02.11
 */
@@ -58,12 +58,13 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (varchar, varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stFiltro            ALIAS FOR $2;
     stDtInicial         ALIAS FOR $3;
     stDtFinal           ALIAS FOR $4;    
+    stCodEntidades      ALIAS FOR $5;
     stSql               VARCHAR   := '';
     stSqlComplemento    VARCHAR   := '';
     reRegistro          RECORD;
@@ -204,20 +205,20 @@ BEGIN
                      pc.cod_estrutural
                     ,publico.fn_nivel(pc.cod_estrutural) as nivel
                     ,pc.nom_conta
-                    , ( SELECT LPAD(tcmgo.orgao.num_orgao::VARCHAR, 2, ''0'') AS cod_orgao
-                        FROM orcamento.orgao
-                        INNER JOIN tcmgo.orgao
-                             ON tcmgo.orgao.num_orgao = orcamento.orgao.num_orgao
-                            AND tcmgo.orgao.exercicio = orcamento.orgao.exercicio
-                        WHERE tcmgo.orgao.exercicio = ' || quote_literal(stExercicio) || '
-                    ) AS num_orgao
-                    , ( SELECT LPAD(unidade.num_unidade::VARCHAR, 2, ''0'') AS cod_orgao
-                        FROM orcamento.unidade
-                        INNER JOIN tcmgo.orgao
-                             ON tcmgo.orgao.num_orgao = orcamento.unidade.num_orgao
-                            AND tcmgo.orgao.exercicio = orcamento.unidade.exercicio
-                        WHERE tcmgo.orgao.exercicio = ' || quote_literal(stExercicio) || '
-                    ) AS cod_unidade
+                    ,(
+                        SELECT SUBSTRING(valor,1,2)
+                        FROM administracao.configuracao_entidade
+                        WHERE cod_entidade = valor_lancamento.cod_entidade
+                        AND exercicio = ''' || stExercicio || ''' 
+                        AND cod_modulo = 42
+                    )::VARCHAR AS num_orgao
+                    ,(
+                        SELECT SUBSTRING(valor,3,2)
+                        FROM administracao.configuracao_entidade
+                        WHERE cod_entidade = valor_lancamento.cod_entidade
+                        AND exercicio = ''' || stExercicio || ''' 
+                        AND cod_modulo = 42
+                    )::VARCHAR AS cod_unidade
                     ,0.00 as vl_saldo_anterior
                     ,0.00 as vl_saldo_debitos
                     ,0.00 as vl_saldo_creditos
@@ -225,19 +226,36 @@ BEGIN
                     ,sc.nom_sistema
                     ,ba.tipo_lancamento
                 FROM
-                    contabilidade.plano_conta      as pc
+                    contabilidade.plano_conta as pc
 
                 INNER JOIN contabilidade.sistema_contabil as sc
-                     ON pc.cod_sistema = sc.cod_sistema
-                    AND pc.exercicio   = sc.exercicio
+                        ON pc.cod_sistema = sc.cod_sistema
+                       AND pc.exercicio   = sc.exercicio
 
                 INNER JOIN contabilidade.plano_analitica  as c_pa
-                     ON c_pa.cod_conta = pc.cod_conta
-                    AND c_pa.exercicio = pc.exercicio
+                        ON c_pa.cod_conta = pc.cod_conta
+                       AND c_pa.exercicio = pc.exercicio
 
-                INNER JOIN tcmgo.balanco_apcaaaa          as ba
-                     ON ba.cod_plano   = c_pa.cod_plano
-                    AND ba.exercicio   = c_pa.exercicio
+                LEFT JOIN tcmgo.balanco_apcaaaa          as ba
+                       ON ba.cod_plano   = c_pa.cod_plano
+                      AND ba.exercicio   = c_pa.exercicio
+
+                INNER JOIN (SELECT exercicio, cod_entidade, tipo, cod_lote, sequencia, tipo_valor, cod_plano
+                              FROM contabilidade.conta_credito
+                             UNION
+                            SELECT exercicio, cod_entidade, tipo, cod_lote, sequencia, tipo_valor, cod_plano
+                              FROM contabilidade.conta_debito
+                        ) AS contas
+                        ON contas.cod_plano = c_pa.cod_plano
+                       AND contas.exercicio = c_pa.exercicio
+
+                INNER JOIN contabilidade.valor_lancamento
+                        ON valor_lancamento.cod_entidade = contas.cod_entidade
+                       AND valor_lancamento.exercicio = contas.exercicio
+                       AND valor_lancamento.tipo = contas.tipo
+                       AND valor_lancamento.cod_lote = contas.cod_lote
+                       AND valor_lancamento.sequencia = contas.sequencia
+                       AND valor_lancamento.tipo_valor = contas.tipo_valor
                 
                 WHERE pc.exercicio = ' || quote_literal(stExercicio) || '
                     

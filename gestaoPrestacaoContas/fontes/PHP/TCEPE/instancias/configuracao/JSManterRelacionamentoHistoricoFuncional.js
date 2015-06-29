@@ -26,7 +26,7 @@
 <?php
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpaLista(){  
     $('inCodMovimentacao').value = '';

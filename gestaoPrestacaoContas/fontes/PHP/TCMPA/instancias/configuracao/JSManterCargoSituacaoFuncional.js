@@ -23,7 +23,7 @@
 */
 </script>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function marcaArraySelecionados()
 {

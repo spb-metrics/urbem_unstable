@@ -304,7 +304,7 @@ function montaHtml()
     $this->obTabela->montaHtml();
     $stHtml = $this->obTabela->getHtml() ;
 
-    $stHtml .= "<script type=\"text/javascript\" language=\"javascript\">\r\n";
+    $stHtml .= "<script type=\"text/javascript\" >\r\n";
     $stHtml .= "\tSortable.create('" . $this->getId() . "',
                                     {  dropOnEmpty:true,
                                         containment:[\"" . $this->getId() . "\",\"" . $this->getId() . "_2\"],

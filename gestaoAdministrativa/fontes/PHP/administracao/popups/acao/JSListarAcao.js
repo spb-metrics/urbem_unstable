@@ -39,7 +39,7 @@ $Date: 2006-09-18 13:25:02 -0300 (Seg, 18 Set 2006) $
 Casos de uso: uc-01.03.93
 */
 ?>
-<script language='javascript'>
+<script type='text/javascript'>
 function retornaAcao(inCodigoAcao, stNomeAcao ){
     window.opener.parent.frames['telaPrincipal'].document.<?=$stNomeForm?>.<?=$stCampoNum?>.value = inCodigoAcao;
 <?if($stCampoNom){?>

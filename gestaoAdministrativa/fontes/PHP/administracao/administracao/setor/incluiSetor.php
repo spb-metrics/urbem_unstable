@@ -63,7 +63,7 @@ case 0:
     $stCodUnidade = $_REQUEST['stCodUnidade'];
     $stCodDpto = $_REQUEST['stCodDpto'];
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function validaOrganograma(iCod,campo,campoCod,stItemMsg)
     {
         var cod = iCod;
@@ -480,7 +480,7 @@ if (comparaValor("nom_setor", $nomSetor, "administracao.setor", "and cod_orgao =
             if ($arCodSetor[0]) {
                 $stCodSetor = $arCodSetor[1];
             }
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                     alertaAviso("'.$stCodSetor.' - '.$nomSetor.'","incluir","aviso","'.Sessao::getId().'");
                  </script>';
             //Limpa o formulário para nova inclusão
@@ -491,14 +491,14 @@ if (comparaValor("nom_setor", $nomSetor, "administracao.setor", "and cod_orgao =
             executaFrameOculto($js);
 
     } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomSetor.'","n_incluir","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("O Setor '.$nomSetor.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");
@@ -605,7 +605,7 @@ case 4:
     $dbConfig->fechaBd();
 
     if ($usuarioResponsavel == "") {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
                     alertaAviso("Código de Usuário invalido ('.$usuarioNumCgm.')","unica","erro","'.Sessao::getId().'");
               </script>';
     }

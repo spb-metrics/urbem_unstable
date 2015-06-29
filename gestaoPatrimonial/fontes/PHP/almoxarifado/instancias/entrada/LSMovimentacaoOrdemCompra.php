@@ -31,7 +31,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Girardi dos Santos
 
-    $Id: LSMovimentacaoOrdemCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSMovimentacaoOrdemCompra.php 62703 2015-06-10 13:29:57Z michel $
 
     */
 
@@ -151,7 +151,7 @@ $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
-$obLista->ultimoDado->setCampo( "[cod_autorizacao]/[exercicio]" );
+$obLista->ultimoDado->setCampo( "cod_autorizacao" );
 $obLista->commitDado();
 
 $obLista->addDado();

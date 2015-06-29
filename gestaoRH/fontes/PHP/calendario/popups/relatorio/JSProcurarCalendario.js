@@ -52,7 +52,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript1.3">
+<script type="text/javascript">
 function insere(inCodigo,stDescricao){
     window.opener.parent.frames['telaPrincipal'].document.getElementById('stDescricao').innerHTML = stDescricao; 
     window.opener.parent.frames['telaPrincipal'].document.frm.inCodCalendar.value = inCodigo; 

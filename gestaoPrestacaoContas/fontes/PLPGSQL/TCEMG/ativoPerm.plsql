@@ -32,18 +32,16 @@ Arquivo de mapeamento para a função que busca os dados de variação patrimoni
     $Id:$
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_ativo_perm(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_ativo_perm(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
+    stDataInicial       ALIAS FOR $3;
+    stDataFinal         ALIAS FOR $4;
     stSql               VARCHAR := '';
     reRegistro          RECORD;
 
 BEGIN 
-
-
-
 
 CREATE TEMPORARY TABLE tmp_arquivo (
           mes                  INTEGER
@@ -57,8 +55,6 @@ CREATE TEMPORARY TABLE tmp_arquivo (
         , codTipo              INTEGER
 
     );
-
-
 
 stSql := '
 INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal,valorDivAtiva)VALUES(12,
@@ -74,6 +70,7 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
             ,contabilidade.lote             as lo
         WHERE   pc.cod_conta = pa.cod_conta
         AND     pc.exercicio = pa.exercicio
+        AND     pc.indicador_superavit = ''permanente''
         AND     pa.cod_plano = cd.cod_plano
         AND     pa.exercicio = cd.exercicio
         AND     cd.cod_lote  = vl.cod_lote
@@ -82,7 +79,6 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -93,10 +89,10 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     lo.dt_lote BETWEEN TO_DATE(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDataFinal || ''', ''dd/mm/yyyy'')
+        AND     pc.exercicio  = '''||stExercicio||'''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''1.4.2.1.2.00.00.00.00.00''),
+        AND     cod_estrutural like  ''1.2.3.1%''),
 
  (SELECT
             coalesce(sum(vl.vl_lancamento),0.00)
@@ -109,6 +105,7 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
             ,contabilidade.lote             as lo
         WHERE   pc.cod_conta = pa.cod_conta
         AND     pc.exercicio = pa.exercicio
+        AND     pc.indicador_superavit = ''permanente''
         AND     pa.cod_plano = cd.cod_plano
         AND     pa.exercicio = cd.exercicio
         AND     cd.cod_lote  = vl.cod_lote
@@ -117,7 +114,6 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -128,10 +124,10 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     lo.dt_lote BETWEEN TO_DATE(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDataFinal || ''', ''dd/mm/yyyy'')
+        AND     pc.exercicio  = '''||stExercicio||'''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''1.4.2.1.1.00.00.00.00''),
+        AND     (cod_estrutural like  ''1.2.3.2%''  OR cod_estrutural like ''1.2.3.2.1.06.06%'')),
 
 
   (SELECT
@@ -145,6 +141,7 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
             ,contabilidade.lote             as lo
         WHERE   pc.cod_conta = pa.cod_conta
         AND     pc.exercicio = pa.exercicio
+        AND     pc.indicador_superavit = ''permanente''
         AND     pa.cod_plano = cd.cod_plano
         AND     pa.exercicio = cd.exercicio
         AND     cd.cod_lote  = vl.cod_lote
@@ -153,7 +150,6 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -164,10 +160,11 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     lo.dt_lote BETWEEN TO_DATE(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDataFinal || ''', ''dd/mm/yyyy'')
+        AND     pc.exercicio  = '''||stExercicio||'''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''1.4.2.1.1.91.00.00.00.00''),
+        AND     cod_estrutural like ''1.2.3.2.1.06%'' 
+        AND     cod_estrutural NOT like ''1.2.3.2.1.06.06%'' ),
 
 (SELECT
             coalesce(sum(vl.vl_lancamento),0.00)
@@ -180,6 +177,7 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
             ,contabilidade.lote             as lo
         WHERE   pc.cod_conta = pa.cod_conta
         AND     pc.exercicio = pa.exercicio
+        AND     pc.indicador_superavit = ''permanente''
         AND     pa.cod_plano = cd.cod_plano
         AND     pa.exercicio = cd.exercicio
         AND     cd.cod_lote  = vl.cod_lote
@@ -188,7 +186,6 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -199,10 +196,10 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     lo.dt_lote BETWEEN TO_DATE(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDataFinal || ''', ''dd/mm/yyyy'')
+        AND     pc.exercicio  = '''||stExercicio||'''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''1.2.2.5.0.00.00.00.00.00''),
+        AND     cod_estrutural like  ''1.4.1%''),
 
 
 (SELECT
@@ -216,6 +213,7 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
             ,contabilidade.lote             as lo
         WHERE   pc.cod_conta = pa.cod_conta
         AND     pc.exercicio = pa.exercicio
+        AND     pc.indicador_superavit = ''permanente''
         AND     pa.cod_plano = cd.cod_plano
         AND     pa.exercicio = cd.exercicio
         AND     cd.cod_lote  = vl.cod_lote
@@ -224,7 +222,6 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     cd.exercicio = vl.exercicio
         AND     cd.tipo_valor= vl.tipo_valor
         AND     cd.cod_entidade= vl.cod_entidade
-
         AND     vl.cod_lote  = la.cod_lote
         AND     vl.tipo      = la.tipo
         AND     vl.sequencia = la.sequencia
@@ -235,21 +232,15 @@ INSERT INTO tmp_arquivo(mes,valorBensMov,valorBensImo,valorObrasInst,valorTitVal
         AND     la.exercicio = lo.exercicio
         AND     la.tipo      = lo.tipo
         AND     la.cod_entidade=lo.cod_entidade
-        AND     EXTRACT(month from lo.dt_lote) = '|| inMes||'
-        AND     pc.exercicio  = ''stExercicio''  
+        AND     lo.dt_lote BETWEEN TO_DATE(''' || stDataInicial || ''', ''dd/mm/yyyy'') AND TO_DATE(''' || stDataFinal || ''', ''dd/mm/yyyy'')
+        AND     pc.exercicio  = '''||stExercicio||'''
         AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''1.2.2.1.1.00.00.00.00.00'')
-
-
+        AND     (cod_estrutural like  ''1.1.2.3%''  OR cod_estrutural like ''1.1.3.2.4%'' ))
 
 )';
-
-
 EXECUTE stSql;
 
-
-
-stSql := ' SELECT mes,COALESCE(valorBensMov, 0.00),COALESCE(valorBensImo, 0.00),COALESCE(valorObrasInst),COALESCE(valorTitVal),COALESCE(valorDivAtiva, 0.00),COALESCE(valorTransRecebidas, 0.00), COALESCE(valorReversaoRPPS, 0.00),COALESCE(codTipo, 00)   FROM tmp_arquivo; ';
+stSql := ' SELECT mes,COALESCE(valorBensMov, 0.00),COALESCE(valorBensImo, 0.00),COALESCE(valorObrasInst),COALESCE(valorTitVal),COALESCE(valorDivAtiva, 0.00),COALESCE(valorTransRecebidas, 0.00), COALESCE(valorReversaoRPPS, 0.00), 01 FROM tmp_arquivo; ';
 
 FOR reRegistro IN EXECUTE stSql
     LOOP

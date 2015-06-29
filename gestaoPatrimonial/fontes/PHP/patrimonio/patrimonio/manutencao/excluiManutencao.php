@@ -69,8 +69,8 @@ if (isset($chave)) {
     $ctrl=2;
 }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 
 switch ($ctrl) {
@@ -135,14 +135,14 @@ switch ($ctrl) {
             $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $exclui->codigo); //registra os passos no auditoria
             $audicao->insereAuditoria();
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso      ( "Bem: <?=$variaveis[0];?>" , "excluir" , "aviso" , "<?=Sessao::getId();?>"     );
                 mudaTelaPrincipal( "excluiManutencao.php?<?=Sessao::getId();?>&ctrl=1&codkey=<?=$variaveis[0];?>" );
             </script>
 <?php
         } else {
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso( "Manutenção" , "n_excluir" , "erro" , "<?=Sessao::getId();?>" );
             </script>
 <?php

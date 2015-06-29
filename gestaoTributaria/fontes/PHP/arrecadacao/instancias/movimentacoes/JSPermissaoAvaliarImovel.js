@@ -33,7 +33,7 @@
 
   * @ignore
 
-    * $Id: JSPermissaoAvaliarImovel.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSPermissaoAvaliarImovel.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.06
 **/
@@ -47,7 +47,7 @@ adicionado trecho de log do CVS
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 f
 function buscaValor(tipoBusca){

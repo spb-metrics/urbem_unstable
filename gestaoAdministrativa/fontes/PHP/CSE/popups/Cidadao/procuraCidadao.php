@@ -57,7 +57,7 @@ if (isset($pagina)) {
 switch ($ctrl) {
     case 0:{
         echo
-        "<script language='JavaScript1.2' type='text/javascript'>
+        "<script type='text/javascript'>
             function Salvar()
             {
                document.frm.flag.value=1;
@@ -110,7 +110,7 @@ switch ($ctrl) {
 
         if ($flag == 1) {
             echo
-            "<script language='JavaScript1.2' type='text/javascript'>
+            "<script type='text/javascript'>
                 function Insere(codCidadao,nomCidadao)
                 {
                     var sCodCidadao;

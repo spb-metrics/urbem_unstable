@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Tonismar Régis Bernardo
     * @ignore
 
-	* $Id: JSManterHierarquia.js 59612 2014-09-02 12:00:51Z gelson $
+	* $Id: JSManterHierarquia.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.02.02
 
@@ -46,7 +46,7 @@ adicionado trecho de log do CVS
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Cancelar(){
 <?php

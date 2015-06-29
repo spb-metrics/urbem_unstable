@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: PREmitirCarne.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PREmitirCarne.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.03.21
 **/
@@ -53,9 +53,7 @@ adicionado trecho de log do CVS
 */
 
 $obRARRCarne->listarEmissaoCarne($rsEmissaoCarne);
-//sistemaLegado::mostravar( $rsEmissaoCarne);
-//echo"finito<br>";
-//exit;
+
 if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
     $boExec = TRUE;
     $arEmissao = array();
@@ -131,7 +129,7 @@ if (!$obErro->ocorreu() ) {
 }
 
 if ($boExec) {
-    echo "<script language=\"javaScript\">\r\n";
+    echo "<script type=\"text/javascript\">\r\n";
     echo "    var sAux = window.open('".CAM_GT_ARR_INSTANCIAS."documentos/OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
     echo "    eval(sAux)\r\n";
 //    echo "parent.document.getElementById(\"oculto\").src=\"".CAM_GT_ARR_INSTANCIAS."calculo/OCImpressaoPDFEmissao.php?".Sessao::getId()."\";\r\n";

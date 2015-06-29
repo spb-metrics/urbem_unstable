@@ -59,7 +59,7 @@ if (isset($_REQUEST["pagina"])) {
 }
 ?>
 
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -142,13 +142,13 @@ case 1:
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["codHistorico"]);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("Motivo do Arquivamento: '.addslashes(urlencode($_REQUEST["nomHistorico"])).'","excluir","aviso","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';
         } else
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("Motivo do Arquivamento: '.addslashes(urlencode($_REQUEST["nomHistorico"])).'","n_excluir","erro","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';

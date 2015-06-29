@@ -40,7 +40,7 @@ Casos de uso: uc-01.05.02
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function VoltarTP(){
     document.frm.target = 'telaPrincipal';
     document.frm.action = 'LSInativarOrgao.php?<?=Sessao::getId();?>';

@@ -20,36 +20,23 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
 
- /*
     * Arquivo de geracao do arquivo deducaoReceita TCM/MG
     * Data de Criação   : 07/10/2013
     * @author Analista      Silvia
     * @author Desenvolvedor Evandro Melos
-    */
+*/
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDeducaoReceita.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDeducaoReceita.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $inMes = $arFiltros['inPeriodo'];
-
-    if ($inMes < 10) {
-        $inMes = "0".$inMes;
-    }
-
-    $dt_inicial = "01/".$inMes."/".Sessao::read('exercicio');
-    $dt_final = SistemaLegado::retornaUltimoDiaMes($inMes,Sessao::read('exercicio'));
-
+    //Arquivo só é gerado no ultimo bimestre valor do "mes" fixo em 12 com data do inicio do exercicio e data final do exercicio
     $obFTCEMGDeducaoReceita = new FTCEMGDeducaoReceita();
-
-    $obFTCEMGDeducaoReceita->setDado('exercicio'    , Sessao::read('exercicio'));
+    $obFTCEMGDeducaoReceita->setDado('exercicio'    , Sessao::read('exercicio')     );
     $obFTCEMGDeducaoReceita->setDado('cod_entidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDeducaoReceita->setDado('dt_inicial' , $dt_inicial);
-    $obFTCEMGDeducaoReceita->setDado('dt_final'   , $dt_final);
+    $obFTCEMGDeducaoReceita->setDado('dt_inicial'   , "01/01/".Sessao::getExercicio() );
+    $obFTCEMGDeducaoReceita->setDado('dt_final'     , "31/12/".Sessao::getExercicio() );
 
     $obFTCEMGDeducaoReceita->recuperaTodos($rsDeducoesReceita);
 
@@ -66,4 +53,5 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+
 ?>

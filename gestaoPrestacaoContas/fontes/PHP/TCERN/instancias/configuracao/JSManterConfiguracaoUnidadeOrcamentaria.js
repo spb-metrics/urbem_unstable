@@ -46,7 +46,7 @@ $Log$
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
     function limparResponsavel(){
         document.getElementById( 'stNomCGM' ).innerHTML = '&nbsp;';
         document.getElementById( 'inNumCGM' ).value = '';

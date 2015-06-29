@@ -159,7 +159,7 @@ switch ($ctrl) {
     // exibe formulario para insercao de Grupo
     case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -356,7 +356,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
 
         if ($depreciacao > 100.00) {
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("Depreciação não pode ser superior a 100%","n_incluir","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("incluiGrupo.php?'.Sessao::getId().'&codNatureza='.$codNatureza.'");
                </script>';
@@ -372,7 +372,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
                 $audicao->insereAuditoria();
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","incluir","aviso","'.Sessao::getId().'");
                         mudaTelaPrincipal("incluiGrupo.php?'.Sessao::getId().'");
                     </script>';
@@ -380,7 +380,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
              } else {
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$insert.'","n_incluir","erro","'.Sessao::getId().'");
                         mudaTelaPrincipal("incluiGrupo.php?'.Sessao::getId().'");
                     </script>';
@@ -389,7 +389,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
         }//Se já existir algum registro com esse nome
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("Já existe um Grupo com esse nome","unica","erro","'.Sessao::getId().'");
                     window.location = "incluiGrupo.php?'.Sessao::getId().'&nomGrupo='.$nomGrupo.'&codNatureza='.$codNatureza.'";
                 </script>';

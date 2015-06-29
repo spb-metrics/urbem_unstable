@@ -33,10 +33,10 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: ABL.inc.php 62359 2015-04-28 19:03:01Z carlos.silva $
-    * $Rev: 62359 $
-    * $Author: carlos.silva $
-    * $Date: 2015-04-28 16:03:01 -0300 (Ter, 28 Abr 2015) $
+    * $Id: ABL.inc.php 62729 2015-06-12 14:33:19Z jean $
+    * $Rev: 62729 $
+    * $Author: jean $
+    * $Date: 2015-06-12 11:33:19 -0300 (Sex, 12 Jun 2015) $
 
 */
 
@@ -392,19 +392,20 @@ if ( count($rsRecordSetABL10->getElementos()) > 0) {
 }
     
 //tipo99
-$arTemp[0] = array( 'tipo_registro'=> 99, 'brancos'=> '', 'nro_sequencial' => $inCount++ );
+$arTemp[0] = array( 'tipo_registro'=> 99, 'brancos'=> '', 'nro_sequencial' => $i+1 );
       
 $arRecordSet[$stArquivo] = new RecordSet();
 $arRecordSet[$stArquivo]->preenche( $arTemp );
+$inEspacoBranco = (Sessao::getExercicio() >= "2014") ? 1026 : 389;
     
 $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    
+
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(389);
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo($inEspacoBranco);
     
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

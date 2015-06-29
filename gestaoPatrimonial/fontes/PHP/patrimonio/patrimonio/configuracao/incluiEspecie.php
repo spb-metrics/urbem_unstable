@@ -111,7 +111,7 @@ switch ($ctrl) {
     //formulario para insercao da Especie com filtro por Natureza->Grupo
     case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -364,14 +364,14 @@ switch ($ctrl) {
                 $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $objeto);
                 $audicao->insereAuditoria();
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","incluir","aviso","'.Sessao::getId().'");
                         mudaTelaPrincipal("incluiEspecie.php?'.Sessao::getId().'");
                     </script>';
 
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","n_incluir","erro","'.Sessao::getId().'");
                         mudaTelaPrincipal("incluiEspecie.php?'.Sessao::getId().'");
                     </script>';
@@ -391,7 +391,7 @@ switch ($ctrl) {
 
             if ($cons != 0) {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Erro no cadastro de Atributos","unica","erro","'.Sessao::getId().'");
                         window.location = "incluiEspecie.php?'.Sessao::getId().'";
                     </script>';
@@ -401,7 +401,7 @@ switch ($ctrl) {
         } else {
             //Se já existir algum registro com esse nome
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("Já existe uma espécie com esse nome","unica","erro","'.Sessao::getId().'");
                     window.location = "incluiEspecie.php?'.Sessao::getId().'&nomEspecie='.$nomEspecie.'&codGrupo='.$codGrupo.'&codNatureza='.$codNatureza.'";
                 </script>';

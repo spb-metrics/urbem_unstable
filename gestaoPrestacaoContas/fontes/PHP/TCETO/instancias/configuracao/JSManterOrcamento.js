@@ -29,10 +29,10 @@
 
     * @author Analista: Silvia Martins Silva
     * @author Desenvolvedor: Michel Teixeira
-    * $Id: JSManterOrcamento.js 60778 2014-11-14 17:55:19Z evandro $
+    * $Id: JSManterOrcamento.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

@@ -49,52 +49,19 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script>
 
-function buscaValor(tipoBusca){
-    if( tipoBusca == 'submeter' || tipoBusca == 'verificarEventosSelecionados' ){
-        selecionaTodosSelect(document.frm.inCodEventoSelecionados);
-    }
-    stAction = document.frm.action; 
-    document.frm.stCtrl.value = tipoBusca;
-    document.frm.action = '<?=$pgOculF;?>?<?=Sessao::getId();?>'
-    document.frm.submit();
-    document.frm.action = stAction;
-}
-
-function excluirContrato( inId ){
-    stAction = document.frm.action;
-    document.frm.stCtrl.value = 'excluirContrato';
-    document.frm.action = '<?=$pgOculF;?>?<?=Sessao::getId();?>?&inId='+inId;
-    document.frm.submit();
-    document.frm.action = stAction;
-}
-
-function validaQuantidadeEventos(){
-    obEventosSelecionados = document.frm.inCodEventoSelecionados;
-    obEventosDisponiveis  = document.frm.inCodEventoDisponiveis;
-    inQtnEventos = <?=Sessao::read('inQtnEventos')?>;
-    if( obEventosSelecionados.length > inQtnEventos ){   
-        ini  = obEventosSelecionados.length-1;
-        arEventosDisponiveis = new Array();
-        while ( ini >= inQtnEventos ){
-            arEventosDisponiveis.unshift(obEventosSelecionados[ini]);
-            ini--;
-        }
-        for(ini=0;ini<=obEventosDisponiveis.length;ini++){
-            arEventosDisponiveis.unshift(obEventosDisponiveis[ini]);
-        }
-        if( obEventosDisponiveis.length == 0 ){
-            arEventosDisponiveis.shift();
+function validaSelectMultiplo(){
+    var valida = true;
+    jQuery("select[name$='Selecionados[]']").each(function(){        
+        if (this.length == 0) {            
+            valida = false;
         }else{
-            limpaSelect(obEventosDisponiveis,0);        
-            arEventosDisponiveis.reverse();
+            for(var inCount=0; inCount < this.length; inCount++){
+                this.options[ inCount ].selected = true;
+            }    
         }
-        for(ini=0;ini<=arEventosDisponiveis.length;ini++){
-            obEventosDisponiveis[ini] = arEventosDisponiveis[ini];
-        }
-        alertaAviso('@Podem ser selecionados no máximo 7 eventos.','form','erro','<?=Sessao::getId();?>');
-    }
+    });
+    return valida;
 }
-
 </script>

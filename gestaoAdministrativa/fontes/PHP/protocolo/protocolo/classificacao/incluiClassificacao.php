@@ -53,7 +53,7 @@ if (!(isset($_REQUEST["ctrl"]))) {
 switch ($ctrl) {
 case 0:
 ?>
-   <script language="JavaScript1.2" type="text/javascript">
+   <script type="text/javascript">
 
       function Valida()
       {
@@ -124,12 +124,12 @@ if ($ok) { //Verifica a existência de registros iguais
         $audicao = new auditoriaLegada;
         $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["nomClassificacao"]);
         $audicao->insereAuditoria();
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("'.$_REQUEST["nomClassificacao"].'","incluir","aviso", "'.Sessao::getId().'");
         window.location = "incluiClassificacao.php?'.Sessao::getId().'";
         </script>';
     } else {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("'.$_REQUEST["nomClassificacao"].'","n_incluir","aviso", "'.Sessao::getId().'");
         window.location = "incluiClassificacao.php?'.Sessao::getId().'";
         </script>';

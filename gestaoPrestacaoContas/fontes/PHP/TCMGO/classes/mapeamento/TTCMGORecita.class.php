@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGORecita.class.php 61770 2015-03-03 13:26:42Z evandro $
+    $Id: TTCMGORecita.class.php 62735 2015-06-12 20:51:43Z arthur $
 
     * Casos de uso: uc-06.04.00
 */
@@ -281,7 +281,7 @@ class TTCMGOReceita extends TOrcamentoContaReceita
     {
 
         $stSQL = "
-                    select '10'                as tipo_registro
+                    SELECT '10' AS tipo_registro
                          , orgao_plano_banco.num_orgao   as cod_orgao
                          , receita.cod_receita
                          , CASE WHEN substr(conta_receita.cod_estrutural, 1, 1) = '9'
@@ -292,59 +292,69 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                          , receita.exercicio
                          , conta_receita.descricao
                          , CASE WHEN receita.vl_original < 0.00 THEN (receita.vl_original * -1) ELSE receita.vl_original END AS vl_original
-                         , ABS(sum (arrecadacao_receita.vl_arrecadacao)
-                        ----- descontando os valores estornados
-                           - (  coalesce(
-                                         ( select sum ( arrecadacao_estornada_receita.vl_estornado)
-                                             from tesouraria.arrecadacao_estornada_receita
-                                            where arrecadacao_estornada_receita.cod_receita = receita.cod_receita
-                                              and arrecadacao_estornada_receita.exercicio   = receita.exercicio
-                                         ), 0 )  ))
-                            as vl_arrecadacao_mes
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
+                         , ABS((
+                                SELECT COALESCE(sum ( arrecadacao_receita.vl_arrecadacao),0) - COALESCE(sum(arrecadacao_estornada_receita.vl_estornado),0)
+                                  FROM tesouraria.arrecadacao_receita
+                              
+                             LEFT JOIN tesouraria.arrecadacao_estornada_receita
+                                    ON arrecadacao_estornada_receita.cod_arrecadacao       = arrecadacao_receita.cod_arrecadacao
+                                   AND arrecadacao_estornada_receita.cod_receita           = arrecadacao_receita.cod_receita
+                                   AND arrecadacao_estornada_receita.exercicio             = arrecadacao_receita.exercicio
+                                   AND arrecadacao_estornada_receita.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
 
-                         , ABS(coalesce(
-                           ( select sum ( arrecadacao_receita.vl_arrecadacao)
-                               from tesouraria.arrecadacao_receita
-                              where arrecadacao_receita.cod_receita = receita.cod_receita
-                                and arrecadacao_receita.exercicio   = receita.exercicio
-                                and to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') <= to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
-                            ), 0 )) as vl_arrecadacao_ate
-                      from orcamento.receita
-                      join orcamento.conta_receita
-                        on ( receita.exercicio = conta_receita.exercicio
-                       and   receita.cod_conta = conta_receita.cod_conta )
-                      join tesouraria.arrecadacao_receita
-                        on ( receita.cod_receita = arrecadacao_receita.cod_receita
-                       and   receita.exercicio   = arrecadacao_receita.exercicio )
-                      join tesouraria.arrecadacao
-                        on ( arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
-                       and   arrecadacao_receita.exercicio              = arrecadacao.exercicio
-                       and   arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao )
-                      join contabilidade.plano_analitica
-                        on ( arrecadacao.cod_plano = plano_analitica.cod_plano
-                       and   arrecadacao.exercicio = plano_analitica.exercicio )
-                      join tcmgo.orgao_plano_banco
-                        on ( plano_analitica.cod_plano = orgao_plano_banco.cod_plano
-                       and   plano_analitica.exercicio = orgao_plano_banco.exercicio )
+                                 WHERE arrecadacao_receita.cod_receita = receita.cod_receita
+                                   AND arrecadacao_receita.exercicio   = receita.exercicio
+                                   AND TO_DATE(arrecadacao_receita.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') <= TO_DATE( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
+                            )) AS vl_arrecadacao_ate
+                      
+                      FROM orcamento.receita
+                
+                INNER JOIN orcamento.conta_receita
+                        ON receita.exercicio = conta_receita.exercicio
+                       AND receita.cod_conta = conta_receita.cod_conta
+                      
+                INNER JOIN tesouraria.arrecadacao_receita
+                        ON receita.cod_receita = arrecadacao_receita.cod_receita
+                       AND receita.exercicio   = arrecadacao_receita.exercicio
+                       AND to_date(arrecadacao_receita.timestamp_arrecadacao::VARCHAR,'yyyy-mm-dd') BETWEEN TO_DATE( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND TO_DATE( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
+                
+                INNER JOIN tesouraria.arrecadacao
+                        ON arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
+                       AND arrecadacao_receita.exercicio              = arrecadacao.exercicio
+                       AND arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao
+                
+                INNER JOIN contabilidade.plano_analitica
+                        ON arrecadacao.cod_plano = plano_analitica.cod_plano
+                       AND arrecadacao.exercicio = plano_analitica.exercicio
+                
+                INNER JOIN tcmgo.orgao_plano_banco
+                        ON plano_analitica.cod_plano = orgao_plano_banco.cod_plano
+                       AND plano_analitica.exercicio = orgao_plano_banco.exercicio
                        
-                     where arrecadacao_receita.exercicio = '".Sessao::getExercicio() . "'
-                      and to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )";
+                 LEFT JOIN tesouraria.arrecadacao_estornada_receita
+		        ON arrecadacao_estornada_receita.cod_arrecadacao       = arrecadacao_receita.cod_arrecadacao
+		       AND arrecadacao_estornada_receita.cod_receita           = arrecadacao_receita.cod_receita
+		       AND arrecadacao_estornada_receita.exercicio             = arrecadacao_receita.exercicio
+		       AND arrecadacao_estornada_receita.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
+                       AND TO_DATE(arrecadacao_estornada_receita.timestamp_estornada::VARCHAR,'yyyy-mm-dd') BETWEEN TO_DATE( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND TO_DATE( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
+                       
+                     WHERE arrecadacao_receita.exercicio = '".Sessao::getExercicio() . "'";
+        
         if ( $this->getDado ( 'stEntidades' ) ) {
-            $stSQL .= "\n  and receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ") ";
+            $stSQL .= "\n  AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ") ";
         }
 
         $stSQL .= "\n
-
-                     group by tipo_registro
+                    GROUP BY tipo_registro
                             , cod_orgao
                             , 1
                             , receita.cod_receita
                             , rubrica
                             , receita.exercicio
                             , conta_receita.descricao
-                            , receita.vl_original
-                ";
-                
+                            , receita.vl_original ";
+
         return $stSQL;
     }
 
@@ -366,7 +376,6 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                  , descricao
                  , ABS(vl_original) AS vl_original
                  , ABS(SUM(vl_arrecadacao_mes)) AS vl_arrecadacao_mes
-                 , ABS(SUM(vl_arrecadacao_ate)) AS vl_arrecadacao_ate
                  , fonte
                  , banco
                  , agencia
@@ -374,25 +383,22 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                  , digito
                  , tipo_conta
               FROM (
-                    SELECT '12'                             AS tipo_registro
-                         , orgao_plano_banco.num_orgao      AS cod_orgao
-                         , CASE
-                            WHEN substr(conta_receita.cod_estrutural::varchar, 1, 1)::integer = 9 THEN
-                                       substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
-                            ELSE
-                                '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
-                           END                              AS rubrica
-                                                      ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
-                                    '03'
-                               WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
-                                    '02'
-                               ELSE
-                                    '01'
-                          END as tipo_conta ";
-                    } else {
+                    SELECT '12' AS tipo_registro
+                         , orgao_plano_banco.num_orgao AS cod_orgao
+                         , CASE WHEN substr(conta_receita.cod_estrutural::varchar, 1, 1)::integer = 9
+                             THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
+                             ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
+                           END AS rubrica
+            ";
+            if ($this->getDado('exercicio') > '2012') {
+                $stSQL .= "
+                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
+                               THEN '03'
+                               WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
+                                 THEN '02'
+                                 ELSE '01'
+                            END as tipo_conta ";
+            } else {
                       $stSQL .= "
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
                                                 '03'
@@ -404,36 +410,12 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                                                 '01'
                                       END as tipo_conta
                         ";
-                    }
-                    $stSQL .= "
-                         , receita.cod_receita
+            }
+            $stSQL .= "  , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
-                         , ABS(SUM(arrecadacao_receita.vl_arrecadacao)
-                        -- descontando os valores estornados
-                                - (  COALESCE(
-                                                ( SELECT SUM(arrecadacao_estornada_receita.vl_estornado)
-                                                    FROM tesouraria.arrecadacao_estornada_receita
-                                                   WHERE arrecadacao_estornada_receita.cod_receita = receita.cod_receita
-                                                     AND arrecadacao_estornada_receita.exercicio   = receita.exercicio
-                                                     AND to_date(arrecadacao_estornada_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN  to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' ) + 1
-                                                ), 0
-                                             )
-                                  )
-                                )                           AS vl_arrecadacao_mes
-                         , ABS(SUM(arrecadacao_receita.vl_arrecadacao)
-                        -- descontando os valores estornados
-                                - (  COALESCE(
-                                                ( SELECT SUM(arrecadacao_estornada_receita.vl_estornado)
-                                                    FROM tesouraria.arrecadacao_estornada_receita
-                                                   WHERE arrecadacao_estornada_receita.cod_receita = receita.cod_receita
-                                                     AND arrecadacao_estornada_receita.exercicio   = receita.exercicio
-                                                     AND to_date(arrecadacao_estornada_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN to_date( '01/01/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
-                                                ), 0
-                                             )
-                                  )
-                                )                           AS vl_arrecadacao_ate
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , CASE
@@ -442,47 +424,68 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                            END AS conta_corrente
                          , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
                          , recurso.cod_fonte as fonte
-                                               FROM orcamento.receita
-                      JOIN orcamento.conta_receita
+                      
+                      FROM orcamento.receita
+                
+                INNER JOIN orcamento.conta_receita
                         ON receita.exercicio = conta_receita.exercicio
                        AND receita.cod_conta = conta_receita.cod_conta
-                      JOIN tesouraria.arrecadacao_receita
+                       
+                INNER JOIN tesouraria.arrecadacao_receita
                         ON receita.cod_receita = arrecadacao_receita.cod_receita
                        AND receita.exercicio   = arrecadacao_receita.exercicio
-                      JOIN tesouraria.arrecadacao
+                       
+                INNER JOIN tesouraria.arrecadacao
                         ON arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
                        AND arrecadacao_receita.exercicio              = arrecadacao.exercicio
                        AND arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao
-                      JOIN contabilidade.plano_analitica
+                       
+                 LEFT JOIN tesouraria.arrecadacao_estornada_receita
+		        ON arrecadacao_estornada_receita.cod_arrecadacao       = arrecadacao_receita.cod_arrecadacao
+		       AND arrecadacao_estornada_receita.cod_receita           = arrecadacao_receita.cod_receita
+		       AND arrecadacao_estornada_receita.exercicio             = arrecadacao_receita.exercicio
+		       AND arrecadacao_estornada_receita.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
+                       AND TO_DATE(arrecadacao_estornada_receita.timestamp_estornada::varchar,'yyyy-mm-dd') BETWEEN TO_DATE( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
+                       
+                INNER JOIN contabilidade.plano_analitica
                         ON arrecadacao.cod_plano = plano_analitica.cod_plano
                        AND arrecadacao.exercicio = plano_analitica.exercicio
-                      JOIN orcamento.recurso
+                       
+                INNER JOIN orcamento.recurso
                         ON recurso.cod_recurso = receita.cod_recurso
                        AND recurso.exercicio   = receita.exercicio
-                      JOIN contabilidade.plano_conta
+                       
+                INNER JOIN contabilidade.plano_conta
                         ON plano_conta.cod_conta = plano_analitica.cod_conta
                        AND plano_conta.exercicio = plano_analitica.exercicio
-                      JOIN contabilidade.plano_banco
+                
+                INNER JOIN contabilidade.plano_banco
                         ON plano_banco.cod_plano = plano_analitica.cod_plano
                        AND plano_banco.exercicio = plano_analitica.exercicio
-                      JOIN monetario.conta_corrente
+                
+                INNER JOIN monetario.conta_corrente
                         ON conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                        AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
                        AND conta_corrente.cod_banco          = plano_banco.cod_banco
-                      JOIN monetario.agencia
+                
+                INNER JOIN monetario.agencia
                         ON agencia.cod_agencia = conta_corrente.cod_agencia
                        AND agencia.cod_banco   = conta_corrente.cod_banco
-                      JOIN monetario.banco
+                
+                INNER JOIN monetario.banco
                         ON banco.cod_banco = agencia.cod_banco
-                      JOIN tcmgo.orgao_plano_banco
+                
+                INNER JOIN tcmgo.orgao_plano_banco
                         ON plano_analitica.cod_plano = orgao_plano_banco.cod_plano
                        AND plano_analitica.exercicio = orgao_plano_banco.exercicio
-                        -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
-                      JOIN tesouraria.boletim
+                
+               -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
+               INNER  JOIN tesouraria.boletim
                         ON arrecadacao.cod_boletim  = boletim.cod_boletim
                        AND arrecadacao.exercicio    = boletim.exercicio
                        AND arrecadacao.cod_entidade = boletim.cod_entidade
-                      JOIN ( SELECT boletim_fechado.cod_boletim
+                
+                INNER JOIN ( SELECT boletim_fechado.cod_boletim
                                   , boletim_fechado.exercicio
                                   , boletim_fechado.cod_entidade
                                FROM tesouraria.boletim_fechado
@@ -508,9 +511,11 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                         ON liberados.cod_boletim  = boletim.cod_boletim
                        AND liberados.exercicio    = boletim.exercicio
                        AND liberados.cod_entidade = boletim.cod_entidade
+                     
                      WHERE to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
                        AND arrecadacao.devolucao = FALSE
-                     AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                  
                   GROUP BY tipo_registro
                          , cod_orgao
                          , 1
@@ -525,28 +530,26 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                          , recurso.cod_fonte
                          , plano_conta.cod_estrutural
 
-UNION
+                UNION
 
-                    SELECT '12'                             AS tipo_registro
-                         , orgao_plano_banco.num_orgao      AS cod_orgao
-                         , CASE
-                            WHEN substr(conta_receita.cod_estrutural, 1, 1) = '9' THEN
-                                       substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
-                            ELSE
-                                '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
-                           END                              AS rubrica
-                               ";
-                          if ($this->getDado('exercicio') > '2012') {
-                            $stSQL .= "
-                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
-                                          '03'
-                                     WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
-                                          '02'
-                                     ELSE
-                                          '01'
-                                END as tipo_conta ";
-                          } else {
-                            $stSQL .= "
+                    SELECT '12' AS tipo_registro
+                         , orgao_plano_banco.num_orgao AS cod_orgao
+                         , CASE WHEN substr(conta_receita.cod_estrutural, 1, 1) = '9'
+                             THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
+                             ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
+                           END AS rubrica
+                ";
+                
+                if ($this->getDado('exercicio') > '2012') {
+                    $stSQL .= "
+                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
+                                    THEN '03'
+                                    WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
+                                     THEN '02'
+                                     ELSE '01'
+                                 END as tipo_conta ";
+                } else {
+                    $stSQL .= "
                                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
                                                       '03'
                                                  WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
@@ -557,60 +560,73 @@ UNION
                                                       '01'
                                             END as tipo_conta
                               ";
-                          }
-                          $stSQL .= "
+                }
+                $stSQL .= "
                          , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
                          , ABS(ROUND(SUM(arrecadacao_receita.vl_arrecadacao), 2)) * -1 AS vl_arrecadacao_mes
-                         , ABS(ROUND(SUM(arrecadacao_receita.vl_arrecadacao), 2)) * -1 AS vl_arrecadacao_ate
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , ltrim(split_part(num_conta_corrente,'-',1),'0') AS conta_corrente
                          , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
                          , recurso.cod_fonte as fonte
+                         
                       FROM orcamento.receita
-                      JOIN orcamento.conta_receita
+                      
+                INNER JOIN orcamento.conta_receita
                         ON receita.exercicio = conta_receita.exercicio
                        AND receita.cod_conta = conta_receita.cod_conta
-                      JOIN tesouraria.arrecadacao_receita
+                
+                INNER JOIN tesouraria.arrecadacao_receita
                         ON receita.cod_receita = arrecadacao_receita.cod_receita
                        AND receita.exercicio   = arrecadacao_receita.exercicio
-                      JOIN tesouraria.arrecadacao
+                
+                INNER JOIN tesouraria.arrecadacao
                         ON arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
                        AND arrecadacao_receita.exercicio              = arrecadacao.exercicio
                        AND arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao
-                      JOIN contabilidade.plano_analitica
+                
+                INNER JOIN contabilidade.plano_analitica
                         ON arrecadacao.cod_plano = plano_analitica.cod_plano
                        AND arrecadacao.exercicio = plano_analitica.exercicio
-                      JOIN orcamento.recurso
+                
+                INNER JOIN orcamento.recurso
                         ON recurso.cod_recurso = receita.cod_recurso
                        AND recurso.exercicio   = receita.exercicio
-                      JOIN contabilidade.plano_banco
+                
+                INNER JOIN contabilidade.plano_banco
                         ON plano_banco.cod_plano = plano_analitica.cod_plano
                        AND plano_banco.exercicio = plano_analitica.exercicio
-                       JOIN contabilidade.plano_conta
+                
+                INNER JOIN contabilidade.plano_conta
                         ON plano_conta.cod_conta = plano_analitica.cod_conta
                        AND plano_conta.exercicio = plano_analitica.exercicio
-                      JOIN monetario.conta_corrente
+                
+                INNER JOIN monetario.conta_corrente
                         ON conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                        AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
                        AND conta_corrente.cod_banco          = plano_banco.cod_banco
-                      JOIN monetario.agencia
+                
+                INNER JOIN monetario.agencia
                         ON agencia.cod_agencia = conta_corrente.cod_agencia
                        AND agencia.cod_banco   = conta_corrente.cod_banco
-                      JOIN monetario.banco
+                
+                INNER JOIN monetario.banco
                         ON banco.cod_banco = agencia.cod_banco
-                      JOIN tcmgo.orgao_plano_banco
+                
+                INNER JOIN tcmgo.orgao_plano_banco
                         ON plano_analitica.cod_plano = orgao_plano_banco.cod_plano
                        AND plano_analitica.exercicio = orgao_plano_banco.exercicio
-                        -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
-                      JOIN tesouraria.boletim
+                
+                -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
+                INNER JOIN tesouraria.boletim
                         ON arrecadacao.cod_boletim  = boletim.cod_boletim
                        AND arrecadacao.exercicio    = boletim.exercicio
                        AND arrecadacao.cod_entidade = boletim.cod_entidade
-                      JOIN ( SELECT boletim_fechado.cod_boletim
+                
+                INNER JOIN ( SELECT boletim_fechado.cod_boletim
                                   , boletim_fechado.exercicio
                                   , boletim_fechado.cod_entidade
                                FROM tesouraria.boletim_fechado
@@ -636,9 +652,11 @@ UNION
                         ON liberados.cod_boletim  = boletim.cod_boletim
                        AND liberados.exercicio    = boletim.exercicio
                        AND liberados.cod_entidade = boletim.cod_entidade
+                       
                      WHERE to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN  to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
                        AND arrecadacao.devolucao = TRUE
-                     AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                  
                   GROUP BY tipo_registro
                          , cod_orgao
                          , 1
@@ -666,8 +684,7 @@ UNION
             , agencia
             , conta_corrente
             , digito
-            , tipo_conta
-    ";
+            , tipo_conta ";
     
         return $stSQL;
     }
@@ -690,33 +707,29 @@ UNION
                  , descricao
                  , ABS(vl_original) AS vl_original
                  , ABS(SUM(vl_arrecadacao_mes)) AS vl_arrecadacao_mes
-                 , ABS(SUM(vl_arrecadacao_ate)) AS vl_arrecadacao_ate
                  , banco
                  , agencia
                  , conta_corrente
                  , digito
                  , tipo_conta
               FROM (
-                    SELECT '11'                             AS tipo_registro
-                         , orgao_plano_banco.num_orgao      AS cod_orgao
-                         , CASE
-                            WHEN substr(conta_receita.cod_estrutural::varchar, 1, 1)::integer = 9 THEN
-                                       substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
-                            ELSE
-                                '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
-                           END                              AS rubrica
-                               ";
-                          if ($this->getDado('exercicio') > '2012') {
-                            $stSQL .= "
-                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
-                                          '03'
-                                     WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
-                                          '02'
-                                     ELSE
-                                          '01'
-                                END as tipo_conta ";
-                          } else {
-                            $stSQL .= "
+                    SELECT '11' AS tipo_registro
+                         , orgao_plano_banco.num_orgao AS cod_orgao
+                         , CASE WHEN substr(conta_receita.cod_estrutural::varchar, 1, 1)::integer = 9
+                             THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
+                             ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
+                           END AS rubrica
+                ";
+                    if ($this->getDado('exercicio') > '2012') {
+                        $stSQL .= "
+                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
+                                     THEN '03'
+                                     WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
+                                      THEN '02'
+                                      ELSE '01'
+                                  END as tipo_conta ";
+                    } else {
+                        $stSQL .= "
                                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
                                                       '03'
                                                  WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
@@ -727,36 +740,13 @@ UNION
                                                       '01'
                                             END as tipo_conta
                               ";
-                          }
-                          $stSQL .= "
+                    }
+                    $stSQL .= "
                          , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
-                         , ABS(SUM(arrecadacao_receita.vl_arrecadacao)
-                        -- descontando os valores estornados
-                                - (  COALESCE(
-                                                ( SELECT SUM(arrecadacao_estornada_receita.vl_estornado)
-                                                    FROM tesouraria.arrecadacao_estornada_receita
-                                                   WHERE arrecadacao_estornada_receita.cod_receita = receita.cod_receita
-                                                     AND arrecadacao_estornada_receita.exercicio   = receita.exercicio
-                                                     AND to_date(arrecadacao_estornada_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' ) + 1
-                                                ), 0
-                                             )
-                                  )
-                                )                           AS vl_arrecadacao_mes
-                         , ABS(SUM(arrecadacao_receita.vl_arrecadacao)
-                        -- descontando os valores estornados
-                                - (  COALESCE(
-                                                ( SELECT SUM(arrecadacao_estornada_receita.vl_estornado)
-                                                    FROM tesouraria.arrecadacao_estornada_receita
-                                                   WHERE arrecadacao_estornada_receita.cod_receita = receita.cod_receita
-                                                     AND arrecadacao_estornada_receita.exercicio   = receita.exercicio
-                                                     AND to_date(arrecadacao_estornada_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN  to_date( '01/01/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
-                                                ), 0
-                                             )
-                                  )
-                                )                           AS vl_arrecadacao_ate
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , CASE
@@ -766,43 +756,62 @@ UNION
                          , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
 
                       FROM orcamento.receita
-                      JOIN orcamento.conta_receita
+                      
+                INNER JOIN orcamento.conta_receita
                         ON receita.exercicio = conta_receita.exercicio
                        AND receita.cod_conta = conta_receita.cod_conta
-                      JOIN tesouraria.arrecadacao_receita
+                       
+                INNER JOIN tesouraria.arrecadacao_receita
                         ON receita.cod_receita = arrecadacao_receita.cod_receita
                        AND receita.exercicio   = arrecadacao_receita.exercicio
-                      JOIN tesouraria.arrecadacao
+                
+                INNER JOIN tesouraria.arrecadacao
                         ON arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
                        AND arrecadacao_receita.exercicio              = arrecadacao.exercicio
                        AND arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao
-                      JOIN contabilidade.plano_analitica
+
+                 LEFT JOIN tesouraria.arrecadacao_estornada_receita
+		        ON arrecadacao_estornada_receita.cod_arrecadacao       = arrecadacao_receita.cod_arrecadacao
+		       AND arrecadacao_estornada_receita.cod_receita           = arrecadacao_receita.cod_receita
+		       AND arrecadacao_estornada_receita.exercicio             = arrecadacao_receita.exercicio
+		       AND arrecadacao_estornada_receita.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
+                       AND TO_DATE(arrecadacao_estornada_receita.timestamp_estornada::varchar,'yyyy-mm-dd') BETWEEN TO_DATE( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
+                
+                INNER JOIN contabilidade.plano_analitica
                         ON arrecadacao.cod_plano = plano_analitica.cod_plano
                        AND arrecadacao.exercicio = plano_analitica.exercicio
-                      JOIN contabilidade.plano_banco
+                
+                INNER JOIN contabilidade.plano_banco
                         ON plano_banco.cod_plano = plano_analitica.cod_plano
                        AND plano_banco.exercicio = plano_analitica.exercicio
-                       JOIN contabilidade.plano_conta
+                
+                INNER JOIN contabilidade.plano_conta
                         ON plano_conta.cod_conta = plano_analitica.cod_conta
                        AND plano_conta.exercicio = plano_analitica.exercicio
-                      JOIN monetario.conta_corrente
+                
+                INNER JOIN monetario.conta_corrente
                         ON conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                        AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
                        AND conta_corrente.cod_banco          = plano_banco.cod_banco
-                      JOIN monetario.agencia
+                
+                INNER JOIN monetario.agencia
                         ON agencia.cod_agencia = conta_corrente.cod_agencia
                        AND agencia.cod_banco   = conta_corrente.cod_banco
-                      JOIN monetario.banco
+                
+                INNER JOIN monetario.banco
                         ON banco.cod_banco = agencia.cod_banco
-                      JOIN tcmgo.orgao_plano_banco
+                
+                INNER JOIN tcmgo.orgao_plano_banco
                         ON plano_analitica.cod_plano = orgao_plano_banco.cod_plano
                        AND plano_analitica.exercicio = orgao_plano_banco.exercicio
-                        -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
-                      JOIN tesouraria.boletim
+                
+                -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
+                INNER JOIN tesouraria.boletim
                         ON arrecadacao.cod_boletim  = boletim.cod_boletim
                        AND arrecadacao.exercicio    = boletim.exercicio
                        AND arrecadacao.cod_entidade = boletim.cod_entidade
-                      JOIN ( SELECT boletim_fechado.cod_boletim
+                
+                INNER JOIN ( SELECT boletim_fechado.cod_boletim
                                   , boletim_fechado.exercicio
                                   , boletim_fechado.cod_entidade
                                FROM tesouraria.boletim_fechado
@@ -828,9 +837,11 @@ UNION
                         ON liberados.cod_boletim  = boletim.cod_boletim
                        AND liberados.exercicio    = boletim.exercicio
                        AND liberados.cod_entidade = boletim.cod_entidade
+                       
                      WHERE to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
                        AND arrecadacao.devolucao = FALSE
---                     AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       
                   GROUP BY tipo_registro
                          , cod_orgao
                          , 1
@@ -844,7 +855,7 @@ UNION
                          , conta_corrente.num_conta_corrente
                          , tipo_conta
 
-UNION
+                UNION
 
                     SELECT '11'                             AS tipo_registro
                          , orgao_plano_banco.num_orgao      AS cod_orgao
@@ -883,49 +894,61 @@ UNION
                          , conta_receita.descricao
                          , receita.vl_original
                          , ABS(ROUND(SUM(arrecadacao_receita.vl_arrecadacao), 2)) * -1 AS vl_arrecadacao_mes
-                         , ABS(ROUND(SUM(arrecadacao_receita.vl_arrecadacao), 2)) * -1 AS vl_arrecadacao_ate
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , ltrim(split_part(num_conta_corrente,'-',1),'0') AS conta_corrente
                          , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
+                      
                       FROM orcamento.receita
-                      JOIN orcamento.conta_receita
+                      
+                INNER JOIN orcamento.conta_receita
                         ON receita.exercicio = conta_receita.exercicio
                        AND receita.cod_conta = conta_receita.cod_conta
-                      JOIN tesouraria.arrecadacao_receita
+                      
+                INNER JOIN tesouraria.arrecadacao_receita
                         ON receita.cod_receita = arrecadacao_receita.cod_receita
                        AND receita.exercicio   = arrecadacao_receita.exercicio
-                      JOIN tesouraria.arrecadacao
+                      
+                INNER JOIN tesouraria.arrecadacao
                         ON arrecadacao_receita.cod_arrecadacao        = arrecadacao.cod_arrecadacao
                        AND arrecadacao_receita.exercicio              = arrecadacao.exercicio
                        AND arrecadacao_receita.timestamp_arrecadacao  = arrecadacao.timestamp_arrecadacao
-                      JOIN contabilidade.plano_analitica
+                      
+                INNER JOIN contabilidade.plano_analitica
                         ON arrecadacao.cod_plano = plano_analitica.cod_plano
                        AND arrecadacao.exercicio = plano_analitica.exercicio
-                      JOIN contabilidade.plano_banco
+                      
+                INNER JOIN contabilidade.plano_banco
                         ON plano_banco.cod_plano = plano_analitica.cod_plano
                        AND plano_banco.exercicio = plano_analitica.exercicio
-                       JOIN contabilidade.plano_conta
+                      
+                INNER JOIN contabilidade.plano_conta
                         ON plano_conta.cod_conta = plano_analitica.cod_conta
                        AND plano_conta.exercicio = plano_analitica.exercicio
-                      JOIN monetario.conta_corrente
+                      
+                INNER JOIN monetario.conta_corrente
                         ON conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                        AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
                        AND conta_corrente.cod_banco          = plano_banco.cod_banco
-                      JOIN monetario.agencia
+                      
+                INNER JOIN monetario.agencia
                         ON agencia.cod_agencia = conta_corrente.cod_agencia
                        AND agencia.cod_banco   = conta_corrente.cod_banco
-                      JOIN monetario.banco
+                      
+                INNER JOIN monetario.banco
                         ON banco.cod_banco = agencia.cod_banco
-                      JOIN tcmgo.orgao_plano_banco
+                      
+                INNER JOIN tcmgo.orgao_plano_banco
                         ON plano_analitica.cod_plano = orgao_plano_banco.cod_plano
                        AND plano_analitica.exercicio = orgao_plano_banco.exercicio
-                        -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
-                      JOIN tesouraria.boletim
+                        
+                -- ligação com o botetim pra garantir q a arrecadação ja foi contabilizada
+                INNER JOIN tesouraria.boletim
                         ON arrecadacao.cod_boletim  = boletim.cod_boletim
                        AND arrecadacao.exercicio    = boletim.exercicio
                        AND arrecadacao.cod_entidade = boletim.cod_entidade
-                      JOIN ( SELECT boletim_fechado.cod_boletim
+                      
+                INNER JOIN ( SELECT boletim_fechado.cod_boletim
                                   , boletim_fechado.exercicio
                                   , boletim_fechado.cod_entidade
                                FROM tesouraria.boletim_fechado
@@ -951,9 +974,11 @@ UNION
                         ON liberados.cod_boletim  = boletim.cod_boletim
                        AND liberados.exercicio    = boletim.exercicio
                        AND liberados.cod_entidade = boletim.cod_entidade
+                     
                      WHERE to_date(arrecadacao_receita.timestamp_arrecadacao::varchar,'yyyy-mm-dd') BETWEEN  to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
                        AND arrecadacao.devolucao = TRUE
---                     AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       AND receita.cod_entidade in ( " .  $this->getDado ( 'stEntidades' ) . ")
+                       
                   GROUP BY tipo_registro
                          , cod_orgao
                          , 1
@@ -980,8 +1005,7 @@ UNION
             , conta_corrente
             , digito
             , tipo_conta
-
-         "  ;
+         ";
 
         return $stSQL;
     }
@@ -1094,4 +1118,5 @@ UNION
     }
 
 }
+
 ?>

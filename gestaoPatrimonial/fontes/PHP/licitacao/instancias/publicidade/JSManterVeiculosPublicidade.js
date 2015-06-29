@@ -33,13 +33,13 @@
 
     * @ignore
     
-    $Id: JSManterVeiculosPublicidade.js 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JSManterVeiculosPublicidade.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
 ?>
 
-<script language="javaScript">
+<script type="text/javascript">
 
 function Limpar() {
 }

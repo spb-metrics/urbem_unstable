@@ -61,7 +61,7 @@ if (isset($pagina)) {
     Sessao::write('pagina',$pagina);
 }
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -143,7 +143,7 @@ $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 //****************************************************************************
 ?>
-   <script language="JavaScript1.2" type="text/javascript">
+   <script type="text/javascript">
 
       function Valida()
       {
@@ -224,12 +224,12 @@ case 2:
                     $audicao = new auditoriaLegada;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["nomClassificacao"]);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$_REQUEST["nomClassificacao"].'","alterar","aviso", "'.Sessao::getId().'");
                     window.location = "alteraClassificacao.php?'.Sessao::getId().'&pagina='.$pagina.'";
                     </script>';
                     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$_REQUEST["nomClassificacao"].'","n_alterar","aviso", "'.Sessao::getId().'");
                     window.location = "alteraClassificacao.php?'.Sessao::getId().'&pagina='.$pagina.'";
                     </script>';

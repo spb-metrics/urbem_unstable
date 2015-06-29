@@ -32,7 +32,7 @@ set_time_limit(0);
 
     * @ignore
 
-    * $Id: OCGeraRelatorioBalanceteDespesa.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioBalanceteDespesa.php 62718 2015-06-11 19:36:38Z jean $
 
     * Casos de uso: uc-02.01.22
 */
@@ -148,7 +148,7 @@ for ( $inCont = 0; $inCont < count( $rsCabecalho); $inCont++ ) {
        $obPDF->addCabecalho("REDUÇÕES  LIQUIDADO NO PER  LIQUIDADO ATÉ PER",12, 8);
        $obPDF->addCabecalho("TOTAL CRÉDITO  PAGO NO PER  PAGO ATÉ PER",11, 8);
     }
-    $obPDF->addCabecalho("SALDO DISPONÍVEL A LIQUIDAR A PAGAR LÍQUIDADO ",13, 8);
+    $obPDF->addCabecalho("     SALDO DISPONÍVEL                       A LIQUIDAR    A PAGAR LÍQUIDADO ",13, 8);
     $obPDF->addIndentacao("nivel","[classificacao]  [descricao_despesa]","    ");
     $obPDF->addQuebraLinha("nivel",0,4);
     $obPDF->addQuebraPagina("pagina",1);

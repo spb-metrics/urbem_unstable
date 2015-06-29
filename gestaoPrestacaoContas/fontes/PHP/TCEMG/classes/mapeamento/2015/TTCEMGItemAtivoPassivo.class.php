@@ -48,8 +48,10 @@ function TTCEMGItemAtivoPassivo()
     $this->setCampoCod('mes');
     $this->setComplementoChave('exercicio');
 
-    $this->AddCampo( 'mes'       , 'integer', true  , '' , true , false);
-    $this->AddCampo( 'exercicio' , 'char'   , true  , '4', true , false);
+    $this->AddCampo( 'mes'         , 'integer', true  , '' , true , false);
+    $this->AddCampo( 'exercicio'   , 'char'   , true  , '4', true , false);
+    $this->AddCampo( 'dataInicial' , 'varchar', false , '' , false , false);
+    $this->AddCampo( 'dataFinal'   , 'varchar', false , '' , false , false);
 }
 
 function recuperaDadosArquivo(&$rsRecordSet)
@@ -67,17 +69,24 @@ function recuperaDadosArquivo(&$rsRecordSet)
 function montaRecuperaDadosArquivo()
 {
     $stSql  = "
-                SELECT ".$this->getDado('mes')." AS mes
-                    , REPLACE(valor_acrescimo::VARCHAR,'.','') AS valor_acrescimo
-                    , REPLACE(vl_reducao::VARCHAR, '.','') AS vl_reducao
-                    , cod_tipo 
-                    , ''::VARCHAR AS descricao
-                 FROM tcemg.item_ativo_passivo ('".Sessao::getExercicio()."', '".$this->getDado('dataInicial')."', '".$this->getDado('dataFinal')."', '".$this->getDado('cod_entidade')."')
-                                       retorno ( valor_acrescimo NUMERIC 
-						, vl_reducao NUMERIC 
-						, cod_tipo VARCHAR
-					      )
+                SELECT  '12' AS mes
+                        , cod_tipo 
+                        , ABS(valor_acrescimo) as valor_acrescimo
+                        , ABS(vl_reducao) as vl_reducao
+                        , ' '::VARCHAR AS descricao
+                FROM tcemg.item_ativo_passivo ('".Sessao::getExercicio()."'
+                                                , '".$this->getDado('dataInicial')."'
+                                                , '".$this->getDado('dataFinal')."'
+                                                , '".$this->getDado('cod_entidade')."'
+                                                )
+                AS retorno ( 
+                            valor_acrescimo NUMERIC 
+						    , vl_reducao NUMERIC 
+						    , cod_tipo VARCHAR
+					       )
+                ORDER by cod_tipo
                ";
+
     return $stSql;
 }
 

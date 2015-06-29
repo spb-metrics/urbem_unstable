@@ -33,7 +33,7 @@
  * $Id:$
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function  montaSpanFileBox(){
     jQuery.post("<?=$pgOcul;?>", { stCtrl: "montaFileBox",inNumeroFoto: jQuery('#inNumeroFoto').val() }, 
     function(data) {

@@ -31,7 +31,7 @@
     * @author Desenvolvedor:  Lucas Teixeira Stephanou
     * @ignore
 
-    $Id: FLManterConvenios.php 62237 2015-04-13 16:35:35Z michel $
+    $Id: FLManterConvenios.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     *Casos de uso: uc-03.05.14
 */
@@ -178,7 +178,7 @@ $obFormulario->addSpan      ( $obSpanResultado   );
 $obFormulario->show();
 
 if ( is_array( $arFiltro ) ) {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     if ($arFiltro['stObjeto']) {
         echo "   var e = document.getElementById('stObjeto').onchange;          \r\n";
         echo "   setTimeout(e,300);                                             \r\n";

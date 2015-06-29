@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: FTCEMGReceitaCorrente.class.php 62757 2015-06-16 17:28:52Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -53,28 +53,31 @@ class FTCEMGReceitaCorrente extends Persistente
     
        $this->AddCampo('stExercicio'            , 'varchar', false, '', false, false);
        $this->AddCampo('stCodEntidades'         , 'varchar', false, '', false, false);
-       $this->AddCampo('inPeriodo'              , 'integer', false, '', false, false);
+       $this->AddCampo('inBimestre'             , 'integer', false, '', false, false);
     
     }
     
     function montaRecuperaTodos()
     {
         $stSql  = "
-            
-            SELECT cod_estrutural
-                 , REPLACE ( valor_previsto::VARCHAR, '.', '' ) AS valor_previsto
-                 , REPLACE ( arrecadado_periodo::VARCHAR, '.', '' ) AS arrecadado_periodo
-                 , REPLACE ( arrecadado_ano::VARCHAR, '.', '' ) AS arrecadado_ano
-                 , REPLACE ( diferenca::VARCHAR, '.', '' ) AS diferenca
-             FROM ".$this->getTabela()." ( '".$this->getDado("stExercicio")."', '".$this->getDado("stCodEntidades")."', '".$this->getDado("stDataInicial")."', '".$this->getDado("stDataFinal")."')
-               AS retorno(                      
-                            cod_estrutural      VARCHAR ,                                           
-                            valor_previsto      NUMERIC ,                                           
-                            arrecadado_periodo  NUMERIC ,                                           
-                            arrecadado_ano      NUMERIC ,                                           
-                            diferenca           NUMERIC                                            
-                       )
-          ORDER BY cod_estrutural; ";
+            SELECT EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS mes
+                 , cod_estrutural
+                 , valor_previsto
+                 , arrecadado_periodo
+                 , arrecadado_ano
+                 , diferenca
+             FROM ".$this->getTabela()." ( '".$this->getDado("stExercicio")."'
+                                         , '".$this->getDado("stCodEntidades")."'
+                                         , '".$this->getDado("dt_inicial")."'
+                                         , '".$this->getDado("dt_final")."'
+                                         )
+               AS retorno                ( cod_estrutural      VARCHAR ,                                           
+                                           valor_previsto      NUMERIC ,
+                                           arrecadado_periodo  NUMERIC ,
+                                           arrecadado_ano      NUMERIC ,
+                                           diferenca           NUMERIC
+                                         )
+         ORDER BY cod_estrutural; ";
           
         return $stSql;
     }

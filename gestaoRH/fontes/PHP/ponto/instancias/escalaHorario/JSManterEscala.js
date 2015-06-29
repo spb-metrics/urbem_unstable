@@ -38,7 +38,7 @@
     * Casos de uso: uc-04.10.02
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpaFormularioTurnoExtra(){
 

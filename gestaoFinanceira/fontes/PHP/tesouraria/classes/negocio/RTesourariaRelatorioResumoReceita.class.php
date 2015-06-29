@@ -283,7 +283,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFTesourariaResumoReceita->setDado("inCodDetalhamento"    ,$this->inCodDetalhamento );
     $obFTesourariaResumoReceita->setDado("boUtilizaEstruturalTCE", 'false' );
 
-    if ($boTCEMS) {
+    if ($boTCEMS and $this->getTipoReceita() != 'extra') {
         $obFTesourariaResumoReceita->setDado("boUtilizaEstruturalTCE"    , 'true' );
     }
 

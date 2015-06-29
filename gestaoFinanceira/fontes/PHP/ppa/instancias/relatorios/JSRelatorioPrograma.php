@@ -38,7 +38,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 limparValores = function () {
     $('inNumProgramaIni').value = '';
     $('inNumProgramaFim').value = '';

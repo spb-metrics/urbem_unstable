@@ -51,7 +51,7 @@ foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
 }
 
 $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-$obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+$obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);

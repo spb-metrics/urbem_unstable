@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: $
+ $Id: SistemaLegado.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -234,7 +234,7 @@ public static function pegaDado($sDado,$sTabela,$sWhere, $boTransacao = "")
 
 public static function executaFramePrincipal($stJs)
 {
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -253,18 +253,18 @@ public static function executaFrameOculto($stJs)
 {
     $stScripts = "";
     if ( substr( basename( $_SERVER['PHP_SELF'] ), 0, 2 ) == "OC"  ) {
-        $stScripts .= '<script language="JavaScript1.2" src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
+        $stScripts .= '<script src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
 ';
     }
 
     print  $stScripts.'
-           <script language="JavaScript1.2" type="text/javascript">
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -285,14 +285,14 @@ public static function executaiFrameOculto($stJs)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -316,14 +316,14 @@ public static function executaWindowOpener($stJs)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -358,14 +358,14 @@ public static function unhtmlentities($stString)
 
 public static function exibeAviso($objeto="",$tipo="n_incluir",$chamada="erro")
 {
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'");
            </script>';
 }
 
 public static function exibeAvisoTelaPrincipal($objeto="",$tipo="n_incluir",$chamada="erro")
 {
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAvisoTelaPrincipal("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'");
            </script>';
 }
@@ -383,7 +383,7 @@ public static function alertaAviso($location="",$objeto="",$tipo="n_incluir",$ch
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".(array_key_exists(1, $aux) ? $aux[1] : '');
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
                 mudaTelaPrincipal("'.$location.'");
            </script>';
@@ -393,7 +393,7 @@ public static function mudaFrameOculto($location)
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaFrameOculto("'.$location.'");
            </script>';
 }
@@ -403,7 +403,7 @@ public static function mudaFramePrincipal($location)
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal("'.$location.'");
            </script>';
 }
@@ -420,7 +420,7 @@ public static function alertaAvisoPopUpPrincipal($location="",$objeto="",$tipo="
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAvisoPopUpPrincipal("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
                 window.close();
                 window.opener.focus();
@@ -434,7 +434,7 @@ public static function alertaAvisoPopUp($location="",$objeto="",$tipo="n_incluir
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona para o proprio PopUp
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 <!--alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");-->
                 parent.window.location.replace("'.$location.'");
            </script>';
@@ -444,7 +444,7 @@ public static function alertaAvisoPopUp($location="",$objeto="",$tipo="n_incluir
 /* Lucas Stephanou || 01/03/2005    */
 public static function BloqueiaFrames($boPrincipal=true,$boMenu=false)
 {
-    $ini = "<script language=\"javascript\">\r\n";
+    $ini = "<script type=\"text/javascript\">\r\n";
     $fim =" \r\n</script>\r\n";
     if ($boMenu ==true) {echo $ini."BloqueiaFrames(true,true);".$fim   ;}
     if ($boPrincipal==true) {echo $ini."BloqueiaFrames(true,false);".$fim   ;}
@@ -452,7 +452,7 @@ public static function BloqueiaFrames($boPrincipal=true,$boMenu=false)
 }
 public static function LiberaFrames($boPrincipal=true,$boMenu=true)
 {
-    $ini = "<script language=\"javascript\">\r\n";
+    $ini = "<script type=\"text/javascript\">\r\n";
     $fim = "\r\n</script>\r\n";
     if ($boMenu ==true) {echo $ini."LiberaFrames(true,true);".$fim   ;}
     if ($boPrincipal==true) {echo $ini."LiberaFrames(true,false);".$fim   ;}
@@ -1264,5 +1264,73 @@ public static function pegaValor($query,$campo)
     return $res;
 }
 
+/*******************************************************************************************************************************/
+/**** Retorna o periodo Inicial e Final dos Meses que estao no Periodo                                                      ****/
+/**** $arDatas     : variável que retorna por referência a data inicial e final dos meses periodo. Formato : 'dd/mm/yyyy'   ****/
+/**** $stTipoPeriodo : variável que recebe o valor do tipo de periodo                                                       ****/
+/**** $inPeriodo  : variável que recebe o valor do periodo solicitado                                                       ****/
+/**** $inExercicio : variável que recebe o valor do exercicio                                                               ****/
+/**** Exemplo de uso .: retornaInicialFinalMesesPeriodicidade($arDatas, 'bimestre', 1, 2015 )                               ****/
+/*******************************************************************************************************************************/
+public static function retornaInicialFinalMesesPeriodicidade(&$arDatas,$stTipoPeriodo,$inPeriodo,$inExercicio)
+{
+    switch($stTipoPeriodo){
+        case "bimestre":
+        case "bimestral":
+            $inMesInicial = ($inPeriodo*2)-1;
+            for ($i=$inMesInicial; $i <= ($inPeriodo*2); $i++){ 
+                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
+                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
+                                    );
+            }
+        break;
 
+        case "trimestre":
+        case "trimestral":
+            $inMesInicial = ($inPeriodo*3)-2;
+            for ($i=$inMesInicial; $i <= ($inPeriodo*3); $i++){ 
+                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
+                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
+                                    );
+            }
+        break;
+
+        case "quadrimestre":
+        case "quadrimestral":
+            $inMesInicial = ($inPeriodo*4)-3;
+            for ($i=$inMesInicial; $i <= ($inPeriodo*4); $i++){ 
+                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
+                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
+                                    );
+            }
+        break;
+
+        case "semestre":
+        case "semestral":
+            $inMesInicial = ($inPeriodo*6)-6;
+            for ($i=$inMesInicial; $i <= ($inPeriodo*6); $i++){ 
+                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
+                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
+                                    );
+            }
+        break;
+    
+        case "ano":
+        case "anual":
+            $arDatas[] = array( 'stDtInicial' => "01/01/".$inExercicio
+                              , 'stDtFinal' => "31/12/".$inExercicio
+                              );
+        break;
+        
+        //Mes
+        default:            
+            for ($i=$inPeriodo; $i <= $inPeriodo; $i++){ 
+                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
+                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
+                                    );
+            }
+        break;
+    }
 }
+
+}//END CLASS

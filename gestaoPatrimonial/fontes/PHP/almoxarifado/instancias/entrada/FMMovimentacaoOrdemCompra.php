@@ -30,12 +30,13 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Girardi dos Santos
 
-    $Id: FMMovimentacaoOrdemCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMMovimentacaoOrdemCompra.php 62703 2015-06-10 13:29:57Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasFornecedor.class.php';
 
 //Define a função do arquivo, ex: incluir ou alterar
 $stAcao = $request->get('stAcao');
@@ -65,6 +66,26 @@ Sessao::write('arItensEntrada', array());
 
 // array de relacionamento entre o item selecionado e a linha no array de entrada
 Sessao::write('arItemLinha', array());
+
+//#22967, Verifica se o Fornecedor do Empenho é cadastrado ou ativo em Compras->Fornecedor.
+//Obrigatório ser Fornecedor Cadastrado e Ativo.
+$stFornecedor = explode(" - ", $_REQUEST['stFornecedor']);
+$inCodFornecedor = $stFornecedor[0];
+
+$obHdnFornecedor = new Hidden;
+$obHdnFornecedor->setName ( "inCodFornecedor" );
+$obHdnFornecedor->setId ( "inCodFornecedor" );
+$obHdnFornecedor->setValue( $inCodFornecedor );
+
+$obTComprasFornecedor = new TComprasFornecedor();
+$obTComprasFornecedor->setDado("cgm_fornecedor", $inCodFornecedor);
+$obTComprasFornecedor->recuperaListaFornecedor( $rsFornecedor );
+
+if ( $rsFornecedor->getNumLinhas() < 1 ||  $rsFornecedor->getCampo('status')=='Inativo'){
+    $stMsg = "Cadastro do Fornecedor (".$_REQUEST['stFornecedor'].") não localizado em Compras. Necessário cadastrar o fornecedor!";
+    $stMsg = ($rsFornecedor->getNumLinhas() < 1) ? $stMsg : "Cadastro do Fornecedor (".$_REQUEST['stFornecedor'].") está Inativo em Compras. Necessário ativar o fornecedor!";
+    sistemaLegado::alertaAviso($pgList.'?'.Sessao::getId().'&stAcao='.$stAcao , $stMsg ,"unica","aviso", Sessao::getId(), "../");
+}
 
 $arEntidade = explode('-',$_REQUEST['stEntidade']);
 
@@ -129,14 +150,6 @@ $obHdnDtOrdem->setValue( $_REQUEST['stDtOrdem'] );
 $obLblFornecedor = new Label();
 $obLblFornecedor->setRotulo( 'Fornecedor' );
 $obLblFornecedor->setValue( $_REQUEST['stFornecedor'] );
-
-$stFornecedor = explode(" - ", $_REQUEST['stFornecedor']);
-$inCodFornecedor = $stFornecedor[0];
-
-$obHdnFornecedor = new Hidden;
-$obHdnFornecedor->setName ( "inCodFornecedor" );
-$obHdnFornecedor->setId ( "inCodFornecedor" );
-$obHdnFornecedor->setValue( $inCodFornecedor );
 
 // label - Valor Total
 $obLblVlTotal = new Label();

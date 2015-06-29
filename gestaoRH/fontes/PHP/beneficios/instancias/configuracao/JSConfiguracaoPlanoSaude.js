@@ -25,7 +25,7 @@
 <?php
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpaVinculo(){  
     document.getElementById( 'inCGMFornecedor' ).value       = '';

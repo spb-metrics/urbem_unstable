@@ -45,7 +45,7 @@ Casos de uso: uc-01.03.91
 
     setAjuda( "UC-01.03.91" );
 ?>
-<script language="javascript">
+<script type="text/javascript">
      function zebra(id, classe)
      {
             var tabela = document.getElementById(id);
@@ -187,7 +187,7 @@ Casos de uso: uc-01.03.91
             $username = $_REQUEST['username'];
 
             ?>
-       <script language="javascript">
+       <script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";
@@ -285,13 +285,13 @@ Casos de uso: uc-01.03.91
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $modulo);
                 $audicao->insereAuditoria();
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$usuarioResponsavelN.' Definido como Responsável pelo Módulo: '.$modulo.'","unica","aviso","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$_SERVER['PHP_SELF'].'?'.Sessao::getId().'&pagina='.$pagina.'&ordem='.$ordem.'");
                 </script>';
             } else {
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("Erro ao tentar incluir o usuário: '.$usuarioResponsavelN.' como responsavel pelo Módulo: '.$modulo.'","unica","erro","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$_SERVER['PHP_SELF'].'?'.Sessao::getId().'&pagina='.$pagina.'&ordem='.$ordem.'");
                 </script>';

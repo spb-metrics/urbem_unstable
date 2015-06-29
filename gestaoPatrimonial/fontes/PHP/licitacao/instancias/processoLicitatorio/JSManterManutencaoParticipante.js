@@ -53,7 +53,7 @@ Função para limpar o array de participantes
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpaFormularioParticipanteLicitacao(){
     if(document.getElementById('trCGMConsorcio').style.display==''){

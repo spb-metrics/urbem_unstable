@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.93
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inNumCGM,stNomCGM,stUsername){
     window.opener.parent.frames['telaPrincipal'].document.<?=$_REQUEST['nomForm']?>.<?=$_REQUEST['campoNum']?>.value = inNumCGM;

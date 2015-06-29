@@ -39,7 +39,7 @@
   **/
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function Cancelar () {
 <?php
     $link = Sessao::read( "link" );

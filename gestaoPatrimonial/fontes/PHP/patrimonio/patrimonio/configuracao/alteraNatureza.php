@@ -156,7 +156,7 @@ switch ($ctrl) {
         $dbEmp->fechaBD();
         //****************************************************************************
     ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
         function Valida()
         {
@@ -242,7 +242,7 @@ switch ($ctrl) {
                 $audicao->insereAuditoria();
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","alterar","aviso","'.Sessao::getId().'");
                         window.location = "alteraNatureza.php?'.Sessao::getId().'";
                     </script>';
@@ -250,7 +250,7 @@ switch ($ctrl) {
             // se ocorreu erro na opecao de update exibe msg de erro
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","n_alterar","aviso","'.Sessao::getId().'");
                         window.location = "alteraNatureza.php?'.Sessao::getId().'";
                     </script>';
@@ -259,7 +259,7 @@ switch ($ctrl) {
         // se existe natureza cadastrada com o nome informado, nao faz update e exibe msg de aviso
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("A Natureza '.$nomNatureza.' já existe","unica","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("alteraNatureza.php?'.Sessao::getId().'&nomNatureza='.$nomNatureza.'&codNatureza='.$codNatureza.'&ctrl=1");
                 </script>';

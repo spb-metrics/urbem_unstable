@@ -74,7 +74,8 @@ function recuperaDadosArquivo(&$rsRecordSet)
 function montaRecuperaDadosArquivo()
 {
     $stSql  = "
-        SELECT cod_mes
+        SELECT 12 as mes
+             , cod_mes
              , cons_adm_dir
              , cons_aut
              , cons_fund
@@ -87,7 +88,37 @@ function montaRecuperaDadosArquivo()
     return $stSql;
 }
 
-function recuperaRelacionamento(&$rsRecordSet, $boTransacao = "")
+
+function recuperaDadosBimestre(&$rsRecordSet, $stFiltro = "", $stOrdem = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaDadosArquivoBimestre().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaDadosArquivoBimestre()
+{
+    $stSql  = "
+        SELECT 12 as mes
+             , cod_mes
+             , cons_adm_dir
+             , cons_aut
+             , cons_fund
+             , cons_empe_est_dep
+             , cons_dem_ent
+          FROM tcemg.execucao_variacao
+         WHERE exercicio = '".Sessao::getExercicio()."'
+           AND cod_mes IN (".$this->getDado("cod_mes").") ";
+
+    return $stSql;
+}
+
+function recuperaRelacionamento(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
         $obErro      = new Erro;
         $obConexao   = new Conexao;

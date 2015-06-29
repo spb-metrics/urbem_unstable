@@ -32,13 +32,13 @@
 
      * Casos de uso: uc-01.06.98
 
-    $Id: interfaceProcessos.class.php 62581 2015-05-21 14:05:03Z michel $
+    $Id: interfaceProcessos.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
 ?>
-<script language="javascript">
+<script type="text/javascript">
      function zebra(id, classe)
      {
             var tabela = document.getElementById(id);
@@ -68,7 +68,7 @@ include_once CAM_GA_ORGAN_COMPONENTES."IMontaOrganograma.class.php";
     public function listaTipos()
     {
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function validaCodigo(processo)
             {
                 var x = 350;
@@ -165,7 +165,7 @@ Formulário para validação de códigos: Matrícula, Inscrição, outros
 
         </table>
         </form>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 placeFocus();
             </script>
 <?php
@@ -552,7 +552,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
             }
 
             echo"
-            <script language='JavaScript1.2' type='text/javascript'>
+            <script type='text/javascript'>
                 boSugerido = false;
                 if ( document.getElementById('link_volta') ) {
                     document.getElementById('link_volta').style.visibility = 'hidden';
@@ -999,7 +999,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
             
                     $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
                     echo"
-                    <script language=\"javascript\">
+                    <script type=\"text/javascript\">
                         function preenche_combos(campo_a, campo_b)
                         {
                             var res = campo_b.split(\".\");
@@ -1062,7 +1062,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         echo "<input type=\"hidden\" name =\"codClassifAssunto\" id=\"codClassifAssunto\" size=\"25\" maxlength=\"20\" value=\"".$codClassifAssunto."\">";    
                         if (strlen($codClassifAssunto) < 3 && strlen($codClassifAssunto) > 0) {
                             echo "
-                                <script language='JavaScript1.2' type='text/javascript'>
+                                <script type='text/javascript'>
                                     alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
                                     mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
                                 </script>
@@ -1071,7 +1071,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         $arrClassifAssunto = explode(".",$codClassifAssunto);
                         if (($arrClassifAssunto[0] == '000') or ($arrClassifAssunto[1] == '000')) {
                             echo "
-                                <script language='JavaScript1.2' type='text/javascript'>
+                                <script type='text/javascript'>
                                     alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
                                     mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
                                 </script>
@@ -1111,7 +1111,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         $dbEmp->fechaBD();
                         if (!$codClassificacaof) {
                             echo"
-                                <script language='JavaScript1.2' type='text/javascript'>
+                                <script type='text/javascript'>
                                     alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
                                     mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
                                 </script>
@@ -1171,7 +1171,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                         $dbEmp->fechaBD();
                         if (!$codAssuntof) {
                             echo "
-                                <script language='JavaScript1.2' type='text/javascript'>
+                                <script type='text/javascript'>
                                     alertaAviso('Classificação/Assunto Inválido','unica','erro','".Sessao::getId()."');
                                     mudaTelaPrincipal('incluiProcesso.php?".Sessao::getId()."');
                                 </script>
@@ -1566,7 +1566,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                     $obFormulario->montaHtml();
                     echo $obFormulario->getHTML();
                     echo"
-                    <script language=\"javascript\">
+                    <script type=\"text/javascript\">
                         if (document.frm.codOrgao.value == \"xxx\") {
                             window.scrollTo(0,200);
                         }
@@ -1577,7 +1577,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                     $this->montaLinksAssuntoAcao($codClassificacao, $codAssunto);
                 }
                 echo"
-                <script language=\"javascript\">
+                <script type=\"text/javascript\">
                     function LimpaTela()
                     {
                         ajaxJavaScript('OCIncluiProcesso.php?', 'limpaListaInteressados');
@@ -1589,7 +1589,7 @@ function formIncluiProcesso($dadosForm="",$action="",$controle=0)
                 ";
                 echo"
                 </table>
-                <script language=\"javascript\">
+                <script type=\"text/javascript\">
                     if (document.frm.inCodOrganograma) {
                         if (document.frm.inCodOrganograma.value == \"xxx\") {
                             document.getElementById('botaoOk').disabled = true;
@@ -1858,7 +1858,7 @@ function formEncaminhaProcesso($action, $codProcesso, $anoExercicio, $codClassif
     $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
     $stNomeAssunto  = pegaDado("nom_assunto","sw_assunto","Where cod_classificacao = '".$codClassificacao."' and cod_assunto = '".$codAssunto."' ");
 ?>
-<script language="JavaScript1.2" src="<?=CAM_GA;?>/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="<?=CAM_GA;?>/javaScript/ifuncoesJs.js" type="text/javascript"></script>
 
         <form name='frm' action='<?=$action;?>?<?=Sessao::getId();?>' method='post' onSubmit="return false;">
         <input type="hidden" name="anoExercicio" value='<?=$anoExercicio;?>'>
@@ -1924,7 +1924,7 @@ function formEncaminhaProcesso($action, $codProcesso, $anoExercicio, $codClassif
             echo $obFormulario->getHTML();
 
         ?>
-        <script language="JavaScript">
+        <script type="text/javascript">
 
             //A função salvar testa a validação, e se tudo ocorrer certo, envia o form
             function Salvar()
@@ -1991,7 +1991,7 @@ function formEncaminhaProcesso($action, $codProcesso, $anoExercicio, $codClassif
 function formEncaminhaProcessoLote()
 {
 ?>
-<script language="JavaScript1.2" src="<?=CAM_GA;?>/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="<?=CAM_GA;?>/javaScript/ifuncoesJs.js" type="text/javascript"></script>
 
         <form name='frm' action='<?=$action;?>?<?=Sessao::getId();?>' method='post' onSubmit="return false;">
         <table width='100%'>
@@ -2019,7 +2019,7 @@ function formEncaminhaProcessoLote()
 
         ?>
 
-    <script language="JavaScript">
+    <script type="text/javascript">
 
             //A função salvar testa a validação, e se tudo ocorrer certo, envia o form
             function Salvar()
@@ -2893,7 +2893,7 @@ Exibe os dados de um processo
         $andamento = $p->pegaDadosAndamento($codProcesso,$anoExercicio);
 ?>
 
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function abreDespacho(codProcesso,anoExercicio,codAndamento,nomSetor,nomUsuario,chave)
             {
                 var x = 180;

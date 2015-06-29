@@ -35,42 +35,47 @@
 
     * @ignore
 
-    $Id: especifPrev.inc.php 62522 2015-05-18 14:22:51Z evandro $
+    $Id: especifPrev.inc.php 62821 2015-06-24 14:24:21Z jean $
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGEspecifPrev.class.php');
+include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGEspecifPrev.class.php');
 
+foreach($arDatasInicialFinal as $arPeriodo) {
+    list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
+    
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $ndias =  cal_days_in_month(CAL_GREGORIAN, $arFiltros['inPeriodo'], Sessao::read('exercicio') );
-    if ($arFiltros['inPeriodo'] < 10) {
-        $arFiltros['inPeriodo'] = '0'.$arFiltros['inPeriodo'];
-    }
-
+    $entidade = SistemaLegado::pegaDado("valor","administracao.configuracao"," WHERE parametro ilike '%entidade_rpps%' AND cod_modulo = 8 AND exercicio = '".Sessao::getExercicio()."'");
+    
     $obFTCEMGEspecifPrev = new FTCEMGEspecifPrev();
-    $obFTCEMGEspecifPrev->setDado('stExercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGEspecifPrev->setDado('dtInicio'      , '01/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio')   );
-    $obFTCEMGEspecifPrev->setDado('dtFinal'       , $ndias.'/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio'));
-    $obFTCEMGEspecifPrev->setDado('stEntidades'   , implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGEspecifPrev->setDado('stRpps'        , 'false');
+    $obFTCEMGEspecifPrev->setDado('stExercicio', Sessao::getExercicio());
+    $obFTCEMGEspecifPrev->setDado('dtInicio'   , $arPeriodo['stDtInicial']);
+    $obFTCEMGEspecifPrev->setDado('dtFinal'    , $arPeriodo['stDtFinal']);
+    $obFTCEMGEspecifPrev->setDado('stEntidades', $entidade);
+    $obFTCEMGEspecifPrev->setDado('stMes'      , $inMes);
 
     $obFTCEMGEspecifPrev->recuperaTodos($rsEspecifPrev);
 
-    while (  !$rsEspecifPrev->eof() ) {
-            $rsEspecifPrev->setCampo('mes', $arFiltros['inPeriodo']);
-            $rsEspecifPrev->Proximo();
-    }
-    $rsEspecifPrev->setPrimeiroElemento();
-
     $obExportador->roUltimoArquivo->addBloco($rsEspecifPrev);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('caixa');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('aplicacoes_financeiras');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('banco');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('aplicacoes_financeiras');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
+}

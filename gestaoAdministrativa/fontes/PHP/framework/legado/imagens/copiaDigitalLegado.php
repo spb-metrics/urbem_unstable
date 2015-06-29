@@ -79,7 +79,7 @@ $dbEmp->fechaBD();
 <meta http-equiv='Pragma' content='no-cache'>
 <meta http-equiv='Cache-Control' content='no-store, no-cache, must-revalidate'>
 <meta http-eqiv='Expires' content='10 mar 1967 09:00:00 GMT'>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     var flag=false;
     function alertaAvisos(objeto,tipo,chamada)
     {
@@ -292,13 +292,13 @@ switch ($ctrl) {
                     $controlaTumb = 1 ;
                     unset($ctrl);
 
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                         window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                         </script>';
                 } else {
 
                     unset($ctrl);
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                         alertaAvisos("'.$errors.'","unica","erro");
                         window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                         </script>';
@@ -348,12 +348,12 @@ switch ($ctrl) {
                     $controlaTumb = 1 ;
                     unset($ctrl);
 
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                         window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                         </script>';
                 } else {
                     unset($ctrl);
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                         alertaAvisos("'.$errors.'","unica","erro");
                         window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                         </script>';
@@ -374,19 +374,19 @@ switch ($ctrl) {
                     //rmdir($diretorio);
 
                     unset($ctrl);
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                                 window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                             </script>';
                 } else {
                     unset($ctrl);
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                         alertaAvisos("'.$errors.'","unica","erro");
                         window.location = "'.CAM_FW_LEGADO.'imagens/copiaDigitalLegado.php?'.Sessao::getId().'&codDoc='.$codDoc.'&acao='.Sessao::read('acao').'&codProcesso='.$codProcesso.'&anoExercicio='.$anoExercicio.'";
                         </script>';
                 }
     break;
         case 3:
-             echo '<script language="JavaScript1.2" type="text/javascript">
+             echo '<script type="text/javascript">
                     window.close();
                     </script>';
     break;

@@ -39,7 +39,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function validar(e) {
     tecla = (document.all) ? e.keyCode : e.which;

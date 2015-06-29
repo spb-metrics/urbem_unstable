@@ -50,8 +50,8 @@ include 'interfaceCgm.class.php'; //Insere a classe que constroi a interface htm
 if(!isset($controle))
     $controle = 0;
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 $html = new interfaceCgm;
 $objCgm = new cgmLegado;
@@ -161,7 +161,7 @@ if ($pessoa == "fisica") {
                 }
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("O cpf '.$cpfigual.' já existe","unica","erro","'.Sessao::getId().'");
                     </script>';
                     $html->formCgm($dadosCgm,$PHP_SELF,0);
@@ -182,7 +182,7 @@ if ($pessoa == "fisica") {
                 }
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("O cnpj '.$cnpjigual.' já existe","unica","erro","'.Sessao::getId().'");
                     </script>';
                 $html->formCgm($dadosCgm,$PHP_SELF,0);

@@ -40,7 +40,7 @@ Casos de uso: uc-01.04.02
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function habilitaLink( valor ){
     document.frm.stCtrl.value = valor;

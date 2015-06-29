@@ -78,8 +78,8 @@ if (isset($chave)) {
     $pagina = $sessao->transf2;
 }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -89,7 +89,7 @@ switch ($ctrl) {
     case 0:
 
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             // submete formulario
             function Salvar()
@@ -308,7 +308,7 @@ switch ($ctrl) {
 
             $objeto = "Grupo: ".$nomGrupo;
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","excluir","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("excluiGrupo.php?'.Sessao::getId().'&ctrl=1&pagina='.$pagina.'");
                 </script>';
@@ -317,7 +317,7 @@ switch ($ctrl) {
 
             $objeto = "Este Grupo está sendo utilizado. Grupo: ".$nomGrupo;
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","n_excluir","erro","'.Sessao::getId().'");
                     window.location = "excluiGrupo.php?'.Sessao::getId().'";
                 </script>';

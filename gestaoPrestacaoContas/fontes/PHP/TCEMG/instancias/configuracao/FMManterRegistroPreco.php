@@ -42,6 +42,8 @@ include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGEmpenhoRegistroPrecos.class.php";
 include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeGeral.class.php';
 include_once CAM_GF_PPA_COMPONENTES.'MontaOrgaoUnidade.class.php';
 include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRegistroPrecosLicitacao.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterRegistroPreco";
@@ -77,13 +79,14 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     $obTTCEMGRegistroPrecos->recuperaProcesso($rsRegistroPrecos);
 
     $inCodEntidade                = $rsRegistroPrecos->getCampo('cod_entidade');
+    $stExercicioRegistroPreco     = $rsRegistroPrecos->getCampo('exercicio_registro_precos');
     $stCodigoRegistroPrecos       = $rsRegistroPrecos->getCampo('codigo_registro_precos');
     $dtAberturaRegistroPrecos     = $rsRegistroPrecos->getCampo('data_abertura_registro_precos');
     $inNumGerenciador             = $rsRegistroPrecos->getCampo('numcgm_gerenciador');
     $stNomGerenciador             = $rsRegistroPrecos->getCampo('nomcgm_gerenciador');
     $stExercicioProcessoLicitacao = $rsRegistroPrecos->getCampo('exercicio_licitacao');
     $inCodigoModalidadeLicitacao  = $rsRegistroPrecos->getCampo('codigo_modalidade_licitacao');
-    $stCodigoProcessoLicitacao    = $rsRegistroPrecos->getCampo('numero_processo_licitacao').'_'.$inCodigoModalidadeLicitacao;
+    $stCodigoProcessoLicitacao    = $rsRegistroPrecos->getCampo('numero_processo_licitacao');
     $inNumeroModalidade           = $rsRegistroPrecos->getCampo('numero_modalidade');
     $dtAtaRegistroPreco           = $rsRegistroPrecos->getCampo('data_ata_registro_preco');
     $dtAtaRegistroPrecoValidade   = $rsRegistroPrecos->getCampo('data_ata_registro_preco_validade');
@@ -93,7 +96,19 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     $inDescontoTabela             = $rsRegistroPrecos->getCampo('desconto_tabela');
     $inProcessoLote               = $rsRegistroPrecos->getCampo('processo_lote');
     $boTipoRegistroPrecos         = $rsRegistroPrecos->getCampo('interno');
-
+    
+    $obTTCEMGRegistroPrecosLicitacao = new TTCEMGRegistroPrecosLicitacao();
+    $obTTCEMGRegistroPrecosLicitacao->setDado('cod_entidade'            , $request->get('inCodEntidade'));
+    $obTTCEMGRegistroPrecosLicitacao->setDado('numero_registro_precos'  , $request->get('inNroRegistroPrecos'));
+    $obTTCEMGRegistroPrecosLicitacao->setDado('exercicio'               , $request->get('stExercicioRegistroPrecos'));
+    $obTTCEMGRegistroPrecosLicitacao->setDado('interno'                 , $request->get('boInterno'));
+    $obTTCEMGRegistroPrecosLicitacao->setDado('numcgm_gerenciador'      , $request->get('numcgmGerenciador'));
+    $obTTCEMGRegistroPrecosLicitacao->recuperaPorChave($rsRegistroPrecosLicitacao);
+    
+    $stExercicioLicitacao   = $rsRegistroPrecosLicitacao->getCampo('exercicio_licitacao');
+    $inCodModalidade        = $rsRegistroPrecosLicitacao->getCampo('cod_modalidade');
+    $inCodLicitacao         = $rsRegistroPrecosLicitacao->getCampo('cod_licitacao');
+    $inCodLicitacao         = ($inCodLicitacao!='') ? $inCodLicitacao.'/'.$stExercicioLicitacao : NULL;
     
     # Monta array Sessao para armazenar os itens.
     $obTTCEMGRegistroPrecosOrgao = new TTCEMGRegistroPrecosOrgao();
@@ -281,30 +296,44 @@ $obHdnExercicio->setValue( Sessao::getExercicio() );
 
 # Entidade Principal
 $obITextBoxSelectEntidade = new ITextBoxSelectEntidadeGeral();
-$obITextBoxSelectEntidade->setId('inCodEntidade');
-$obITextBoxSelectEntidade->setName('inCodEntidade');
+$obITextBoxSelectEntidade->obTextBox->setId('inCodEntidade');
+$obITextBoxSelectEntidade->obTextBox->setName('inCodEntidade');
+$obITextBoxSelectEntidade->obSelect->setName('stNomEntidade');
+$obITextBoxSelectEntidade->obSelect->setId('stNomEntidade');
 $obITextBoxSelectEntidade->setObrigatorio(true);
 $obITextBoxSelectEntidade->setCodEntidade($inCodEntidade);
-$obITextBoxSelectEntidade->obTextBox->obEvento->setOnChange("jQuery('#stCodigoProcesso').val('');ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
-$obITextBoxSelectEntidade->obSelect->obEvento->setOnChange("jQuery('#stCodigoProcesso').val('');ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
+$obITextBoxSelectEntidade->obTextBox->obEvento->setOnChange("jQuery('#stCodigoProcesso').val('');ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
+$obITextBoxSelectEntidade->obSelect->obEvento->setOnChange("jQuery('#stCodigoProcesso').val('');ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
 
-if ($stAcao == 'alterar') {
+if ($stAcao == 'alterar')
     $obITextBoxSelectEntidade->setLabel(true);
-}
+
+$obTxtExercicioRegistroPreco = new TextBox();
+$obTxtExercicioRegistroPreco->setName('stExercicioRegistroPreco');
+$obTxtExercicioRegistroPreco->setId('stExercicioRegistroPreco');
+$obTxtExercicioRegistroPreco->setRotulo('Exercício');
+$obTxtExercicioRegistroPreco->setMaxLength(4);
+$obTxtExercicioRegistroPreco->setSize(5);
+$obTxtExercicioRegistroPreco->setNull(false);
+$obTxtExercicioRegistroPreco->setInteiro(true);
+$obTxtExercicioRegistroPreco->setValue( ($stExercicioRegistroPreco != "") ? $stExercicioRegistroPreco : Sessao::getExercicio() );
+$obTxtExercicioRegistroPreco->obEvento->setOnChange("jQuery('#stCodigoProcesso').val('');ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao='+frm.stExercicioProcessoLicitacao.value+'&stExercicioRegistroPreco='+frm.stExercicioRegistroPreco.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'verificaExercicioLicitacao');");
+
+if ($stAcao == 'alterar')
+    $obTxtExercicioRegistroPreco->setLabel(true);
 
 $obTxtCodigoProcesso = new TextBox();
 $obTxtCodigoProcesso->setName('stCodigoProcesso');
 $obTxtCodigoProcesso->setId('stCodigoProcesso');
 $obTxtCodigoProcesso->setRotulo('Nro. do Processo de Registro de Preços');
 $obTxtCodigoProcesso->setTitle('Número do processo de Registro de Preços.');
-$obTxtCodigoProcesso->setMaxLength(17);
-$obTxtCodigoProcesso->setMascara('999999999999/9999');
+$obTxtCodigoProcesso->setMaxLength(12);
 $obTxtCodigoProcesso->setNull(false);
+$obTxtCodigoProcesso->setInteiro(true);
 $obTxtCodigoProcesso->setValue( $stCodigoRegistroPrecos );
-$obTxtCodigoProcesso->obEvento->setOnChange( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade='+jQuery('#inCodEntidade').val()+'&stNumProcesso='+this.value,'validaNroProcesso');");
-if ($stAcao == 'alterar') {
-    $obTxtCodigoProcesso->setReadOnly(true);
-}
+$obTxtCodigoProcesso->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade='+jQuery('#inCodEntidade').val()+'&stNumProcesso='+jQuery('#stCodigoProcesso').val()+'&stExercicioRegistroPreco='+jQuery('#stExercicioRegistroPreco').val(),'validaNroProcesso');");
+if ($stAcao == 'alterar')
+    $obTxtCodigoProcesso->setLabel(true);
 
 if ( $stAcao == 'incluir' ) {
     $obRdTipoRegistroPrecosSim = new Radio();
@@ -353,15 +382,17 @@ $obBscOrgaoGerenciador->obCampoCod->setValue( $inNumGerenciador );
 $obBscOrgaoGerenciador->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumOrgaoGerenciador='+this.value,'buscaOrgaoGerenciador');");
 $obBscOrgaoGerenciador->setFuncaoBusca( "abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumOrgaoGerenciador','inNomOrgaoGerenciador','','".Sessao::getId()."&stCtrl=buscaOrgaoGerenciador','800','550');" );
 
-$obTxtNumeroProcessoLicitacao = new Select();
+if ($stAcao == 'alterar')
+    $obBscOrgaoGerenciador->setLabel(true);
+
+$obTxtNumeroProcessoLicitacao = new TextBox();
 $obTxtNumeroProcessoLicitacao->setName     ( 'stNroProcessoLicitacao'   );
 $obTxtNumeroProcessoLicitacao->setId       ( 'stNroProcessoLicitacao'   );
 $obTxtNumeroProcessoLicitacao->setRotulo   ( 'Nro. do Processo de Licitação');
 $obTxtNumeroProcessoLicitacao->setTitle    ( 'Número sequencial do processo cadastrado no órgão gerenciador do registro de preços por exercício.' );
-$obTxtNumeroProcessoLicitacao->setCampoID  ( 'cod_licitacao'    );
-$obTxtNumeroProcessoLicitacao->setCampoDesc( 'cod_licitacao'    );
-$obTxtNumeroProcessoLicitacao->addOption   ( '','Selecione'     );
-$obTxtNumeroProcessoLicitacao->setNull     ( false );
+$obTxtNumeroProcessoLicitacao->setMaxLength(12);
+$obTxtNumeroProcessoLicitacao->setCaracteresAceitos ( '[0-9.]' );
+$obTxtNumeroProcessoLicitacao->setNull(false);
 $obTxtNumeroProcessoLicitacao->setValue( $stCodigoProcessoLicitacao );
 
 $obTxtExercicioProcessoLicitacao = new TextBox();
@@ -372,7 +403,7 @@ $obTxtExercicioProcessoLicitacao->setMaxLength(4);
 $obTxtExercicioProcessoLicitacao->setSize(5);
 $obTxtExercicioProcessoLicitacao->setNull(false);
 $obTxtExercicioProcessoLicitacao->setValue( ($stExercicioProcessoLicitacao != "") ? $stExercicioProcessoLicitacao : Sessao::getExercicio() );
-$obTxtExercicioProcessoLicitacao->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
+$obTxtExercicioProcessoLicitacao->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao='+frm.stExercicioProcessoLicitacao.value+'&stExercicioRegistroPreco='+frm.stExercicioRegistroPreco.value, 'verificaExercicioLicitacao');");
 
 $obRadioCodigoModalidadeLicitacaoConcorrencia = new Radio();
 $obRadioCodigoModalidadeLicitacaoConcorrencia->setRotulo('Modalidade da Licitação');
@@ -381,28 +412,25 @@ $obRadioCodigoModalidadeLicitacaoConcorrencia->setName('inCodModalidadeLicitacao
 $obRadioCodigoModalidadeLicitacaoConcorrencia->setLabel("Concorrência");
 $obRadioCodigoModalidadeLicitacaoConcorrencia->setValue("1");
 $obRadioCodigoModalidadeLicitacaoConcorrencia->setNull(false);
-$obRadioCodigoModalidadeLicitacaoConcorrencia->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
+$obRadioCodigoModalidadeLicitacaoConcorrencia->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stAcao=".$stAcao."&inCodLicitacao=".$inCodLicitacao."', 'carregaLicitacao');");
 
 if($inCodigoModalidadeLicitacao == 3)
     $inCodigoModalidadeLicitacao = 1;
 elseif($inCodigoModalidadeLicitacao == 6 || $inCodigoModalidadeLicitacao == 7)
-    $inCodigoModalidadeLicitacao = 2; 
-    
+    $inCodigoModalidadeLicitacao = 2;    
 
-if ( $inCodigoModalidadeLicitacao == 1) {
-    $obRadioCodigoModalidadeLicitacaoConcorrencia->setChecked(true);    
-}
+if ( $inCodigoModalidadeLicitacao == 1)
+    $obRadioCodigoModalidadeLicitacaoConcorrencia->setChecked(true);
 
 $obRadioCodigoModalidadeLicitacaoPregao = new Radio;
 $obRadioCodigoModalidadeLicitacaoPregao->setName('inCodModalidadeLicitacao');
 $obRadioCodigoModalidadeLicitacaoPregao->setLabel("Pregão");
 $obRadioCodigoModalidadeLicitacaoPregao->setValue("2");
 $obRadioCodigoModalidadeLicitacaoPregao->setNull(false);
-$obRadioCodigoModalidadeLicitacaoPregao->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');");
+$obRadioCodigoModalidadeLicitacaoPregao->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stAcao=".$stAcao."&inCodLicitacao=".$inCodLicitacao."', 'carregaLicitacao');");
 
-if ( $inCodigoModalidadeLicitacao == 2) {
-    $obRadioCodigoModalidadeLicitacaoPregao->setChecked(true);    
-}
+if ( $inCodigoModalidadeLicitacao == 2)
+    $obRadioCodigoModalidadeLicitacaoPregao->setChecked(true);
 
 $obTxtNumeroModalidade = new TextBox();
 $obTxtNumeroModalidade->setName('stNroModalidade');
@@ -459,9 +487,9 @@ if ( $stAcao == 'incluir' ) {
     $obDescontoTabelaSim->setLabel('Sim');
     $obDescontoTabelaSim->setValue(1);
     $obDescontoTabelaSim->setNull(false);
-    if ( $inDescontoTabela == 1) {
+    if ( $inDescontoTabela == 1)
         $obDescontoTabelaSim->setChecked(true);    
-    }
+
     $obDescontoTabelaSim->obEvento->setOnClick("if (jQuery('#nuPercentualLote')) { jQuery('#nuPercentualLote').removeAttr('disabled'); }");
     
     $obDescontoTabelaNao = new Radio();
@@ -470,9 +498,9 @@ if ( $stAcao == 'incluir' ) {
     $obDescontoTabelaNao->setLabel('Não');
     $obDescontoTabelaNao->setValue(2);
     $obDescontoTabelaNao->setNull(false);
-    if ( $inDescontoTabela == 2) {
+    if ( $inDescontoTabela == 2)
         $obDescontoTabelaNao->setChecked(true);    
-    }
+
     $obDescontoTabelaNao->obEvento->setOnClick("jQuery('#nuPercentualLote').attr('disabled', 'disabled'); jQuery('#nuPercentualItem').attr('disabled', 'disabled');");
     
     $obProcessoPorLoteSim = new Radio();
@@ -483,9 +511,9 @@ if ( $stAcao == 'incluir' ) {
     $obProcessoPorLoteSim->setLabel('Sim');
     $obProcessoPorLoteSim->setValue('1');
     $obProcessoPorLoteSim->setNull(false);
-    if ( $inProcessoLote == 1) {
+    if ( $inProcessoLote == 1)
         $obProcessoPorLoteSim->setChecked(true);    
-    }
+
     $obProcessoPorLoteSim->obEvento->setOnClick("montaParametrosGET('montaFormLote', 'stCtrl'); jQuery('#nuPercentualItem').attr('disabled', 'disabled'); ");
     
     $obProcessoPorLoteNao = new Radio();
@@ -494,9 +522,9 @@ if ( $stAcao == 'incluir' ) {
     $obProcessoPorLoteNao->setLabel('Não');
     $obProcessoPorLoteNao->setValue('2');
     $obProcessoPorLoteNao->setNull(false);
-    if ( $inProcessoLote == 2) {
+    if ( $inProcessoLote == 2)
         $obProcessoPorLoteNao->setChecked(true);    
-    }
+
     $obProcessoPorLoteNao->obEvento->setOnClick("jQuery('#spnLote').html('');\n jQuery('#spnLoteQuantitativo').html('');\n if (jQuery('#inDescontoTabela:checked').val() == 1) { jQuery('#nuPercentualItem').removeAttr('disabled'); }");
 } else {
     # Caso o Registro de Preço já tenha desconto em tabela, não poderá ser alterado.
@@ -524,6 +552,46 @@ if ( $stAcao == 'incluir' ) {
     $obLblProcessoPorLote->setValue  ( ($inProcessoLote == 1) ? "&nbsp;Sim" : "&nbsp;Não" );
 }
 
+//Consulta para Buscar Modalidades Licitação
+$obComprasModalidade = new TComprasModalidade();
+$rsModalidadeLicit = new RecordSet;
+$stFiltro = " WHERE cod_modalidade IN (3,6,7)  ";
+$stOrdem  = " ORDER BY cod_modalidade, descricao ";
+$obComprasModalidade->recuperaTodos($rsModalidadeLicit, $stFiltro, $stOrdem);
+
+//Montando Licitação Urbem
+$obTxtExercicioLicitacao = new TextBox();
+$obTxtExercicioLicitacao->setName       ( 'stExercicioLicitacao' );
+$obTxtExercicioLicitacao->setId         ( 'stExercicioLicitacao' );
+$obTxtExercicioLicitacao->setRotulo     ( 'Exercício' );
+$obTxtExercicioLicitacao->setMaxLength  ( 4 );
+$obTxtExercicioLicitacao->setSize       ( 5 );
+$obTxtExercicioLicitacao->setNull       ( true );
+$obTxtExercicioLicitacao->setValue      ( ($stExercicioLicitacao != "") ? $stExercicioLicitacao : Sessao::getExercicio() );
+$obTxtExercicioLicitacao->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioRegistroPreco='+frm.stExercicioRegistroPreco.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value+'&stAcao=".$stAcao."&inCodLicitacao=".$inCodLicitacao."', 'verificaExercicioLicitacao');");
+
+$obISelectModalidade = new Select();
+$obISelectModalidade->setName       ( 'inCodModalidade' );
+$obISelectModalidade->setId         ( 'inCodModalidade' );
+$obISelectModalidade->setRotulo     ( 'Modalidade' );
+$obISelectModalidade->setTitle      ( 'Selecione a Modalidade.' );
+$obISelectModalidade->setCampoID    ( 'cod_modalidade' );
+$obISelectModalidade->setValue      ( $inCodModalidade );
+$obISelectModalidade->setCampoDesc  ( '[cod_modalidade] - [descricao]' );
+$obISelectModalidade->addOption     ( '','Selecione' );
+$obISelectModalidade->setNull       ( true );
+$obISelectModalidade->preencheCombo ( $rsModalidadeLicit );
+$obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioRegistroPreco='+frm.stExercicioRegistroPreco.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value+'&stAcao=".$stAcao."&inCodLicitacao=".$inCodLicitacao."', 'carregaLicitacao');");
+
+$obISelectLicitacao = new Select();
+$obISelectLicitacao->setName    ( 'inCodLicitacao' );
+$obISelectLicitacao->setId      ( 'inCodLicitacao' );
+$obISelectLicitacao->setRotulo  ( 'Licitação' );
+$obISelectLicitacao->setTitle   ( 'Selecione a Licitação.' );
+$obISelectLicitacao->addOption  ( '','Selecione' );
+$obISelectLicitacao->setNull    ( true );
+$obISelectLicitacao->setValue   ( $inCodLicitacao );
+
 # Inclui formulário de Orgãos
 include_once 'FMManterRegistroPrecoOrgaos.php';
 
@@ -536,7 +604,6 @@ include_once 'FMManterRegistroPrecoQuantitativos.php';
 # Inclui formulário de empenhos
 include_once 'FMManterRegistroPrecoEmpenho.php';
 
-
 $obFormulario = new FormularioAbas;
 $obFormulario->addForm( $obForm );
 
@@ -547,6 +614,7 @@ $obFormulario->addHidden( $obHdnCtrl );
 $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addHidden( $obHdnExercicio );
 $obFormulario->addComponente( $obITextBoxSelectEntidade );
+$obFormulario->addComponente( $obTxtExercicioRegistroPreco );
 $obFormulario->addComponente( $obTxtCodigoProcesso );
 if ( $stAcao == "incluir") {
     $obFormulario->agrupaComponentes (array($obRdTipoRegistroPrecosSim,$obRdTipoRegistroPrecosNao));
@@ -573,6 +641,11 @@ if ($stAcao == "incluir") {
     $obFormulario->addComponente ( $obLblDescontoTabela ) ;
     $obFormulario->addComponente ( $obLblProcessoPorLote ) ;
 }
+
+$obFormulario->addTitulo( "Licitação" );
+$obFormulario->addComponente ( $obTxtExercicioLicitacao );
+$obFormulario->addComponente ( $obISelectModalidade );
+$obFormulario->addComponente ( $obISelectLicitacao );
 
 # Elementos da Aba Orgãos
 $obFormulario->addAba("Orgãos");
@@ -638,7 +711,7 @@ $obFormulario->OK();
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {
-    $stJs  = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioProcessoLicitacao=' +frm.stExercicioProcessoLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&stNroProcessoLicitacao=".$stCodigoProcessoLicitacao."&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');";
+    $stJs  = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stAcao=".$stAcao."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$inCodLicitacao."&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');";
     $stJs .= preencheComboOrgaoAbaQuantitativo();
     
     $boLote = false;

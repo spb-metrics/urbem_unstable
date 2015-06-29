@@ -32,12 +32,12 @@
 
     * @ignore
 
-    * $Id: JSRelatorioDomicilioFiscal.js 59807 2014-09-12 12:31:14Z evandro $
+    * $Id: JSRelatorioDomicilioFiscal.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function preencheProxCombo( inPosicao  ){
     document.frm.stCtrl.value = 'preencheProxCombo';

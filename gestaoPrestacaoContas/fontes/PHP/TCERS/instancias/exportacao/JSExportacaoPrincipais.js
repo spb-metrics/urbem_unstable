@@ -34,10 +34,10 @@
 
     * @ignore
 
-    $Revision: 61473 $
+    $Revision: 62838 $
     $Name$
     $Autor: $
-    $Date: 2015-01-21 11:32:02 -0200 (Qua, 21 Jan 2015) $
+    $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
 
     * Casos de uso: uc-02.08.01
 */
@@ -53,7 +53,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 function add_arquivos_extras(exercicio){ 
 /**
 * Function add_arquivos_extras 

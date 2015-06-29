@@ -737,7 +737,7 @@ switch ($_REQUEST['stCtrl']) {
     case "grupo":
     $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
            </script>';
     break;
@@ -745,7 +745,7 @@ switch ($_REQUEST['stCtrl']) {
     case "credito":
     $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
            </script>';
     break;

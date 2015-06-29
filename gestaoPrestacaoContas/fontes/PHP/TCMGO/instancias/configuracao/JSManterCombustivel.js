@@ -33,7 +33,7 @@
  * $Id:$        
  */
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Salvar(){
         if( Valida() ){
             selecionaTodosSelect(document.frm.arCodCombustivelSWDisponivel);

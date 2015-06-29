@@ -38,26 +38,20 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGDespesaTotalPessoalPL.class.php');
+include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDespesaTotalPessoalPL.class.php');
+    
+$arFiltros = Sessao::read('filtroRelatorio');
 
-    $arFiltros = Sessao::read('filtroRelatorio');
-
-    if ($arFiltros['inPeriodo']<10) {
-        $stMes = "0".$arFiltros['inPeriodo'];
-    } else {
-        $stMes = $arFiltros['inPeriodo'];
-    }
-
-    $dtPeriodoInicial = "01/".$stMes."/".Sessao::read('exercicio');
-    $dtPeriodoFinal   = date("t",mktime(0,0,0,$arFiltros['inPeriodo'],1,Sessao::read('exercicio')))."/".$stMes."/".Sessao::read('exercicio');
+foreach($arDatasInicialFinal as $arPeriodo) {
+    list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
 
     $obFTCEMGDespesaTotalPessoalPL = new FTCEMGDespesaTotalPessoalPL();
     $obFTCEMGDespesaTotalPessoalPL->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDespesaTotalPessoalPL->setDado('dt_inicial'  , $dtPeriodoInicial);
-    $obFTCEMGDespesaTotalPessoalPL->setDado('dt_final'    , $dtPeriodoFinal);
+    $obFTCEMGDespesaTotalPessoalPL->setDado('dt_inicial', $arPeriodo['stDtInicial']);
+    $obFTCEMGDespesaTotalPessoalPL->setDado('dt_final'  , $arPeriodo['stDtFinal']);
 
     //1 MES
-    $arTemp[0]["mes"] = $arFiltros['inPeriodo'];
+    $arTemp[0]["bimestre"] = $inMes;
 
     //2 VENCIMENTOS E VANTAGENS FIXAS - SERVIDORES
     $stFiltro = " (conta_despesa.cod_estrutural like ''3.1.9.0%''
@@ -74,8 +68,9 @@
                AND conta_despesa.cod_estrutural not like ''3.1.9.0.92%''
                AND conta_despesa.cod_estrutural != ''3.1.9.0.16.04.00.00.00''
                AND conta_despesa.cod_estrutural not like ''3.1.9.0.34%'')";
+    
     $obFTCEMGDespesaTotalPessoalPL->setDado('filtro'      , $stFiltro);
-    $obFTCEMGDespesaTotalPessoalPL->recuperaRelacionamento($rsTemp);
+    $obFTCEMGDespesaTotalPessoalPL->recuperaRelacionamento($rsTemp);    
     $arTemp[0]["nuVencimentosVantagens"] = $rsTemp->getCampo("valor");
 
     //3 APOSENTADORIAS E REFORMAS
@@ -192,7 +187,7 @@
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('bimestre');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     
@@ -251,29 +246,10 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuOutrasDespesas');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
+     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nadaDeclararPessoal');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuDespesasAnteriores');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuDespExercAntExcl');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuCorApurMovel');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuDespesaCorres');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('nuDespesaCompet');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
+
+}
 ?>

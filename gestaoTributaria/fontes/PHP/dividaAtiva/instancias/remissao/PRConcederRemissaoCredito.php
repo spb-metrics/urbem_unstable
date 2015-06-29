@@ -1114,7 +1114,7 @@ SistemaLegado::LiberaFrames();
 SistemaLegado::alertaAviso($pgFilt, 'Remissão de Dívida Ativa', 'incluir', 'aviso', Sessao::getId(), '../');
 
 $pgFormRelatorioExecucao = 'FMConcederRemissaoRelatorioCredito.php';
-echo "<script language=\"javaScript\">\r\n";
+echo "<script type=\"text/javascript\">\r\n";
 echo "    var sAux = window.open('".$pgFormRelatorioExecucao."?".Sessao::getId()."&stAcao=".$_REQUEST["stAcao"]."&inCodNorma=".$_REQUEST['inCodNorma']."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
 echo "    eval(sAux)\r\n";
 echo "</script>\r\n";

@@ -41,53 +41,51 @@ class TTCEMGDividaConsolidadaRPPS extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql = " SELECT 
-                        ".$this->getDado('mes')." as mes
-                        , CAST(COALESCE(div_contratual_demais           ,0.00) AS NUMERIC(14,2)) as div_contratual_demais
-                        , CAST(COALESCE(div_contratual_ppp              ,0.00) AS NUMERIC(14,2)) as div_contratual_ppp
-                        , CAST(COALESCE(div_mobiliaria                  ,0.00) AS NUMERIC(14,2)) as div_mobiliaria
-                        , CAST(COALESCE(op_credito_inf_12               ,0.00) AS NUMERIC(14,2)) as op_credito_inf_12
-                        , CAST(COALESCE(outras                          ,0.00) AS NUMERIC(14,2)) as outras
-                        , CAST(COALESCE(parc_contr_sociais_prev         ,0.00) AS NUMERIC(14,2)) as parc_contr_sociais_prev
-                        , CAST(COALESCE(parc_contr_sociais_demais       ,0.00) AS NUMERIC(14,2)) as parc_contr_sociais_demais
-                        , CAST(COALESCE(parc_tributos                   ,0.00) AS NUMERIC(14,2)) as parc_tributos
-                        , CAST(COALESCE(parc_fgts                       ,0.00) AS NUMERIC(14,2)) as parc_fgts
-                        , CAST(COALESCE(precatorios_post                ,0.00) AS NUMERIC(14,2)) as precatorios_post
-                        , CAST(COALESCE(div_contratual_demais_rpps      ,0.00) AS NUMERIC(14,2)) as div_contratual_demais_rpps
-                        , CAST(COALESCE(div_contratual_ppp_rpps         ,0.00) AS NUMERIC(14,2)) as div_contratual_ppp_rpps
-                        , CAST(COALESCE(div_mobiliaria_rpps             ,0.00) AS NUMERIC(14,2)) as div_mobiliaria_rpps
-                        , CAST(COALESCE(op_credito_inf_12_rpps          ,0.00) AS NUMERIC(14,2)) as op_credito_inf_12_rpps
-                        , CAST(COALESCE(outras_rpps                     ,0.00) AS NUMERIC(14,2)) as outras_rpps
-                        , CAST(COALESCE(parc_contr_sociais_prev_rpps    ,0.00) AS NUMERIC(14,2)) as parc_contr_sociais_prev_rpps
-                        , CAST(COALESCE(parc_contr_sociais_demais_rpps  ,0.00) AS NUMERIC(14,2)) as parc_contr_sociais_demais_rpps
-                        , CAST(COALESCE(parc_tributos_rpps              ,0.00) AS NUMERIC(14,2)) as parc_tributos_rpps
-                        , CAST(COALESCE(parc_fgts_rpps                  ,0.00) AS NUMERIC(14,2)) as parc_fgts_rpps
-                        , CAST(COALESCE(precatorios_post_rpps           ,0.00) AS NUMERIC(14,2)) as precatorios_post_rpps
-                    FROM tcemg.arquivo_divida_consolidada_rpps('".$this->getDado('exercicio')."'
-                                                                ,'Mes'
-                                                                ,".$this->getDado('mes')."
+                        '12' as mes
+                        , ABS(div_contratual_demais         ) as div_contratual_demais
+                        , ABS(div_contratual_ppp            ) as div_contratual_ppp
+                        , ABS(div_mobiliaria                ) as div_mobiliaria
+                        , ABS(op_credito_inf_12             ) as op_credito_inf_12
+                        , ABS(outras                        ) as outras
+                        , ABS(parc_contr_sociais_prev       ) as parc_contr_sociais_prev
+                        , ABS(parc_contr_sociais_demais     ) as parc_contr_sociais_demais
+                        , ABS(parc_tributos                 ) as parc_tributos
+                        , ABS(parc_fgts                     ) as parc_fgts
+                        , ABS(precatorios_post              ) as precatorios_post
+                        , ABS(div_contratual_demais_rpps    ) as div_contratual_demais_rpps
+                        , ABS(div_contratual_ppp_rpps       ) as div_contratual_ppp_rpps
+                        , ABS(div_mobiliaria_rpps           ) as div_mobiliaria_rpps
+                        , ABS(op_credito_inf_12_rpps        ) as op_credito_inf_12_rpps
+                        , ABS(outras_rpps                   ) as outras_rpps
+                        , ABS(parc_contr_sociais_prev_rpps  ) as parc_contr_sociais_prev_rpps
+                        , ABS(parc_contr_sociais_demais_rpps) as parc_contr_sociais_demais_rpps
+                        , ABS(parc_tributos_rpps            ) as parc_tributos_rpps
+                        , ABS(parc_fgts_rpps                ) as parc_fgts_rpps
+                        , ABS(precatorios_post_rpps         ) as precatorios_post_rpps
+                    FROM tcemg.arquivo_divida_consolidada_rpps('".$this->getDado('exercicio')."'                                                                
                                                                 ,'".$this->getDado('cod_entidade')."'
                                                                 ,'".$this->getDado('cod_entidade_rpps')."') 
                     AS tbl(
-                             div_contratual_demais              NUMERIC
-                            , div_contratual_ppp                NUMERIC
-                            , div_mobiliaria                    NUMERIC
-                            , op_credito_inf_12                 NUMERIC
-                            , outras                            NUMERIC
-                            , parc_contr_sociais_prev           NUMERIC
-                            , parc_contr_sociais_demais         NUMERIC
-                            , parc_tributos                     NUMERIC
-                            , parc_fgts                         NUMERIC
-                            , precatorios_post                  NUMERIC
-                            , div_contratual_demais_rpps        NUMERIC
-                            , div_contratual_ppp_rpps           NUMERIC
-                            , div_mobiliaria_rpps               NUMERIC
-                            , op_credito_inf_12_rpps            NUMERIC
-                            , outras_rpps                       NUMERIC
-                            , parc_contr_sociais_prev_rpps      NUMERIC
-                            , parc_contr_sociais_demais_rpps    NUMERIC
-                            , parc_tributos_rpps                NUMERIC
-                            , parc_fgts_rpps                    NUMERIC
-                            , precatorios_post_rpps             NUMERIC
+                             div_contratual_demais              NUMERIC(14,2)
+                            , div_contratual_ppp                NUMERIC(14,2)
+                            , div_mobiliaria                    NUMERIC(14,2)
+                            , op_credito_inf_12                 NUMERIC(14,2)
+                            , outras                            NUMERIC(14,2)
+                            , parc_contr_sociais_prev           NUMERIC(14,2)
+                            , parc_contr_sociais_demais         NUMERIC(14,2)
+                            , parc_tributos                     NUMERIC(14,2)
+                            , parc_fgts                         NUMERIC(14,2)
+                            , precatorios_post                  NUMERIC(14,2)
+                            , div_contratual_demais_rpps        NUMERIC(14,2)
+                            , div_contratual_ppp_rpps           NUMERIC(14,2)
+                            , div_mobiliaria_rpps               NUMERIC(14,2)
+                            , op_credito_inf_12_rpps            NUMERIC(14,2)
+                            , outras_rpps                       NUMERIC(14,2)
+                            , parc_contr_sociais_prev_rpps      NUMERIC(14,2)
+                            , parc_contr_sociais_demais_rpps    NUMERIC(14,2)
+                            , parc_tributos_rpps                NUMERIC(14,2)
+                            , parc_fgts_rpps                    NUMERIC(14,2)
+                            , precatorios_post_rpps             NUMERIC(14,2)
                     )
         ";
         

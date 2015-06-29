@@ -33,13 +33,13 @@
  * @ignore 
  * $id: $
  * 
- * $Revision: 60426 $
+ * $Revision: 62838 $
  * $Name$
- * $Author: gelson $
- * $Date: 2014-10-21 09:54:26 -0200 (Ter, 21 Out 2014) $
+ * $Author: diogo.zarpelon $
+ * $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
 **/
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function selecionaArquivos(boSelected) {
     i = 0;

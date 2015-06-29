@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.95
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function AdicionaValorVariavel(stControle){
     var mensagem = '';
     var valor   = (document.frm.stValor)    ? document.frm.stValor.value    : '';

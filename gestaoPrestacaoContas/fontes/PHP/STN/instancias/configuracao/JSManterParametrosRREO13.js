@@ -33,7 +33,7 @@
  * $Id:$        
  */         
 ?>                                                                                                                     
-<script language="JavaScript">
+<script type="text/javascript">
     function limpaFormularioAux(){
         jq('#stAno').selectOptions('');
         jq('#flReceitaPrevidenciaria').val('');

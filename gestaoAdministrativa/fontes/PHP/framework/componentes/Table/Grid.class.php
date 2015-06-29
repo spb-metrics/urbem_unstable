@@ -515,7 +515,7 @@ class Grid
             </div>
         </div>";
 
-        $stHtml .= "<script language='javascript'>                                                              \n";
+        $stHtml .= "<script type='text/javascript'>                                                              \n";
 
 
         $stHtml .= "Ext.onReady ( function () {                                                                 \n";

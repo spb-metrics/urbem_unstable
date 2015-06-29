@@ -44,7 +44,7 @@ include (CAM_FRAMEWORK."legado/paginacaoLegada.class.php");
 include (CAM_FRAMEWORK."legado/auditoriaLegada.class.php");
 setAjuda('uc-01.06.96');
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -72,7 +72,7 @@ if (!(isset($_REQUEST["codDocumento"]))) {
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);
         if ($dbEmp->numeroDeLinhas == 0 && $_REQUEST["pagina"] != 0) {
-            echo 	"<script language='javascript'>
+            echo 	"<script type='text/javascript'>
                         mudaTelaPrincipal('excluiDocumento.php?".Sessao::getId()."');
                     </script>";
         }
@@ -144,12 +144,12 @@ if ($documento->deleteDocumento()) {
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codDocumento);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.addslashes(urlencode($_REQUEST["stDescQuestao"])).'","excluir","aviso", "'.Sessao::getId().'");
                  window.location = "excluiDocumento.php?'.Sessao::getId().'&pagina='.$cod[1].'";
                  </script>';
 } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("Documento '.addslashes(urlencode($_REQUEST["stDescQuestao"])).', não pode ser excluído porque está sendo utilizado","n_excluir","erro", "'.Sessao::getId().'");
                  window.location = "excluiDocumento.php?'.Sessao::getId().'&pagina='.$cod[1].'";
                  </script>';

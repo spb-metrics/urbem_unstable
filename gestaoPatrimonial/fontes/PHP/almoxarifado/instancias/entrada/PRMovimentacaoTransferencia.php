@@ -227,9 +227,9 @@ function lightbox($arItens, $inCodLancamento, $inCodLancamentoEntrada, $total_pa
 
     if ($inPP > 0 OR $inEM >0) {
         if ($_REQUEST['stAcao'] == 'saida') {
-            echo '<script language="JavaScript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'",\'saida\');'.$stJs.'</script>';
+            echo '<script type="text/javascript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'",\'saida\');'.$stJs.'</script>';
         } else {
-            echo '<script language="JavaScript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'",\'entrada\');'.$stJs.'</script>';
+            echo '<script type="text/javascript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'",\'entrada\');'.$stJs.'</script>';
         }
 
         return True;

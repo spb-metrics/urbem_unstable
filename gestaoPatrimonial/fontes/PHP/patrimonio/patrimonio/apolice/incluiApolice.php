@@ -105,7 +105,7 @@ Revision 1.23  2006/07/06 12:11:27  diego
         // Formulario para INCLUSAO de Apolice
         case 0:
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";
@@ -230,7 +230,7 @@ Revision 1.23  2006/07/06 12:11:27  diego
                 alertaAviso("listaApolice.php","Apólice ".$numero." - ".$sessao,"n_incluir","erro",Sessao::getId());
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("O Número: '.$numero.' desta Apólice, já está cadastrada na Seguradora: '.$seguradora.'","unica","erro", "'.Sessao::getId().'");            mudaTelaPrincipal("incluiApolice.php?'.Sessao::getId().'&numero='.$numero.'&nomSeguradora='.$seguradora.'&dtVencimento='.$dtVencimento.'&contato='.$contato.'&codSeguradora='.$codSeguradora.'"); </script>';
         }
         break;

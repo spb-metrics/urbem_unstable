@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RContabilidadeLancamentoValor.class.php 62341 2015-04-24 21:14:44Z carlos.silva $
+    * $Id: RContabilidadeLancamentoValor.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-02.02.05, uc-02.02.04, uc-02.02.11, uc-02.02.21, uc-02.02.31, uc-02.02.02
 */
@@ -1012,7 +1012,7 @@ class RContabilidadeLancamentoValor
         if ($this->nuErros > 0) {
             fclose($this->logErros) ;
         }
-        echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+        echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
 
         return $obErro;
     }

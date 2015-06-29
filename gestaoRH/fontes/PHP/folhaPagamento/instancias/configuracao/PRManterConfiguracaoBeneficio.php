@@ -62,52 +62,64 @@ $pgJS   = "JS".$stPrograma.".js";
 switch ($stAcao) {
     case "alterar":
         Sessao::setTrataExcecao(true);
-        $obTFolhaPagamentoConfiguracaoBeneficio = new TFolhaPagamentoConfiguracaoBeneficio;
-        $obTFolhaPagamentoConfiguracaoBeneficio->setDado('cod_configuracao', 1);
-        $obTFolhaPagamentoConfiguracaoBeneficio->inclusao();
         
-        $obTFolhaPagamentoTipoEventoBeneficio = new TFolhaPagamentoTipoEventoBeneficio;
-        $obTFolhaPagamentoTipoEventoBeneficio->recuperaTodos($rsTipoEventoBeneficio, " WHERE cod_beneficio = 1");        
-
-        $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
-        $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo = '".$_POST["inCodigoEvento"]."'");
-
-        $obTFolhaPagamentoBeneficioEvento = new TFolhaPagamentoBeneficioEvento;
-        $obTFolhaPagamentoBeneficioEvento->setDado("cod_configuracao", $obTFolhaPagamentoConfiguracaoBeneficio->getDado("cod_configuracao"));
-        $obTFolhaPagamentoBeneficioEvento->setDado("timestamp"       , $obTFolhaPagamentoConfiguracaoBeneficio->getDado("timestamp"));
-        $obTFolhaPagamentoBeneficioEvento->setDado("cod_evento"      , $rsEvento->getCampo("cod_evento"));
-        $obTFolhaPagamentoBeneficioEvento->setDado("cod_tipo"        , $rsTipoEventoBeneficio->getCampo("cod_tipo"));
-        $obTFolhaPagamentoBeneficioEvento->inclusao();
-
-        $arPlanos = Sessao::read('arPlanos');
-        $i = 1 + 1;
-        foreach ($arPlanos as $registro) {
+        if ( $_POST["inCodigoEvento"] != "" ) {
             $obTFolhaPagamentoConfiguracaoBeneficio = new TFolhaPagamentoConfiguracaoBeneficio;
-            $obTFolhaPagamentoConfiguracaoBeneficio->setDado('cod_configuracao', $i); $i++;
+            $obTFolhaPagamentoConfiguracaoBeneficio->setDado('cod_configuracao', 1);
             $obTFolhaPagamentoConfiguracaoBeneficio->inclusao();
-            
+        
             $obTFolhaPagamentoTipoEventoBeneficio = new TFolhaPagamentoTipoEventoBeneficio;
-            $obTFolhaPagamentoTipoEventoBeneficio->recuperaTodos($rsTipoEventoBeneficio, " WHERE cod_beneficio = 2");
-            
+            $obTFolhaPagamentoTipoEventoBeneficio->recuperaTodos($rsTipoEventoBeneficio, " WHERE cod_beneficio = 1");        
+
             $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
-            $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo = '".$registro["codigo"]."'");
-            
+            $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo = '".$_POST["inCodigoEvento"]."'");
+
             $obTFolhaPagamentoBeneficioEvento = new TFolhaPagamentoBeneficioEvento;
             $obTFolhaPagamentoBeneficioEvento->setDado("cod_configuracao", $obTFolhaPagamentoConfiguracaoBeneficio->getDado("cod_configuracao"));
             $obTFolhaPagamentoBeneficioEvento->setDado("timestamp"       , $obTFolhaPagamentoConfiguracaoBeneficio->getDado("timestamp"));
             $obTFolhaPagamentoBeneficioEvento->setDado("cod_evento"      , $rsEvento->getCampo("cod_evento"));
             $obTFolhaPagamentoBeneficioEvento->setDado("cod_tipo"        , $rsTipoEventoBeneficio->getCampo("cod_tipo"));
             $obTFolhaPagamentoBeneficioEvento->inclusao();
+        }else{
+            $obTFolhaPagamentoConfiguracaoBeneficio = new TFolhaPagamentoConfiguracaoBeneficio;
+            $obTFolhaPagamentoConfiguracaoBeneficio->setDado('cod_configuracao', 1);
+            $obTFolhaPagamentoConfiguracaoBeneficio->exclusao();
+        
+            $obTFolhaPagamentoBeneficioEvento = new TFolhaPagamentoBeneficioEvento;
+            $obTFolhaPagamentoBeneficioEvento->setDado("cod_configuracao", 1);
+            $obTFolhaPagamentoBeneficioEvento->exclusao();
+        }
+
+        $arPlanos = Sessao::read('arPlanos');
+        $i = 1 + 1;        
+        if ( $arPlanos > 0 ) {
+            foreach ($arPlanos as $registro) {
+                $obTFolhaPagamentoConfiguracaoBeneficio = new TFolhaPagamentoConfiguracaoBeneficio;
+                $obTFolhaPagamentoConfiguracaoBeneficio->setDado('cod_configuracao', $i); $i++;
+                $obTFolhaPagamentoConfiguracaoBeneficio->inclusao();
             
-            $obTFolhaPagamentoConfiguracaoBeneficioFornecedor = new TFolhaPagamentoConfiguracaoBeneficioFornecedor;
-            $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("cod_configuracao", $obTFolhaPagamentoConfiguracaoBeneficio->getDado('cod_configuracao'));
-            $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("timestamp"       , $obTFolhaPagamentoConfiguracaoBeneficio->getDado('timestamp'));
-            $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("cgm_fornecedor"  , $registro['numcgm']);
-            $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->inclusao();
+                $obTFolhaPagamentoTipoEventoBeneficio = new TFolhaPagamentoTipoEventoBeneficio;
+                $obTFolhaPagamentoTipoEventoBeneficio->recuperaTodos($rsTipoEventoBeneficio, " WHERE cod_beneficio = 2");
+            
+                $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
+                $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo = '".$registro["codigo"]."'");
+            
+                $obTFolhaPagamentoBeneficioEvento = new TFolhaPagamentoBeneficioEvento;
+                $obTFolhaPagamentoBeneficioEvento->setDado("cod_configuracao", $obTFolhaPagamentoConfiguracaoBeneficio->getDado("cod_configuracao"));
+                $obTFolhaPagamentoBeneficioEvento->setDado("timestamp"       , $obTFolhaPagamentoConfiguracaoBeneficio->getDado("timestamp"));
+                $obTFolhaPagamentoBeneficioEvento->setDado("cod_evento"      , $rsEvento->getCampo("cod_evento"));
+                $obTFolhaPagamentoBeneficioEvento->setDado("cod_tipo"        , $rsTipoEventoBeneficio->getCampo("cod_tipo"));
+                $obTFolhaPagamentoBeneficioEvento->inclusao();
+            
+                $obTFolhaPagamentoConfiguracaoBeneficioFornecedor = new TFolhaPagamentoConfiguracaoBeneficioFornecedor;
+                $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("cod_configuracao", $obTFolhaPagamentoConfiguracaoBeneficio->getDado('cod_configuracao'));
+                $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("timestamp"       , $obTFolhaPagamentoConfiguracaoBeneficio->getDado('timestamp'));
+                $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->setDado("cgm_fornecedor"  , $registro['numcgm']);
+                $obTFolhaPagamentoConfiguracaoBeneficioFornecedor->inclusao();
+            }
         }
         
         Sessao::encerraExcecao();
-        $stDescricaoEvento = $_POST['inCodigoEvento'] ."-". $rsEvento->getCampo("descricao");
-        sistemaLegado::alertaAviso($pgForm,"Evento $stDescricaoEvento","incluir","aviso", Sessao::getId(), "../");
+        sistemaLegado::alertaAviso($pgForm,"Configurar cálculo de benefícios concluido com sucesso.","incluir","aviso", Sessao::getId(), "../");
     break;
 }

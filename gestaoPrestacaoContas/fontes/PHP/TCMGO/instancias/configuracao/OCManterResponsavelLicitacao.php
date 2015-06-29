@@ -38,7 +38,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php" );
+include_once ( CAM_GA_CGM_MAPEAMENTO."TCGM.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterResponsavelLicitacao";
@@ -57,25 +57,31 @@ $boTransacao = new Transacao();
 // Acoes por pagina
 switch ($stCtrl) {
     case "validaCGM":
-        $obTCGMPessoaFisica = new TCGMPessoaFisica();        
+        $obTCGM = new TCGM();        
         $rsCGM = new RecordSet();
         
         $inNumCGM = $request->get($request->get('stNomCampoCod'));
         if ( !$inNumCGM == "" ) {            
-            $obTCGMPessoaFisica->recuperaRelacionamento( $rsCGM, "AND PF.numcgm = ".$inNumCGM."","",$boTransacao );
-
-                if ($rsCGM->getNumLinhas() < 1) {
-                    $stJs  = "alertaAviso('@Número do CGM (". $request->get($request->get('stNomCampoCod')) .") não encontrado no cadastro de Pessoa ', 'form','erro','".Sessao::getId()."');";
-                    
-                    $stNomCampoCod = $request->get('stNomCampoCod');
-                    $stIdCampoDesc = $request->get('stIdCampoDesc');
-                    $stJs .= " d.getElementById('".$stNomCampoCod."').value = ''; ";
-                    $stJs .= " d.getElementById('".$stIdCampoDesc."').innerHTML = '&nbsp;'; ";
-                    
-                }else{
-                    $stNomCGM = $rsCGM->getCampo('nom_cgm');
-                    $stJs = "retornaValorBscInner( '".$request->get('stNomCampoCod')."', '".$request->get('stIdCampoDesc')."', 'frm', '".str_replace("'", "\'", $stNomCGM)."');";
-                } 
+            
+            $filtroVinculo  =" AND SW_CGM.numcgm = ".$inNumCGM; 
+            $filtroVinculo .=" AND comissao_licitacao.cod_licitacao  = ".$request->get('inCodLicitacao');
+            $filtroVinculo .=" AND comissao_licitacao.cod_comissao   = ".$request->get('inCodComissao');
+            $filtroVinculo .=" AND comissao_licitacao.cod_modalidade = ".$request->get('inCodModalidade');
+            
+            $obTCGM->recuperaRelacionamentoVinculadoComissaoLicitacao($rsCGM, "" ,"" , $boTransacao, "" , "", $filtroVinculo);
+                
+            if ($rsCGM->getNumLinhas() < 1) {
+                $stJs  = "alertaAviso('@Número do CGM (". $request->get($request->get('stNomCampoCod')) .") não encontrado no cadastro de comissão desta licitação ', 'form','erro','".Sessao::getId()."');";
+                
+                $stNomCampoCod = $request->get('stNomCampoCod');
+                $stIdCampoDesc = $request->get('stIdCampoDesc');
+                $stJs .= " d.getElementById('".$stNomCampoCod."').value = ''; ";
+                $stJs .= " d.getElementById('".$stIdCampoDesc."').innerHTML = '&nbsp;'; ";
+                
+            }else{
+                $stNomCGM = $rsCGM->getCampo('nom_cgm');
+                $stJs = "retornaValorBscInner( '".$request->get('stNomCampoCod')."', '".$request->get('stIdCampoDesc')."', 'frm', '".str_replace("'", "\'", $stNomCGM)."');";
+            } 
 
         }else{
             $stNomCampoCod = $request->get('stNomCampoCod');

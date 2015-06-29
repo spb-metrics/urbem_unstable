@@ -45,7 +45,7 @@ Bug #9636#
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 /**
 * Desmarca todos elementos do combo (select).

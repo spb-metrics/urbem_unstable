@@ -68,7 +68,7 @@ $ctrl = 0;
 switch ($ctrl) {
 case 0:
 ?>
-   <script language="JavaScript1.2" type="text/javascript">
+   <script type="text/javascript">
 
       function Valida()
       {
@@ -191,12 +191,12 @@ case 1:
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $objeto);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("'.$objeto.'","incluir","aviso","'.Sessao::getId().'");
             mudaTelaPrincipal("incluiAtributo.php?'.Sessao::getId().'");
             </script>';
         } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("'.$objeto.'","n_incluir","erro","'.Sessao::getId().'");
             mudaTelaPrincipal("incluiAtributo.php?'.Sessao::getId().'");
             </script>';
@@ -207,7 +207,7 @@ case 1:
     //******************************************************************
     //Se já existir algum registro com esse nome
     $js = "f.ok.disabled = false;";
-    echo '<script language="JavaScript1.2" type="text/javascript">
+    echo '<script type="text/javascript">
     alertaAviso("Já existe um atributo com esse nome","unica","erro","'.Sessao::getId().'");
     </script>';	}//****************************************************************	break;
 }

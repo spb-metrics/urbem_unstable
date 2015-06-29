@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
+
     * Data de Criação   : 02/03/2007
 
     * @author Analista: Gelson
@@ -31,15 +28,13 @@
 
     * @ignore
 
-    $Revision: 61525 $
+    $Revision: 62844 $
     $Name$
     $Author: evandro $
-    $Date: 2015-01-29 17:21:26 -0200 (Qui, 29 Jan 2015) $
+    $Date: 2015-06-26 17:33:35 -0300 (Sex, 26 Jun 2015) $
 
     * Casos de uso: uc-06.04.00
-*/
 
-/*
 $Log$
 Revision 1.6  2007/06/12 18:33:46  hboaventura
 inclusão dos casos de uso uc-06.04.00
@@ -83,22 +78,18 @@ $obTMapeamento->setDado ('stEntidades', $stEntidades  );
 $obTMapeamento->recuperaArquivoExportacao10($rsRegistro10,"","",$boTransacao);
 $obTMapeamento->recuperaArquivoExportacao11($rsRegistro11,"","",$boTransacao);
 
-$i = 0;        
-$j = 0;
+$i = 1;        
 
 if ($rsRegistro10->getNumLinhas() > 0) {
     $stChave10 = '';
     $stChaveAuxiliar10 = '';    
-    foreach ($rsRegistro10->arElementos as $stChave) {
-        $rsRegistro10->arElementos[$i]['numero_registro']    = $i+1;
-        $rsRegistro10->arElementos[$i]['vl_cancelamento']    = 0;
-        $rsRegistro10->arElementos[$i]['vl_encampacao']      = 0;
-        $i++;
-    }   
+
     foreach ($rsRegistro10->getElementos() as $arRegistro10) {
-        $stChaveAuxiliar10 = $arRegistro10['num_orgao'] . $arRegistro10['num_unidade'] . $arRegistro10['exercicio'] . $arRegistro10['tipo_lancamento'];
+        $stChaveAuxiliar10 = $arRegistro10['num_orgao'].$arRegistro10['num_unidade'].$arRegistro10['exercicio'].$arRegistro10['tipo_lancamento'].$arRegistro10['rownumber'];
         if ( $stChaveAuxiliar10 != $stChave10 ) {
-            $stChave10 = $arRegistro10['num_orgao'] . $arRegistro10['num_unidade'] . $arRegistro10['exercicio'] . $arRegistro10['tipo_lancamento'];
+            $stChave10 = $arRegistro10['num_orgao'].$arRegistro10['num_unidade'].$arRegistro10['exercicio'].$arRegistro10['tipo_lancamento'].$arRegistro10['rownumber'];
+
+            $arRegistro10['numero_registro'] = $i++;
 
             unset($$rsBloco);
             $$rsBloco = new RecordSet();
@@ -164,20 +155,16 @@ if ($rsRegistro10->getNumLinhas() > 0) {
         
             if ($rsRegistro11->getNumLinhas() > 0) {
                 $stChave11 = '';                                
-                foreach ($rsRegistro11->arElementos as $stChave) {                    
-                    $rsRegistro11->arElementos[$j]['numero_registro']    = $j+1;
-                    $rsRegistro11->arElementos[$j]['vl_cancelamento']    = 0;
-                    $rsRegistro11->arElementos[$j]['vl_encampacao']      = 0;
-                    $j++;
-                }
 
                 foreach ($rsRegistro11->getElementos() as $arRegistro11) {
-                    $stChave20Aux = $arRegistro11['num_orgao'] . $arRegistro11['num_unidade'] . $arRegistro11['exercicio'] . $arRegistro11['tipo_lancamento'];
-                    //Verifica se registro 20 bate com chave do registro 10
-                    if ($stChave10 === $stChave20Aux) {
-                        //Chave única do registro 20
-                        if ($stChave20 != $stChave20Aux ) {
-                            $stChave20 = $stChave20Aux;
+                    $stChave11Aux = $arRegistro11['num_orgao'].$arRegistro11['num_unidade'].$arRegistro11['exercicio'].$arRegistro11['tipo_lancamento'].$arRegistro11['rownumber'];
+                    //Verifica se registro 11 bate com chave do registro 10
+                    if ($stChave10 == $stChave11Aux) {
+                        //Chave única do registro 11
+                        if ($stChave11 != $stChave11Aux ) {
+                            $stChave11 = $stChave11Aux;
+
+                            $arRegistro11['numero_registro'] = $i++;
 
                             unset($$rsBloco);
                             $$rsBloco = new RecordSet();
@@ -253,7 +240,7 @@ $rsRecordSetRodape = new RecordSet;
 $arRegistro = array();
 $arRegistro[0][ 'tipo_registro'  ] = 99 ;
 $arRegistro[0][ 'brancos'        ] = ' ';
-$arRegistro[0][ 'numero_registro'] = count($rsRegistro10->getElementos()) + count($rsRegistro11->getElementos());
+$arRegistro[0][ 'numero_registro'] = count($rsRegistro10->getElementos()) + count($rsRegistro11->getElementos())+1;
 
 $rsRecordSetRodape->preenche ( $arRegistro );
 

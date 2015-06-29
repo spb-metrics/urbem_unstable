@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterJulgamentoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterJulgamentoProposta.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-03.05.26
 */
@@ -208,7 +208,7 @@ $obFormulario->defineBarra ( array($obBtnOk,$obBtnCancelar) );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
-echo "<script language='javascript'>\n";
+echo "<script type='text/javascript'>\n";
 
 $stUrl = $pgOcul."?".Sessao::getId()."&stMapaCompras=".$request->get('inCodMapa')."/".$request->get('stExercicio')."&boAlteraAnula=true&inCodLicitacao=".$request->get('inCodLicitacao')."&inCodModalidade=".$request->get('inCodModalidade');
 

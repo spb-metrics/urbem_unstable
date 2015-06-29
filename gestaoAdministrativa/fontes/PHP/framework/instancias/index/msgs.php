@@ -49,7 +49,7 @@ if (!(session_is_registered("sessao"))) {
 <title></title>
 
 <link href="includes/estilos_inicial.css" type="text/css" rel="stylesheet">
-<script language="JavaScript" type="text/JavaScript">
+<script type="text/JavaScript">
     function mudaMenu(func)
     {
         sPag = "menu.php?<?=Sessao::getId();?>&nivel=3&cod_func_pass="+func;

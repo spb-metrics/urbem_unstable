@@ -31,12 +31,12 @@
 * @author Analista: Gelson W. Gonçalves
 * @author Desenvolvedor: Henrique Girardi dos Santos
 
-   $Id: JSMovimentacaoOrdemCompra.js 59612 2014-09-02 12:00:51Z gelson $
+   $Id: JSMovimentacaoOrdemCompra.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 /* atualizar o item selecionado  */
 function selecionaItem( Objeto )

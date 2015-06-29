@@ -133,11 +133,6 @@ class relatorioPdfLegado
     {
         $this->montaCabecalhoHTML();
 
-        $sAcrobatReader = Sessao::read("acrobatreader");
-
-        if ( is_dir($sAcrobatReader) ) {
-           $sAcrobatReader .= "/acroread";
-        }
         $this->iCopias = (int) $this->iCopias;
         if ($this->iCopias<1) {
             $this->iCopias=1;
@@ -193,8 +188,8 @@ class relatorioPdfLegado
 -->
         </table>
         </div>
-        <script language="JavaScript1.2" type="text/javascript" src=ifuncoesJs.js></script>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript" src=ifuncoesJs.js></script>
+        <script type="text/javascript">
             alertaAvisoNivel2("Documento enviado para a Fila de Impressão","unica","aviso",'.Sessao::getId().');
         </script>';
         $this->montaRodapeHTML();
@@ -397,8 +392,6 @@ class relatorioPdfLegado
                                              pegaConfiguracao('logradouro')." ".
                                              pegaConfiguracao('numero');
         $this->PDF->sEnderecoPrefeitura[3]  = "Cep: ".pegaConfiguracao('cep')." - ".$sMunic;
-
-        Sessao::write('acrobatreader',pegaConfiguracao('caminho_acrobat'));
 
         $this->PDF->sImprimeUsuario = strtoupper(pegaConfiguracao('usuario_relatorio'));
         $this->PDF->sNomeRelatorio  = $this->sScriptFile;
@@ -1017,8 +1010,8 @@ class relatorioPdfLegado
         <html>
         <head>
         <title></title>
-        <script language="JavaScript1.2" src="ifuncoesJs.js" type="text/javascript"></script>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script src="ifuncoesJs.js" type="text/javascript"></script>
+        <script type="text/javascript">
         function alertaAviso(objeto,tipo,chamada)
         {
             var x = 350;

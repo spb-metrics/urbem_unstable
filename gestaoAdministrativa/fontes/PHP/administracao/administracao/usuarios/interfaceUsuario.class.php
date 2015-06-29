@@ -81,7 +81,7 @@ class interfaceUsuario
     public function formBuscaUsuario($ctrl,$action="")
     {
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
     //A função Valida() faz a verfificação dos campos, monte-a conforme a sua necessidade.
 
@@ -189,7 +189,7 @@ class interfaceUsuario
         </tr>
     </table>
 </form>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     placeFocus();
 </script>
 <?php
@@ -340,7 +340,7 @@ class interfaceUsuario
             }
         }
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     //A função Valida() faz a verfificação dos campos, monte-a conforme a sua necessidade.
     function Valida()
     {
@@ -512,7 +512,7 @@ class interfaceUsuario
         $exercicio = SistemaLegado::pegaConfiguracao("ano_exercicio");
 
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {

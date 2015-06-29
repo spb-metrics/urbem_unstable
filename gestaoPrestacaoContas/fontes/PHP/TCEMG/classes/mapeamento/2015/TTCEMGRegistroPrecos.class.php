@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGRegistroPrecos.class.php 62269 2015-04-15 18:28:39Z franver $
- * $Revision: 62269 $
- * $Author: franver $
- * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
+ * $Id: TTCEMGRegistroPrecos.class.php 62842 2015-06-26 17:29:59Z michel $
+ * $Revision: 62842 $
+ * $Author: michel $
+ * $Date: 2015-06-26 14:29:59 -0300 (Sex, 26 Jun 2015) $
  * 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -105,6 +105,8 @@ class TTCEMGRegistroPrecos extends Persistente
               FROM tcemg.registro_precos
 
              WHERE cod_entidade = ".$this->getDado('cod_entidade');
+        if($this->getDado('exercicio')!=NULL)
+            $stSql .= " AND exercicio='".$this->getDado('exercicio')."'";
 
         return $stSql;
     }
@@ -126,7 +128,8 @@ class TTCEMGRegistroPrecos extends Persistente
     {
         $stSql = "
             SELECT cod_entidade
-                 , LPAD(numero_registro_precos::VARCHAR, 12, '0') || '/'|| exercicio AS codigo_registro_precos
+                 , LPAD(numero_registro_precos::VARCHAR, 12, '0') AS codigo_registro_precos
+                 , registro_precos.exercicio AS exercicio_registro_precos
                  , TO_CHAR(data_abertura_registro_precos,'dd/mm/yyyy') AS data_abertura_registro_precos
                  , sw_cgm.numcgm  AS numcgm_gerenciador
                  , sw_cgm.nom_cgm AS nomcgm_gerenciador
@@ -184,17 +187,23 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  parp.cod_entidade::VARCHAR||parp.numero_registro_precos::VARCHAR||parp.exercicio::VARCHAR AS chave10
                   ,  10 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  TO_CHAR(parp.data_abertura_registro_precos, 'ddmmyyyy') AS data_abertura_processo_adesao
-                  ,  sw_cgm.nom_cgm AS nome_orgao_gerenciador
-                  ,  config_licitacao.exercicio_licitacao
-                  ,  config_licitacao.num_licitacao AS numero_processo_licitacao
+                  ,  CASE WHEN RPO.nome_orgao_gerenciador IS NOT NULL
+                                THEN RPO.nome_orgao_gerenciador
+                                ELSE sw_cgm.nom_cgm
+                     END AS nome_orgao_gerenciador
+                  ,  parp.exercicio_licitacao
+                  ,  parp.numero_processo_licitacao AS numero_processo_licitacao
                   --MODIFICAR Modalidade Licitação em Cdg Modalidade do Arquivo
+                  --No Ticket #23018 foi ajustado, mas deve-se manter o CASE, pois registros de preços mais antigos podem ser das modalidades licitação = 3,6,7.
                   ,  CASE WHEN parp.codigo_modalidade_licitacao = 3 THEN 1
-                          WHEN parp.codigo_modalidade_licitacao = 6 THEN 2
-			              WHEN parp.codigo_modalidade_licitacao = 7 THEN 2
+                          WHEN parp.codigo_modalidade_licitacao IN (6,7) THEN 2
 			              ELSE parp.codigo_modalidade_licitacao
                      END AS codigo_modalidade_licitacao	
                   ,  parp.numero_modalidade
@@ -222,6 +231,32 @@ class TTCEMGRegistroPrecos extends Persistente
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
                
+         LEFT JOIN  (
+                       SELECT orgao.nom_orgao||' - '||unidade.nom_unidade AS nome_orgao_gerenciador
+                            , RPO.*
+                         FROM tcemg.registro_precos_orgao AS RPO
+                       INNER JOIN orcamento.orgao
+                           ON orgao.num_orgao = RPO.num_orgao
+                          AND orgao.exercicio = RPO.exercicio_unidade
+           
+                       INNER JOIN orcamento.unidade
+                           ON unidade.num_orgao = RPO.num_orgao
+                          AND unidade.num_unidade = RPO.num_unidade
+                          AND unidade.exercicio = RPO.exercicio_unidade
+                        WHERE RPO.gerenciador = TRUE
+                 )  AS RPO
+                ON  RPO.cod_entidade = parp.cod_entidade
+               AND  RPO.numero_registro_precos = parp.numero_registro_precos
+               AND  RPO.exercicio_registro_precos = parp.exercicio
+               AND  RPO.interno = parp.interno
+               AND  RPO.numcgm_gerenciador = parp.numcgm_gerenciador   
+               
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno
+               
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
 																VALUES (cod_licitacao		INTEGER
@@ -231,10 +266,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -287,7 +322,10 @@ class TTCEMGRegistroPrecos extends Persistente
         $obErro      = new Erro;
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
-    
+
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave11, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, lrp.cod_lote';
+            
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -305,7 +343,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  lrp.cod_entidade::VARCHAR||lrp.numero_registro_precos::VARCHAR||lrp.exercicio::VARCHAR AS chave11
                   ,  11 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  lrp.cod_lote
@@ -325,6 +366,12 @@ class TTCEMGRegistroPrecos extends Persistente
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
                
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno               
+               
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
 																VALUES (cod_licitacao		INTEGER
@@ -334,10 +381,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -372,15 +419,16 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
 
         return $stSql;
     }
@@ -391,6 +439,9 @@ class TTCEMGRegistroPrecos extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
     
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave12, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, irp.cod_lote, irp.num_item';
+            
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -408,7 +459,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  irp.cod_entidade::VARCHAR||irp.numero_registro_precos::VARCHAR||irp.exercicio::VARCHAR AS chave12
                   ,  12 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  irp.cod_item
@@ -421,12 +475,31 @@ class TTCEMGRegistroPrecos extends Persistente
                AND  irp.numero_registro_precos = parp.numero_registro_precos
                AND  irp.exercicio = parp.exercicio
                
-         LEFT JOIN  tcemg.registro_precos_orgao
+        INNER JOIN  tcemg.registro_precos_orgao
                 ON  registro_precos_orgao.cod_entidade = parp.cod_entidade
                AND  registro_precos_orgao.numero_registro_precos = parp.numero_registro_precos
                AND  registro_precos_orgao.exercicio_registro_precos = parp.exercicio
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
+               
+        INNER JOIN  tcemg.registro_precos_orgao_item
+                ON  registro_precos_orgao_item.cod_entidade = registro_precos_orgao.cod_entidade
+               AND  registro_precos_orgao_item.numero_registro_precos = registro_precos_orgao.numero_registro_precos
+               AND  registro_precos_orgao_item.exercicio_registro_precos = registro_precos_orgao.exercicio_registro_precos
+               AND  registro_precos_orgao_item.interno = registro_precos_orgao.interno
+               AND  registro_precos_orgao_item.numcgm_gerenciador = registro_precos_orgao.numcgm_gerenciador
+               AND  registro_precos_orgao_item.exercicio_unidade = registro_precos_orgao.exercicio_unidade
+               AND  registro_precos_orgao_item.num_unidade = registro_precos_orgao.num_unidade
+               AND  registro_precos_orgao_item.num_orgao = registro_precos_orgao.num_orgao 
+               AND  registro_precos_orgao_item.cod_lote = irp.cod_lote
+               AND  registro_precos_orgao_item.cod_item = irp.cod_item
+               AND  registro_precos_orgao_item.cgm_fornecedor = irp.cgm_fornecedor
+
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno 
                
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
@@ -437,10 +510,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -475,17 +548,18 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
         
-        $stSql .= " GROUP BY 1,2,3,4,5,6,7,8 ";
+        $stSql .= " GROUP BY 1,2,3,4,5,6,7,8,irp.cod_lote \n";
 
         return $stSql;
     }
@@ -496,6 +570,9 @@ class TTCEMGRegistroPrecos extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
     
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave13, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, irp.cod_lote, irp.num_item';
+        
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -513,7 +590,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  irp.cod_entidade::VARCHAR||irp.numero_registro_precos::VARCHAR||irp.exercicio::VARCHAR AS chave13
                   ,  13 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  irp.cod_item
@@ -526,12 +606,31 @@ class TTCEMGRegistroPrecos extends Persistente
                AND  irp.numero_registro_precos = parp.numero_registro_precos
                AND  irp.exercicio = parp.exercicio
              
-         LEFT JOIN  tcemg.registro_precos_orgao
+        INNER JOIN  tcemg.registro_precos_orgao
                 ON  registro_precos_orgao.cod_entidade = parp.cod_entidade
                AND  registro_precos_orgao.numero_registro_precos = parp.numero_registro_precos
                AND  registro_precos_orgao.exercicio_registro_precos = parp.exercicio
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
+               
+        INNER JOIN  tcemg.registro_precos_orgao_item
+                ON  registro_precos_orgao_item.cod_entidade = registro_precos_orgao.cod_entidade
+               AND  registro_precos_orgao_item.numero_registro_precos = registro_precos_orgao.numero_registro_precos
+               AND  registro_precos_orgao_item.exercicio_registro_precos = registro_precos_orgao.exercicio_registro_precos
+               AND  registro_precos_orgao_item.interno = registro_precos_orgao.interno
+               AND  registro_precos_orgao_item.numcgm_gerenciador = registro_precos_orgao.numcgm_gerenciador
+               AND  registro_precos_orgao_item.exercicio_unidade = registro_precos_orgao.exercicio_unidade
+               AND  registro_precos_orgao_item.num_unidade = registro_precos_orgao.num_unidade
+               AND  registro_precos_orgao_item.num_orgao = registro_precos_orgao.num_orgao 
+               AND  registro_precos_orgao_item.cod_lote = irp.cod_lote
+               AND  registro_precos_orgao_item.cod_item = irp.cod_item
+               AND  registro_precos_orgao_item.cgm_fornecedor = irp.cgm_fornecedor
+
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno 
                
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
@@ -542,10 +641,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -580,17 +679,17 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
-        
-        $stSql .= " GROUP BY 1,2,3,4,5,6,7,8 ";
+        $stSql .= " GROUP BY 1,2,3,4,5,6,7,8,irp.num_item \n";
 
         return $stSql;
     }
@@ -601,6 +700,9 @@ class TTCEMGRegistroPrecos extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
     
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave14, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, irp.cod_lote, irp.num_item';
+            
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -618,7 +720,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  irp.cod_entidade::VARCHAR||irp.numero_registro_precos::VARCHAR||irp.exercicio::VARCHAR AS chave14
                   ,  14 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  irp.cod_lote
@@ -634,12 +739,31 @@ class TTCEMGRegistroPrecos extends Persistente
                AND  irp.numero_registro_precos = parp.numero_registro_precos
                AND  irp.exercicio = parp.exercicio
              
-         LEFT JOIN  tcemg.registro_precos_orgao
+        INNER JOIN  tcemg.registro_precos_orgao
                 ON  registro_precos_orgao.cod_entidade = parp.cod_entidade
                AND  registro_precos_orgao.numero_registro_precos = parp.numero_registro_precos
                AND  registro_precos_orgao.exercicio_registro_precos = parp.exercicio
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
+               
+        INNER JOIN  tcemg.registro_precos_orgao_item
+                ON  registro_precos_orgao_item.cod_entidade = registro_precos_orgao.cod_entidade
+               AND  registro_precos_orgao_item.numero_registro_precos = registro_precos_orgao.numero_registro_precos
+               AND  registro_precos_orgao_item.exercicio_registro_precos = registro_precos_orgao.exercicio_registro_precos
+               AND  registro_precos_orgao_item.interno = registro_precos_orgao.interno
+               AND  registro_precos_orgao_item.numcgm_gerenciador = registro_precos_orgao.numcgm_gerenciador
+               AND  registro_precos_orgao_item.exercicio_unidade = registro_precos_orgao.exercicio_unidade
+               AND  registro_precos_orgao_item.num_unidade = registro_precos_orgao.num_unidade
+               AND  registro_precos_orgao_item.num_orgao = registro_precos_orgao.num_orgao 
+               AND  registro_precos_orgao_item.cod_lote = irp.cod_lote
+               AND  registro_precos_orgao_item.cod_item = irp.cod_item
+               AND  registro_precos_orgao_item.cgm_fornecedor = irp.cgm_fornecedor
+
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno
                
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
@@ -650,10 +774,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -688,15 +812,16 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
 
         return $stSql;
     }
@@ -706,7 +831,10 @@ class TTCEMGRegistroPrecos extends Persistente
         $obErro      = new Erro;
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
-    
+
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave15, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, irp.cod_lote, irp.num_item';
+        
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -724,7 +852,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  irp.cod_entidade::VARCHAR||irp.numero_registro_precos::VARCHAR||irp.exercicio::VARCHAR AS chave15
                   ,  15 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  irp.cod_lote
@@ -754,12 +885,31 @@ class TTCEMGRegistroPrecos extends Persistente
          LEFT JOIN  sw_cgm_pessoa_juridica
                 ON  sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm
 
-         LEFT JOIN  tcemg.registro_precos_orgao
+        INNER JOIN  tcemg.registro_precos_orgao
                 ON  registro_precos_orgao.cod_entidade = parp.cod_entidade
                AND  registro_precos_orgao.numero_registro_precos = parp.numero_registro_precos
                AND  registro_precos_orgao.exercicio_registro_precos = parp.exercicio
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
+               
+        INNER JOIN  tcemg.registro_precos_orgao_item
+                ON  registro_precos_orgao_item.cod_entidade = registro_precos_orgao.cod_entidade
+               AND  registro_precos_orgao_item.numero_registro_precos = registro_precos_orgao.numero_registro_precos
+               AND  registro_precos_orgao_item.exercicio_registro_precos = registro_precos_orgao.exercicio_registro_precos
+               AND  registro_precos_orgao_item.interno = registro_precos_orgao.interno
+               AND  registro_precos_orgao_item.numcgm_gerenciador = registro_precos_orgao.numcgm_gerenciador
+               AND  registro_precos_orgao_item.exercicio_unidade = registro_precos_orgao.exercicio_unidade
+               AND  registro_precos_orgao_item.num_unidade = registro_precos_orgao.num_unidade
+               AND  registro_precos_orgao_item.num_orgao = registro_precos_orgao.num_orgao 
+               AND  registro_precos_orgao_item.cod_lote = irp.cod_lote
+               AND  registro_precos_orgao_item.cod_item = irp.cod_item
+               AND  registro_precos_orgao_item.cgm_fornecedor = irp.cgm_fornecedor
+
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno
                
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
@@ -770,10 +920,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -808,15 +958,16 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
 
         return $stSql;
     }
@@ -827,6 +978,9 @@ class TTCEMGRegistroPrecos extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;    
     
+        if ($stOrdem == "")
+            $stOrdem = 'ORDER BY chave20, cod_orgao, cod_unidade_sub, parp.numero_registro_precos, parp.exercicio, irp.cod_lote, irp.num_item';
+        
         if (trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
             
@@ -844,7 +998,10 @@ class TTCEMGRegistroPrecos extends Persistente
              SELECT  irp.cod_entidade::VARCHAR||irp.numero_registro_precos::VARCHAR||irp.exercicio::VARCHAR AS chave20
                   ,  20 AS tipo_registro
                   ,  (SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = parp.exercicio AND parametro = 'tcemg_codigo_orgao_entidade_sicom' AND cod_entidade = parp.cod_entidade) AS cod_orgao
-                  ,  LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_sub
+                  ,  CASE WHEN registro_precos_orgao.numero_registro_precos IS NOT NULL
+                                THEN LPAD(LPAD(registro_precos_orgao.num_orgao::VARCHAR, 2, '0')||LPAD(registro_precos_orgao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                                ELSE LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0')
+                     END AS cod_unidade_sub
                   ,  parp.numero_registro_precos  
                   ,  parp.exercicio AS exercicio_adesao
                   ,  irp.cod_lote
@@ -879,12 +1036,31 @@ class TTCEMGRegistroPrecos extends Persistente
          LEFT JOIN  sw_cgm_pessoa_juridica
                 ON  sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm
 
-         LEFT JOIN  tcemg.registro_precos_orgao
+        INNER JOIN  tcemg.registro_precos_orgao
                 ON  registro_precos_orgao.cod_entidade = parp.cod_entidade
                AND  registro_precos_orgao.numero_registro_precos = parp.numero_registro_precos
                AND  registro_precos_orgao.exercicio_registro_precos = parp.exercicio
                AND  registro_precos_orgao.interno = parp.interno
                AND  registro_precos_orgao.numcgm_gerenciador = parp.numcgm_gerenciador
+               
+        INNER JOIN  tcemg.registro_precos_orgao_item
+                ON  registro_precos_orgao_item.cod_entidade = registro_precos_orgao.cod_entidade
+               AND  registro_precos_orgao_item.numero_registro_precos = registro_precos_orgao.numero_registro_precos
+               AND  registro_precos_orgao_item.exercicio_registro_precos = registro_precos_orgao.exercicio_registro_precos
+               AND  registro_precos_orgao_item.interno = registro_precos_orgao.interno
+               AND  registro_precos_orgao_item.numcgm_gerenciador = registro_precos_orgao.numcgm_gerenciador
+               AND  registro_precos_orgao_item.exercicio_unidade = registro_precos_orgao.exercicio_unidade
+               AND  registro_precos_orgao_item.num_unidade = registro_precos_orgao.num_unidade
+               AND  registro_precos_orgao_item.num_orgao = registro_precos_orgao.num_orgao 
+               AND  registro_precos_orgao_item.cod_lote = irp.cod_lote
+               AND  registro_precos_orgao_item.cod_item = irp.cod_item
+               AND  registro_precos_orgao_item.cgm_fornecedor = irp.cgm_fornecedor
+
+        INNER JOIN  tcemg.registro_precos_licitacao
+                ON  registro_precos_licitacao.cod_entidade = parp.cod_entidade
+               AND  registro_precos_licitacao.numero_registro_precos = parp.numero_registro_precos
+               AND  registro_precos_licitacao.exercicio = parp.exercicio
+               AND  registro_precos_licitacao.interno = parp.interno
                
         INNER JOIN (
                      SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('', '".$this->getDado('entidades')."')
@@ -895,10 +1071,10 @@ class TTCEMGRegistroPrecos extends Persistente
 																	   ,exercicio_licitacao	VARCHAR
 																	   ,num_licitacao		TEXT ) 
                  )  config_licitacao
-                ON  config_licitacao.cod_entidade = parp.cod_entidade
-               AND  config_licitacao.cod_licitacao = parp.numero_processo_licitacao::integer
-               AND  config_licitacao.cod_modalidade = parp.codigo_modalidade_licitacao
-               AND  config_licitacao.exercicio = parp.exercicio_licitacao
+                ON  config_licitacao.cod_entidade = registro_precos_licitacao.cod_entidade_licitacao
+               AND  config_licitacao.cod_licitacao = registro_precos_licitacao.cod_licitacao
+               AND  config_licitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+               AND  config_licitacao.exercicio = registro_precos_licitacao.exercicio_licitacao
 
         INNER JOIN  licitacao.licitacao
                 ON  licitacao.cod_licitacao = config_licitacao.cod_licitacao
@@ -933,15 +1109,16 @@ class TTCEMGRegistroPrecos extends Persistente
                               AND homologacao.cod_item                    = homologacao_anulada.cod_item
                     ) IS NULL
             
-             WHERE  1=1 ";
+             WHERE  1=1 \n";
              
         if ($this->getDado('entidades')) {
-            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") "; 
+            $stSql .= " AND parp.cod_entidade IN (".$this->getDado('entidades').") \n"; 
         }
 
         
-        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) ";
+        $stSql .= " AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy')
+                        BETWEEN TO_DATE('01/" . $this->getDado('mes_referencia') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+                            AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes_referencia') . "' || '-' || '01','yyyy-mm-dd')) \n";
 
         return $stSql;
     }

@@ -37,7 +37,7 @@
     * $Id:$
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 /**
  * Metodo que formata o valor para o padrao americano para poder realizar os calculos e transforma o valor em float

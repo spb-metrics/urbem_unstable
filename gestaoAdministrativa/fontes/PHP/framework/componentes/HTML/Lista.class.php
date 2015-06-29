@@ -32,7 +32,7 @@
 * @package framework
 * @subpackage componentes
 
-* $Id: Lista.class.php 60261 2014-10-09 13:20:24Z carlos.silva $
+* $Id: Lista.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-01.01.00
 
@@ -1126,7 +1126,7 @@ function montaHTML()
                                 $stProxima = substr(basename($stLink),0,strpos(basename($stLink),'.php'));
                                 if ( $this->boEncRegistroUnico and $stReferer != $stProxima and strpos(basename($stHttpReferer),'PR') !== 0) {
                                     if ( $obRecordSet->getNumLinhas() == 1 and count($arAcao) == 1 and !$obAcao->getFuncao() ) {
-                                            print '<script language="JavaScript1.2" type="text/javascript">
+                                            print '<script type="text/javascript">
                                                    mudaTelaPrincipal("'.$stLink.'");
                                                    </script>';
                                     }

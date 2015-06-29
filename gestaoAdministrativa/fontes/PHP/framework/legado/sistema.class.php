@@ -58,7 +58,6 @@ class sistema
     var $periodoAuditoria;
     var $municipio;
     var $logotipo;
-    var $caminhoAcrobat;
     var $destinatario;
     var $corpo;
     var $assunto;
@@ -87,7 +86,6 @@ class sistema
         $this->periodoAuditoria = "";
         $this->municipio = "";
         $this->logotipo = "";
-        $this->caminhoAcrobat = "";
         $this->destinatario = "suporte@cnm.org.br";
         $this->corpo = "";
         $this->assunto = "BUG - ";
@@ -337,7 +335,7 @@ class sistema
     }
 
     /*** Método que seta as variáveis para edição das configurações básicas ***/
-    function setaVariaveisConf($nome, $endereco, $bairro, $cep, $ddd, $fone, $fax, $email, $cnpj, $populacao, $periodoAuditoria, $uf, $municipio, $logotipo) { //$caminhoAcrobat)
+    function setaVariaveisConf($nome, $endereco, $bairro, $cep, $ddd, $fone, $fax, $email, $cnpj, $populacao, $periodoAuditoria, $uf, $municipio, $logotipo) { 
     {
         $this->nome = $nome;
         $this->endereco = $endereco;
@@ -353,7 +351,6 @@ class sistema
         $this->uf = $uf;
         $this->municipio = $municipio;
         $this->logotipo = $logotipo;
-        //$this->caminhoAcrobat = $caminhoAcrobat;
     }
 
     /***Método que monta a lista de Estados ***/
@@ -402,7 +399,7 @@ class sistema
     {
         $dbConfig = new dataBaseLegado;
         $dbConfig->abreBd();
-        $select =   "select c.nom_prefeitura, c.endereco, c.bairro, c.cep, c.ddd, c.fone, c.fax, c.e_mail, c.cnpj, c.populacao, c.logotipo, c.periodo_auditoria, u.nom_uf, m.nom_municipio, c.caminho_acrobat
+        $select =   "select c.nom_prefeitura, c.endereco, c.bairro, c.cep, c.ddd, c.fone, c.fax, c.e_mail, c.cnpj, c.populacao, c.logotipo, c.periodo_auditoria, u.nom_uf, m.nom_municipio
                         from administracao.configuracao as c, sw_municipio as m, sw_uf as u
                         where c.cod_municipio = m.cod_municipio";
         $dbConfig->abreSelecao($select);
@@ -420,7 +417,6 @@ class sistema
         $this->periodoAuditoria = $dbConfig->pegaCampo("periodo_auditoria");
         $this->uf = $dbConfig->pegaCampo("nom_uf");
         $this->municipio = $dbConfig->pegaCampo("nom_municipio");
-        //$this->caminhoAcrobat = $dbConfig->pegaCampo("caminho_acrobat");
     }
 
     /*** Método que edita as configurações básicas do sistema (Nome da prefeitura, endereço, cep, email, fone, período_auditoria e municipio) ***/
@@ -443,7 +439,6 @@ class sistema
                         cod_uf = '$this->uf',
                         cod_municipio = '$this->municipio',
                         logotipo = '$this->logotipo'";
-                        //caminho_acrobat = '$this->caminhoAcrobat'";
         $config = $dbConfig->executaSql($update);
         if ($config)
             return true;

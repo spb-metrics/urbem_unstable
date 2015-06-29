@@ -180,7 +180,7 @@ break;
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <link rel="STYLESHEET" type="text/css" href="../includes/stylos_ns.css">
 
-<script language="javascript"><!--
+<script type="text/javascript"><!--
 var skipcycle = false
 
 function fcsOnMe()
@@ -246,7 +246,7 @@ echo '<input type="button" value="OK" style="font-size : 12px; color : #0A5A82; 
 break;
 case "cc":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 sPag = '$pag?".Sessao::getId()."&".$chave."=".$valor."';
@@ -259,7 +259,7 @@ onClick='mudaPagina();'> <input type='button' value='Cancelar' style='font-size 
 break;
 case "sn":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 sPag = '$pag&".$chave."=".$valor."';
@@ -272,7 +272,7 @@ onClick='mudaPagina();'> <input type='button' value='Não' style='font-size : 12
 break;
 case "pp":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 sPag = '$pag&".$chave."=".$valor."';
@@ -285,7 +285,7 @@ onClick='mudaPagina();'> <input type='button' value='Não' style='font-size : 12
 break;
 case "decisao":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 sPag = '$pag?".Sessao::getId()."';
@@ -298,7 +298,7 @@ onClick='javascript:window.close()'> <input type='button' value='Não' style='fo
 break;
 case "ccform":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 window.opener.parent.frames['telaPrincipal'].document.frm.submit();
@@ -310,7 +310,7 @@ onClick='mudaPagina();'> <input type='button' value='Cancelar' style='font-size 
 break;
 case "oculto":
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 window.opener.parent.frames['oculto'].document.frm.submit();

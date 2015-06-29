@@ -33,12 +33,12 @@
 
     * @ignore
 
-    $Revision: 62219 $
+    $Revision: 62759 $
     $Name$
-    $Author: michel $
-    $Date: 2015-04-09 09:47:41 -0300 (Qui, 09 Abr 2015) $
+    $Author: jean $
+    $Date: 2015-06-16 15:00:15 -0300 (Ter, 16 Jun 2015) $
     
-    $Id: DES.inc.php 62219 2015-04-09 12:47:41Z michel $
+    $Id: DES.inc.php 62759 2015-06-16 18:00:15Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -202,7 +202,7 @@
                         $$rsBloco->preenche(array($arRegistro11));
 
                         $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-                        $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+                        $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
         
                         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -330,7 +330,7 @@
                                     $$rsBloco->preenche(array($arRegistro12));
         
                                     $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-                                    $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+                                    $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
     
                                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
                                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -461,7 +461,7 @@
                                                     $$rsBloco->preenche(array($arRegistro13));
                 
                                                     $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-                                                    $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+                                                    $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
         
                                                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
                                                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

@@ -158,7 +158,7 @@ setAjuda('uc-01.06.95');
     $propAssunto = $altera->listaClassificacaoAssunto( $condicao );
     $propAssunto = current($propAssunto);
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -353,12 +353,12 @@ if ( count($mtAtributos) ) {
           $audicao = new auditoriaLegada;
               $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), "Assunto: ".$nom);
               $audicao->insereAuditoria();
-              $script  = "<script language=\"JavaScript1.2\" type=\"text/javascript\"> \n";
+              $script  = "<script type=\"text/javascript\"> \n";
               $script .= "   alertaAviso(\"".$altera->nome."\",\"alterar\",\"aviso\", \"".Sessao::getId()."\");\n";
               $script .= "   mudaTelaPrincipal(\"alteraAssunto.php?".Sessao::getId()."&pagina=".$pagina."&codClassificacao=".$codClassificacao."\");\n";
               $script .= "</script>\n";
        } else {
-          $script  = "<script language=\"JavaScript1.2\" type=\"text/javascript\"> \n";
+          $script  = "<script type=\"text/javascript\"> \n";
               $script .= "   alertaAviso(\"".$altera->nome."\",\"n_alterar\",\"erro\", \"".Sessao::getId()."\");\n";
               $script .= "   mudaTelaPrincipal(\"alteraAssunto.php?".Sessao::getId()."&pagina=".$pagina."\");\n";
               $script .= "</script>\n";

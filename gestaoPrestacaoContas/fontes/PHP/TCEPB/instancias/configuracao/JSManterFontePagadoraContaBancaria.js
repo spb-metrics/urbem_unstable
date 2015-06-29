@@ -39,7 +39,7 @@
 
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 function limpaFormularioExtra(){
     document.getElementById('stNomCGM').innerHTML = '&nbsp;';
 }

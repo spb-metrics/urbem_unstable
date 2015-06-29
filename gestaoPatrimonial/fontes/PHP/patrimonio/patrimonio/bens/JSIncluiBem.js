@@ -52,7 +52,7 @@ Revision 1.7  2006/07/06 12:11:27  diego
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Limpar(){
     

@@ -39,7 +39,7 @@
 
 */
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 function excluiItem(stControle, inId, sincrono ){
     param = '&inId='+inId;

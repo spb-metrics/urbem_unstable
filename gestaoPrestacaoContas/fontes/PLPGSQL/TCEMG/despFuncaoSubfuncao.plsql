@@ -34,34 +34,20 @@
     $Id:$
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_desp_funcao_subfuncao(VARCHAR, VARCHAR, INTEGER, VARCHAR) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_desp_funcao_subfuncao(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
-    stCodEntidade       ALIAS FOR $2;
-    inPeriodo           ALIAS FOR $3;
-    inTipoPeriodo       ALIAS FOR $4;
+    stCodEntidade       ALIAS FOR $2;    
+    stDtInicial         ALIAS FOR $3;
+    stDtFinal           ALIAS FOR $4;
     
-    
+    inPeriodo           VARCHAR := '';
     stSql               VARCHAR := '';
-    stDtInicial         VARCHAR := '';
-    stDtFinal           VARCHAR := '';
-    stDtFinalDate       VARCHAR;
     reRegistro          RECORD;
-    arDatas             VARCHAR[];
 
 BEGIN
-
-    IF inTipoPeriodo = 'mensal' THEN
-        stDtInicial := '01/'||LPAD(inPeriodo::varchar, 2, '0'::varchar)||'/'||stExercicio;
-        SELECT last_day (TO_DATE(stDtInicial, 'dd/mm/yyyy')) INTO stDtFinalDate;
-        stDtFinal := TO_CHAR(TO_DATE(stDtFinalDate, 'yyyy-mm-dd'), 'dd/mm/yyyy');
-        
-    ELSE
     
-        arDatas := publico.bimestre(inPeriodo::integer, stExercicio::integer);
-        stDtInicial := arDatas[0];
-        stDtFinal   := arDatas[1];
-    END IF;
+    inPeriodo := EXTRACT( month FROM TO_DATE(stDtInicial,'dd/mm/yyyy') );
 
     stSql := '
     CREATE TEMPORARY TABLE tmp_arquivo AS (
@@ -77,7 +63,7 @@ BEGIN
              , sum(COALESCE((SELECT * FROM tcemg.fn_desp_funcao_subfuncao_empenhada(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''' )), 0.00)) AS vl_empenhado
              , sum(COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada_anexo2(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''', false )), 0.00)) AS vl_liquidado
              , sum(COALESCE((SELECT * FROM tcemg.fn_desp_funcao_subfuncao_anulada(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''' )), 0.00)) AS vl_anulada
-             , CAST('''' AS VARCHAR) AS cod_entidade_relacionada
+             , despesa.cod_entidade AS cod_entidade_relacionada
           FROM orcamento.despesa
           JOIN orcamento.funcao
             ON funcao.exercicio  = despesa.exercicio

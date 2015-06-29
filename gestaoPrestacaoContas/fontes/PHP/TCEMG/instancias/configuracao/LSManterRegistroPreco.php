@@ -32,11 +32,11 @@
 
   * @ignore
   *
-  * $Id: LSManterRegistroPreco.php 61913 2015-03-13 18:55:57Z franver $
+  * $Id: LSManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
   *
-  * $Revision: 61913 $
-  * $Author: franver $
-  * $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
+  * $Revision: 62832 $
+  * $Author: michel $
+  * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -58,6 +58,7 @@ $stCaminho     = CAM_GPC_TCEMG_INSTANCIAS."configuracao/";
 
 $stAcao        = $request->get('stAcao');
 $inCodEntidade = $request->get('inCodEntidade');
+$stExercicioRegistroPreco  = $request->get('stExercicioRegistroPreco');
 
 if ($stAcao == 'alterar') {
     $stCaminho = $stCaminho.$pgForm;
@@ -72,6 +73,7 @@ if (empty($inCodEntidade)){
 $rsRegistroPrecos = new RecordSet();
 $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
 $obTTCEMGRegistroPrecos->setDado('cod_entidade' , $inCodEntidade);
+$obTTCEMGRegistroPrecos->setDado('exercicio'    , $stExercicioRegistroPreco);
 $obTTCEMGRegistroPrecos->recuperaListaProcesso( $rsRegistroPrecos );
 
 $obLista = new Lista;
@@ -163,6 +165,7 @@ $obLista->ultimaAcao->addCampo("&inNroRegistroPrecos"       , "numero_registro_p
 $obLista->ultimaAcao->addCampo("&stExercicioRegistroPrecos" , "exercicio");
 $obLista->ultimaAcao->addCampo("&boInterno"                 , "interno");
 $obLista->ultimaAcao->addCampo("&numcgmGerenciador"         , "numcgm_gerenciador");
+$obLista->ultimaAcao->addCampo("&stDescQuestao"             , "[numero_registro_precos]/[exercicio]");
 $obLista->ultimaAcao->setLink( $stCaminho."?".Sessao::getId()."&stAcao=".$stAcao );
 $obLista->commitAcao();
 $obLista->show();

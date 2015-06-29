@@ -430,7 +430,7 @@ if ($stAcao == "incluir") {
 }
 $obFormulario->show();
 if ($stAcao == 'alterar' || $stAcao == 'anular'|| $stAcao == 'anular') {
-    echo "<script language=\"javascript\" type=\"text/javascript\"> \r\n";
+    echo "<script type=\"text/javascript\"> \r\n";
     echo " ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumeroAditivo=".$_REQUEST['inNumeroAditivo']."&inNumConvenio=".$_REQUEST['inNumConvenio']."&stExercicio=".$_REQUEST['stExercicioAditivo']."', 'carregaListaVeiculos');  \r\n";
     echo " ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodLei=".$rsLicitacaoConvenioAditivo->getCampo("cod_norma_autorizativa"). "', 'montaBuscaNorma');     \r\n";
     echo "</script>";

@@ -32,7 +32,7 @@
 
  Casos de uso: uc-01.06.98
 
- $Id: despachaProcesso.php 61555 2015-02-04 18:03:43Z diogo.zarpelon $
+ $Id: despachaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  */
 
@@ -79,7 +79,7 @@ if ($ctrl == 1) {
 }
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
     function zebra(id, classe)
     {
@@ -418,7 +418,7 @@ break;
            $dbConfig->fechaBd();
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
    function Valida()
    {
        var mensagem = "";
@@ -675,7 +675,7 @@ break;
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $obj);
                 $audicao->insereAuditoria();
                 $chave = $anoE."-".$codAndamento."-".$codProcesso;
-                echo 	'<script language="JavaScript1.2" type="text/javascript">
+                echo 	'<script type="text/javascript">
                             alertaAviso("'.$obj.'","incluir","aviso", "'.Sessao::getId().'");
                             window.location = "despachaProcesso.php?'.Sessao::getId().'&ctrl=4&chave='.$chave.'";
                         </script>';
@@ -685,14 +685,14 @@ break;
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $obj);
                 $audicao->insereAuditoria();
                 $chave = $anoE."-".$codAndamento."-".$codProcesso;
-                echo 	'<script language="JavaScript1.2" type="text/javascript">
+                echo 	'<script type="text/javascript">
                             alertaAviso("'.$obj.'","incluir","aviso", "'.Sessao::getId().'");
                             window.location = "despachaProcesso.php?'.Sessao::getId().'&ctrl=4&chave='.$chave.'";
                         </script>';
             }
         } else {
             $chave = $anoE."-".$codAndamento."-".$codProcesso;
-            echo 	'<script language="JavaScript1.2" type="text/javascript">
+            echo 	'<script type="text/javascript">
                         alertaAviso("'.$obj.'","n_incluir","erro", "'.Sessao::getId().'");
                         window.location = "despachaProcesso.php?'.Sessao::getId().'&ctrl=4&chave='.$chave.'";
                     </script>';
@@ -702,7 +702,7 @@ break;
 
     case 4:
         ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 function SalvarForm()
                 {
                     document.frm.action = "despacho.php?<?=Sessao::getId()?>&ctrl=4&chave=<?=$chave?>";

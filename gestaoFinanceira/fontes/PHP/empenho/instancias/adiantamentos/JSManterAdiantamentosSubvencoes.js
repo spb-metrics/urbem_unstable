@@ -119,7 +119,7 @@ Caso de Uso 02.03.31
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
    function incluirNotaFiscal(prm){
 

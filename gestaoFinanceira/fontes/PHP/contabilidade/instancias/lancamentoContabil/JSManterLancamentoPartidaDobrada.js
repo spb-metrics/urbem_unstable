@@ -47,7 +47,7 @@ Caso de Uso 02.02.33
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
    function incluirDebito(prm){
        var erro     = new Boolean(false);

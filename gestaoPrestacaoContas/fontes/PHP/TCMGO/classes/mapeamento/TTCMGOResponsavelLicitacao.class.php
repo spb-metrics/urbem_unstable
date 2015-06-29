@@ -106,20 +106,24 @@ class TTCMGOResponsavelLicitacao extends Persistente
                             , licitacao.exercicio::varchar||LPAD(''||licitacao.cod_entidade::varchar,2, '0')||LPAD(''||licitacao.cod_modalidade::varchar,2, '0')||LPAD(''||licitacao.cod_licitacao::varchar,4, '0') AS num_processo_licitatorio 
                             , dadosResponsaveis.tipo_responsabilidade
                             , dadosResponsaveis.cpf
-                            , sw_cgm.nom_cgm as nome_responsavel
-                            , ''::VARCHAR(50) as cargo_responsavel
-                            , sw_cgm.logradouro as logra_res_responsavel
-                            , ''::varchar(20) as setor_logra_responsavel
-                            , sw_municipio.nom_municipio as cidade_logra_responsavel
-                            , sw_uf.sigla_uf as uf_cidade_logra_responsavel
-                            , sw_cgm.cep as cep_logra_responsavel
-                            , CASE WHEN sw_cgm.fone_residencial != '' THEN
-                                        sw_cgm.fone_residencial 
+                            , dadosResponsaveis.nom_cgm as nome_responsavel
+                            ,CASE WHEN (comissao_membros.numcgm = dadosResponsaveis.numcgm) THEN
+                                    comissao_membros.cargo
+                                  WHEN (membro_adicional.numcgm = dadosResponsaveis.numcgm) THEN
+                                    membro_adicional.cargo
+                            END AS cargo_responsavel
+                            , dadosResponsaveis.logradouro as logra_res_responsavel
+                            , dadosResponsaveis.bairro as setor_logra_responsavel
+                            , dadosResponsaveis.nom_municipio as cidade_logra_responsavel
+                            , dadosResponsaveis.sigla_uf as uf_cidade_logra_responsavel
+                            , dadosResponsaveis.cep as cep_logra_responsavel
+                            , CASE WHEN dadosResponsaveis.fone_residencial != '' THEN
+                                        dadosResponsaveis.fone_residencial 
                                     ELSE
-                                        sw_cgm.fone_celular 
+                                        dadosResponsaveis.fone_celular 
                             END as fone_responsavel
-                            , sw_cgm.e_mail as email
-                            , CASE sw_escolaridade.cod_escolaridade 
+                            , dadosResponsaveis.e_mail as email
+                            , CASE dadosResponsaveis.cod_escolaridade 
                                     WHEN 0  THEN 0
                                     WHEN 1  THEN 0
                                     WHEN 2  THEN 01
@@ -136,106 +140,276 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                     WHEN 14 THEN 08
                                     WHEN 15 THEN 07
                             END as escolaridade
-                            , ''::VARCHAR(15) as brancos
+                            , ''::VARCHAR(15) as brancos                            
                                                         
-                    FROM licitacao.licitacao    
+                    FROM tcmgo.responsavel_licitacao
 
-              INNER JOIN tcmgo.responsavel_licitacao
-                      ON tcmgo.responsavel_licitacao.exercicio      = licitacao.exercicio
-                     AND tcmgo.responsavel_licitacao.cod_licitacao  = licitacao.cod_licitacao
-                     AND tcmgo.responsavel_licitacao.cod_modalidade = licitacao.cod_modalidade
-                     AND tcmgo.responsavel_licitacao.cod_entidade   = licitacao.cod_entidade
-              
-              INNER JOIN (
-                            SELECT *
-                                    , 1 AS tipo_responsabilidade
+                INNER JOIN (
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
+                                   , 1 AS tipo_responsabilidade
                                     
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_abertura_licitacao
+                            JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
                            
                         UNION ALL                        
 
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                     , 2 AS tipo_responsabilidade
                                     
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_edital
+                             JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
 
                         UNION ALL
                        
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                     , 3 AS tipo_responsabilidade
                                     
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_pesquisa
+                             JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
 
                         UNION ALL
                        
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                    , 4 AS tipo_responsabilidade
                                    
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_recurso_orcamentario
+                             JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
 
                         UNION ALL
                        
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                    , 5 AS tipo_responsabilidade
                                    
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_conducao_licitacao
+                             JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
 
                         UNION ALL
                        
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                    , 6 AS tipo_responsabilidade
                                    
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
                              ON sw_cgm_pessoa_fisica.numcgm = responsavel_licitacao.cgm_resp_homologacao
+                             JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
                         
                         UNION ALL
                      
-                            SELECT *
+                            SELECT sw_cgm_pessoa_fisica.cpf
+                                   , responsavel_licitacao.exercicio
+                                   , responsavel_licitacao.cod_licitacao
+                                   , responsavel_licitacao.cod_modalidade
+                                   , responsavel_licitacao.cod_entidade
+                                   , sw_cgm_pessoa_fisica.numcgm
+                                   , sw_escolaridade.cod_escolaridade
+                                   , sw_cgm.nom_cgm
+                                   , sw_cgm.logradouro
+                                   , sw_cgm.bairro
+                                   , sw_municipio.nom_municipio
+                                   , sw_uf.sigla_uf
+                                   , sw_cgm.cep
+                                   , sw_cgm.fone_residencial 
+                                   , sw_cgm.fone_celular 
+                                   , sw_cgm.e_mail                                    
                                    , 7 AS tipo_responsabilidade
-                                   
                             FROM tcmgo.responsavel_licitacao
                             JOIN sw_cgm_pessoa_fisica
-                             ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_adjudicacao
+                                ON sw_cgm_pessoa_fisica.numcgm =  responsavel_licitacao.cgm_resp_adjudicacao
+                            JOIN sw_cgm
+                                ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm                        
+                            JOIN sw_municipio
+                                ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
+                                AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                            JOIN sw_uf
+                                ON sw_uf.cod_uf = sw_municipio.cod_uf
+                            JOIN sw_escolaridade
+                                ON sw_escolaridade.cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade
 
                     ) AS dadosResponsaveis
-                          ON tcmgo.responsavel_licitacao.exercicio     = dadosResponsaveis.exercicio
-                        AND tcmgo.responsavel_licitacao.cod_licitacao  = dadosResponsaveis.cod_licitacao
-                        AND tcmgo.responsavel_licitacao.cod_modalidade = dadosResponsaveis.cod_modalidade
-                        AND tcmgo.responsavel_licitacao.cod_entidade   = dadosResponsaveis.cod_entidade
+                          ON responsavel_licitacao.exercicio     = dadosResponsaveis.exercicio
+                        AND responsavel_licitacao.cod_licitacao  = dadosResponsaveis.cod_licitacao
+                        AND responsavel_licitacao.cod_modalidade = dadosResponsaveis.cod_modalidade
+                        AND responsavel_licitacao.cod_entidade   = dadosResponsaveis.cod_entidade
 
-                    JOIN sw_cgm
-                        ON sw_cgm.numcgm = dadosResponsaveis.numcgm
-                        
-                    JOIN sw_municipio
-                        ON sw_municipio.cod_municipio   = sw_cgm.cod_municipio
-                        AND sw_municipio.cod_uf         = sw_cgm.cod_uf
+                    INNER JOIN licitacao.licitacao    
+                      ON dadosResponsaveis.exercicio      = licitacao.exercicio
+                     AND dadosResponsaveis.cod_licitacao  = licitacao.cod_licitacao
+                     AND dadosResponsaveis.cod_modalidade = licitacao.cod_modalidade
+                     AND dadosResponsaveis.cod_entidade   = licitacao.cod_entidade
 
-                    JOIN sw_uf
-                        ON sw_uf.cod_uf = sw_municipio.cod_uf
-
-                    JOIN sw_escolaridade
-                        ON sw_escolaridade.cod_escolaridade = dadosResponsaveis.cod_escolaridade
+                JOIN licitacao.comissao_licitacao 
+                    ON comissao_licitacao.cod_licitacao     = licitacao.cod_licitacao
+                    AND comissao_licitacao.cod_modalidade   = licitacao.cod_modalidade
+                    AND comissao_licitacao.cod_entidade     = licitacao.cod_entidade
+                    AND comissao_licitacao.exercicio        = licitacao.exercicio
+                         
+                JOIN licitacao.comissao_membros
+                    ON comissao_membros.cod_comissao = comissao_licitacao.cod_comissao
+                    AND comissao_membros.numcgm      = dadosResponsaveis.numcgm
                     
-                    JOIN compras.mapa_cotacao
+                LEFT JOIN licitacao.membro_adicional
+                    ON membro_adicional.cod_licitacao   = licitacao.cod_licitacao
+                    AND membro_adicional.cod_modalidade = licitacao.cod_modalidade
+                    AND membro_adicional.cod_entidade   = licitacao.cod_entidade
+                    AND membro_adicional.exercicio      = licitacao.exercicio
+
+                    left JOIN compras.mapa_cotacao
                          ON mapa_cotacao.exercicio_mapa = licitacao.exercicio
                         AND mapa_cotacao.cod_mapa = licitacao.cod_mapa
              
-                    JOIN compras.cotacao
+                    left JOIN compras.cotacao
                          ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
                         AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
             
-                    JOIN compras.julgamento
+                    left JOIN compras.julgamento
                          ON julgamento.exercicio   = cotacao.exercicio
                         AND julgamento.cod_cotacao = cotacao.cod_cotacao
             
@@ -354,7 +528,7 @@ class TTCMGOResponsavelLicitacao extends Persistente
                                     membro_adicional.natureza_cargo
                         END AS natureza_cargo
                         , sem_acentos(sw_cgm.logradouro) as logra_res_membro
-                        , ''::varchar(20) as setor_logra_membro
+                        , sw_cgm.bairro as setor_logra_membro
                         , sw_municipio.nom_municipio as cidade_logra_membro
                         , sw_uf.sigla_uf as uf_cidade_lograMembro
                         , sw_cgm.cep as cep_logra_membro

@@ -37,7 +37,7 @@
     * $Id:$
  */         
 ?>                                                                                                                     
-<script language="JavaScript">
+<script type="text/javascript">
     function limpaFormularioAux(){
         jq('#stProvidencia').val('');
         jq('#flValorProvidencia').val('');

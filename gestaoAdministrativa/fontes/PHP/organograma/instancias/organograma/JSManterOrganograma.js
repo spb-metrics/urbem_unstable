@@ -39,7 +39,7 @@ $Date: 2005-11-29 14:45:45 -0200 (Ter, 29 Nov 2005) $
 Casos de uso: uc-01.05.01
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

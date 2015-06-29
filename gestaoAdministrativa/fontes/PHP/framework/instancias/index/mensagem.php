@@ -52,7 +52,7 @@ include URBEM_ROOT_PATH . 'gestaoAdministrativa/fontes/PHP/framework/include/val
 include(CAM_FW_LEGADO."funcoesLegado.lib.php");
 include(CAM_FW_LEGADO."sistema.class.php");
 if((strtolower(Sistema::consultaStatus()) == 'i')&&(Sessao::read('username') != 'admin')){
-    echo("<script language='javascript'>parent.window.location.href='".URBEM_ROOT_URL."/index.php?action=sair';</script>");
+    echo("<script type='text/javascript'>parent.window.location.href='".URBEM_ROOT_URL."/index.php?action=sair';</script>");
 }
 
 $obj = array_key_exists('obj',$_GET) ? $_GET['obj'] : null;

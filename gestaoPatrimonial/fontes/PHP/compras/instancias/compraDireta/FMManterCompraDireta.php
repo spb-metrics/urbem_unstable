@@ -34,7 +34,7 @@
 
     * Casos de uso : uc-03.04.33
 
-    $Id: FMManterCompraDireta.php 61973 2015-03-19 18:38:46Z carlos.silva $
+    $Id: FMManterCompraDireta.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -514,7 +514,7 @@ $obFormulario->show();
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 if ($boAlteraAnula) {
-    echo "<script language='javascript'>\n";
+    echo "<script type='text/javascript'>\n";
     echo "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade=".$arCompraDireta['cod_entidade']."&stMapaCompras=".$arCompraDireta['cod_mapa']."/".$arCompraDireta['exercicio_mapa']."&boAlteraAnula=true','montaItensAlterar');";
     echo "</script>\n";
 }

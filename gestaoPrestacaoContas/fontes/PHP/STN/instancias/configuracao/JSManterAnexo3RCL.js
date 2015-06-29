@@ -34,7 +34,7 @@
  * $Id:$        
  */         
 ?>                                                                                                                     
-<script language="JavaScript">
+<script type="text/javascript">
 
     function limparFormularioAux(stExercicio){
         jq('#stExercicio').val(stExercicio);

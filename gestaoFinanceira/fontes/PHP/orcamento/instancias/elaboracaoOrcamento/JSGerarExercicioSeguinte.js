@@ -44,7 +44,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
     function validaEventos( stNomCampo, arNomCampoValida, stValor ) {
         var stValorOriginal = stValor;

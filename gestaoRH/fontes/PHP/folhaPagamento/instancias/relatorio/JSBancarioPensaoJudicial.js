@@ -52,7 +52,7 @@ Contrução
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Limpar(){
     limpaSelect(document.frm.inCodAgenciaDisponiveis,0);

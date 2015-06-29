@@ -40,7 +40,7 @@ Casos de uso: uc-03.05.16
 */
 ?>
 
-<script language="Javascript">
+<script type="text/javascript">
 
 function Insere( stEdital ){
 	

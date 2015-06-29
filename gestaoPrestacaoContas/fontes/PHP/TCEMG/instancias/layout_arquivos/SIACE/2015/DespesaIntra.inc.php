@@ -24,7 +24,7 @@
 ?>
 <?php
    /*
-    * Arquivo de geracao do arquivo sertTerceiros TCM/MG
+    * Arquivo de geracao do arquivo DespesaIntra TCM/MG
     * Data de Criação   : 19/01/2009
 
     * @author Analista      Tonismar Régis Bernardo
@@ -35,35 +35,44 @@
 
     * @ignore
 
-    $Id:$
+    $Id: DespesaIntra.inc.php 62748 2015-06-16 14:07:21Z michel $
     */
 
-/* Arquivos PassivoPerm não implementado, simplesmente vazio
-*/
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGDespesaIntra.class.php');
 
- include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGDespesaIntra.class.php');
-
-    $arFiltros = Sessao::read('filtroRelatorio');
-    $dataInicial = '01/'.str_pad($arFiltros['inPeriodo'], 2, "0", STR_PAD_LEFT).'/'.Sessao::read('exercicio');
-    $dataFinal = SistemaLegado::retornaUltimoDiaMes($arFiltros['inPeriodo'],Sessao::read('exercicio'));
+    $arFiltros   = Sessao::read('filtroRelatorio');
+    Sistemalegado::retornaInicialFinalMesesPeriodicidade($arDtInicialFinal,'anual',$arFiltros['inPeriodo'],Sessao::getExercicio());
     
     $obTTCEMGDespesaIntra = new TTCEMGDespesaIntra();
-    $obTTCEMGDespesaIntra->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obTTCEMGDespesaIntra->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obTTCEMGDespesaIntra->setDado('mes'         , str_pad($arFiltros['inPeriodo'], 2, "0", STR_PAD_LEFT));
-    $obTTCEMGDespesaIntra->setDado('dataInicial' , $dataInicial);
-    $obTTCEMGDespesaIntra->setDado('dataFinal'   , $dataFinal);
-
-    $obTTCEMGDespesaIntra->recuperaDadosArquivo($rsDespesaIntra);
-
-    $obExportador->roUltimoArquivo->addBloco($rsDespesaIntra);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demais_despesas_intra');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('tipo_conta');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('juros_encargos_divida');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('amort_divida');
+    foreach ($arDtInicialFinal as $stDatas) {
+        $obTTCEMGDespesaIntra->setDado('exercicio'   , Sessao::getExercicio()                               );
+        $obTTCEMGDespesaIntra->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado'])  );
+        $obTTCEMGDespesaIntra->setDado('bimestre'    , '6'                                                  );
+        $obTTCEMGDespesaIntra->setDado('dataInicial' , $stDatas['stDtInicial']                              );
+        $obTTCEMGDespesaIntra->setDado('dataFinal'   , $stDatas['stDtFinal']                                );   
+    
+        $obTTCEMGDespesaIntra->recuperaDadosArquivo($rsDespesaIntra);
+        
+        $obExportador->roUltimoArquivo->addBloco($rsDespesaIntra);
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('bimestre');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demais_despesas_intra');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('juros_encargos_divida');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    }
  
-
-        
-        
+?>

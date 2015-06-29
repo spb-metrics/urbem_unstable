@@ -55,7 +55,7 @@ if (!isset($controle)) {
 switch ($controle) {
 case 0:
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function Valida()
 {
@@ -256,7 +256,7 @@ $codClassificacao = pegaDado("cod_classificacao","cse.tipo_tratamento","Where co
 $nomTratamento = pegaDado("nom_tratamento","cse.tipo_tratamento","Where cod_tratamento = '".$codTratamento."' ");
 $nomClassificacao = pegaDado("nom_classificacao","cse.classificacao_tratamento","Where cod_classificacao = '".$codClassificacao."' ");
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";

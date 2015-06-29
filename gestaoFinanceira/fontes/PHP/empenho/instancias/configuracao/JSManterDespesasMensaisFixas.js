@@ -51,7 +51,7 @@ Manter Despesas Fixas Mensais
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(valor){
     var stTarget = document.frm.target;

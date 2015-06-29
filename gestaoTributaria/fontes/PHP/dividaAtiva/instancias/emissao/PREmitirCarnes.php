@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: PREmitirCarnes.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PREmitirCarnes.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.04.04
 **/
@@ -337,7 +337,7 @@ if ($ii < 0) {
     }
 
     if (!$obErro->ocorreu() &&  $boExec ) {
-        echo "<script language=\"javaScript\">\r\n";
+        echo "<script type=\"text/javascript\">\r\n";
         echo "    var sAux = window.open('OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
         echo "    eval(sAux)\r\n";
         echo "</script>\r\n";

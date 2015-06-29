@@ -38,102 +38,109 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGComparativoPe.class.php');
-
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGComparativoPe.class.php');
+    
+    $obErro = new Erro();
+    
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $ndias =  cal_days_in_month(CAL_GREGORIAN, $arFiltros['inPeriodo'], Sessao::read('exercicio') );
-    if ($arFiltros['inPeriodo'] < 10) {
-        $arFiltros['inPeriodo'] = '0'.$arFiltros['inPeriodo'];
-    }
-
     $obFTCEMGComparativoPe = new FTCEMGComparativoPe();
-    $obFTCEMGComparativoPe->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGComparativoPe->setDado('dtInicial'   , '01/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio')   );
-    $obFTCEMGComparativoPe->setDado('dtFinal'     , $ndias.'/'.$arFiltros['inPeriodo'].'/'.Sessao::read('exercicio'));
-    $obFTCEMGComparativoPe->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-
-    $obFTCEMGComparativoPe->recuperaTodos( $rsComparativoPe );
+    foreach ($arDatasInicialFinal as $stDatas) {
+        list($inDia,$inMes,$inAno) = explode("/", $stDatas['stDtInicial']);
     
-    $rsDados = new RecordSet();
-    $arDados = array();
-    $arDados['mes'] = $arFiltros['inPeriodo'];
+        $obFTCEMGComparativoPe->setDado('exercicio'   , Sessao::getExercicio() );
+        $obFTCEMGComparativoPe->setDado('dtInicial'   , $stDatas['stDtInicial'] );
+        $obFTCEMGComparativoPe->setDado('dtFinal'     , $stDatas['stDtFinal'] );
+        $obFTCEMGComparativoPe->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
+        
+        $obFTCEMGComparativoPe->recuperaContasARO($rsContasARO,"","",$boTransacao);
+
+        if ($rsContasARO->getNumLinhas() < 0) {
+            SistemaLegado::exibeAviso("É necessário configurar a conta Antecipações de Receita Orçamentária - ARO na configuração do STN","n_incluir","erro");
+        }else{
+            
+            $obFTCEMGComparativoPe->recuperaTodos( $rsComparativoPe );
+        
+            $rsDados = new RecordSet();
+            $arDados = array();
+            $arDados['mes'] = $inMes;
+        
+            foreach ( $rsComparativoPe->getElementos() as $value ) {
+                
+                //Valor da despesa líquida inativos e pensionistas
+                if ( preg_match("/Inativo e Pensio/i", $value['descricao']) )
+                    $arDados['desp_liq_inat_pens'] = $value['valor'];
+                
+                //Valor da antecipação da receita orçamentária
+                if ( preg_match("/Receita extra orcamentaria/i", $value['descricao']) )
+                    $arDados['ant_rec_orc'] = $value['valor'];
+                        
+                //Valor da divida consolidada
+                if ( preg_match("/VIDA CONSOLIDADA -/", $value['descricao']) )
+                    $arDados['div_cons'] = $value['valor'];
+                
+                //Valor da divida consolidada líquida
+                if ( preg_match("/VIDA CONSOLIDADA L.*/", $value['descricao']) )
+                    $arDados['div_cons_liq'] = $value['valor'];
+                        
+                //Valor da dívida mobiliária
+                if ( preg_match("/Mobili/i", $value['descricao']) )
+                    $arDados['div_mobiliaria'] = $value['valor'];
+                        
+                //Valor das concessões de garantia
+                if ( preg_match("/concessoes de garantia/i", $value['descricao']) )
+                    $arDados['conc_garantia'] = $value['valor'];
+                
+                //Valor das operações de crédito
+                if ( preg_match("/credito/i", $value['descricao']) )
+                    $arDados['op_credito'] = $value['valor'];
+                    
+            }
+        
+            $rsDados->add($arDados);
+            $obExportador->roUltimoArquivo->addBloco($rsDados);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desp_liq_inat_pens');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_cons');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_cons_liq');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_mobiliaria');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('conc_garantia');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    foreach ( $rsComparativoPe->getElementos() as $value ) {
-        
-        //Valor da despesa líquida inativos e pensionistas
-        if ( preg_match("/Inativo e Pensio/i", $value['descricao']) )
-            $arDados['desp_liq_inat_pens'] = $value['valor'];
-        
-        //Valor da antecipação da receita orçamentária
-        if ( preg_match("/Receita extra orcamentaria/i", $value['descricao']) )
-            $arDados['ant_rec_orc'] = $value['valor'];
-        
-        //Valor da divida consolidada
-        if ( preg_match("/VIDA CONSOLIDADA -/", $value['descricao']) )
-            $arDados['div_cons'] = $value['valor'];
-
-        //Valor da divida consolidada líquida
-        if ( preg_match("/VIDA CONSOLIDADA L.*/", $value['descricao']) )
-            $arDados['div_cons_liq'] = $value['valor'];
-        
-        //Valor da dívida mobiliária
-        if ( preg_match("/Mobili/i", $value['descricao']) )
-            $arDados['div_mobiliaria'] = $value['valor'];
-        
-        //Valor das concessões de garantia
-        if ( preg_match("/concessoes de garantia/i", $value['descricao']) )
-            $arDados['conc_garantia'] = $value['valor'];
-
-        //Valor das operações de crédito
-        if ( preg_match("/credito/i", $value['descricao']) )
-            $arDados['op_credito'] = $value['valor'];
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('ant_rec_orc');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        }
     }
 
-    $rsDados->add($arDados);
-
-    $obExportador->roUltimoArquivo->addBloco($rsDados);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desp_liq_inat_pens');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('ant_rec_orc');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_cons');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_cons_liq');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_mobiliaria');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('conc_garantia');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    
 unset($arFiltros);
 unset($obFTCEMGComparativoPe);
 unset($rsDados);

@@ -105,6 +105,21 @@ $obHdnTipoBusca->setValue( $request->get('tipoBusca') );
 if($request->get('tipoBusca')=='usuario')
     $request->set('tipoBusca', 'fisica');
 
+if ($request->get('tipoBusca') == "vinculoComissaoLicitacao"){
+    $obHdnCodLicitacao = new Hidden;
+    $obHdnCodLicitacao->setName("hdnCodLicitacao");
+    $obHdnCodLicitacao->setValue( $request->get('inCodLicitacao') );
+    
+    $obHdnCodModalidade = new Hidden;
+    $obHdnCodModalidade->setName("hdnCodModalidade");
+    $obHdnCodModalidade->setValue( $request->get('inCodModalidade') );
+
+
+    $obHdnCodComissao = new Hidden;
+    $obHdnCodComissao->setName("hdnCodComissao");
+    $obHdnCodComissao->setValue( $request->get('inCodComissao') );
+}
+
 $obHdnCampoNum = new Hidden;
 $obHdnCampoNum->setName( "campoNum" );
 $obHdnCampoNum->setValue( $request->get('campoNum') );
@@ -227,6 +242,11 @@ $obFormulario->addHidden( $obHdnCampoNom );
 $obFormulario->addHidden( $obHdnStTabelaVinculo );
 $obFormulario->addHidden( $obHdnStCampoVinculo );
 $obFormulario->addHidden( $obHdnStId );
+if ($request->get('tipoBusca') == "vinculoComissaoLicitacao"){
+    $obFormulario->addHidden( $obHdnCodLicitacao );
+    $obFormulario->addHidden( $obHdnCodModalidade );
+    $obFormulario->addHidden( $obHdnCodComissao );
+}
 $obFormulario->addTitulo( "Dados para CGM" );
 $obFormulario->addComponente( $obTipoBuscaNomCgm );
 

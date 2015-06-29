@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamento.class.php 62592 2015-05-21 17:46:11Z lisiane $
+    $Id: TEmpenhoOrdemPagamento.class.php 62712 2015-06-11 15:00:29Z evandro $
 
     * Casos de uso: uc-02.03.12,uc-02.03.16,uc-02.03.05,uc-02.04.05,uc-02.03.28
 */
@@ -2753,4 +2753,187 @@ class TEmpenhoOrdemPagamento extends Persistente
     {
         $this->executaRecupera('montaRecuperaListaChequesOrdemPagamento', $rsRecordSet, $stFiltro, $stOrder, $boTransacao);
     }
+
+
+    public function recuperaDadosPagamentoBorderoContaRecurso(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRecuperaDadosPagamentoBorderoContaRecurso().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaDadosPagamentoBorderoContaRecurso()
+    {
+        $stSql  = " SELECT * FROM                                                                                                                        
+         (    SELECT                                                                                                                          
+                     EOP.COD_ORDEM,                                                                                                           
+                     EMP.EXERCICIO_EMPENHO,                                                                                                   
+                     EOP.EXERCICIO,                                                                                                           
+                     EOP.COD_ENTIDADE,                                                                                                        
+                     TO_CHAR(EOP.DT_VENCIMENTO, 'dd/mm/yyyy') AS DT_VENCIMENTO,                                                               
+                     TO_CHAR(EOP.DT_EMISSAO, 'dd/mm/yyyy') AS DT_EMISSAO,                                                                     
+                     CGMEMP.NOM_CGM AS BENEFICIARIO ,                                                                                            
+                     EMPENHO.fn_consultar_valor_pagamento_ordem(eop.EXERCICIO,eop.COD_ORDEM,eop.COD_ENTIDADE) AS VALOR_PAGAMENTO,             
+                     coalesce(eopa.vl_anulado,0.00) as vl_anulado,                                                                            
+                     EMP.CGM_BENEFICIARIO,                                                                                                    
+                     coalesce(sum(emp.vl_pago_nota),0.00) as vl_pago_nota,                                                                    
+                     replace(empenho.retorna_notas_empenhos(eop.exercicio,eop.cod_ordem,eop.cod_entidade),'','<br>') as nota_empenho,         
+                     EMP.implantado                                                                                                           
+                FROM                                                                                                                          
+                     EMPENHO.ORDEM_PAGAMENTO AS EOP                                                                                           
+                     LEFT JOIN (                                                                                                              
+                             SELECT opa.cod_ordem                                                                                             
+                                   ,opa.exercicio                                                                                             
+                                   ,opa.cod_entidade                                                                                          
+                                   ,coalesce(sum(opla.vl_anulado),0.00) as vl_anulado                                                         
+                             FROM  EMPENHO.ORDEM_PAGAMENTO_ANULADA AS OPA                                                                     
+                                   JOIN empenho.ordem_pagamento_liquidacao_anulada as opla                                                    
+                                   ON (    opa.exercicio    = opla.exercicio                                                                  
+                                       AND opa.cod_ordem    = opla.cod_ordem                                                                  
+                                       AND opa.cod_entidade = opla.cod_entidade                                                               
+                                       AND opa.timestamp    = opla.timestamp                                                                  
+                                   )                                                                                                          
+                          GROUP BY opa.cod_ordem, opa.exercicio, opa.cod_entidade                                                             
+                     ) as EOPA ON (  eopa.cod_ordem = eop.cod_ordem                                                                           
+                                 AND eopa.exercicio = eop.exercicio                                                                           
+                                 AND eopa.cod_entidade = eop.cod_entidade                                                                     
+                     )                                                                                                                        
+                 LEFT JOIN                                                                                                                    
+                     (                                                                                                                        
+                     SELECT                                                                                                                   
+                         PL.COD_ORDEM,                                                                                                        
+                         PL.EXERCICIO,                                                                                                        
+                         PL.COD_ENTIDADE,                                                                                                     
+                         PE.CGM_BENEFICIARIO,                                                                                                 
+                         PE.IMPLANTADO,                                                                                                       
+                         NL.EXERCICIO_EMPENHO,                                                                                                
+                         NL.COD_EMPENHO,                                                                                                      
+                         NL.COD_NOTA,
+                         PE.cod_pre_empenho,                                                                                                         
+                         sum(NLP.vl_pago) as vl_pago_nota                                                                                     
+                     FROM                                                                                                                     
+                         EMPENHO.PAGAMENTO_LIQUIDACAO    as PL,                                                                               
+                         EMPENHO.NOTA_LIQUIDACAO         as NL                                                                                
+                         LEFT JOIN (                                                                                                          
+                                  SELECT nlp.exercicio                                                                                        
+                                        ,nlp.cod_entidade                                                                                     
+                                        ,nlp.cod_nota                                                                                         
+                                        ,nlp.timestamp                                                                                        
+                                        ,coalesce(sum(nlp.vl_pago),0.00) - coalesce(sum(nlp.vl_anulado),0.00) as vl_pago                      
+                                    FROM (SELECT  cod_nota                                                                                    
+                                                 ,cod_entidade                                                                                
+                                                 ,exercicio                                                                                   
+                                                 ,timestamp                                                                                   
+                                                 ,sum(vl_pago) as vl_pago                                                                     
+                                                 ,0.00 as vl_anulado                                                                          
+                                          FROM empenho.nota_liquidacao_paga                                                                   
+                                         GROUP BY cod_nota, timestamp, cod_entidade, exercicio, vl_anulado                                    
+                                                                                                                                              
+                                    UNION                                                                                                     
+                                                                                                                                              
+                                          SELECT cod_nota                                                                                     
+                                                ,cod_entidade                                                                                 
+                                                ,exercicio                                                                                    
+                                                ,timestamp                                                                                    
+                                                ,0.00 as vl_pago                                                                              
+                                                ,sum(vl_anulado) as vl_anulado                                                                
+                                          FROM  empenho.nota_liquidacao_paga_anulada                                                          
+                                         GROUP BY cod_nota, timestamp, cod_entidade, exercicio, vl_pago                                       
+                                        ) as NLP                                                                                              
+                                 GROUP BY nlp.exercicio, nlp.timestamp, nlp.cod_entidade, nlp.cod_nota                                        
+                         ) as NLP ON (   nlp.cod_nota = nl.cod_nota                                                                           
+                                     AND nlp.exercicio = nl.exercicio                                                                         
+                                     AND nlp.cod_entidade = nl.cod_entidade                                                                   
+                         ),                                                                                                                   
+                         EMPENHO.EMPENHO                 as E,                                                                                
+                         EMPENHO.PRE_EMPENHO             as PE                                                                               
+                     WHERE                                                                                                                    
+                         PL.COD_NOTA             = NL.COD_NOTA       AND                                                                      
+                         PL.EXERCICIO_LIQUIDACAO = NL.EXERCICIO      AND                                                                      
+                         PL.COD_ENTIDADE         = NL.COD_ENTIDADE   AND     
+        ";
+        
+        if($this->getDado('cod_ordem'))
+            $stSql .= "             pl.cod_ordem = ".$this->getDado('cod_ordem')." AND ";                                                                  
+        
+        if($this->getDado('exercicio'))
+            $stSql .= "             pl.exercicio = '".$this->getDado('exercicio')."' AND ";                                                                
+        
+        if($this->getDado('cod_entidade'))
+            $stSql .= "             pl.cod_entidade = ".$this->getDado('cod_entidade')." AND ";
+        
+        $stSql .= "                                                                                                                                      
+                         NL.COD_EMPENHO          = E.COD_EMPENHO     AND                                                                      
+                         NL.EXERCICIO_EMPENHO    = E.EXERCICIO       AND                                                                      
+                         NL.COD_ENTIDADE         = E.COD_ENTIDADE    AND                                                                      
+                                                                                                                                              
+                         E.COD_PRE_EMPENHO       = PE.COD_PRE_EMPENHO    AND                                                                  
+                         E.EXERCICIO             = PE.EXERCICIO                                                                            
+                                                                                                                                              
+                 GROUP BY                                                                                                                     
+                         PL.COD_ORDEM,                                                                                                        
+                         PL.EXERCICIO,                                                                                                        
+                         PL.COD_ENTIDADE,                                                                                                     
+                         PE.CGM_BENEFICIARIO,                                                                                                 
+                         PE.IMPLANTADO,                                                                                                       
+                         NL.EXERCICIO_EMPENHO,                                                                                                
+                         NL.COD_EMPENHO,                                                                                                      
+                         NL.COD_NOTA,
+                         PE.cod_pre_empenho                                                                                                          
+                                                                                                                                              
+                 ) AS EMP ON (                                                                                                                
+                     EOP.COD_ORDEM       = EMP.COD_ORDEM AND                                                                                  
+                     EOP.EXERCICIO       = EMP.EXERCICIO AND                                                                                  
+                     EOP.COD_ENTIDADE    = EMP.COD_ENTIDADE                                                                                   
+                 )                                                                                                                            
+                 LEFT JOIN                                                                                                                    
+                     ORCAMENTO.ENTIDADE AS OE                                                                                                 
+                 ON                                                                                                                           
+                   ( OE.COD_ENTIDADE = EOP.COD_ENTIDADE                                                                                       
+                 AND OE.EXERCICIO    = EOP.EXERCICIO    )                                                                                     
+                 
+                LEFT JOIN SW_CGM as CGMEMP 
+                    ON CGMEMP.NUMCGM = EMP.CGM_BENEFICIARIO                                                          
+                
+                JOIN empenho.pre_empenho_despesa
+                    ON pre_empenho_despesa.exercicio = EMP.exercicio
+                    AND pre_empenho_despesa.cod_pre_empenho = EMP.cod_pre_empenho
+                
+                JOIN orcamento.despesa
+                    ON despesa.exercicio        = pre_empenho_despesa.exercicio
+                    AND despesa.cod_despesa     = pre_empenho_despesa.cod_despesa
+
+             WHERE eop.cod_ordem is not null   
+        ";                                                                                               
+        if($this->getDado('cod_ordem'))
+            $stSql .= "     AND EOP.cod_ordem = ".$this->getDado('cod_ordem');
+        if($this->getDado('exercicio'))
+            $stSql .= "     AND eop.exercicio = '".$this->getDado('exercicio')."'";
+        if($this->getDado('cod_entidade'))
+            $stSql .= "     AND eop.cod_entidade = ".$this->getDado('cod_entidade');
+        if($this->getDado('cod_recurso'))
+            $stSql .= "    and despesa.cod_recurso = ".$this->getDado('cod_recurso');
+
+        $stSql .= "                                                                                                                                      
+             GROUP BY eop.exercicio,eop.dt_vencimento,eop.dt_emissao,emp.exercicio_empenho,eop.COD_ORDEM,eop.COD_ENTIDADE,EMP.CGM_BENEFICIARIO,CGMEMP.nom_cgm,VALOR_PAGAMENTO,EMP.implantado,eopa.vl_anulado 
+                                                                                                                                              
+             ORDER BY eop.cod_ordem                                                                                                           
+         ) as tbl                                                                                                                             
+                                                                                                                                              
+         where (valor_pagamento - vl_anulado ) > vl_pago_nota                                                                                 
+        ";
+
+        return $stSql;
+    }
+
+
+
 }

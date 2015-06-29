@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGRegistroPrecos.class.php 61951 2015-03-18 16:29:06Z michel $
- * $Revision: 61951 $
+ * $Id: TTCEMGRegistroPrecos.class.php 62832 2015-06-25 16:55:06Z michel $
+ * $Revision: 62832 $
  * $Author: michel $
- * $Date: 2015-03-18 13:29:06 -0300 (Qua, 18 Mar 2015) $
+ * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
  * 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -105,6 +105,8 @@ class TTCEMGRegistroPrecos extends Persistente
               FROM tcemg.registro_precos
 
              WHERE cod_entidade = ".$this->getDado('cod_entidade');
+        if($this->getDado('exercicio')!=NULL)
+            $stSql .= " AND exercicio='".$this->getDado('exercicio')."'";
 
         return $stSql;
     }
@@ -126,7 +128,8 @@ class TTCEMGRegistroPrecos extends Persistente
     {
         $stSql = "
             SELECT cod_entidade
-                 , LPAD(numero_registro_precos::VARCHAR, 12, '0') || '/'|| exercicio AS codigo_registro_precos
+                 , LPAD(numero_registro_precos::VARCHAR, 12, '0') AS codigo_registro_precos
+                 , registro_precos.exercicio AS exercicio_registro_precos
                  , TO_CHAR(data_abertura_registro_precos,'dd/mm/yyyy') AS data_abertura_registro_precos
                  , sw_cgm.numcgm  AS numcgm_gerenciador
                  , sw_cgm.nom_cgm AS nomcgm_gerenciador

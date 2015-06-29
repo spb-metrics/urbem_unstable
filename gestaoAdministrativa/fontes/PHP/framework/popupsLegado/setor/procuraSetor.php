@@ -67,7 +67,7 @@ $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 ?>
 <html><head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function alertaAviso(objeto,tipo,chamada)
 {
     var x = 350;
@@ -106,7 +106,7 @@ switch ($ctrl) {
 case 0:
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {

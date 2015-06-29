@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: OCManterComissaoLicitacao.php 60972 2014-11-26 17:08:29Z evandro $
+    $Id: OCManterComissaoLicitacao.php 62654 2015-05-29 12:59:20Z evandro $
 
     * Casos de uso: uc-03.05.09
 */
@@ -296,6 +296,11 @@ function incluiMembro()
             $stJs .= " alertaAviso('@Já existe um pregoeiro para esta comissão.','form','erro','".Sessao::getId()."');";
         }
 
+        if ( ($_REQUEST['stCargoMembro'] == "") || ( $_REQUEST['inNaturezaCargo'] == "") ) {
+            $boIncluir = false;
+            $stJs .= " alertaAviso('@Deve informar o Cargo do membro e sua natureza.','form','erro','".Sessao::getId()."');";
+        }
+
         if ($boIncluir) {
             $arRegistro = array();
             $arRegistro['inId']             = $inCont = $inCountMembros;
@@ -365,6 +370,12 @@ function alteraMembro()
             $boAlterar = false;
             $stJs = " alertaAviso('@Já existe um pregoeiro para esta comissão.','form','erro','".Sessao::getId()."');";
         }
+
+        if ( ($_REQUEST['stCargoMembro'] == "") || ( $_REQUEST['inNaturezaCargo'] == "") ) {
+            $boAlterar = false;
+            $stJs .= " alertaAviso('@Deve informar o Cargo do Membro e sua Natureza.','form','erro','".Sessao::getId()."');";
+        }
+
         if ($boAlterar) {
 
             $arRegistro = array();

@@ -58,8 +58,6 @@ $pgProc = "PR".$stPrograma.".php?".Sessao::getId();
 $pgOcul = "OC".$stPrograma.".php?".Sessao::getId();
 $pgJS   = "JS".$stPrograma.".js";
 
-SistemaLegado::mostraVar($_REQUEST);
-
 $stFncJavaScript .= " function insereEvento(cod_evento,num,nom,texto) {                     \n";
 $stFncJavaScript .= " var sNum;                                                             \n";
 $stFncJavaScript .= " var sNom;                                                             \n";

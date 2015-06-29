@@ -31,7 +31,7 @@
     * @author Desenvolvedor:  Lisiane Morais
     * @ignore
 
-    $Id: FMManterOrcamento.php 60602 2014-11-03 14:49:54Z michel $
+    $Id: FMManterOrcamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -133,7 +133,7 @@ $obIPopUpLeiPPA->geraFormulario($obFormulario);
 $obFormulario->OK();
 $obFormulario->show();
 
-echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+echo "<script type=\"text/javascript\">             \r\n";
 echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."', 'buscaDados');     \r\n";
 echo "</script>   \r\n";
 

@@ -30,7 +30,7 @@
  * @author Analista: Cassiano
  * @author Desenvolvedor: Cassiano
 
- * $Id: FMConsultarOrgao.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: FMConsultarOrgao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  Casos de uso: uc-01.05.02
 
@@ -108,7 +108,7 @@ $stDataInativacao     = $obRegra->getInativacao();
 Sessao::write('obRegra', $obRegra);
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 ajaxJavaScript('<?=$pgOcul."?".Sessao::getId();?>','preencheInner');
 //-->

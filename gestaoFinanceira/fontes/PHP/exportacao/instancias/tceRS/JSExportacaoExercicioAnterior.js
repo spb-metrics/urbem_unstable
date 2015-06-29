@@ -49,7 +49,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 function Limpar(){
     limpaFormulario();
 }

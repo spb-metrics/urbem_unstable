@@ -44,7 +44,7 @@ Arquivos para geração do TCMGO
 
 */
 ?>
-<script language="javascript">
+<script type="text/javascript">
     limparGestor(){
         document.getElementById( 'inCGMGestor' ).value = '';
         document.getElementById( 'dtInicio' ).value = '';

@@ -374,6 +374,9 @@ function montaRecuperaRelacionamentoRelatorio()
           
           INNER JOIN pessoal.contrato_servidor_nomeacao_posse
                   ON contrato_servidor_nomeacao_posse.cod_contrato = contrato_servidor.cod_contrato
+                 AND contrato_servidor_nomeacao_posse.timestamp = ( SELECT MAX(timestamp)
+                                                                      FROM pessoal.contrato_servidor_nomeacao_posse AS csnp
+                                                                     WHERE csnp.cod_contrato = contrato_servidor_nomeacao_posse.cod_contrato)
           
           INNER JOIN sw_categoria_habilitacao
                   ON sw_categoria_habilitacao.cod_categoria = sw_cgm_pessoa_fisica.cod_categoria_cnh

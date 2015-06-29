@@ -63,7 +63,7 @@ include_once '../../../framework/legado/mascarasLegado.lib.php';
     $resultInicial = hoje();
     $resultFinal   = hoje();
 ?>
-   <script language="javascript">
+   <script type="text/javascript">
      function zebra(id, classe)
      {
             var tabela = document.getElementById(id);
@@ -77,7 +77,7 @@ include_once '../../../framework/legado/mascarasLegado.lib.php';
     switch ($ctrl) {
         case 0:
 ?>
-        <script language="javascript">
+        <script type="text/javascript">
         //compara a data 1 com a data 2
         //retorna 1 => data 1 maior que data 2
         //        0 => datas iguais
@@ -243,7 +243,7 @@ include_once '../../../framework/legado/mascarasLegado.lib.php';
         case 1:
 
             ?>
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     function SalvarVolume()
                     {
                         document.frm.action = "relVolume.php?<?=Sessao::getId()?>&ctrl=1&ordem=<?=$ordem?>&dataInicial=<?=$dataInicial?>&dataFinal=<?=$dataFinal?>";

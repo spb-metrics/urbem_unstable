@@ -52,7 +52,7 @@ Construção.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function abrePopUpFuncao(){
     var width  = 800;
     var height = 550;

@@ -631,7 +631,7 @@ stSql := '
                 , COALESCE(tmp_recurso_saldos.a_pagar_exercicio_anteriores,0.00) as a_pagar_exercicio_anteriores
                 , SUM(consignacoes.valor_positivo) as valor_credito
                 , sum(consignacoes.valor_negativo) as valor_debito
-                , COALESCE(SUM(COALESCE(tmp_recurso_inicial.valor_consignacoes)), 0) + (COALESCE(SUM(COALESCE(consignacoes.valor_positivo, 0))) + COALESCE(SUM(COALESCE(consignacoes.valor_negativo, 0)))) as consignacoes
+                , COALESCE(SUM(COALESCE(tmp_recurso_inicial.valor_consignacoes)), 0.00) + (COALESCE(SUM(COALESCE(consignacoes.valor_positivo, 0.00))) + COALESCE(SUM(COALESCE(consignacoes.valor_negativo, 0.00)))) as consignacoes
                 , tmp_recurso_saldos.caixa
         FROM tmp_recurso_saldos
         

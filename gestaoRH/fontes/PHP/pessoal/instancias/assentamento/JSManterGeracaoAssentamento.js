@@ -49,7 +49,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     var stAction = document.frm.action;

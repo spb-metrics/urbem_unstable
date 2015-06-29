@@ -71,8 +71,8 @@ if (!(isset($ctrl)))
 if (isset($codNatureza))
     $ctrl = 1;
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -171,7 +171,7 @@ switch ($ctrl) {
 
             $objeto = "Natureza: ".$nomNatureza;
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","excluir","aviso","'.Sessao::getId().'");
                     window.location = "excluiNatureza.php?'.Sessao::getId().'";
                 </script>';
@@ -179,7 +179,7 @@ switch ($ctrl) {
 
             $objeto = "Esta Natureza está sendo utilizada. Natureza: ".$nomNatureza;
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                      alertaAviso("Esta natureza está sendo utilizada! (Natureza:'.$nomNatureza.')","n_excluir","erro","'.Sessao::getId().'");
                     window.location = "excluiNatureza.php?'.Sessao::getId().'";
                 </script>';

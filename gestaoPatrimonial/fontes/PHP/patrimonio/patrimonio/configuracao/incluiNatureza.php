@@ -72,7 +72,7 @@ switch ($ctrl) {
     // exibe formulario para insercao de Natureza
     case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -145,7 +145,7 @@ switch ($ctrl) {
             $audicao->insereAuditoria();
 
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","incluir","aviso","'.Sessao::getId().'");
                     window.location = "incluiNatureza.php?'.Sessao::getId().'";
                 </script>';
@@ -153,7 +153,7 @@ switch ($ctrl) {
         // se houver erro na insercao da natureza exibe msg de erro
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","n_incluir","erro","'.Sessao::getId().'");
                     window.location = "incluiNatureza.php?'.Sessao::getId().'";
                 </script>';
@@ -162,7 +162,7 @@ switch ($ctrl) {
     //Se já existir algum registro com esse nome..
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("Já existe uma Natureza com esse nome","unica","erro","'.Sessao::getId().'");
                 window.location = "incluiNatureza.php?'.Sessao::getId().'&nomNatureza='.$nomNatureza.'";
             </script>';

@@ -31,7 +31,7 @@
   * @author Analista:
   * @author Programador: Fernando Zank Correa Evangelista
 
-  $Id: FLFichaPatrimonial.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: FLFichaPatrimonial.php 62830 2015-06-25 14:49:46Z jean $
 
   Caso de uso: uc-03.01.11
 
@@ -161,6 +161,20 @@ $obPeriodicidadeIncorporacao->setTitle( 'Selecione o Período de Incorporação.
 $obPeriodicidadeIncorporacao->setNull( true );
 $obPeriodicidadeIncorporacao->setExercicio ( Sessao::getExercicio() );
 
+//Filtro demonstrar depreciações
+$obDepreciacoesSim = new Radio;
+$obDepreciacoesSim->setRotulo ( "Demonstrar Depreciações" );
+$obDepreciacoesSim->setTitle  ( "Selecione se é para demonstrar as depreciações." );
+$obDepreciacoesSim->setName   ( "stDepreciacoes" );
+$obDepreciacoesSim->setChecked( false );
+$obDepreciacoesSim->setValue  ( "S" );
+$obDepreciacoesSim->setLabel  ( "Sim" );
+
+$obDepreciacoesNao = new Radio;
+$obDepreciacoesNao->setName   ( "stDepreciacoes" );
+$obDepreciacoesNao->setChecked( true );
+$obDepreciacoesNao->setValue  ( "N" );
+$obDepreciacoesNao->setLabel  ( "Não" );
 //Radios de histórico
 $obRdbComHistorico = new Radio;
 $obRdbComHistorico->setRotulo ( "Imprimir Histórico" );
@@ -215,6 +229,7 @@ $obFormulario->agrupaComponentes( array( $obRdbTipoResumido, $obRdbTipoCompleto)
 $obFormulario->agrupaComponentes( array( $obRdbComHistorico, $obRdbSemHistorico));
 $obFormulario->addComponente    ( $obDtDataAquisicao);
 $obFormulario->addComponente    ( $obPeriodicidadeIncorporacao);
+$obFormulario->agrupaComponentes( array( $obDepreciacoesSim, $obDepreciacoesNao));
 $obFormulario->addTitulo        ( "Localização"   );
 $obIMontaOrganograma->geraFormulario( $obFormulario );
 $obIMontaOrganogramaLocal->geraFormulario( $obFormulario );

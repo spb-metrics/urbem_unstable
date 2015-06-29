@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: TTGOBLP.class.php 61563 2015-02-05 15:54:03Z lisiane $
+    * $Id: TTGOBLP.class.php 62691 2015-06-05 20:58:25Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -58,77 +58,46 @@ class TTGOBLP extends Persistente
         $dtFinal   = "'31/12/".$this->getDado('exercicio')."'";
         $entidade  = "'".$this->getDado('cod_entidade')."'";
         $stSql = "
-                SELECT *
-                  FROM ( 
-                        SELECT 10 AS registro
-                             , '01' AS tipo_lancamento
-                             , tipo_conta
-                             , SUM(vl_saldo_anterior) AS vl_saldo_anterior
-                             , SUM(vl_saldo_creditos) AS vl_saldo_creditos
-                             , SUM(vl_saldo_debitos) AS vl_saldo_debitos
-                             , SUM(vl_saldo_atual) AS vl_saldo_atual  
-                             , SUM((vl_saldo_anterior + vl_saldo_creditos) - vl_saldo_debitos) AS saldo_exerc_seguinte  
-                        FROM( SELECT * 
-                                FROM tcmgo.balanco_patrimonial_ativo( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." )
-                                  AS ( cod_estrutural VARCHAR
-                                     , nivel INTEGER
-                                     , nom_conta VARCHAR
-                                     , vl_saldo_anterior NUMERIC
-                                     , vl_saldo_debitos NUMERIC
-                                     , vl_saldo_creditos NUMERIC
-                                     , vl_saldo_atual NUMERIC 
-                                     , tipo_conta INTEGER )
-                              ORDER BY cod_estrutural ) AS TABELA
-                              GROUP BY tipo_conta
+                        SELECT  10 AS registro
+                                , '01' AS tipo_lancamento
+                                ,* 
+                        FROM tcmgo.balanco_patrimonial_ativo( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." )
+                        AS ( tipo_conta varchar
+                            ,vl_saldo_anterior NUMERIC
+                            ,vl_saldo_atual   NUMERIC 
+                        )
+                    
+                    UNION
 
-               UNION ALL
+                        SELECT  10 AS registro
+                                , '02' AS tipo_lancamento
+                                ,* 
+                        FROM tcmgo.balanco_patrimonial_passivo( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." )
+                        AS ( tipo_conta varchar
+                            ,vl_saldo_anterior NUMERIC
+                            ,vl_saldo_atual   NUMERIC 
+                        )
+                    
+                    UNION 
 
-                    SELECT 10 AS registro
-                         , '02' AS tipo_lancamento
-                         , tipo_conta
-                         , SUM(vl_saldo_anterior) AS vl_saldo_anterior
-                         , SUM(vl_saldo_creditos) AS vl_saldo_creditos
-                         , SUM(vl_saldo_debitos) AS vl_saldo_debitos
-                         , SUM(vl_saldo_atual) AS vl_saldo_atual  
-                         , SUM((vl_saldo_anterior + vl_saldo_creditos) - vl_saldo_debitos) AS saldo_exerc_seguinte
-                     FROM( SELECT * 
-                             FROM tcmgo.balanco_patrimonial_passivo( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." ) 
-                               AS ( cod_estrutural VARCHAR
-                                  , nivel INTEGER
-                                  , nom_conta VARCHAR
-                                  , vl_saldo_anterior NUMERIC
-                                  , vl_saldo_debitos NUMERIC
-                                  , vl_saldo_creditos NUMERIC
-                                  , vl_saldo_atual NUMERIC 
-                                  , tipo_conta INTEGER )
-                           ORDER BY cod_estrutural ) AS TABELA
-                           GROUP BY tipo_conta
+                        SELECT  10 AS registro
+                                , '02' AS tipo_lancamento
+                                , tipo_conta::varchar
+                                , SUM(vl_saldo_anterior) AS vl_saldo_anterior
+                                , SUM(vl_saldo_atual) AS vl_saldo_atual                        
+                        FROM tcmgo.balanco_patrimonial_patrimonio_liquido( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." )
+                        AS ( cod_estrutural VARCHAR
+                            , nivel INTEGER
+                            , nom_conta VARCHAR
+                            , vl_saldo_anterior NUMERIC
+                            , vl_saldo_debitos NUMERIC
+                            , vl_saldo_creditos NUMERIC
+                            , vl_saldo_atual NUMERIC 
+                            , tipo_conta INTEGER
+                        )
+                        GROUP BY tipo_conta
 
-              UNION ALL
-
-                SELECT 10 AS registro
-                      ,	'02' AS tipo_lancamento
-                      , tipo_conta
-                      , SUM(vl_saldo_anterior) AS vl_saldo_anterior
-                      , SUM(vl_saldo_creditos) AS vl_saldo_creditos
-                      , SUM(vl_saldo_debitos) AS vl_saldo_debitos
-                      , SUM(vl_saldo_atual) AS vl_saldo_atual  
-                      , SUM((vl_saldo_anterior + vl_saldo_creditos) - vl_saldo_debitos) AS saldo_exerc_seguinte
-                FROM(  
-                SELECT * 
-                  FROM tcmgo.balanco_patrimonial_patrimonio_liquido( ".$exercicio.",".$dtInicial.",".$dtFinal.",".$entidade." ) 
-                    AS ( cod_estrutural VARCHAR
-                       , nivel INTEGER
-                       , nom_conta VARCHAR
-                       , vl_saldo_anterior NUMERIC
-                       , vl_saldo_debitos NUMERIC
-                       , vl_saldo_creditos NUMERIC
-                       , vl_saldo_atual NUMERIC 
-                       , tipo_conta INTEGER)
-                ORDER BY cod_estrutural ) AS TABELA
-                GROUP BY tipo_conta
-           ) AS tabela
-     ORDER BY tipo_lancamento, tipo_conta ";
+                ORDER BY tipo_lancamento, tipo_conta ";
 
     return $stSql;
 

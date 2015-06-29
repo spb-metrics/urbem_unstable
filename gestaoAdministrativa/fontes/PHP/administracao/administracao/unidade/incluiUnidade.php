@@ -57,7 +57,7 @@ $stMascaraUnidade = $arMascaraSetor[0].".".$arMascaraSetor[1]."/9999";
 switch ($controle) {
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function validaOrganograma(iCod,campo,campoCod,stItemMsg)
     {
@@ -232,19 +232,19 @@ case 1:
                 if ($arCodUnidade[0]) {
                     $stCodUnidade = $arCodUnidade[1];
                 }
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$stCodUnidade." - ".$nomUnidade.'","incluir","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&stCodOrgao='.$stCodOrgao.'&stNomeOrgao='.$stNomeOrgao.'");
                     </script>';
         } else {
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomUnidade.'","n_incluir","erro","'.Sessao::getId().'");
                     </script>';
                     executaFrameOculto("f.ok.disabled = false;");
         }
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("A Unidade '.$nomUnidade.' já existe","unica","erro","'.Sessao::getId().'");
             </script>';
             executaFrameOculto("f.ok.disabled = false;");
@@ -267,7 +267,7 @@ case 2:
     $dbConfig->fechaBd();
 
     if ($usuarioResponsavel == "") {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
                     alertaAviso("Código de Usuário invalido ('.$usuarioNumCgm.')","unica","erro","'.Sessao::getId().'");
               </script>';
     }

@@ -36,12 +36,12 @@
 
     * Casos de uso: uc-03.05.15
     
-    $Id: JSManterConfiguracaoOrdenador.js 60161 2014-10-02 20:19:43Z lisiane $
+    $Id: JSManterConfiguracaoOrdenador.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */ 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(variavel){
     var stTraget = document.frm.target;

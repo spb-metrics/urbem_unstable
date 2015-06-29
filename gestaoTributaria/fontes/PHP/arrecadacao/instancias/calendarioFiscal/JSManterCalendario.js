@@ -34,14 +34,14 @@
     * @supackage Regras
     * @package Urbem
 
-    * $Id: JSManterCalendario.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterCalendario.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.03.03
 
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function mudaMenu(func){
     sPag="../../../../../../gestaoAdministrativa/fontes/PHP/framework/instancias/index/menu.php?<?=Sessao::getId();?>&nivel=2&cod_func_pass="+func;

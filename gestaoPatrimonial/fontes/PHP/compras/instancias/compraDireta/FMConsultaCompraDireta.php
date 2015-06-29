@@ -241,7 +241,7 @@ $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
-echo "<script language='javascript'>\n";
+echo "<script type='text/javascript'>\n";
 echo "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade=".$arCompraDireta['cod_entidade']."&stMapaCompras=".$arCompraDireta['cod_mapa']."/".$arCompraDireta['exercicio_mapa']."&boAlteraAnula=true','montaItensAlterar');";
 echo "</script>\n";
 

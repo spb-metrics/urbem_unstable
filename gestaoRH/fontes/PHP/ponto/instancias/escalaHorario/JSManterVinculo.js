@@ -42,7 +42,7 @@
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function selecionarTodos(){
     if(jQuery('#boTodos').attr('checked')){
         jQuery(":checkbox").attr("checked", "checked");        

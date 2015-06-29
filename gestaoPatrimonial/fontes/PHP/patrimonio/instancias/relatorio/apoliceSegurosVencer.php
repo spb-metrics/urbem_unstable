@@ -70,7 +70,7 @@ switch ($ctrl) {
 
 case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -151,7 +151,7 @@ case 1:
         $dtFinal = dataToSql($datafinal);
         if ($dtFinal < $dtInicial) {
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaMensagem("A Data Inicial deve ser menor que a data final","unica","aviso","<?=$sessao->id;?>");
                 window.location = "apoliceSegurosVencer.php?<?=$sessao->id;?>";
             </script>

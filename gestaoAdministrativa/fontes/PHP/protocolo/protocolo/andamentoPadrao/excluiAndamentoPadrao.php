@@ -61,8 +61,8 @@ $valor            = $_REQUEST["valor"];
 $codOrgao       = $_REQUEST["codOrgao"];
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 
 #sistemalegado::mostravar($_REQUEST);
@@ -74,7 +74,7 @@ case 0:
 Sessao::write('ordem', 0);
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function Valida()
 {
@@ -427,7 +427,7 @@ case 2:
     }
     ?>
 
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
     <!--
     function Valida()
     {

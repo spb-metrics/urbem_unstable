@@ -45,7 +45,7 @@ uc 02.09.01
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function  verificaProtocolo( nroProtocolo ){
     if (nroProtocolo.value.length < 9) {

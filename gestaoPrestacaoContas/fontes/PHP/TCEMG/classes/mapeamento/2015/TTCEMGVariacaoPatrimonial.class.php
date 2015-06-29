@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: TTCEMGVariacaoPatrimonial.class.php 62801 2015-06-19 16:37:08Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -50,12 +50,12 @@ function TTCEMGVariacaoPatrimonial()
     parent::Persistente();
 }
 
-function recuperaRelacionamento(&$rsRecordSet)
+function recuperaValores(&$rsRecordSet)
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    $stSql = $this->montaRecuperaRelacionamento().$stFiltro.$stOrdem;
+    $stSql = $this->montaRecuperaValores().$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
 
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -63,15 +63,15 @@ function recuperaRelacionamento(&$rsRecordSet)
     return $obErro;
 }
 
-function montaRecuperaRelacionamento()
+function montaRecuperaValores()
 {
-    $stSql = "   select mes
-                                , REPLACE(deficit::VARCHAR,'.','') as deficit
-                                , REPLACE(superavit::VARCHAR,'.','') as superavit
-                        from tcemg.fn_variacao_patrimonial('".$this->getDado("stExercicio")."', '".$this->getDado("stEntidade")."', ".$this->getDado("mes").")
-            as retorno( mes INTEGER
-                             , deficit NUMERIC
-                             , superavit NUMERIC )";
+    $stSql = "   SELECT mes
+                      , ABS(deficit) as deficit
+                      , ABS(superavit) as superavit
+                   FROM tcemg.fn_variacao_patrimonial('".$this->getDado("stExercicio")."', '".$this->getDado("stEntidade")."', ".$this->getDado("mes").")
+                     AS retorno( mes       INTEGER
+                               , deficit   NUMERIC
+                               , superavit NUMERIC )";
 
     return $stSql;
 }

@@ -33,7 +33,7 @@
 
  * @ignore
 
- $Id: menu.php 60751 2014-11-13 12:26:15Z diogo.zarpelon $
+ $Id: menu.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  $Revision: 28718 $
  $Name$
@@ -50,7 +50,7 @@ include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML
 include(CAM_FW_LEGADO."funcoesLegado.lib.php");
 include(CAM_FW_LEGADO."sistema.class.php");
 if((strtolower(Sistema::consultaStatus()) == 'i')&&(Sessao::read('username') != 'admin')){
-    echo("<script language='javascript'>parent.window.location.href='".URBEM_ROOT_URL."/index.php?action=sair';</script>");
+    echo("<script type='text/javascript'>parent.window.location.href='".URBEM_ROOT_URL."/index.php?action=sair';</script>");
 }
 
 Sessao::open();
@@ -125,7 +125,7 @@ if ($nivel == 1) {
       MontaCSSMenu();
       window.status = ":::::::: URBEM ::::::::";
 </script>
-<script language="JavaScript" type="text/JavaScript">
+<script type="text/JavaScript">
 
 function mudaTelaMenu(sPag)
 {
@@ -221,7 +221,7 @@ a imagem na tela */
 <head>
 
 <body bgcolor="#ffffff" leftmargin=0 topmargin=0 >
-<?php echo "<script language=JavaScript type=text/JavaScript>
+<?php echo "<script type='text/javascript'>
                 window.onload= mostraTituloPagina('".Sessao::getTituloPagina()."','".($nivel ? Sessao::getVersao() : '' )."');
             </script>"; ?>
 <div id="fundo_carregando">
@@ -231,7 +231,7 @@ a imagem na tela */
 
 <form name="frmMenu"><?php
 if (!Sessao::getId()) {
-    echo "<script language=JavaScript type=text/JavaScript>
+    echo "<script type='text/javascript'>
                 window.location='menu.html'
                 </script>";
 }
@@ -573,7 +573,7 @@ case 3:
 
 </center>
 </form>
-<script language="javascript">
+<script type="text/javascript">
     EscondeCarregando();
 </script>
 </body>

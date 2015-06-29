@@ -83,7 +83,7 @@ if ($ctrl >= 2) {
     $aAbas = array(2=>"Prescrição", 3=>"Exames", 4=>"Internações");
     //$aAbas = array(2=>"Dados Tratamento", 3=>"Dados Exames", 4=>"Dados Internações");
     ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function mudarAba(keyant,key)
     {
         var f = document.frm;
@@ -210,7 +210,7 @@ switch ($ctrl) {
 //Dá a opção de procurar tratamentos por cidadão. Se não fornecer o código do cidadão exibe todos os tratamentos.
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function buscaNome()
     {
         aux = document.getElementById("lista");
@@ -1033,7 +1033,7 @@ case 10:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

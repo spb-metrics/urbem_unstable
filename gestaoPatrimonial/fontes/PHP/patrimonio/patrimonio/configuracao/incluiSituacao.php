@@ -75,7 +75,7 @@ switch ($ctrl) {
     // formulario para insercao de uma nova Situacao de Bem
     case 0:
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -163,7 +163,7 @@ switch ($ctrl) {
                 $audicao->insereAuditoria();
 
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$objeto.'","incluir","aviso","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
                 </script>';
@@ -172,7 +172,7 @@ switch ($ctrl) {
             } else {
 
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$objeto.'","n_incluir","erro","'.Sessao::getId().'");
                 //mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
                 </script>';
@@ -184,7 +184,7 @@ switch ($ctrl) {
         // nao insere a Situacao de Bem e exibe msg de erro
         else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("A Situação '.$nom.' já existe","unica","erro","'.Sessao::getId().'");
             //mudaTelaPrincipal("incluiSituacao.php?'.Sessao::getId().'&nom='.$nom.'");
             </script>';

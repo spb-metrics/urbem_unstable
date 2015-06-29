@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMImplantarSaldo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMImplantarSaldo.php 62826 2015-06-24 17:45:14Z jean $
 
     * Casos de uso: uc-02.02.04
 */
@@ -214,46 +214,46 @@ $obHdnCtrl->setValue( $stCtrl );
 
 $obHdnCodEntidade = new Hidden;
 $obHdnCodEntidade->setName ( "inCodEntidade" );
-$obHdnCodEntidade->setValue( $_POST['inCodEntidade']  );
+$obHdnCodEntidade->setValue( $request->get('inCodEntidade') );
 
 $obHdnCodGrupo= new Hidden;
 $obHdnCodGrupo->setName ( "inCodGrupo" );
-$obHdnCodGrupo->setValue( $_POST[ 'inCodGrupo' ]  );
+$obHdnCodGrupo->setValue( $request->get('inCodGrupo') );
 
 $obHdnCodEstrutural = new Hidden;
 $obHdnCodEstrutural->setName ( "stCodEstrutural" );
-$obHdnCodEstrutural->setValue( $_POST['stCodEstrutural'] );
+$obHdnCodEstrutural->setValue( $request->get('stCodEstrutural') );
 
 $obHdnCodEstruturalInicial = new Hidden;
 $obHdnCodEstruturalInicial->setName ( "stCodEstruturalInicial" );
-$obHdnCodEstruturalInicial->setValue( $_POST['stCodEstruturalInicial'] );
+$obHdnCodEstruturalInicial->setValue( $request->get('stCodEstruturalInicial') );
 
 $obHdnCodEstruturalFinal = new Hidden;
 $obHdnCodEstruturalFinal->setName ( "stCodEstruturalFinal" );
-$obHdnCodEstruturalFinal->setValue( $_POST['stCodEstruturalFinal'] );
+$obHdnCodEstruturalFinal->setValue( $request->get('stCodEstruturalFinal') );
 
 $obHdnCodPlanoInicial = new Hidden;
 $obHdnCodPlanoInicial->setName ( "inCodPlanoInicial" );
-$obHdnCodPlanoInicial->setValue( $_POST['inCodPlanoInicial'] );
+$obHdnCodPlanoInicial->setValue( $request->get('inCodPlanoInicial') );
 
 $obHdnCodPlanoFinal = new Hidden;
 $obHdnCodPlanoFinal->setName ( "inCodPlanoFinal" );
-$obHdnCodPlanoFinal->setValue( $_POST['inCodPlanoFinal'] );
+$obHdnCodPlanoFinal->setValue( $request->get('inCodPlanoFinal') );
 
 //Define o objeto Label Entidade
 $obLblCodEntidade = new Label;
 $obLblCodEntidade->setRotulo( "Entidade" );
-$obLblCodEntidade->setValue( $_POST['inCodEntidade']." - $stNomEntidade" );
+$obLblCodEntidade->setValue( $request->get('inCodEntidade')." - ".$stNomEntidade );
 
 //Define o objeto Label Código Classificação Contábil
 $obLblCodConta = new Label;
 $obLblCodConta->setRotulo( "Conta Contábil" );
-$obLblCodConta->setValue( $_POST['stCodEstruturalInicial']." - $stDescricaoClassificacaoInicial" );
+$obLblCodConta->setValue( $request->get('stCodEstruturalInicial')." - ".$request->get('stDescricaoClassificacaoInicial') );
 
 //Define o objeto Label Código Reduzido
 $obLblCodPlano = new Label;
 $obLblCodPlano->setRotulo( "Reduzido" );
-$obLblCodPlano->setValue( $_POST['inCodPlanoInicial']." - $stDescricaoContaAnaliticaInicial" );
+$obLblCodPlano->setValue( $request->get('inCodPlanoInicial')." - ".$request->get('stDescricaoContaAnaliticaInicial') );
 
 //Define o objeto Label Data de Lançamento
 $obLblDtLanc = new Label;

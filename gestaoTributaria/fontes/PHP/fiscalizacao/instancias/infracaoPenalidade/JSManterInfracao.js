@@ -37,7 +37,7 @@
  * Casos de uso:
  */
 ?>
-<script language="Javascript">
+<script type="text/javascript">
 
 function incluirPenalidade()
 {

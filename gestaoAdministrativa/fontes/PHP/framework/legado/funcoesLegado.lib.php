@@ -729,7 +729,7 @@ function mudaTelaPrincipal($location="")
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal("'.$location.'");
            </script>';
 }
@@ -747,7 +747,7 @@ function alertaAviso($location="",$objeto="",$tipo="n_incluir",$chamada="erro", 
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
                 mudaTelaPrincipal("'.$location.'");
            </script>';
@@ -759,7 +759,7 @@ function alertaAviso2($location="",$objeto="",$tipo="n_incluir",$chamada="erro",
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
                 parent.window.location.replace("'.$location.'");
            </script>';
@@ -771,7 +771,7 @@ function alertaAvisoPopUp($location="",$objeto="",$tipo="n_incluir",$chamada="er
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona para o proprio PopUp
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 <!--alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");-->
                 parent.window.location.replace("'.$location.'");
            </script>';
@@ -784,7 +784,7 @@ function alertaAvisoPopUp($location="",$objeto="",$tipo="n_incluir",$chamada="er
     exibeAviso("Usuário","alterar","aviso"); */
 function exibeAviso($objeto="",$tipo="n_incluir",$chamada="erro")
 {
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso("'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'");
            </script>';
 }
@@ -1277,7 +1277,7 @@ function executaFrameOculto($javaScript)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -1300,7 +1300,7 @@ function executaiFrameOculto($javaScript)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -1323,7 +1323,7 @@ function executaWindowOpener($javaScript)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";
@@ -1383,14 +1383,14 @@ function getmicrotime()
 /* Lucas Stephanou || 01/03/2005    */
 function BloqueiaFrames($boPrincipal=true,$boMenu=false)
 {
-    $ini = "<script language=\"javascript\">\r\n";
+    $ini = "<script type=\"text/javascript\">\r\n";
     $fim = "\r\n</script>\r\n";
     if ($boMenu ==true) {echo $ini."BloqueiaFrames(true,true);".$fim   ;}
     if ($boPrincipal==true) {echo $ini."BloqueiaFrames(true,false);".$fim   ;}
 }
 function LiberaFrames($boPrincipal=true,$boMenu=true)
 {
-    $ini = "<script language=\"javascript\">\r\n";
+    $ini = "<script type=\"text/javascript\">\r\n";
     $fim = "\r\n</script>\r\n";
     if ($boMenu ==true) {echo $ini."LiberaFrames(true,true);".$fim   ;}
     if ($boPrincipal==true) {echo $ini."LiberaFrames(true,false);".$fim   ;}

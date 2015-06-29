@@ -32,16 +32,16 @@
   
   * @ignore
   *
-  * $Id: JSVincularPlanoTCE.js 62528 2015-05-18 17:53:04Z franver $
+  * $Id: JSVincularPlanoTCE.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
   
-  * $Revision: 62528 $
+  * $Revision: 62838 $
   * $Name: $
-  * $Author: franver $
-  * $Date: 2015-05-18 14:53:04 -0300 (Seg, 18 Mai 2015) $
+  * $Author: diogo.zarpelon $
+  * $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
   
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function validaCampos() {
     var jq = window.parent.frames["telaPrincipal"].jQuery;

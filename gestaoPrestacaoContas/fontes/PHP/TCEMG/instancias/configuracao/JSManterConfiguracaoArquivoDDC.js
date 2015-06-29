@@ -34,7 +34,7 @@ Casos de uso: uc-01.05.03
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function incluir(inExercicio,inMes,inCodEntidade){
     var stTraget = document.frm.target;

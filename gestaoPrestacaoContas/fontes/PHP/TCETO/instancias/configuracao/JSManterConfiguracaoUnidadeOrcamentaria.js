@@ -29,12 +29,12 @@
 
     * @author Analista: Silvia Martins Silva
     * @author Desenvolvedor: Michel Teixeira
-    * $Id: JSManterConfiguracaoUnidadeOrcamentaria.js 60654 2014-11-06 13:18:49Z michel $
+    * $Id: JSManterConfiguracaoUnidadeOrcamentaria.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     document.frm.stCtrl.value = BuscaDado;

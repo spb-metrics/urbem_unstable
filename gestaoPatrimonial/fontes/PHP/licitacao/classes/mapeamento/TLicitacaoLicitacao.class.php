@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 62518 2015-05-15 20:39:53Z evandro $
+    $Id: TLicitacaoLicitacao.class.php 62654 2015-05-29 12:59:20Z evandro $
 
 */
 
@@ -948,6 +948,184 @@ function montaRecuperaLicitacaoNaoHomologada()
             WHERE julgamento_item.ordem = 1
       ";
 
+      return $stSql;
+  }
+
+  public function recuperaLicitacaoResponsavelTCMGO(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+  {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stOrdem = " ORDER BY  ll.cod_licitacao ";
+        $stSql = $this->montaRecuperaLicitacaoResponsavelTCMGO().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+        return $obErro;
+  }
+
+  public function montaRecuperaLicitacaoResponsavelTCMGO()
+  {
+        $stSql = " SELECT ll.cod_entidade                                                    
+                      , ll.cod_licitacao                                                   
+                      , ll.cod_processo||'/'||ll.exercicio_processo as processo            
+                      , cm.descricao                                                       
+                      , cm.cod_modalidade                                                  
+                      , ll.cod_modalidade                                                  
+                      , ll.cod_mapa||'/'||ll.exercicio_mapa as mapa_compra                 
+                      , ll.cod_entidade||' - '||cgm.nom_cgm as entidade                    
+                      , ll.cod_modalidade||' - '||cm.descricao as modalidade               
+                      , ll.cod_objeto                                                      
+                      , ll.cod_regime                                                      
+                      , ll.timestamp                                                       
+                      , ll.cod_tipo_objeto                                                 
+                      , ll.cod_tipo_licitacao                                              
+                      , ll.cod_criterio                                                    
+                      , ll.vl_cotado                                                       
+                      , ll.exercicio                                                       
+                      , to_char(ll.timestamp::date, 'dd/mm/yyyy') as dt_licitacao          
+                      , LPAD(ll.num_orgao::VARCHAR, 2, '0') || '.' || LPAD(ll.num_unidade::VARCHAR, 2, '0') AS unidade_orcamentaria       
+                      , homologadas.dt_homologacao
+                      , ll.tipo_chamada_publica
+                      , comissao_licitacao.cod_comissao
+          
+                   FROM licitacao.licitacao as ll
+                
+              LEFT JOIN licitacao.licitacao_anulada as la                            
+                     ON ll.cod_licitacao  = la.cod_licitacao      
+                    AND ll.cod_modalidade = la.cod_modalidade    
+                    AND ll.cod_entidade   = la.cod_entidade                             
+                    AND ll.exercicio      = la.exercicio
+                    
+              LEFT JOIN (   SELECT cotacao_licitacao.cod_licitacao 
+                                 , cotacao_licitacao.cod_modalidade 
+                                 , cotacao_licitacao.cod_entidade 
+                                 , cotacao_licitacao.exercicio_licitacao 
+                                 , homologacao.homologado          
+                                 , to_char(homologacao.timestamp::date, 'dd/mm/yyyy') as dt_homologacao    
+                              
+                              FROM licitacao.cotacao_licitacao                      
+
+                        INNER JOIN licitacao.adjudicacao
+                                ON adjudicacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
+                               AND adjudicacao.cod_modalidade      = cotacao_licitacao.cod_modalidade
+                               AND adjudicacao.cod_entidade        = cotacao_licitacao.cod_entidade
+                               AND adjudicacao.exercicio_licitacao = cotacao_licitacao.exercicio_licitacao
+                               AND adjudicacao.lote                = cotacao_licitacao.lote
+                               AND adjudicacao.cod_cotacao         = cotacao_licitacao.cod_cotacao
+                               AND adjudicacao.cod_item            = cotacao_licitacao.cod_item
+                               AND adjudicacao.exercicio_cotacao   = cotacao_licitacao.exercicio_cotacao
+                               AND adjudicacao.cgm_fornecedor      = cotacao_licitacao.cgm_fornecedor
+
+                       INNER JOIN licitacao.homologacao 
+                               ON homologacao.num_adjudicacao     = adjudicacao.num_adjudicacao
+                              AND homologacao.cod_entidade        = adjudicacao.cod_entidade
+                              AND homologacao.cod_modalidade      = adjudicacao.cod_modalidade
+                              AND homologacao.cod_licitacao       = adjudicacao.cod_licitacao
+                              AND homologacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
+                              AND homologacao.cod_item            = adjudicacao.cod_item
+                              AND homologacao.cod_cotacao         = adjudicacao.cod_cotacao
+                              AND homologacao.lote                = adjudicacao.lote
+                              AND homologacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                              AND homologacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
+                              
+                         GROUP BY cotacao_licitacao.cod_licitacao 
+                                , cotacao_licitacao.cod_modalidade 
+                                , cotacao_licitacao.cod_entidade 
+                                , cotacao_licitacao.exercicio_licitacao 
+                                , homologacao.homologado
+                                , homologacao.timestamp
+                ) AS homologadas
+                ON homologadas.cod_licitacao       = ll.cod_licitacao 
+               AND homologadas.cod_modalidade      = ll.cod_modalidade
+               AND homologadas.cod_entidade        = ll.cod_entidade
+               AND homologadas.exercicio_licitacao = ll.exercicio
+        
+        INNER JOIN compras.modalidade as cm 
+                ON ll.cod_modalidade = cm.cod_modalidade
+               
+        INNER JOIN orcamento.entidade as oe
+                ON ll.cod_entidade = oe.cod_entidade                                  
+               AND ll.exercicio    = oe.exercicio               
+                
+        INNER JOIN sw_cgm as cgm
+                ON oe.numcgm = cgm.numcgm
+               
+        JOIN licitacao.comissao_licitacao
+            ON comissao_licitacao.cod_licitacao     = ll.cod_licitacao
+            AND comissao_licitacao.cod_modalidade   = ll.cod_modalidade
+            AND comissao_licitacao.cod_entidade     = ll.cod_entidade
+            AND comissao_licitacao.exercicio        = ll.exercicio
+
+        WHERE 1 = 1 \n ";
+      
+      $stConsulta = Sessao::read('consulta');
+      if (!$stConsulta) {
+          $stSql .="    AND la.cod_licitacao is NULL                    \n";
+      }
+      Sessao::remove('consulta');
+
+       if ($this->getDado('cod_homologada') == 2) {
+             $stSql.=  " AND homologadas.homologado = 't'             \n";
+       } else if ($this->getDado('cod_homologada') == 3) {
+             $stSql.=  " AND ( homologadas.homologado = 'f' 
+                                OR NOT EXISTS (
+                                        SELECT 1
+                                          FROM licitacao.homologacao 
+                                         WHERE ll.cod_licitacao    = homologacao.cod_licitacao 
+                                             AND ll.cod_modalidade = homologacao.cod_modalidade 
+                                             AND ll.cod_entidade   = homologacao.cod_entidade 
+                                             AND ll.exercicio      = homologacao.exercicio_licitacao 
+                                        ) 
+                                      )       \n";
+       }
+       
+      if ($this->getDado('cod_entidade')) {
+        $stSql.=  "AND ll.cod_entidade in (".$this->getDado('cod_entidade').")             \n";
+      }
+
+      if ($this->getDado('cod_processo')) {
+        $stSql.=  "AND ll.cod_processo in (".$this->getDado('cod_processo').")             \n";
+      }
+
+      if ($this->getDado('exercicio_processo')) {
+        $stSql.=  "AND ll.exercicio_processo = '".$this->getDado('exercicio_processo')."'  \n";
+      }
+
+      if ($this->getDado('cod_modalidade')) {
+        $stSql.=  "AND ll.cod_modalidade IN (".$this->getDado('cod_modalidade').") \n";
+      }
+      if ($this->getDado('exercicio')) {
+       $stSql.=  "AND ll.exercicio = '".$this->getDado('exercicio')."'                     \n";
+      }
+
+      if ($this->getDado('cod_licitacao')) {
+       $stSql.=  "AND ll.cod_licitacao = '".$this->getDado('cod_licitacao')."'             \n";
+      }
+
+      if ($this->getDado('cod_mapa')) {
+       $stSql.=  "AND ll.cod_mapa = '".$this->getDado('cod_mapa')."'             \n";
+      }
+
+      if ($this->getDado('exercicio_mapa')) {
+       $stSql.=  "AND ll.exercicio_mapa = '".$this->getDado('exercicio_mapa')."'             \n";
+      }
+
+      if ($this->getDado('cod_tipo_licitacao')) {
+       $stSql.=  "AND ll.cod_tipo_licitacao = '".$this->getDado('cod_tipo_licitacao')."'             \n";
+      }
+
+      if ($this->getDado('cod_criterio')) {
+       $stSql.=  "AND ll.cod_criterio = '".$this->getDado('cod_criterio')."'             \n";
+      }
+
+      if ($this->getDado('cod_objeto')) {
+       $stSql.=  "AND ll.cod_objeto = '".$this->getDado('cod_objeto')."'             \n";
+      }
+
+      if ($this->getDado('cod_tipo_objeto')) {
+       $stSql.=  "AND ll.cod_tipo_objeto = '".$this->getDado('cod_tipo_objeto')."'             \n";
+      }
+      
       return $stSql;
   }
 

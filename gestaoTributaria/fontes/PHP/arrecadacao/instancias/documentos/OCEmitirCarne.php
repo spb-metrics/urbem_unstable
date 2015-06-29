@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Tonismar R. Bernardo
 
-  * $Id: OCEmitirCarne.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCEmitirCarne.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.11
 
@@ -738,7 +738,7 @@ switch ($_REQUEST['stCtrl']) {
     case "grupo":
     $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
            </script>';
     break;
@@ -746,7 +746,7 @@ switch ($_REQUEST['stCtrl']) {
     case "credito":
     $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
            </script>';
     break;
@@ -1140,8 +1140,8 @@ switch ($_REQUEST['stCtrl']) {
         # Ordem de Emissão.
         $obCmbOrdemEmissao = new SelectMultiplo();
         $obCmbOrdemEmissao->setName  ( 'inTipoOrdem' );
-        $obCmbOrdemEmissao->setRotulo( "*Ordem de Emissão" );
-        $obCmbOrdemEmissao->setNull  ( true );
+        $obCmbOrdemEmissao->setRotulo( "Ordem de Emissão" );
+        $obCmbOrdemEmissao->setNull  ( false );
         $obCmbOrdemEmissao->setTitle ( 'Ordem para emissão dos dados.' );
 
         $arOrdem = array(

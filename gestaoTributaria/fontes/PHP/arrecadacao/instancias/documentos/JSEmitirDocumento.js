@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSEmitirDocumento.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSEmitirDocumento.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.03.11
 */
@@ -47,7 +47,7 @@ Revision 1.1  2007/10/09 18:48:59  cercato
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function Cancelar () {
 <?php
     $link = Sessao::read("link");

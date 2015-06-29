@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterManutencaoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterManutencaoProposta.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso : uc-03.05.25
 */
@@ -247,7 +247,7 @@ $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
-echo "<script language='javascript'>\n";
+echo "<script type='text/javascript'>\n";
 
 if ($stAcao == 'manter') {
     echo "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stMapaCompras=".$request->get('inCodMapa')."/".$request->get('stExercicio')."&inCodLicitacao=".$request->get('inCodLicitacao')."&stExercicio=".$request->get('stExercicio')."&inCodModalidade=".$request->get('inCodModalidade')."&stAcao=".$request->get('stAcao')."&boAlteraAnula=true','montaClusterLabels');";

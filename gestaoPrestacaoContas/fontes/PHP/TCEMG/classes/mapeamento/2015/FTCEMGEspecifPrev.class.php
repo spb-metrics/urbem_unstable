@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGEspecifPrev.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: FTCEMGEspecifPrev.class.php 62821 2015-06-24 14:24:21Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -61,29 +61,29 @@ function FTCEMGEspecifPrev()
 function montaRecuperaTodos()
 {
     $stSql  = "
-        SELECT CASE WHEN aplicacoes_financeiras <> 0 THEN
-                            REPLACE(aplicacoes_financeiras::TEXT, '.', '')
-                    ELSE    '000'
-               END AS aplicacoes_financeiras
-             , CASE WHEN caixa <> 0 THEN
-                            REPLACE(caixa::TEXT, '.', '')
-                    ELSE    '000'
-               END AS caixa
-             , CASE WHEN banco <> 0 THEN
-                            REPLACE(banco::TEXT, '.', '')
-                    ELSE    '000'
-               END AS banco
+
+        SELECT ".$this->getDado('stMes')." AS mes
+             , CASE WHEN aplicacoes_financeiras < 0.00
+                    THEN aplicacoes_financeiras*-1
+                    ELSE aplicacoes_financeiras
+                END AS aplicacoes_financeiras
+             , CASE WHEN caixa < 0.00
+                    THEN caixa*-1
+                    ELSE caixa
+                END AS caixa
+             , CASE WHEN banco < 0.00
+                    THEN banco*-1
+                    ELSE banco
+                END AS banco
           FROM ".$this->getTabela()."( '".$this->getDado("stExercicio")."'
                                      , '".$this->getDado("dtInicio")."'
                                      , '".$this->getDado("dtFinal")."'
                                      , '".$this->getDado("stEntidades")."'
-                                     , '".$this->getDado("stRpps")."'
                                      ) AS retorno(
                                                    aplicacoes_financeiras   NUMERIC
                                                  , caixa                    NUMERIC
                                                  , banco                    NUMERIC
                                                  )";
-
     return $stSql;
 }
 

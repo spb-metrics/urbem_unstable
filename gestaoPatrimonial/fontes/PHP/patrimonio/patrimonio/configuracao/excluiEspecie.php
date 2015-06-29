@@ -80,8 +80,8 @@ if (isset($chave)) {
     $pagina = $sessao->transf2;
 }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -121,7 +121,7 @@ switch ($ctrl) {
     // filtra Especies cadastradas por Natureza->Grupo
     case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -447,7 +447,7 @@ switch ($ctrl) {
             $audicao->insereAuditoria();
 
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","excluir","aviso","'.Sessao::getId().'");
                     window.location = "excluiEspecie.php?ctrl=1&pagina='.$pagina.'&'.Sessao::getId().'";
                 </script>';
@@ -455,7 +455,7 @@ switch ($ctrl) {
             } else {
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$objeto.'","n_excluir","erro","'.Sessao::getId().'");
                         window.location = "excluiEspecie.php?ctrl=1&pagina='.$pagina.'&'.Sessao::getId().'";
                     </script>';
@@ -463,7 +463,7 @@ switch ($ctrl) {
 
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","n_excluir","erro","'.Sessao::getId().'");
                     window.location = "excluiEspecie.php?ctrl=1&pagina='.$pagina.'&'.Sessao::getId().'";
                 </script>';

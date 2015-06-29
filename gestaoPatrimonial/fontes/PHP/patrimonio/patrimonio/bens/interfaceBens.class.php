@@ -392,7 +392,7 @@ class interfaceBens
 // encerra operacoes no frame oculto
 
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 <?php
             if (isset($codBem)) {
 ?>
@@ -1231,7 +1231,7 @@ if ($formAcao != 'incluir_lote') {
 
             return false;
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function valorMaximo(campo, limite)
             {
                 if (campo.value.length > limite) // se estiver maior que o tamanho estabelecido, reduza-o
@@ -1536,7 +1536,7 @@ if ($formAcao != 'incluir_lote') {
         if(!isset($dataBaixa))
             $dataBaixa = hoje();
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";

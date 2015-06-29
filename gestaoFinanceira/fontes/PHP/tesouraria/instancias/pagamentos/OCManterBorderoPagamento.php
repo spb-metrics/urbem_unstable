@@ -20,46 +20,17 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
- /**
-    * Paginae Oculta para funcionalidade Manter Transferencia
-    * Data de Criação   : 09/01/2006
 
+    * Pagina Oculta para funcionalidade Bordero Pagamento
+    * Data de Criação   : 09/01/2006
     * @author Analista: Lucas Leusin Oaigen
     * @author Desenvolvedor: Jose Eduardo Porto
-
-    * @ignore
-
     $Revision: 30835 $
-    $Name$
+    $Name: $
     $Author: cako $
     $Date: 2007-04-30 16:21:28 -0300 (Seg, 30 Abr 2007) $
-
+    $Id: OCManterBorderoPagamento.php 62712 2015-06-11 15:00:29Z evandro $
     * Casos de uso: uc-02.04.20,uc-02.03.28
-
-*/
-
-/*
-$Log$
-Revision 1.31  2007/04/30 19:21:27  cako
-implementação uc-02.03.28
-
-Revision 1.30  2007/03/30 21:58:02  cako
-Bug #7884#
-
-Revision 1.29  2007/03/13 19:04:22  cako
-Bug #8380#
-
-Revision 1.28  2007/01/24 19:05:28  cako
-Bug #7884#
-
-Revision 1.27  2006/10/23 16:32:50  domluc
-Add opção para multiplos boletins
-
-Revision 1.26  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
 
 */
 
@@ -180,7 +151,7 @@ function montaListaDiverso($arRecordSet , $boExecuta = true)
 
 }
 
-function mostraSpanOrdemPagamento($_REQUEST)
+function mostraSpanOrdemPagamento()
 {
     global $obRMONAgencia;
     global $obRMONConta;
@@ -212,10 +183,20 @@ function mostraSpanOrdemPagamento($_REQUEST)
                 $obREmpenhoOrdemPagamento->setCodigoOrdem( $_REQUEST['inNumOrdemPagamento'] );
                 $obREmpenhoOrdemPagamento->setExercicio( $_REQUEST['stExercicio'] );
                 $obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodigoEntidade'] );
-     //         $obREmpenhoOrdemPagamento->setListarNaoPaga( true );
 
-                    $obREmpenhoOrdemPagamento->listarDadosPagamentoBordero( $rsLista , $boTransacao);
+                    //$obREmpenhoOrdemPagamento->listarDadosPagamentoBordero( $rsLista , $boTransacao);
+                    
+                    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoRecurso.class.php"          );
+                    $obTContabilidadePlanoRecurso          = new TContabilidadePlanoRecurso;
+                    $obTContabilidadePlanoRecurso->setDado('exercicio', $_REQUEST["stExercicio"] );
+                    $obTContabilidadePlanoRecurso->setDado('cod_plano', $_REQUEST['inCodConta'] );
+                    $obTContabilidadePlanoRecurso->recuperaPorChave($rsRecurso,"","",$boTransacao);
 
+                    $obREmpenhoOrdemPagamento->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso($rsRecurso->getCampo('cod_recurso'));
+                    $obREmpenhoOrdemPagamento->listarDadosPagamentoBorderoContaRecurso( $rsLista, $boTransacao);
+
+                    //recuperaDadosPagamentoBorderoContaRecurso
+                    
                     if ( $rsLista->getNumLinhas() > 0 ) {
                         $obREmpenhoOrdemPagamento->consultar();
 
@@ -409,13 +390,15 @@ function mostraSpanOrdemPagamento($_REQUEST)
                             $obTxtContaCorrente->setMaxLength ( 20                                       );
                             $obTxtContaCorrente->setNull      ( true                                     );
 
-                            $obTxtNrNFDocumento = new TextBox ;
-                            $obTxtNrNFDocumento->setRotulo    ( "Nr. NF / Documento"                     );
-                            $obTxtNrNFDocumento->setName      ( "stNrNFDocumento"                        );
-                            $obTxtNrNFDocumento->setValue     ( $stNrNFDocumento                         );
-                            $obTxtNrNFDocumento->setSize      ( 20                                       );
-                            $obTxtNrNFDocumento->setMaxLength ( 100                                      );
-                            $obTxtNrNFDocumento->setNull      ( true                                     );
+                            if (Sessao::getExercicio() <= '2014' ){
+                                $obTxtNrNFDocumento = new TextBox ;
+                                $obTxtNrNFDocumento->setRotulo    ( "Nr. NF / Documento"                     );
+                                $obTxtNrNFDocumento->setName      ( "stNrNFDocumento"                        );
+                                $obTxtNrNFDocumento->setValue     ( $stNrNFDocumento                         );
+                                $obTxtNrNFDocumento->setSize      ( 20                                       );
+                                $obTxtNrNFDocumento->setMaxLength ( 100                                      );
+                                $obTxtNrNFDocumento->setNull      ( true                                     );
+                            }
 
                             // Define Objeto TextArea para observações
                             $obTxtObs = new TextArea;
@@ -451,7 +434,10 @@ function mostraSpanOrdemPagamento($_REQUEST)
                             $obFormulario->addComponenteComposto    ( $obTxtBanco,$obCmbBanco     );
                             $obFormulario->addComponenteComposto    ( $obTxtAgencia,$obCmbAgencia );
                             $obFormulario->addComponente ( $obTxtContaCorrente );
-                            $obFormulario->addComponente ( $obTxtNrNFDocumento );
+                            
+                            if (Sessao::getExercicio() <= '2014' )
+                                $obFormulario->addComponente ( $obTxtNrNFDocumento );
+                            
                             $obFormulario->addComponente ( $obTxtObs           );
 
                             $obFormulario->montaInnerHTML ();
@@ -493,7 +479,7 @@ function mostraSpanOrdemPagamento($_REQUEST)
         }
     } else {
         SistemaLegado::exibeAviso("Informe a Conta Pagadora.","","erro");
-        SistemaLegado::executaFrameOculto( "d.frm.inNumOrdemPagamento.value = '';");
+        SistemaLegado::executaFrameOculto( "d.frm.inNumOrdemPagamento.value = ''; d.getElementById('stNumOrdemPagamento').innerHTML = '&nbsp;'; ");
     }
 }
 
@@ -537,32 +523,37 @@ if ($_REQUEST['mostraSpanOrdemPagamento']) {
             $arItens = Sessao::read('arItens');
 
             $inCount = count($arItens);
-
-            $arItens[$inCount]['num_item']                     = $inCount+1;
-            $arItens[$inCount]['inCodigoEntidade']             = $_POST['inCodigoEntidade'];
-            $arItens[$inCount]['stOrdemPagamento']             = $_POST['stOrdemPagamento'];
-            $arItens[$inCount]['stEmpenho']                    = $_POST['stEmpenho'];
-            $arItens[$inCount]['inCodCredor']                  = $_POST['inCodCredor'];
-            $arItens[$inCount]['stCredor']                     = $_POST['inCodCredor'] ." - ". $_POST['stNomCredor'];
-            $arItens[$inCount]['inValor' ]                     = $_POST['inValor'];
-            $arItens[$inCount]['inNumBancoCredor']             = $_POST['inNumBancoCredor'];
-            $arItens[$inCount]['inNumAgenciaCredor']           = $_POST['inNumAgenciaCredor'];
-            $arItens[$inCount]['stNumeroContaCredor']          = $_POST['stNumeroContaCredor'];
-            $arItens[$inCount]['stObservacao']                 = $_POST['stObservacao'];
-            $arItens[$inCount]['inCodBancoCredor']             = $_POST['inCodBancoCredor'];
-            $arItens[$inCount]['inCodAgenciaCredor']           = $_POST['inCodAgenciaCredor'];
-            $arItens[$inCount]['stTipoTransacaoCredor']        = $_POST['stTipoTransacao'];
-            $arItens[$inCount]['inNumOrdemPagamentoCredor']    = $_POST['inNumOrdemPagamentoCredor'];
-            $arItens[$inCount]['stCPF/CNPJ']                   = $_POST['stCPF/CNPJ'];
-            $arItens[$inCount]['stNrNFDocumento']              = $_POST['stNrNFDocumento'];
-            $arItens[$inCount]['stExercicioOrdem']             = $_POST['stExercicioOrdem'];
-            $arItens[$inCount]['stExercicioEmpenho']           = $_POST['stExercicioEmpenho'];
-            $arItens[$inCount]['stDtEmissaoOrdem']             = $_POST['stDtEmissaoOrdem'];
-
-            Sessao::write('arItens',$arItens);
-
-            $stHTML = montaListaDiverso(Sessao::read('arItens'));
-
+            if ( $inCount < 50 ) {
+                $arItens[$inCount]['num_item']                     = $inCount+1;
+                $arItens[$inCount]['inCodigoEntidade']             = $_POST['inCodigoEntidade'];
+                $arItens[$inCount]['stOrdemPagamento']             = $_POST['stOrdemPagamento'];
+                $arItens[$inCount]['stEmpenho']                    = $_POST['stEmpenho'];
+                $arItens[$inCount]['inCodCredor']                  = $_POST['inCodCredor'];
+                $arItens[$inCount]['stCredor']                     = $_POST['inCodCredor'] ." - ". $_POST['stNomCredor'];
+                $arItens[$inCount]['inValor' ]                     = $_POST['inValor'];
+                $arItens[$inCount]['inNumBancoCredor']             = $_POST['inNumBancoCredor'];
+                $arItens[$inCount]['inNumAgenciaCredor']           = $_POST['inNumAgenciaCredor'];
+                $arItens[$inCount]['stNumeroContaCredor']          = $_POST['stNumeroContaCredor'];
+                $arItens[$inCount]['stObservacao']                 = $_POST['stObservacao'];
+                $arItens[$inCount]['inCodBancoCredor']             = $_POST['inCodBancoCredor'];
+                $arItens[$inCount]['inCodAgenciaCredor']           = $_POST['inCodAgenciaCredor'];
+                $arItens[$inCount]['stTipoTransacaoCredor']        = $_POST['stTipoTransacao'];
+                $arItens[$inCount]['inNumOrdemPagamentoCredor']    = $_POST['inNumOrdemPagamentoCredor'];
+                $arItens[$inCount]['stCPF/CNPJ']                   = $_POST['stCPF/CNPJ'];
+                
+                if (Sessao::getExercicio() <= '2014' )
+                    $arItens[$inCount]['stNrNFDocumento']              = $_POST['stNrNFDocumento'];
+                
+                $arItens[$inCount]['stExercicioOrdem']             = $_POST['stExercicioOrdem'];
+                $arItens[$inCount]['stExercicioEmpenho']           = $_POST['stExercicioEmpenho'];
+                $arItens[$inCount]['stDtEmissaoOrdem']             = $_POST['stDtEmissaoOrdem'];
+    
+                Sessao::write('arItens',$arItens);
+    
+                $stHTML = montaListaDiverso(Sessao::read('arItens'));
+            }else{
+                SistemaLegado::exibeAviso("Maximo de 50 OPs por borderô.","","erro");
+            }
             if ( count(Sessao::read('arItens')) == 1 ) {
                 SistemaLegado::executaFrameOculto(" f.inCodEntidade.disabled = true;" );
             }
@@ -639,7 +630,10 @@ if ($_REQUEST['mostraSpanOrdemPagamento']) {
                     $arItens[$inCount]['stTipoTransacaoCredor']        = $value['stTipoTransacaoCredor'];
                     $arItens[$inCount]['inNumOrdemPagamentoCredor']    = $value['inNumOrdemPagamentoCredor'];
                     $arItens[$inCount]['stCPF/CNPJ']                   = $value['stCPF/CNPJ'];
-                    $arItens[$inCount]['stNrNFDocumento']              = $value['stNrNFDocumento'];
+                    
+                    if (Sessao::getExercicio() <= '2014' )
+                        $arItens[$inCount]['stNrNFDocumento']              = $value['stNrNFDocumento'];
+                    
                     $arItens[$inCount]['stExercicioOrdem']             = $value['stExercicioOrdem'];
                     $arItens[$inCount]['stExercicioEmpenho']           = $value['stExercicioEmpenho'];
                     $arItens[$inCount]['stDtEmissaoOrdem']             = $value['stDtEmissaoOrdem'];
@@ -748,7 +742,7 @@ if ($_REQUEST['mostraSpanOrdemPagamento']) {
                 $obBscOrdemPagamento->setValue( '' );
                 $obBscOrdemPagamento->obCampoCod->setName("inNumOrdemPagamento");
                 $obBscOrdemPagamento->obCampoCod->setValue( "" );
-                $obBscOrdemPagamento->setFuncaoBusca ( "abrePopUp('".CAM_GF_EMP_POPUPS."ordemPagamento/FLOrdemPagamento.php','frm','inNumOrdemPagamento','stNumOrdemPagamento','&inCodEntidade='+document.frm.inCodigoEntidade.value+'&tipoBusca=bordero','".Sessao::getId()."','800','550');" );
+                $obBscOrdemPagamento->setFuncaoBusca ( "abrePopUp('".CAM_GF_EMP_POPUPS."ordemPagamento/FLOrdemPagamento.php','frm','inNumOrdemPagamento','stNumOrdemPagamento','&inCodPlano='+document.frm.inCodConta.value+'&inCodEntidade='+document.frm.inCodigoEntidade.value+'&tipoBusca=bordero_recurso','".Sessao::getId()."','800','550','ordem_pagamento');" );
                 $obBscOrdemPagamento->setValoresBusca( 'OCManterBorderoPagamento.php?'.Sessao::getId().'&mostraSpanOrdemPagamento=1', "frm", '' );
 
                 $obFormulario = new Formulario;

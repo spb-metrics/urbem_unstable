@@ -38,23 +38,26 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGComparativoPL.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGComparativoPL.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
     $obFTCEMGComparativoPL = new FTCEMGComparativoPL();
     $obFTCEMGComparativoPL->setDado('exercicio'   , Sessao::read('exercicio'));
     $obFTCEMGComparativoPL->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGComparativoPL->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obFTCEMGComparativoPL->setDado('periodo'     , $arFiltros['inPeriodo']);
 
     $obFTCEMGComparativoPL->recuperaTodos($rsComparativoPL);
 
     $obExportador->roUltimoArquivo->addBloco($rsComparativoPL);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('periodo');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+  
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valor');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+?>

@@ -177,7 +177,7 @@ switch ($ctrl) {
     // filtra natureza dos grupos a serem filtrados
     case 0:
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             // submete formulario
             function Salvar()
@@ -427,7 +427,7 @@ switch ($ctrl) {
         $conn->fechaBD();
 
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -592,7 +592,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
         $depreciacao = str_replace(',','.',str_replace('.','',$depreciacao));
         if ($depreciacao > 100.00) {
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("Depreciação não pode ser superior a 100%","n_alterar","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("alteraGrupo.php?'.Sessao::getId().'&codNatureza='.$codNatureza.'&pagina='.$pagina.'&ctrl=1");
                </script>';
@@ -611,13 +611,13 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
                     $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $objeto);
                     $audicao->insereAuditoria();
                     echo '
-                        <script language="JavaScript1.2" type="text/javascript">
+                        <script type="text/javascript">
                             alertaAviso("'.$objeto.'","alterar","aviso","'.Sessao::getId().'");
                             mudaTelaPrincipal("alteraGrupo.php?'.Sessao::getId().'&codNatureza='.$codNatureza.'&pagina='.$pagina.'&ctrl=1");
                         </script>';
                 } else {
                     echo '
-                        <script language="JavaScript1.2" type="text/javascript">
+                        <script type="text/javascript">
                             alertaAviso("'.$objeto.'","n_alterar","aviso","'.Sessao::getId().'");
                             mudaTelaPrincipal("alteraGrupo.php?'.Sessao::getId().'&codNatureza='.$codNatureza.'&pagina='.$pagina.'&ctrl=1");
                         </script>';
@@ -626,7 +626,7 @@ href="javascript:abrePopUp('../../../../../../gestaoFinanceira/fontes/PHP/contab
         } else {
 
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("O Grupo '.$nomGrupo.' já existe","unica","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("alteraGrupo.php?'.Sessao::getId().'&nomGrupo='.$nomGrupo.'&codNatureza='.$codNatureza.'&codGrupo='.$codGrupo.'&ctrl=2");
                 </script>';

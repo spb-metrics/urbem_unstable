@@ -50,7 +50,7 @@ Adicionada tag log.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function CalculaMedia(){
   if ( ( document.frm.inTxtProva.value != "" ) && ( document.frm.inTxtTitulacao.value != "") ) {
         Prova = document.frm.inTxtProva.value.replace(",", ".");

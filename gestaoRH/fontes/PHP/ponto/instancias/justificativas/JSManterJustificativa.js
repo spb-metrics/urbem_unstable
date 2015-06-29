@@ -38,7 +38,7 @@
     * Casos de uso: uc-04.10.03
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function verificaQuantidadeHoras(quantidadeHoras) {
     if ( quantidadeHoras.value.length == 1 ){

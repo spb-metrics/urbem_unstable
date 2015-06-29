@@ -162,13 +162,13 @@ case 1:
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $cod1);
                 $audicao->insereAuditoria();
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("Assunto '.urlencode($stDescQuestao).'","excluir","aviso", "'.Sessao::getId().'");
                     </script>';
                     echo '<META HTTP-EQUIV="Refresh" CONTENT="0;URL=excluiAssunto.php?'.Sessao::getId().'&codClassificacao='.$cod2.'&pagina='.$pagina.'">'; //da um refresh na página
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("Assunto '.$nom.'","n_excluir","erro", "'.Sessao::getId().'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&codClassificacao='.$cod2.'&pagina='.$pagina.'");
                     </script>';

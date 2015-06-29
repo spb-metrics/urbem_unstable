@@ -109,7 +109,7 @@ foreach ($rsRegistro10->arElementos as $arRegistro10) {
             $$rsBloco->preenche(array($arRegistro11));
 
             $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-            $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+            $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
 
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

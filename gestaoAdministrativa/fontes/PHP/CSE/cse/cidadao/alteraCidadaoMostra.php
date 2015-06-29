@@ -411,7 +411,7 @@ if ( !isset( $ctrl ) ) {
     }
 }
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
       function atualizaMunicipio()
       {
@@ -1529,7 +1529,7 @@ if ($$questCenso) {
     echo "    </table>\n";
     }
 ?>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 function paginacao(linkPagina)
 {
@@ -1737,7 +1737,7 @@ if ($valor == "true") {
     }
 ?>
 </table>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 function paginacao(linkPagina)
 {

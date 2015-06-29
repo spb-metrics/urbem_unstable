@@ -94,8 +94,8 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado
 
 ?>
 
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -580,7 +580,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado
 <?php
     unset ($sessao->transf);
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         // preenche os combos de Natureza, Grupo e Especie
         function preencheNGE(variavel, valor)
         {

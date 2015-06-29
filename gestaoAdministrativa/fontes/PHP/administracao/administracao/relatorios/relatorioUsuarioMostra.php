@@ -31,7 +31,7 @@
    * @author Analista: Cassiano
    * @author Desenvolvedor: Cassiano
 
-   $Id: relatorioUsuarioMostra.php 59612 2014-09-02 12:00:51Z gelson $
+   $Id: relatorioUsuarioMostra.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
    Casos de uso: uc-01.03.94
 
@@ -182,7 +182,7 @@ Sessao::write('orderby',$orderby);
 
 ?>
 
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript">
     document.frm.action = "usuario.php?<?=Sessao::getId()?>&inCodOrgao=<?=$inCodOrgao?>&orderby=<?=$orderby?>";
     document.frm.submit();
 </script>

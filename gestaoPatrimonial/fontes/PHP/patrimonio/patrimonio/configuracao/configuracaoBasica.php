@@ -111,7 +111,7 @@ case 0:
 //                  executaFrameOculto($js);
 
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {

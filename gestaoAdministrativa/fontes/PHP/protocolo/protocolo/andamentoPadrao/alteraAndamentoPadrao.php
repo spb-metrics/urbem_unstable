@@ -63,7 +63,7 @@ case 0:
 Sessao::write('ordem', 0);
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function Valida()
 {
@@ -403,7 +403,7 @@ case 2:
     }
     ?>
 
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
     <!--
     function Valida()
     {
@@ -701,7 +701,7 @@ case 4:
     </tr>
     </table>
     </form>
-    <script language="JavaScript">
+    <script type="text/javascript">
     <!--
 
     function Valida()

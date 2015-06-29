@@ -44,7 +44,7 @@ Revision 1.1  2006/09/29 10:45:38  cercato
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Insere( stR1, stR2  ){
     window.opener.parent.frames['telaPrincipal'].document.frm.<?=$_REQUEST["campoNum"];?>.value = stR1+'/'+stR2;

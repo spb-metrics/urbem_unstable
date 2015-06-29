@@ -854,7 +854,7 @@ function criaAbas($aAbas,$abaAtual=0,$abaAnterior=0,$width="100%")
 ***************************************************************************/
 function geraJavaScript()
 {
-    $js = "<script language='JavaScript1.2' type='text/javascript'> \n";
+    $js = "<script type='text/javascript'> \n";
     //Permite incluir outras funções javascript
     $js .= $this->sJava." \n ";
     //Função para trocar de aba -- É necessário que o campo "controle" exista

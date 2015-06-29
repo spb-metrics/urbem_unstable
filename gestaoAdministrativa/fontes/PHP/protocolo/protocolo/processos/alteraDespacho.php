@@ -233,7 +233,7 @@ $variaveis = explode("-",$chave);
 
             ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -380,13 +380,13 @@ if ($processo->updateDespacho()) {
                     $audicao = new auditoria;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $obj);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$obj.'","alterar","aviso", "'.Sessao::getId().'");
                     window.location = "incluiDespacho.php?'.Sessao::getId().'&chave='.$chave.'&ctrl=3";
                     </script>';
     //}
 } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$obj.'","n_alterar","erro", "'.Sessao::getId().'");
                     window.location = "alteraDespacho.php?'.Sessao::getId().'";
                     </script>';

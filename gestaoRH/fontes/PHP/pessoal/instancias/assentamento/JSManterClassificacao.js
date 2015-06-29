@@ -48,7 +48,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function focusIncluir(){
     document.frm.stDescricao.focus();
 }

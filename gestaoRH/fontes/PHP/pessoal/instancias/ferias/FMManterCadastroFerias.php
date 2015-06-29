@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: FMManterCadastroFerias.php 60017 2014-09-25 17:43:38Z franver $
+    $Id: FMManterCadastroFerias.php 62702 2015-06-09 20:53:34Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -218,13 +218,15 @@ $obHdnDataFinal->setName                        ( "dtFinal"                     
 $obHdnDataFinal->setValue                       ( $dtFinal                                                              );
 
 $rsFormasPagamento = new recordset();
+
+
 if ($_REQUEST['inCodRegime'] != "") {
     $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
-    $stFiltro  = " AND cod_regime = ".$_REQUEST['inCodRegime'];
-    $stFiltro .= "GROUP BY forma_pagamento_ferias.cod_forma";
-    $stFiltro .= "       , forma_pagamento_ferias.codigo";
-    $stFiltro .= "       , forma_pagamento_ferias.dias";
-    $stFiltro .= "       , forma_pagamento_ferias.abono";
+    $stFiltro  = " AND cod_regime = ".$_REQUEST['inCodRegime']." \n";
+    $stFiltro .= "GROUP BY forma_pagamento_ferias.cod_forma      \n";
+    $stFiltro .= "       , forma_pagamento_ferias.codigo         \n";
+    $stFiltro .= "       , forma_pagamento_ferias.dias           \n";
+    $stFiltro .= "       , forma_pagamento_ferias.abono            ";
     $obTPessoalFormaPagamentoFerias->recuperaRelacionamento($rsFormasPagamento,$stFiltro);
 
     $obHdnRegime =  new Hidden;

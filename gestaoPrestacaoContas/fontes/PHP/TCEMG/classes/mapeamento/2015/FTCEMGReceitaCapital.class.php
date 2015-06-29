@@ -30,7 +30,7 @@
  * @author Analista: Dagiane Vieira
  * @author Desenvolvedor: Michel Teixeira
  *
- * $Id: FTCEMGReceitaCapital.class.php 62269 2015-04-15 18:28:39Z franver $
+ * $Id: FTCEMGReceitaCapital.class.php 62751 2015-06-16 14:44:45Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -58,18 +58,18 @@ class FTCEMGReceitaCapital extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql  = " SELECT 
-                            ".$this->getDado('mes')." AS mes
+                              EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS mes
                             , cod_tipo
-                            , REPLACE(rec_alienacao      , '.', '') AS rec_alienacao
-                            , REPLACE(rec_amort          , '.', '') AS rec_amort
-                            , REPLACE(rec_transf_capital , '.', '') AS rec_transf_capital
-                            , REPLACE(rec_convenios      , '.', '') AS rec_convenios
-                            , REPLACE(out_rec_cap        , '.', '') AS out_rec_cap
-                            , REPLACE(rec_ret_op_cred    , '.', '') AS rec_ret_op_cred
-                            , REPLACE(rec_privat         , '.', '') AS rec_privat
-                            , REPLACE(rec_ref_divida     , '.', '') AS rec_ref_divida
-                            , REPLACE(rec_out_op_cred    , '.', '') AS rec_out_op_cred
-                            , REPLACE(deducoes           , '.', '') AS deducoes
+                            , rec_alienacao
+                            , rec_amort
+                            , rec_transf_capital
+                            , rec_convenios
+                            , out_rec_cap
+                            , rec_ret_op_cred
+                            , rec_privat
+                            , rec_ref_divida
+                            , rec_out_op_cred
+                            , deducoes
                     FROM ".$this->getTabela()." ( '".$this->getDado('exercicio')."'
                                                 , '".$this->getDado('cod_entidade')."'
                                                 , '".$this->getDado('dt_inicial')."'

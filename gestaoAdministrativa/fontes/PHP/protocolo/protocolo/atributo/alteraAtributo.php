@@ -45,7 +45,7 @@ include_once (CAM_FRAMEWORK."legado/auditoriaLegada.class.php");
 include_once (CAM_FRAMEWORK."legado/paginacaoLegada.class.php" );
 setAjuda('uc-01.06.93');
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -90,7 +90,7 @@ case 0:
    $dbEmp->abreBD();
    $dbEmp->abreSelecao($sSQL);
    if ($dbEmp->numeroDeLinhas == 0 && $pagina != 0) {
-        echo "<script language='javascript'>
+        echo "<script type='text/javascript'>
                 mudaTelaPrincipal('".$PHP_SELF."?".Sessao::getId()."');
               </script>";
     }
@@ -148,7 +148,7 @@ $tipo = $vetAtributo[0]['tipoValor'];
 $valorPadrao = $vetAtributo[0]['valorPadrao'];
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function Valida()
 {

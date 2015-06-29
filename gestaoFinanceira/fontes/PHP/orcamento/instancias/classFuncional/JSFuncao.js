@@ -48,7 +48,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Cancelar(){
     document.frm.target = 'telaPrincipal';

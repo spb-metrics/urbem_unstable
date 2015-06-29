@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCConcederLicencaGeral.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConcederLicencaGeral.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.02.12
 
@@ -500,7 +500,7 @@ case "carregarElementos":
   session_start( $inSessaoCorrente );
 
   $stFiltroEmissaoOP  = "&acao=462&modulo=14&funcionalidade=141";
- print "<script language=\"JavaScript1.2\" type=\"text/javascript\">
+ print "<script type=\"text/javascript\">
                                 window.location.target = 'telaPrincipal';
                                 location.href='".$pgProx."?&stAcao=incluir".$stFiltroEmissaoOP."';
                                 //mudaMenu         ( \"Conceder Outras Licenças\",\"141\" );

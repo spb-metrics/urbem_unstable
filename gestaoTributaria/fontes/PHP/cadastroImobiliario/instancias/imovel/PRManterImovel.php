@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterImovel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterImovel.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.09
 */
@@ -80,7 +80,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_incluir", $chama
 {
     ;
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso      ( "'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
            </script>';
 //    session_regenerate_id();
@@ -90,7 +90,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_incluir", $chama
 //    $sessao->geraURLRandomica();
     Sessao::write('acaoLote'  , "751");
     Sessao::write('modulo',  "12");
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaMenu         ( "'.$func.'"     );
                 mudaTelaPrincipal( "'.$location.'" );
            </script>';

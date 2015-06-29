@@ -31,7 +31,7 @@
 	* @author Desenvolvedor: Michel Teixeira
 	* @ignore
 
-	$Id: FMManterConvenio.php 59612 2014-09-02 12:00:51Z gelson $
+	$Id: FMManterConvenio.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 	*Casos de uso:
 */
@@ -451,7 +451,7 @@ if ($stAcao == 'alterar') {
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumConvenio=".$_REQUEST['inNumConvenio']."&inCodConvenio=".$_REQUEST['inCodConvenio']."&stExercicio=".$_REQUEST['inExercicio']."', 'montaListas');     \r\n";
     echo "</script>                                                             \r\n";
 }

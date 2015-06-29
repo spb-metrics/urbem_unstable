@@ -51,30 +51,33 @@ function FTCEMGPassivoPerm()
 
     $this->setTabela('tcemg.fn_passivo_perm');
 
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('exercicio'    ,'varchar',false,''    ,false,false);
+    $this->AddCampo('cod_entidade' ,'varchar',false,''    ,false,false);
+    $this->AddCampo('data_inicial' ,'integer',false,''    ,false,false);
+    $this->AddCampo('data_final'   ,'integer',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
+    
     $stSql  = "
         SELECT mes
-             , REPLACE(valoremp::varchar,'.','') AS valoremp
-             , REPLACE(valortransconcedidas::varchar,'.','') AS valortransconcedidas
-             , REPLACE(valorprovisaorpps::varchar,'.','') AS valorprovisaorpps
+             , ABS(valoremp)             as valoremp
+             , ABS(valortransconcedidas) as valortransconcedidas
+             , ABS(valorprovisaorpps)    as valorprovisaorpps
              , codtipo
 
     FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
-                                     ) AS retorno(
-                                                  mes                 INTEGER,
-                                                  valoremp                     NUMERIC,
-                                                  valortransconcedidas  NUMERIC,
-                                                  valorprovisaorpps      NUMERIC,
-                                                  codtipo             INTEGER
-                                                 )";
+                                , '".$this->getDado("cod_entidade")."'
+                                , '".$this->getDado("data_inicial")."'
+                                , '".$this->getDado("data_final")."'
+                                ) AS retorno(
+                                    mes                     INTEGER,
+                                    valoremp                NUMERIC,
+                                    valortransconcedidas    NUMERIC,
+                                    valorprovisaorpps       NUMERIC,
+                                    codtipo                 INTEGER
+                                )";
 
     return $stSql;
 }

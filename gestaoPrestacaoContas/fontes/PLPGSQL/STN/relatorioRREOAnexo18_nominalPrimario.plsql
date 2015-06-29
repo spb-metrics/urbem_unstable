@@ -310,7 +310,7 @@ BEGIN
              AND configuracao.parametro = 'meta_resultado_primario_fixada'
              AND configuracao.cod_modulo = 36 ) > 0 ) THEN
         IF stExercicio::integer > 2012 THEN
-            UPDATE tmp_retorno SET porcentagem = (vl_ate_periodo/vl_meta)*100 WHERE grupo = 2 AND ordem = 0;
+            UPDATE tmp_retorno SET porcentagem = (vl_ate_periodo/vl_meta) WHERE grupo = 2 AND ordem = 0;
         ELSE
             UPDATE tmp_retorno SET porcentagem = (vl_meta/vl_ate_periodo)*100 WHERE grupo = 2 AND ordem = 0;
         END IF;

@@ -49,49 +49,48 @@ function TTCEMGDemostrativoOpCredito()
 {
     parent::Persistente();
 
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('stExercicio'   ,'VARCHAR' ,false ,'' ,false ,false);
+    $this->AddCampo('stCodEntidade' ,'VARCHAR' ,false ,'' ,false ,false);
+    $this->AddCampo('inBimestre'    ,'INTEGER' ,false ,'' ,false ,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
-      SELECT 
-             LPAD(mes::VARCHAR,2,'0') AS mes
+      SELECT 12 AS mes
            , 'N' AS nada_declarar
-           , vl_imobiliaria_interna
-           , '0.00'::NUMERIC(14,2) AS vl_imobiliaria_externa
-           , vl_abertura_credito
-           , '0.00'::NUMERIC(14,2) AS vl_deriv_ppp
-           , '0.00'::NUMERIC(14,2) AS vl_aquis_fin
-           , '0.00'::NUMERIC(14,2) AS vl_pela_venda_ter_bs
-           , vl_dem_antec_receita
-           , '0.00'::NUMERIC(14,2) AS vl_assuncao_rec_conf_div
-           , '0.00'::NUMERIC(14,2) AS vl_outras_pper_credito
-           , vl_contrat_externa     
-           , vl_parc_div_trib             
-           , vl_parc_div_prev            
-           , vl_parc_div_dem_cs           
-           , vl_parc_div_fgts        
-           , '0.00'::NUMERIC(14,2) AS vl_melhoria_adm_rec_gffp   
-           , '0.00'::NUMERIC(14,2) AS vl_prog_ilum_pub   
-           , '0.00'::NUMERIC(14,2) AS vl_amp_art9   
-           , '0.00'::NUMERIC(14,2) AS vl_oper_vedadas
-        FROM tcemg.demonstrativo_op_credito(  '".$this->getDado("exercicio")."'
-                                            , 'Mes'
-                                            , ".$this->getDado("mes")."
-                                            , '".$this->getDado("cod_entidade")."'
-                                           ) AS tbl (  mes                          integer
-                                                      ,vl_imobiliaria_interna       numeric
-                                                      ,vl_contrat_externa           numeric
-                                                      ,vl_abertura_credito          numeric
-                                                      ,vl_dem_antec_receita         numeric
-                                                      ,vl_parc_div_trib             numeric
-                                                      ,vl_parc_div_prev             numeric
-                                                      ,vl_parc_div_dem_cs           numeric
-                                                      ,vl_parc_div_fgts             numeric
-                                           )";
+           , REPLACE( vl_imobiliaria_interna::VARCHAR, '.', '' ) AS vl_imobiliaria_interna
+           , 0 AS vl_imobiliaria_externa 
+           , REPLACE (vl_abertura_credito::VARCHAR, '.', '' ) AS vl_abertura_credito
+           , 0 AS vl_deriv_ppp
+           , 0 AS vl_aquis_fin
+           , 0 AS vl_pela_venda_ter_bs
+           , REPLACE( vl_dem_antec_receita::VARCHAR, '.', '' ) AS vl_dem_antec_receita
+           , 0 AS vl_assuncao_rec_conf_div
+           , 0 AS vl_outras_pper_credito
+           , REPLACE( vl_contrat_externa::VARCHAR, '.', '' ) AS vl_contrat_externa
+           , REPLACE( vl_parc_div_trib::VARCHAR, '.', '' ) AS vl_parc_div_trib
+           , REPLACE( vl_parc_div_prev::VARCHAR, '.', '' ) AS vl_parc_div_prev
+           , REPLACE( vl_parc_div_dem_cs::VARCHAR, '.', '' ) AS vl_parc_div_dem_cs           
+           , REPLACE( vl_parc_div_fgts::VARCHAR, '.', '' ) AS vl_parc_div_fgts        
+           , 0 AS vl_melhoria_adm_rec_gffp   
+           , 0 AS vl_prog_ilum_pub   
+           , 0 AS vl_amp_art9   
+           , 0 AS vl_oper_vedadas
+        FROM tcemg.demonstrativo_op_credito ( '".$this->getDado("stExercicio")."'
+                                             , 'bimestre'
+                                             , ".$this->getDado("inBimestre")."
+                                             , '".$this->getDado("stCodEntidade")."'
+                                           ) AS tbl (  mes                          INTEGER
+                                                     , vl_imobiliaria_interna       NUMERIC
+                                                     , vl_contrat_externa           NUMERIC
+                                                     , vl_abertura_credito          NUMERIC
+                                                     , vl_dem_antec_receita         NUMERIC
+                                                     , vl_parc_div_trib             NUMERIC
+                                                     , vl_parc_div_prev             NUMERIC
+                                                     , vl_parc_div_dem_cs           NUMERIC
+                                                     , vl_parc_div_fgts             NUMERIC
+                                           ) ";
     return $stSql;
 }
 

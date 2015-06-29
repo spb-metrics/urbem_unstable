@@ -49,6 +49,7 @@ include_once ( CAM_GP_LIC_COMPONENTES."ISelectCriterioJulgamento.class.php" );
 include_once ( CAM_GP_COM_COMPONENTES."ISelectTipoObjeto.class.php" );
 include_once ( CAM_GP_COM_COMPONENTES."IPopUpObjeto.class.php" );
 include_once ( CAM_GP_LIC_COMPONENTES."ISelectComissao.class.php" );
+include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma   = "ManterHabilitacaoParticipante";
@@ -96,6 +97,21 @@ $obEdital->obCampoCod->setName( "numEdital" );
 
 $obComissao = new ISelectComissao();
 
+// campo fornecedor
+$obFornecedor = new IPopUpCGMVinculado($obForm);
+$obFornecedor->setTabelaVinculo       ( 'compras.fornecedor'    );
+$obFornecedor->setCampoVinculo        ( 'cgm_fornecedor'        );
+$obFornecedor->setNomeVinculo         ( 'Fornecedor'            );
+$obFornecedor->setRotulo              ( 'Fornecedor'            );
+$obFornecedor->setTitle               ( 'Informe o fornecedor.' );
+$obFornecedor->setName                ( 'stNomCGM'              );
+$obFornecedor->setId                  ( 'stNomCGM'              );
+$obFornecedor->obCampoCod->setName    ( 'inCGM'                 );
+$obFornecedor->obCampoCod->setId      ( 'inCGM'                 );
+$obFornecedor->obCampoCod->setNull    ( true                    );
+$obFornecedor->setNull                ( true                    );
+
+
 $obFormulario = new Formulario();
 $obFormulario->addForm( $obForm );
 $obFormulario->addHidden( $obHdnCtrl );
@@ -105,6 +121,7 @@ $obFormulario->addComponente( $obPopUpProcesso );
 $obFormulario->addComponente( $obEdital        );
 $obFormulario->addComponente( $obPopUpMapa );
 $obFormulario->addComponente( $obTipoLicitacao );
+$obFormulario->addComponente( $obFornecedor );
 $obFormulario->addComponente( $obCriterioJulgamento );
 $obFormulario->addComponente( $obTipoObjeto );
 $obFormulario->addComponente( $obObjeto );

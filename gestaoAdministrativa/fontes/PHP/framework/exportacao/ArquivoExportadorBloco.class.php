@@ -127,7 +127,7 @@ function Formatar()
                         $stColuna .= $this->stDelimitador;                    
                 break;
             
-                case "TCE_GO":
+                case "TCM_GO":
                         //Padrão de Saída do Arquivo TCE_GO em ISO-8859-1
                         $stColuna = mb_convert_encoding($stColuna, "ISO-8859-1");                    
                 break;

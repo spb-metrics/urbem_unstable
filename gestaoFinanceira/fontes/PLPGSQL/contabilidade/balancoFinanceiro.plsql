@@ -23,7 +23,7 @@
 /* Script de função PLPGSQL
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-$Id: balancoFinanceiro.plsql 62477 2015-05-13 17:31:55Z michel $
+$Id: balancoFinanceiro.plsql 62743 2015-06-15 18:15:02Z michel $
 */
 
 
@@ -40,6 +40,8 @@ DECLARE
     dtInicialAnterior       VARCHAR := '';
     dtFinalAnterior         VARCHAR := '';
     stDespesa               VARCHAR := '';
+    stDespesaAnterior       VARCHAR := '';
+    inMovimentacao          INTEGER;
     reRegistro              RECORD;
     reRegistroAux           RECORD;
     arDescricao             VARCHAR[];
@@ -64,7 +66,7 @@ IF (stTipoDespesa = 'E') THEN
         stDespesa := '(empenhado_per - anulado_per) as valor';
         
         IF (stExercicio >= '2014') THEN
-            stDespesa := stDespesa ||', empenhado_per_anterior as valor_anterior';
+            stDespesaAnterior := '(empenhado_per_anterior - anulado_per_anterior) as valor_anterior';
         END IF;
     
     END IF;
@@ -73,7 +75,7 @@ IF (stTipoDespesa = 'E') THEN
         stDespesa := 'liquidado_per as valor';
         
         IF (stExercicio >= '2014') THEN
-            stDespesa := stDespesa ||', liquidado_per_anterior as valor_anterior';
+            stDespesaAnterior := 'liquidado_per_anterior as valor_anterior';
         END IF;
     END IF;
     
@@ -81,7 +83,7 @@ IF (stTipoDespesa = 'E') THEN
         stDespesa := 'pago_per as valor';
         
         IF (stExercicio >= '2014') THEN
-            stDespesa := stDespesa ||', pago_per_anterior as valor_anterior';
+            stDespesaAnterior := 'pago_per_anterior as valor_anterior';
         END IF;
     END IF;
 
@@ -89,22 +91,16 @@ IF (stTipoDespesa = 'E') THEN
     stSql := ' CREATE TEMPORARY TABLE fluxo_caixa_receita AS
             SELECT
                     descricao
-                    ,SUM(arrecadado_periodo) as arrecadado_periodo
+                    ,ABS(SUM(arrecadado_periodo)) as arrecadado_periodo
         ';
     IF(stExercicio >= '2014' )THEN
-        stSql := stSql || ',SUM(arrecadado_periodo_anterior) as arrecadado_periodo_anterior';
+        stSql := stSql || ',ABS(SUM(arrecadado_periodo_anterior)) as arrecadado_periodo_anterior';
     END IF;
     
     stSql := stSql || '
             FROM(
                 SELECT
-                    CASE
-                        WHEN descricao = ''redutoras_receita_orcamentaria'' AND recurso like ''0001''
-                        THEN ''deducoes_recurso_livre''
-                        WHEN descricao = ''redutoras_receita_orcamentaria'' AND recurso NOT LIKE ''0001''
-                        THEN ''deducoes_recurso_vinculado''
-                ELSE descricao
-                END as descricao
+                 descricao
                 ,SUM(arrecadado_periodo) as arrecadado_periodo
     ';
     
@@ -116,22 +112,26 @@ IF (stTipoDespesa = 'E') THEN
                 FROM(
                     SELECT 
                         CASE
-                            WHEN recurso like ''0001''
+                            WHEN recurso like ''0001'' AND cod_estrutural NOT like ''9%''
                             THEN ''recurso_livre''
-                            WHEN recurso NOT like ''0001'' AND cod_estrutural NOT like ''9%''
+                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND (cod_estrutural like ''1.0.0.0%'' OR cod_estrutural like ''2.0.0.0%'' OR cod_estrutural like ''7.0.0.0%'')
                             THEN ''recurso_vinculado''
-                            WHEN cod_estrutural like ''9%''
+                            WHEN recurso like ''0001'' AND cod_estrutural like ''9.0.0.0%''
+                            THEN ''deducoes_recurso_livre''
+                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND cod_estrutural like ''9.0.0.0%''
+                            THEN ''deducoes_recurso_vinculado''
+                            WHEN cod_estrutural like ''9%'' AND recurso IS NOT NULL
                             THEN ''redutoras_receita_orcamentaria''
-                            WHEN cod_estrutural like ''1.0.0.0%''
-                            OR cod_estrutural like ''2.0.0.0%''
+                            WHEN (cod_estrutural like ''1%'' OR cod_estrutural like ''2%'' OR cod_estrutural like ''7%'') AND recurso IS NOT NULL
+                            --PODE OCORRER DE UMA RECEITA DO EXERCÍCIO ATUAL NÃO SER ENCONTRADA NO EXERCÍCIO ANTERIOR
                             THEN ''receita_orcamentaria''
                     END as descricao
                     ,recurso
-                    ,ABS(arrecadado_periodo) as arrecadado_periodo
+                    ,arrecadado_periodo
             ';
     
     IF(stExercicio >= '2014' )THEN
-        stSql := stSql || ',ABS(arrecadado_periodo_anterior) as arrecadado_periodo_anterior';
+        stSql := stSql || ',arrecadado_periodo_anterior';
     END IF;
                     
                     
@@ -155,22 +155,29 @@ IF (stTipoDespesa = 'E') THEN
     ';
     IF(stExercicio >= '2014' )THEN
         stSql := stSql || '
-                LEFT JOIN orcamento.fn_balancete_receita('|| quote_literal(stExercicioAnterior) ||'
-                                                        ,''''
-                                                        ,'|| quote_literal(dtInicialAnterior) ||'
-                                                        ,'|| quote_literal(dtFinalAnterior) ||'
-                                                        ,'|| quote_literal(stCodEntidade) ||'
-                                                        ,'''','''','''','''','''','''','''')
-                    as exercicio_anterior(                      
-                            cod_estrutural_anterior      varchar,                                           
-                            receita_anterior             integer,                                           
-                            recurso_anterior             varchar,                                           
-                            descricao_anterior           varchar,                                           
-                            valor_previsto_anterior      numeric,                                           
-                            arrecadado_periodo_anterior  numeric,                                           
-                            arrecadado_ano_anterior      numeric,                                           
-                            diferenca_anterior           numeric                                           
-                            )
+                LEFT JOIN (	   SELECT SUM(valor_previsto_anterior) AS valor_previsto_anterior
+                                    , SUM(arrecadado_periodo_anterior) AS arrecadado_periodo_anterior
+                                    , SUM(arrecadado_ano_anterior) AS arrecadado_ano_anterior
+                                    , SUM(diferenca_anterior) AS diferenca_anterior
+                                    , cod_estrutural_anterior
+                                 FROM orcamento.fn_balancete_receita('|| quote_literal(stExercicioAnterior) ||'
+                                               ,''''
+                                               ,'|| quote_literal(dtInicialAnterior) ||'
+                                               ,'|| quote_literal(dtFinalAnterior) ||'
+                                               ,'|| quote_literal(stCodEntidade) ||'
+                                               ,'''','''','''','''','''','''','''')
+                                    AS exercicio_anterior(                      
+                                                            cod_estrutural_anterior      varchar,                                           
+                                                            receita_anterior             integer,                                           
+                                                            recurso_anterior             varchar,                                           
+                                                            descricao_anterior           varchar,                                           
+                                                            valor_previsto_anterior      numeric,                                           
+                                                            arrecadado_periodo_anterior  numeric,                                           
+                                                            arrecadado_ano_anterior      numeric,                                           
+                                                            diferenca_anterior           numeric                                           
+                                                         )
+                              GROUP BY exercicio_anterior.cod_estrutural_anterior
+                          ) as exercicio_anterior
                     ON(retorno.cod_estrutural = exercicio_anterior.cod_estrutural_anterior)
                 
             ';
@@ -187,118 +194,156 @@ IF (stTipoDespesa = 'E') THEN
 
 --Criando tabela para armazenar despesas referente a sua classificao para calculo futuro
     stSql := ' CREATE TEMPORARY TABLE tmp_calculo_despesas AS
-            SELECT
-                    classificacao            
-                    ,num_recurso        
-                    ,'|| stDespesa ||'
-                    ,empenhado_ano
-                    ,anulado_ano
-                    ,liquidado_ano
-                    ,pago_ano
-            FROM orcamento.fn_balancete_despesa('|| quote_literal(stExercicio) ||'
-                                                ,'' AND od.cod_entidade IN  ('|| stCodEntidade ||')''
-                                                ,'|| quote_literal(dtInicial) ||'
-                                                ,'|| quote_literal(dtFinal) ||'
-                                                ,'''','''','''','''','''' ,'''','''', '''' )
-                                as retorno( 
-                                    exercicio       char(4),                                                                                
-                                    cod_despesa     integer,                                                                                
-                                    cod_entidade    integer,                                                                                
-                                    cod_programa    integer,                                                                                
-                                    cod_conta       integer,                                                                                
-                                    num_pao         integer,                                                                                
-                                    num_orgao       integer,                                                                                
-                                    num_unidade     integer,                                                                                
-                                    cod_recurso     integer,                                                                                
-                                    cod_funcao      integer,                                                                                
-                                    cod_subfuncao   integer,                                                                                
-                                    tipo_conta      varchar,                                                                                
-                                    vl_original     numeric,                                                                                
-                                    dt_criacao      date,                                                                                   
-                                    classificacao   varchar,                                                                                
-                                    descricao       varchar,                                                                                
-                                    num_recurso     varchar,                                                                                
-                                    nom_recurso     varchar,                                                                                
-                                    nom_orgao       varchar,                                                                                
-                                    nom_unidade     varchar,                                                                                
-                                    nom_funcao      varchar,                                                                                
-                                    nom_subfuncao   varchar,                                                                                
-                                    nom_programa    varchar,                                                                                
-                                    nom_pao         varchar,                                                                                
-                                    empenhado_ano   numeric,                                                                                
-                                    empenhado_per   numeric,                                                                                 
-                                    anulado_ano     numeric,                                                                                
-                                    anulado_per     numeric,                                                                                
-                                    pago_ano        numeric,                                                                                
-                                    pago_per        numeric,                                                                                 
-                                    liquidado_ano   numeric,                                                                                
-                                    liquidado_per   numeric,                                                                                
-                                    saldo_inicial   numeric,                                                                                
-                                    suplementacoes  numeric,                                                                                
-                                    reducoes        numeric,                                                                                
-                                    total_creditos  numeric,                                                                                
-                                    credito_suplementar  numeric,                                                                            
-                                    credito_especial  numeric,                                                                            
-                                    credito_extraordinario  numeric,
-                                    num_programa    varchar,
-                                    num_acao        varchar
-                                    )
+                SELECT classificacao
+                     , num_recurso
+                     , SUM(valor) AS valor
+                     , SUM(valor_anterior) AS valor_anterior
+                     , SUM(empenhado_ano) AS empenhado_ano
+                     , SUM(anulado_ano) AS anulado_ano
+                     , SUM(liquidado_ano) AS liquidado_ano
+                     , SUM(pago_ano) AS pago_ano
+                     , SUM(empenhado_ano_anterior) AS empenhado_ano_anterior
+                     , SUM(anulado_ano_anterior) AS anulado_ano_anterior
+                     , SUM(liquidado_ano_anterior) AS liquidado_ano_anterior
+                     , SUM(pago_ano_anterior) AS pago_ano_anterior
+                  FROM (
+                                    SELECT
+                                            classificacao            
+                                            ,num_recurso
+                                            ,'|| stDespesa ||'
+                                            ,0.00 as valor_anterior
+                                            ,empenhado_ano
+                                            ,anulado_ano
+                                            ,liquidado_ano
+                                            ,pago_ano
+                                            ,0.00 AS empenhado_ano_anterior
+                                            ,0.00 AS anulado_ano_anterior
+                                            ,0.00 AS liquidado_ano_anterior
+                                            ,0.00 AS pago_ano_anterior
+                                    FROM orcamento.fn_balancete_despesa('|| quote_literal(stExercicio) ||'
+                                                                        ,'' AND od.cod_entidade IN  ('|| stCodEntidade ||')''
+                                                                        ,'|| quote_literal(dtInicial) ||'
+                                                                        ,'|| quote_literal(dtFinal) ||'
+                                                                        ,'''','''','''','''','''' ,'''','''', '''' )
+                                                        AS retorno( 
+                                                                        exercicio       char(4),                                                                                
+                                                                        cod_despesa     integer,                                                                                
+                                                                        cod_entidade    integer,                                                                                
+                                                                        cod_programa    integer,                                                                                
+                                                                        cod_conta       integer,                                                                                
+                                                                        num_pao         integer,                                                                                
+                                                                        num_orgao       integer,                                                                                
+                                                                        num_unidade     integer,                                                                                
+                                                                        cod_recurso     integer,                                                                                
+                                                                        cod_funcao      integer,                                                                                
+                                                                        cod_subfuncao   integer,                                                                                
+                                                                        tipo_conta      varchar,                                                                                
+                                                                        vl_original     numeric,                                                                                
+                                                                        dt_criacao      date,                                                                                   
+                                                                        classificacao   varchar,                                                                                
+                                                                        descricao       varchar,                                                                                
+                                                                        num_recurso     varchar,                                                                                
+                                                                        nom_recurso     varchar,                                                                                
+                                                                        nom_orgao       varchar,                                                                                
+                                                                        nom_unidade     varchar,                                                                                
+                                                                        nom_funcao      varchar,                                                                                
+                                                                        nom_subfuncao   varchar,                                                                                
+                                                                        nom_programa    varchar,                                                                                
+                                                                        nom_pao         varchar,                                                                                
+                                                                        empenhado_ano   numeric,                                                                                
+                                                                        empenhado_per   numeric,                                                                                 
+                                                                        anulado_ano     numeric,                                                                                
+                                                                        anulado_per     numeric,                                                                                
+                                                                        pago_ano        numeric,                                                                                
+                                                                        pago_per        numeric,                                                                                 
+                                                                        liquidado_ano   numeric,                                                                                
+                                                                        liquidado_per   numeric,                                                                                
+                                                                        saldo_inicial   numeric,                                                                                
+                                                                        suplementacoes  numeric,                                                                                
+                                                                        reducoes        numeric,                                                                                
+                                                                        total_creditos  numeric,                                                                                
+                                                                        credito_suplementar  numeric,                                                                            
+                                                                        credito_especial  numeric,                                                                            
+                                                                        credito_extraordinario  numeric,
+                                                                        num_programa    varchar,
+                                                                        num_acao        varchar
+                                                                  )
         ';
 
     IF(stExercicio::integer >= 2014 )THEN
         stSql := stSql || '
-                            LEFT JOIN orcamento.fn_balancete_despesa('|| quote_literal(stExercicioAnterior) ||'
-                                                                    ,'' AND od.cod_entidade IN  ('|| stCodEntidade ||')''
-                                                                    ,'|| quote_literal(dtInicialAnterior) ||'
-                                                                    ,'|| quote_literal(dtFinalAnterior) ||'
-                                                                    ,'''','''','''','''','''' ,'''','''', '''' )
-                                as retorno_anterior( 
-                                    exercicio_anterior       char(4),                                                                                
-                                    cod_despesa_anterior     integer,                                                                                
-                                    cod_entidade_anterior    integer,                                                                                
-                                    cod_programa_anterior    integer,                                                                                
-                                    cod_conta_anterior       integer,                                                                                
-                                    num_pao_anterior         integer,                                                                                
-                                    num_orgao_anterior       integer,                                                                                
-                                    num_unidade_anterior     integer,                                                                                
-                                    cod_recurso_anterior     integer,                                                                                
-                                    cod_funcao_anterior      integer,                                                                                
-                                    cod_subfuncao_anterior   integer,                                                                                
-                                    tipo_conta_anterior      varchar,                                                                                
-                                    vl_original_anterior     numeric,                                                                                
-                                    dt_criacao_anterior      date,                                                                                   
-                                    classificacao_anterior   varchar,                                                                                
-                                    descricao_anterior       varchar,                                                                                
-                                    num_recurso_anterior     varchar,                                                                                
-                                    nom_recurso_anterior     varchar,                                                                                
-                                    nom_orgao_anterior       varchar,                                                                                
-                                    nom_unidade_anterior     varchar,                                                                                
-                                    nom_funcao_anterior      varchar,                                                                                
-                                    nom_subfuncao_anterior   varchar,                                                                                
-                                    nom_programa_anterior    varchar,                                                                                
-                                    nom_pao_anterior         varchar,                                                                                
-                                    empenhado_ano_anterior   numeric,                                                                                
-                                    empenhado_per_anterior   numeric,                                                                                 
-                                    anulado_ano_anterior     numeric,                                                                                
-                                    anulado_per_anterior     numeric,                                                                                
-                                    pago_ano_anterior        numeric,                                                                                
-                                    pago_per_anterior        numeric,                                                                                 
-                                    liquidado_ano_anterior   numeric,                                                                                
-                                    liquidado_per_anterior   numeric,                                                                                
-                                    saldo_inicial_anterior   numeric,                                                                                
-                                    suplementacoes_anterior  numeric,                                                                                
-                                    reducoes_anterior        numeric,                                                                                
-                                    total_creditos_anterior  numeric,                                                                                
-                                    credito_suplementar_anterior  numeric,                                                                            
-                                    credito_especial_anterior  numeric,                                                                            
-                                    credito_extraordinario_anterior  numeric,
-                                    num_programa    varchar,
-                                    num_acao        varchar
-                                    )
-                                ON(retorno.classificacao = retorno_anterior.classificacao_anterior)
+                                 UNION ALL
+
+                                    SELECT
+                                            classificacao_anterior AS classificacao
+                                            ,num_recurso_anterior AS num_recurso
+                                            ,0.00 AS valor
+			                                ,'|| stDespesaAnterior ||'
+			                                ,0.00 AS empenhado_ano
+			                                ,0.00 AS anulado_ano
+			                                ,0.00 AS liquidado_ano
+			                                ,0.00 AS pago_ano
+                                            ,empenhado_ano_anterior
+			                                ,anulado_ano_anterior
+			                                ,liquidado_ano_anterior
+			                                ,pago_ano_anterior
+                                    FROM orcamento.fn_balancete_despesa('|| quote_literal(stExercicioAnterior) ||'
+                                                                        ,'' AND od.cod_entidade IN  ('|| stCodEntidade ||')''
+                                                                        ,'|| quote_literal(dtInicialAnterior) ||'
+                                                                        ,'|| quote_literal(dtFinalAnterior) ||'
+                                                                        ,'''','''','''','''','''' ,'''','''', '''' )
+                                                        AS retorno_anterior( 
+                                                                        exercicio_anterior       char(4),                                                                                
+                                                                        cod_despesa_anterior     integer,                                                                                
+                                                                        cod_entidade_anterior    integer,                                                                                
+                                                                        cod_programa_anterior    integer,                                                                                
+                                                                        cod_conta_anterior       integer,                                                                                
+                                                                        num_pao_anterior         integer,                                                                                
+                                                                        num_orgao_anterior       integer,                                                                                
+                                                                        num_unidade_anterior     integer,                                                                                
+                                                                        cod_recurso_anterior     integer,                                                                                
+                                                                        cod_funcao_anterior      integer,                                                                                
+                                                                        cod_subfuncao_anterior   integer,                                                                                
+                                                                        tipo_conta_anterior      varchar,                                                                                
+                                                                        vl_original_anterior     numeric,                                                                                
+                                                                        dt_criacao_anterior      date,                                                                                   
+                                                                        classificacao_anterior   varchar,                                                                                
+                                                                        descricao_anterior       varchar,                                                                                
+                                                                        num_recurso_anterior     varchar,                                                                                
+                                                                        nom_recurso_anterior     varchar,                                                                                
+                                                                        nom_orgao_anterior       varchar,                                                                                
+                                                                        nom_unidade_anterior     varchar,                                                                                
+                                                                        nom_funcao_anterior      varchar,                                                                                
+                                                                        nom_subfuncao_anterior   varchar,                                                                                
+                                                                        nom_programa_anterior    varchar,                                                                                
+                                                                        nom_pao_anterior         varchar,                                                                                
+                                                                        empenhado_ano_anterior   numeric,                                                                                
+                                                                        empenhado_per_anterior   numeric,                                                                                 
+                                                                        anulado_ano_anterior     numeric,                                                                                
+                                                                        anulado_per_anterior     numeric,                                                                                
+                                                                        pago_ano_anterior        numeric,                                                                                
+                                                                        pago_per_anterior        numeric,                                                                                 
+                                                                        liquidado_ano_anterior   numeric,                                                                                
+                                                                        liquidado_per_anterior   numeric,                                                                                
+                                                                        saldo_inicial_anterior   numeric,                                                                                
+                                                                        suplementacoes_anterior  numeric,                                                                                
+                                                                        reducoes_anterior        numeric,                                                                                
+                                                                        total_creditos_anterior  numeric,                                                                                
+                                                                        credito_suplementar_anterior  numeric,                                                                            
+                                                                        credito_especial_anterior  numeric,                                                                            
+                                                                        credito_extraordinario_anterior  numeric,
+                                                                        num_programa    varchar,
+                                                                        num_acao        varchar
+                                                                  )
     ';
     END IF;
     
+    stSql := stSql || '
+                       ) AS calculo_despesas
+              GROUP BY classificacao
+                     , num_recurso   
+    ';
+
 EXECUTE stSql;
 
 --INSERT para separar as despesas orcamentarias por sua classificacao.
@@ -345,12 +390,18 @@ EXECUTE stSql;
         
     IF (stTipoDespesa = 'L') THEN
     --INSERT para colocar inscricao_restos_pagar_processados
-        INSERT INTO tmp_calculo_despesas(classificacao,valor) VALUES('inscricao_restos_pagar_processados'
+        INSERT INTO tmp_calculo_despesas(classificacao,valor,valor_anterior) VALUES('inscricao_restos_pagar_processados'
                                                                     , (SELECT 
                                                                             ( 
                                                                             SUM(liquidado_ano) - SUM(pago_ano) 
                                                                             )
                                                                         FROM tmp_calculo_despesas)
+                                                                    , (SELECT 
+                                                                            ( 
+                                                                            SUM(liquidado_ano_anterior) - SUM(pago_ano_anterior) 
+                                                                            )
+                                                                        FROM tmp_calculo_despesas
+                                                                       WHERE classificacao <> 'despesas_orcamentarias')
                                                                     );
     END IF;
 
@@ -383,55 +434,160 @@ EXECUTE stSql;
     
 --Criando tabela para armazenar saldos referente ao cod_estrutural
     stSql := ' CREATE TEMPORARY TABLE fluxo_caixa_saldo AS
-            SELECT 
-            CASE
-                WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''
-                    THEN ''depositos_restituiveis_valores_vinculados''
-                WHEN cod_estrutural         like ''2.1.8%'' AND indicador_superavit = ''financeiro''
-                    THEN ''valores_restituiveis''
-                WHEN cod_estrutural         like ''1.1.1.0%''
-                    THEN ''caixa_equivalentes''
-                WHEN cod_estrutural          like ''4.5.1.1.0%''
-                    THEN ''transferencias_recebidas_orcamentaria''
-                WHEN cod_estrutural          like ''3.5.1.1.0%''
-                    THEN ''tranferencias_concedidas_orcamentaria''
-                WHEN cod_estrutural          like ''4.5.1.2.0%''                        
-                    THEN ''transferencias_recebidas_independentes_orcamentaria''
-                WHEN cod_estrutural          like ''3.5.1.2.0%''                        
-                    THEN ''transferencias_concedidas_independentes_orcamentaria''
-                WHEN cod_estrutural          like ''4.5.1.3.0%''
-                    THEN ''transferencias_recebidas_cobertura''
-                WHEN cod_estrutural          like ''3.5.1.3%''
-                    THEN ''transferencias_concedidas_cobertura''
-                WHEN cod_estrutural          like ''6.3.2.2.0%''
-                    THEN ''pagamento_restos_pagar_processados''
-                WHEN cod_estrutural          like ''6.3.1.4.0%''
-                    THEN ''pagamento_restos_pagar_nao_processados''
-            END as descricao
-            ,CASE WHEN (select count(cod_lote) as lotes from contabilidade.lote where exercicio = '|| quote_literal(stExercicioAnterior) ||') > 0 THEN
-                            ABS(sum(vl_saldo_anterior))
-                  ELSE      0.00
-             END AS vl_saldo_anterior
-            ,ABS(sum(vl_saldo_debitos)) as vl_saldo_debitos
-            ,ABS(sum(vl_saldo_creditos)) as vl_saldo_creditos
-            ,ABS(sum(vl_saldo_atual)) as vl_saldo_atual
-            FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||'
-                                                                ,''cod_entidade IN  ('|| stCodEntidade ||') ''
-                                                                ,'|| quote_literal(dtInicial) ||'
-                                                                ,'|| quote_literal(dtFinal) ||'
-                                                                ,''A''::CHAR)
-                        as retorno
-                        ( cod_estrutural varchar                                                    
-                                    ,nivel integer                                                               
-                                    ,nom_conta varchar                                                           
-                                    ,cod_sistema integer                                                         
-                                    ,indicador_superavit char(12)                                                    
-                                    ,vl_saldo_anterior numeric                                                   
-                                    ,vl_saldo_debitos  numeric                                                   
-                                    ,vl_saldo_creditos numeric                                                   
-                                    ,vl_saldo_atual    numeric                                                   
-                                    )
-                GROUP BY descricao
+                SELECT descricao
+                       ,(sum(vl_saldo_anterior)) AS vl_saldo_anterior
+                       ,(sum(vl_saldo_debitos)) AS vl_saldo_debitos
+                       ,(sum(vl_saldo_creditos)) AS vl_saldo_creditos
+                       ,(sum(vl_saldo_atual)) AS vl_saldo_atual
+                       ,(sum(vl_saldo_debitos_anterior)) AS vl_saldo_debitos_anterior
+                       ,(sum(vl_saldo_creditos_anterior)) AS vl_saldo_creditos_anterior
+                       ,(sum(vl_saldo_atual_anterior)) AS vl_saldo_atual_anterior
+                       ,(sum(vl_saldo_inicial_anterior)) AS vl_saldo_inicial_anterior
+                  FROM (  
+                        SELECT 
+                        CASE';
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' AND nivel IN (4)';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
+                        END IF;
+                            stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados''';
+            
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.3.5%'' OR cod_estrutural   like ''1.1.3.8%'' ) AND indicador_superavit = ''financeiro''';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
+                        END IF;
+                            stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados_saldo''';
+            
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.3.5.0%'' OR cod_estrutural   like ''1.1.3.8.0%'' )
+                                                THEN ''outros_recebimentos_ext''';
+                        ELSE stSql := stSql || '  WHEN cod_estrutural         like ''2.1.8%'' AND indicador_superavit = ''financeiro''
+                                                  THEN ''valores_restituiveis''';
+                        END IF;
+                       
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.1%'' OR cod_estrutural   like ''1.1.4.1%'' ) AND cod_sistema IN (1,2)';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.1.0%''';
+                        END IF;
+                          stSql := stSql || '                 
+                                THEN ''caixa_equivalentes''
+                            WHEN cod_estrutural          like ''4.5.1.1.0%''
+                                THEN ''transferencias_recebidas_orcamentaria''
+                            WHEN cod_estrutural          like ''3.5.1.1.0%''
+                                THEN ''tranferencias_concedidas_orcamentaria''
+                            WHEN cod_estrutural          like ''4.5.1.2.0%''                        
+                                THEN ''transferencias_recebidas_independentes_orcamentaria''
+                            WHEN cod_estrutural          like ''3.5.1.2.0%''                        
+                                THEN ''transferencias_concedidas_independentes_orcamentaria''
+                            WHEN cod_estrutural          like ''4.5.1.3.0%''
+                                THEN ''transferencias_recebidas_cobertura''
+                            WHEN cod_estrutural          like ''3.5.1.3%''
+                                THEN ''transferencias_concedidas_cobertura''
+                            WHEN cod_estrutural          like ''6.3.2.2.0%''
+                                THEN ''pagamento_restos_pagar_processados''
+                            WHEN cod_estrutural          like ''6.3.1.4.0%''
+                                THEN ''pagamento_restos_pagar_nao_processados''
+                        END as descricao
+                        ,(sum(vl_saldo_anterior)) AS vl_saldo_anterior
+                        ,(sum(vl_saldo_debitos)) AS vl_saldo_debitos
+                        ,(sum(vl_saldo_creditos)) AS vl_saldo_creditos
+                        ,(sum(vl_saldo_atual)) AS vl_saldo_atual
+                        ,0.00 AS vl_saldo_debitos_anterior
+                        ,0.00 AS vl_saldo_creditos_anterior
+                        ,0.00 AS vl_saldo_atual_anterior
+                        ,0.00 AS vl_saldo_inicial_anterior
+                        FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||'
+                                                                            ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                            ,'|| quote_literal(dtInicial) ||'
+                                                                            ,'|| quote_literal(dtFinal) ||'
+                                                                            ,''A''::CHAR)
+                                    as retorno
+                                    ( cod_estrutural varchar                                                    
+                                                ,nivel integer                                                               
+                                                ,nom_conta varchar                                                           
+                                                ,cod_sistema integer                                                         
+                                                ,indicador_superavit char(12)                                                    
+                                                ,vl_saldo_anterior numeric                                                   
+                                                ,vl_saldo_debitos  numeric                                                   
+                                                ,vl_saldo_creditos numeric                                                   
+                                                ,vl_saldo_atual    numeric                                                   
+                                                )
+                            GROUP BY descricao
+                     
+                     UNION ALL
+                     
+                        SELECT 
+                        CASE';
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' AND nivel IN (4)';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
+                        END IF;
+                            stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados''';
+            
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.3.5%'' OR cod_estrutural   like ''1.1.3.8%'' ) AND indicador_superavit = ''financeiro''';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
+                        END IF;
+                            stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados_saldo''';
+            
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.3.5.0%'' OR cod_estrutural   like ''1.1.3.8.0%'' )
+                                                THEN ''outros_recebimentos_ext''';
+                        ELSE stSql := stSql || '  WHEN cod_estrutural         like ''2.1.8%'' AND indicador_superavit = ''financeiro''
+                                                  THEN ''valores_restituiveis''';
+                        END IF;
+                       
+                        IF (stExercicio::integer >= 2014) THEN
+                            stSql := stSql || ' WHEN (cod_estrutural   like ''1.1.1%'' OR cod_estrutural   like ''1.1.4.1%'' ) AND cod_sistema IN (1,2)';
+                        ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.1.0%''';
+                        END IF;
+                          stSql := stSql || '                 
+                                THEN ''caixa_equivalentes''
+                            WHEN cod_estrutural          like ''4.5.1.1.0%''
+                                THEN ''transferencias_recebidas_orcamentaria''
+                            WHEN cod_estrutural          like ''3.5.1.1.0%''
+                                THEN ''tranferencias_concedidas_orcamentaria''
+                            WHEN cod_estrutural          like ''4.5.1.2.0%''                        
+                                THEN ''transferencias_recebidas_independentes_orcamentaria''
+                            WHEN cod_estrutural          like ''3.5.1.2.0%''                        
+                                THEN ''transferencias_concedidas_independentes_orcamentaria''
+                            WHEN cod_estrutural          like ''4.5.1.3.0%''
+                                THEN ''transferencias_recebidas_cobertura''
+                            WHEN cod_estrutural          like ''3.5.1.3%''
+                                THEN ''transferencias_concedidas_cobertura''
+                            WHEN cod_estrutural          like ''6.3.2.2.0%''
+                                THEN ''pagamento_restos_pagar_processados''
+                            WHEN cod_estrutural          like ''6.3.1.4.0%''
+                                THEN ''pagamento_restos_pagar_nao_processados''
+                        END as descricao
+                        ,0.00 AS vl_saldo_anterior
+                        ,0.00 AS vl_saldo_debitos
+                        ,0.00 AS vl_saldo_creditos
+                        ,0.00 AS vl_saldo_atual
+                        ,(sum(vl_saldo_debitos)) AS vl_saldo_debitos_anterior
+                        ,(sum(vl_saldo_creditos)) AS vl_saldo_creditos_anterior
+                        ,(sum(vl_saldo_atual)) AS vl_saldo_atual_anterior
+                        ,(sum(vl_saldo_anterior)) AS vl_saldo_inicial_anterior
+                        FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicioAnterior) ||'
+                                                                            ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                            ,'|| quote_literal(dtInicialAnterior) ||'
+                                                                            ,'|| quote_literal(dtFinalAnterior) ||'
+                                                                            ,''A''::CHAR)
+                                    as retorno
+                                    ( cod_estrutural varchar                                                    
+                                                ,nivel integer                                                               
+                                                ,nom_conta varchar                                                           
+                                                ,cod_sistema integer                                                         
+                                                ,indicador_superavit char(12)                                                    
+                                                ,vl_saldo_anterior numeric                                                   
+                                                ,vl_saldo_debitos  numeric                                                   
+                                                ,vl_saldo_creditos numeric                                                   
+                                                ,vl_saldo_atual    numeric                                                   
+                                                )
+                            GROUP BY descricao                             
+                       ) AS fluxo_caixa_saldo
+                 WHERE descricao IS NOT NULL
+              GROUP BY descricao    
     ';
 
 EXECUTE stSql;
@@ -501,23 +657,35 @@ IF (stExercicio::integer >= 2014) THEN
                                     ,vl_saldo_anterior 	        as valor_anterior
                                     ,vl_saldo_debitos 	        as valor_debito 
                                     ,vl_saldo_creditos	        as valor_credito
-                                    ,vl_saldo_atual		as valor
+                                    ,vl_saldo_atual		        as valor
+                                    ,vl_saldo_debitos_anterior  as valor_debito_anterior
+                                    ,vl_saldo_creditos_anterior as valor_credito_anterior
+                                    ,vl_saldo_atual_anterior    as valor_atual_anterior
+                                    ,vl_saldo_inicial_anterior  as valor_inicial_anterior
                                     FROM fluxo_caixa_saldo
                     UNION
                             SELECT 
                                     descricao
-                                    ,arrecadado_periodo_anterior as valor_anterior
-                                    ,0		 		 as valor_debito 
-                                    ,0				 as valor_credito
-                                    ,arrecadado_periodo 	 as valor 
+                                    ,arrecadado_periodo_anterior    as valor_anterior
+                                    ,0		 		                as valor_debito 
+                                    ,0				                as valor_credito
+                                    ,arrecadado_periodo 	        as valor
+                                    ,0		 		                as valor_debito_anterior 
+                                    ,0				                as valor_credito_anterior
+                                    ,0				                as valor_atual_anterior
+                                    ,0                              as valor_inicial_anterior
                                     FROM fluxo_caixa_receita
                     UNION
                             SELECT 
                                     descricao
-                                    ,valor_anterior     as valor_anterior
-                                    ,0		 	as valor_debito 
-                                    ,0			as valor_credito
-                                    ,valor 
+                                    ,valor_anterior             as valor_anterior
+                                    ,0		 	                as valor_debito 
+                                    ,0			                as valor_credito
+                                    ,valor                      as valor
+                                    ,0		 		            as valor_debito_anterior 
+                                    ,0				            as valor_credito_anterior
+                                    ,0				            as valor_atual_anterior
+                                    ,0                          as valor_inicial_anterior
                                     FROM tmp_despesas
                     )as tbl
             WHERE descricao <> ''''
@@ -566,6 +734,11 @@ END IF;
                             END AS valor 
                        FROM resultado_financeiro 
                       WHERE descricao = 'pagamento_restos_pagar_processados')
+           ,valor_anterior  = (SELECT CASE WHEN (ABS(valor_debito_anterior) - ABS(valor_credito_anterior)) < 0.00 THEN (ABS(valor_debito_anterior) - ABS(valor_credito_anterior)) * -1
+                                 ELSE (ABS(valor_debito_anterior) - ABS(valor_credito_anterior))
+                            END AS valor_anterior 
+                       FROM resultado_financeiro 
+                      WHERE descricao = 'pagamento_restos_pagar_processados')
     WHERE descricao = 'pagamento_restos_pagar_processados';
 
 --CRIANDO TABELA PARA RESULTADO DO RELATORIO 
@@ -606,14 +779,16 @@ END IF;
     arDescricao[18] := 'Inscrição de Restos a Pagar Processados';
     arDescricao[19] := 'Inscrição de Restos a Pagar Não Processados';
     arDescricao[20] := 'Depósitos Restituíveis e Valores Vinculados';
-    arDescricao[21] := 'Valores Restituiveis';
+    IF (stExercicio::integer >= 2014) THEN
+         arDescricao[21] := 'Outros Recebimentos Extraorçamentários';
+    ELSE arDescricao[21] := 'Valores Restituiveis';
+    END IF;
     arDescricao[22] := '';
     arDescricao[23] := 'Saldo em Espécie do Exercício Anterior (IV)';
     arDescricao[24] := 'Caixa e Equivalentes de Caixa';
-    arDescricao[25] := 'Depósitos Restituíveis e Valores Vinculados';
-    arDescricao[26] := 'Outros Recebimentos';
-    arDescricao[27] := '';
-    arDescricao[28] := 'TOTAL (V) = (I+II+III+IV)';
+    arDescricao[25] := 'Depósitos Restituíveis e Valores Vinculados';    
+    arDescricao[26] := '';
+    arDescricao[27] := 'TOTAL (V) = (I+II+III+IV)';
     
     --DESPESAS POR RECURSO
     arDescricaoDespesas[0] := 'Despesa Orçamentária(VI)';
@@ -637,14 +812,16 @@ END IF;
     arDescricaoDespesas[18] := 'Pagamentos de Restos a Pagar Processados';
     arDescricaoDespesas[19] := 'Pagamentos de Restos a Pagar Não Processados';
     arDescricaoDespesas[20] := 'Depósitos Restituíveis e Valores Vinculados';
-    arDescricaoDespesas[21] := 'Valores Restituiveis';
+    IF (stExercicio::integer >= 2014) THEN
+         arDescricaoDespesas[21] := 'Outros Pagamentos Extraorçamentários';
+    ELSE arDescricaoDespesas[21] := 'Valores Restituiveis';
+    END IF;
     arDescricaoDespesas[22] := '';
     arDescricaoDespesas[23] := 'Saldo em Espécie para o Exercício Seguinte (IX)';
     arDescricaoDespesas[24] := 'Caixa e Equivalentes de Caixa';
-    arDescricaoDespesas[25] := 'Depósitos Restituíveis e Valores Vinculados';
-    arDescricaoDespesas[26] := 'Outros Recebimentos';
-    arDescricaoDespesas[27] := '';
-    arDescricaoDespesas[28] := 'TOTAL (X) = (VI+VII+VIII+IX)';
+    arDescricaoDespesas[25] := 'Depósitos Restituíveis e Valores Vinculados';    
+    arDescricaoDespesas[26] := '';
+    arDescricaoDespesas[27] := 'TOTAL (X) = (VI+VII+VIII+IX)';
     
     --Armazenar valores da tabela resultado_financeiro em um array de acordo com a regra pra serem inseridos na tabela relatorio_financeiro
     arDescricaoValores[0] := 'receita_orcamentaria';
@@ -668,16 +845,19 @@ END IF;
     arDescricaoValores[18] := 'inscricao_restos_pagar_processados';
     arDescricaoValores[19] := 'inscricao_restos_pagar_nao_processados';
     arDescricaoValores[20] := 'depositos_restituiveis_valores_vinculados';
+    IF (stExercicio::integer >= 2014) THEN
+         arDescricaoValores[21] := 'outros_recebimentos_ext';
+    ELSE arDescricaoValores[21] := 'valores_restituiveis';
+    END IF;
     arDescricaoValores[21] := 'valores_restituiveis';
     arDescricaoValores[22] := '';
     arDescricaoValores[23] := '';
     arDescricaoValores[24] := 'caixa_equivalentes';
-    arDescricaoValores[25] := 'depositos_restituiveis_valores_vinculados';
-    arDescricaoValores[26] := 'outros_recebimentos';
+    arDescricaoValores[25] := 'depositos_restituiveis_valores_vinculados';    
+    arDescricaoValores[26] := '';
     arDescricaoValores[27] := '';
-    arDescricaoValores[28] := '';
     
-    
+  
     --DESCRICAO DOS CAMPOS PARA CRIAR A RELACAO ENTRE AS TABELAS DESPESAS
     arDescricaoDespesasValores[0] := 'despesas_orcamentarias';
     arDescricaoDespesasValores[1] := '';
@@ -700,18 +880,20 @@ END IF;
     arDescricaoDespesasValores[18] := 'pagamento_restos_pagar_processados';
     arDescricaoDespesasValores[19] := 'pagamento_restos_pagar_nao_processados';
     arDescricaoDespesasValores[20] := 'depositos_restituiveis_valores_vinculados';
-    arDescricaoDespesasValores[21] := 'valores_restituiveis';
+    IF (stExercicio::integer >= 2014) THEN
+         arDescricaoDespesasValores[21] := 'outros_recebimentos_ext';
+    ELSE arDescricaoDespesasValores[21] := 'valores_restituiveis';
+    END IF;
     arDescricaoDespesasValores[22] := '';
     arDescricaoDespesasValores[23] := '';
     arDescricaoDespesasValores[24] := 'caixa_equivalentes';
-    arDescricaoDespesasValores[25] := 'depositos_restituiveis_valores_vinculados';
-    arDescricaoDespesasValores[26] := 'outros_recebimentos';
+    arDescricaoDespesasValores[25] := 'depositos_restituiveis_valores_vinculados';    
+    arDescricaoDespesasValores[26] := '';
     arDescricaoDespesasValores[27] := '';
-    arDescricaoDespesasValores[28] := '';
 
 
 --INSERIR Descricoes na Tabela
-    FOR i IN 0..28 LOOP
+    FOR i IN 0..27 LOOP
         INSERT INTO relatorio_financeiro(   ordem                           
                                             ,descricao_ingressos            
                                             ,valor_ingresso                
@@ -732,45 +914,56 @@ END IF;
 --UPDATE para inserir os valores de acordo com a regra de negocio.
     --Passando valor para o valor_anterior para ficar de acordo com a regra da conta
     UPDATE relatorio_financeiro
-        SET valor_ingresso = (SELECT valor_ingresso_anterior FROM relatorio_financeiro WHERE ordem = 26)
-    WHERE ordem = 26;  
-
-    UPDATE relatorio_financeiro
-    SET valor_ingresso = COALESCE((SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
-        ,valor_ingresso_anterior = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_ingresso = COALESCE((SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+        ,valor_ingresso_anterior = COALESCE((SELECT valor_credito_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
     WHERE ordem = 20;
     
     UPDATE relatorio_financeiro
-    SET valor_dispendios = COALESCE((SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
-        ,valor_dispendios_anterior = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_dispendios = COALESCE((SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+        ,valor_dispendios_anterior = COALESCE((SELECT valor_debito_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
     WHERE ordem = 20;
     
     UPDATE relatorio_financeiro
-    SET valor_ingresso = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_ingresso = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados_saldo'),0.00)
+        ,valor_ingresso_anterior = COALESCE((SELECT valor_inicial_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados_saldo'),0.00)
     WHERE ordem = 25;
     
     UPDATE relatorio_financeiro
-    SET valor_dispendios = COALESCE((SELECT valor FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
-        ,valor_dispendios_anterior = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_dispendios = COALESCE((SELECT valor FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados_saldo'),0.00)
+        ,valor_dispendios_anterior = COALESCE((SELECT valor_atual_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados_saldo'),0.00)
     WHERE ordem = 25;
     
-    UPDATE relatorio_financeiro
-    SET valor_ingresso = (SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'valores_restituiveis')
-        ,valor_ingresso_anterior = (SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'valores_restituiveis')
-    WHERE ordem = 21;
+    IF (stExercicio::integer >= 2014) THEN
+         UPDATE relatorio_financeiro
+         SET valor_ingresso = COALESCE((SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'outros_recebimentos_ext'),0.00)
+           , valor_ingresso_anterior =  COALESCE((SELECT valor_debito_anterior FROM resultado_financeiro WHERE descricao = 'outros_recebimentos_ext'),0.00)
+         WHERE ordem = 21;
+    ELSE   UPDATE relatorio_financeiro
+           SET valor_ingresso =  COALESCE((SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'valores_restituiveis'),0.00)
+             , valor_ingresso_anterior =  COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'valores_restituiveis'),0.00)
+           WHERE ordem = 21;
+    END IF;
     
-    UPDATE relatorio_financeiro
-    SET valor_dispendios = (SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'valores_restituiveis')
-        ,valor_dispendios_anterior = (SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'valores_restituiveis')
-    WHERE ordem = 21; 
+    IF (stExercicio::integer >= 2014) THEN
+        UPDATE relatorio_financeiro
+           SET valor_dispendios = COALESCE((SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'outros_recebimentos_ext'),0.00)
+             , valor_dispendios_anterior = COALESCE((SELECT valor_credito_anterior FROM resultado_financeiro WHERE descricao = 'outros_recebimentos_ext'),0.00)
+         WHERE ordem = 21;
+    ELSE
+        UPDATE relatorio_financeiro
+           SET valor_dispendios = COALESCE((SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'valores_restituiveis'),0.00)
+             , valor_dispendios_anterior = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'valores_restituiveis'),0.00)
+         WHERE ordem = 21;
+    END IF;
     
     UPDATE relatorio_financeiro
     SET valor_ingresso = (SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
+      , valor_ingresso_anterior = (SELECT valor_inicial_anterior FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
     WHERE ordem = 24; 
     
     UPDATE relatorio_financeiro
     SET valor_dispendios = (SELECT valor FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
-        ,valor_dispendios_anterior = (SELECT valor FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
+        ,valor_dispendios_anterior = (SELECT valor_atual_anterior FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
     WHERE ordem = 24
     AND (select count(cod_lote) as lotes from contabilidade.lote where exercicio = stExercicioAnterior) > 0; 
     
@@ -794,48 +987,48 @@ END IF;
     WHERE ordem = 0;
 
 --CALCULANDO OS TOTAIS DO EXERCICIO ATUAL dos INGRESSOS E FAZENDO UPDATE NA TABELA DO RELATORIO
-    totalI  := (SELECT SUM(valor_ingresso) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
-    totalII := (SELECT SUM(valor_ingresso) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
-    totalIII:= (SELECT SUM(valor_ingresso) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(valor_ingresso) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25,26));
+    totalI  := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
+    totalII := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
+    totalIII:= (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
+    totalIV := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
 
     UPDATE relatorio_financeiro
     SET valor_ingresso = totalV
-    WHERE ordem  = 28;
+    WHERE ordem  = 27;
 
 --CALCULANDO OS TOTAIS DO EXERCICIO ANTERIOR dos INGRESSOS E FAZENDO UPDATE NA TABELA DO RELATORIO
-    totalI  := (SELECT SUM(valor_ingresso_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
-    totalII := (SELECT SUM(valor_ingresso_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
-    totalIII:= (SELECT SUM(valor_ingresso_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(valor_ingresso_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25,26));
+    totalI  := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
+    totalII := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
+    totalIII:= (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
+    totalIV := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro
     SET valor_ingresso_anterior = totalV
-    WHERE ordem  = 28;
+    WHERE ordem  = 27;
 
 --CALCULANDO OS TOTAIS DO EXERCICIO ATUAL dos DISPENDIOS E FAZENDO UPDATE NA TABELA DO RELATORIO
-    totalI  := (SELECT SUM(valor_dispendios) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
-    totalII := (SELECT SUM(valor_dispendios) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
-    totalIII:= (SELECT SUM(valor_dispendios) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(valor_dispendios) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25,26));
+    totalI  := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
+    totalII := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
+    totalIII:= (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
+    totalIV := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro
     SET valor_dispendios = totalV
-    WHERE ordem  = 28;
+    WHERE ordem  = 27;
 
 --CALCULANDO OS TOTAIS DO EXERCICIO ANTERIOR dos DISPENDIOS E FAZENDO UPDATE NA TABELA DO RELATORIO
-    totalI  := (SELECT SUM(valor_dispendios_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
-    totalII := (SELECT SUM(valor_dispendios_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
-    totalIII:= (SELECT SUM(valor_dispendios_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(valor_dispendios_anterior) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25,26));
+    totalI  := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
+    totalII := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
+    totalIII:= (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
+    totalIV := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro
     SET valor_dispendios_anterior = totalV
-    WHERE ordem  = 28;
+    WHERE ordem  = 27;
     
 --TRANTANDO COLUNAS PARA FICAR EM BRANCO
     UPDATE relatorio_financeiro
@@ -858,6 +1051,55 @@ END IF;
     ,valor_dispendios_anterior = null
     WHERE ordem in (11,17,23);
     
+--RETIRANDO O SINAL DO QUADRO DE Recebimentos Extra-Orçamentários e Pagamentos Extraorçamentários
+    UPDATE relatorio_financeiro
+    SET 
+     valor_ingresso              = (SELECT ABS(valor_ingresso)            FROM relatorio_financeiro WHERE ordem IN (18) ) 
+    ,valor_ingresso_anterior     = (SELECT ABS(valor_ingresso_anterior)   FROM relatorio_financeiro WHERE ordem IN (18) )
+    ,valor_dispendios            = (SELECT ABS(valor_dispendios)          FROM relatorio_financeiro WHERE ordem IN (18) )
+    ,valor_dispendios_anterior   = (SELECT ABS(valor_dispendios_anterior) FROM relatorio_financeiro WHERE ordem IN (18) )
+    WHERE ordem IN (18);
+
+    UPDATE relatorio_financeiro
+    SET 
+     valor_ingresso              = (SELECT ABS(valor_ingresso)            FROM relatorio_financeiro WHERE ordem IN (19) ) 
+    ,valor_ingresso_anterior     = (SELECT ABS(valor_ingresso_anterior)   FROM relatorio_financeiro WHERE ordem IN (19) )
+    ,valor_dispendios            = (SELECT ABS(valor_dispendios)          FROM relatorio_financeiro WHERE ordem IN (19) )
+    ,valor_dispendios_anterior   = (SELECT ABS(valor_dispendios_anterior) FROM relatorio_financeiro WHERE ordem IN (19) )
+    WHERE ordem IN (19);
+
+    UPDATE relatorio_financeiro
+    SET 
+     valor_ingresso              = (SELECT ABS(valor_ingresso)            FROM relatorio_financeiro WHERE ordem IN (20) ) 
+    ,valor_ingresso_anterior     = (SELECT ABS(valor_ingresso_anterior)   FROM relatorio_financeiro WHERE ordem IN (20) )
+    ,valor_dispendios            = (SELECT ABS(valor_dispendios)          FROM relatorio_financeiro WHERE ordem IN (20) )
+    ,valor_dispendios_anterior   = (SELECT ABS(valor_dispendios_anterior) FROM relatorio_financeiro WHERE ordem IN (20) )
+    WHERE ordem IN (20);
+
+    UPDATE relatorio_financeiro
+    SET 
+     valor_ingresso              = (SELECT ABS(valor_ingresso)            FROM relatorio_financeiro WHERE ordem IN (21) ) 
+    ,valor_ingresso_anterior     = (SELECT ABS(valor_ingresso_anterior)   FROM relatorio_financeiro WHERE ordem IN (21) )
+    ,valor_dispendios            = (SELECT ABS(valor_dispendios)          FROM relatorio_financeiro WHERE ordem IN (21) )
+    ,valor_dispendios_anterior   = (SELECT ABS(valor_dispendios_anterior) FROM relatorio_financeiro WHERE ordem IN (21) )
+    WHERE ordem IN (21);
+
+    --Retirar os valores do exercicio anterior já que balancete de vereificacao pega os dados do saldo inicial que nao devem ser considerados no relatorio
+    --caso nao tenha lancamento no exercicio anterior
+    SELECT COUNT(cod_lote)
+    INTO inMovimentacao
+    FROM contabilidade.lancamento
+    WHERE exercicio = (stExercicio::integer-1)::varchar;
+
+    IF (inMovimentacao = 0) THEN
+        UPDATE relatorio_financeiro
+        SET 
+        valor_ingresso_anterior     = 0.00
+        ,valor_dispendios_anterior  = 0.00
+        WHERE ordem NOT IN (1,4,5,9,10,11,15,16,17,22,23,26);
+    END IF;
+
+
 stSql :='SELECT * FROM relatorio_financeiro ORDER by ordem';
     
 FOR reRegistro IN EXECUTE stSql

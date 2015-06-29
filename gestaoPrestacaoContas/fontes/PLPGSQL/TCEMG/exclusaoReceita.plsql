@@ -31,75 +31,78 @@
     * @package URBEM
     * @subpackage 
 
-    $Id:$
+    $Id: exclusaoReceita.plsql 62756 2015-06-16 17:20:02Z franver $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_exclusao_receita(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_exclusao_receita(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
-    stDtInicial         VARCHAR := '';
-    stDtFinal           VARCHAR := '';
+    stDtInicial         ALIAS FOR $3;
+    stDtFinal           ALIAS FOR $4;
+
     stSql               VARCHAR := '';
     reRegistro          RECORD;
-
 BEGIN
 
-    stDtInicial := '01/01/' || stExercicio;
-    stDtFinal := TO_CHAR(last_day(TO_DATE(stExercicio || '-' || inMes || '-' || '01','yyyy-mm-dd')),'dd/mm/yyyy');
+    stSql := '  CREATE TEMPORARY TABLE tmp_exclusao_receita AS (
+                  SELECT * 
+                     FROM orcamento.fn_balancete_receita(  '|| quote_literal( stExercicio ) ||'
+                                                         , ''''
+                                                         , '|| quote_literal( stDtInicial ) ||'
+                                                         , '|| quote_literal( stDtFinal ) ||'
+                                                         , '|| quote_literal( stCodEntidade ) ||'
+                                                         , ''''
+                                                         , ''''
+                                                         , ''''
+                                                         , ''''
+                                                         , ''''
+                                                         , ''''
+                                                         , '''' ) 
+                           AS retorno(                      
+                                        cod_estrutural      VARCHAR ,                                           
+                                        receita             INTEGER ,                                           
+                                        recurso             VARCHAR ,                                           
+                                        descricao           VARCHAR ,                                           
+                                        valor_previsto      NUMERIC ,                                           
+                                        arrecadado_periodo  NUMERIC ,                                           
+                                        arrecadado_ano      NUMERIC ,                                           
+                                        diferenca           NUMERIC                                           
+                            )
+                ) ';
+                
+    EXECUTE stSql;
 
-    CREATE TEMPORARY TABLE tmp_retorno(
-        mes                        INTEGER,
-        contr_serv                 NUMERIC(14,2),
-        compens_reg_prev           NUMERIC(14,2),
-        fundacoes_transf_corrente   NUMERIC(14,2),
-        autarquias_transf_corrente NUMERIC(14,2),
-        empestdep_transf_corrente  NUMERIC(14,2),
-        demaisent_transf_corrente  NUMERIC(14,2),
-        fundacoes_transf_capital   NUMERIC(14,2),
-        autarquias_transf_capital  NUMERIC(14,2),
-        empestdep_transf_capital   NUMERIC(14,2),
-        demaisent_transf_capital   NUMERIC(14,2),
-        out_duplic                 NUMERIC(14,2),
-        contr_patronal             NUMERIC(14,2)
-    );
-
-    INSERT INTO tmp_retorno VALUES (  inMes
-                                    , stn.pl_saldo_contas (  stExercicio
-                                                           , stDtInicial
-                                                           , stDtFinal
-                                                           , ' plano_conta.cod_estrutural LIKE ''1.2.1.0.29%'' '
-                                                           , stCodEntidade
-                                                           , 'false'
-                                                          )
-                                    , stn.pl_saldo_contas (  stExercicio
-                                                           , stDtInicial
-                                                           , stDtFinal
-                                                           , ' plano_conta.cod_estrutural LIKE ''1.2.1.0.99.00.10%'' '
-                                                           , stCodEntidade
-                                                           , 'false'
-                                                          )
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                    , 0
-                                   );
-
-    stSql := 'SELECT * FROM tmp_retorno';                                                 
+    stSql := 'SELECT *
+                FROM (
+                        SELECT 0 AS bimestre
+                            , ( SELECT ABS(COALESCE(SUM( arrecadado_periodo ),0)) AS arrecadado_periodo
+                                  FROM tmp_exclusao_receita
+                                 WHERE cod_estrutural = ''1.2.1.0.29.00.00.00.00''
+                              ) AS contr_serv
+                            , ( SELECT ABS(COALESCE(SUM( arrecadado_periodo ),0)) AS arrecadado_periodo
+                                  FROM tmp_exclusao_receita
+                                 WHERE cod_estrutural = ''1.2.1.0.99.00.10.00.00''
+                              ) AS compens_reg_prev          
+                            , 0.00 AS out_duplic                
+                            , 0.00 AS contr_patronal
+                            , 0.00 descOutrasDuplic
+                            , 0.00 AS fundacoes_transf_corrente 
+                            , 0.00 AS autarquias_transf_corrente
+                            , 0.00 AS empestdep_transf_corrente 
+                            , 0.00 AS demaisent_transf_corrente 
+                            , 0.00 AS fundacoes_transf_capital  
+                            , 0.00 AS autarquias_transf_capital 
+                            , 0.00 AS empestdep_transf_capital  
+                            , 0.00 AS demaisent_transf_capital  
+                ) AS retorno ';                                                 
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;
     END LOOP;
 
-    DROP TABLE tmp_retorno;
+    DROP TABLE tmp_exclusao_receita;
 
     RETURN;
 

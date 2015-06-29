@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalCVC.class.php 62360 2015-04-28 19:07:29Z franver $
+    $Id: TTCEMGArquivoMensalCVC.class.php 62603 2015-05-22 17:25:16Z carlos.silva $
 
 */
 
@@ -136,17 +136,18 @@ class TTCEMGArquivoMensalCVC extends Persistente
                              ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                             AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                             
-                      LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.num_orgao
-                                               ELSE despesa.num_orgao
+                      LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.num_orgao
+                                               ELSE veiculo_uniorcam.num_orgao
                                            END AS cod_orgao
-                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.num_unidade
-                                               ELSE despesa.num_unidade
+                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.num_unidade
+                                               ELSE veiculo_uniorcam.num_unidade
                                            END AS cod_unidade
-                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.exercicio
-                                               ELSE despesa.exercicio
+                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.exercicio
+                                               ELSE veiculo_uniorcam.exercicio
+                                               
                                            END AS exercicio_locacao
                                         , veiculo_propriedade.cod_veiculo
                                         , MAX(veiculo_propriedade.timestamp) AS timestamp
@@ -372,17 +373,17 @@ class TTCEMGArquivoMensalCVC extends Persistente
                              ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                             AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                             
-                      LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.num_orgao
-                                               ELSE despesa.num_orgao
+                      LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.num_orgao
+                                               ELSE veiculo_uniorcam.num_orgao
                                            END AS cod_orgao
-                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.num_unidade
-                                               ELSE despesa.num_unidade
+                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.num_unidade
+                                               ELSE veiculo_uniorcam.num_unidade
                                            END AS cod_unidade
-                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                               THEN veiculo_uniorcam.exercicio
-                                               ELSE despesa.exercicio
+                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                               THEN despesa.exercicio
+                                               ELSE veiculo_uniorcam.exercicio
                                            END AS exercicio_locacao
                                         , veiculo_propriedade.cod_veiculo
                                         , MAX(veiculo_propriedade.timestamp) AS timestamp
@@ -477,10 +478,11 @@ class TTCEMGArquivoMensalCVC extends Persistente
             LEFT JOIN tcemg.arquivo_cvc
                    ON registro10.num_unidade = arquivo_cvc.num_unidade
                   AND registro10.num_orgao   = arquivo_cvc.num_orgao
-                  AND registro10.exercicio   = arquivo_cvc.exercicio
+                  --AND registro10.exercicio   = arquivo_cvc.exercicio
                   AND registro10.cod_veiculo = arquivo_cvc.cod_veiculo
                 WHERE arquivo_cvc.mes = TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy'),'mm')
-            
+                  AND arquivo_cvc.cod_veiculo IS NULL 
+                
              ORDER BY registro10.cod_veiculo
         ";
 
@@ -643,17 +645,18 @@ class TTCEMGArquivoMensalCVC extends Persistente
                      ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                     AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                     
-              LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                       THEN veiculo_uniorcam.num_orgao
-                                       ELSE despesa.num_orgao
+              LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                       THEN despesa.num_orgao
+                                       ELSE veiculo_uniorcam.num_orgao
                                    END AS cod_orgao
-                                , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                       THEN veiculo_uniorcam.num_unidade
-                                       ELSE despesa.num_unidade
+                                , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                       THEN despesa.num_unidade
+                                       ELSE veiculo_uniorcam.num_unidade
                                    END AS cod_unidade
-                                , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
-                                       THEN veiculo_uniorcam.exercicio
-                                       ELSE despesa.exercicio
+                                , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
+                                       THEN despesa.exercicio
+                                       ELSE veiculo_uniorcam.exercicio
+                                       
                                    END AS exercicio_locacao
                                 , veiculo_propriedade.cod_veiculo
                                 , MAX(veiculo_propriedade.timestamp) AS timestamp
@@ -668,7 +671,7 @@ class TTCEMGArquivoMensalCVC extends Persistente
                        INNER JOIN frota.terceiros
                                ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
                               AND terceiros.timestamp = veiculo_propriedade.timestamp
-                       INNER JOIN frota.veiculo_locacao
+                        LEFT JOIN frota.veiculo_locacao
                                ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
                         LEFT JOIN patrimonio.veiculo_uniorcam
                                ON veiculo.cod_veiculo = veiculo_uniorcam.cod_veiculo
@@ -712,7 +715,7 @@ class TTCEMGArquivoMensalCVC extends Persistente
                        INNER JOIN frota.terceiros
                                ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
                               AND terceiros.timestamp = veiculo_propriedade.timestamp
-                       INNER JOIN frota.veiculo_cessao
+                        LEFT JOIN frota.veiculo_cessao
                                ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
                         LEFT JOIN patrimonio.veiculo_uniorcam
                                ON veiculo.cod_veiculo = veiculo_uniorcam.cod_veiculo

@@ -42,7 +42,7 @@ $Date: 2006-09-08 07:05:52 -0300 (Sex, 08 Set 2006) $
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
       window.status = ":::::::: URBEM ::::::::";
 </script>
 <html>

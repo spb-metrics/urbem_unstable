@@ -32,7 +32,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function addCmb(){
     if (document.frm.stPeriodo.value == 't') {

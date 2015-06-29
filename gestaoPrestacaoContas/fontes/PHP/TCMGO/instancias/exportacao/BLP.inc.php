@@ -44,13 +44,15 @@ Construção
     include_once( CAM_GPC_TGO_MAPEAMENTO."TTGOBLP.class.php" );
     $obTMapeamento = new TTGOBLP();
 
-    $obTMapeamento->setDado('exercicio'  , Sessao::getExercicio() );
-    $obTMapeamento->setDado('cod_entidade',$stEntidades );
+    $obTMapeamento->setDado('exercicio'    , Sessao::getExercicio() );
+    $obTMapeamento->setDado('cod_entidade' , $stEntidades );
     $obTMapeamento->recuperaTodos( $arRecordSet[$stArquivo] );
 
     $i = 0;
+    $j = 1;
     foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
-        $arRecordSet[$stArquivo]->arElementos[$i]['numero_sequencial'] = ++$i;
+        $arRecordSet[$stArquivo]->arElementos[$i]['numero_sequencial'] = $j++;
+        $i++;
     }
 
     $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
@@ -70,7 +72,7 @@ Construção
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("saldo_exerc_seguinte");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_atual");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
@@ -79,7 +81,7 @@ Construção
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
     
     $recordSet2[$stArquivo] = new RecordSet();
-    $recordSet2[$stArquivo]->preenche(array(array('tipo_registro' => 99, 'numero_registro' => $i)));
+    $recordSet2[$stArquivo]->preenche(array(array('tipo_registro' => 99, 'numero_registro' => ++$i)));
     
     $obExportador->roUltimoArquivo->addBloco($recordSet2[$stArquivo]);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");

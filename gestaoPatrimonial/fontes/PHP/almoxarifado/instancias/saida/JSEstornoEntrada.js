@@ -22,7 +22,7 @@
     **********************************************************************************
 */
 </script>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

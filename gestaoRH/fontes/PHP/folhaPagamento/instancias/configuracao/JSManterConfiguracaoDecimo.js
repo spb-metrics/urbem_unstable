@@ -43,7 +43,7 @@ Construção.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 function buscaValor(tipoBusca){

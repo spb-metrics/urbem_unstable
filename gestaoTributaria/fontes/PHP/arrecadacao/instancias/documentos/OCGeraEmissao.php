@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: OCGeraEmissao.php 61651 2015-02-20 18:47:10Z evandro $
+    * $Id: OCGeraEmissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.11
 **/
@@ -53,7 +53,7 @@ if ($passo == 1) {
     ;
     $stHTML .= " <html> \n";
     $stHTML .= " <head> \n";
-    $stHTML .= " <script language=\"JavaScript1.2\" type=\"text/javascript\"> \n";
+    $stHTML .= " <script type=\"text/javascript\"> \n";
     $stHTML .= "     function executa() { \n";
     $stHTML .= "         var mensagem = \"\"; \n";
     $stHTML .= "         var erro = false; \n";

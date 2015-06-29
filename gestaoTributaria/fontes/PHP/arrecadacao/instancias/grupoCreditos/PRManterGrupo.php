@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Texeira Stephanou
 
-    * $Id: PRManterGrupo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterGrupo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-05.03.02
 */
@@ -71,7 +71,7 @@ include_once( $pgJs );
 function alertaAvisoCalendario($stPagina,$stMensagem,$stVariavel)
 {
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
             window.open("'.$stPagina.'?stMsg='.$stMensagem.'&'.Sessao::getId().'","_blank","toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=350, height=200, top=200 , left=350");
            </script>';
 }

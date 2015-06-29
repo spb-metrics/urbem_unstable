@@ -48,7 +48,7 @@ switch ($ctrl) {
 case 0:
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function isNumber(fld, e)
     {
         var key = '';
@@ -237,7 +237,7 @@ if (isset($codMarca)) {
 case 1:
 ?>
 <!-------------------------------------------------------------------------------->
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function Insere(codVeiculo)
 {
     var iCodVeiculo;

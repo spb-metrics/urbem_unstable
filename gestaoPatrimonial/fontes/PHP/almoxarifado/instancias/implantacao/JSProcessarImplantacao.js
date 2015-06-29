@@ -34,7 +34,7 @@
 
     * @ignore
     
-    $Id: JSProcessarImplantacao.js 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JSProcessarImplantacao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 // Casos de uso: uc-03.03.16
     
@@ -43,7 +43,7 @@
 
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 
 function excluiItem(stControle, inId, sincrono ){
     param = '&inId='+inId;

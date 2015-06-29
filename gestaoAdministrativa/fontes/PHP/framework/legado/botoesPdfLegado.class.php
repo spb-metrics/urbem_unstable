@@ -42,7 +42,7 @@ class botoesPdfLegado
     public function NEW_imprimeBotoes($sScriptXML="", $sSQL="", $sTitulo="", $sSubTitulo="", $sParametros="")
     {
         print '
-        <script language="javascript">
+        <script type="text/javascript">
             function MostraImpressao(sessao)
             {
                 var inWinWid = screen.width;
@@ -77,7 +77,7 @@ class botoesPdfLegado
         <input type="hidden" name="sSubTitulo" value="'.$sSubTitulo.'">
         <input type="hidden" name="sParametros" value="'.$sParametros.'">
         </form>
-        <script language="javascript">
+        <script type="text/javascript">
             ImprimirPDF("'.Sessao::getId().'");
         </script>
         ';
@@ -85,7 +85,7 @@ class botoesPdfLegado
     public function imprimeBotoes($sScriptXML="", $sSQL="", $sTitulo="", $sSubTitulo="", $sParametros="")
     {
         print '
-        <script language="javascript">
+        <script type="text/javascript">
             function Salvar()
             {
                 document.frmPDF.action   = "../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/pdf/relatorioPdfLegado.php?'.Sessao::getId().'&btn=1" + HojeAgora();
@@ -137,7 +137,7 @@ class botoesPdfLegado
         $codMasSetor        = $_REQUEST['codMasSetor'];
 
         print '
-        <script language="javascript">
+        <script type="text/javascript">
             function Salvar()
             {
                 document.frmPDF.action =

@@ -37,7 +37,7 @@
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
     function preencheProxCombo(inPosicao){
         document.frm.stCtrl.value = 'preencheProxCombo';

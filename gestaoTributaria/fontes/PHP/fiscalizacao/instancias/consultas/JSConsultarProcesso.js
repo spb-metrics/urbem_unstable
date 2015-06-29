@@ -39,7 +39,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Voltar(){
     document.frm.target = 'telaPrincipal';

@@ -46,7 +46,7 @@ include_once (CAM_FW_LEGADO."funcoesLegado.lib.php");
 setAjuda('uc-01.02.93')
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";

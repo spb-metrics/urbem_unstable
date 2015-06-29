@@ -31,107 +31,164 @@
     * @package URBEM
     * @subpackage 
 
-    $Id:$
+    $Id: $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_disp_financeiras(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_disp_financeiras(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
-    stDtInicial         VARCHAR := '';
-    stDtFinal           VARCHAR := '';
+    stDtInicial         ALIAS FOR $3;
+    stDtFinal           ALIAS FOR $4;
+    
+    inEntidadeRPPS      INTEGER;
     stSql               VARCHAR := '';
     reRegistro          RECORD;
-
 BEGIN
-
-    stDtInicial := '01/01/' || stExercicio;
-    stDtFinal := TO_CHAR(last_day(TO_DATE(stExercicio || '-' || inMes || '-' || '01','yyyy-mm-dd')),'dd/mm/yyyy');
-
-    --Pega os valores "normais"
-    CREATE TEMPORARY TABLE tmp_retorno AS
-        SELECT inMes AS mes
-             , caixa
-             , conta_movimento
-             , contas_vinculadas
-             , aplicacoes_financeiras
-             , (depositos 
-                + 
-                rpp_exercicio
-                +
-                rpp_exercicios_anteriores
-                +
-                outras_obrigacoes_financeiras) AS compromissado
-             , 0.00 AS caixa_rpps
-             , 0.00 AS conta_movimento_rpps
-             , 0.00 AS contas_vinculadas_rpps
-             , 0.00 AS aplicacoes_financeiras_rpps
-             , 0.00 AS compromissado_rpps
-          FROM tcemg.fn_rgf_anexo5_geral_disp_finan ( stExercicio , stDtInicial, stDtFinal, stCodEntidade, 'false') as
-          (     caixa                                 NUMERIC
-              , conta_movimento                       NUMERIC
-              , contas_vinculadas                     NUMERIC
-              , aplicacoes_financeiras                NUMERIC
-              , outras_disponibilidades_financeiras   NUMERIC
-              , depositos                             NUMERIC
-              , rpp_exercicio                         NUMERIC
-              , rpp_exercicios_anteriores             NUMERIC
-              , outras_obrigacoes_financeiras         NUMERIC
-              , restos_nao_processados                NUMERIC
-          );
-
-
-    stSql := '
-    SELECT caixa
-         , conta_movimento
-         , contas_vinculadas
-         , aplicacoes_financeiras
-         , outras_disponibilidades_financeiras
-         , depositos
-         , rpp_exercicio
-         , rpp_exercicios_anteriores
-         , outras_obrigacoes_financeiras
-         , restos_nao_processados
-      FROM tcemg.fn_rgf_anexo5_geral_disp_finan ( ''' || stExercicio || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''', ''' || stCodEntidade || ''', ''true'') as
-      (     caixa                                 NUMERIC
-          , conta_movimento                       NUMERIC
-          , contas_vinculadas                     NUMERIC
-          , aplicacoes_financeiras                NUMERIC
-          , outras_disponibilidades_financeiras   NUMERIC
-          , depositos                             NUMERIC
-          , rpp_exercicio                         NUMERIC
-          , rpp_exercicios_anteriores             NUMERIC
-          , outras_obrigacoes_financeiras         NUMERIC
-          , restos_nao_processados                NUMERIC
-      )';
-
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        UPDATE tmp_retorno SET caixa_rpps = reRegistro.caixa
-             , conta_movimento_rpps = reRegistro.conta_movimento
-             , contas_vinculadas_rpps = reRegistro.contas_vinculadas
-             , aplicacoes_financeiras_rpps = reRegistro.aplicacoes_financeiras
-             , compromissado_rpps = (reRegistro.depositos 
-                                     + 
-                                     reRegistro.rpp_exercicio
-                                     +
-                                     reRegistro.rpp_exercicios_anteriores
-                                     +
-                                     reRegistro.outras_obrigacoes_financeiras); 
-
-    END LOOP;
     
-    stSql := 'SELECT * FROM tmp_retorno';                                                 
+    SELECT valor 
+    INTO inEntidadeRPPS 
+    FROM administracao.configuracao 
+    WHERE parametro = 'cod_entidade_rpps' 
+    AND cod_modulo = 8 
+    AND exercicio = stExercicio;
+
+    --Remove a entidade RPPS se foi selecionada no filtro
+    IF ( length(stCodEntidade) > 1 ) THEN
+        stCodEntidade := REGEXP_REPLACE(stCodEntidade,','||inEntidadeRPPS||'|'||inEntidadeRPPS||',','');
+    END IF;
+
+    --Cria tabela com os valores da entidade RPPS
+    CREATE TEMPORARY TABLE tmp_balanco_entidade_rpps AS
+        SELECT * 
+        FROM contabilidade.fn_rl_balancete_verificacao( stExercicio
+                                                        , 'cod_entidade IN  ('||inEntidadeRPPS||') '
+                                                        , stDtInicial
+                                                        , stDtFinal
+                                                        , 'A'::CHAR)
+        as retorno
+                ( cod_estrutural            varchar                                                    
+                    ,nivel                  integer                                                               
+                    ,nom_conta              varchar                                                           
+                    ,cod_sistema            integer                                                         
+                    ,indicador_superavit    char(12)                                                    
+                    ,vl_saldo_anterior      numeric                                                   
+                    ,vl_saldo_debitos       numeric                                                   
+                    ,vl_saldo_creditos      numeric                                                   
+                    ,vl_saldo_atual         numeric                                                   
+                );
+
+    --Cria tabela com os valores da entidade RPPS
+    CREATE TEMPORARY TABLE tmp_balanco_outras_entidade AS
+        SELECT * 
+        FROM contabilidade.fn_rl_balancete_verificacao( stExercicio
+                                                        , 'cod_entidade IN  ('||stCodEntidade||') '
+                                                        , stDtInicial
+                                                        , stDtFinal
+                                                        , 'A'::CHAR)
+        as retorno
+                ( cod_estrutural            varchar                                                    
+                    ,nivel                  integer                                                               
+                    ,nom_conta              varchar                                                           
+                    ,cod_sistema            integer                                                         
+                    ,indicador_superavit    char(12)                                                    
+                    ,vl_saldo_anterior      numeric                                                   
+                    ,vl_saldo_debitos       numeric                                                   
+                    ,vl_saldo_creditos      numeric                                                   
+                    ,vl_saldo_atual         numeric                                                   
+                );                                                
+    
+    stSql := '  SELECT   
+                (SELECT vl_saldo_atual
+                        FROM tmp_balanco_outras_entidade
+                        WHERE cod_estrutural like ''1.1.1.1.1.00.00.00.00.00%''
+                ) as caixa
+                
+                ,(SELECT vl_saldo_atual
+                        FROM tmp_balanco_outras_entidade
+                        WHERE cod_estrutural like ''1.1.1.1.1.19.01.00.00.00%''
+                ) as conta_movimento
+
+                ,(SELECT vl_saldo_atual
+                        FROM tmp_balanco_outras_entidade
+                        WHERE cod_estrutural like ''1.1.1.1.1.19.02.00.00.00%''
+                ) as contas_vinculadas
+
+                ,(SELECT SUM(vl_saldo_atual) as vl_saldo_atual
+                        FROM tmp_balanco_outras_entidade
+                        WHERE cod_estrutural like ''1.1.1.1.1.50.00.00.00.00%''
+                        OR cod_estrutural like ''1.1.4%''
+                ) as aplicacoes_financeiras                
+
+                ,(  SELECT ABS(COALESCE(SUM(consignacoes),0.00))
+                    FROM stn.pl_recurso_descricao('''||stExercicio||''','''||stDtInicial||''','''||stDtFinal||''','' '','''||stCodEntidade||''',''false'') AS
+                    ( tipo_recurso                  char(1)
+                     , cod_recurso                  integer
+                     , exercicio                    varchar
+                     , nom_recurso                  varchar
+                     , positivo                     numeric
+                     , negativo                     numeric
+                     , saldo                        numeric
+                     , a_pagar_exercicio            numeric
+                     , a_pagar_exercicio_anteriores numeric
+                     , valor_consignacao_positivo   numeric
+                     , valor_consignacao_negativo   numeric
+                     , consignacoes                 numeric
+                     , caixa                        numeric       
+                    )
+                ) as compromissado
+
+                ,(SELECT vl_saldo_atual
+                        FROM tmp_balanco_entidade_rpps
+                        WHERE cod_estrutural like ''1.1.1.1.1.00.00.00.00.00%''
+                ) as caixa_rpps
+                
+                ,(SELECT SUM(vl_saldo_atual) as vl_saldo_atual
+                        FROM tmp_balanco_entidade_rpps
+                        WHERE cod_estrutural like ''1.1.1.1.1.06%''
+                ) as contas_movimento_rpps
+
+                ,(SELECT SUM(vl_saldo_atual) as vl_saldo_atual
+                        FROM tmp_balanco_entidade_rpps
+                        WHERE cod_estrutural like ''1.1.1.1.1.06%''
+                ) as contas_vinculadas_rpps
+
+                ,(SELECT SUM(vl_saldo_atual) as vl_saldo_atual
+                        FROM tmp_balanco_entidade_rpps
+                        WHERE cod_estrutural like ''1.1.1.1.1.50.00.00.00.00%''
+                        OR cod_estrutural like ''1.1.4%''
+                ) as aplicacoes_financeiras_rpps
+
+                ,(SELECT ABS(SUM(consignacoes))
+                    FROM stn.pl_recurso_descricao('''||stExercicio||''','''||stDtFinal||''','''||stDtInicial||''','' '','''||stCodEntidade||''',''true'') AS
+                    ( tipo_recurso                  char(1)
+                     , cod_recurso                  integer
+                     , exercicio                    varchar
+                     , nom_recurso                  varchar
+                     , positivo                     numeric
+                     , negativo                     numeric
+                     , saldo                        numeric
+                     , a_pagar_exercicio            numeric
+                     , a_pagar_exercicio_anteriores numeric
+                     , valor_consignacao_positivo   numeric
+                     , valor_consignacao_negativo   numeric
+                     , consignacoes                 numeric
+                     , caixa                        numeric       
+                    )
+                ) as compromissado_rpps
+
+            ';                                                 
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;
     END LOOP;
 
-    DROP TABLE tmp_retorno;
+    DROP TABLE tmp_balanco_entidade_rpps;
+    DROP TABLE tmp_balanco_outras_entidade;
 
     RETURN;
 
 END;
 $$ LANGUAGE 'plpgsql';                                                                  
+

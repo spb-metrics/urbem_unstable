@@ -59,7 +59,7 @@ Formulário de inclusão de fornecedores
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 

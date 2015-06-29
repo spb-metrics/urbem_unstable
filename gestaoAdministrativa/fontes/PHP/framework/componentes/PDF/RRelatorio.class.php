@@ -126,7 +126,7 @@ function executaFrameOculto($stArquivo)
 {
     $stHTML  = " <html> \n";
     $stHTML .= " <head> \n";
-    $stHTML .= " <script language=\"JavaScript1.2\" type=\"text/javascript\"> \n";
+    $stHTML .= " <script type=\"text/javascript\"> \n";
     $stHTML .= "     function executa() { \n";
     $stHTML .= "         var mensagem = \"\"; \n";
     $stHTML .= "         var erro = false; \n";

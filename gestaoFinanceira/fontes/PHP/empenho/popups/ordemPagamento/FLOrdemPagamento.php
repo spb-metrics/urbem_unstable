@@ -60,6 +60,10 @@ $pgJS   = "JS".$stPrograma.".js";
 
 //include( $pgJS );
 
+if ( empty( $_REQUEST['stAcao'] ) ) {
+    $_REQUEST['stAcao'] = "incluir";
+}
+
 $obRTesourariaBoletim = new RTesourariaBoletim();
 $obRTesourariaBoletim->setExercicio( Sessao::getExercicio() );
 $obRTesourariaBoletim->setDataBoletim( date( 'd/m/'.Sessao::getExercicio() ) );
@@ -110,6 +114,13 @@ $obHdnCampoNom = new Hidden;
 $obHdnCampoNom->setName( "campoNom" );
 $obHdnCampoNom->setValue( $campoNom );
 
+//Definne Hidden para buscar OP de contas com mesmo Recurso/Fonte
+if ( $_REQUEST['inCodPlano'] ) {
+    $obHdnCodPlano = new Hidden;
+    $obHdnCodPlano->setName( "hdnCodPlano" );
+    $obHdnCodPlano->setValue( $_REQUEST['inCodPlano'] );    
+}
+
 //Define HIDDEN para a entidade
 $obHdnCodEntidade = new Hidden;
 $obHdnCodEntidade->setName( "inCodEntidade" );
@@ -146,6 +157,8 @@ $obFormulario->addHidden( $obHdnTipoBusca );
 $obFormulario->addHidden( $obHdnCampoNum );
 $obFormulario->addHidden( $obHdnCampoNom );
 $obFormulario->addHidden( $obHdnCodEntidade );
+if ( $_REQUEST['inCodPlano'] ) 
+    $obFormulario->addHidden( $obHdnCodPlano );
 $obFormulario->addTitulo( "Dados para Ordem de Pagamento" );
 $obFormulario->addComponente( $obTxtExercicio );
 $obFormulario->addComponente( $obTxtOrdemPagamento );

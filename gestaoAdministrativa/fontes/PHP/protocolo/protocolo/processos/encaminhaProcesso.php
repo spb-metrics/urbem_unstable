@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: encaminhaProcesso.php 62135 2015-03-31 13:10:20Z michel $
+    $Id: encaminhaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -70,7 +70,7 @@ $pagina = $_REQUEST["pagina"];
 if (isset($pagina)) {
     Sessao::write('pagina',$pagina);
 }?>
-<script language="javascript">
+<script type="text/javascript">
     function zebra(id, classe)
     {
        var tabela = document.getElementById(id);
@@ -84,7 +84,7 @@ if (isset($pagina)) {
 switch ($controle) {
 case 0:
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Salvar()
     {
         document.frm.action = "encaminhaProcesso.php?<?=Sessao::getId()?>&controle=1";

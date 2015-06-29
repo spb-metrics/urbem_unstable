@@ -38,25 +38,39 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGExecucaoVariacao.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGExecucaoVariacao.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
     $obTTCEMGConsideracaoExecucaoVariacao = new TTCEMGExecucaoVariacao();
-    $obTTCEMGConsideracaoExecucaoVariacao->setDado('cod_mes'   , $arFiltros['inPeriodo']);
-    $obTTCEMGConsideracaoExecucaoVariacao->setDado('exercicio'   , Sessao::getExercicio());
-    $obTTCEMGConsideracaoExecucaoVariacao->recuperaDadosArquivo($rsArquivo);
-
+    $obTTCEMGConsideracaoExecucaoVariacao->setDado('exercicio', Sessao::getExercicio());
+    $obTTCEMGConsideracaoExecucaoVariacao->setDado('cod_mes', 12);
+    $obTTCEMGConsideracaoExecucaoVariacao->recuperaDadosBimestre($rsArquivo);
+    
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cons_adm_dir');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+            
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cons_aut');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+        
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cons_fund');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cons_empe_est_dep');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+        
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cons_dem_ent');
-
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+    
 ?>

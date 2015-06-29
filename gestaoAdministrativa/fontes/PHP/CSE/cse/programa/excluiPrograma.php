@@ -60,8 +60,8 @@ if (!isset($controle)) {
 }
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -197,12 +197,12 @@ case 1:
         $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $objeto);
         $audicao->insereAuditoria();
         //Exibe mensagem e retorna para a página padrão
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                 alertaAviso("'.$codPrograma.'","excluir","aviso","'.$sessao->id.'");
                 window.location = "excluiPrograma.php?'.$sessao->id.'&pagina='.$pagina.'";
                 </script>';
         } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                 alertaAviso("'.$codPrograma.'","n_excluir","erro","'.$sessao->id.'");
                 window.location = "excluiPrograma.php?'.$sessao->id.'&pagina='.$pagina.'";
                 </script>';
@@ -215,7 +215,7 @@ case 1:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

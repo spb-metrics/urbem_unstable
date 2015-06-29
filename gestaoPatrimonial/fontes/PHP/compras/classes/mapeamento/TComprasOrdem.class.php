@@ -33,29 +33,19 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TComprasOrdem.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TComprasOrdem.class.php 62703 2015-06-10 13:29:57Z michel $
     *
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-/**
-  * Efetua conexão com a tabela  compras.ordem
-  * Data de Criação: 30/06/2006
-
-  * @author Analista: Diego Victoria
-  * @author Desenvolvedor: Leandro André Zis
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TComprasOrdem extends Persistente
 {
     /**
     * Método Construtor
     * @access Private
-*/
+    */
     public function TComprasOrdem()
     {
         parent::Persistente();
@@ -71,6 +61,7 @@ class TComprasOrdem extends Persistente
         $this->AddCampo('cod_empenho'       ,'integer'  ,true, ''     ,false, true  );
         $this->AddCampo('observacao'        ,'char'     ,true, '200'  ,false, false );
         $this->AddCampo('tipo'              ,'char'     ,true, '1'    ,true , true  );
+        $this->AddCampo('numcgm_entrega'    ,'integer'  ,false, ''    ,false, true  );
     }
 
     public function recuperaFornecedorOrdemCompra(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
@@ -217,6 +208,10 @@ class TComprasOrdem extends Persistente
             SELECT
                empenho.cod_empenho
              , pre_empenho.cod_pre_empenho
+             , CASE WHEN item_pre_empenho.cod_item IS NOT NULL
+                    THEN item_pre_empenho.cod_item 
+                    ELSE item_pre_empenho_julgamento.cod_item
+               END AS cod_item
              , item_pre_empenho.num_item
              , item_pre_empenho.nom_item
              , item_pre_empenho.quantidade
@@ -224,22 +219,17 @@ class TComprasOrdem extends Persistente
              , ( item_pre_empenho.quantidade - COALESCE(ordem.quantidade,0) ) AS oc_saldo
              , COALESCE(ordem.quantidade,0) AS oc_quantidade_atendido
              , COALESCE(ordem.vl_total,0) AS oc_vl_atendido
-             --, ROUND( (item_pre_empenho.vl_total - SUM(COALESCE(empenho_anulado_item.vl_anulado,0)) - (SUM(COALESCE(nota_liquidacao_item.vl_total,0)) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado,0)))) / item_pre_empenho.quantidade,2 ) as vl_unitario
-         , ROUND(item_pre_empenho.vl_total / item_pre_empenho.quantidade,2) AS vl_unitario
+             , ROUND(item_pre_empenho.vl_total / item_pre_empenho.quantidade,2) AS vl_unitario
              , ( ROUND( (item_pre_empenho.vl_total - SUM(COALESCE(empenho_anulado_item.vl_anulado,0)) - SUM(COALESCE(nota_liquidacao_item.vl_total,0)) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado,0)))  / item_pre_empenho.quantidade,2 ) * ( item_pre_empenho.quantidade - COALESCE(ordem.quantidade,0) ) ) AS oc_vl_total
-/*
-                    empenho.cod_empenho
-                 ,  pre_empenho.cod_pre_empenho
-                 ,  item_pre_empenho.num_item
-                 ,  item_pre_empenho.nom_item
-                 ,  item_pre_empenho.quantidade
-                 ,  item_pre_empenho.exercicio
-                 ,  COALESCE(ordem.quantidade,0) AS oc_quantidade_atendido
-                 ,  COALESCE(ordem.vl_total,0) AS oc_vl_atendido
-                 ,  ( item_pre_empenho.quantidade - COALESCE(ordem.quantidade,0) ) AS oc_saldo
-                 ,  ROUND( (item_pre_empenho.vl_total - SUM(COALESCE(empenho_anulado_item.vl_anulado,0))) - SUM(COALESCE(nota_liquidacao_item.vl_total,0)) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado,0)))  / item_pre_empenho.quantidade,2 ) as vl_unitario
-                 ,  (ROUND( (item_pre_empenho.vl_total - SUM(COALESCE(empenho_anulado_item.vl_anulado,0)) - SUM(COALESCE(nota_liquidacao_item.vl_total,0)) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado,0))) ) / item_pre_empenho.quantidade,2 ) * ( item_pre_empenho.quantidade - COALESCE(ordem.quantidade,0) ) ) AS oc_vl_total
-*/
+             , CASE WHEN item_pre_empenho_julgamento.cod_item IS NULL AND ordem.cod_item IS NULL THEN TRUE
+                    ELSE FALSE
+               END AS bo_centro_marca
+             , ordem.cod_item AS cod_item_ordem
+             , ordem.cod_marca AS cod_marca_ordem
+             , ordem.cod_centro AS cod_centro_ordem
+             , centro_custo.descricao AS nom_centro_ordem
+             , marca.descricao AS nom_marca_ordem
+
               FROM  empenho.empenho
 
         INNER JOIN  empenho.pre_empenho
@@ -250,10 +240,14 @@ class TComprasOrdem extends Persistente
                 ON  item_pre_empenho.exercicio = pre_empenho.exercicio
                AND  item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
-        INNER JOIN  empenho.item_pre_empenho_julgamento
+         LEFT JOIN  empenho.item_pre_empenho_julgamento
                 ON  item_pre_empenho_julgamento.exercicio = item_pre_empenho.exercicio
                AND  item_pre_empenho_julgamento.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                AND  item_pre_empenho_julgamento.num_item = item_pre_empenho.num_item
+               
+         LEFT JOIN  almoxarifado.catalogo_item
+                ON  item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item 
+                OR  ( item_pre_empenho.cod_item = catalogo_item.cod_item AND item_pre_empenho_julgamento.cod_item IS NULL)
 
          LEFT JOIN  empenho.empenho_anulado_item
                 ON  empenho_anulado_item.exercicio = item_pre_empenho.exercicio
@@ -273,45 +267,56 @@ class TComprasOrdem extends Persistente
                AND  nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
                AND  nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
 
-        LEFT JOIN  (	SELECT 	SUM( ordem_item.quantidade - COALESCE(ordem_item_anulacao.quantidade,0) ) AS quantidade
-                            ,	SUM( ordem_item.vl_total - COALESCE(ordem_item_anulacao.vl_total,0) ) AS vl_total
+         LEFT JOIN  (  SELECT  SUM( ordem_item.quantidade - COALESCE(ordem_item_anulacao.quantidade,0) ) AS quantidade
+                            ,  SUM( ordem_item.vl_total - COALESCE(ordem_item_anulacao.vl_total,0) ) AS vl_total
                             ,  ordem.exercicio_empenho
                             ,  ordem.cod_empenho
+                            ,  ordem.cod_entidade
                             ,  ordem_item.num_item
-                        FROM  compras.ordem
-                    INNER JOIN  compras.ordem_item
-                            ON  ordem_item.exercicio = ordem.exercicio
-                        AND  ordem_item.cod_entidade = ordem.cod_entidade
-                        AND  ordem_item.cod_ordem = ordem.cod_ordem
-                        AND  ordem_item.tipo = ordem.tipo
-                        AND  ordem.tipo = '".$this->getDado('tipo')."'
+                            ,  ordem_item.cod_item
+                            ,  ordem_item.cod_marca
+                            ,  ordem_item.cod_centro
+                         FROM  compras.ordem
+                   INNER JOIN  compras.ordem_item
+                           ON  ordem_item.exercicio = ordem.exercicio
+                          AND  ordem_item.cod_entidade = ordem.cod_entidade
+                          AND  ordem_item.cod_ordem = ordem.cod_ordem
+                          AND  ordem_item.tipo = ordem.tipo
+                          AND  ordem.tipo = '".$this->getDado('tipo')."'
                     LEFT JOIN  compras.ordem_item_anulacao
-                            ON  ordem_item_anulacao.exercicio = ordem_item.exercicio
-                        AND  ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
-                        AND  ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
-                        AND  ordem_item_anulacao.num_item = ordem_item.num_item
-                        AND  ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
-                        AND  ordem_item_anulacao.tipo = ordem_item.tipo
+                           ON  ordem_item_anulacao.exercicio = ordem_item.exercicio
+                          AND  ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
+                          AND  ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
+                          AND  ordem_item_anulacao.num_item = ordem_item.num_item
+                          AND  ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
+                          AND  ordem_item_anulacao.tipo = ordem_item.tipo
                         WHERE  NOT EXISTS 	(	SELECT 	1
                                                 FROM  compras.ordem_anulacao
                                                 WHERE  ordem_anulacao.exercicio = ordem.exercicio
                                                 AND  ordem_anulacao.cod_entidade = ordem.cod_entidade
                                                 AND  ordem_anulacao.cod_ordem = ordem.cod_ordem
                                                 AND  ordem_anulacao.tipo = ordem.tipo
-                                                AND  ordem.tipo = '".$this->getDado('tipo')."'
                                             )
-                    GROUP BY 	ordem.exercicio_empenho, ordem.cod_empenho, ordem_item.num_item
-
+                     GROUP BY  ordem.exercicio_empenho, ordem.cod_empenho, ordem.cod_entidade, ordem_item.num_item, ordem_item.cod_item, ordem_item.cod_marca, ordem_item.cod_centro 
                             ) AS ordem
                 ON  ordem.exercicio_empenho = empenho.exercicio
                AND  ordem.cod_empenho = empenho.cod_empenho
+               AND  ordem.cod_entidade = empenho.cod_entidade
                AND  ordem.num_item = item_pre_empenho.num_item
+
+         LEFT JOIN  almoxarifado.marca
+                ON  marca.cod_marca = ordem.cod_marca
+
+         LEFT JOIN  almoxarifado.centro_custo
+                ON  centro_custo.cod_centro = ordem.cod_centro
+
              WHERE  empenho.cod_empenho = ".$this->getDado('cod_empenho')."
                AND  empenho.exercicio = '".$this->getDado('exercicio')."'
                AND  empenho.cod_entidade = ".$this->getDado('cod_entidade')."
                AND  (item_pre_empenho.quantidade - COALESCE(ordem.quantidade,0)) > 0
                AND  (item_pre_empenho.vl_total - (COALESCE(nota_liquidacao_item.vl_total,0) - COALESCE(nota_liquidacao_item_anulado.vl_anulado,0)) > 0)
                AND  (ROUND( ( item_pre_empenho.vl_total - COALESCE(empenho_anulado_item.vl_anulado,0 ) ) / item_pre_empenho.quantidade,2 ) > 0)
+               AND  ( catalogo_item.cod_tipo".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." OR catalogo_item.cod_tipo IS NULL )
 --		       AND  NOT EXISTS 	( 	SELECT 	1
 --		       						  FROM  empenho.empenho_anulado
 --    	       						 WHERE  empenho_anulado.exercicio = empenho.exercicio
@@ -322,6 +327,8 @@ class TComprasOrdem extends Persistente
             GROUP BY
                empenho.cod_empenho
              , pre_empenho.cod_pre_empenho
+             , item_pre_empenho.cod_item
+             , item_pre_empenho_julgamento.cod_item
              , item_pre_empenho.num_item
              , item_pre_empenho.nom_item
              , item_pre_empenho.quantidade
@@ -329,6 +336,11 @@ class TComprasOrdem extends Persistente
              , item_pre_empenho.vl_total
              , ordem.quantidade
              , ordem.vl_total
+             , ordem.cod_item
+             , ordem.cod_marca
+             , ordem.cod_centro
+             , centro_custo.descricao
+             , marca.descricao
         ";
 
         return $stSql;
@@ -345,9 +357,9 @@ class TComprasOrdem extends Persistente
             SELECT 	item_pre_empenho.num_item
                  ,  item_pre_empenho.cod_pre_empenho
                  ,	item_pre_empenho.exercicio
-                 ,  CASE WHEN ( julgada.descricao is null )
+                 ,  CASE WHEN ( catalogo_item.descricao is null )
                          THEN empenho_diverso.descricao
-                         ELSE julgada.descricao
+                         ELSE catalogo_item.descricao
                     END AS descricao
                  ,  CASE WHEN ( julgada.nom_unidade is null )
                          THEN empenho_diverso.nom_unidade
@@ -358,9 +370,18 @@ class TComprasOrdem extends Persistente
                          ELSE julgada.nom_grandeza
                     END AS nom_grandeza
                  ,  CASE WHEN ( julgada.cod_item is null )
-                        THEN null
-                        ELSE julgada.cod_item
+                         THEN item_pre_empenho.cod_item
+                         ELSE julgada.cod_item
                     END AS cod_item
+                 ,  CASE WHEN julgada.cod_item IS NOT NULL THEN FALSE
+                         WHEN ordem_item.cod_centro IS NULL AND ordem_item.cod_marca IS NULL THEN TRUE
+                         ELSE FALSE
+                    END AS bo_centro_marca
+                 ,  ordem_item.cod_item AS cod_item_ordem
+                 ,  ordem_item.cod_marca AS cod_marca_ordem
+                 ,  ordem_item.cod_centro AS cod_centro_ordem
+                 ,  centro_custo.descricao AS nom_centro_ordem
+                 ,  marca.descricao AS nom_marca_ordem
               FROM  empenho.pre_empenho
         INNER JOIN  empenho.item_pre_empenho
                 ON  item_pre_empenho.exercicio = pre_empenho.exercicio
@@ -386,6 +407,7 @@ class TComprasOrdem extends Persistente
                AND  julgada.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                AND  julgada.num_item = item_pre_empenho.num_item
                AND  julgada.cgm_fornecedor = pre_empenho.cgm_beneficiario
+
          LEFT JOIN  (	SELECT 	item_pre_empenho.exercicio
                              ,  item_pre_empenho.cod_pre_empenho
                              ,  item_pre_empenho.num_item
@@ -402,6 +424,57 @@ class TComprasOrdem extends Persistente
                 ON  empenho_diverso.exercicio = item_pre_empenho.exercicio
                AND  empenho_diverso.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                AND  empenho_diverso.num_item = item_pre_empenho.num_item
+
+        INNER JOIN  empenho.empenho
+                ON  pre_empenho.exercicio = empenho.exercicio
+               AND  pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+
+         LEFT JOIN  ( SELECT ordem_item.cod_item
+                           , ordem_item.cod_marca
+                           , ordem_item.cod_centro
+                           , ordem_item.cod_entidade
+                           , ordem_item.num_item
+                           , ordem.cod_empenho
+                           , ordem.exercicio_empenho
+                        FROM compras.ordem
+                  INNER JOIN compras.ordem_item
+                          ON ordem_item.exercicio = ordem.exercicio
+                         AND ordem_item.cod_entidade = ordem.cod_entidade
+                         AND ordem_item.cod_ordem = ordem.cod_ordem
+                         AND ordem_item.tipo = ordem.tipo
+                   LEFT JOIN compras.ordem_item_anulacao
+                          ON ordem_item_anulacao.exercicio = ordem_item.exercicio
+                         AND ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
+                         AND ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
+                         AND ordem_item_anulacao.exercicio_pre_empenho = ordem_item.exercicio_pre_empenho
+                         AND ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
+                         AND ordem_item_anulacao.num_item = ordem_item.num_item
+                         AND ordem_item_anulacao.tipo = ordem_item.tipo
+                       WHERE ordem_item_anulacao.num_item IS NULL
+                    GROUP BY ordem_item.cod_item
+                           , ordem_item.cod_marca
+                           , ordem_item.cod_centro
+                           , ordem_item.cod_entidade
+                           , ordem_item.num_item
+                           , ordem.cod_empenho
+                           , ordem.exercicio_empenho
+                 )  AS ordem_item
+                ON  ordem_item.cod_empenho = empenho.cod_empenho
+               AND  ordem_item.exercicio_empenho = empenho.exercicio
+               AND  ordem_item.cod_entidade = empenho.cod_entidade
+               AND  ordem_item.num_item = item_pre_empenho.num_item
+               
+         LEFT JOIN  almoxarifado.catalogo_item
+                ON  catalogo_item.cod_item = julgada.cod_item
+                OR  (catalogo_item.cod_item = item_pre_empenho.cod_item AND julgada.cod_item IS NULL)   
+                OR  (catalogo_item.cod_item = ordem_item.cod_item AND item_pre_empenho.cod_item IS NULL AND julgada.cod_item IS NULL)
+
+         LEFT JOIN  almoxarifado.marca
+                ON  marca.cod_marca = ordem_item.cod_marca
+
+         LEFT JOIN  almoxarifado.centro_custo
+                ON  centro_custo.cod_centro = ordem_item.cod_centro
+
              WHERE  pre_empenho.exercicio = '".$this->getDado('exercicio')."'
                AND  pre_empenho.cod_pre_empenho = ".$this->getDado('cod_pre_empenho')."
                AND  item_pre_empenho.num_item = ".$this->getDado('num_item')."
@@ -421,6 +494,12 @@ class TComprasOrdem extends Persistente
         SELECT ordem.cod_ordem
              , item_pre_empenho.num_item
              , item_pre_empenho.nom_item
+             , CASE WHEN ordem_item.cod_item IS NOT NULL
+                    THEN ordem_item.cod_item 
+                    WHEN item_pre_empenho.cod_item IS NOT NULL
+                    THEN item_pre_empenho.cod_item
+                    ELSE julgamento.cod_item
+               END AS cod_item
              , item_pre_empenho.cod_pre_empenho
              , item_pre_empenho.exercicio
              , item_pre_empenho.quantidade AS qtde_empenhada
@@ -430,13 +509,26 @@ class TComprasOrdem extends Persistente
              , ordem_item.quantidade AS qtde_da_oc
              , (ordem_item.quantidade * ROUND(item_pre_empenho.vl_total / item_pre_empenho.quantidade,2)) AS vl_total_item
              , (item_pre_empenho.quantidade - COALESCE(quantidade_oc.quantidade,0)) AS oc_saldo
+             , ordem_item.cod_item AS cod_item_ordem
+             , ordem_item.cod_marca AS cod_marca_ordem
+             , ordem_item.cod_centro AS cod_centro_ordem
+             , centro_custo.descricao AS nom_centro_ordem
+             , marca.descricao AS nom_marca_ordem
           FROM compras.ordem
     INNER JOIN empenho.empenho
             ON empenho.cod_empenho = ordem.cod_empenho
            AND empenho.exercicio = ordem.exercicio_empenho
+           AND empenho.cod_entidade = ordem.cod_entidade
     INNER JOIN empenho.item_pre_empenho
             ON item_pre_empenho.exercicio = empenho.exercicio
            AND item_pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+     LEFT JOIN empenho.item_pre_empenho_julgamento AS julgamento
+            ON item_pre_empenho.cod_pre_empenho = julgamento.cod_pre_empenho
+           AND item_pre_empenho.exercicio = julgamento.exercicio
+           AND item_pre_empenho.num_item = julgamento.num_item
+     LEFT JOIN almoxarifado.catalogo_item
+            ON julgamento.cod_item = catalogo_item.cod_item 
+            OR ( item_pre_empenho.cod_item = catalogo_item.cod_item AND julgamento.cod_item IS NULL )
      LEFT JOIN ( SELECT empenho_anulado_item.exercicio
                       , empenho_anulado_item.cod_pre_empenho
                       , empenho_anulado_item.num_item
@@ -454,6 +546,9 @@ class TComprasOrdem extends Persistente
                       , ordem_item.cod_ordem
                       , ordem_item.tipo
                       , ordem_item.num_item
+                      , ordem_item.cod_item
+                      , ordem_item.cod_marca
+                      , ordem_item.cod_centro 
                       , (ordem_item.vl_total - COALESCE(ordem_item_anulacao.vl_total,0)) AS vl_total
                       , (ordem_item.quantidade - COALESCE(ordem_item_anulacao.quantidade,0)) AS quantidade
                    FROM compras.ordem_item
@@ -489,6 +584,12 @@ class TComprasOrdem extends Persistente
             ON quantidade_oc.exercicio = item_pre_empenho.exercicio
            AND quantidade_oc.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
            AND quantidade_oc.num_item = item_pre_empenho.num_item
+
+     LEFT JOIN almoxarifado.marca
+            ON marca.cod_marca = ordem_item.cod_marca
+
+     LEFT JOIN almoxarifado.centro_custo
+            ON centro_custo.cod_centro = ordem_item.cod_centro
             ";
 
             if ( $this->getDado('cod_ordem') ) {
@@ -501,6 +602,7 @@ class TComprasOrdem extends Persistente
                 $stFiltro.= ' ordem.cod_entidade = '.$this->getDado('cod_entidade').' AND ';
             }
             $stFiltro.= ' ordem.tipo = \''.$this->getDado('tipo').'\' AND ';
+            $stFiltro.= " ( catalogo_item.cod_tipo".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." OR catalogo_item.cod_tipo IS NULL ) AND ";
 
             if ($stFiltro != '') {
                 $stSql.= ' WHERE '.substr( $stFiltro,0,strlen($stFiltro)-4 );
@@ -524,7 +626,7 @@ class TComprasOrdem extends Persistente
         $stSql.= "
                   SELECT ordem.cod_ordem
                        , ordem.exercicio
-                       , ordem.cod_autorizacao
+                       , ordem.cod_autorizacao|| '/'||ordem.exercicio AS cod_autorizacao
                        , ordem.cod_empenho
                        , ordem.cod_entidade
                        , ordem.nom_entidade
@@ -563,44 +665,35 @@ class TComprasOrdem extends Persistente
                                 ON entidade_cgm.numcgm = entidade.numcgm
 
                         INNER JOIN empenho.item_pre_empenho
-                                   ON item_pre_empenho.exercicio = ordem.exercicio_empenho
-                                  AND item_pre_empenho.cod_pre_empenho = ordem_item.cod_pre_empenho
-                                  AND item_pre_empenho.num_item = ordem_item.num_item
+                                ON item_pre_empenho.exercicio = ordem.exercicio_empenho
+                               AND item_pre_empenho.cod_pre_empenho = ordem_item.cod_pre_empenho
+                               AND item_pre_empenho.num_item = ordem_item.num_item
 
-                           INNER JOIN empenho.pre_empenho
+                        INNER JOIN empenho.pre_empenho
                                 ON pre_empenho.exercicio = item_pre_empenho.exercicio
                                AND pre_empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
 
-                           INNER JOIN empenho.autorizacao_empenho
+                         LEFT JOIN empenho.autorizacao_empenho
                                 ON pre_empenho.exercicio = autorizacao_empenho.exercicio
                                AND pre_empenho.cod_pre_empenho = autorizacao_empenho.cod_pre_empenho
+                               AND autorizacao_empenho.cod_entidade    = ordem.cod_entidade
 
                         INNER JOIN empenho.empenho
                                 ON empenho.exercicio       = pre_empenho.exercicio
                                AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                               AND empenho.cod_entidade    = ordem.cod_entidade
 
                          LEFT JOIN empenho.empenho_anulado_item
                                 ON empenho_anulado_item.exercicio       = item_pre_empenho.exercicio
                                AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                               AND empenho_anulado_item.cod_entidade    = ordem.cod_entidade
                                AND empenho_anulado_item.num_item        = item_pre_empenho.num_item
 
                         INNER JOIN sw_cgm AS fornecedor
-                                   ON fornecedor.numcgm = pre_empenho.cgm_beneficiario
+                                ON fornecedor.numcgm = pre_empenho.cgm_beneficiario
 
-                               WHERE ordem.tipo = '".$this->getDado('tipo')."'
+                             WHERE ordem.tipo = '".$this->getDado('tipo')."'
                                AND (ROUND( ( item_pre_empenho.vl_total - COALESCE(empenho_anulado_item.vl_anulado,0 ) ) / item_pre_empenho.quantidade,2 ) > 0)
-
-                    /*
-                    -- Evita que seja feita a entrada de ordem de compra que tenha o empenho anulado.
-                    AND NOT EXISTS
-                                 (
-                                    SELECT 1
-                                      FROM empenho.empenho_anulado
-                                     WHERE empenho_anulado.cod_empenho  = empenho.cod_empenho
-                                       AND empenho_anulado.exercicio    = empenho.exercicio
-                                       AND empenho_anulado.cod_entidade = empenho.cod_entidade
-                                 )
-                    */
 
                         GROUP BY pre_empenho.cgm_beneficiario
                                , ordem_item.exercicio
@@ -744,7 +837,41 @@ class TComprasOrdem extends Persistente
                         INNER JOIN  almoxarifado.centro_custo
                                 ON  centro_custo.cod_centro = mapa_item.cod_centro
 
-                        WHERE  julgamento_item.ordem = 1 ) AS centro_custo
+                        WHERE  julgamento_item.ordem = 1
+                        
+                        UNION ALL
+
+                        SELECT ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , centro_custo.cod_centro
+                             , centro_custo.descricao AS centro_custo
+                          FROM compras.ordem_item
+                     LEFT JOIN compras.ordem_item_anulacao
+                            ON ordem_item_anulacao.exercicio = ordem_item.exercicio
+                           AND ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
+                           AND ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
+                           AND ordem_item_anulacao.exercicio_pre_empenho = ordem_item.exercicio_pre_empenho
+                           AND ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND ordem_item_anulacao.num_item = ordem_item.num_item
+                           AND ordem_item_anulacao.tipo = ordem_item.tipo                 
+                     LEFT JOIN empenho.item_pre_empenho_julgamento
+                            ON item_pre_empenho_julgamento.exercicio = ordem_item.exercicio
+                           AND item_pre_empenho_julgamento.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND item_pre_empenho_julgamento.num_item = ordem_item.num_item
+                    INNER JOIN almoxarifado.centro_custo
+                            ON centro_custo.cod_centro = ordem_item.cod_centro
+                         WHERE ordem_item_anulacao.cod_ordem IS NULL
+                           AND item_pre_empenho_julgamento.num_item IS NULL
+                           AND ordem_item.tipo = '".$this->getDado('tipo')."'
+                      GROUP BY ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , centro_custo.cod_centro
+                             , centro_custo.descricao
+                        ) AS centro_custo
                     ON  centro_custo.exercicio = item_pre_empenho.exercicio
                     AND centro_custo.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                     AND centro_custo.num_item = item_pre_empenho.num_item
@@ -810,7 +937,44 @@ class TComprasOrdem extends Persistente
                         INNER JOIN  almoxarifado.marca
                                 ON  marca.cod_marca = catalogo_item_marca.cod_marca
 
-                        WHERE  julgamento_item.ordem = 1 ) AS centro_custo
+                        WHERE  julgamento_item.ordem = 1
+                        
+                        UNION ALL
+
+                        SELECT ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , marca.cod_marca
+                             , marca.descricao AS marca
+                          FROM compras.ordem_item
+                     LEFT JOIN compras.ordem_item_anulacao
+                            ON ordem_item_anulacao.exercicio = ordem_item.exercicio
+                           AND ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
+                           AND ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
+                           AND ordem_item_anulacao.exercicio_pre_empenho = ordem_item.exercicio_pre_empenho
+                           AND ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND ordem_item_anulacao.num_item = ordem_item.num_item
+                           AND ordem_item_anulacao.tipo = ordem_item.tipo                 
+                     LEFT JOIN empenho.item_pre_empenho_julgamento
+                            ON item_pre_empenho_julgamento.exercicio = ordem_item.exercicio
+                           AND item_pre_empenho_julgamento.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND item_pre_empenho_julgamento.num_item = ordem_item.num_item
+                    INNER JOIN almoxarifado.catalogo_item_marca
+                            ON ordem_item.cod_item = catalogo_item_marca.cod_item
+                           AND ordem_item.cod_marca = catalogo_item_marca.cod_marca
+                    INNER JOIN almoxarifado.marca
+                            ON marca.cod_marca = catalogo_item_marca.cod_marca
+                         WHERE ordem_item_anulacao.cod_ordem IS NULL
+                           AND item_pre_empenho_julgamento.num_item IS NULL
+                           AND ordem_item.tipo = '".$this->getDado('tipo')."'
+                      GROUP BY ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , marca.cod_marca
+                             , marca.descricao
+                        ) AS centro_custo
                     ON  centro_custo.exercicio = item_pre_empenho.exercicio
                     AND centro_custo.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
                     AND centro_custo.num_item = item_pre_empenho.num_item
@@ -930,11 +1094,62 @@ class TComprasOrdem extends Persistente
                             , (CASE WHEN edital.condicoes_pagamento IS NOT NULL THEN edital.condicoes_pagamento
                                 ELSE compra_direta.condicoes_pagamento END) AS condicoes_pagamento
                             , (CASE WHEN edital.local_entrega_material IS NOT NULL THEN edital.local_entrega_material
-                                ELSE '' END) AS local_entrega_material
+                                    ELSE CASE WHEN( item_pre_empenho_julgamento.cod_mapa IS NOT NULL )
+                                                THEN ( SELECT sw_cgm.nom_cgm AS localizacao_entrega 
+                                                        FROM compras.mapa_item
+                                                      INNER JOIN compras.solicitacao_entrega
+                                                          ON solicitacao_entrega.exercicio = mapa_item.exercicio_solicitacao
+                                                         AND solicitacao_entrega.cod_entidade = mapa_item.cod_entidade
+                                                         AND solicitacao_entrega.cod_solicitacao = mapa_item.cod_solicitacao
+                                                      INNER JOIN sw_cgm
+                                                          ON sw_cgm.numcgm = solicitacao_entrega.numcgm
+                                                       WHERE mapa_item.cod_mapa = item_pre_empenho_julgamento.cod_mapa
+                                                         AND mapa_item.exercicio = item_pre_empenho_julgamento.exercicio_mapa
+                                                       LIMIT 1
+                                                     )
+                                         END
+                              END) AS local_entrega_material
+                            , (CASE WHEN edital.local_entrega_material IS NULL AND item_pre_empenho_julgamento.cod_mapa IS NOT NULL
+                                                THEN ( SELECT sw_cgm.numcgm
+                                                        FROM compras.mapa_item
+                                                      INNER JOIN compras.solicitacao_entrega
+                                                          ON solicitacao_entrega.exercicio = mapa_item.exercicio_solicitacao
+                                                         AND solicitacao_entrega.cod_entidade = mapa_item.cod_entidade
+                                                         AND solicitacao_entrega.cod_solicitacao = mapa_item.cod_solicitacao
+                                                      INNER JOIN sw_cgm
+                                                          ON sw_cgm.numcgm = solicitacao_entrega.numcgm
+                                                       WHERE mapa_item.cod_mapa = item_pre_empenho_julgamento.cod_mapa
+                                                         AND mapa_item.exercicio = item_pre_empenho_julgamento.exercicio_mapa
+                                                       LIMIT 1
+                                                     )
+                                    WHEN edital.local_entrega_material IS NULL AND item_pre_empenho_julgamento.cod_mapa IS NULL
+                                                THEN (    SELECT ordem.numcgm_entrega
+                                                            FROM compras.ordem
+                                                       LEFT JOIN compras.ordem_anulacao
+                                                              ON ordem_anulacao.cod_entidade = ordem.cod_entidade
+                                                             AND ordem_anulacao.cod_ordem = ordem.cod_ordem
+                                                             AND ordem_anulacao.exercicio = ordem.exercicio
+                                                             AND ordem_anulacao.tipo = ordem.tipo
+                                                           WHERE ordem.exercicio = empenho.exercicio
+                                                             AND ordem.cod_entidade = empenho.cod_entidade
+                                                             AND ordem.cod_empenho = empenho.cod_empenho
+                                                             AND ordem.tipo = '".$this->getDado('tipo')."'
+                                                             AND ordem_anulacao.cod_ordem IS NULL
+                                                        GROUP BY ordem.numcgm_entrega
+                                                     )
+                              END) AS cgm_entrega_material
                             , (CASE WHEN licitacao.cod_licitacao IS NOT NULL THEN 'licitacao'
-                                ELSE 'compra_direta' END ) AS tipo
-                            , julgamento_item.cgm_fornecedor
-                            , sw_cgm.nom_cgm AS fornecedor
+                                    WHEN compra_direta.cod_compra_direta IS NOT NULL THEN 'compra_direta'
+                                    ELSE 'diversos'
+                                    END ) AS tipo
+                            , CASE WHEN item_pre_empenho_julgamento.cod_mapa IS NULL
+                                   THEN pre_empenho.cgm_beneficiario
+                                   ELSE item_pre_empenho_julgamento.cgm_fornecedor
+                              END AS cgm_fornecedor
+                            , CASE WHEN item_pre_empenho_julgamento.cod_mapa IS NULL
+                                   THEN cgm_beneficiario.nom_cgm
+                                   ELSE item_pre_empenho_julgamento.nom_cgm
+                              END AS fornecedor
                             , empenho.fn_consultar_valor_empenhado
                               (
                                  pre_empenho.exercicio
@@ -976,107 +1191,137 @@ class TComprasOrdem extends Persistente
                         ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
                         AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
-                INNER JOIN empenho.autorizacao_empenho
+                 LEFT JOIN empenho.autorizacao_empenho
                         ON  autorizacao_empenho.exercicio       = pre_empenho.exercicio
-                        AND autorizacao_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                       AND autorizacao_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
                 INNER JOIN empenho.item_pre_empenho
                         ON item_pre_empenho.exercicio = pre_empenho.exercicio
-                        AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                       AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
-                INNER JOIN empenho.item_pre_empenho_julgamento
+                INNER JOIN sw_cgm AS cgm_beneficiario
+                        ON pre_empenho.cgm_beneficiario = cgm_beneficiario.numcgm
+
+                 LEFT JOIN (
+                            SELECT item_pre_empenho_julgamento.*
+                                 , catalogo_item.cod_tipo
+                              FROM empenho.item_pre_empenho_julgamento
+                        INNER JOIN almoxarifado.catalogo_item
+                                ON item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item
+                           ) AS julgamento
+                        ON item_pre_empenho.cod_pre_empenho = julgamento.cod_pre_empenho
+                       AND item_pre_empenho.exercicio = julgamento.exercicio
+                       AND item_pre_empenho.num_item = julgamento.num_item
+                       
+                 LEFT JOIN almoxarifado.catalogo_item
+                        ON item_pre_empenho.cod_item = catalogo_item.cod_item 
+
+                 LEFT JOIN (
+                            SELECT item_pre_empenho_julgamento.*
+                                 , CASE WHEN item_pre_empenho_julgamento.cod_item IS NOT NULL THEN TRUE
+                                   ELSE FALSE
+                                   END AS bo_compras_licitacao
+                                 , mapa.exercicio AS exercicio_mapa
+                                 , mapa.cod_mapa
+                                 , sw_cgm.nom_cgm
+                              FROM empenho.item_pre_empenho_julgamento
+                        INNER JOIN almoxarifado.catalogo_item
+                                ON item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item
+                               AND catalogo_item.cod_tipo ".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." 
+            
+                        INNER JOIN compras.julgamento_item
+                                ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
+                               AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
+                               AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
+                               AND item_pre_empenho_julgamento.lote = julgamento_item.lote
+                               AND item_pre_empenho_julgamento.cgm_fornecedor = julgamento_item.cgm_fornecedor
+                               AND julgamento_item.ordem = 1
+            
+                        INNER JOIN sw_cgm
+                                ON julgamento_item.cgm_fornecedor = sw_cgm.numcgm
+            
+                        INNER JOIN (SELECT cotacao.*
+                                      FROM compras.cotacao
+                                 LEFT JOIN compras.cotacao_anulada
+                                    ON cotacao.exercicio = cotacao_anulada.exercicio
+                                       AND cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
+                                     WHERE cotacao_anulada.cod_cotacao IS NULL
+                                   ) AS cotacao
+                                ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
+                               AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
+            
+                        INNER JOIN compras.mapa_cotacao
+                                ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+                               AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+            
+                        INNER JOIN compras.mapa
+                                ON mapa_cotacao.exercicio_mapa = mapa.exercicio
+                               AND mapa_cotacao.cod_mapa = mapa.cod_mapa
+                           ) AS item_pre_empenho_julgamento
                         ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
-                        AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
-                        AND item_pre_empenho.num_item = item_pre_empenho_julgamento.num_item
+                       AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
+                       AND item_pre_empenho.num_item = item_pre_empenho_julgamento.num_item
 
-                INNER JOIN almoxarifado.catalogo_item
-                        ON item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item
-                        AND catalogo_item.cod_tipo ".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )."
+                 LEFT JOIN (SELECT compra_direta.*
+                              FROM compras.compra_direta
+                         LEFT JOIN compras.compra_direta_anulacao
+                                ON compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
+                               AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
+                               AND compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
+                               AND compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
+                             WHERE compra_direta_anulacao.cod_compra_direta IS NULL
+                           ) AS compra_direta
+                        ON item_pre_empenho_julgamento.exercicio_mapa = compra_direta.exercicio_mapa
+                       AND item_pre_empenho_julgamento.cod_mapa = compra_direta.cod_mapa
 
-                INNER JOIN compras.julgamento_item
-                        ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
-                        AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
-                        AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
-                        AND item_pre_empenho_julgamento.lote = julgamento_item.lote
-                        AND item_pre_empenho_julgamento.cgm_fornecedor = julgamento_item.cgm_fornecedor
+                 LEFT JOIN (SELECT licitacao.*
+                              FROM licitacao.licitacao
+                         LEFT JOIN licitacao.licitacao_anulada
+                                ON licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                               AND licitacao_anulada.exercicio = licitacao.exercicio
+                               AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
+                               AND licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
+                             WHERE licitacao_anulada.cod_licitacao IS NULL
+                           ) AS licitacao
+                        ON item_pre_empenho_julgamento.exercicio_mapa = licitacao.exercicio_mapa
+                       AND item_pre_empenho_julgamento.cod_mapa = licitacao.cod_mapa
 
-                INNER JOIN sw_cgm
-                        ON julgamento_item.cgm_fornecedor = sw_cgm.numcgm
-
-                INNER JOIN compras.cotacao
-                        ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
-                        AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
-
-                INNER JOIN compras.mapa_cotacao
-                        ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-                        AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-
-                INNER JOIN compras.mapa
-                        ON mapa_cotacao.exercicio_mapa = mapa.exercicio
-                        AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-
-                LEFT JOIN compras.compra_direta
-                        ON mapa.exercicio = compra_direta.exercicio_mapa
-                        AND mapa.cod_mapa = compra_direta.cod_mapa
-
-                LEFT JOIN licitacao.licitacao
-                        ON mapa.exercicio = licitacao.exercicio_mapa
-                        AND mapa.cod_mapa = licitacao.cod_mapa
-
-                LEFT JOIN licitacao.edital
+                 LEFT JOIN licitacao.edital
                         ON  licitacao.cod_licitacao = edital.cod_licitacao
-                        AND licitacao.cod_modalidade = edital.cod_modalidade
-                        AND licitacao.cod_entidade = edital.cod_entidade
-                        AND licitacao.exercicio = edital.exercicio_licitacao
+                       AND licitacao.cod_modalidade = edital.cod_modalidade
+                       AND licitacao.cod_entidade = edital.cod_entidade
+                       AND licitacao.exercicio = edital.exercicio_licitacao
 
-                LEFT JOIN licitacao.participante
+                 LEFT JOIN licitacao.participante
                         ON licitacao.cod_licitacao = participante.cod_licitacao
-                        AND licitacao.cod_modalidade = participante.cod_modalidade
-                        AND licitacao.cod_entidade = participante.cod_entidade
-                        AND licitacao.exercicio = participante.exercicio
+                       AND licitacao.cod_modalidade = participante.cod_modalidade
+                       AND licitacao.cod_entidade = participante.cod_entidade
+                       AND licitacao.exercicio = participante.exercicio
 
-                LEFT JOIN compras.objeto AS objeto_licitacao
+                 LEFT JOIN compras.objeto AS objeto_licitacao
                         ON licitacao.cod_objeto = objeto_licitacao.cod_objeto
 
-                LEFT JOIN compras.objeto AS objeto_compra_direta
+                 LEFT JOIN compras.objeto AS objeto_compra_direta
                         ON compra_direta.cod_objeto = objeto_compra_direta.cod_objeto
 
-                LEFT JOIN compras.modalidade AS modalidade_licitacao
+                 LEFT JOIN compras.modalidade AS modalidade_licitacao
                         ON licitacao.cod_modalidade = modalidade_licitacao.cod_modalidade
 
-                LEFT JOIN compras.modalidade AS modalidade_compra_direta
+                 LEFT JOIN compras.modalidade AS modalidade_compra_direta
                         ON compra_direta.cod_modalidade = modalidade_compra_direta.cod_modalidade
 
                 WHERE
-                    -- NÃO PODE HAVER UMA COTAÇÃO ANULADA
-                    NOT EXISTS (
-                                   SELECT 1
-                                     FROM compras.cotacao_anulada
-                                    WHERE cotacao.exercicio = cotacao_anulada.exercicio
-                                      AND cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
-                               )
-
-                    AND (
-                        NOT EXISTS (
-                                    SELECT 1
-                                    FROM compras.compra_direta_anulacao
-                                    WHERE compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
-                                      AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
-                                      AND compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
-                                      AND compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
-
-                                    )
-                        OR NOT EXISTS (
-                                    SELECT 1
-                                     FROM licitacao.licitacao_anulada
-                                    WHERE licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                      AND licitacao_anulada.exercicio = licitacao.exercicio
-                                      AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
-                                      AND licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
-                                    )
-                        )
-
-                    AND julgamento_item.ordem = 1
+                      (
+                            --SE FOR LICITAÇÃO OU COMPRA DIRETA
+                            ( licitacao.cod_licitacao IS NOT NULL OR compra_direta.cod_compra_direta IS NOT NULL )
+                            --OU NÃO POSSUI MAPA E COD_ITEM EM PRE_EMPENHO É NULO
+                            --OU NÃO POSSUI MAPA E O TIPO DE ITEM DO PRE_EMPENHO É IGUAL AO TIPO DE ORDEM(COMPRA OU SERVIÇO)
+                        OR  (    ( item_pre_empenho_julgamento.cod_mapa IS NULL AND julgamento.cod_item IS NULL )
+                             AND (  ( item_pre_empenho.cod_item IS NOT NULL AND catalogo_item.cod_tipo IS NOT NULL AND catalogo_item.cod_tipo".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." )
+                                 OR ( item_pre_empenho.cod_item IS NULL )
+                                 )
+                            )
+                      )
                     ".$this->getDado('stFiltro')."
 
                     GROUP BY      item_pre_empenho.cod_pre_empenho
@@ -1085,8 +1330,8 @@ class TComprasOrdem extends Persistente
                                 , empenho.cod_entidade
                                 , sw_cgm_pessoa_juridica.nom_fantasia
                                 , pre_empenho_despesa.cod_despesa
-                                , TO_CHAR(empenho.dt_empenho, 'dd/mm/yyyy')
-                                , TO_CHAR(empenho.dt_vencimento, 'dd/mm/yyyy')
+                                , empenho.dt_empenho
+                                , empenho.dt_vencimento
                                 , licitacao.cod_licitacao
                                 , compra_direta.cod_compra_direta
                                 , licitacao.exercicio
@@ -1098,13 +1343,17 @@ class TComprasOrdem extends Persistente
                                 , edital.condicoes_pagamento
                                 , edital.local_entrega_material
                                 , licitacao.cod_licitacao
-                                , julgamento_item.cgm_fornecedor
+                                , item_pre_empenho_julgamento.cgm_fornecedor
+                                , item_pre_empenho_julgamento.nom_cgm
                                 , objeto_compra_direta.descricao
                                 , compra_direta.cod_modalidade
                                 , modalidade_compra_direta.descricao
                                 , compra_direta.condicoes_pagamento
-                                , sw_cgm.nom_cgm
                                 , pre_empenho.exercicio
+                                , pre_empenho.cgm_beneficiario
+                                , cgm_beneficiario.nom_cgm
+                                , item_pre_empenho_julgamento.cod_mapa
+                                , item_pre_empenho_julgamento.exercicio_mapa
 
                 -- NÃO PODE LISTAR OS EMPENHOS QUE JÁ ESTÃO COM TODOS OS ITENS USADOS POR ALGUMA ORDEM DE COMPRA
                     HAVING (
@@ -1210,11 +1459,46 @@ class TComprasOrdem extends Persistente
                       , (CASE WHEN edital.condicoes_pagamento IS NOT NULL THEN edital.condicoes_pagamento
                               ELSE compra_direta.condicoes_pagamento END) AS condicoes_pagamento
                       , (CASE WHEN edital.local_entrega_material IS NOT NULL THEN edital.local_entrega_material
-                              ELSE '' END) AS local_entrega_material
+                              ELSE cgm_entrega.nom_cgm END) AS local_entrega_material
+                      , (CASE WHEN edital.local_entrega_material IS NULL AND item_pre_empenho_julgamento.cod_mapa IS NOT NULL
+                                                AND ( SELECT sw_cgm.numcgm
+                                                        FROM compras.mapa_item
+                                                      INNER JOIN compras.solicitacao_entrega
+                                                          ON solicitacao_entrega.exercicio = mapa_item.exercicio_solicitacao
+                                                         AND solicitacao_entrega.cod_entidade = mapa_item.cod_entidade
+                                                         AND solicitacao_entrega.cod_solicitacao = mapa_item.cod_solicitacao
+                                                      INNER JOIN sw_cgm
+                                                          ON sw_cgm.numcgm = solicitacao_entrega.numcgm
+                                                       WHERE mapa_item.cod_mapa = item_pre_empenho_julgamento.cod_mapa
+                                                         AND mapa_item.exercicio = item_pre_empenho_julgamento.exercicio_mapa
+                                                       LIMIT 1
+                                                     ) IS NOT NULL
+                                                THEN ( SELECT sw_cgm.numcgm
+                                                        FROM compras.mapa_item
+                                                      INNER JOIN compras.solicitacao_entrega
+                                                          ON solicitacao_entrega.exercicio = mapa_item.exercicio_solicitacao
+                                                         AND solicitacao_entrega.cod_entidade = mapa_item.cod_entidade
+                                                         AND solicitacao_entrega.cod_solicitacao = mapa_item.cod_solicitacao
+                                                      INNER JOIN sw_cgm
+                                                          ON sw_cgm.numcgm = solicitacao_entrega.numcgm
+                                                       WHERE mapa_item.cod_mapa = item_pre_empenho_julgamento.cod_mapa
+                                                         AND mapa_item.exercicio = item_pre_empenho_julgamento.exercicio_mapa
+                                                       LIMIT 1
+                                                     )
+                              ELSE ordem.numcgm_entrega                       
+                              END) AS cgm_entrega_material
                       , (CASE WHEN licitacao.cod_licitacao IS NOT NULL THEN 'licitacao'
-                              ELSE 'compra_direta' END ) AS tipo
-                      , julgamento_item.cgm_fornecedor
-                      , sw_cgm.nom_cgm AS fornecedor
+                                   WHEN compra_direta.cod_compra_direta IS NOT NULL THEN 'compra_direta'
+                                   ELSE 'diversos'
+                              END ) AS tipo
+                      , CASE WHEN item_pre_empenho_julgamento.cod_mapa IS NULL
+                                   THEN pre_empenho.cgm_beneficiario
+                                   ELSE item_pre_empenho_julgamento.cgm_fornecedor
+                              END AS cgm_fornecedor
+                      , CASE WHEN item_pre_empenho_julgamento.cod_mapa IS NULL
+                                   THEN cgm_beneficiario.nom_cgm
+                                   ELSE item_pre_empenho_julgamento.nom_cgm
+                              END AS fornecedor
                       , ordem.cod_ordem
                       , ordem.exercicio AS exercicio_ordem
                       , TO_CHAR(ordem.timestamp, 'dd/mm/yyyy') AS timestamp
@@ -1249,79 +1533,146 @@ class TComprasOrdem extends Persistente
                         ON item_pre_empenho.exercicio = pre_empenho.exercicio
                        AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
-                INNER JOIN empenho.item_pre_empenho_julgamento
+                INNER JOIN sw_cgm AS cgm_beneficiario
+                        ON pre_empenho.cgm_beneficiario = cgm_beneficiario.numcgm
+
+                LEFT JOIN (
+                            SELECT item_pre_empenho_julgamento.*
+                                 , catalogo_item.cod_tipo
+                              FROM empenho.item_pre_empenho_julgamento
+                        INNER JOIN almoxarifado.catalogo_item
+                                ON item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item
+                           ) AS julgamento
+                        ON item_pre_empenho.cod_pre_empenho = julgamento.cod_pre_empenho
+                       AND item_pre_empenho.exercicio = julgamento.exercicio
+                       AND item_pre_empenho.num_item = julgamento.num_item
+                       
+                LEFT JOIN almoxarifado.catalogo_item
+                        ON item_pre_empenho.cod_item = catalogo_item.cod_item 
+
+                LEFT JOIN (
+                            SELECT item_pre_empenho_julgamento.*
+                                 , CASE WHEN item_pre_empenho_julgamento.cod_item IS NOT NULL THEN TRUE
+                                   ELSE FALSE
+                                   END AS bo_compras_licitacao
+                                 , mapa.exercicio AS exercicio_mapa
+                                 , mapa.cod_mapa
+                                 , sw_cgm.nom_cgm
+                              FROM empenho.item_pre_empenho_julgamento
+                        INNER JOIN almoxarifado.catalogo_item
+                                ON item_pre_empenho_julgamento.cod_item = catalogo_item.cod_item
+                               AND catalogo_item.cod_tipo ".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." 
+
+                        INNER JOIN compras.julgamento_item
+                                ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
+                               AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
+                               AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
+                               AND item_pre_empenho_julgamento.lote = julgamento_item.lote
+                               AND item_pre_empenho_julgamento.cgm_fornecedor = julgamento_item.cgm_fornecedor
+                               AND julgamento_item.ordem = 1
+
+                        INNER JOIN sw_cgm
+                                ON julgamento_item.cgm_fornecedor = sw_cgm.numcgm
+
+                        INNER JOIN (SELECT cotacao.*
+                                      FROM compras.cotacao
+                                 LEFT JOIN compras.cotacao_anulada
+                                    ON cotacao.exercicio = cotacao_anulada.exercicio
+                                       AND cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
+                                     WHERE cotacao_anulada.cod_cotacao IS NULL
+                                   ) AS cotacao
+                                ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
+                               AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
+
+                        INNER JOIN compras.mapa_cotacao
+                                ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
+                               AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
+
+                        INNER JOIN compras.mapa
+                                ON mapa_cotacao.exercicio_mapa = mapa.exercicio
+                               AND mapa_cotacao.cod_mapa = mapa.cod_mapa
+                           ) AS item_pre_empenho_julgamento
                         ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
                        AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
                        AND item_pre_empenho.num_item = item_pre_empenho_julgamento.num_item
 
-                INNER JOIN compras.julgamento_item
-                        ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
-                       AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
-                       AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
-                       AND item_pre_empenho_julgamento.lote = julgamento_item.lote
-                       AND item_pre_empenho_julgamento.cgm_fornecedor = julgamento_item.cgm_fornecedor
+                 LEFT JOIN (SELECT compra_direta.*
+                              FROM compras.compra_direta
+                         LEFT JOIN compras.compra_direta_anulacao
+                                ON compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
+                               AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
+                               AND compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
+                               AND compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
+                             WHERE compra_direta_anulacao.cod_compra_direta IS NULL
+                           ) AS compra_direta
+                        ON item_pre_empenho_julgamento.exercicio_mapa = compra_direta.exercicio_mapa
+                       AND item_pre_empenho_julgamento.cod_mapa = compra_direta.cod_mapa
 
-                INNER JOIN sw_cgm
-                        ON julgamento_item.cgm_fornecedor = sw_cgm.numcgm
+                 LEFT JOIN (SELECT licitacao.*
+                              FROM licitacao.licitacao
+                         LEFT JOIN licitacao.licitacao_anulada
+                                ON licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                               AND licitacao_anulada.exercicio = licitacao.exercicio
+                               AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
+                               AND licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
+                             WHERE licitacao_anulada.cod_licitacao IS NULL
+                           ) AS licitacao
+                        ON item_pre_empenho_julgamento.exercicio_mapa = licitacao.exercicio_mapa
+                       AND item_pre_empenho_julgamento.cod_mapa = licitacao.cod_mapa
 
-                INNER JOIN compras.cotacao
-                        ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
-                        AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
-
-                INNER JOIN compras.mapa_cotacao
-                        ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-                        AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
-
-                INNER JOIN compras.mapa
-                        ON mapa_cotacao.exercicio_mapa = mapa.exercicio
-                        AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-
-                LEFT JOIN compras.compra_direta
-                        ON mapa.exercicio = compra_direta.exercicio_mapa
-                        AND mapa.cod_mapa = compra_direta.cod_mapa
-
-                LEFT JOIN licitacao.licitacao
-                        ON mapa.exercicio = licitacao.exercicio_mapa
-                        AND mapa.cod_mapa = licitacao.cod_mapa
-
-                LEFT JOIN licitacao.edital
+                 LEFT JOIN licitacao.edital
                         ON  licitacao.cod_licitacao = edital.cod_licitacao
-                        AND licitacao.cod_modalidade = edital.cod_modalidade
-                        AND licitacao.cod_entidade = edital.cod_entidade
-                        AND licitacao.exercicio = edital.exercicio_licitacao
+                       AND licitacao.cod_modalidade = edital.cod_modalidade
+                       AND licitacao.cod_entidade = edital.cod_entidade
+                       AND licitacao.exercicio = edital.exercicio_licitacao
 
-                LEFT JOIN licitacao.participante
+                 LEFT JOIN licitacao.participante
                         ON licitacao.cod_licitacao = participante.cod_licitacao
-                        AND licitacao.cod_modalidade = participante.cod_modalidade
-                        AND licitacao.cod_entidade = participante.cod_entidade
-                        AND licitacao.exercicio = participante.exercicio
+                       AND licitacao.cod_modalidade = participante.cod_modalidade
+                       AND licitacao.cod_entidade = participante.cod_entidade
+                       AND licitacao.exercicio = participante.exercicio
 
-                LEFT JOIN compras.objeto AS objeto_licitacao
+                 LEFT JOIN compras.objeto AS objeto_licitacao
                         ON licitacao.cod_objeto = objeto_licitacao.cod_objeto
 
-                LEFT JOIN compras.objeto AS objeto_compra_direta
+                 LEFT JOIN compras.objeto AS objeto_compra_direta
                         ON compra_direta.cod_objeto = objeto_compra_direta.cod_objeto
 
-                LEFT JOIN compras.modalidade AS modalidade_licitacao
+                 LEFT JOIN compras.modalidade AS modalidade_licitacao
                         ON licitacao.cod_modalidade = modalidade_licitacao.cod_modalidade
 
-                LEFT JOIN compras.modalidade AS modalidade_compra_direta
+                 LEFT JOIN compras.modalidade AS modalidade_compra_direta
                         ON compra_direta.cod_modalidade = modalidade_compra_direta.cod_modalidade
 
-                LEFT JOIN  empenho.empenho_anulado_item
-                       ON  empenho_anulado_item.exercicio       = item_pre_empenho.exercicio
-                      AND  empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-                      AND  empenho_anulado_item.num_item        = item_pre_empenho.num_item
+                 LEFT JOIN empenho.empenho_anulado_item
+                        ON empenho_anulado_item.exercicio       = item_pre_empenho.exercicio
+                       AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                       AND empenho_anulado_item.num_item        = item_pre_empenho.num_item
+
+                 LEFT JOIN sw_cgm AS cgm_entrega
+                        ON cgm_entrega.numcgm = ordem.numcgm_entrega
 
                 WHERE
-                      NOT EXISTS (
+                        (
+                            --SE FOR LICITAÇÃO OU COMPRA DIRETA
+                            ( licitacao.cod_licitacao IS NOT NULL OR compra_direta.cod_compra_direta IS NOT NULL )
+                            --OU NÃO POSSUI MAPA E COD_ITEM EM PRE_EMPENHO É NULO
+                            --OU NÃO POSSUI MAPA E O TIPO DE ITEM DO PRE_EMPENHO É IGUAL AO TIPO DE ORDEM(COMPRA OU SERVIÇO)
+                        OR  (    ( item_pre_empenho_julgamento.cod_mapa IS NULL AND julgamento.cod_item IS NULL )
+                             AND (  ( item_pre_empenho.cod_item IS NOT NULL AND catalogo_item.cod_tipo IS NOT NULL AND catalogo_item.cod_tipo".( $this->getDado('tipo')=='C'?' <> 3 ':' = 3 ' )." )
+                                 OR ( item_pre_empenho.cod_item IS NULL )
+                                 )
+                            )
+                        )
+                
+                        AND NOT EXISTS (
                                       SELECT 1
                                         FROM compras.compra_direta_anulacao
                                        WHERE compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
                                         AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
                                         AND compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
                                         AND compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
-                                 )
+                                        )
 
                         AND NOT EXISTS (
                                         SELECT 1
@@ -1335,22 +1686,6 @@ class TComprasOrdem extends Persistente
                 ";
                 if ($this->getDado('acao') != 'consultar' && $this->getDado('acao') != 'reemitir') {
                     $stSql .= "
-                    /*
-                    AND NOT EXISTS (
-                                    SELECT 1
-                                    FROM empenho.empenho_anulado
-                                    WHERE empenho.exercicio = empenho_anulado.exercicio
-                                        AND empenho.cod_entidade = empenho_anulado.cod_entidade
-                                        AND empenho.cod_empenho = empenho_anulado.cod_empenho
-                                    )
-                    */
-                    AND NOT EXISTS (
-                                    SELECT 1
-                                    FROM compras.cotacao_anulada
-                                    WHERE cotacao.exercicio = cotacao_anulada.exercicio
-                                        AND cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
-                                    )
-
                     AND NOT EXISTS (
                                      SELECT 1
                                        FROM compras.nota_fiscal_fornecedor
@@ -1366,8 +1701,7 @@ class TComprasOrdem extends Persistente
                     ";
                 }
 
-        $stSql .= "AND julgamento_item.ordem = 1
-            AND ordem.tipo = '".$this->getDado('tipo')."'";
+        $stSql .= "AND ordem.tipo = '".$this->getDado('tipo')."'";
 
         $stSql .= " AND  (ROUND( ( item_pre_empenho.vl_total - COALESCE(empenho_anulado_item.vl_anulado,0 ) ) / item_pre_empenho.quantidade,2 ) > 0) ";
 
@@ -1377,30 +1711,33 @@ class TComprasOrdem extends Persistente
                 , empenho.cod_entidade
                 , sw_cgm_pessoa_juridica.nom_fantasia
                 , pre_empenho_despesa.cod_despesa
-                , TO_CHAR(empenho.dt_empenho, 'dd/mm/yyyy')
-                , (CASE WHEN licitacao.cod_licitacao IS NOT NULL THEN licitacao.cod_licitacao
-                    ELSE compra_direta.cod_compra_direta END )
-                , (CASE WHEN licitacao.exercicio IS NOT NULL THEN licitacao.exercicio END )
-                , (CASE WHEN licitacao.cod_objeto IS NOT NULL THEN licitacao.cod_objeto
-                    ELSE compra_direta.cod_objeto END)
-                , (CASE WHEN objeto_licitacao.descricao IS NOT NULL THEN objeto_licitacao.descricao
-                    ELSE objeto_compra_direta.descricao END)
-                , (CASE WHEN licitacao.cod_modalidade IS NOT NULL THEN licitacao.cod_modalidade
-                    ELSE compra_direta.cod_modalidade END)
-                , (CASE WHEN modalidade_licitacao.descricao IS NOT NULL THEN modalidade_licitacao.descricao
-                    ELSE modalidade_compra_direta.descricao END)
-                , (CASE WHEN edital.condicoes_pagamento IS NOT NULL THEN edital.condicoes_pagamento
-                      ELSE compra_direta.condicoes_pagamento END)
-                , (CASE WHEN edital.local_entrega_material IS NOT NULL THEN edital.local_entrega_material
-                    ELSE '' END)
-                , (CASE WHEN licitacao.cod_licitacao IS NOT NULL THEN 'licitacao'
-                    ELSE 'compra_direta' END )
-                , julgamento_item.cgm_fornecedor
-                , sw_cgm.nom_cgm
+                , empenho.dt_empenho
+                , licitacao.cod_licitacao
+                , compra_direta.cod_compra_direta
+                , licitacao.exercicio
+                , licitacao.cod_objeto
+                , objeto_licitacao.descricao
+                , objeto_compra_direta.descricao
+                , licitacao.cod_modalidade
+                , compra_direta.cod_modalidade
+                , compra_direta.cod_objeto
+                , modalidade_licitacao.descricao
+                , modalidade_compra_direta.descricao
+                , edital.condicoes_pagamento
+                , compra_direta.condicoes_pagamento
+                , edital.local_entrega_material
+                , pre_empenho.cgm_beneficiario
+                , item_pre_empenho_julgamento.cgm_fornecedor
+                , cgm_beneficiario.nom_cgm
+                , item_pre_empenho_julgamento.nom_cgm
                 , ordem.cod_ordem
                 , ordem.exercicio
-                , TO_CHAR(ordem.timestamp, 'dd/mm/yyyy')
-                , ordem.tipo ";
+                , ordem.timestamp
+                , ordem.tipo 
+                , item_pre_empenho_julgamento.cod_mapa
+                , item_pre_empenho_julgamento.exercicio_mapa
+                , ordem.numcgm_entrega
+                , cgm_entrega.nom_cgm ";
 
         return $stSql;
     }

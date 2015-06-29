@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.99
 
-    $Id: relatorioAssunto.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: relatorioAssunto.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -72,7 +72,7 @@ switch ($ctrl) {
     case 0:
 
 ?>
- <script language="JavaScript1.2" type="text/javascript">
+ <script type="text/javascript">
 
       function Valida()
       {
@@ -128,7 +128,7 @@ switch ($ctrl) {
         if ($tipo == 1) {
 
             ?>
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     function SalvarSintetico()
                     {
                         document.frm.action = "assuntoSintetico.php?<?=Sessao::getId()?>&ctrl=1&tipo=1&ordem=<?=$_REQUEST["ordem"];?>";
@@ -218,7 +218,7 @@ switch ($ctrl) {
         }
         if ($tipo == 2) {
             ?>
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     function SalvarAnalitico()
                     {
                         document.frm.action = "assuntoAnalitico.php?<?=Sessao::getId()?>&ctrl=1&tipo=2&ordem=<?=$ordem?>";

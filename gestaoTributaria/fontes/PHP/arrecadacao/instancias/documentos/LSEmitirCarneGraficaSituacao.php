@@ -52,8 +52,8 @@ $obHdnCtrl->setValue ( $_REQUEST["stCtrl"] );
 
 $nuPorcentagem = number_format((Sessao::read('listados') * 100 / Sessao::read('total_listar')), 2, ',', ' ');
 
-$stHtml = "<center>".$nuPorcentagem."% gerado até o momento!<br>";
-$stHtml = "<img id=\"img_carregando\" src=\"".CAM_FW_IMAGENS."loading.gif\"></center>";
+$stHtml  = "<center>".$nuPorcentagem."% gerado até o momento!<br>";
+$stHtml .= "<img id=\"img_carregando\" src=\"".CAM_FW_IMAGENS."loading.gif\"></center>";
 $stJs = "d.getElementById('spnSpan1').innerHTML = '".$stHtml."';   \n";
 
 //Define objeto SPAN

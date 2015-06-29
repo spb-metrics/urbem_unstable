@@ -40,7 +40,7 @@
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function limpaForm( BuscaValor ){
     document.frm.reset();

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: PRManterTransferencia.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterTransferencia.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.17
 */
@@ -96,7 +96,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_incluir", $chama
 {
     ;
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 alertaAviso      ( "'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
            </script>';
 //    session_regenerate_id();
@@ -108,7 +108,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_incluir", $chama
     Sessao::write('modulo', "12" );
     Sessao::write('acaoLote', "739"); //no rcimconfiguracao.class.php (buscaModulo) eh utilizada esta variavel para recuperar a acao atual!
 //    $sessao->funcionalidade = $func;
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 mudaMenu         ( "'.$func.'"     );
                 mudaTelaPrincipal( "'.$location.'" );
            </script>';

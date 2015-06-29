@@ -43,7 +43,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
      action = document.frm.action;

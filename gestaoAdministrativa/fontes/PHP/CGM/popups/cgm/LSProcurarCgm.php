@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-02.08.05
 
-    $Id: LSProcurarCgm.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSProcurarCgm.php 62654 2015-05-29 12:59:20Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -207,7 +207,20 @@ if ($arCampo['stFiltroVinculado'] !="") {
 }
 
 if ( $request->get('stTabelaVinculo') ) {
-    $obTCGM->recuperaRelacionamentoVinculado( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)", $boTransacao , $_REQUEST['stTabelaVinculo'] , $_REQUEST['stCampoVinculo'], $stFiltroVinculado);
+    switch ($request->get('stTipoBusca')) {
+        case "vinculadoPlanoSaude":
+            $obTCGM->recuperaRelacionamentoVinculadoPlanoSaude( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)", $boTransacao , $_REQUEST['stTabelaVinculo'] , $_REQUEST['stCampoVinculo'], $stFiltroVinculado);
+        break;
+
+        case "vinculoComissaoLicitacao":
+            $stFiltroVinculado = "AND licitacao.cod_licitacao = ".$request->get('hdnCodLicitacao')." AND licitacao.cod_modalidade = ".$request->get('hdnCodModalidade')." AND comissao_licitacao.cod_comissao = ".$request->get('hdnCodComissao');
+            $obTCGM->recuperaRelacionamentoVinculadoComissaoLicitacao( $rsLista, $stFiltro, " ORDER BY lower(sw_cgm.nom_cgm)", $boTransacao , "" , "", $stFiltroVinculado);
+        break;
+
+        default:
+            $obTCGM->recuperaRelacionamentoVinculado( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)", $boTransacao , $_REQUEST['stTabelaVinculo'] , $_REQUEST['stCampoVinculo'], $stFiltroVinculado);
+        break;
+    }
 } else {
     $obTCGM->recuperaRelacionamentoSintetico( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)" );
 }

@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: PRExcluirInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRExcluirInscricao.php 62811 2015-06-22 19:07:59Z lisiane $
 
     *Casos de uso: uc-05.04.02
 
@@ -93,11 +93,11 @@ $pgJs          = "JS".$stPrograma.".js";
 Sessao::remove('link');
 Sessao::remove('stLink');
 
-$arInscricao = explode ( '/', $_REQUEST['inCodInscricao'] );
+$arInscricao = explode ( '/', $request->get('inCodInscricao') );
 
 $inCodInscricao = $arInscricao[0];
 $inExercicio    = $arInscricao[1];
-$stMotivo       = $_REQUEST['stMotivo'];
+$stMotivo       = $request->get('stMotivo');
 
 $stFiltro = "where a.cod_acao = '".Sessao::read('acao')."'";
 $obTModeloDocumento = new TAdministracaoModeloDocumento;
@@ -138,8 +138,8 @@ Sessao::getTransacao()->setMapeamento( $obTDividaCancelada );
     $obTDividaCancelada->setDado ('motivo',         $stMotivo           );
     $obTDividaCancelada->inclusao();
 
-    if ($_REQUEST["inProcesso"]) {
-        $arProcesso = explode( "/", $_REQUEST["inProcesso"] );
+    if ( $request->get('inProcesso') ) {
+        $arProcesso = explode( "/", $request->get('inProcesso') );
         $obTDATProcessoCancelamento = new TDATProcessoCancelamento;
         $obTDATProcessoCancelamento->setDado( 'cod_inscricao', $inCodInscricao );
         $obTDATProcessoCancelamento->setDado( 'exercicio', $inExercicio );
@@ -170,6 +170,7 @@ Sessao::getTransacao()->setMapeamento( $obTDividaCancelada );
 Sessao::encerraExcecao();
 
 if ($_REQUEST["boEmissaoDocumento"] == "on") { //boEmissaoDocumento
+    
     $stCaminho = CAM_GT_DAT_INSTANCIAS."emissao/LSManterEmissao.php";
 
     $stParametros = "&stTipoModalidade=emissao";

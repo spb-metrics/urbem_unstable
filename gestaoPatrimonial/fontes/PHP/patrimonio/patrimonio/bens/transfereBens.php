@@ -135,7 +135,7 @@ switch ($controle) {
         $exercicio = pegaConfiguracao("ano_exercicio");
 
     ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function valorMaximo(campo, limite)
             {
                 if (campo.value.length > limite) // se estiver maior que o tamanho estabelecido, reduza-o
@@ -437,7 +437,7 @@ exit();
 
         }
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function valorMaximo(campo, limite)
             {
                 if (campo.value.length > limite) // se estiver maior que o tamanho estabelecido, reduza-o
@@ -660,7 +660,7 @@ exit();
             $conn->vaiPrimeiro();
     ?>
 
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 function valorMaximo(campo, limite)
                 {
                     if (campo.value.length > limite) // se estiver maior que o tamanho estabelecido, reduza-o

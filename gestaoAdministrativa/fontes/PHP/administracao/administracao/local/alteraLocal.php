@@ -234,7 +234,7 @@ case 1:
     }
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -361,19 +361,19 @@ if (comparaValor("nom_local", $nomLocal, "administracao.local", "and cod_orgao =
             if ($arCodLocal[0]) {
                 $stCodLocal = $arCodLocal[1];
             }
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodLocal.' - '.$nomLocal.'","alterar","aviso","'.Sessao::getId().'");
                  mudaTelaPrincipal("alteraLocal.php?'.Sessao::getId().'&pagina='.$pagina.'");
                  </script>';
     } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomLocal.'","n_alterar","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("O Local '.$nomLocal.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");

@@ -65,7 +65,7 @@ if ($ctrl >= 0) {
     }
     $aAbas = array("Prescrição", "Exames", "Internações");
     ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function mudarAba(keyant,key)
     {
         var f = document.frm;
@@ -906,7 +906,7 @@ case 10:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

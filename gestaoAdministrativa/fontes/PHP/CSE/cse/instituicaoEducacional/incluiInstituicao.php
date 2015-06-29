@@ -52,7 +52,7 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
     switch ($ctrl) {
         case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -120,20 +120,20 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
                 $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $var[nomInstituicao]);
                 $audicao->insereAuditoria();
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("'.$var[nomInstituicao].'","incluir","aviso","'.$sessao->id.'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'");
                     </script>';
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("'.$var[nomInstituicao].'","n_incluir","erro","'.$sessao->id.'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'");
                     </script>';
             }
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("A Instituição '.$var[nomInstituicao].' já existe","unica","erro","'.$sessao->id.'");
                 mudaTelaPrincipal("incluiInstituicao.php?'.$sessao->id.'&codInstituicao='.$var[codInsituicao].'&nomInstituicao='.$var[nomInstituicao].'&ctrl=0");
                 </script>';

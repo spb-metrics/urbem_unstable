@@ -63,15 +63,15 @@ if (!(isset($ctrl)))
     $ctrl = 0;
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
 switch ($ctrl) {
       case 0:
 ?>
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                   function Valida()
                   {
                         var mensagem = "";
@@ -311,14 +311,14 @@ switch ($ctrl) {
                   $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $codApolice);
                   $audicao->insereAuditoria();
                   echo '
-                  <script language="JavaScript1.2" type="text/javascript">
+                  <script type="text/javascript">
                         alertaAviso("Bem '.$codBem.' excluído da Apólice '.$codApolice.'","unica","aviso","'.Sessao::getId().'");
                         mudaTelaPrincipal("excluiBens.php?'.Sessao::getId().'&ctrl=2&codApolice='.$codApolice.'");
                   </script>
                   ';
             } else {
                   echo '
-                  <script language="JavaScript1.2" type="text/javascript">
+                  <script type="text/javascript">
                         alertaAviso("Não foi possível excluir o bem '.$codBem.'da Aopólice '.$codApolice.'","unica","aviso","'.Sessao::getId().'");
                         mudaTelaPrincipal("excluiBens.php?'.Sessao::getId().'&ctrl=2&codApolice='.$codApolice.'");
                   </script>

@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: imprimeReciboProcesso.php 62581 2015-05-21 14:05:03Z michel $
+    $Id: imprimeReciboProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -59,7 +59,7 @@ $permitido      = $arInteressados['permitidos'];
 
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function ImprimirEtiqueta()
     {
@@ -105,7 +105,7 @@ if ( empty($nomCgm) and $numCgm ) {
 
 if ($iCodProcesso==0 or strlen($sAnoExercicio)==0) {
     exit('
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             alertaAviso("Código do Processo Inexistente ou Ano exercício Inválido","unica","erro","'.Sessao::getId().'");
             mudaTelaPrincipal("listaSituacaoProcesso.php?'.Sessao::getId().'");
         </script>');
@@ -346,7 +346,7 @@ if (file_exists($caminhoRecibo)) {
     }
 
 } else {
-    echo "<script language='javascript'>
+    echo "<script type='text/javascript'>
             alertaAviso('Erro ao Carregar o arquivo XML, verifique os parâmetros','unica','erro', '".Sessao::getId()."');
         </script>";
 }

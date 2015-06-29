@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: ListaPDF.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: ListaPDF.class.php 62808 2015-06-22 11:44:14Z gelson $
 
 Casos de uso: uc-01.01.00
 */
@@ -1045,7 +1045,6 @@ function show()
         $sFilePDF = $sFile.".pdf";
         $sFilePS  = $sFile.".ps";
         $this->Output($sFilePDF);
-//        $cmdo = "cat $sFile | $sAcrobatReader -toPostScript -fast $stParams | lpr -P$this->stFilaImpressao -#$this->inNumeroImpressoes ";
         $cmdo  = " pdf2ps ".$sFilePDF." ".$sFilePS." && ";
         $cmdo .= " lpr -r -P$this->stFilaImpressao ".$sFilePS." -#$this->inNumeroImpressoes";
         exec($cmdo, $aAux);

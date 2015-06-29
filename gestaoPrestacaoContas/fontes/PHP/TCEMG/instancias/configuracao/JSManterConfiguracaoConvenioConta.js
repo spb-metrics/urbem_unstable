@@ -28,16 +28,16 @@
 
     * @ignore
     *
-    * $Id: JSManterConfiguracaoConvenioConta.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterConfiguracaoConvenioConta.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     *
-    * $Revision: 59612 $
-    * $Author: gelson $
-    * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    * $Revision: 62838 $
+    * $Author: diogo.zarpelon $
+    * $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
     
 */
 </script>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     document.frm.stCtrl.value = BuscaDado;

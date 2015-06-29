@@ -38,19 +38,19 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGObsMetaArrecadacao.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGObsMetaArrecadacao.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
     $obTTCEMGObsMetaArrecadacao = new TTCEMGObsMetaArrecadacao();
     $obTTCEMGObsMetaArrecadacao->setDado('exercicio'   , Sessao::getExercicio());
-    $obTTCEMGObsMetaArrecadacao->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obTTCEMGObsMetaArrecadacao->setDado('periodo'     , ($arFiltros['inPeriodo']*2));
 
     $obTTCEMGObsMetaArrecadacao->recuperaDadosArquivo($rsArquivo);
-
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('periodo');
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('observacao');
 
 ?>

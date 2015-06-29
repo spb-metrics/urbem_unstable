@@ -29,10 +29,10 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLManterRegistroPreco.php 59612 2014-09-02 12:00:51Z gelson $
- * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
- * $Author: gelson $
- * $Rev: 59612 $
+ * $Id: FLManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
+ * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+ * $Author: michel $
+ * $Rev: 62832 $
  *
  */
 
@@ -57,6 +57,16 @@ $obHdnAcao->setValue($stAcao);
 $obForm = new Form;
 $obForm->setAction($pgList);
 
+$obTxtExercicioRegistroPreco = new TextBox();
+$obTxtExercicioRegistroPreco->setName('stExercicioRegistroPreco');
+$obTxtExercicioRegistroPreco->setId('stExercicioRegistroPreco');
+$obTxtExercicioRegistroPreco->setRotulo('Exercício');
+$obTxtExercicioRegistroPreco->setMaxLength(4);
+$obTxtExercicioRegistroPreco->setSize(5);
+$obTxtExercicioRegistroPreco->setNull(true);
+$obTxtExercicioRegistroPreco->setInteiro(true);
+$obTxtExercicioRegistroPreco->setValue( Sessao::getExercicio() );
+
 $obITextBoxSelectEntidade = new ITextBoxSelectEntidadeGeral();
 $obITextBoxSelectEntidade->setId('stEntidade');
 $obITextBoxSelectEntidade->setName('stEntidade');
@@ -66,6 +76,7 @@ $obFormulario = new Formulario;
 $obFormulario->addForm  ( $obForm    );
 $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addTitulo("Dados para filtro");
+$obFormulario->addComponente($obTxtExercicioRegistroPreco);
 $obFormulario->addComponente($obITextBoxSelectEntidade);
 $obFormulario->OK();
 $obFormulario->show();

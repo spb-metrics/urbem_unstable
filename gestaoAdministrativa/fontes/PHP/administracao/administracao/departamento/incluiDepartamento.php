@@ -58,7 +58,7 @@ $controle = 0;
 switch ($controle) {
 case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function validaOrganograma(iCod,campo,campoCod,stItemMsg)
     {
@@ -358,19 +358,19 @@ if (comparaValor("nom_departamento", $nomDepartamento, "administracao.departamen
             if ($arCodDpto[0]) {
                 $stCodDpto = $arCodDpto[1];
             }
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodDpto.' - '.$nomDepartamento.'","incluir","aviso","'.Sessao::getId().'");
                  mudaTelaPrincipal("incluiDepartamento.php?'.Sessao::getId().'&stCodOrgao='.$stCodOrgao.'&stCodUnidade='.$stCodUnidade.'");
                  </script>';
             } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomDepartamento.'","n_incluir","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("O Departamento '.$nomDepartamento.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");

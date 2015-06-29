@@ -52,6 +52,6 @@ uc-02.04.33
 
 */ 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 </script>
                 

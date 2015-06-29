@@ -51,7 +51,7 @@ Adicionada nova opção para consulta de ficha financeira.
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
 	 action = document.frm.action;

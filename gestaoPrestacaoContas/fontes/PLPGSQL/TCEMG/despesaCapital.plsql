@@ -31,23 +31,23 @@
     * @package URBEM
     * @subpackage 
 
-    $Id: despesaCapital.plsql 62056 2015-03-27 14:53:30Z michel $
+    $Id: despesaCapital.plsql 62780 2015-06-17 14:35:08Z michel $
 */
 
-CREATE OR REPLACE FUNCTION tcemg.fn_despesa_capital(VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcemg.fn_despesa_capital(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
-    stDtInicial         VARCHAR := '';
-    stDtFinal           VARCHAR := '';
+    stDtInicial         ALIAS FOR $3;
+    stDtFinal           ALIAS FOR $4;
+
+    inPeriodo           INTEGER := 0;
     stSql               VARCHAR := '';
     reRegistro          RECORD;
 
 BEGIN
 
-    stDtInicial := '01/01/' || stExercicio;
-    stDtFinal := TO_CHAR(last_day(TO_DATE(stExercicio || '-' || inMes || '-' || '01','yyyy-mm-dd')),'dd/mm/yyyy');
+    inPeriodo := EXTRACT( month FROM TO_DATE(''|| stDtInicial ||'','dd/mm/yyyy') ) AS mes;
 
     CREATE TEMPORARY TABLE tmp_retorno(
         mes                 INTEGER,
@@ -430,7 +430,7 @@ BEGIN
     EXECUTE stSql;
 
     --insere os dados na tabela de retorno o tipo 1 - dotacao inicial
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , COALESCE((SELECT SUM(vl_original)
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.4%'
@@ -481,7 +481,7 @@ BEGIN
                                     , 1 );
 
      --insere os dados na tabela de retorno o tipo 2 - dotacao atualizada
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , COALESCE((SELECT SUM(vl_atualizado)
                                                   FROM tmp_dotacao
                                                  WHERE cod_estrutural LIKE '4.4%'
@@ -532,7 +532,7 @@ BEGIN
                                     , 2 );        
 
     --insere os dados na tabela de retorno o tipo 4 - empenho
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_empenhado 
                                                  WHERE cod_estrutural LIKE '4.4%'
@@ -583,7 +583,7 @@ BEGIN
                                     , 4 );
 
     --insere os dados na tabela de retorno o tipo 5 - liquidada
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , (COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_liquidado 
                                                  WHERE cod_estrutural LIKE '4.4%'
@@ -689,7 +689,7 @@ BEGIN
                                     , 5 );
 
     --insere os dados na tabela de retorno o tipo 6 - anulado
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , COALESCE((SELECT SUM(valor) 
                                                   FROM tmp_anulado 
                                                  WHERE cod_estrutural LIKE '4.4%'
@@ -740,7 +740,7 @@ BEGIN
                                     , 6 );
 
       --insere os dados na tabela de retorno o tipo 3 - dotacao saldo
-    INSERT INTO tmp_retorno VALUES (  inMes
+    INSERT INTO tmp_retorno VALUES (  inPeriodo
                                     , COALESCE((SELECT SUM(vl_atualizado) 
                                                        + ( COALESCE((SELECT SUM(valor) 
                                                                     FROM tmp_anulado 

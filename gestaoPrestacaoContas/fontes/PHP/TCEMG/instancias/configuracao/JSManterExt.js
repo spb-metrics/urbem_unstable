@@ -55,7 +55,7 @@ Arquivos para geração do TCMGO
 
 */
 ?>
-<script language="javascript">
+<script type="text/javascript">
         
     function excluirListaItens( id,categoria,tipo_lancamento,sub_tipo_lancamento ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+id+'&categoria='+categoria+'&tipo_lancamento='+tipo_lancamento+'&sub_tipo_lancamento='+sub_tipo_lancamento,'excluirListaItens');

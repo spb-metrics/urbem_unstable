@@ -21,16 +21,20 @@
     *                                                                                *
     **********************************************************************************
 */
+/**
+    * Página JavaScript de Ordem de Compra
+    * Data de Criação   : 06/07/2007
+
+    * @author Analista: Gelson W. Gonçalves
+    * @author Desenvolvedor: Henrique Boaventura
+
+    * @ignore
+
+    $Id: JSManterOrdemCompra.js 62696 2015-06-09 14:19:37Z michel $
+
+*/
 </script>
 <script>
-//     function teste(){
-//         var campos = new String();
-//         for(cmp=0;cmp<document.frm.elements.length;cmp++){
-//           campos+="&"+document.frm.elements[cmp].name+"="+document.frm.elements[cmp].value;
-//         }
-//         ajaxJavaScript('<?=$pgOcul?>?<?=$sessao->id?>'+campos,'BuscaPreEmpenho');
-//     }
-
     function buscaDado( BuscaDado ){
         var stTarget = document.frm.target;
         var stAction = document.frm.action;
@@ -38,7 +42,6 @@
         document.frm.stCtrl.value = BuscaDado;
         document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
         document.frm.submit();
-        //document.frm.action = '<?=$pgProc;?>?<?=$sessao->id;?>';
         document.frm.action = stAction;
         document.frm.target = stTarget;
     }
@@ -46,5 +49,62 @@
     function limparFiltro(){
         document.frm.reset();
         passaItem('document.frm.inCodEntidade','document.frm.inCodEntidadeDisponivel','tudo');
+    }
+    
+    function incluirItem( idItem, linha_table_tree) {
+        var boErro = false;
+        var msg = '';
+
+        var inCodItem = document.getElementById('inCodItem'+idItem).value;
+        var inCodCentroCusto = document.getElementById('inCodCentroCusto'+idItem).value;
+        var inMarca = document.getElementById('inMarca'+idItem).value;
+
+        if (inCodItem=='') {
+            boErro = true;
+            msg = msg+'@Campo Código do Item inválido().';
+        }
+        if (inCodCentroCusto=='') {
+            boErro = true;
+            msg = msg+'@Campo Centro de Custo inválido().';
+        }
+        if (inMarca=='') {
+            boErro = true;
+            msg = msg+'@Campo Marca inválido().';
+        }
+
+        if(boErro == true){
+            alertaAviso(msg,'form','erro','".Sessao::getId()."', '../');
+        }else{
+            TableTreeLineControl( linha_table_tree , 'none', '', 'none');
+            
+            var stTarget = document.frm.target;
+            var stAction = document.frm.action;
+            document.frm.target = 'oculto';
+            document.frm.stCtrl.value = 'incluirItem';
+            document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&idItem='+idItem;
+            document.frm.submit();
+            document.frm.action = stAction;
+            document.frm.target = stTarget;
+        }
+    }
+    
+    function limpaItem( idItem, boMarcaCentro ) {
+        if (boMarcaCentro == 'f') {
+            document.getElementById('inCodItem'+idItem).value = '';
+            document.getElementById('stNomItem'+idItem).innerHTML = '&nbsp;';
+        }
+        document.getElementById('inCodCentroCusto'+idItem).value = '';
+        document.getElementById('stNomCentroCusto'+idItem).innerHTML = '&nbsp;';
+        document.getElementById('inMarca'+idItem).value = '';
+        document.getElementById('stNomMarca'+idItem).innerHTML = '&nbsp;';
+        
+        var stTarget = document.frm.target;
+        var stAction = document.frm.action;
+        document.frm.target = 'oculto';
+        document.frm.stCtrl.value = 'excluirItem';
+        document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&idItem='+idItem;
+        document.frm.submit();
+        document.frm.action = stAction;
+        document.frm.target = stTarget;
     }
 </script>

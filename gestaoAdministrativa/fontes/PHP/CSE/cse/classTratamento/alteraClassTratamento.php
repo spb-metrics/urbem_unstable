@@ -147,7 +147,7 @@ $conn->vaiPrimeiro();
 case 1:
 $nomClassTratamento = pegaDado("nom_classificacao","cse.classificacao_tratamento","Where cod_classificacao = '".$codClassTratamento."' ");
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";
@@ -249,7 +249,7 @@ case 2:
 ?>
 <html>
 <head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function executa()
 {
     var mensagem = "";

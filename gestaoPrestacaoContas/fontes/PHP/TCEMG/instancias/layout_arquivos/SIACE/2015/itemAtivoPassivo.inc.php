@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-   /*
+
     * Arquivo de geracao do arquivo sertTerceiros TCM/MG
     * Data de Criação   : 19/01/2009
 
@@ -35,34 +32,59 @@
 
     * @ignore
 
-    $Id:$
+    $Id: $
     */
 
-/* Arquivos PassivoPerm não implementado, simplesmente vazio
-*/
-
- include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGItemAtivoPassivo.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGItemAtivoPassivo.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
-    $dataInicial = '01/'.str_pad($arFiltros['inPeriodo'], 2, "0", STR_PAD_LEFT).'/'.Sessao::read('exercicio');
-    $dataFinal = SistemaLegado::retornaUltimoDiaMes($arFiltros['inPeriodo'],Sessao::read('exercicio'));
     
+    SistemaLegado::retornaInicialFinalMesesPeriodicidade( $arDatas,"ano",$arFiltros['inPeriodo'],Sessao::getExercicio() );
+
     $obTTCEMGItemAtivoPassivo = new TTCEMGItemAtivoPassivo();
-    $obTTCEMGItemAtivoPassivo->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obTTCEMGItemAtivoPassivo->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obTTCEMGItemAtivoPassivo->setDado('mes'         , str_pad($arFiltros['inPeriodo'], 2, "0", STR_PAD_LEFT));
-    $obTTCEMGItemAtivoPassivo->setDado('dataInicial' , $dataInicial);
-    $obTTCEMGItemAtivoPassivo->setDado('dataFinal'   , $dataFinal);
 
-    $obTTCEMGItemAtivoPassivo->recuperaDadosArquivo($rsItemAtivoPassivo);
+    foreach ($arDatas as $stDatas) {
 
-    $obExportador->roUltimoArquivo->addBloco($rsItemAtivoPassivo);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('descricao');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valor_acrescimo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_reducao');
+        $obTTCEMGItemAtivoPassivo->setDado('exercicio'    , Sessao::read('exercicio'));
+        $obTTCEMGItemAtivoPassivo->setDado('cod_entidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']));
+        $obTTCEMGItemAtivoPassivo->setDado('dataInicial'  , $stDatas['stDtInicial'] );
+        $obTTCEMGItemAtivoPassivo->setDado('dataFinal'    , $stDatas['stDtFinal']   );
+    
+        $obTTCEMGItemAtivoPassivo->recuperaDadosArquivo($rsItemAtivoPassivo);
+    
+        $obExportador->roUltimoArquivo->addBloco($rsItemAtivoPassivo);
+    
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('descricao');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(120);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valor_acrescimo');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('vl_reducao');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+    }
+
+    unset($arDatas);
+    unset($arFiltros);
+    unset($obTTCEMGItemAtivoPassivo);
+
+?>
 
 
         

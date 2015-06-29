@@ -46,6 +46,25 @@ Revision 1.10  2006/07/05 20:39:28  cleisson
 Adicionada tag Log aos arquivos
 
 */
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+
+//Novo Relatorio apartir de 2015 e será feito em MPDF
+if (Sessao::getExercicio() >= '2015' ) {
+    include_once '../../../../../../config.php';
+    include_once CLA_MPDF;
+    
+    $arDadosBordero = Sessao::read('arDados');
+    $arDadosBordero['filtro'] = Sessao::read('filtroRelatorio');
+    $obMPDF = new FrameWorkMPDF(2,30,7);
+    $obMPDF->setNomeRelatorio("Borderô Pagamento");
+    $obMPDF->setFormatoFolha("A4");
+    $obMPDF->setConteudo($arDadosBordero);
+    $obMPDF->setTipoSaida('I');
+    $obMPDF->gerarRelatorio();    
+
+}else{
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once( CAM_FW_PDF."RRelatorio.class.php" );
@@ -243,5 +262,7 @@ $obPDF->setAlinhamento ( "C" );
 $obPDF->addCampo("Assinante_3", 8 );
 
 $obPDF->show();
+
+}//Fim do ELSE
 
 ?>

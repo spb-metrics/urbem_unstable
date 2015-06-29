@@ -106,7 +106,7 @@ switch ($ctrl) {
     //formulario para insercao da Especie com filtro por Natureza->Grupo
     case 0:
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
 
         function Valida()
         {
@@ -458,7 +458,7 @@ switch ($ctrl) {
         $conn->fechaBD();
 
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -645,7 +645,7 @@ switch ($ctrl) {
 
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Erro no cadastro de Atributos","unica","erro","'.Sessao::getId().'");
                         window.location = "incluiEspecie.php?'.Sessao::getId().'";
                     </script>';
@@ -693,7 +693,7 @@ switch ($ctrl) {
 
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Erro no cadastro de Atributos","unica","erro","'.Sessao::getId().'");
                         window.location = "incluiEspecie.php?'.Sessao::getId().'";
                     </script>';
@@ -715,7 +715,7 @@ switch ($ctrl) {
                 $msg .= "Espécie ".$nomEspecie;
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("'.$msg.'","alterar","aviso","'.Sessao::getId().'");
                         window.location = "alteraEspecie.php?ctrl=1&pagina='.$pagina.'&'.Sessao::getId().'";
                     </script>';
@@ -723,7 +723,7 @@ switch ($ctrl) {
             } else {
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                         alertaAviso("Não foi possível alterar a espécie","unica","erro","'.Sessao::getId().'");
                         window.location = "alteraEspecie.php?'.Sessao::getId().'";
                     </script>';
@@ -731,7 +731,7 @@ switch ($ctrl) {
 
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("A Espécie '.$nomEspecie.' já existe","unica","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("alteraEspecie.php?'.Sessao::getId().'&nomEspecie='.$nomEspecie.'&codNatureza='.$codNatureza.'&codGrupo='.$codGrupo.'&codEspecie='.$codEspecie.'&ctrl=1");
                 </script>';

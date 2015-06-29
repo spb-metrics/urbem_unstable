@@ -170,7 +170,7 @@ case 1:
         $dbConfig->fechaBd();
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -280,19 +280,19 @@ if (comparaValor("nom_unidade", $nomUnidade, "administracao.unidade", "and cod_o
             if ($arCodUnidade[0]) {
                 $stCodUnidade = $arCodUnidade[1];
             }
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodUnidade.' - '.$nomUnidade.'","alterar","aviso","'.Sessao::getId().'");
                  mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&pagina='.$pagina.'");
                  </script>';
     } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomUnidade.'","n_alterar","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo'
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("A Unidade '.$nomUnidade.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");
@@ -314,7 +314,7 @@ case 3:
     $dbConfig->fechaBd();
 
     if ($usuarioResponsavel == "") {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
                     alertaAviso("Código de Usuário invalido ('.$usuarioNumCgm.')","unica","erro","'.Sessao::getId().'");
               </script>';
     }

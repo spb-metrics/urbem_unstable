@@ -206,7 +206,7 @@ case 1:
         }
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -327,19 +327,19 @@ if (comparaValor("nom_Setor", $nomSetor, "administracao.setor", "and cod_orgao =
             if ($arCodSetor[0]) {
                 $stCodSetor = $arCodSetor[1];
             }
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$stCodSetor.' - '.$nomSetor.'","alterar","aviso","'.Sessao::getId().'");
                  mudaTelaPrincipal("alteraSetor.php?'.Sessao::getId().'&pagina='.$pagina.'");
                  </script>';
     } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$nomSetor.'","n_alterar","erro","'.Sessao::getId().'");
                  </script>';
                  executaFrameOculto("f.ok.disabled = false;");
     }
 } else {
     echo '
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
         alertaAviso("O Setor '.$nomSetor.' já existe","unica","erro","'.Sessao::getId().'");
         </script>';
         executaFrameOculto("f.ok.disabled = false;");
@@ -361,7 +361,7 @@ case 3:
     $dbConfig->fechaBd();
 
     if ($usuarioResponsavel == "") {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
                     alertaAviso("Código de Usuário invalido ('.$usuarioNumCgm.')","unica","erro","'.Sessao::getId().'");
               </script>';
     }

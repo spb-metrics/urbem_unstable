@@ -70,8 +70,8 @@ setAjuda("UC-03.01.10");
         $pagina = $sessao->transf2;
     }
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -181,7 +181,7 @@ Sessao::getExercicio()
                 $audicao->insereAuditoria();
 
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("Situação: '.$exclui->nome.'","excluir","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("excluiSituacao.php?'.Sessao::getId().'&pagina='.$pagina.'&ctrl=0");
                     </script>';
@@ -189,7 +189,7 @@ Sessao::getExercicio()
             // se operacao de deleção nao foi realizada com sucesso exibe msg de erro
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("'.$objeto.'","n_excluir","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("excluiSituacao.php?'.Sessao::getId().'&ctrl=0");
                     </script>';

@@ -49,7 +49,7 @@ bug #7649
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Salvar(){
     document.frm.target = 'telaPrincipal';

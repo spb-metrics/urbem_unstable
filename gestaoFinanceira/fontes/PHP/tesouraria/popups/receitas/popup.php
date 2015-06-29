@@ -65,7 +65,7 @@ $sTitulo = "Confirmação";
 
 ?>
 
-<script language="javascript"><!--
+<script type="text/javascript"><!--
 var skipcycle = false
 
 function fcsOnMe()
@@ -103,7 +103,7 @@ mytimer = setTimeout('fcsOnMe()', 500);
 <td colspan=2 align=center>
 <?php
 echo "
-<script language='JavaScript1.2' type='text/javascript'>
+<script type='text/javascript'>
 function mudaPagina()
 {
 window.opener.parent.frames['telaPrincipal'].document.frm.stRedireciona.value='FMDetalhamentoReceitas.php?".Sessao::getId()."&stExercicio=".$_GET["stExercicio"]."&inCodConta=".$_GET["inCodPlano"]."';

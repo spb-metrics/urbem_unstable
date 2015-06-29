@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSManterCobranca.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterCobranca.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-05.04.04
 */
@@ -62,7 +62,7 @@ Revision 1.1  2007/02/09 18:32:04  cercato
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function ListarCobranca() {
     if ( document.frm.inCGM.value == "" && document.frm.inCodInscricao.value == "" && document.frm.inCodImovelInicial.value == "" && document.frm.inNumInscricaoEconomicaInicial.value == "" ) {

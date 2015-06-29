@@ -22,7 +22,7 @@
     **********************************************************************************
 */
 </script>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
      var acao = document.frm.action;

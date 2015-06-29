@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: AOC.inc.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: AOC.inc.php 62672 2015-06-03 13:34:20Z evandro $
 
     * Casos de uso: uc-06.04.00
 */
@@ -59,7 +59,7 @@
     foreach ($rsAlteracoes->arElementos as $arAlteracoes) {
 
         $arAlteracoes['nro_sequencial'] = ++$inCount;
-        $stChave = $arAlteracoes['cod_programa'].$arAlteracoes['num_orgao'].$arAlteracoes['num_unidade'].$arAlteracoes['cod_funcao'].$arAlteracoes['cod_subfuncao'].$arAlteracoes['nat_acao'].$arAlteracoes['num_seqproj'];
+        $stChave = $arAlteracoes['num_programa'].$arAlteracoes['num_orgao'].$arAlteracoes['num_unidade'].$arAlteracoes['cod_funcao'].$arAlteracoes['cod_subfuncao'].$arAlteracoes['nat_acao'].$arAlteracoes['num_seqproj'];
 
         $rsBloco = 'rsBloco_'.$inCount;
         unset($$rsBloco);
@@ -71,7 +71,7 @@
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_programa");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
 
@@ -117,7 +117,7 @@
 
         //tipo 11
         foreach ($rsAlteracoesElemento->arElementos as $arAlteracoesElemento) {
-            $stChaveElemento = $arAlteracoesElemento['cod_programa'].$arAlteracoesElemento['num_orgao'].$arAlteracoesElemento['num_unidade'].$arAlteracoesElemento['cod_funcao'].$arAlteracoesElemento['cod_subfuncao'].$arAlteracoesElemento['nat_acao'].$arAlteracoesElemento['num_seqproj'];
+            $stChaveElemento = $arAlteracoesElemento['num_programa'].$arAlteracoesElemento['num_orgao'].$arAlteracoesElemento['num_unidade'].$arAlteracoesElemento['cod_funcao'].$arAlteracoesElemento['cod_subfuncao'].$arAlteracoesElemento['nat_acao'].$arAlteracoesElemento['num_seqproj'];
             $stChaveElementoRecurso = $stChaveElemento.$arAlteracoesElemento['cod_estrutural'].$arAlteracoesElemento['dt_suplementacao'].$arAlteracoesElemento['cod_suplementacao'].$arAlteracoesElemento['tipo_alteracao'];
             if ($stChave == $stChaveElemento) {
                 $arAlteracoesElemento['nro_sequencial'] = ++$inCount;
@@ -132,7 +132,7 @@
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_programa");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
 
@@ -198,7 +198,7 @@
 
                 //tipo 12
                 foreach ($rsAlteracoesRecurso->arElementos as $arAlteracoesRecurso) {
-                    $stChaveRecurso = $arAlteracoesRecurso['cod_programa'].$arAlteracoesRecurso['num_orgao'].$arAlteracoesRecurso['num_unidade'].$arAlteracoesRecurso['cod_funcao'].$arAlteracoesRecurso['cod_subfuncao'].$arAlteracoesRecurso['nat_acao'].$arAlteracoesRecurso['num_seqproj'].$arAlteracoesRecurso['cod_estrutural'].$arAlteracoesRecurso['dt_suplementacao'].$arAlteracoesRecurso['cod_suplementacao'].$arAlteracoesRecurso['tipo_alteracao'];
+                    $stChaveRecurso = $arAlteracoesRecurso['num_programa'].$arAlteracoesRecurso['num_orgao'].$arAlteracoesRecurso['num_unidade'].$arAlteracoesRecurso['cod_funcao'].$arAlteracoesRecurso['cod_subfuncao'].$arAlteracoesRecurso['nat_acao'].$arAlteracoesRecurso['num_seqproj'].$arAlteracoesRecurso['cod_estrutural'].$arAlteracoesRecurso['dt_suplementacao'].$arAlteracoesRecurso['cod_suplementacao'].$arAlteracoesRecurso['tipo_alteracao'];
                     if ($stChaveRecurso == $stChaveElementoRecurso) {
                         $arAlteracoesRecurso['nro_sequencial'] = ++$inCount;
 
@@ -212,7 +212,7 @@
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
+                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_programa");
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
 

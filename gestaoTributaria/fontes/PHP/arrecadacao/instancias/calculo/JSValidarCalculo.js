@@ -41,7 +41,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function verificaMarcados() {
     var cont = 0;

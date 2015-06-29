@@ -31,7 +31,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    * $Id: cancelaEncaminhamento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: cancelaEncaminhamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-01.06.98
 
@@ -77,7 +77,7 @@ if ($_REQUEST['controle'] == 1) {
     $ctrl = $_REQUEST['controle'];
 } ?>
 
-<script language="javascript">
+<script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -92,7 +92,7 @@ switch ($ctrl) {
 case 0:
     Sessao::remove('filtro');
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Valida()
     {
         var erro = false;
@@ -489,12 +489,12 @@ if (Sessao::read('ordem') != "") {
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codProcesso);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("Encaminhamento para Processo cod. '.$codProcesso.' cancelado com sucesso","unica","aviso", "'.Sessao::getId().'");
             window.location = "cancelaEncaminhamento.php?'.Sessao::getId().'&ctrl=1&pagina='.$pagina.'&codProcessoFl='.$codProcessoFl.'&codClassificacao='.$codClassificacao.'&codAssunto='.$codAssunto.'&numCgm='.$numCgm.'&numCgmU='.$numCgmU.'&numCgmUltimo='.$numCgmUltimo.'&dataInicial='.$dataInicial.'&dataFinal='.$dataFinal.'&ordem='.$ordem.'";
             </script>';
         } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
             alertaAviso("Encaminhamento para Processo cod. '.$codProcesso.'","n_alterar","aviso", "'.Sessao::getId().'");
             window.location = "cancelaEncaminhamento.php?'.Sessao::getId().'&ctrl=1&pagina='.$pagina.'&codProcessoFl='.$codProcessoFl.'&codClassificacao='.$codClassificacao.'&codAssunto='.$codAssunto.'&numCgm='.$numCgm.'&numCgmU='.$numCgmU.'&numCgmUltimo='.$numCgmUltimo.'&dataInicial='.$dataInicial.'&dataFinal='.$dataFinal.'&ordem='.$ordem.'";
             </script>';

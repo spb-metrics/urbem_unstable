@@ -54,30 +54,24 @@ class TTCEALRelEventosContabeis extends Persistente
                                ON sw_cgm.numcgm = entidade.numcgm
                        INNER JOIN sw_cgm_pessoa_juridica AS PJ 
                                ON PJ.numcgm = sw_cgm.numcgm
-                            WHERE entidade.exercicio    = '".$this->getDado('stExercicio')."' 
+                            WHERE entidade.exercicio = '".$this->getDado('stExercicio')."' 
                               AND entidade.cod_entidade = ".$this->getDado('inCodEntidade')."
                        ) AS cod_und_gestora
                      , (SELECT LPAD(valor,4,'0') 
                           FROM administracao.configuracao_entidade 
-                         WHERE exercicio    = '".$this->getDado('stExercicio')."'
+                         WHERE exercicio = '".$this->getDado('stExercicio')."'
                            AND cod_entidade = ".$this->getDado('inCodEntidade')." 
-                           AND cod_modulo   = 62 
-                           AND parametro    = 'tceal_configuracao_unidade_autonoma'
+                           AND cod_modulo = 62 
+                           AND parametro = 'tceal_configuracao_unidade_autonoma'
                        ) AS codigo_ua
                      , ".$this->getDado('bimestre')." AS bimestre
                      , '".$this->getDado('stExercicio')."' AS exercicio
-                     , CASE WHEN ccpc.cod_estrutural IS NOT NULL THEN SUBSTRING(REPLACE(ccpc.cod_estrutural, '.', ''), 1, 8)
-                            WHEN cdpc.cod_estrutural IS NOT NULL THEN SUBSTRING(REPLACE(cdpc.cod_estrutural, '.', ''), 1, 8)
-                       END AS cod_evento
-                     , CASE WHEN ccpc.nom_conta IS NOT NULL THEN REPLACE(ccpc.nom_conta, '.', '')
-                            WHEN cdpc.nom_conta IS NOT NULL THEN REPLACE(cdpc.nom_conta, '.', '')
-                       END AS titulo_evento
-                     , CASE WHEN ccpc.tipo_valor = 'C' THEN 2
-                            WHEN cdpc.tipo_valor = 'D' THEN 1
+                     , retorno_evento.cod_evento
+                     , contas.nom_conta AS titulo_evento
+                     , CASE WHEN retorno_evento.tipo_conta = 'credito' THEN 2
+                            WHEN retorno_evento.tipo_conta = 'debito' THEN 1
                        END AS id_debcred
-                     , CASE WHEN ccpc.cod_estrutural IS NOT NULL THEN REPLACE(ccpc.cod_estrutural, '.', '')
-                            WHEN cdpc.cod_estrutural IS NOT NULL THEN REPLACE(cdpc.cod_estrutural, '.', '')
-                       END AS cod_conta_contabil
+                     , REPLACE(retorno_evento.cod_estrutural, '.', '') AS cod_conta_contabil
 
                   FROM contabilidade.lancamento
 
@@ -94,14 +88,15 @@ class TTCEALRelEventosContabeis extends Persistente
                    AND lote.tipo         = lancamento.tipo
                    AND lote.cod_entidade = lancamento.cod_entidade
 
-            LEFT  JOIN (  SELECT                                    
+                  JOIN (  SELECT                                    
                                  cc.cod_lote,                                     
                                  cc.tipo,                                         
                                  cc.sequencia,                                    
                                  cc.exercicio,                                    
                                  cc.tipo_valor,                                   
                                  cc.cod_entidade,                                 
-                                 cc.cod_plano,                                    
+                                 cc.cod_plano,
+                                 pc.cod_conta,                                    
                                  pc.cod_estrutural,  
                                  pc.nom_conta                                      
                             FROM contabilidade.plano_analitica     AS pa          
@@ -112,22 +107,18 @@ class TTCEALRelEventosContabeis extends Persistente
                               ON pc.cod_conta    = pa.cod_conta
                              AND pc.exercicio    = pa.exercicio                                                             
                            WHERE pa.exercicio = '".$this->getDado('stExercicio')."' 
-                        ) AS  ccpc                                             
-                     ON ccpc.cod_lote     = valor_lancamento.cod_lote       
-                    AND ccpc.sequencia    = valor_lancamento.sequencia      
-                    AND ccpc.tipo_valor   = valor_lancamento.tipo_valor     
-                    AND ccpc.tipo         = valor_lancamento.tipo           
-                    AND ccpc.exercicio    = valor_lancamento.exercicio      
-                    AND ccpc.cod_entidade = valor_lancamento.cod_entidade
 
-              LEFT JOIN (  SELECT                                               
+                         UNION 
+
+                              SELECT                                               
                                   cd.cod_lote,                                     
                                   cd.tipo,                                         
                                   cd.sequencia,                                    
                                   cd.exercicio,                                    
                                   cd.tipo_valor,                                   
                                   cd.cod_entidade,                                 
-                                  cd.cod_plano,                                    
+                                  cd.cod_plano,
+                                  pc.cod_conta,                                    
                                   pc.cod_estrutural,  
                                   pc.nom_conta                                      
                              FROM contabilidade.plano_analitica     AS pa          
@@ -138,13 +129,19 @@ class TTCEALRelEventosContabeis extends Persistente
                                ON pc.cod_conta    = pa.cod_conta   
                               AND pc.exercicio    = pa.exercicio                                                           
                             WHERE pa.exercicio = '".$this->getDado('stExercicio')."' 
-                        ) AS  cdpc                                             
-                     ON cdpc.cod_lote     = valor_lancamento.cod_lote       
-                    AND cdpc.tipo_valor   = valor_lancamento.tipo_valor     
-                    AND cdpc.tipo         = valor_lancamento.tipo           
-                    AND cdpc.sequencia    = valor_lancamento.sequencia      
-                    AND cdpc.exercicio    = valor_lancamento.exercicio      
-                    AND cdpc.cod_entidade = valor_lancamento.cod_entidade              
+                        ) AS  contas                                             
+                     ON contas.cod_lote     = valor_lancamento.cod_lote
+                    AND contas.tipo_valor   = valor_lancamento.tipo_valor
+                    AND contas.tipo         = valor_lancamento.tipo
+                    AND contas.sequencia    = valor_lancamento.sequencia
+                    AND contas.exercicio    = valor_lancamento.exercicio
+                    AND contas.cod_entidade = valor_lancamento.cod_entidade
+
+               JOIN (SELECT *
+                     FROM recupera_tipo_eventos_contabeis('".$this->getDado('stExercicio')."') AS retorno
+                     ( cod_conta integer, cod_estrutural varchar, tipo_conta text, cod_evento integer, nom_evento varchar)
+                  ) as retorno_evento
+                 ON retorno_evento.cod_conta = contas.cod_conta
 
                  WHERE lancamento.exercicio = '".$this->getDado('stExercicio')."'
                    AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado("dt_inicial")."','dd/mm/yyyy')

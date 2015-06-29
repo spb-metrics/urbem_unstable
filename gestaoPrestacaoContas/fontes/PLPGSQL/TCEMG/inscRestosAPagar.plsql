@@ -60,10 +60,6 @@ BEGIN
        AND configuracao.cod_modulo = 8
        AND configuracao.parametro  = 'cod_entidade_rpps';
 
-    --retira a entidade rpps das entidades selecionadas
-    SELECT SUBSTR(REPLACE(stCodEntidade || ',', ',' || inCodEntidadeRPPS  || ',',','),1,LENGTH( REPLACE(stCodEntidade || ',', ',' || inCodEntidadeRPPS  || ',',','))-1)
-      INTO inCodEntidade;
-
     --seleciona a entidade do legislativo
     SELECT cod_entidade
       INTO inCodEntidadeLegislativo
@@ -74,26 +70,29 @@ INNER JOIN sw_cgm
        AND (    nom_cgm ILIKE '%camara%'
              OR nom_cgm ILIKE '%câmara%');
 
-    IF((SELECT POSITION(inCodEntidadeLegislativo IN stCodEntidade)) = 0)
-    THEN
-        inCodEntidadeLegislativo := 0;
-    END IF; 
+    --seleciona a entidade do Executivo
+    SELECT cod_entidade
+      INTO inCodEntidade
+      FROM orcamento.entidade
+INNER JOIN sw_cgm
+        ON entidade.numcgm = sw_cgm.numcgm
+     WHERE entidade.exercicio = stExercicio
+       AND nom_cgm ILIKE '%prefeitura%';
 
     --cria a tabela temporaria para retornar os dados
     CREATE TEMPORARY TABLE tmp_retorno(
         mes                          INTEGER,
-        vl_processado                NUMERIC(14,2),
-        vl_nao_processado            NUMERIC(14,2),
         vl_despesa_nao_inscrita      NUMERIC(14,2),
-        vl_vinculado                 NUMERIC(14,2),
+        vl_nao_processado            NUMERIC(14,2),
         vl_nao_vinculado             NUMERIC(14,2),
+        vl_processado                NUMERIC(14,2),
+        vl_vinculado                 NUMERIC(14,2),
         vl_rpps_processado           NUMERIC(14,2),
         vl_rpps_nao_processado       NUMERIC(14,2),
         vl_rpps_despesa_nao_inscrita NUMERIC(14,2),
         vl_rpps_vinculado            NUMERIC(14,2),
         vl_rpps_nao_vinculado        NUMERIC(14,2),
         vl_processado_legislativo    NUMERIC(14,2)
-
     );
 
     --Cria uma table temporaria para guardar os dados dos restos
@@ -105,19 +104,26 @@ INNER JOIN sw_cgm
                END AS tipo_recurso
              , sum(liquidados_nao_pagos) as liquidados_nao_pagos
              , sum(empenhados_nao_liquidados) as empenhados_nao_liquidados
-          FROM stn.fn_rgf_anexo6_recurso(stExercicio,inCodEntidade,stDtFinal) AS tb
-               (  cod_recurso integer
-                , tipo varchar
-                , total_processados_exercicios_anteriores numeric
-                , total_processados_exercicio_anterior numeric
+             , sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) AS liquidados_nao_pagos_exercicios_anteriores
+             , sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) AS empenhados_nao_liquidados_exercicios_anteriores           
+          FROM stn.fn_rgf_anexo6novo_recurso(stExercicio,inCodEntidade,stDtFinal) AS tb
+            (   cod_recurso                                   integer
+                , tipo                                        varchar
+                , entidade                                    integer
+                , total_processados_exercicios_anteriores     numeric
+                , total_processados_exercicio_anterior        numeric
                 , total_nao_processados_exercicios_anteriores numeric
-                , total_nao_processados_exercicio_anterior numeric
-                , liquidados_nao_pagos numeric
-                , empenhados_nao_liquidados numeric
-               )
-     LEFT JOIN orcamento.recurso(stExercicio) AS recurso
+                , total_nao_processados_exercicio_anterior    numeric
+                , liquidados_nao_pagos                        numeric
+                , empenhados_nao_liquidados                   numeric
+                , empenhados_nao_liquidados_cancelados        numeric
+                , caixa_liquida                               numeric 
+            )
+
+        JOIN orcamento.recurso(stExercicio) AS recurso
             ON recurso.cod_recurso = tb.cod_recurso
            AND recurso.exercicio = stExercicio
+           WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = stExercicio))
       GROUP BY tb.cod_recurso
              , recurso.tipo
       ORDER BY tb.cod_recurso
@@ -132,19 +138,25 @@ INNER JOIN sw_cgm
                END AS tipo_recurso
              , sum(liquidados_nao_pagos) as liquidados_nao_pagos
              , sum(empenhados_nao_liquidados) as empenhados_nao_liquidados
-          FROM stn.fn_rgf_anexo6_recurso(stExercicio,inCodEntidadeRPPS,stDtFinal) AS tb
-               (  cod_recurso integer
-                , tipo varchar
-                , total_processados_exercicios_anteriores numeric
-                , total_processados_exercicio_anterior numeric
+             , sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) AS liquidados_nao_pagos_exercicios_anteriores
+             , sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) AS empenhados_nao_liquidados_exercicios_anteriores           
+          FROM stn.fn_rgf_anexo6novo_recurso(stExercicio,inCodEntidadeRPPS,stDtFinal) AS tb
+               (   cod_recurso                                integer
+                , tipo                                        varchar
+                , entidade                                    integer
+                , total_processados_exercicios_anteriores     numeric
+                , total_processados_exercicio_anterior        numeric
                 , total_nao_processados_exercicios_anteriores numeric
-                , total_nao_processados_exercicio_anterior numeric
-                , liquidados_nao_pagos numeric
-                , empenhados_nao_liquidados numeric
-               )
-     LEFT JOIN orcamento.recurso(stExercicio) AS recurso
+                , total_nao_processados_exercicio_anterior    numeric
+                , liquidados_nao_pagos                        numeric
+                , empenhados_nao_liquidados                   numeric
+                , empenhados_nao_liquidados_cancelados        numeric
+                , caixa_liquida                               numeric 
+            )
+        JOIN orcamento.recurso(stExercicio) AS recurso
             ON recurso.cod_recurso = tb.cod_recurso
            AND recurso.exercicio = stExercicio
+           WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = stExercicio))
       GROUP BY tb.cod_recurso
              , recurso.tipo
       ORDER BY tb.cod_recurso
@@ -158,60 +170,109 @@ INNER JOIN sw_cgm
                     ELSE recurso.tipo
                END AS tipo_recurso
              , sum(liquidados_nao_pagos) as liquidados_nao_pagos
-             , sum(empenhados_nao_liquidados) as empenhados_nao_liquidados
-          FROM stn.fn_rgf_anexo6_recurso(stExercicio,inCodEntidadeLegislativo,stDtFinal) AS tb
-               (  cod_recurso integer
-                , tipo varchar
-                , total_processados_exercicios_anteriores numeric
-                , total_processados_exercicio_anterior numeric
+          FROM stn.fn_rgf_anexo6novo_recurso(stExercicio,inCodEntidadeLegislativo,stDtFinal) AS tb
+               (   cod_recurso                                integer
+                , tipo                                        varchar
+                , entidade                                    integer
+                , total_processados_exercicios_anteriores     numeric
+                , total_processados_exercicio_anterior        numeric
                 , total_nao_processados_exercicios_anteriores numeric
-                , total_nao_processados_exercicio_anterior numeric
-                , liquidados_nao_pagos numeric
-                , empenhados_nao_liquidados numeric
-               )
-     LEFT JOIN orcamento.recurso(stExercicio) AS recurso
+                , total_nao_processados_exercicio_anterior    numeric
+                , liquidados_nao_pagos                        numeric
+                , empenhados_nao_liquidados                   numeric
+                , empenhados_nao_liquidados_cancelados        numeric
+                , caixa_liquida                               numeric 
+            )
+        JOIN orcamento.recurso(stExercicio) AS recurso
             ON recurso.cod_recurso = tb.cod_recurso
            AND recurso.exercicio = stExercicio
+           WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = stExercicio))
       GROUP BY tb.cod_recurso
              , recurso.tipo
       ORDER BY tb.cod_recurso
              , recurso.tipo;
 
     --insere os valores na tabela temporaria
-    INSERT INTO tmp_retorno VALUES (  inMes
-                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos)
-                                                        FROM tmp_restos),0) AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(empenhados_nao_liquidados)
-                                                        FROM tmp_restos),0) AS NUMERIC)
+    INSERT INTO tmp_retorno VALUES (  
+                                    inMes
+
+                                    --vl_despesa_nao_inscrita
                                     , CAST(0 AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(COALESCE(liquidados_nao_pagos,0))
+
+                                    --vl_nao_processado
+                                    , CAST(COALESCE(( SELECT SUM(empenhados_nao_liquidados)
                                                              +
-                                                             SUM(COALESCE(empenhados_nao_liquidados,0))
-                                                        FROM tmp_restos
-                                                       WHERE tipo_recurso <> 'L'),0) AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(COALESCE(liquidados_nao_pagos,0))
+                                                             SUM(empenhados_nao_liquidados_exercicios_anteriores)
+                                                        FROM tmp_restos),0) AS NUMERIC)
+                                    
+                                    --vl_nao_vinculado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
                                                              +
-                                                             SUM(COALESCE(empenhados_nao_liquidados,0))
+                                                             SUM(empenhados_nao_liquidados_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados)
                                                         FROM tmp_restos
                                                        WHERE tipo_recurso = 'L'),0) AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos)
+                                    
+                                    --vl_processado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
+                                                        FROM tmp_restos),0) AS NUMERIC)
+                                    
+                                    --vl_vinculado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados)
+                                                        FROM tmp_restos
+                                                       WHERE tipo_recurso = 'V'),0) AS NUMERIC)
+                                    
+                                    --vl_rpps_processado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
                                                         FROM tmp_restos_rpps),0) AS NUMERIC)
-                                    , CAST(COALESCE((SELECT SUM(empenhados_nao_liquidados)
+                                    
+                                    --vl_rpps_nao_processado
+                                    , CAST(COALESCE((SELECT  SUM(empenhados_nao_liquidados_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados)
                                                        FROM tmp_restos_rpps),0) AS NUMERIC)
+                                    
+                                    --vl_rpps_despesa_nao_inscrita
                                     , CAST(0 AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(COALESCE(liquidados_nao_pagos,0))
+                                    
+                                    --vl_rpps_vinculado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
                                                              +
-                                                             SUM(COALESCE(empenhados_nao_liquidados,0))
-                                                        FROM Tmp_restos_rpps
-                                                       WHERE Tipo_recurso <> 'L'),0) AS NUMERIC)
-                                    , CAST(COALESCE(( SELECT SUM(COALESCE(liquidados_nao_pagos,0))
+                                                             SUM(empenhados_nao_liquidados_exercicios_anteriores)
                                                              +
-                                                             SUM(COALESCE(empenhados_nao_liquidados,0))
+                                                             SUM(empenhados_nao_liquidados)
+                                                        FROM tmp_restos_rpps
+                                                       WHERE Tipo_recurso = 'V'),0) AS NUMERIC)
+                                    
+                                    --vl_rpps_nao_vinculado
+                                    , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos) 
+                                                             + 
+                                                             SUM(liquidados_nao_pagos_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados_exercicios_anteriores)
+                                                             +
+                                                             SUM(empenhados_nao_liquidados)
                                                         FROM tmp_restos_rpps
                                                        WHERE tipo_recurso = 'L'),0) AS NUMERIC)
+                                    
+                                    --vl_processado_legislativo
                                     , CAST(COALESCE(( SELECT SUM(liquidados_nao_pagos)
                                                    FROM tmp_restos_legislativo),0) AS NUMERIC));
-
 
   stSql := '
       SELECT *

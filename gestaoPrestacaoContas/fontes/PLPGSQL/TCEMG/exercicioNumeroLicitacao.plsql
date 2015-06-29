@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage 
 
-    $Id: exercicioNumeroLicitacao.plsql 61947 2015-03-18 13:35:37Z michel $
+    $Id: exercicioNumeroLicitacao.plsql 62611 2015-05-25 12:01:22Z lisiane $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.fn_exercicio_numero_licitacao(VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
@@ -51,12 +51,12 @@ BEGIN
                    , licitacao.cod_modalidade
                    , licitacao.cod_entidade
                    , licitacao.exercicio	
-                   , CASE WHEN config_entidade.bom_despacho IS TRUE AND licitacao_tc.exercicio_licitacao IS NOT NULL THEN
+                   , CASE WHEN config_entidade.bom_despacho IS TRUE AND licitacao_tc.exercicio_licitacao IS NOT NULL AND config_entidade.exercicio = licitacao.exercicio THEN
                                     licitacao_tc.exercicio_licitacao::varchar
                           ELSE
                                     licitacao.exercicio::varchar
 				     END AS exercicio_licitacao
-                   , CASE WHEN config_entidade.bom_despacho IS TRUE AND licitacao_tc.numero_licitacao IS NOT NULL THEN
+                   , CASE WHEN config_entidade.bom_despacho IS TRUE AND licitacao_tc.numero_licitacao IS NOT NULL AND config_entidade.exercicio = licitacao.exercicio THEN
                                     licitacao_tc.numero_licitacao::varchar
                           ELSE
                                     licitacao.exercicio::varchar||LPAD(''''||licitacao.cod_entidade::varchar,2, ''0'')||LPAD(''''||licitacao.cod_modalidade::varchar,2, ''0'')||LPAD(''''||licitacao.cod_licitacao::varchar,4, ''0'')

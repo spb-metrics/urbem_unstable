@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.03.94
 
-    $Id: relatorioPermissao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: relatorioPermissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -100,7 +100,7 @@ case 0:
     echo $obFormulario->getHTML();
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function validacao(cod)
     {
         var f = document.frm;
@@ -181,7 +181,7 @@ case 1:
 ?>
 
 <form action="permissao.php?<?=Sessao::getId()?>" method="POST" name="frm">
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         document.frm.action = "permissao.php?<?=Sessao::getId()?>&filtro=1&controle=1&numCgm=<?=$numCgm?>&nomCgm=<?=$nomCgm?>&codModulo=<?=$codModulo?>&codOrgao=<?=$inCodOrgao?>&codUnidade=<?=$codUnidade?>&codDpto=<?=$codDpto?>&codSetor=<?=$codSetor?>&orderby=<?=$orderby?>";
         document.frm.submit();
     </script>

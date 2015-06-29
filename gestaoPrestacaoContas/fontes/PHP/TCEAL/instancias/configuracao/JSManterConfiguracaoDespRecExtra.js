@@ -32,7 +32,7 @@
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
         
     function montaLista( id,classificacao,cod_plano,nom_conta ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>','montaLista');

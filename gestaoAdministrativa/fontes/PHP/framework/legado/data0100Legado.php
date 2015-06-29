@@ -56,8 +56,8 @@ $noFrame = isset($noFrame) ? $noFrame : null;
 <html>
 <head>
    <title>Calendário</title>
-<script language="JavaScript" src="funcoesJs.js" type="text/javascript"></script>
-<script language="javascript" type="text/javascript">
+<script src="funcoesJs.js" type="text/javascript"></script>
+<script type="text/javascript">
 
     function xMontaCSS()
     {

@@ -306,7 +306,7 @@ function defineFoco()
 {
     $stSaida = '';
     if ($stId = $this->getFoco()) {
-            $stSaida    = "<script language=\"javascript\">\r\n"                ;
+            $stSaida    = "<script type=\"text/javascript\">\r\n"                ;
             $stSaida   .= "document.getElementById('".$stId."').focus()\r\n"    ;
             $stSaida   .= "</script>\r\n"                                       ;
         }

@@ -58,17 +58,6 @@ if(!empty($arLicitacao)){
     $_REQUEST = $arLicitacao;
 }
 
-$arCGMResponsaveis = Sessao::read("arCGMResponsaveis");
-
-$arEntidade = explode('-',$_REQUEST['stEntidade']); 
-$arModalidade = explode('-',$_REQUEST['stModalidade']); 
-$obTTCMGOResponsavelLicitacao = new TTCMGOResponsavelLicitacao();
-$obTTCMGOResponsavelLicitacao->setDado('exercicio', $_REQUEST['stExercicioLicitacao']);
-$obTTCMGOResponsavelLicitacao->setDado('cod_entidade', $arEntidade[0]);
-$obTTCMGOResponsavelLicitacao->setDado('cod_modalidade', $arModalidade[0]);
-$obTTCMGOResponsavelLicitacao->setDado('cod_licitacao', $_REQUEST['inCodLicitacao']);
-$obTTCMGOResponsavelLicitacao->recuperaPorChave($rsRecordSet);
-
 $obForm = new Form;
 $obForm->setAction ( $pgProc );
 
@@ -126,7 +115,15 @@ $obHdnCodModalidade = new Hidden;
 $obHdnCodModalidade->setName ( "inCodModalidade" );
 $obHdnCodModalidade->setValue( $_REQUEST['inCodModalidade']);
 
+$arCGMResponsaveis = Sessao::read("arCGMResponsaveis");
 
+$arEntidade = explode('-',$_REQUEST['stEntidade']); 
+$arModalidade = explode('-',$_REQUEST['stModalidade']); 
+$obTTCMGOResponsavelLicitacao = new TTCMGOResponsavelLicitacao();
+$obTTCMGOResponsavelLicitacao->setDado('exercicio', $_REQUEST['stExercicioLicitacao']);
+$obTTCMGOResponsavelLicitacao->setDado('cod_entidade', $arEntidade[0]);
+$obTTCMGOResponsavelLicitacao->setDado('cod_modalidade', $arModalidade[0]);
+$obTTCMGOResponsavelLicitacao->setDado('cod_licitacao', $_REQUEST['inCodLicitacao']);
 $obTTCMGOResponsavelLicitacao->recuperaPorChave($rsRecordSet);
 
 if(!empty($arCGMResponsaveis)){
@@ -198,8 +195,13 @@ $obBscCGM->obCampoCod->setValue   ( "cgm_responsavel"  );
 if(($_REQUEST['inCodModalidade'] != '9') && ($_REQUEST['inCodModalidade'] != '8')){
     $obBscCGM->obCampoCod->setNull    ( true              );
 }
-$obBscCGM->setValoresBusca($pgOcul."?".Sessao::getId(),$obForm->getName(),'validaCGM');
-$obBscCGM->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumCGM','stNomCGM','fisica','".Sessao::getId()."','800','550');" );
+
+$obBscCGM->setValoresBusca($pgOcul."?".Sessao::getId()."&inCodComissao=".$_REQUEST['inCodComissao'],$obForm->getName(),'validaCGM');
+
+$stLink = CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','".$obForm->getName();
+$stLink .= "&stTabelaVinculo=licitacao.comissao_membros&stCampoVinculo=numcgm&stId=stNomCGM";
+$stLink .= "&inCodModalidade=".$_REQUEST['inCodModalidade']."&inCodLicitacao=".$_REQUEST['inCodLicitacao']."&inCodComissao=".$_REQUEST['inCodComissao'];
+$obBscCGM->setFuncaoBusca("abrePopUp('".$stLink."', 'inNumCGM','stNomCGM','vinculoComissaoLicitacao','".Sessao::getId()."','800','550');");
     
 $obLista->addCabecalho('Responsável', 8);
 $obLista->addDadoComponente( $obBscCGM );

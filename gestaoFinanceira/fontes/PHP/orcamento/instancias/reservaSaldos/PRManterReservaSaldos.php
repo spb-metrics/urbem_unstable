@@ -110,7 +110,7 @@ switch ($stAcao) {
         } else {
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
-        echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+        echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
     break;
     case "anular":
         $obROrcamentoReservaSaldos->setExercicio                        ( Sessao::getExercicio()                );

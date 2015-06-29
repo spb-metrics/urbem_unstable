@@ -93,12 +93,12 @@ case 1:
                     $audicao = new auditoria;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codFuncao);
                     $audicao->insereAuditoria();
-                    echo "<script language='JavaScript1.2' type='text/javascript'>
+                    echo "<script type='text/javascript'>
                     alertaAviso('".$nomClassificacao."','excluir','aviso','".Sessao::getId()."');
                     window.location = 'excluiFuncao.php?".Sessao::getId()."';
                     </script>";
                     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$nomClassificacao.'","n_excluir","aviso","'.Sessao::getId().'");
                     window.location = "excluiFuncao.php?'.Sessao::getId().'";
                     </script>';

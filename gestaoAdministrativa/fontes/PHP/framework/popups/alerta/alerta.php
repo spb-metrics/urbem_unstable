@@ -205,7 +205,7 @@ switch ($chamada) {
 
 ?>
 
-<script language="javascript"><!--
+<script type="text/javascript"><!--
 var skipcycle = false
 
 function fcsOnMe()
@@ -264,7 +264,7 @@ switch ($chamada) {
 
     case "cc":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     sPag = '$pag?".Sessao::getId()."&".$chave."=".$valor."';
@@ -278,7 +278,7 @@ switch ($chamada) {
 
     case "sn":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     sPag = '$pag&".$chave."=".$valor."';
@@ -292,7 +292,7 @@ switch ($chamada) {
 
     case "pp":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     sPag = '$pag&".$chave."=".$valor."';
@@ -306,7 +306,7 @@ switch ($chamada) {
 
     case "decisao":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     sPag = '$pag?".Sessao::getId()."';
@@ -320,7 +320,7 @@ switch ($chamada) {
 
     case "ccform":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     window.opener.parent.frames['$frameDestino'].document.frm.submit();
@@ -333,7 +333,7 @@ switch ($chamada) {
 
     case "oculto":
     echo "
-    <script language='JavaScript1.2' type='text/javascript'>
+    <script type='text/javascript'>
     function mudaPagina()
     {
     window.opener.parent.frames['oculto'].document.frm.submit();

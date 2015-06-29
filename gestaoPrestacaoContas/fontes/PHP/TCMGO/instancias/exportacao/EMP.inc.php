@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: EMP.inc.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: EMP.inc.php 62759 2015-06-16 18:00:15Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -76,7 +76,7 @@
         $$rsBloco->preenche(array($stChave));
 
         $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
-    $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+    $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);

@@ -440,7 +440,7 @@ if ($stAcao == "incluir") {
 $obFormulario->show();
 
 if ($stAcao == 'alterar' || $stAcao == 'anular') {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumContrato=".$_REQUEST['inNumContrato']. "&inCodEntidade=".$_REQUEST['inCodEntidade']. "&stExercicioContrato=".$_REQUEST['stExercicioContrato']. "', 'carregaListaVeiculos');  \r\n";
     echo "</script>                                                             \r\n";
 }

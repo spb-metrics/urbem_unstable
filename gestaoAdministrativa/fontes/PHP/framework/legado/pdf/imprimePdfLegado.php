@@ -80,7 +80,7 @@ $dbEmp->fechaBD();
 </tr>
 </table>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
 function alertaAviso(objeto,tipo,chamada)
 {

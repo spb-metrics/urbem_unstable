@@ -30,7 +30,7 @@
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     document.frm.stCtrl.value = BuscaDado;

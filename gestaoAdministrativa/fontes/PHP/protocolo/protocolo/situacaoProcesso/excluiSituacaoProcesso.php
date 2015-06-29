@@ -49,13 +49,13 @@ Casos de uso: uc-01.06.98
         $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codigo); //registra os passos no auditoria
         $audicao->insereAuditoria();
         echo'
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("Situação '.$nom.'","excluir","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("listaSituacaoProcesso.php?'.Sessao::getId().'&acao=46");
                 </script>';
     } else
         echo'
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("Situação '.$nom.'","n_excluir","erro", "'.Sessao::getId().'");
                 mudaTelaPrincipal("listaSituacaoProcesso.php?'.Sessao::getId().'&acao=46");
                 </script>';

@@ -47,7 +47,7 @@ setAjuda('uc-01.06.96');
 if (!(isset($_REQUEST["nomDocumento"]))) {
 ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function Valida()
     {
@@ -107,12 +107,12 @@ if (!(isset($_REQUEST["nomDocumento"]))) {
                         $audicao = new auditoriaLegada;
                         $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $nomDocumento);
                         $audicao->insereAuditoria();
-                        echo '<script language="JavaScript1.2" type="text/javascript">
+                        echo '<script type="text/javascript">
                         alertaAviso("'.$nomDocumento.'","incluir","aviso", "'.Sessao::getId().'");
                         window.location = "incluiDocumento.php?'.Sessao::getId().'";
                         </script>';
                         } else {
-                        echo '<script language="JavaScript1.2" type="text/javascript">
+                        echo '<script type="text/javascript">
                         alertaAviso("'.$nomDocumento.'","n_incluir","erro", "'.Sessao::getId().'");
                         window.location = "incluiDocumento.php?'.Sessao::getId().'";
                         </script>';

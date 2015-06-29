@@ -33,7 +33,7 @@
  * @package framework
  * @subpackage componentes
 
- $Id: cabecalho.inc.php 60669 2014-11-06 19:55:50Z carolina $
+ $Id: cabecalho.inc.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  Casos de uso: uc-01.01.00
 */
@@ -133,7 +133,7 @@ $jsPath = constant('ENV_TYPE') == 'dev' ? '' : 'compressed/';
 <body bgcolor="#E6E6E6" leftmargin=0 topmargin=0>
 
 <!-- *******************  Layers para bloquear frames ******************************** -->
-<script language="javascript">
+<script type="text/javascript">
     function anulaTecla()
     {
     }
@@ -233,7 +233,7 @@ $dbEmp->fechaBD();
     if ( Sessao::getVoltarProtocolo() ) {				    //
         $stHtml = '
         <!-- INICIO VOLTA-->
-        <script language=\'javascript\'>
+        <script type=\'text/javascript\'>
             if (window.parent.frames["telaPrincipal"]) {
                 var stLink = \'<a id="link_volta" href="'.CAM_GA_PROT_INSTANCIAS.'processo/OCManterProcesso.php?'.Sessao::getId().'&stCtrl=voltarProcesso"  alt="Voltar para processo">\';
                 stLink += \'<span alt="Voltar">Voltar</span>\';

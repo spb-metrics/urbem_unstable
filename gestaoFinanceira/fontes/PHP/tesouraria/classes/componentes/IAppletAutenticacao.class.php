@@ -31,7 +31,7 @@
 * @author Desenvolvedor: Cleisson Barboza
 * @author Desenvolvedor: Jose Eduardo Porto
 *
-* $Id: IAppletAutenticacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+* $Id: IAppletAutenticacao.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * @package framework
 * @subpackage componentes
@@ -159,7 +159,7 @@ class IAppletAutenticacao extends Applet
 
         parent::montaHTML();
         $stHtml .= parent::getHtml()                                           ."                  \n";
-        $stHtml .= "<script language=\"JavaScript\">                                               \n";
+        $stHtml .= "<script type=\"text/javascript\">                                               \n";
         $stHtml .= "var texto = ".$stTexto.";                                                      \n";
         $stHtml .= "document.applets['".$this->getName()."'].setTexto(texto);                                           \n";
         $stHtml .= "</script>                                                                      \n";

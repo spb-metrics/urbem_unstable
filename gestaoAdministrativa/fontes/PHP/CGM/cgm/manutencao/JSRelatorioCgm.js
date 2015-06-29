@@ -15,7 +15,7 @@ $Id: $
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function preencheUf( stLimpar ){
     var stTraget = document.frm.target;
     var stAction = document.frm.action;

@@ -53,7 +53,7 @@ Revision 1.10  2006/07/06 12:09:52  diego
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function executaFuncaoAjax2( funcao, parametrosGET, sincrono ) {
     if( parametrosGET ) {

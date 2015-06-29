@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSCobrancaJudicial.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSCobrancaJudicial.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 	* Casos de uso: uc-05.04.02
 */
@@ -47,7 +47,7 @@ Revision 1.1  2007/09/11 20:44:13  cercato
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Cancelar () {
 <?php

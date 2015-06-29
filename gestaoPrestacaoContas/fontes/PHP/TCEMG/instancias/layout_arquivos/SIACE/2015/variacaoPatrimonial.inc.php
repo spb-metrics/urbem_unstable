@@ -35,38 +35,37 @@ Arquivo de geracao do arquivo despesaTotalPessoalPE TCM/MG
 
     * @ignore
 
-    $Id:$
+    $Id: variacaoPatrimonial.inc.php 62749 2015-06-16 14:22:54Z franver $
  */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGVariacaoPatrimonial.class.php');
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGVariacaoPatrimonial.class.php';
 
-    $arFiltros = Sessao::read('filtroRelatorio');
+$arFiltros = Sessao::read('filtroRelatorio');
 
-    if ($arFiltros['inPeriodo']<10) {
-        $stMes = "0".$arFiltros['inPeriodo'];
-    } else {
-        $stMes = $arFiltros['inPeriodo'];
-    }
-
-    $dtPeriodoInicial = "01/".$stMes."/".Sessao::read('exercicio');
-    $dtPeriodoFinal   = date("t",mktime(0,0,0,$arFiltros['inPeriodo'],1,Sessao::read('exercicio')))."/".$stMes."/".Sessao::read('exercicio');
-
-    $filtro= 'cod_entidade IN  ('.implode(',',$arFiltros['inCodEntidadeSelecionado']).')';
+foreach($arDatasInicialFinal as $arPeriodo) {
+    list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
 
     $obFTCEMGVariacaoPatrimonial = new TTCEMGVariacaoPatrimonial();
-    $obFTCEMGVariacaoPatrimonial->setDado('stEntidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGVariacaoPatrimonial->setDado('stExercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGVariacaoPatrimonial->setDado('mes'         , $arFiltros['inPeriodo']);
-
-    $obFTCEMGVariacaoPatrimonial->recuperaRelacionamento($rsArquivo);
-
+    $obFTCEMGVariacaoPatrimonial->setDado('stEntidade'  , implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGVariacaoPatrimonial->setDado('stExercicio' , Sessao::getExercicio());
+    $obFTCEMGVariacaoPatrimonial->setDado('mes'         , $inMes);
+    
+    $obFTCEMGVariacaoPatrimonial->recuperaValores($rsArquivo);
+    
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('deficit');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('superavit');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+}

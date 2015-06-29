@@ -29,12 +29,11 @@ include_once(CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGReceitaIntr
 $arFiltros = Sessao::read('filtroRelatorio');
 $obTTCEMGReceitaIntra = new TTCEMGReceitaIntra();
 
-$obTTCEMGReceitaIntra->setDado('exercicio'   , Sessao::read('exercicio'));
+$obTTCEMGReceitaIntra->setDado('exercicio'   , Sessao::getExercicio() );
 $obTTCEMGReceitaIntra->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
 $obTTCEMGReceitaIntra->setDado('mes'         , '12');
-
-$obTTCEMGReceitaIntra->setDado('dt_inicial', '01/01/'.Sessao::read('exercicio'));
-$obTTCEMGReceitaIntra->setDado('dt_final', '31/12/'.Sessao::read('exercicio'));
+$obTTCEMGReceitaIntra->setDado('dt_inicial', '01/01/'.Sessao::getExercicio() );
+$obTTCEMGReceitaIntra->setDado('dt_final', '31/12/'.Sessao::getExercicio()   );
 $obTTCEMGReceitaIntra->recuperaTodos($rsArquivo);
 
 $obExportador->roUltimoArquivo->addBloco($rsArquivo);
@@ -43,14 +42,14 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUME
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demais_receita_intra');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('amortizacao_emprestimos');

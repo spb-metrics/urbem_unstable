@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: TCGM.class.php 62175 2015-04-02 19:34:56Z lisiane $
+$Id: TCGM.class.php 62654 2015-05-29 12:59:20Z evandro $
 
 $Revision: 28411 $
 $Name$
@@ -330,5 +330,110 @@ function montaRecuperaRelacionamentoVinculado($stTabelaVinculo = null  , $stCamp
 
     return $stSql;
 }
+
+
+/*  busca cgm vinculados a alguma popup, ex: fornecedor, fara um inner join para pegar somente cgm que estejam na tabela
+    patrimonio.fornecedor .
+*/
+function recuperaRelacionamentoVinculadoPlanoSaude(&$rsrecordset, $stcondicao = "" , $stordem = "" , $botransacao = "" , $tabelaVinculo = "" , $campoVinculo = "", $filtroVinculo="")
+{
+    $oberro      = new erro;
+    $obconexao   = new conexao;
+    $rsrecordset = new recordset;
+
+    if ( trim( $stordem ) ) {
+        $stordem = strtolower( $stordem );
+        $stordem = ( strpos( $stordem , "order by" ) === false ) ? " order by $stordem" : $stordem;
+    }
+
+    $stsql = $this->montaRecuperaRelacionamentoVinculadoPlanoSaude( $tabelaVinculo  , $campoVinculo, $filtroVinculo) . $stcondicao . $stordem;
+    $this->setdebug( $stsql );
+    $oberro = $obconexao->executasql( $rsrecordset, $stsql, $botransacao );
+
+    return $oberro;
+}
+
+function montaRecuperaRelacionamentoVinculadoPlanoSaude($stTabelaVinculo = null  , $stCampoVinculo = null, $filtroVinculo = null)
+{
+    
+    $stSql  = " SELECT
+                        CGM.numcgm
+                        ,CGM.nom_cgm
+                FROM
+                    SW_CGM AS CGM
+
+                LEFT JOIN sw_cgm_pessoa_fisica AS PF
+                    ON CGM.numcgm = PF.numcgm
+                LEFT JOIN sw_cgm_pessoa_juridica AS PJ
+                    ON CGM.numcgm = PJ.numcgm
+
+                JOIN beneficio.layout_fornecedor
+                    ON layout_fornecedor.cgm_fornecedor = CGM.numcgm
+
+                JOIN compras.fornecedor
+                    ON fornecedor.cgm_fornecedor = layout_fornecedor.cgm_fornecedor
+
+                WHERE CGM.numcgm <> 0
+                AND exists (select 1 
+                            from ". $stTabelaVinculo ." as tabela_vinculo
+                            where tabela_vinculo.$stCampoVinculo = CGM.numcgm ".$filtroVinculo.") 
+        ";
+    return $stSql;
+}
+
+function recuperaRelacionamentoVinculadoComissaoLicitacao(&$rsrecordset, $stcondicao = "" , $stordem = "" , $botransacao = "" , $tabelaVinculo = "" , $campoVinculo = "", $filtroVinculo="")
+{
+    $oberro      = new erro;
+    $obconexao   = new conexao;
+    $rsrecordset = new recordset;
+
+    if ( trim( $stordem ) ) {
+        $stordem = strtolower( $stordem );
+        $stordem = ( strpos( $stordem , "order by" ) === false ) ? " order by $stordem" : $stordem;
+    }
+
+    $stsql = $this->montaRecuperaRelacionamentoVinculadoComissaoLicitacao( $tabelaVinculo  , $campoVinculo, $filtroVinculo) . $stcondicao . $stordem;
+    $this->setdebug( $stsql );
+    $oberro = $obconexao->executasql( $rsrecordset, $stsql, $botransacao );
+
+    return $oberro;
+}
+
+function montaRecuperaRelacionamentoVinculadoComissaoLicitacao($stTabelaVinculo = null  , $stCampoVinculo = null, $filtroVinculo = null)
+{
+    $stSql  = " SELECT
+                        SW_CGM.numcgm
+                        ,SW_CGM.nom_cgm
+                
+                FROM licitacao.licitacao
+                    
+                JOIN licitacao.comissao_licitacao
+                    ON comissao_licitacao.cod_licitacao     = licitacao.cod_licitacao
+                    AND comissao_licitacao.cod_modalidade   = licitacao.cod_modalidade
+                    AND comissao_licitacao.cod_entidade     = licitacao.cod_entidade
+                    AND comissao_licitacao.exercicio        = licitacao.exercicio    
+
+                JOIN licitacao.comissao_membros
+                    ON comissao_membros.cod_comissao = comissao_licitacao.cod_comissao
+                    
+                JOIN SW_CGM 
+                    ON SW_CGM.numcgm = comissao_membros.numcgm
+
+                LEFT JOIN sw_cgm_pessoa_fisica AS PF
+                    ON SW_CGM.numcgm = PF.numcgm
+
+                LEFT JOIN sw_cgm_pessoa_juridica AS PJ
+                    ON SW_CGM.numcgm = PJ.numcgm
+                
+                WHERE SW_CGM.numcgm <> 0
+                ".$filtroVinculo."
+                
+        ";
+    return $stSql;
+
+}
+
+
+
 
 } // classe

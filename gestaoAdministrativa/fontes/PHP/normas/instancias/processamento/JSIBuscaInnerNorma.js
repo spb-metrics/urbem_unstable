@@ -49,7 +49,7 @@ Criação do componente para buscar normas.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function abrePopUpNorma(){
     var width  = 800;
     var height = 550;

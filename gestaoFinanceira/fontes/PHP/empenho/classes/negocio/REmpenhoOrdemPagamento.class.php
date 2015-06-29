@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoOrdemPagamento.class.php 61275 2014-12-29 12:51:47Z evandro $
+    $Id: REmpenhoOrdemPagamento.class.php 62712 2015-06-11 15:00:29Z evandro $
 
     * Casos de uso: uc-02.03.03,uc-02.03.05,uc-02.03.20,uc-02.03.23,uc-02.04.05,uc-02.03.28
 */
@@ -1255,6 +1255,31 @@ function listarDadosPagamentoBordero(&$rsRecordSet, $boTransacao = "")
 
     return $obErro;
 }
+
+function listarDadosPagamentoBorderoContaRecurso(&$rsRecordSet, $boTransacao = "")
+{
+    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoOrdemPagamento.class.php"        );
+    $obTEmpenhoOrdemPagamento        = new TEmpenhoOrdemPagamento;
+
+    $stFiltro = "";
+    if ( $this->getCodigoOrdem() ) {
+        $obTEmpenhoOrdemPagamento->setDado('cod_ordem', $this->getCodigoOrdem());
+    }
+    if ($this->stExercicio) {
+        $obTEmpenhoOrdemPagamento->setDado('exercicio', $this->stExercicio );
+    }
+    if ( $this->obROrcamentoEntidade->getCodigoEntidade() ) {
+        $obTEmpenhoOrdemPagamento->setDado('cod_entidade', $this->obROrcamentoEntidade->getCodigoEntidade() );
+    }
+    if ( $this->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso() ){
+        $obTEmpenhoOrdemPagamento->setDado('cod_recurso', $this->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso() );   
+    }
+    
+    $obErro = $obTEmpenhoOrdemPagamento->recuperaDadosPagamentoBorderoContaRecurso( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+
+    return $obErro;
+}
+
 
 /**
 * Lista as Ordens de Pagamento A Pagar

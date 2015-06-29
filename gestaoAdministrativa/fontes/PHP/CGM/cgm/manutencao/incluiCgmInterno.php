@@ -35,12 +35,12 @@
 
     * Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: incluiCgmInterno.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: incluiCgmInterno.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 echo
-'<script language="JavaScript1.2" type="text/javascript">
+'<script type="text/javascript">
 mudaTelaPrincipal("incluiCgm.php?'.Sessao::getId().'&pessoa=outros");
 </script>';
 

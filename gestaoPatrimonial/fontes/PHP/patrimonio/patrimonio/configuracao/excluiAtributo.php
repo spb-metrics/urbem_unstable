@@ -67,8 +67,8 @@ if (!(isset($ctrl)))
 if (isset($codAtributo))
     $ctrl = 1;
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 switch ($ctrl) {
@@ -160,7 +160,7 @@ case 1:
         $audicao = new auditoriaLegada;
         $audicao->setaAuditoria(Sessao::read('numCgm'), $sessao->acao, $codAtributo);
         $audicao->insereAuditoria();
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("'.$objeto.'","excluir","aviso","'.Sessao::getId().'");
         window.location = "excluiAtributo.php?'.Sessao::getId().'";
         </script>';
@@ -168,7 +168,7 @@ case 1:
     // se houve erro na exclusao ,exibe msg de erro
     } else {
         $objeto = "Este Atributo está sendo utilizado. Atributo: ".$nomAtributo;
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("'.$objeto.'","n_excluir","erro","'.Sessao::getId().'");
         window.location = "excluiAtributo.php?'.Sessao::getId().'";
         </script>';

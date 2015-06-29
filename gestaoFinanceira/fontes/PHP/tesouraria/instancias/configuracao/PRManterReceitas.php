@@ -87,7 +87,7 @@ $obErro = $obRContabilidadePlanoContaAnalitica->salvarContasAnaliticaCredito();
 
 $pgProx = ( $_POST['stRedireciona'] ) ? $_POST['stRedireciona'] : $pgForm;
 
-echo "<script language='JavaScript'>LiberaFrames(true,false);</script>";
+echo "<script type='text/javascript'>LiberaFrames(true,false);</script>";
 if ( !$obErro->ocorreu() )
     SistemaLegado::exibeAviso("Configuração da Tesouraria","alterar","aviso");
 else

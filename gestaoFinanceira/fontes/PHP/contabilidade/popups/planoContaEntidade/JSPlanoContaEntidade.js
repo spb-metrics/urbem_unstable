@@ -50,7 +50,7 @@ Bug #6751#
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(inCodigo,inEstrutural,stDescricao){
     if( eval( window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"]?>') != null ) ) {

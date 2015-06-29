@@ -38,7 +38,7 @@
  */
 ?>
 
-<script language="Javascript">
+<script type="text/javascript">
 
 function buscaOCMontaOrgaoUnidade(tipoBusca,actionAnterior,actionPosterior,targetPosterior,sessao){
     BloqueiaFrames(true,true);

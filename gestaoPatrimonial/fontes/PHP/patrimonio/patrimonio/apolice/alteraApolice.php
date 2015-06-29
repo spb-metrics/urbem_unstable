@@ -112,7 +112,7 @@ setAjuda("UC-03.01.08");
 
         $apolice->mostraApolice($codigo);
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
         function Valida()
         {

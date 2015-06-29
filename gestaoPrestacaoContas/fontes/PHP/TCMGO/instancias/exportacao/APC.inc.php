@@ -31,10 +31,10 @@
 
     * @ignore
 
-    $Revision: 62213 $
+    $Revision: 62759 $
     $Name$
     $Author: jean $
-    $Date: 2015-04-08 16:28:23 -0300 (Qua, 08 Abr 2015) $
+    $Date: 2015-06-16 15:00:15 -0300 (Ter, 16 Jun 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -59,7 +59,7 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obTMapeamento = new TTCMGOAtivoPermanenteCreditos;
         $obTMapeamento->setDado ('exercicio'  , Sessao::getExercicio() );
         $obTMapeamento->setDado ('stEntidades',  $stEntidades  );
-        $obTMapeamento->recuperaTodos($rsRegistro10);
+        $obTMapeamento->recuperaRegistro10($rsRegistro10);
 
         $i = 1;
         foreach ($rsRegistro10->arElementos as $stChave) {
@@ -110,11 +110,11 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cancelamento");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_encampacao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_saldo_atual");

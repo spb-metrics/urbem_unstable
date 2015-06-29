@@ -37,20 +37,18 @@
 
     $Id:$
     */
+include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/FTCEMGDespesaPrev.class.php");
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/FTCEMGDespesaPrev.class.php");
-    include_once(CAM_FW_HTML."Bimestre.class.php");
-    
-    $arFiltros = Sessao::read('filtroRelatorio');
+$arFiltros = Sessao::read('filtroRelatorio');
+foreach($arDatasInicialFinal as $arPeriodo) {
+    list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
 
-    $obBimestre = new Bimestre();
     $obFTCEMGDespesaPrev = new FTCEMGDespesaPrev();
-    $obFTCEMGDespesaPrev->setDado('exercicio'    , Sessao::read('exercicio')                           );
+    $obFTCEMGDespesaPrev->setDado('exercicio'    , Sessao::getExercicio());
     $obFTCEMGDespesaPrev->setDado('cod_entidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']) );
-    $obFTCEMGDespesaPrev->setDado('bimestre'     , $arFiltros['inPeriodo']);
-    
-    $obFTCEMGDespesaPrev->setDado('dt_inicial', $obBimestre->getDataInicial($arFiltros['inPeriodo'],Sessao::read('exercicio')) );
-    $obFTCEMGDespesaPrev->setDado('dt_final'  , $obBimestre->getDataFinal($arFiltros['inPeriodo'],Sessao::read('exercicio')) );
+    $obFTCEMGDespesaPrev->setDado('bimestre'     , $inMes);
+    $obFTCEMGDespesaPrev->setDado('dt_inicial'   , $arPeriodo['stDtInicial']);
+    $obFTCEMGDespesaPrev->setDado('dt_final'     , $arPeriodo['stDtFinal']);
     
     $obFTCEMGDespesaPrev->recuperaTodos($rsRecordSet,"","",$boTrasacao);
 
@@ -61,18 +59,13 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('codtipo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despadmgeral');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despprevsoci');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despadmgeral');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
@@ -96,17 +89,22 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despesasprevintra');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despreserva');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despoutrasreservas');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('codtipo');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despesasprevintra');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
@@ -134,5 +132,10 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outrasdespesas');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+}
 
-    ?>
+unset($arFiltros);
+unset($obFTCEMGDespesaPrev);
+
+?>

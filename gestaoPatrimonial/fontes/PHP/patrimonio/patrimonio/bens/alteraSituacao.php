@@ -72,7 +72,7 @@ Revision 1.8  2006/07/06 12:11:27  diego
                 $altera->selecionaClassificacao();
                 $slista = $altera->listaSituacao();
 ?>
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
 
                 function Valida()
                 {
@@ -152,7 +152,7 @@ Revision 1.8  2006/07/06 12:11:27  diego
 
         if ($altera->alteraSituacao()) {
         echo'
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("Situação","alterar","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("alteraSituacao.php?'.Sessao::getId().'");
                 </script>';
@@ -165,7 +165,7 @@ Revision 1.8  2006/07/06 12:11:27  diego
 
         } else {
             echo'
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("Situação","n_alterar","erro", "'.Sessao::getId().'");
                 mudaTelaPrincipal("alteraSituacao.php?'.Sessao::getId().'");
                 </script>';

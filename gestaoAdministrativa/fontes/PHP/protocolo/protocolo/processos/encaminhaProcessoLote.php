@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: encaminhaProcessoLote.php 61868 2015-03-11 14:38:11Z michel $
+    $Id: encaminhaProcessoLote.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -81,7 +81,7 @@ if (isset($pagina)) {
 }
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
      function zebra(id, classe)
      {
        var tabela = document.getElementById(id);

@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.99
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function setControleTextArea(controle){
     document.frm.stControleTextArea.value = controle.name;

@@ -52,7 +52,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function validaProgressao(){
     var mensagem = '';
     var stCampo = trim(document.frm.stDescricaoNivel.value);

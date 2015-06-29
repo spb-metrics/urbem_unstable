@@ -49,7 +49,7 @@ Bug #9122#
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function salvarOkFiltro(){
     document.frm.stOkRetorno.value = 'filtro';

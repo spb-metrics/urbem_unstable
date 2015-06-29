@@ -66,7 +66,7 @@ $obForm->setTarget( "oculto" );
 
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 $obTFolhaPagamentoBeneficioEvento = new TFolhaPagamentoBeneficioEvento;
-$obTFolhaPagamentoBeneficioEvento->recuperaRelacionamento($rsBeneficioEvento);
+$obTFolhaPagamentoBeneficioEvento->recuperaRelacionamento($rsBeneficioEvento," AND beneficio_evento.cod_tipo = 1 ","",$boTransacao);
 
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
@@ -77,9 +77,9 @@ $obHdnCtrl =  new Hidden;
 $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( $stCtrl  );
 
-$obIBscEvento = new IBscEvento;
+$obIBscEvento = new IBscEvento("inCodigoEvento","stEvento");
 $obIBscEvento->obBscInnerEvento->setRotulo( "Evento de Desconto de Vale-Transporte" );
-$obIBscEvento->obBscInnerEvento->setNull  ( false );
+
 $obIBscEvento->addNaturezasAceitas        ( "D"   );
 $obIBscEvento->setNaturezaChecked         ( "D"   );
 $obIBscEvento->setEventoSistema           ( true  );
@@ -103,6 +103,7 @@ $obCGMFornecedor->setName( 'stCGMFornecedor' );
 $obCGMFornecedor->setId( 'stCGMFornecedor' );
 $obCGMFornecedor->obCampoCod->setName( 'inCGMFornecedor' );
 $obCGMFornecedor->obCampoCod->setId( 'inCGMFornecedor' );
+$obCGMFornecedor->stTipo = "vinculadoPlanoSaude";
 $obCGMFornecedor->setNull(true);
 
 //Botão para Incluir / Limpar
@@ -127,7 +128,6 @@ $obFormulario->addHidden( $obHdnAcao                                            
 $obFormulario->addHidden( $obHdnCtrl                                                       );
 $obFormulario->addTitulo( "Configuração do Cálculo de Benefícios"                          );
 $obFormulario->addTitulo( "Vale-Transporte"                                                );
-//$obFormulario->addComponente( $obIBscEvento );
 $obIBscEvento->geraFormulario( $obFormulario                                               );
 
 $obFormulario->addTitulo( "Plano de Saúde" );

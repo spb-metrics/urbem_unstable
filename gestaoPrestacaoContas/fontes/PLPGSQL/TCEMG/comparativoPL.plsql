@@ -38,56 +38,59 @@ CREATE OR REPLACE FUNCTION tcemg.fn_comparativo_pl(VARCHAR, VARCHAR, INTEGER) RE
 DECLARE
     stExercicio         ALIAS FOR $1;
     stCodEntidade       ALIAS FOR $2;
-    inMes               ALIAS FOR $3;
+    inPeriodo           ALIAS FOR $3;
+    
     stSql               VARCHAR := '';
+    stDtInicial         VARCHAR := '';
     stDtFinal           VARCHAR := '';
-    stDtFinalDate       VARCHAR;
     stDia               VARCHAR := '';
+    arDatas             VARCHAR[];
     nuValor             NUMERIC(14,2);
     nuValorRCL          NUMERIC(14,2);
+    
     reRegistro          RECORD;
-
 BEGIN
 
-    stDia := '01/'||inMes||'/'||stExercicio;
-    SELECT last_day (TO_DATE(stDia, 'dd/mm/yyyy')) INTO stDtFinalDate;
-    stDtFinal := TO_CHAR(TO_DATE(stDtFinalDate, 'yyyy-mm-dd'), 'dd/mm/yyyy');
+    arDatas       := publico.bimestre(stExercicio,inPeriodo);
+    stDtInicial   := arDatas[0];
+    stDtFinal     := arDatas[1];
 
     CREATE TEMPORARY TABLE tmp_arquivo (
           valor       NUMERIC(14,2)
-        , mes         INTEGER
+        , periodo     INTEGER
     );
 
-    SELECT COALESCE(SUM(CAST((total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6
-                   + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12) AS NUMERIC(14,2))), 0.00) INTO nuValor
-    FROM stn.pl_total_subcontas (stDtFinal) AS retorno (  ordem          integer
-                                                        , cod_conta      varchar
-                                                        , nom_conta      varchar
-                                                        , cod_estrutural varchar
-                                                        , mes_1          numeric
-                                                        , mes_2          numeric
-                                                        , mes_3          numeric
-                                                        , mes_4          numeric
-                                                        , mes_5          numeric
-                                                        , mes_6          numeric
-                                                        , mes_7          numeric
-                                                        , mes_8          numeric
-                                                        , mes_9          numeric
-                                                        , mes_10         numeric
-                                                        , mes_11         numeric
-                                                        , mes_12         numeric
-                                                        , total_mes_1    numeric
-                                                        , total_mes_2    numeric
-                                                        , total_mes_3    numeric
-                                                        , total_mes_4    numeric
-                                                        , total_mes_5    numeric
-                                                        , total_mes_6    numeric
-                                                        , total_mes_7    numeric
-                                                        , total_mes_8    numeric
-                                                        , total_mes_9    numeric
-                                                        , total_mes_10   numeric
-                                                        , total_mes_11   numeric
-                                                        , total_mes_12   numeric)
+    SELECT COALESCE(SUM((total_mes_1 + total_mes_2 + total_mes_3 + total_mes_4  + total_mes_5  + total_mes_6
+                         + total_mes_7 + total_mes_8 + total_mes_9 + total_mes_10 + total_mes_11 + total_mes_12)
+                    ), 0.00) INTO nuValor
+      FROM stn.pl_total_subcontas (stDtFinal) AS retorno (  ordem          integer
+                                                          , cod_conta      varchar
+                                                          , nom_conta      varchar
+                                                          , cod_estrutural varchar
+                                                          , mes_1          numeric
+                                                          , mes_2          numeric
+                                                          , mes_3          numeric
+                                                          , mes_4          numeric
+                                                          , mes_5          numeric
+                                                          , mes_6          numeric
+                                                          , mes_7          numeric
+                                                          , mes_8          numeric
+                                                          , mes_9          numeric
+                                                          , mes_10         numeric
+                                                          , mes_11         numeric
+                                                          , mes_12         numeric
+                                                          , total_mes_1    numeric
+                                                          , total_mes_2    numeric
+                                                          , total_mes_3    numeric
+                                                          , total_mes_4    numeric
+                                                          , total_mes_5    numeric
+                                                          , total_mes_6    numeric
+                                                          , total_mes_7    numeric
+                                                          , total_mes_8    numeric
+                                                          , total_mes_9    numeric
+                                                          , total_mes_10   numeric
+                                                          , total_mes_11   numeric
+                                                          , total_mes_12   numeric )
     WHERE ordem = 1;
 
     --
@@ -95,12 +98,15 @@ BEGIN
     --
     SELECT stn.fn_calcula_rcl_vinculada(stExercicio,stDtFinal,stCodEntidade)
       INTO nuValorRCL;
-
+    
+    -- Atualiza valor
     nuValor := nuValor + nuValorRCL;
 
-    INSERT INTO tmp_arquivo VALUES (nuValor, inMes);
+    INSERT INTO tmp_arquivo VALUES (nuValor, inPeriodo);
 
-    stSql := ' SELECT mes, COALESCE(valor, 0.00) AS valor FROM tmp_arquivo; ';
+    stSql := ' SELECT periodo
+                    , COALESCE(valor, 0.00) AS valor
+                 FROM tmp_arquivo; ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP

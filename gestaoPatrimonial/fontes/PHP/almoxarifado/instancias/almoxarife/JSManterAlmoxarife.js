@@ -46,7 +46,7 @@ Revision 1.4  2006/07/06 12:09:52  diego
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

@@ -60,18 +60,18 @@ function montaRecuperaTodos()
 {
     $stSql  = "
         SELECT mes
-             , REPLACE(valorbensmov::VARCHAR,'.','') AS valorbensmov
-             , REPLACE(valorbensimo::VARCHAR ,'.','') AS valorbensimo
-             , REPLACE(valorobrasinst::VARCHAR ,'.','') AS valorobrasinst
-             , REPLACE(valortitval::VARCHAR ,'.','') AS valortitval
-             , REPLACE(valordivativa::VARCHAR ,'.','') AS valordivativa
-             , REPLACE(valortransrecebidas::VARCHAR ,'.','') AS valortransrecebidas
-             , REPLACE(valorreversaorpps::VARCHAR ,'.','') AS valorreversaorpp
+             , valorbensmov
+             , valorbensimo
+             , valorobrasinst
+             , valortitval
+             , valordivativa
+             , valortransrecebidas
+             , valorreversaorpps
              , codtipo
-
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
+                                     , '".$this->getDado("data_inicial")."'
+                                     , '".$this->getDado("data_final")."'                                     
                                      ) AS retorno(
                                                   mes                 INTEGER,
                                                   valorbensmov        NUMERIC,

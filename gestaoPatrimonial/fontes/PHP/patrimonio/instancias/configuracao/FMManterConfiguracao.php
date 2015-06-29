@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.01.01
 
-    $Id: FMManterConfiguracao.php 60499 2014-10-23 20:20:33Z arthur $
+    $Id: FMManterConfiguracao.php 62716 2015-06-11 18:26:42Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -186,35 +186,10 @@ $obTxtColetoraCaracterSeparador->setValue ( $stColetoraCaracterSeparador );
 
 $obVlrMinDepreciacao = new Numerico;
 $obVlrMinDepreciacao->setName  ( 'flValorMinimoDepreciacao' );
-$obVlrMinDepreciacao->setTitle ( 'Informe o valor mínimo para depreciação do bem.' );
-$obVlrMinDepreciacao->setRotulo( 'Valor Mínimo Depreciação' );
+$obVlrMinDepreciacao->setTitle ( 'Informe o Valor Mínimo do Bem para Depreciação.' );
+$obVlrMinDepreciacao->setRotulo( 'Valor Mínimo do Bem para Depreciação ' );
 $obVlrMinDepreciacao->setValue ( $flValorMinimoDepreciacao );
 $obVlrMinDepreciacao->setNull  ( false );
-
-/*
-$arCompetenciaDepreciacao = array(0 => false, 1 => false, 2 => false, 3 => false, 4 => false, 6 => false, 12=> false);
-$arCompetenciaDepreciacao[$inCompetenciaDepreciacao ? $inCompetenciaDepreciacao : 0] = true;
-
-$obCmbCompetenciaDepreciacao = new Select;
-$obCmbCompetenciaDepreciacao->setName   ('inCompetenciaDepreciacao');
-$obCmbCompetenciaDepreciacao->setRotulo ('Competência Depreciação');
-$obCmbCompetenciaDepreciacao->setNull   (false);
-$obCmbCompetenciaDepreciacao->addOption ('',   'Selecione'       ,$arCompetenciaDepreciacao[0]);
-$obCmbCompetenciaDepreciacao->addOption ('1',  'Mensal'          , $arCompetenciaDepreciacao[1] );
-$obCmbCompetenciaDepreciacao->addOption ('2',  'Bimestral'       , $arCompetenciaDepreciacao[2] );
-$obCmbCompetenciaDepreciacao->addOption ('3',  'Trimestral'      , $arCompetenciaDepreciacao[3] );
-$obCmbCompetenciaDepreciacao->addOption ('4',  'Quadrimestral'   , $arCompetenciaDepreciacao[4] );
-$obCmbCompetenciaDepreciacao->addOption ('6',  'Semestral'       , $arCompetenciaDepreciacao[6] );
-$obCmbCompetenciaDepreciacao->addOption ('12', 'Anual'           , $arCompetenciaDepreciacao[12]);
-
-$obCmbAlterarDepreciacao = new Select;
-$obCmbAlterarDepreciacao->setName   ('boSubstituirDepreciacao');
-$obCmbAlterarDepreciacao->setRotulo ('Substituir Depreciação');
-$obCmbAlterarDepreciacao->setNull   (false);
-$obCmbAlterarDepreciacao->addOption ('false','Não',($boSubstituirDepreciacao=='false' ? false : true));
-$obCmbAlterarDepreciacao->addOption ('true','Sim',($boSubstituirDepreciacao=='true' ? true : false));
-$obCmbAlterarDepreciacao->setTitle('Indica se o processamento em lote deve substituir o registro caso já exista uma depreciação realizada no mês.');
-*/
 
 //monta o formulário
 $obFormulario = new Formulario;
@@ -230,8 +205,6 @@ $obFormulario->addComponente( $obIPopUpContaAtivo );
 $obFormulario->agrupaComponentes( array( $obRdAlterarBensSim, $obRdAlterarBensNao ) );
 $obFormulario->agrupaComponentes( array( $obRdPlacaAlfaSim, $obRdPlacaAlfaNao ) );
 $obFormulario->addComponente ( $obVlrMinDepreciacao );
-//$obFormulario->addComponente ( $obCmbCompetenciaDepreciacao );
-//$obFormulario->addComponente ( $obCmbAlterarDepreciacao );
 
 $obFormulario->addTitulo    ( "Configuração da Coletora de Dados" );
 $obFormulario->addComponente( $obTxtColetoraDigitosLocal );

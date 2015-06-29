@@ -249,72 +249,15 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="listagem" id="1183">
-            <list-property name="columnHints">
-                <structure>
-                    <property name="columnName">registro</property>
-                    <text-property name="displayName">registro</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">nom_cgm</property>
-                    <text-property name="displayName">nom_cgm</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">matricula_ipe</property>
-                    <text-property name="displayName">matricula_ipe</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">valor</property>
-                    <text-property name="displayName">valor</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">situacao</property>
-                    <text-property name="displayName">situacao</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">dt_situacao</property>
-                    <text-property name="displayName">dt_situacao</text-property>
-                </structure>
-            </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">registro</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">nom_cgm</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">matricula_ipe</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">valor</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">situacao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">dt_situacao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
-            <method name="beforeOpen"><![CDATA[this.queryText  = "SELECT to_char(dt_situacao, 'dd/mm/yyyy') as dt_situacao, * \n";
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[this.queryText  = "SELECT to_char(dt_situacao, 'dd/mm/yyyy') as dt_situacao, valor::NUMERIC,* \n";
 this.queryText += "FROM    													   \n";
 this.queryText += " exportarArquivoIpers( 									   \n";
 this.queryText += params["inCodPeriodoMovimentacao"]+",                        \n";
@@ -330,59 +273,10 @@ this.queryText += params["inCodComplementar"]+",                               \
 this.queryText += params["boAgruparFolhas"]+"                                  \n";
 this.queryText += " ) as contrato ORDER BY nom_cgm \n";
 
-//params["query"] = this.queryText;]]></method>
+params["query"] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet">
-                <structure>
-                    <property name="position">1</property>
-                    <property name="name">registro</property>
-                    <property name="nativeName">registro</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">2</property>
-                    <property name="name">nom_cgm</property>
-                    <property name="nativeName">nom_cgm</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">matricula_ipe</property>
-                    <property name="nativeName">matricula_ipe</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">4</property>
-                    <property name="name">valor</property>
-                    <property name="nativeName">valor</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                </structure>
-                <structure>
-                    <property name="position">5</property>
-                    <property name="name">situacao</property>
-                    <property name="nativeName">situacao</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">6</property>
-                    <property name="name">dt_situacao</property>
-                    <property name="nativeName">dt_situacao</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-            </list-property>
-            <xml-property name="queryText"><![CDATA[SELECT '' as registro, 
-       '' as nom_cgm,
-       '' as matricula_ipe,
-       0 as valor,
-       '' as situacao,
-       '' as dt_situacao
-       ]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[]]></xml-property>
         </oda-data-set>
     </data-sets>
     <styles>
@@ -611,8 +505,9 @@ this.queryText += " ) as contrato ORDER BY nom_cgm \n";
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <expression name="expression">dataSetRow["valor"]</expression>
-                    <property name="dataType">float</property>
+                    <expression name="expression" type="javascript">dataSetRow['valor']</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">0</property>
@@ -718,10 +613,10 @@ this.queryText += " ) as contrato ORDER BY nom_cgm \n";
                         </data>
                     </cell>
                     <cell id="1190">
-                        <data id="1213">
+                        <data id="6668">
                             <structure name="numberFormat">
-                                <property name="category">Custom</property>
-                                <property name="pattern">###,##0.00</property>
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
                             </structure>
                             <property name="textAlign">right</property>
                             <property name="resultSetColumn">valor</property>

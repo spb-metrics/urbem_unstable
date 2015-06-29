@@ -56,7 +56,7 @@ Casos de uso: uc-01.03.91
         case 0:
     $mensagem = pegaConfiguracao("mensagem", 2, Sessao::getExercicio() );
 ?>
-<script language="javascript">
+<script type="text/javascript">
 function Valida()
 {
         var mensagem = "";
@@ -131,7 +131,7 @@ function Valida()
             $audicao->insereAuditoria();
 
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
                 alertaAviso("'.$stMensagem.'...","alterar","aviso", "'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$_SERVER['PHP_SELF'].'?'.Sessao::getId().'&ctrl=0");
             </script>';

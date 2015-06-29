@@ -33,10 +33,10 @@
 
     * @ignore
 
-    $Revision: 61769 $
+    $Revision: 62622 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-03-03 10:20:41 -0300 (Ter, 03 Mar 2015) $
+    $Author: carlos.silva $
+    $Date: 2015-05-25 16:52:18 -0300 (Seg, 25 Mai 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -57,7 +57,6 @@ Revision 1.1  2007/05/08 14:49:18  bruce
     $obTTCMGOAFD = new TTCMGOAFD();
     $obTTCMGOAFD->setDado('exercicio', Sessao::getExercicio());
     $obTTCMGOAFD->setDado('cod_entidade', $stEntidades );
-    
     $obTTCMGOAFD->recuperaContasBancarias($rsRecordSetAFD10);
     $obTTCMGOAFD->recuperaContasBancariasFonteRecurso($rsRecordSetAFD11);
     

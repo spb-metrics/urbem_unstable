@@ -48,7 +48,7 @@ if (is_object($sessao)) {
     <html>
         <head>
         <title>Encerrando...</title>
-        <script language="JavaScript" type="text/JavaScript">
+        <script type="text/JavaScript">
             function encerra()
             {
                 //opener.parent.frames["telaTopo"].location.reload();
@@ -68,7 +68,7 @@ if (is_object($sessao)) {
     <html>
         <head>
         <title>Encerrando...</title>
-        <script language="JavaScript" type="text/JavaScript">
+        <script type="text/JavaScript">
             function encerra()
             {
                 window.close();

@@ -45,7 +45,7 @@ Bug#9764#
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     stAction = document.frm.action;

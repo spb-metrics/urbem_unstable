@@ -40,7 +40,7 @@ Casos de uso: uc-01.06.98
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 //include("../../../framework/include/cabecalho.inc.php");
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function voltaProcesso()
     {
         document.frm.action = "consultaProcesso.php?<?=Sessao::getId()?>";

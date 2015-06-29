@@ -183,7 +183,7 @@ BEGIN
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
 
-    stSql := '
+    stSql := ' CREATE TEMPORARY TABLE tmp_total_ativo AS
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
              , nivel
              , CAST(nom_conta AS VARCHAR) as nom_conta
@@ -1051,6 +1051,64 @@ BEGIN
              , tipo_conta
     ';
 
+    EXECUTE stSql;
+
+    stSql := '  
+
+                SELECT 
+                        ''01''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                        FROM tmp_total_ativo
+                        WHERE tipo_conta = 1
+            UNION 
+
+                SELECT  
+                        ''02''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_ativo
+                WHERE cod_estrutural BETWEEN ''1.2.1.1.0.01.00'' AND ''1.2.1.9.0.00.00''
+
+            UNION 
+
+                SELECT  
+                        ''03''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_ativo
+                WHERE cod_estrutural = ''1.2.3.1.0.00.00''
+
+            UNION 
+
+                SELECT  
+                        ''04''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_ativo
+                WHERE cod_estrutural = ''1.2.3.2.0.00.00''
+
+            UNION 
+
+                SELECT  
+                        ''06''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_ativo
+                WHERE cod_estrutural = ''1.2.1.1.0.04.00''
+
+            UNION
+
+                SELECT  
+                        ''07''::VARCHAR as tipo_conta
+                        ,SUM(vl_saldo_anterior) as vl_saldo_anterior
+                        ,SUM(vl_saldo_atual) as vl_saldo_atual
+                FROM tmp_total_ativo
+                WHERE tipo_conta  = 7
+
+
+            ';
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;
@@ -1067,6 +1125,7 @@ BEGIN
     DROP TABLE tmp_credito;
     DROP TABLE tmp_totaliza_debito;
     DROP TABLE tmp_totaliza_credito;
+    DROP TABLE tmp_total_ativo;
 
     RETURN;
 END;

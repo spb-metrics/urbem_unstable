@@ -38,10 +38,7 @@ DECLARE
     stCodEntidades          ALIAS FOR $4;
     stSql                   VARCHAR   := '';
     reRegistro              RECORD;
-    inMes                   VARCHAR;
 BEGIN
-    
-    inMes := SUBSTR(dtInicial,4,2);
 
     stSql :='CREATE TEMPORARY TABLE tmp_deducoes AS
                 SELECT *
@@ -53,16 +50,16 @@ BEGIN
                                                 ,'|| quote_literal(stCodEntidades) ||'
                                                 ,'''','''','''','''','''','''','''') 
                     as retorno(                      
-                        cod_estrutural      varchar,                                           
-                        receita             integer,                                           
-                        recurso             varchar,                                           
-                        descricao           varchar,                                           
-                        valor_previsto      numeric,                                           
-                        arrecadado_periodo  numeric,                                           
-                        arrecadado_ano      numeric,                                           
-                        diferenca           numeric                                           
+                        cod_estrutural      varchar,     
+                        receita             integer,     
+                        recurso             varchar,     
+                        descricao           varchar,     
+                        valor_previsto      numeric,     
+                        arrecadado_periodo  numeric,     
+                        arrecadado_ano      numeric,     
+                        diferenca           numeric     
                     )
-                WHERE cod_estrutural like ''9.1.7%''
+                WHERE cod_estrutural like ''9.1.7.0%''
                 ';
     EXECUTE stSql;
     
@@ -71,26 +68,26 @@ BEGIN
             SELECT *
                 FROM(
                     SELECT 
-                        '|| quote_literal(inMes) ||' as mes
-                        , ''01'' as cod_tipo
+                        12::varchar as mes
+                        , ''01''::varchar as cod_tipo
                         , ABS(sum(valor_previsto))::varchar as valor_01
                         FROM tmp_deducoes
                     UNION 
                     SELECT 
-                        '|| quote_literal(inMes) ||' as mes
-                        , ''02'' as cod_tipo
+                        12::varchar as mes
+                        , ''02''::varchar as cod_tipo
                         , ABS(sum(valor_previsto))::varchar as valor_02
                         FROM tmp_deducoes
                     UNION 
                     SELECT 
-                        '|| quote_literal(inMes) ||' as mes
-                        , ''03'' as cod_tipo
-                        , null as valor_03
+                        12::varchar as mes
+                        , ''03''::varchar as cod_tipo
+                        , ABS(sum(valor_previsto))::varchar as valor_03
                         FROM tmp_deducoes
                     UNION 
                     SELECT 
-                        '|| quote_literal(inMes) ||' as mes
-                        , ''04'' as cod_tipo
+                        12::varchar as mes
+                        , ''04''::varchar as cod_tipo
                         , ABS(sum(arrecadado_periodo))::varchar as valor_04
                         FROM tmp_deducoes
                     ) resultado

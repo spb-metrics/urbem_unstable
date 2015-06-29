@@ -50,7 +50,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 function rd_extra(){ 
 /**
 * Function rd_extra 

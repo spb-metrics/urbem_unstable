@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.41
 
-    $Id: FMConsultarAssentamentoGerado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMConsultarAssentamentoGerado.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -48,7 +48,7 @@ $pgProc     = "PR".$stPrograma.".php?".Sessao::getId();
 $pgJS       = "JS".$stPrograma.".js";
 //$jsOnload   = "executaFuncaoAjax('processarForm','&inRegistro=".$_REQUEST['inContrato']."&inCodMes=".$_REQUEST['inCodMes']."&inAno=".$_REQUEST['inAno']."');";
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);

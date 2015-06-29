@@ -44,7 +44,7 @@ include(CAM_FW_LEGADO."botoesPdfLegado.class.php");
 
 $sAnoExercicio = pegaconfiguracao("ano_exercicio");
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
     function Valida()
     {
         var mensagem = "";

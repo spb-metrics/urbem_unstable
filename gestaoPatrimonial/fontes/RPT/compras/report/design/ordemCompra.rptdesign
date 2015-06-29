@@ -236,215 +236,14 @@ function formataNumExenteso(valor)
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dadosFornecedor" id="237">
-            <list-property name="columnHints">
-                <structure>
-                    <property name="columnName">cod_ordem</property>
-                    <text-property name="displayName">cod_ordem</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">exercicio</property>
-                    <text-property name="displayName">exercicio</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">cod_entidade</property>
-                    <text-property name="displayName">cod_entidade</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">observacao</property>
-                    <text-property name="displayName">observacao</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">cod_empenho</property>
-                    <text-property name="displayName">cod_empenho</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">dt_ordem</property>
-                    <text-property name="displayName">dt_ordem</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">cpf_cnpj</property>
-                    <text-property name="displayName">cpf_cnpj</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">fornecedor</property>
-                    <text-property name="displayName">fornecedor</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">logradouro</property>
-                    <text-property name="displayName">logradouro</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">numero</property>
-                    <text-property name="displayName">numero</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">bairro</property>
-                    <text-property name="displayName">bairro</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">cep</property>
-                    <text-property name="displayName">cep</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">telefone</property>
-                    <text-property name="displayName">telefone</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">uf</property>
-                    <text-property name="displayName">uf</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">nom_municipio</property>
-                    <text-property name="displayName">nom_municipio</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">processo</property>
-                    <text-property name="displayName">processo</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">modalidade</property>
-                    <text-property name="displayName">modalidade</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">objeto</property>
-                    <text-property name="displayName">objeto</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">proposta</property>
-                    <text-property name="displayName">proposta</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">empenho</property>
-                    <text-property name="displayName">empenho</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">dt_empenho</property>
-                    <text-property name="displayName">dt_empenho</text-property>
-                </structure>
-                <structure>
-                    <property name="columnName">local_entrega_propostas</property>
-                    <text-property name="displayName">local_entrega_propostas</text-property>
-                </structure>
-            </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">cod_ordem</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">exercicio</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">cod_entidade</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">observacao</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">cod_empenho</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">dt_ordem</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">7</property>
-                        <property name="name">cpf_cnpj</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">8</property>
-                        <property name="name">fornecedor</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">9</property>
-                        <property name="name">logradouro</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">10</property>
-                        <property name="name">numero</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">11</property>
-                        <property name="name">bairro</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">12</property>
-                        <property name="name">cep</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">13</property>
-                        <property name="name">telefone</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">uf</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">15</property>
-                        <property name="name">nom_municipio</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">16</property>
-                        <property name="name">processo</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">17</property>
-                        <property name="name">modalidade</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">18</property>
-                        <property name="name">objeto</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">19</property>
-                        <property name="name">proposta</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">20</property>
-                        <property name="name">empenho</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">21</property>
-                        <property name="name">dt_empenho</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">22</property>
-                        <property name="name">local_entrega_propostas</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData"/>
             <property name="rowFetchLimit">0</property>
             <method name="beforeOpen"><![CDATA[if (params['cod_ordem'] != ""){
   this.queryText += " AND ordem.cod_ordem = "+params['cod_ordem'];
@@ -463,162 +262,7 @@ if (params['tipo_ordem'] != ""){
 }
 params['stQuery'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet">
-                <structure>
-                    <property name="position">1</property>
-                    <property name="name">cod_ordem</property>
-                    <property name="nativeName">cod_ordem</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                </structure>
-                <structure>
-                    <property name="position">2</property>
-                    <property name="name">exercicio</property>
-                    <property name="nativeName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">cod_entidade</property>
-                    <property name="nativeName">cod_entidade</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                </structure>
-                <structure>
-                    <property name="position">4</property>
-                    <property name="name">observacao</property>
-                    <property name="nativeName">observacao</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">5</property>
-                    <property name="name">cod_empenho</property>
-                    <property name="nativeName">cod_empenho</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                </structure>
-                <structure>
-                    <property name="position">6</property>
-                    <property name="name">dt_ordem</property>
-                    <property name="nativeName">dt_ordem</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">7</property>
-                    <property name="name">cpf_cnpj</property>
-                    <property name="nativeName">cpf_cnpj</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">8</property>
-                    <property name="name">fornecedor</property>
-                    <property name="nativeName">fornecedor</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">9</property>
-                    <property name="name">logradouro</property>
-                    <property name="nativeName">logradouro</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">10</property>
-                    <property name="name">numero</property>
-                    <property name="nativeName">numero</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">11</property>
-                    <property name="name">bairro</property>
-                    <property name="nativeName">bairro</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">12</property>
-                    <property name="name">cep</property>
-                    <property name="nativeName">cep</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">13</property>
-                    <property name="name">telefone</property>
-                    <property name="nativeName">telefone</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">14</property>
-                    <property name="name">uf</property>
-                    <property name="nativeName">uf</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">15</property>
-                    <property name="name">nom_municipio</property>
-                    <property name="nativeName">nom_municipio</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">16</property>
-                    <property name="name">processo</property>
-                    <property name="nativeName">processo</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">17</property>
-                    <property name="name">modalidade</property>
-                    <property name="nativeName">modalidade</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">18</property>
-                    <property name="name">objeto</property>
-                    <property name="nativeName">objeto</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">19</property>
-                    <property name="name">proposta</property>
-                    <property name="nativeName">proposta</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">20</property>
-                    <property name="name">empenho</property>
-                    <property name="nativeName">empenho</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">21</property>
-                    <property name="name">dt_empenho</property>
-                    <property name="nativeName">dt_empenho</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">22</property>
-                    <property name="name">local_entrega_propostas</property>
-                    <property name="nativeName">local_entrega_propostas</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-            </list-property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT ordem.cod_ordem
     ,   ordem.exercicio
     ,   ordem.cod_entidade
@@ -638,11 +282,14 @@ params['stQuery'] = this.queryText;]]></method>
     ,   (CASE WHEN licitacao.cod_processo IS NOT NULL THEN licitacao.cod_processo||'/'||licitacao.exercicio_processo
          ELSE '' END ) AS processo
     ,   (CASE WHEN modalidade_licitacao.descricao IS NOT NULL THEN modalidade_licitacao.descricao
-         ELSE modalidade_compra_direta.descricao END) AS modalidade
+         WHEN modalidade_compra_direta.descricao IS NOT NULL THEN modalidade_compra_direta.descricao
+         ELSE atributo_valor_padrao.valor_padrao END) AS modalidade
     ,   (CASE WHEN objeto_licitacao.descricao IS NOT NULL THEN objeto_licitacao.descricao
-         ELSE objeto_compra_direta.descricao END) AS objeto
+    	 WHEN objeto_compra_direta.descricao IS NOT NULL THEN objeto_compra_direta.descricao
+         ELSE pre_empenho.descricao END) AS objeto
     ,   (CASE WHEN edital.num_edital IS NOT NULL THEN 'Edital '||edital.num_edital||'/'||edital.exercicio
-         ELSE 'Compra Direta '||compra_direta.cod_compra_direta||'/'||compra_direta.exercicio_mapa END) AS proposta
+         WHEN compra_direta.cod_compra_direta IS NOT NULL THEN 'Compra Direta '||compra_direta.cod_compra_direta||'/'||compra_direta.exercicio_mapa
+         ELSE 'Empenho Diversos '||empenho.cod_empenho||'/'||empenho.exercicio END) AS proposta
     ,   empenho.cod_empenho||'/'||empenho.exercicio AS empenho
     ,   TO_CHAR(empenho.dt_empenho, 'dd/mm/yyyy') as dt_empenho
     ,   CASE WHEN( compra_direta.cod_mapa IS NOT NULL )
@@ -658,7 +305,9 @@ params['stQuery'] = this.queryText;]]></method>
                       AND mapa_item.exercicio = mapa.exercicio
                     LIMIT 1
                   )
-             ELSE edital.local_entrega_propostas
+             WHEN edital.local_entrega_propostas IS NOT NULL
+             THEN edital.local_entrega_propostas
+             ELSE cgm_entrega_ordem.nom_cgm
         END AS local_entrega_propostas
 FROM compras.ordem
 
@@ -690,12 +339,12 @@ INNER JOIN empenho.item_pre_empenho
         ON item_pre_empenho.exercicio = pre_empenho.exercicio
         AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
-INNER JOIN empenho.item_pre_empenho_julgamento
+LEFT JOIN empenho.item_pre_empenho_julgamento
         ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
         AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
         AND item_pre_empenho.num_item = item_pre_empenho_julgamento.num_item
 
-INNER JOIN compras.julgamento_item
+LEFT JOIN compras.julgamento_item
         ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
         AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
         AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
@@ -704,6 +353,7 @@ INNER JOIN compras.julgamento_item
 
 INNER JOIN sw_cgm as cgm_fornecedor
         ON julgamento_item.cgm_fornecedor = cgm_fornecedor.numcgm
+        OR (cgm_fornecedor.numcgm=pre_empenho.cgm_beneficiario AND julgamento_item.cgm_fornecedor IS NULL)
 
 LEFT JOIN sw_cgm_pessoa_juridica AS cgm_fornecedor_juridico
         ON cgm_fornecedor.numcgm = cgm_fornecedor_juridico.numcgm
@@ -718,15 +368,15 @@ INNER JOIN sw_municipio
 INNER JOIN sw_uf
         ON  sw_municipio.cod_uf = sw_uf.cod_uf
 
-INNER JOIN compras.cotacao
+LEFT JOIN compras.cotacao
         ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
         AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
 
-INNER JOIN compras.mapa_cotacao
+LEFT JOIN compras.mapa_cotacao
         ON cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
         AND cotacao.exercicio = mapa_cotacao.exercicio_cotacao
 
-INNER JOIN compras.mapa
+LEFT JOIN compras.mapa
         ON mapa_cotacao.exercicio_mapa = mapa.exercicio
         AND mapa_cotacao.cod_mapa = mapa.cod_mapa
 
@@ -761,6 +411,25 @@ LEFT JOIN   licitacao.edital
         AND licitacao.cod_modalidade = edital.cod_modalidade
         AND licitacao.cod_entidade = edital.cod_entidade
         AND licitacao.exercicio = edital.exercicio_licitacao
+        
+INNER JOIN empenho.atributo_empenho_valor 
+        ON  atributo_empenho_valor.exercicio = pre_empenho.exercicio
+        AND atributo_empenho_valor.cod_pre_empenho = pre_empenho.cod_pre_empenho
+        
+INNER JOIN administracao.atributo_dinamico
+        ON  atributo_empenho_valor.cod_modulo = atributo_dinamico.cod_modulo
+        AND atributo_empenho_valor.cod_cadastro = atributo_dinamico.cod_cadastro
+        AND atributo_empenho_valor.cod_atributo = atributo_dinamico.cod_atributo
+        AND atributo_dinamico.nom_atributo = 'Modalidade'   
+
+INNER JOIN administracao.atributo_valor_padrao
+        ON  atributo_dinamico.cod_modulo = atributo_valor_padrao.cod_modulo
+        AND atributo_dinamico.cod_cadastro = atributo_valor_padrao.cod_cadastro
+        AND atributo_dinamico.cod_atributo = atributo_valor_padrao.cod_atributo
+        AND atributo_empenho_valor.valor::integer = atributo_valor_padrao.cod_valor 
+        
+LEFT JOIN sw_cgm AS cgm_entrega_ordem
+        ON cgm_entrega_ordem.numcgm = ordem.numcgm_entrega               
 
 WHERE 
 
@@ -771,39 +440,16 @@ WHERE
                        AND cotacao.cod_cotacao = cotacao_anulada.cod_cotacao
                 )
 
-    AND julgamento_item.ordem = 1
+    AND (		julgamento_item.cod_cotacao IS NULL
+     		OR
+     		   (julgamento_item.cod_cotacao IS NOT NULL AND julgamento_item.ordem = 1)
+    	)
 ]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dadosItens" id="240">
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">item</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">marca</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">quantidade</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">vl_unitario</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">vl_total</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                </list-property>
-            </structure>
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData"/>
             <property name="rowFetchLimit">0</property>
             <method name="beforeOpen"><![CDATA[if (params['cod_ordem'] != ""){
   this.queryText += " AND ordem.cod_ordem = "+params['cod_ordem'];
@@ -823,38 +469,7 @@ if (params['tipo_ordem'] != ""){
   this.queryText += " AND ordem_item.tipo = '"+params['tipo_ordem']+"'";
 }]]></method>
             <property name="dataSource">postgres</property>
-            <list-property name="resultSet">
-                <structure>
-                    <property name="position">1</property>
-                    <property name="name">item</property>
-                    <property name="nativeName">item</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">2</property>
-                    <property name="name">marca</property>
-                    <property name="nativeName">marca</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">quantidade</property>
-                    <property name="nativeName">quantidade</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">4</property>
-                    <property name="name">vl_unitario</property>
-                    <property name="nativeName">vl_unitario</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">5</property>
-                    <property name="name">vl_total</property>
-                    <property name="nativeName">vl_total</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-            </list-property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT  catalogo_item.descricao AS item
       , marca.descricao AS marca
       , ordem_item.quantidade
@@ -874,19 +489,19 @@ INNER JOIN empenho.item_pre_empenho
        AND item_pre_empenho.cod_pre_empenho = ordem_item.cod_pre_empenho
        AND item_pre_empenho.num_item        = ordem_item.num_item
 
-INNER JOIN empenho.item_pre_empenho_julgamento
+LEFT JOIN empenho.item_pre_empenho_julgamento
         ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
        AND item_pre_empenho.exercicio = item_pre_empenho_julgamento.exercicio
        AND item_pre_empenho.num_item = item_pre_empenho_julgamento.num_item
 
-INNER JOIN compras.julgamento_item
+LEFT JOIN compras.julgamento_item
         ON item_pre_empenho_julgamento.exercicio_julgamento = julgamento_item.exercicio
        AND item_pre_empenho_julgamento.cod_cotacao = julgamento_item.cod_cotacao
        AND item_pre_empenho_julgamento.cod_item = julgamento_item.cod_item
        AND item_pre_empenho_julgamento.lote = julgamento_item.lote
        AND item_pre_empenho_julgamento.cgm_fornecedor = julgamento_item.cgm_fornecedor
 
-INNER JOIN compras.cotacao_fornecedor_item
+LEFT JOIN compras.cotacao_fornecedor_item
         ON julgamento_item.exercicio = cotacao_fornecedor_item.exercicio
        AND julgamento_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
        AND julgamento_item.cod_item = cotacao_fornecedor_item.cod_item
@@ -894,10 +509,13 @@ INNER JOIN compras.cotacao_fornecedor_item
        AND julgamento_item.cgm_fornecedor = cotacao_fornecedor_item.cgm_fornecedor
 
 INNER JOIN  almoxarifado.catalogo_item
-        ON  cotacao_fornecedor_item.cod_item = catalogo_item.cod_item
+        ON  julgamento_item.cod_item = catalogo_item.cod_item
+        OR  ( ordem_item.cod_item = catalogo_item.cod_item AND julgamento_item.cod_item IS NULL )
 
-INNER JOIN  almoxarifado.marca
+LEFT JOIN  almoxarifado.marca
         ON  cotacao_fornecedor_item.cod_marca = marca.cod_marca
+        OR  ( ordem_item.cod_marca = marca.cod_marca AND cotacao_fornecedor_item.cod_marca IS NULL )
+        
 WHERE NOT EXISTS (
                     SELECT 1
                       FROM compras.cotacao
@@ -908,7 +526,10 @@ WHERE NOT EXISTS (
                        AND item_pre_empenho_julgamento.exercicio = cotacao.exercicio
                     )
 
-    AND julgamento_item.ordem = 1
+    AND (		julgamento_item.cod_cotacao IS NULL
+     		OR
+     		   (julgamento_item.cod_cotacao IS NOT NULL AND julgamento_item.ordem = 1)
+    	)
       ]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dadosUsuario" id="1234">

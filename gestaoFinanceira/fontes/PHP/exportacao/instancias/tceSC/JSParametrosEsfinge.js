@@ -42,7 +42,7 @@
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
     function mudaStatusCheckBox( boStatus ){
         document.getElementById('chkPPA').disabled              = boStatus;

@@ -30,7 +30,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    * $Id: desapensaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: desapensaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Casos de uso: uc-01.06.98
 
@@ -42,7 +42,7 @@ include CAM_FW_LEGADO."mascarasLegado.lib.php";
 include CAM_FW_LEGADO."auditoriaLegada.class.php";
 include '../apensamento.class.php';
 ?>
-<script language="javascript">
+<script type="text/javascript">
      function zebra(id, classe)
      {
             var tabela = document.getElementById(id);
@@ -101,7 +101,7 @@ setAjuda('uc-01.06.98');
         *   Tela de Filtros                                              *
         *****************************************************************/
             echo '
-            <script language="javascript">
+            <script type="text/javascript">
                 function Salvar()
                 {
                     document.frm.action = "desapensaProcesso.php?'.Sessao::getId().'&controle=1";
@@ -422,7 +422,7 @@ if (Sessao::read('ordem') =='') {
     *   Lista de processos desapensados de um processo                  *
     *****************************************************************/
         echo '
-        <script language="javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var numElementos = document.frm.elements.length;

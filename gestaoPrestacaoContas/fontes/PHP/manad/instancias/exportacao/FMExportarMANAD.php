@@ -48,8 +48,6 @@ $pgProc 	= "PR".$stPrograma.".php"	;
 $pgOcul 	= "OC".$stPrograma.".php"	;
 $pgJS   	= "JS".$stPrograma.".js"	;
 
-//echo "<script language=\"javascript\" type=\"text/javascript\" src=\"".$pgJS."\"></script>";
-// include_once( $pgJS );
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 //destroi arrays de sessão que armazenam os dados do FILTRO

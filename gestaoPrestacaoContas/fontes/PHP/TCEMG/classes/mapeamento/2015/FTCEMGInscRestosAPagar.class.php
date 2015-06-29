@@ -58,32 +58,31 @@ class FTCEMGInscRestosAPagar extends Persistente
 
     public function montaRecuperaTodos()
     {
-        $stSql  = "
-            SELECT mes
-                 , REPLACE( ROUND(vl_processado,2)::VARCHAR, '.', '' ) AS vl_processado
-                 , REPLACE( ROUND(vl_nao_processado,2)::VARCHAR, '.', '' ) AS vl_nao_processado
-                 , REPLACE( ROUND(vl_despesa_nao_inscrita,2)::VARCHAR, '.', '' ) AS vl_despesa_nao_inscrita
-                 , REPLACE( ROUND(vl_vinculado,2)::VARCHAR, '.', '' ) AS vl_vinculado
-                 , REPLACE( ROUND(vl_nao_vinculado,2)::VARCHAR, '.', '' ) AS vl_nao_vinculado
-                 , REPLACE( ROUND(vl_rpps_processado,2)::VARCHAR, '.', '' ) AS vl_rpps_processado
-                 , REPLACE( ROUND(vl_rpps_nao_processado,2)::VARCHAR, '.', '' ) AS vl_rpps_nao_processado
-                 , REPLACE( ROUND(vl_rpps_despesa_nao_inscrita,2)::VARCHAR, '.', '' ) AS vl_rpps_despesa_nao_inscrita
-                 , REPLACE( ROUND(vl_rpps_vinculado,2)::VARCHAR, '.', '' ) AS vl_rpps_vinculado
-                 , REPLACE( ROUND(vl_rpps_nao_vinculado,2)::VARCHAR, '.', '' ) AS vl_rpps_nao_vinculado
-                 , REPLACE( ROUND(vl_processado_legislativo,2)::VARCHAR, '.', '' ) AS vl_processado_legislativo
-                 , 'S' AS nada_declarar
-                 , 0 AS vl_rppsas_processado
-                 , 0 AS vl_rppsas_nao_processado
-                 , 0 AS vl_rppsas_despesa_nao_inscrita
-                 , 0 AS vl_rppsas_vinculado
-                 , 0 AS vl_rppsas_nao_vinculado
-              FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
+        $stSql  = "SELECT   mes
+                            , vl_despesa_nao_inscrita      
+                            , vl_nao_processado            
+                            , vl_nao_vinculado             
+                            , vl_processado                
+                            , vl_vinculado                 
+                            , vl_rpps_processado           
+                            , vl_rpps_nao_processado       
+                            , vl_rpps_despesa_nao_inscrita 
+                            , vl_rpps_vinculado            
+                            , vl_rpps_nao_vinculado        
+                            , vl_processado_legislativo    
+                            , 'S' AS nada_declarar
+                            , 0.00 AS vl_rppsas_processado
+                            , 0.00 AS vl_rppsas_nao_processado
+                            , 0.00 AS vl_rppsas_despesa_nao_inscrita
+                            , 0.00 AS vl_rppsas_vinculado
+                            , 0.00 AS vl_rppsas_nao_vinculado
+                    FROM ".$this->getTabela()."('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") AS retorno
                                           ( mes                          INTEGER,
-                                            vl_processado                NUMERIC,
-                                            vl_nao_processado            NUMERIC,
                                             vl_despesa_nao_inscrita      NUMERIC,
-                                            vl_vinculado                 NUMERIC,
+                                            vl_nao_processado            NUMERIC,
                                             vl_nao_vinculado             NUMERIC,
+                                            vl_processado                NUMERIC,
+                                            vl_vinculado                 NUMERIC,
                                             vl_rpps_processado           NUMERIC,
                                             vl_rpps_nao_processado       NUMERIC,
                                             vl_rpps_despesa_nao_inscrita NUMERIC,

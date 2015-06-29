@@ -40,7 +40,7 @@ Casos de uso: uc-01.06.98
 */
 ?>
 
-<script language="Javascript">
+<script type="text/javascript">
 
 function buscaAssunto(){ 
     document.frm.stCtrl.value = 'buscaAssunto';

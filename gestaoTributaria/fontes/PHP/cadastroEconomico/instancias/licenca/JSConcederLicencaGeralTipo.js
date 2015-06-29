@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage Regra
 
-	* $Id: JSConcederLicencaGeralTipo.js 59612 2014-09-02 12:00:51Z gelson $
+	* $Id: JSConcederLicencaGeralTipo.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.02.12
 
@@ -46,7 +46,7 @@ adicionado trecho de log do CVS
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 /* Conceder */
 function Cancelar () {
 <?php

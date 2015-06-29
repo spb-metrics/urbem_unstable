@@ -45,7 +45,7 @@ Revision 1.3  2006/07/06 12:09:52  diego
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado , codCGM){
  var stTarget              = document.frm.target;

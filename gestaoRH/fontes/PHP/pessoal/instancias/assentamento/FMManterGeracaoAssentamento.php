@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: FMManterGeracaoAssentamento.php 61724 2015-02-27 16:26:44Z evandro $
+ $Id: FMManterGeracaoAssentamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  * Casos de uso: uc-04.04.14
  */
@@ -47,7 +47,7 @@ include_once CAM_GA_NORMAS_COMPONENTES."IBuscaInnerNorma.class.php";
 
 ?>
 
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/json-js-master/json2.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/json-js-master/json2.js" type="text/javascript"></script>
 
 <?php
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc

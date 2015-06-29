@@ -49,13 +49,13 @@ function TTCEMGExecucaoVariacao()
     $this->setCampoCod('exercicio');
     $this->setCampoCod('cod_mes');
 
-    $this->AddCampo('cod_mes'                   , 'integer', true, ''       , true,  false);
-    $this->AddCampo( 'exercicio'                  , 'char'    , true  , '4'    , true  , false  );
-    $this->AddCampo( 'cons_adm_dir'           , 'char'    , true  , '4000' , false , false  );
-    $this->AddCampo( 'cons_aut'                  , 'char'    , true  , '4000' , false , false  );
-    $this->AddCampo( 'cons_fund'                 , 'char'    , true  , '4000' , false , false  );
+    $this->AddCampo( 'cod_mes'           , 'integer' , true  , ''     , true  , false  );
+    $this->AddCampo( 'exercicio'         , 'char'    , true  , '4'    , true  , false  );
+    $this->AddCampo( 'cons_adm_dir'      , 'char'    , true  , '4000' , false , false  );
+    $this->AddCampo( 'cons_aut'          , 'char'    , true  , '4000' , false , false  );
+    $this->AddCampo( 'cons_fund'         , 'char'    , true  , '4000' , false , false  );
     $this->AddCampo( 'cons_empe_est_dep' , 'char'    , true  , '4000' , false , false  );
-    $this->AddCampo( 'cons_dem_ent'          , 'char'    , true  , '4000' , false , false  );
+    $this->AddCampo( 'cons_dem_ent'      , 'char'    , true  , '4000' , false , false  );
 
 }
 
@@ -74,20 +74,50 @@ function recuperaDadosArquivo(&$rsRecordSet)
 function montaRecuperaDadosArquivo()
 {
     $stSql  = "
-        SELECT cod_mes
+        SELECT 12 as mes
+             , cod_mes
              , cons_adm_dir
              , cons_aut
              , cons_fund
              , cons_empe_est_dep
              , cons_dem_ent
           FROM tcemg.execucao_variacao
-        WHERE exercicio = '".Sessao::getExercicio()."'
-             AND cod_mes = ".$this->getDado("cod_mes")."";
+         WHERE exercicio = '".Sessao::getExercicio()."'
+           AND cod_mes = ".$this->getDado("cod_mes")."";
 
     return $stSql;
 }
 
-function recuperaRelacionamento(&$rsRecordSet, $boTransacao = "")
+function recuperaDadosBimestre(&$rsRecordSet,$stFiltro = "", $stOrdem = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaDadosArquivoBimestre().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaDadosArquivoBimestre()
+{
+    $stSql  = "
+        SELECT 12 as mes
+             , cod_mes::VARCHAR AS cod_mes
+             , cons_adm_dir::VARCHAR AS cons_adm_dir
+             , cons_aut::VARCHAR AS cons_aut
+             , cons_fund::VARCHAR AS cons_fund
+             , cons_empe_est_dep::VARCHAR AS cons_empe_est_dep
+             , cons_dem_ent::VARCHAR AS cons_dem_ent
+          FROM tcemg.execucao_variacao
+         WHERE exercicio = '".Sessao::getExercicio()."'
+           AND cod_mes = ".$this->getDado("cod_mes")."";
+           
+    return $stSql;
+}
+
+function recuperaRelacionamento(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
         $obErro      = new Erro;
         $obConexao   = new Conexao;
@@ -105,9 +135,9 @@ function montaRecuperaRelacionamento()
 {
         $stSql  = "
                 SELECT *
-                  FROM  tcemg.execucao_variacao
-                WHERE cod_mes = ".$this->getDado("cod_mes")."
-                    AND exercicio = '".Sessao::read('exercicio')."'
+                  FROM tcemg.execucao_variacao
+                 WHERE cod_mes = ".$this->getDado("cod_mes")."
+                   AND exercicio = '".Sessao::read('exercicio')."'
 
                ";
 

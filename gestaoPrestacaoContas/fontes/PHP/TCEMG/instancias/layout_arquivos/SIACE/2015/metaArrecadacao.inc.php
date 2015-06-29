@@ -38,7 +38,7 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGMetaArrecadacao.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGMetaArrecadacao.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
@@ -46,12 +46,17 @@
     $obFTCEMGMetaArrecadacao->setDado('exercicio'   , Sessao::read('exercicio'));
     $obFTCEMGMetaArrecadacao->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
     $obFTCEMGMetaArrecadacao->setDado('bimestre'    , $arFiltros['inPeriodo']);
-
     $obFTCEMGMetaArrecadacao->recuperaTodos($rsArquivo);
-
+    
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('bimestre');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valor_meta');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+?>

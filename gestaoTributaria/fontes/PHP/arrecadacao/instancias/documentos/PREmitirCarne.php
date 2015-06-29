@@ -27,7 +27,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: tonismar R. Bernardo
 
-  * $Id: PREmitirCarne.php 59868 2014-09-16 20:50:40Z lisiane $
+  * $Id: PREmitirCarne.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.11
 
@@ -45,7 +45,6 @@ include_once CAM_GT_ARR_FUNCAO."FNumeracaoConsolidacao.class.php";
 include_once CAM_GA_CGM_NEGOCIO."RCGM.class.php";
 include_once CAM_GT_ARR_CLASSES."boletos/RRelatorioCarnePetropolis.class.php";
 
-SistemaLegado::BloqueiaFrames();
 flush();
 
 global $request;
@@ -594,7 +593,7 @@ switch ($stAcao) {
         }
 
         if (!$obErro->ocorreu() &&  $boExec ) {
-            echo "<script language=\"javaScript\">\r\n";
+            echo "<script type=\"text/javascript\">\r\n";
             echo "    var sAux = window.open('OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
             echo "    eval(sAux)\r\n";
             echo "</script>\r\n";
@@ -702,7 +701,7 @@ switch ($stAcao) {
             }
 
             if ($boExec) {
-                echo "<script language=\"javaScript\">\r\n";
+                echo "<script type=\"text/javascript\">\r\n";
                 echo "    var sAux = window.open('OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
                 echo "    eval(sAux)\r\n";
                 echo "</script>\r\n";
@@ -782,7 +781,15 @@ switch ($stAcao) {
                 require_once CAM_GT_ARR_MAPEAMENTO.'FARRListaEmissaoGrafica.class.php';
                 $obListaEmissao = new FARRListaEmissaoGrafica;
 
-                $stOrdemEmissao   = implode(",",$_REQUEST["inCodOrdemSelecionados"]);
+                
+                if ($_REQUEST["inCodOrdemSelecionados"] == "") {
+                        sistemaLegado::exibeAviso( "Uma ordem de Emissão deve ser selecionada!", "n_incluir", "erro");
+                        SistemaLegado::LiberaFrames();
+                        exit;
+                } else {
+                    $stOrdemEmissao   = implode(",",$_REQUEST["inCodOrdemSelecionados"]);
+                }
+                
                 $stPadraoCodBarra = $_REQUEST['stPadraoCodBarra'];
 
                 $obListaEmissao->stTipoInscricao = $_REQUEST['inTipoInscricao'];
@@ -792,7 +799,7 @@ switch ($stAcao) {
                 Sessao::write('inCodGrupo'       , $arDados[0] );
                 Sessao::write('inExercicio'      , $arDados[1] );
                 Sessao::write('stPadraoCodBarra' , $_REQUEST["stPadraoCodBarra"] );
-
+                
                 if (!$arDados[0]) {
                     $arCreditoTEMP = explode ( '.', $_REQUEST['inCodCredito'] );
                     Sessao::write('inCodCredito'  , $arCreditoTEMP[0]);
@@ -850,6 +857,7 @@ switch ($stAcao) {
                 if ($rsInscricoes->getNumLinhas() < 1) {
                     $obErro->setDescricao("Nenhum registro para emissão encontrado!");
                     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_erro","erro");
+                    SistemaLegado::LiberaFrames();
                     exit;
                 }
 
@@ -859,7 +867,7 @@ switch ($stAcao) {
                 Sessao::write('listados', 0 );
                 Sessao::write('inscricoes_lista', $arTMP );
                 Sessao::write('total_listar', count($arTMP) );
-
+                
                 Sessao::write("TipoEmissao"     , $stTipoEmissao );
                 Sessao::write("OrdemEmissao"    , $stOrdemEmissao );
 

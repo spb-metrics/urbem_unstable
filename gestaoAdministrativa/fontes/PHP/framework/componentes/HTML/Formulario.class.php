@@ -27,7 +27,7 @@
 * Montar o HTML de um formulario de acordo com os valores setados pelo usuário
 * Data de Criação: 06/02/2003
 
-$Id: Formulario.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: Formulario.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
 
@@ -530,7 +530,7 @@ function addComponente($obComponente , $boAbreComponente = true, $boFechaCompone
 function addArquivoJS($stArquivoJS)
 {
     $stScript = $this->getArquivoJS();
-    $stScript .= "\n<script language=\"JavaScript1.2\" src=\"".$stArquivoJS."\" type=\"text/javascript\"></script>\n";
+    $stScript .= "\n<script src=\"".$stArquivoJS."\" type=\"text/javascript\"></script>\n";
     $this->setArquivoJS( $stScript );
 }
 
@@ -879,7 +879,7 @@ function addFormularioAbas(&$obFormularioAbas)
         }
     }
     $obFormularioAbas->montaInnerHTML();
-    $stHTML  = "\n<script language='javascript'>\n".$obFormularioAbas->obJavaScript->geraHabilitaLayer()."\n</script>\n";
+    $stHTML  = "\n<script type='text/javascript'>\n".$obFormularioAbas->obJavaScript->geraHabilitaLayer()."\n</script>\n";
     $stHTML .= str_replace( "\\'","'",$obFormularioAbas->getHTML());
     if ( strtolower(get_class($this)) == "formularioabas" ) {
         $stHTML  = str_replace( "layer_", "layer_".count($this->arAbas)."_", $stHTML );
@@ -1227,7 +1227,7 @@ function montaHTML()
     $stHtml .= $this->obJavaScript->getJavaScript();
     $inCountJsArray =  is_array($this->arJavaScript) ? count($this->arJavaScript) : 0;
     for ($inCount=0; $inCount<$inCountJsArray; $inCount++) {
-        $stHtml .= "<script language=\"JavaScript\">\n";
+        $stHtml .= "<script type=\"text/javascript\">\n";
         $stHtml .= $this->arJavaScript[$inCount]->getValida();
         $stHtml .= $this->arJavaScript[$inCount]->getLimpar();
         $stHtml .= "</script>\n";
@@ -1258,8 +1258,8 @@ function montaHTML()
     if ( $this->getForm() ) {
         $stHtml .= $obForm->fechaForm();
     }
-    $stHtml .= "\n<script language='javascript'>\nexecuta();\n</script>\n";
-    $stHtml .= "\n<script language='javascript'>\n".$this->obJavaScript->getMonitoraBuscaINNER()."\n</script>\n";
+    $stHtml .= "\n<script type='text/javascript'>\nexecuta();\n</script>\n";
+    $stHtml .= "\n<script type='text/javascript'>\n".$this->obJavaScript->getMonitoraBuscaINNER()."\n</script>\n";
     parent::setHTML( $stHtml );
 }
 

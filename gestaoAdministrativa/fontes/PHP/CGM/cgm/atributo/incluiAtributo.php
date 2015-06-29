@@ -53,7 +53,7 @@ if (!(isset($_REQUEST["ctrl"]))) {
 switch ($ctrl) {
    case 0:
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 <!--
 function Valida()
 {
@@ -129,7 +129,7 @@ function Salvar()
    </tr>
 </table>
 </form>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 document.frm.nomAtributo.focus();
 //-->

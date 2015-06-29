@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: alteraProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: alteraProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -202,7 +202,7 @@ while (!$dbConfig->eof()) {
 $dbConfig->limpaSelecao();
 $dbConfig->fechaBd();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function Salvar()
     {
           document.frm.submit();
@@ -316,13 +316,13 @@ if ($erro == 0) {
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $obj);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$obj.'","alterar","aviso","'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';
 } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$obj.'","n_alterar","erro","'.Sessao::getId().'");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
             </script>';

@@ -48,7 +48,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValorFiltro(tipoBusca){
     var stTraget = document.frm.target;

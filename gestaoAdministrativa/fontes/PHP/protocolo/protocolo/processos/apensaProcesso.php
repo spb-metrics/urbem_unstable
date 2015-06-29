@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: apensaProcesso.php 62562 2015-05-20 16:41:58Z michel $
+    $Id: apensaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -75,7 +75,7 @@ $pagina = $_REQUEST["pagina"];
 if (isset($pagina)) {
     Sessao::write('pagina',$pagina);
 }?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -91,7 +91,7 @@ switch ($controle) {
      /*****************************************************************
       *   Tela de Filtros                                              *
       *****************************************************************/
-        echo '<script language="javascript">
+        echo '<script type="text/javascript">
                 function Salvar()
                 {
                     document.frm.action = "apensaProcesso.php?'.Sessao::getId().'&controle=1";
@@ -406,7 +406,7 @@ switch ($controle) {
         *   Lista de processos apensados de um processo                  *
         *****************************************************************/
         echo '
-        <script language="javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var numElementos = document.frm.elements.length;

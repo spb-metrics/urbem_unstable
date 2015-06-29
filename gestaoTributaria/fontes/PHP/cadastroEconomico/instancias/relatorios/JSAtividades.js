@@ -40,7 +40,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     var stTraget = document.frm.target;

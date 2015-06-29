@@ -31,7 +31,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: TComprasNotaFiscalFornecedor.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TComprasNotaFiscalFornecedor.class.php 62703 2015-06-10 13:29:57Z michel $
   */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -116,47 +116,75 @@ class TComprasNotaFiscalFornecedor extends Persistente
              LEFT JOIN empenho.empenho_anulado_item
                     ON empenho_anulado_item.exercicio = item_pre_empenho.exercicio
                    AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                   AND empenho_anulado_item.cod_entidade = ordem.cod_entidade
                    AND empenho_anulado_item.num_item = item_pre_empenho.num_item
 
-            LEFT JOIN ( SELECT item_pre_empenho_julgamento.exercicio
+             LEFT JOIN (SELECT item_pre_empenho_julgamento.exercicio
                              , item_pre_empenho_julgamento.cod_pre_empenho
                              , item_pre_empenho_julgamento.num_item
                              , item_pre_empenho_julgamento.cod_item
                              , centro_custo.cod_centro
                              , centro_custo.descricao AS nom_centro
-
                           FROM empenho.item_pre_empenho_julgamento
-
-                         INNER JOIN compras.julgamento_item
-                                 ON julgamento_item.exercicio = item_pre_empenho_julgamento.exercicio_julgamento
-                                AND julgamento_item.cod_cotacao = item_pre_empenho_julgamento.cod_cotacao
-                                AND julgamento_item.cod_item = item_pre_empenho_julgamento.cod_item
-                                AND julgamento_item.cgm_fornecedor = item_pre_empenho_julgamento.cgm_fornecedor
-                                AND julgamento_item.lote = item_pre_empenho_julgamento.lote
-
-                         INNER JOIN compras.mapa_cotacao
-                                 ON mapa_cotacao.cod_cotacao = julgamento_item.cod_cotacao
-                                AND mapa_cotacao.exercicio_cotacao = julgamento_item.exercicio
-
-                         INNER JOIN compras.mapa_item
-                                 ON mapa_item.exercicio = mapa_cotacao.exercicio_mapa
-                                AND mapa_item.cod_mapa = mapa_cotacao.cod_mapa
-                                AND mapa_item.cod_item = julgamento_item.cod_item
-
-                         INNER JOIN almoxarifado.centro_custo
-                                 ON centro_custo.cod_centro = mapa_item.cod_centro
-
+                    INNER JOIN compras.julgamento_item
+                            ON julgamento_item.exercicio = item_pre_empenho_julgamento.exercicio_julgamento
+                           AND julgamento_item.cod_cotacao = item_pre_empenho_julgamento.cod_cotacao
+                           AND julgamento_item.cod_item = item_pre_empenho_julgamento.cod_item
+                           AND julgamento_item.cgm_fornecedor = item_pre_empenho_julgamento.cgm_fornecedor
+                           AND julgamento_item.lote = item_pre_empenho_julgamento.lote
+                    INNER JOIN compras.mapa_cotacao
+                            ON mapa_cotacao.cod_cotacao = julgamento_item.cod_cotacao
+                           AND mapa_cotacao.exercicio_cotacao = julgamento_item.exercicio
+                    INNER JOIN compras.mapa_item
+                            ON mapa_item.exercicio = mapa_cotacao.exercicio_mapa
+                           AND mapa_item.cod_mapa = mapa_cotacao.cod_mapa
+                           AND mapa_item.cod_item = julgamento_item.cod_item
+                    INNER JOIN almoxarifado.centro_custo
+                            ON centro_custo.cod_centro = mapa_item.cod_centro
                          WHERE julgamento_item.ordem = 1
-                        ) AS  centro_custo
-                      ON centro_custo.exercicio = item_pre_empenho.exercicio
-                         AND centro_custo.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-                         AND centro_custo.num_item = item_pre_empenho.num_item
-            INNER JOIN( SELECT cod_item
-                            , ativo
-                         FROM
-                              almoxarifado.catalogo_item ) as catalogo
-                   ON( catalogo.cod_item = centro_custo.cod_item )
-            LEFT JOIN ( 	SELECT lancamento_material.cod_item
+
+                     UNION ALL
+
+                        SELECT ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , centro_custo.cod_centro
+                             , centro_custo.descricao AS nom_centro
+                          FROM compras.ordem_item
+                     LEFT JOIN compras.ordem_item_anulacao
+                            ON ordem_item_anulacao.exercicio = ordem_item.exercicio
+                           AND ordem_item_anulacao.cod_entidade = ordem_item.cod_entidade
+                           AND ordem_item_anulacao.cod_ordem = ordem_item.cod_ordem
+                           AND ordem_item_anulacao.exercicio_pre_empenho = ordem_item.exercicio_pre_empenho
+                           AND ordem_item_anulacao.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND ordem_item_anulacao.num_item = ordem_item.num_item
+                           AND ordem_item_anulacao.tipo = ordem_item.tipo                 
+                     LEFT JOIN empenho.item_pre_empenho_julgamento
+                            ON item_pre_empenho_julgamento.exercicio = ordem_item.exercicio
+                           AND item_pre_empenho_julgamento.cod_pre_empenho = ordem_item.cod_pre_empenho
+                           AND item_pre_empenho_julgamento.num_item = ordem_item.num_item
+                    INNER JOIN almoxarifado.centro_custo
+                            ON centro_custo.cod_centro = ordem_item.cod_centro
+                         WHERE ordem_item_anulacao.cod_ordem IS NULL
+                           AND item_pre_empenho_julgamento.num_item IS NULL
+                           AND ordem_item.tipo = '".$this->getDado('tipo')."'
+                      GROUP BY ordem_item.exercicio
+                             , ordem_item.cod_pre_empenho
+                             , ordem_item.num_item
+                             , ordem_item.cod_item
+                             , centro_custo.cod_centro
+                             , centro_custo.descricao
+                       ) AS  centro_custo
+                    ON centro_custo.exercicio = item_pre_empenho.exercicio
+                   AND centro_custo.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                   AND centro_custo.num_item = item_pre_empenho.num_item
+            INNER JOIN ( SELECT cod_item
+                              , ativo
+                           FROM almoxarifado.catalogo_item
+                       ) as catalogo
+                    ON ( catalogo.cod_item = centro_custo.cod_item )
+             LEFT JOIN ( 	SELECT lancamento_material.cod_item
                                  , SUM( lancamento_material.quantidade ) AS quantidade
                                  , nota_fiscal_fornecedor_ordem.exercicio AS exercicio
                                  , nota_fiscal_fornecedor_ordem.cod_ordem
@@ -179,10 +207,10 @@ class TComprasNotaFiscalFornecedor extends Persistente
                                  , nota_fiscal_fornecedor_ordem.cod_entidade
                       ) AS lancamento_material
 
-                         ON lancamento_material.exercicio    = ordem.exercicio
-                        AND lancamento_material.cod_ordem    = ordem.cod_ordem
-                        AND lancamento_material.cod_entidade = ordem.cod_entidade
-                        AND lancamento_material.cod_item     = centro_custo.cod_item
+                    ON lancamento_material.exercicio    = ordem.exercicio
+                   AND lancamento_material.cod_ordem    = ordem.cod_ordem
+                   AND lancamento_material.cod_entidade = ordem.cod_entidade
+                   AND lancamento_material.cod_item     = centro_custo.cod_item
 
             INNER JOIN administracao.unidade_medida
                     ON unidade_medida.cod_grandeza = item_pre_empenho.cod_grandeza

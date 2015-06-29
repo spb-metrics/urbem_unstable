@@ -161,7 +161,7 @@ document.body.addEventListener('keyup', function (event) { countlimit(thelimit,e
 
 </script>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -247,7 +247,7 @@ while (!$dbEmp->eof()) {
     $dbEmp->limpaSelecao();
     $dbEmp->fechaBD();
 if ($dbEmp->numeroDeLinhas == 0) {
-echo '<script language="JavaScript1.2" type="text/javascript">
+echo '<script type="text/javascript">
                  alertaAviso("Somente pessoas físicas podem incluir um comunicado","unica","erro","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';
@@ -270,12 +270,12 @@ $erro = 1;
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $titulo);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$titulo.'","incluir","aviso","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';
             } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$titulo.'","n_incluir","erro","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';
@@ -328,12 +328,12 @@ $erro = 1;
             $audicao = new auditoriaLegada;
             $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $titulo);
             $audicao->insereAuditoria();
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$titulo.'","incluir","aviso","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';
             } else {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                  alertaAviso("'.$titulo.'","n_incluir","erro","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';
@@ -342,7 +342,7 @@ $erro = 1;
 }
 
 if ($erros == 0) {
-echo '<script language="JavaScript1.2" type="text/javascript">
+echo '<script type="text/javascript">
                  alertaAviso("Preencha corretamente o Órgão, Unidade, Departamente e Setor","unica","erro","'.Sessao::getId().'");
                  window.location = "comunicado.php?'.Sessao::getId().'";
                  </script>';

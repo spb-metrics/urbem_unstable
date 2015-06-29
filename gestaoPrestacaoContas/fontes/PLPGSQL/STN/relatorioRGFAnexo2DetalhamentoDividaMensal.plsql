@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatorioRGFAnexo2DetalhamentoDividaMensal.plsql 61101 2014-12-08 19:27:45Z evandro $
+* $Id: relatorioRGFAnexo2DetalhamentoDividaMensal.plsql 62608 2015-05-22 19:35:48Z evandro $
 
 * Casos de uso: uc-06.01.02
 */
@@ -63,6 +63,9 @@ BEGIN
     arDatas := publico.mes(stExercicio,inPeriodo);
     dtInicial := arDatas[0];    
     arDtFinal[1] := arDatas[1];
+  ELSEIF (stTipoPeriodo = 'Ano') THEN
+    dtInicial := '01/01/'||stExercicio||'';
+    arDtFinal[1] := '31/12/'||stExercicio||'';
   END IF;
 
   stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));

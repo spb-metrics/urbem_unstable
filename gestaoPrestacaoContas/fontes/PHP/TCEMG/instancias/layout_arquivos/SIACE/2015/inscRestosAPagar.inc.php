@@ -38,14 +38,14 @@
     $Id:$
     */
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGInscRestosAPagar.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGInscRestosAPagar.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
     $obFTCEMGInscRestosAPagar = new FTCEMGInscRestosAPagar();
-    $obFTCEMGInscRestosAPagar->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGInscRestosAPagar->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGInscRestosAPagar->setDado('mes'         , $arFiltros['inPeriodo']);
+    $obFTCEMGInscRestosAPagar->setDado('exercicio'   , Sessao::getExercicio() );
+    $obFTCEMGInscRestosAPagar->setDado('cod_entidade', '');//valor da entidade deixar vazio, a PL ja busca todas as entidade necessarias
+    $obFTCEMGInscRestosAPagar->setDado('mes'         , '12');
 
     echo implode(',',$arFiltros['inCodEntidadeSelecionado']);
 

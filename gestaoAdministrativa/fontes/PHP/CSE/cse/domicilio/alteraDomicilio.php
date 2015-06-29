@@ -66,7 +66,7 @@ $Date: 2007-01-03 09:33:57 -0200 (Qua, 03 Jan 2007) $
                 unset($sessao->transf2);
             }
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function atualizaMunicipio()
     {
@@ -472,7 +472,7 @@ if ($fim[3]) {
             }
             $cep = formataCep($cep);
  ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function atualizaMunicipio()
       {
@@ -1248,13 +1248,13 @@ $dbConfig->fechaBd();
             $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $var[logradouro]."-".$var[numero]."-".$var[complemento]);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$var[codDomicilio].' - '.$var[logradouro].'","alterar","aviso","'.$sessao->id.'","");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'&ctrl=0&pagina='.$pg.'");
             </script>';
         } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$var[codDomicilio].' - '.$var[logradouro].'","n_alterar","erro","'.$sessao->id.'","");
             </script>';
         }

@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.95
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function AdicionaFuncao(stControle){
     var mensagem = '';
     var funcao  = (document.frm.stFuncao)   ? document.frm.stFuncao.value    : '';

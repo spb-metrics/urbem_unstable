@@ -52,7 +52,7 @@ construção
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function validaQuantidadeEventos(){
     obEventosSelecionados = document.frm.inCodEventoSelecionados;

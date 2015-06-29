@@ -53,7 +53,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     var stTarget = document.frm.target;

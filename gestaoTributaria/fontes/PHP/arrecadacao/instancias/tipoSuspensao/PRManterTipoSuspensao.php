@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Texeira Stephanou
 
-    * $Id: PRManterTipoSuspensao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterTipoSuspensao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 * Casos de uso: uc-05.03.7
 */
@@ -67,7 +67,7 @@ function alertaAvisoRedirect($location="", $objeto="", $tipo="n_incluir", $chama
     $aux = explode("?",$location);
     $location = $aux[0]."?".Sessao::getId()."&".$aux[1];
     //Imprime um código javascript que redireciona o frame 'telaPrincipal'
-    print '<script language="JavaScript1.2" type="text/javascript">
+    print '<script type="text/javascript">
                 SistemaLegado::alertaAviso      ( "'.$objeto.'","'.$tipo.'","'.$chamada.'","'.Sessao::getId().'","'.$caminho.'");
                 mudaMenu         ( "'.$func.'"     );
                 mudaTelaPrincipal( "'.$location.'" );

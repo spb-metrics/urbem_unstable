@@ -57,7 +57,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
         $configuracao->setaEstadoAtual($codUf);
         $configuracao->listaComboEstados();
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function atualizaMunicipio()
       {
@@ -812,13 +812,13 @@ if ($lista != "") {
             $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $var[logradouro]."-".$var[numero]."-".$var[complemento]);
             $audicao->insereAuditoria();
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$var[codDomicilio].' - '.$var[logradouro].'","incluir","aviso","'.$sessao->id.'","");
             mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'");
             </script>';
         } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("'.$var[logradouro].'","n_incluir","erro","'.$sessao->id.'","");
             </script>';
         }

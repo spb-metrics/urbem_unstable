@@ -30,7 +30,7 @@
     * @author Analista: Anderson Konze
     * @author Desenvolvedor: Leopoldo Braga Barreiro
 
-    $Id: IMontaAssinaturas.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IMontaAssinaturas.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-xx.xx.xx
 
@@ -576,7 +576,7 @@ function geraListaLeituraFormulario(&$obFormulario, $stTipoDoc='')
 */
 function disparaLista()
 {
-    return "<script language='Javascript' type='text/javascript'>try {getIMontaAssinaturas();} catch (e) {}</script>\n";
+    return "<script type='text/javascript'>try {getIMontaAssinaturas();} catch (e) {}</script>\n";
 }
 
 /**

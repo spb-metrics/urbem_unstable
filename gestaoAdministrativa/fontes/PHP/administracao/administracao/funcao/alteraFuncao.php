@@ -93,7 +93,7 @@ $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 //****************************************************************************
 ?>
-      <script language="JavaScript1.2" type="text/javascript">
+      <script type="text/javascript">
 
       function Valida()
       {
@@ -162,12 +162,12 @@ case 2:
                     $audicao = new auditoria;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $nomFuncao);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$nomFuncao.'","alterar","aviso","'.Sessao::getId().'");
                     window.location = "alteraFuncao.php?'.Sessao::getId().'";
                     </script>';
                     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$nomFuncao.'","n_alterar","aviso","'.Sessao::getId().'");
                     window.location = "alteraFuncao.php?'.Sessao::getId().'";
                     </script>';

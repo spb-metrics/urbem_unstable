@@ -53,7 +53,7 @@ Revision 1.4  2006/07/06 12:10:10  diego
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function goOculto(stControle)
 {

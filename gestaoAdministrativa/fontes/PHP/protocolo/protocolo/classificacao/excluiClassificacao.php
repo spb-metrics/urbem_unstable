@@ -55,7 +55,7 @@ if (isset($_REQUEST["codClassificacao"])) {
     $ctrl = 1;
 }
 ?>
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -136,12 +136,12 @@ case 1:
                     $audicao = new auditoriaLegada;
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $_REQUEST["codClassificacao"]);
                     $audicao->insereAuditoria();
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.urlencode($_REQUEST["stDescQuestao"]).'","excluir","aviso", "'.Sessao::getId().'");
                     window.location = "excluiClassificacao.php?'.Sessao::getId().'";
                     </script>';
                     } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("A Classificação '.urlencode($_REQUEST["stDescQuestao"]).' não pode ser excluída porque está sendo utilizada!","n_excluir","erro", "'.Sessao::getId().'");
                     window.location = "excluiClassificacao.php?'.Sessao::getId().'";
                     </script>';

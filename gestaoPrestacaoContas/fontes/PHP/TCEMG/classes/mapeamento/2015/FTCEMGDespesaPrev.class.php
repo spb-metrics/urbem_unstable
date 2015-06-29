@@ -45,41 +45,39 @@ class FTCEMGDespesaPrev extends Persistente
     {
         $stSql  = "
 
-            SELECT 
-                    ".$this->getDado('bimestre')." as bimestre
-                    ,codtipo
-                    ,REPLACE(despAdmGeral            ::VARCHAR,'.','') as despAdmGeral
-                    ,REPLACE(despPrevSoci            ::VARCHAR,'.','') as despPrevSoci
-                    ,REPLACE(despPrevSocInatPens     ::VARCHAR,'.','') as despPrevSocInatPens
-                    ,REPLACE(outrasDespCorrentes     ::VARCHAR,'.','') as outrasDespCorrentes
-                    ,REPLACE(despInvestimentos       ::VARCHAR,'.','') as despInvestimentos
-                    ,REPLACE(despInversoesFinanceiras::VARCHAR,'.','') as despInversoesFinanceiras
-                    ,REPLACE(despesasPrevIntra       ::VARCHAR,'.','') as despesasPrevIntra
-                    ,REPLACE(despReserva             ::VARCHAR,'.','') as despReserva
-                    ,REPLACE(despOutrasReservas      ::VARCHAR,'.','') as despOutrasReservas
-                    ,REPLACE(despCorrentes           ::VARCHAR,'.','') as despCorrentes
-                    ,REPLACE(despCapital             ::VARCHAR,'.','') as despCapital
-                    ,REPLACE(outrosBeneficios        ::VARCHAR,'.','') as outrosBeneficios
-                    ,REPLACE(contPrevidenciaria      ::VARCHAR,'.','') as contPrevidenciaria
-                    ,REPLACE(outrasDespesas          ::VARCHAR,'.','') as outrasDespesas
-                FROM ".$this->getTabela()."('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."') as
-                retorno (   
-                            codtipo                   INTEGER,
-                            despAdmGeral               NUMERIC,
-                            despPrevSoci               NUMERIC,
-                            despPrevSocInatPens        NUMERIC,
-                            outrasDespCorrentes        NUMERIC, 
-                            despInvestimentos          NUMERIC,
-                            despInversoesFinanceiras   NUMERIC,
-                            despesasPrevIntra          NUMERIC,
-                            despReserva                NUMERIC,
-                            despOutrasReservas         NUMERIC,
-                            despCorrentes              NUMERIC,
-                            despCapital                NUMERIC,
-                            outrosBeneficios           NUMERIC,
-                            contPrevidenciaria         NUMERIC,
-                            outrasDespesas             NUMERIC
-                    )
+              SELECT ".$this->getDado('bimestre')." as bimestre
+                   , codtipo
+                   , despAdmGeral
+                   , despPrevSoci
+                   , despPrevSocInatPens
+                   , outrasDespCorrentes
+                   , despInvestimentos
+                   , despInversoesFinanceiras
+                   , despesasPrevIntra
+                   , despReserva
+                   , despOutrasReservas
+                   , despCorrentes
+                   , despCapital
+                   , outrosBeneficios
+                   , contPrevidenciaria
+                   , outrasDespesas
+                FROM ".$this->getTabela()."('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('dt_inicial')."','".$this->getDado('dt_final')."')
+                  AS retorno ( codtipo                   INTEGER
+                             , despAdmGeral              NUMERIC
+                             , despPrevSoci              NUMERIC
+                             , despPrevSocInatPens       NUMERIC
+                             , outrasDespCorrentes       NUMERIC
+                             , despInvestimentos         NUMERIC
+                             , despInversoesFinanceiras  NUMERIC
+                             , despesasPrevIntra         NUMERIC
+                             , despReserva               NUMERIC
+                             , despOutrasReservas        NUMERIC
+                             , despCorrentes             NUMERIC
+                             , despCapital               NUMERIC
+                             , outrosBeneficios          NUMERIC
+                             , contPrevidenciaria        NUMERIC
+                             , outrasDespesas            NUMERIC
+                             )
             ORDER BY codtipo
 
         ";

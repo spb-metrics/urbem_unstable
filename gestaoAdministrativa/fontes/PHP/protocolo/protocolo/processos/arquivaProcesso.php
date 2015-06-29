@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: arquivaProcesso.php 62506 2015-05-15 16:23:58Z michel $
+    $Id: arquivaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -60,7 +60,7 @@ if (!(isset($ctrl)) || trim($ctrl)=="") {
 }
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function Salvar()
     {
         document.frm.action = "arquivaProcesso.php?<?=Sessao::getId()?>&ctrl=1";
@@ -92,7 +92,7 @@ case 1:
         }
     }
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function mudarPag(y)
     {
         window.location.replace(y);
@@ -398,7 +398,7 @@ case 2:
             $dbEmp->fechaBD();
 
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     //Força um valor máximo para um campo do tipo textarea
     function valorMaximo(campo, limite)
     {
@@ -641,12 +641,12 @@ case 3:
         $audicao = new auditoriaLegada;
         $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $codProcesso.'/'.$anoE);
         $audicao->insereAuditoria();
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("Processo '.$codProcesso.'/'.$anoE.' arquivado com sucesso","unica","aviso", "'.Sessao::getId().'");
         window.location="arquivaProcesso.php?'.Sessao::getId().'&ctrl=4&codProcesso='.$codProcesso.'&anoExercicio='.$anoE.'&arquivamento='.$arquivamento.'&historicoArquivamento='.$historicoArquivamento.'";
         </script>';
     } else {
-        echo '<script language="JavaScript1.2" type="text/javascript">
+        echo '<script type="text/javascript">
         alertaAviso("Não foi possível arquivar o Processo '.$codProcesso.'/'.$anoE.'","unica","erro", "'.Sessao::getId().'");
         window.location = "arquivaProcesso.php?'.Sessao::getId().'&ctrl=1&codProcessoFl='.
         $codProcessoFl.'&codClassificacao='.
@@ -675,7 +675,7 @@ case 5:
 //#########################
 
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         function SalvarTemporario()
         {
             document.frm.action = "arquivaProcessoTemporario.php?<?=Sessao::getId()?>&ctrl=4&arquivamento=5&codProcesso=<?=$codProcesso?>&anoExercicio=<?=$anoExercicio?>&historicoArquivamento=<?=$historicoArquivamento?>";
@@ -955,7 +955,7 @@ case 9:
 //#########################
 
 ?>
-    <script language="JavaScript1.2" type="text/javascript">
+    <script type="text/javascript">
         function SalvarDefinitivo()
         {
             document.frm.action = "arquivaProcessoDefinitivo.php?<?=Sessao::getId()?>&ctrl=4&arquivamento=9&codProcesso=<?=$codProcesso?>&anoExercicio=<?=$anoExercicio?>&historicoArquivamento=<?=$historicoArquivamento?>";

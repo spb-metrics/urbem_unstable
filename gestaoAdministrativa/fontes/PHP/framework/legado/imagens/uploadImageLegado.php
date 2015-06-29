@@ -47,7 +47,7 @@ Casos de uso: uc-01.01.00
 
 <link rel=STYLESHEET type=text/css href=stylos_ns.css>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
  function InsereNomeImagem(sValor)
  {
          window.opener.parent.frames['telaPrincipal'].document.frm.logotipo.value = sValor;

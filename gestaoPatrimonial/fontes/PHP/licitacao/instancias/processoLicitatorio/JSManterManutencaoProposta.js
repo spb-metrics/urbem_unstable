@@ -63,7 +63,7 @@
 */
 ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 
 	// atualiza particpante
 	// na proposta

@@ -32,16 +32,16 @@
   
   * @ignore
   *
-  * $Id: JSManterConfiguracaoLeisPPA.js 61474 2015-01-21 17:06:03Z franver $
+  * $Id: JSManterConfiguracaoLeisPPA.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
   
-  * $Revision: 61474 $
+  * $Revision: 62838 $
   * $Name: $
-  * $Author: franver $
-  * $Date: 2015-01-21 15:06:03 -0200 (Qua, 21 Jan 2015) $
+  * $Author: diogo.zarpelon $
+  * $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
   
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     var stAction = document.frm.action;

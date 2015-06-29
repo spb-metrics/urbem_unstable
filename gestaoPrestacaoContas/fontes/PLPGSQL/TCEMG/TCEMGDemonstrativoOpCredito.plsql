@@ -34,20 +34,20 @@
 CREATE OR REPLACE FUNCTION tcemg.demonstrativo_op_credito(varchar,varchar,integer,varchar) RETURNS SETOF RECORD AS $$
 DECLARE
 
-  stExercicio         ALIAS FOR $1;
-  stTipoPeriodo       ALIAS FOR $2;
-  inPeriodo           ALIAS FOR $3;
-  stCodEntidade       ALIAS FOR $4;
+  stExercicio            ALIAS FOR $1;
+  stTipoPeriodo          ALIAS FOR $2;
+  inPeriodo              ALIAS FOR $3;
+  stCodEntidade          ALIAS FOR $4;
 
-  dtInicial            VARCHAR := '';
-  arDtFinal            VARCHAR[];
-  stExercicioAnterior  VARCHAR := '';
-  stSql                VARCHAR := '';
-  stSqlConfiguracao    VARCHAR := '';
-  stContasConfiguracao VARCHAR := '';
-  arFiltro             VARCHAR[];
-  arDatas              VARCHAR[];
-  inCondicao           INTEGER := 1;
+  dtInicial              VARCHAR := '';
+  dtFinal                VARCHAR := '';
+  stSql                  VARCHAR := '';
+  stSqlConfiguracao      VARCHAR := '';
+  stContasConfiguracao   VARCHAR := '';
+  arFiltro               VARCHAR[];
+  arDatas                VARCHAR[];
+  inCondicao             INTEGER := 1;
+  inCodEntidadeRPPS      INTEGER := NULL;
 
   valorMobiliariaInterna NUMERIC(14,4) := 0.0000;
   valorContratExter      NUMERIC(14,4) := 0.0000;
@@ -58,20 +58,20 @@ DECLARE
   valorParcDivDemCS      NUMERIC(14,4) := 0.0000;
   valorParcDivFGTS       NUMERIC(14,4) := 0.0000;
 
-  inCodEntidadeRPPS   INTEGER := NULL;
-
-  reConfiguracao RECORD;
-  reRegistro             RECORD;
+  reConfiguracao        RECORD;
+  reRegistro            RECORD;
 
 BEGIN
   
-  IF( stTipoPeriodo = 'Mes' ) THEN
-    arDatas := publico.mes(stExercicio,inPeriodo);
-    dtInicial := arDatas[0];    
-    arDtFinal[1] := arDatas[1];
+  IF ( stTipoPeriodo = 'mes' ) THEN
+    arDatas      := publico.mes( stExercicio, inPeriodo );
+    dtInicial    := arDatas[0];    
+    dtFinal      := arDatas[1];  
+  ELSEIF ( stTipoPeriodo = 'bimestre' ) THEN
+    arDatas      := publico.bimestre( stExercicio, inPeriodo );
+    dtInicial    := arDatas[0];    
+    dtFinal      := arDatas[1];
   END IF;
-
-  stExercicioAnterior := trim(to_char((to_number(stExercicio,'9999')-1),'9999'));
 
   --
   -- DESCOBRE A ENTIDADE RPPS
@@ -313,7 +313,7 @@ BEGIN
   END IF;
   --------- FIM PEGA CONFIGURAÇÃO    
 
-    ----------------------------------- PEGA CONFIGURAÇÃO PARA A LINHA Valor de parcelamento de dívidas do FGTS
+  ----------------------------------- PEGA CONFIGURAÇÃO PARA A LINHA Valor de parcelamento de dívidas do FGTS
   stContasConfiguracao := '';
   stSqlConfiguracao := '
                  SELECT REPLACE(publico.fn_mascarareduzida(cod_estrutural),''.'','''') as estrutural
@@ -343,8 +343,6 @@ BEGIN
     arFiltro[8] := '';
   END IF;
   --------- FIM PEGA CONFIGURAÇÃO  
-  
-
 
   -- LOOP PARA EXECUTAR AS CONSULTAS E INSERIR OS RESULTADOS NA TABELA TEMPORARIA
   FOR i IN 1..8 LOOP
@@ -354,7 +352,7 @@ BEGIN
         SELECT 
               (  SELECT SUM( stn.pl_saldo_contas(  '''||stExercicio||'''
                                                   , '''||dtInicial||'''
-                                                  , '''||arDtFinal[1]||'''
+                                                  , '''||dtFinal||'''
                                                   , '''||arFiltro[i]||'''
                                                   , '''||stCodEntidade||'''
                                                  ) * '||inCondicao||'
@@ -412,4 +410,3 @@ BEGIN
 END;
 
 $$ language 'plpgsql';
-

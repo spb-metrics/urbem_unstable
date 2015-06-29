@@ -24,14 +24,14 @@
 ?>
 <?php
 
-include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'TTCEMGDividaConsolidadaRPPS.class.php');
+include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/TTCEMGDividaConsolidadaRPPS.class.php');
 
 $arFiltros = Sessao::read('filtroRelatorio');
 
 $stCodEntidadeRPPS = SistemaLegado::pegaConfiguracao("cod_entidade_rpps",8,Sessao::read('exercicio'),$boTransacao);
 
 //VALIDAR O ARRAY PARA MANDAR PRA CONSULTA
-if ( in_array($stCodEntidadeRPPS, $arFiltros['inCodEntidadeSelecionado']) ) {
+if ( in_array($stCodEntidadeRPPS, $arFiltros['inCodEntidadeSelecionado']) && (count($arFiltros['inCodEntidadeSelecionado']) > 1) ) {
     //Retira o valor da entidade RPPS do array de entidades
     $inCodEntidade = array_diff( $arFiltros['inCodEntidadeSelecionado'], array($stCodEntidadeRPPS) );
     $inCodEntidade = implode(",", $inCodEntidade);
@@ -39,17 +39,14 @@ if ( in_array($stCodEntidadeRPPS, $arFiltros['inCodEntidadeSelecionado']) ) {
     $inCodEntidade = implode(",", $arFiltros['inCodEntidadeSelecionado']);
 }
 
+//Arquivo é gerado só no ultimo Bimestre e equivale a todos o periodo do ano 01/01 a 31/12
 $obTTCEMGDividaConsolidadaRPPS = new TTCEMGDividaConsolidadaRPPS();
 $obTTCEMGDividaConsolidadaRPPS->setDado('exercicio'         , Sessao::read('exercicio'));
 $obTTCEMGDividaConsolidadaRPPS->setDado('cod_entidade'      , $inCodEntidade);
 $obTTCEMGDividaConsolidadaRPPS->setDado('cod_entidade_rpps' , $stCodEntidadeRPPS);
-$obTTCEMGDividaConsolidadaRPPS->setDado('mes'               , $arFiltros['inPeriodo']);
-$obTTCEMGDividaConsolidadaRPPS->setDado('dt_inicial'        , '01/'.str_pad($arFiltros['inPeriodo'],2,'0',STR_PAD_LEFT).'/'.Sessao::read('exercicio'));
-$obTTCEMGDividaConsolidadaRPPS->setDado('dt_final'          , SistemaLegado::retornaUltimoDiaMes($arFiltros['inPeriodo'],Sessao::read('exercicio')));
 
 $obTTCEMGDividaConsolidadaRPPS->recuperaTodos($rsArquivo);
 
-$obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
 $obExportador->roUltimoArquivo->addBloco($rsArquivo);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
@@ -57,104 +54,105 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUME
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_demais');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_mobiliaria');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_ppp');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_mobiliaria');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito_inf_12');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outras');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_prev');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_demais');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_tributos');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_fgts');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_demais');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('precatorios_post');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_demais_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito_inf_12');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_ppp_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_tributos');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_prev');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_demais');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_fgts');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outras');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_mobiliaria_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito_inf_12_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_ppp_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outras_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_prev_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_demais_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_tributos_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_fgts_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('div_contratual_demais_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('precatorios_post_rpps');
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('op_credito_inf_12_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_tributos_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_prev_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_contr_sociais_demais_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('parc_fgts_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+$obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna('outras_rpps');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+
 
 unset($rsArquivo);
 unset($obTTCEMGDividaConsolidadaRPPS);

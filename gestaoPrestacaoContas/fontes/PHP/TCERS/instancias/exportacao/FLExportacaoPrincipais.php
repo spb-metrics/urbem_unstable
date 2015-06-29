@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FLExportacaoPrincipais.php 62094 2015-03-29 00:14:58Z lisiane $
+    $Id: FLExportacaoPrincipais.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-02.08.01
 */
@@ -51,7 +51,6 @@ $pgProc 	= "PR".$stPrograma.".php"	;
 $pgOcul 	= "OC".$stPrograma.".php"	;
 $pgJS   	= "JS".$stPrograma.".js"	;
 
-//echo "<script language=\"javascript\" type=\"text/javascript\" src=\"".$pgJS."\"></script>";
 include_once( $pgJS );
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc

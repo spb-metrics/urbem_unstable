@@ -20,10 +20,7 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-   /*
+
     * Arquivo de geracao do arquivo sertTerceiros TCM/MG
     * Data de Criação   : 19/01/2009
 
@@ -35,35 +32,56 @@
 
     * @ignore
 
-    $Id:$
-    */
-
-/* Arquivos PassivoPerm não implementado, simplesmente vazio
+    $Id: $
 */
 
-     include_once( CAM_GPC_TCEMG_MAPEAMENTO . 'FTCEMGPassivoPerm.class.php');
+    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGPassivoPerm.class.php');
 
     $arFiltros = Sessao::read('filtroRelatorio');
 
+    SistemaLegado::retornaInicialFinalMesesPeriodicidade( $arDatas,"ano",$arFiltros['inPeriodo'],Sessao::getExercicio() );
+    
     $obFTCEMGAtivoPerm = new FTCEMGPassivoPerm();
-    $obFTCEMGAtivoPerm->setDado('exercicio'   , Sessao::read('exercicio'));
-    $obFTCEMGAtivoPerm->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGAtivoPerm->setDado('mes'         , $arFiltros['inPeriodo']);
-    $rsTemp = new RecordSet;
-    $obFTCEMGAtivoPerm->recuperaTodos($rsTemp);
 
-    $obExportador->roUltimoArquivo->addBloco($rsTemp);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('codtipo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valoremp');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valortransconcedidas');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorprovisaorpps');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    foreach ($arDatas as $stDatas) {
+
+        $obFTCEMGAtivoPerm->setDado('exercicio'    , Sessao::getExercicio() );
+        $obFTCEMGAtivoPerm->setDado('cod_entidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']) );
+        $obFTCEMGAtivoPerm->setDado('data_inicial' , $stDatas['stDtInicial'] );
+        $obFTCEMGAtivoPerm->setDado('data_final'   , $stDatas['stDtFinal']   );
+    
+        $rsTemp = new RecordSet;
+        $obFTCEMGAtivoPerm->recuperaTodos($rsTemp);
+
+        $obExportador->roUltimoArquivo->addBloco($rsTemp);
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valoremp');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valortransconcedidas');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('valorprovisaorpps');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('codtipo');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+    }
+
+    unset($arDatas);
+    unset($arFiltros);
+    unset($obFTCEMGAtivoPerm);
+
+?>

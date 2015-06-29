@@ -30,7 +30,7 @@
     * @author Analista:
     * @author Programador: Fernando Zank Correa Evangelista
 
-    * $Id: OCGeraRelatorioDiarioBanco.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioDiarioBanco.php 62669 2015-06-02 18:30:22Z lisiane $
 
     Caso de uso: uc-02.02.24
 **/
@@ -49,6 +49,7 @@ if ( count( $arFiltro['inCodEntidade'] ) == 1 ) {
     $obRRelatorio->setCodigoEntidade( $arFiltro['inCodEntidade'][0] );
     $obRRelatorio->setExercicioEntidade ( Sessao::getExercicio() );
 }
+$rsRecordSet = Sessao::read('rsRecordSet');
 
 $obRRelatorio->setExercicio  ( Sessao::getExercicio() );
 $obRRelatorio->recuperaCabecalho( $arConfiguracao );
@@ -58,7 +59,7 @@ $obPDF->setSubTitulo         ( "Período: ". $arFiltro['stDataInicial']." até "
 $obPDF->setUsuario           ( Sessao::getUsername() );
 $obPDF->setEnderecoPrefeitura( $arConfiguracao );
 
-$obPDF->addRecordSet( Sessao::read('rsRecordSet') );
+$obPDF->addRecordSet( $rsRecordSet );
 $obPDF->addIndentacao  ("nivel","nom_conta","      ");
 
 $obPDF->setAlinhamento ( "C" );

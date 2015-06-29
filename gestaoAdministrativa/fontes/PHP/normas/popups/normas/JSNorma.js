@@ -41,7 +41,7 @@ Casos de uso: uc-01.04.02
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere( boExibeDataNorma, boExibeDataPublicacao, inCodNorma, stNomNorma, stNomTipoNorma, stNumNormaExercicio, dt_assinatura, dt_publicacao ){
     var stDescricao = stNomTipoNorma + ' ' + stNumNormaExercicio + ' - ' + stNomNorma;

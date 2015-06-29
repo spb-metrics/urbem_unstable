@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Programador: Fernando Piccini Cercato
 
-    * $Id: JSProcurarCobranca.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSProcurarCobranca.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.04.04
 **/
@@ -44,7 +44,7 @@ Revision 1.1  2007/04/16 18:13:46  cercato
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Insere( stR1, stR2  ){
 //    window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"];?>').innerHTML = stR2;

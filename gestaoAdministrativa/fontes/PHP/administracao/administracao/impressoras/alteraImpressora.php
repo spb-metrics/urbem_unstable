@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-01.03.92
 
-    $Id: alteraImpressora.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: alteraImpressora.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -60,7 +60,7 @@ $stAcao = $request->get('stAcao');
 
 $pgProc = 'alteraImpressora.php';
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function zebra(id, classe)
     {
        var tabela = document.getElementById(id);

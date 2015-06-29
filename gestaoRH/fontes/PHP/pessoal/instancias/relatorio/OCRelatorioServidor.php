@@ -135,7 +135,11 @@ switch ($arFiltro["stTipoFiltro"]) {
             $stFiltroContratos .= $inCodCadastro.")";
         }
         $valorAtributo = $arFiltro["Atributo_".$inCodAtributo."_".$inCodCadastro.""];
-        #$stFiltroContratos .=" AND atributo_contrato_servidor_valor.valor ilike '%".$valorAtributo."%' ";
+
+        if ($valorAtributo != '') {
+            $stFiltroContratos .=" AND atributo_contrato_servidor_valor.valor = '".$valorAtributo."' ";
+        }
+
    break;
 }
 
@@ -157,7 +161,9 @@ switch ($arFiltro['stSituacao']){
     break;
 }
 
-$stFiltroContratos = " WHERE 1=1 ".$stFiltroContratos;
+if ($stFiltroContratos != '') {
+    $stFiltroContratos = " WHERE ".substr($stFiltroContratos,5);
+}
 
 $obRRelatorioServidor->geraRecordSet( $rsRecordset, $stFiltroContratos, $stOrder );
 

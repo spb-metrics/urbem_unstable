@@ -43,7 +43,7 @@
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function bloqueiaAbas(){
     document.links['id_layer_2'].href = "javascript:buscaValor('exibeAviso');";

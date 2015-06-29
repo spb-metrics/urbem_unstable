@@ -33,46 +33,50 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: TTCEMGDespesaIntra.class.php 62748 2015-06-16 14:07:21Z michel $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CLA_PERSISTENTE                                                                      );
+include_once CLA_PERSISTENTE;
 
 class TTCEMGDespesaIntra extends Persistente
 {
 
-function recuperaDadosArquivo(&$rsRecordSet)
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-    $stSql = $this->montaRecuperaDadosArquivo().$stFiltro.$stOrdem;
-    $this->stDebug = $stSql;
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-function montaRecuperaDadosArquivo()
-{
-    $stSql  = " SELECT mes
-                     , REPLACE(demais_despesas_intra::VARCHAR,'.','') AS demais_despesas_intra
-                     , tipo_conta
-                     , '000'::VARCHAR AS juros_encargos_divida
-                     , '000'::VARCHAR AS amort_divida
-		  FROM tcemg.despesa_intra( '".Sessao::getExercicio()."','".$this->getDado('cod_entidade')."'
-					   ,'".$this->getDado('dataInicial')."'
-					   ,'".$this->getDado('dataFinal')."'
-					   ,'".$this->getDado('mes')."') as retorno( mes                     integer,
-                                                                                     demais_despesas_intra   numeric,          
-                                                                                     tipo_conta              text    
-                                                                                    ) ";
-    return $stSql;
-}
-
-public function __destruct(){}
-
+	function recuperaDadosArquivo(&$rsRecordSet)
+	{
+		$obErro      = new Erro;
+		$obConexao   = new Conexao;
+		$rsRecordSet = new RecordSet;
+		$stSql = $this->montaRecuperaDadosArquivo().$stFiltro.$stOrdem;
+		$this->stDebug = $stSql;
+		$obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+	
+		return $obErro;
+	}
+	
+	function montaRecuperaDadosArquivo()
+	{
+		$stSql  = " SELECT bimestre
+						 , demais_despesas_intra
+						 , cod_tipo
+						 , juros_encargos_divida
+						 , amort_divida
+					  FROM tcemg.despesa_intra( '".Sessao::getExercicio()."'
+											  , '".$this->getDado('cod_entidade')."'
+											  , '".$this->getDado('dataInicial')."'
+											  , '".$this->getDado('dataFinal')."'
+											  , '".$this->getDado('bimestre')."'
+											  )
+						AS retorno			  ( bimestre                INTEGER
+											  , demais_despesas_intra   NUMERIC
+											  , cod_tipo                TEXT
+											  , juros_encargos_divida   NUMERIC
+											  , amort_divida            NUMERIC
+											  ) ";
+		return $stSql;
+	}
+	
+	public function __destruct(){}
 
 }
 

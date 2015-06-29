@@ -327,14 +327,14 @@ function executaFrameOcultoParent($stJs)
 {
     print '<html>
            <head>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
-           <script language="JavaScript1.2" type="text/javascript">
+           <script src="'.CAM_GA.'javaScript/ifuncoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/funcoesJs.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/genericas.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/Window.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/mascaras.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/tipo.js" type="text/javascript"></script>
+           <script src="'.CAM_GA.'javaScript/arvore.js" type="text/javascript"></script>
+           <script type="text/javascript">
            function executa()
            {
                 var mensagem = "";

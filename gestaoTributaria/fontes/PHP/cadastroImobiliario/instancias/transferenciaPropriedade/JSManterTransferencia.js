@@ -34,7 +34,7 @@
 
     * @ignore
     
-    * $Id: JSManterTransferencia.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSManterTransferencia.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.17
 */
@@ -49,7 +49,7 @@ adicionado trecho de log do CVS
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function mudaMenu(func){
     sPag = "<?=CAM_FW_INSTANCIAS;?>index/menu.php?<?=Sessao::getId();?>&nivel=3&cod_modulo_pass=12&cod_gestao=5&stNomeGestao=Tributária&modulos=Cadastro Imobiliário&cod_func_pass="+func;

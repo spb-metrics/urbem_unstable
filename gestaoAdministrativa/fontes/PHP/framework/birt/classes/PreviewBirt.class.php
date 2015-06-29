@@ -32,7 +32,7 @@
  * @author Analista: Lucas Stephanou
  * @author Desenvolvedor: Lucas Stephanou
  *
- * $Id: PreviewBirt.class.php 62428 2015-05-07 20:12:43Z diogo.zarpelon $
+ * $Id: PreviewBirt.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
  * Casos de uso: uc-01.00.00
  *
  ***********************************************************************/
@@ -487,10 +487,10 @@ class PreviewBirt
         $stPreviewHtml .= "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">\n";
         $stPreviewHtml .= "<head>\n";
         $stPreviewHtml .= "<title> " . $this->getTitulo() . "</title>\n";
-        $stPreviewHtml .= "<script language='javascript' src='../../../../../../gestaoAdministrativa/fontes/javaScript/scriptaculous/prototype.js' type='text/javascript'></script>\n";
-        $stPreviewHtml .= "<script language='javascript' src='../../../../../../gestaoAdministrativa/fontes/javaScript/scriptaculous/scriptaculous.js' type='text/javascript'></script>\n";
-        $stPreviewHtml .= "<script language='javascript' src='../../../../../../gestaoAdministrativa/fontes/javaScript/jquery.js' type='text/javascript'></script>\n";
-        $stPreviewHtml .= "<script language='javascript' src='../../../../../../gestaoAdministrativa/fontes/javaScript/jquery-migrate-1.2.1.js' type='text/javascript'></script>\n";
+        $stPreviewHtml .= "<script src='../../../../../../gestaoAdministrativa/fontes/javaScript/scriptaculous/prototype.js' type='text/javascript'></script>\n";
+        $stPreviewHtml .= "<script src='../../../../../../gestaoAdministrativa/fontes/javaScript/scriptaculous/scriptaculous.js' type='text/javascript'></script>\n";
+        $stPreviewHtml .= "<script src='../../../../../../gestaoAdministrativa/fontes/javaScript/jquery.js' type='text/javascript'></script>\n";
+        $stPreviewHtml .= "<script src='../../../../../../gestaoAdministrativa/fontes/javaScript/jquery-migrate-1.2.1.js' type='text/javascript'></script>\n";
         $stPreviewHtml .= "<link href='../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/CSS/stylos_ns.css' rel='stylesheet' type='text/css' />\n";
         $stPreviewHtml .= "<link href='../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/CSS/birt.css' rel='stylesheet' type='text/css' />\n";
         $stPreviewHtml .= "<style> body { background-color:#fff;} a {cursor:hand;} </style>\n";
@@ -630,8 +630,8 @@ class PreviewBirt
 
             $stHtmlPdf = "<html>";
            $stHtmlPdf .= "<head>";
-           $stHtmlPdf .= "<script language=\"JavaScript1.2\" src=\"../../../../../../gestaoAdministrativa/fontes/javaScript/jquery.js\" type=\"text/javascript\"></script>";
-           $stHtmlPdf .= "<script language=\"JavaScript1.2\" src=\"../../../../../../gestaoAdministrativa/fontes/javaScript/genericas.js\" type=\"text/javascript\"></script>";
+           $stHtmlPdf .= "<script src=\"../../../../../../gestaoAdministrativa/fontes/javaScript/jquery.js\" type=\"text/javascript\"></script>";
+           $stHtmlPdf .= "<script src=\"../../../../../../gestaoAdministrativa/fontes/javaScript/genericas.js\" type=\"text/javascript\"></script>";
            $stHtmlPdf .= "</head>";
            $stHtmlPdf .= "<body onload='LiberaFrames(true,false);'>";
            $stHtmlPdf .= "<iframe src='$stBirtPdfDireto' style=\"border:none;display:none;\" id=\"iframe_birt\" name=\"iframe_birt\" width=\"98%\" height=\"85%\" longdesc=\"IFrame com Relatorio\" ></iframe>\n";

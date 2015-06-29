@@ -48,7 +48,7 @@ Bug#9982#
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function selecionarTodos(){
     if(document.frm.boTodos.checked==true){

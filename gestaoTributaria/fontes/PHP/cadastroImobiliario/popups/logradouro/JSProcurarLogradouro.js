@@ -35,13 +35,13 @@
 
     * @ignore
     
-    * $Id: JSProcurarLogradouro.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSProcurarLogradouro.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.01.04
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function IniciaSessions(  ){
     var stTraget = document.frm.target;

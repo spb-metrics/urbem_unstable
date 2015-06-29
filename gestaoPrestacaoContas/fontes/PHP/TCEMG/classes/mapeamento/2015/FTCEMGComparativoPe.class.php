@@ -49,19 +49,19 @@ function FTCEMGComparativoPe()
 {
     parent::Persistente();
 
-    $this->setTabela('stn.fn_comparativoPe');
+    $this->setTabela('tcemg.fn_comparativoPe');
 
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('dtInicial'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('dtFinal'       ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
+    $this->AddCampo('exercicio'     ,'varchar' ,false ,'' ,false ,false);
+    $this->AddCampo('dtInicial'     ,'varchar' ,false ,'' ,false ,false);
+    $this->AddCampo('dtFinal'       ,'varchar' ,false ,'' ,false ,false);
+    $this->AddCampo('cod_entidade'  ,'varchar' ,false ,'' ,false ,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
         SELECT descricao
-             , valor
+             , ABS(COALESCE(valor,0.00)) AS valor
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("dtInicial")."'
                                      , '".$this->getDado("dtFinal")."'
@@ -70,8 +70,34 @@ function montaRecuperaTodos()
                                                   descricao VARCHAR,
                                                   valor     NUMERIC
                                                  )";
-
     return $stSql;
 }
+
+public function recuperaContasARO(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if(trim($stOrdem))
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    $stSql = $this->montaRecuperaContasARO().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+   
+public function montaRecuperaContasARO()
+{
+
+    $stSql = "  SELECT cod_plano         
+                FROM stn.vinculo_contas_rgf_2 
+                WHERE cod_conta = 17 
+                AND exercicio = '".$this->getDado("exercicio")."'
+            ";
+    return $stSql;
+}  
+
 
 }

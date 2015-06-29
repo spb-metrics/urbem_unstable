@@ -66,7 +66,7 @@ if (isset($pagina)) {
 
 ?>
 
- <script language="javascript">
+ <script type="text/javascript">
  function zebra(id, classe)
  {
        var tabela = document.getElementById(id);
@@ -98,7 +98,7 @@ case 0:
    $dbEmp->abreBD();
    $dbEmp->abreSelecao($sSQL);
    if ($dbEmp->numeroDeLinhas == 0 && $pagina != 0) {
-        echo "<script language='javascript'>
+        echo "<script type='text/javascript'>
                 mudaTelaPrincipal('".$PHP_SELF."?".Sessao::getId()."');
               </script>";
     }

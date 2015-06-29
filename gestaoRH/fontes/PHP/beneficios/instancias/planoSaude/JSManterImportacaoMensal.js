@@ -29,7 +29,7 @@
 */
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 function Salvar(){
  if( Valida() ){

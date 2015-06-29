@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: incluiDespacho.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: incluiDespacho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include '../../../framework/include/cabecalho.inc.php';
@@ -300,7 +300,7 @@ case 1:
 
             ?>
 
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
       function Valida()
       {
@@ -432,7 +432,7 @@ if (is_array($lista_domentos_processo)) {
 </form>
 <?php
 } else {
-echo '<script language="JavaScript1.2" type="text/javascript">
+echo '<script type="text/javascript">
                     alertaAviso("Você já despachou este processo. Se quiser alterá-lo, opte pela ação Alterar Despachos.","unica","aviso", "'.Sessao::getId().'");
                     window.location = "incluiDespacho.php?'.Sessao::getId().'";
                     </script>';
@@ -440,7 +440,7 @@ echo '<script language="JavaScript1.2" type="text/javascript">
 
 } else {
 
-echo '<script language="JavaScript1.2" type="text/javascript">
+echo '<script type="text/javascript">
                     alertaAviso("Este processo não existe ou não está no seu Setor.","unica","aviso", "'.Sessao::getId().'");
                     window.location = "incluiDespacho.php?'.Sessao::getId().'";
                     </script>';
@@ -461,13 +461,13 @@ if ($processo->insertDespacho()) {
                     $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $obj);
                     $audicao->insereAuditoria();
                     $chave = $anoE."-".$codAndamento."-".$codProcesso;
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$obj.'","incluir","aviso", "'.Sessao::getId().'");
                     window.location = "incluiDespacho.php?'.Sessao::getId().'&ctrl=3&chave='.$chave.'";
                     </script>';
     //}
 } else {
-                    echo '<script language="JavaScript1.2" type="text/javascript">
+                    echo '<script type="text/javascript">
                     alertaAviso("'.$obj.'","n_incluir","erro", "'.Sessao::getId().'");
                     window.location = "incluiDespacho.php?'.Sessao::getId().'";
                     </script>';

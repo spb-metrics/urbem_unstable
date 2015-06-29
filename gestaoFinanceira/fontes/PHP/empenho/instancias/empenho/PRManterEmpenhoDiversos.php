@@ -377,7 +377,7 @@ switch ($stAcao) {
             } else {
                 $stFiltroLiquidacao .= "&acaoEmpenho=822&moduloEmpenho=10&funcionalidadeEmpenho=82";
             }
-            print '<script language="JavaScript1.2" type="text/javascript">
+            print '<script type="text/javascript">
                         mudaMenu         ( "Liquidação","202" );
                    </script>';
 

@@ -64,7 +64,7 @@ $anoE = pegaConfiguracao("ano_exercicio");
 $codOrgao = $_REQUEST['codOrgao'];
 $codUnidade = $_REQUEST['codUnidade'];
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function validaSetor(origem,item)
     {
@@ -239,7 +239,7 @@ case 1:
                 if ($arCodLocal[0]) {
                     $stCodLocal = $arCodLocal[1];
                 }
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     //alertaAviso("'.$nomLocal.'","incluir","aviso","'.Sessao::getId().'");
                     alertaAviso("'.$stCodLocal.' - '.$nomLocal.'","incluir","aviso","'.Sessao::getId().'");
                     </script>';
@@ -249,14 +249,14 @@ case 1:
                     $js .= "f.ok.disabled = false; \n";
                     executaFrameOculto($js);
         } else {
-                echo '<script language="JavaScript1.2" type="text/javascript">
+                echo '<script type="text/javascript">
                     alertaAviso("'.$nomLocal.'","n_incluir","erro","'.Sessao::getId().'");
                     </script>';
                     executaFrameOculto("f.ok.disabled = false;");
         }
     } else {
         echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("O Local '.$nomLocal.' já existe","unica","erro","'.Sessao::getId().'");
             </script>';
             executaFrameOculto("f.ok.disabled = false;");

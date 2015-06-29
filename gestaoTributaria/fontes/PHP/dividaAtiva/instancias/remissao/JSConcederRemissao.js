@@ -32,14 +32,14 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-    * $Id: JSConcederRemissao.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSConcederRemissao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.04.11
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

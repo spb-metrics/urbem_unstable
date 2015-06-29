@@ -35,7 +35,7 @@
 
         Casos de uso: uc-01.01.00
 
-        $Id: filtrosSELegado.inc.php 59612 2014-09-02 12:00:51Z gelson $
+        $Id: filtrosSELegado.inc.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 $mascaraSetor = SistemaLegado::pegaConfiguracao('mascara_setor');
@@ -127,7 +127,7 @@ $mascaraSetor = SistemaLegado::pegaConfiguracao('mascara_setor');
     <?php
         if ($codMasSetor != "") {
             echo "
-                <script language='javascript'>
+                <script type='text/javascript'>
                     preencheCA('codMasSetor', '".$codMasSetor."');
                 </script>
             ";

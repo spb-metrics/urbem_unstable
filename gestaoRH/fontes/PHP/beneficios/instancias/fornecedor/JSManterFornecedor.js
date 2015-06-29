@@ -48,7 +48,7 @@ Adicionada tag log.
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaCGM(BuscaValor){
     document.frm.stCtrl.value = BuscaValor;

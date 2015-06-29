@@ -132,7 +132,7 @@ $mascaraSetor = pegaConfiguracao('mascara_setor',2);
     <?php
         if ($codMasSetor != "") {
             echo "
-                <script language='javascript'>
+                <script type='text/javascript'>
                     preencheCA('codMasSetor', '".$codMasSetor."');
                 </script>
             ";

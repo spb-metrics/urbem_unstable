@@ -30,7 +30,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: FMManterOrdemCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
 
 */
 
@@ -107,7 +107,6 @@ $obSpnListaItens = new Span;
 $obSpnListaItens->setId('spnListaItens');
 
 if ( strpos($stAcao,'incluir') === false ) {
-//if ($stAcao != "incluir") {
     // adiciona o campo de número de ordem de compra ao formulário
     $obLblNumOrdemCompra = new Label();
     $obLblNumOrdemCompra->setRotulo("Ordem de $stDesc");
@@ -177,6 +176,29 @@ if ($stTipo == 'licitacao') {
     $obLblLocalEntrega = new Label();
     $obLblLocalEntrega->setRotulo("Local de Entrega do Material");
     $obLblLocalEntrega->setValue($_REQUEST['stLocalEntregaMaterial']);
+}
+
+if(($_REQUEST["stTipo"] == "diversos" && $_REQUEST['cgm_entrega_material'] == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){
+    include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
+    $obLocalizacaoEntrega = new IPopUpCGMVinculado( $obForm );
+    $obLocalizacaoEntrega->setNull              ( false                                 );
+    $obLocalizacaoEntrega->setTabelaVinculo     ( 'sw_cgm_pessoa_juridica'              );
+    $obLocalizacaoEntrega->setCampoVinculo      ( 'numcgm'                              );
+    $obLocalizacaoEntrega->setNomeVinculo       ( 'Localização de Entrega'              );
+    $obLocalizacaoEntrega->setRotulo            ( 'Localização de Entrega'              );
+    $obLocalizacaoEntrega->setTitle             ( 'Informe a localização de entrega.'   );
+    $obLocalizacaoEntrega->setId                ( 'stNomEntrega'                        );
+    $obLocalizacaoEntrega->obCampoCod->setName  ( 'inEntrega'                           );
+    $obLocalizacaoEntrega->obCampoCod->setId    ( 'inEntrega'                           );
+    $obLocalizacaoEntrega->obCampoCod->setValue ( $_REQUEST['cgm_entrega_material']     );
+    $obLocalizacaoEntrega->setValue             ( $_REQUEST['stLocalEntregaMaterial']   );
+}else{
+    if(isset($_REQUEST['cgm_entrega_material'])&&$_REQUEST['cgm_entrega_material']!=''){
+        $obHdnCgmEntrega = new Hidden();
+        $obHdnCgmEntrega->setName  ( "inEntrega" );
+        $obHdnCgmEntrega->setId    ( "inEntrega" );
+        $obHdnCgmEntrega->setValue ( $_REQUEST['cgm_entrega_material']  );
+    }
 }
 
 if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false ) {
@@ -318,10 +340,12 @@ if ( strpos($stAcao,'incluir') === false ) {
 }
 $obFormulario->addComponente($obLblEntidade);
 $obFormulario->addComponente($obLblNumEmpenho);
-$obFormulario->addComponente($obLblCodigo);
-$obFormulario->addComponente($obLblModalidade);
-$obFormulario->addComponente($obLblObjeto);
-$obFormulario->addComponente($obLblCondicoesPagamento);
+if($_REQUEST["stTipo"] != "diversos"){
+    $obFormulario->addComponente($obLblCodigo);
+    $obFormulario->addComponente($obLblModalidade);
+    $obFormulario->addComponente($obLblObjeto);
+    $obFormulario->addComponente($obLblCondicoesPagamento);
+}
 if ($stTipo == 'licitacao') {
     $obFormulario->addComponente($obLblLocalEntrega);
 }
@@ -334,6 +358,14 @@ if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false 
     $obFormulario->addComponente($obTxtObservacao);
 } elseif ( strpos($stAcao,'anular') !== false ) {
     $obFormulario->addComponente($obTxtMotivo);
+}
+
+if(($_REQUEST["stTipo"] == "diversos" && $_REQUEST['cgm_entrega_material'] == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){    
+    $obFormulario->addComponente( $obLocalizacaoEntrega );
+}else{
+    if(isset($_REQUEST['cgm_entrega_material'])&&$_REQUEST['cgm_entrega_material']!=''){
+        $obFormulario->addHidden($obHdnCgmEntrega);
+    }
 }
 
 $obFormulario->addSpan($obSpnListaItens);

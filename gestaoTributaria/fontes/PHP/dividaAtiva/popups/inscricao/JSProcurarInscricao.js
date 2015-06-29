@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Programador: Fernando Piccini Cercato
 
-    * $Id: JSProcurarInscricao.js 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: JSProcurarInscricao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.04.02
 **/
@@ -44,7 +44,7 @@ Revision 1.1  2006/09/29 10:45:38  cercato
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function Insere( stR1, stR2  ){
     if( eval( window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"]?>') != null )){

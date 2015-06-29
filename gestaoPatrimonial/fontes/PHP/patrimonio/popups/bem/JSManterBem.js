@@ -52,7 +52,7 @@ Adicionando ao repositório
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function insere(stCampoNum,stCampoNom,inNumCGM,stNomCGM){
     var x = "window.opener.parent.frames['telaPrincipal'].document.getElementById('"+stCampoNum+"').value = '"+inNumCGM+"';";

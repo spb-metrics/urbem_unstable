@@ -35,7 +35,7 @@
  * @uc uc-02.10.14
  */
 ?>
-<script language='Javascript'>
+<script type='text/javascript'>
 
 function LimpaFormularioExtra()
 {

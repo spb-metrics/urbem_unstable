@@ -59,7 +59,7 @@ Adicionada tag Log aos arquivos
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function comparaDataLiquidacao( stUltima ){
         DiaUltima = stUltima.substring(0,2);

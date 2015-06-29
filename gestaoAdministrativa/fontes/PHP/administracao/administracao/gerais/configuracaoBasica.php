@@ -30,7 +30,7 @@
       * @author Analista: Cassiano
       * @author Desenvolvedor: Cassiano
 
-      $Id: configuracaoBasica.php 62350 2015-04-28 13:48:39Z arthur $
+      $Id: configuracaoBasica.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
       Casos de uso: uc-01.03.97
     */
@@ -88,7 +88,6 @@ switch ($ctrl) {
             $logotipo             = pegaConfiguracao("logotipo");
             $periodoAuditoria     = pegaConfiguracao("periodo_auditoria");
             $usuarioRelatorio     = pegaConfiguracao("usuario_relatorio");
-            $caminhoAcrobat       = pegaConfiguracao("caminho_acrobat");
             $mensagem             = pegaConfiguracao("mensagem");
             $status               = pegaConfiguracao("status");
             $nomMunicipio         = pegaConfiguracao("nom_municipio");
@@ -127,13 +126,7 @@ switch ($ctrl) {
             $configuracao->setaEstadoAtual($codUf);
             $configuracao->listaComboEstados();
         ?>
-        <script language="JavaScript1.2" type="text/javascript">
-
-            // Verifica no case 2 a existencia ou nao do diretorio
-            function VerificaCaminhoAcrobat(caminhoAcrobat)
-            {
-               window.parent.frames["oculto"].document.location = "configuracaoBasica.php?<?=Sessao::getId();?>&ctrl=2&caminho_Acrobat="+caminhoAcrobat;
-            }
+        <script type="text/javascript">
 
             function VerificaDiretorio(diretorio)
             {
@@ -185,17 +178,6 @@ switch ($ctrl) {
                     mensagem += "@Campo Período Auditoria inválido! ()";
                     erro = true;
                 }
-
-                campo = document.frm.caminho_acrobat.value;
-                tamanho = campo.length;
-                if (campo == "") {
-                    mensagem += "@Campo Caminho da Raiz do Acrobat inválido! ()";
-                    erro = true;
-                        } else {
-                            if (campo.substring(tamanho-1,tamanho) == "/") {
-                                document.frm.caminho_acrobat.value =campo.substring(0,tamanho-1);
-                            }
-                        }
 
                 campo = document.frm.diretorio.value;
                 tamanho = campo.length;
@@ -554,15 +536,6 @@ switch ($ctrl) {
     </tr>
 
     <tr>
-    <td class=label>*Caminho da Raiz do Acrobat</td>
-    <td class=field>
-       <input type="text" name="caminho_acrobat" size=60 maxlength=60 value="<?=$caminhoAcrobat;?>"
-       onBlur="return VerificaCaminhoAcrobat(this.value)"
-       >
-    </td>
-    </tr>
-
-    <tr>
     <td class=label>*Caminho da Raiz do Sistema</td>
     <td class=field>
         <input type="text" name="diretorio" size=60 maxlength=60 value="<?=$diretorio;?>"
@@ -659,7 +632,6 @@ switch ($ctrl) {
     $logotipo             = $request->get('logotipo');
     $periodo_auditoria    = $request->get('periodo_auditoria');
     $relatorio_usuario    = $request->get('relatorio_usuario');
-    $caminho_acrobat      = $request->get('caminho_acrobat');
     $diretorio            = $request->get('diretorio');
     $anoExercicio         = $request->get('anoExercicio');
     $mascaraSetor         = $request->get('mascaraSetor');
@@ -702,7 +674,6 @@ switch ($ctrl) {
     $obRAdministracaoConfiguracao->addConfiguracao( 'logotipo'                  , $logotipo             );
     $obRAdministracaoConfiguracao->addConfiguracao( 'periodo_auditoria'         , $periodo_auditoria    );
     $obRAdministracaoConfiguracao->addConfiguracao( 'usuario_relatorio'         , $relatorio_usuario    );
-    $obRAdministracaoConfiguracao->addConfiguracao( 'caminho_acrobat'           , $caminho_acrobat      );
     $obRAdministracaoConfiguracao->addConfiguracao( 'diretorio'                 , $diretorio            );
     $obRAdministracaoConfiguracao->addConfiguracao( 'ano_exercicio'             , $anoExercicio         );
     $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_setor'             , $mascaraSetor         );
@@ -754,26 +725,13 @@ case 1:
     }
 break;
 
-case 2:
-    $js = "";
-
-    $caminho_Acrobat = $_REQUEST['caminho_Acrobat'];
-
-    if (($caminho_Acrobat !=' ') and (!is_dir($caminho_Acrobat)) ) {
-        $js .= "alertaAviso('Campo Caminho da Raiz do Acrobat inválido!','form','erro','Sessao::getId()');\n";
-        $js .= "f.caminho_acrobat.value = '';\n";
-        $js .= "f.caminho_acrobat.focus();\n";
-    }
-    executaFrameOculto($js);
-break;
-
 case 3:
 
     $diretorio = $_REQUEST['diretorio'];
 
     $js = "";
     if (($diretorio!=' ') and (!is_dir($diretorio))) {
-        $js .= "if (f.caminho_acrobat.value != '') {\n";
+        $js .= "if (f.diretorio.value != '') {\n";
         $js .= "    alertaAviso('Campo Caminho da Raiz do Sistema inválido!','form','erro','Sessao::getId()');\n";
         $js .= "    f.diretorio.value = '';\n";
         $js .= "    f.diretorio.focus();\n";

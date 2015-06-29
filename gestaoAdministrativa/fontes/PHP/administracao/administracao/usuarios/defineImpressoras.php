@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-01.03.93
 
-    $Id: defineImpressoras.php 59982 2014-09-24 17:38:20Z evandro $
+    $Id: defineImpressoras.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 
@@ -55,7 +55,7 @@ if (strlen($controle) == 0) {
     $controle = 0;
 }
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function zebra(id, classe)
     {
        var tabela = document.getElementById(id);
@@ -214,7 +214,7 @@ case 2: // Mostra uma lista de impressoras a que o usuário pode ter acesso
     $cgm = $_REQUEST['cgm'];
     $username = $_REQUEST['username'];
 ?>
-    <script language="javascript">
+    <script type="text/javascript">
         function Salvar()
         {
             var boValidaPadrao = true;

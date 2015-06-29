@@ -102,7 +102,6 @@ BEGIN
                     )                                                                                                       
                 ORDER BY classificacao 
             ';
-
     EXECUTE stSql;    
 
     stSql := '  CREATE TEMPORARY TABLE tmp_despesa_total AS 
@@ -133,7 +132,6 @@ BEGIN
                     )                                                                                                       
                 ORDER BY classificacao 
             ';
-
     EXECUTE stSql;
 
     stSql := '
@@ -143,8 +141,8 @@ BEGIN
                         ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_administrativa) as despAdmGeral
                         ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_previdencia   ) as despPrevSoci                        
                         ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.1.9.0.01%'' OR classificacao ILIKE ''3.1.9.0.03%'') as despPrevSocInatPens        
-                        ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
-                        ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_total WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
+                        ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
+                        ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
                         ,0.00 as despInversoesFinanceiras   
                         ,(SELECT SUM(saldo_inicial) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.1.9.1.13%'' ) as despesasPrevIntra          
                         ,0.00 as despReserva          
@@ -170,8 +168,8 @@ BEGIN
                         ,(SELECT SUM(total_credito) FROM tmp_despesa_administrativa) as despAdmGeral
                         ,(SELECT SUM(total_credito) FROM tmp_despesa_previdencia   ) as despPrevSoci                        
                         ,(SELECT SUM(total_credito) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.1.9.0.01%'' OR classificacao ILIKE ''3.1.9.0.03%'') as despPrevSocInatPens        
-                        ,(SELECT SUM(total_credito) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
-                        ,(SELECT SUM(total_credito) FROM tmp_despesa_total WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
+                        ,(SELECT SUM(total_credito) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
+                        ,(SELECT SUM(total_credito) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
                         ,0.00 as despInversoesFinanceiras   
                         ,(SELECT SUM(total_credito) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.1.9.1.13%'' ) as despesasPrevIntra          
                         ,0.00 as despReserva          
@@ -197,10 +195,10 @@ BEGIN
                         ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_administrativa) as despAdmGeral
                         ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_previdencia   ) as despPrevSoci                        
                         ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.1.9.0.01%'' OR classificacao ILIKE ''3.1.9.0.03%'') as despPrevSocInatPens        
-                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
-                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_total WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
+                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''3.3%'') as outrasDespCorrentes         
+                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_previdencia WHERE classificacao ILIKE ''4.4%'' ) as despInvestimentos 
                         ,0.00 as despInversoesFinanceiras   
-                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.1.9.1.13%'' ) as despesasPrevIntra          
+                        ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_total WHERE classificacao ILIKE ''3.1.9.1.13.00.00.00.00%'' ) as despesasPrevIntra          
                         ,0.00 as despReserva          
                         ,0.00 as despOutrasReservas         
                         ,(SELECT SUM(empenhado_mes) FROM tmp_despesa_administrativa WHERE classificacao ILIKE ''3%'' ) as despCorrentes              

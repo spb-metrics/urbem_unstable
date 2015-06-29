@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterCatalogo.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterCatalogo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-03.03.04
 */
@@ -226,7 +226,7 @@ $obFormulario->show();
 
 include_once($pgJs);
 
-echo "<script language='javascript'>montaParametrosGET('montaFormulario','inCodigo',true);</script>";
+echo "<script type='text/javascript'>montaParametrosGET('montaFormulario','inCodigo',true);</script>";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 ?>

@@ -484,6 +484,6 @@ $obIFrame->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
-echo "<script language='javascript'> buscaValor('montaDadosPorTipo'); </script>\n";
+echo "<script type='text/javascript'> buscaValor('montaDadosPorTipo'); </script>\n";
 
 ?>

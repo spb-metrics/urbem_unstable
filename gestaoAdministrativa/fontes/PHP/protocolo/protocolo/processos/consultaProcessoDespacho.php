@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: consultaProcessoDespacho.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: consultaProcessoDespacho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 $Revision: 4412 $
 $Name$
@@ -71,7 +71,7 @@ $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 ?>
 <html><head>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 function alertaMensagem(erro,tipo)
 {
     var x = 350;

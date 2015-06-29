@@ -49,7 +49,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function buscaValor(variavel){
     var stTraget = document.frm.target;
     document.frm.target = "oculto";

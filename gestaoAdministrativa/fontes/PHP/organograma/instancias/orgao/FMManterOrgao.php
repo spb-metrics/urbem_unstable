@@ -30,7 +30,7 @@
  * @author Analista: Cassiano
  * @author Desenvolvedor: Cassiano
 
- * $Id: FMManterOrgao.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: FMManterOrgao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  * Casos de uso: uc-01.05.02
  */
@@ -132,7 +132,7 @@ if (empty($stAcao) || $stAcao == "incluir") {
     $stGet .= "&inCodNivelTxt=".$inCodNivel."&inCodTipoNormaAux=".$inCodTipoNorma;
 
 $stHeredoc = <<<HEREDOC
-    <script language='javascript'>
+    <script type='text/javascript'>
         <!--
             ajaxJavaScript('$pgOcul?$stGet','preencheInner');
         //-->

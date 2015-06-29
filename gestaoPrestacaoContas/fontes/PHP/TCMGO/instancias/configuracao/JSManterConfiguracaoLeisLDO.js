@@ -32,7 +32,7 @@
   
   * @ignore
   *
-  * $Id: JSManterConfiguracaoLeisLDO.js 61481 2015-01-21 19:22:02Z arthur $
+  * $Id: JSManterConfiguracaoLeisLDO.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
   
   * $Revision: $
   * $Name: $
@@ -41,7 +41,7 @@
   
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     var stAction = document.frm.action;

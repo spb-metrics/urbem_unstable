@@ -33,10 +33,10 @@
 
     * @ignore
     
-    $Revision: 59612 $
+    $Revision: 62838 $
     $Name$
     $Autor:$
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
     
     * Casos de uso: uc-06.01.22
 
@@ -51,7 +51,7 @@ Ajustes
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     var stTarget = document.frm.target;

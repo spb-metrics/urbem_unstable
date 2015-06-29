@@ -48,7 +48,7 @@ Revision 1.1  2006/10/26 14:04:28  cercato
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

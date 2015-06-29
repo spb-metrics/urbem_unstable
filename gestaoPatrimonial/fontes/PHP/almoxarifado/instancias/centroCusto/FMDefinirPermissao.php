@@ -111,7 +111,7 @@ $obFormulario->addSpan($obSpnCentroCusto);
 $obFormulario->OK();
 $obFormulario->show();
 
-echo "<script language='javaScript'>jQuery('#Ok').removeAttr('disabled');</script>";
+echo "<script type='text/javascript'>jQuery('#Ok').removeAttr('disabled');</script>";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

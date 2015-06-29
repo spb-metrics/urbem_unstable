@@ -56,8 +56,8 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
     }
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 
 <?php
 
@@ -172,13 +172,13 @@ $Date: 2007-01-03 08:44:42 -0200 (Qua, 03 Jan 2007) $
             $audicao->setaAuditoria($sessao->numCgm, $sessao->acao, $codInstituicao);
             $audicao->insereAuditoria();
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$codInstituicao.'","excluir","aviso","'.$sessao->id.'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'&pagina='.$pagina.'");
                 </script>';
         } else {
             echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$codInstituicao.'","n_excluir","erro","'.$sessao->id.'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.$sessao->id.'");
                 </script>';

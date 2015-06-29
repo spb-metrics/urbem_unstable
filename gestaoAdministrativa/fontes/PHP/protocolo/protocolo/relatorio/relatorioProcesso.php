@@ -32,7 +32,7 @@
 
  Casos de uso: uc-01.06.99
 
- $Id: relatorioProcesso.php 61944 2015-03-17 18:41:50Z jean $
+ $Id: relatorioProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
  */
 
@@ -65,7 +65,7 @@ $obFormulario->setAjuda('UC-01.06.99');
 $obFormulario->show();
 
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 //compara a data 1 com a data 2
 //retorna 1 => data 1 maior que data 2
@@ -399,7 +399,7 @@ function zebra(id, classe)
                 </table>
             </form>
 
-    <script language='javaScript'>
+    <script type='text/javascript'>
     function Salvar()
     {
         if (ValidaData()) {
@@ -422,7 +422,7 @@ function zebra(id, classe)
         }
 
         ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
            function SalvarRelatorio()
            {
                 document.frm.action = "relProcesso.php?<?=Sessao::getId()?>&ctrl=1&ordem=<?=$ordem?>&codProcesso=<?=$codProcesso?>&codClassificacao=<?=$codClassificacao?>&codAssunto=<?=$codAssunto?>&resumo=<?=$resumo?>&codMasSetor=<?=$codMasSetor?>&codSituacao=<?=$stCodSituacao?>&numCgm=<?=$numCgm?>&dataInicial=<?=$dataInicial?>&dataFinal=<?=$dataFinal?>&codOrgao=<?=$codOrgao?>";

@@ -35,31 +35,32 @@
 
     * @ignore
 
-    $Id: exclusaoDespesa.inc.php 62522 2015-05-18 14:22:51Z evandro $
+    $Id: exclusaoDespesa.inc.php 62752 2015-06-16 14:46:22Z franver $
     */
-
+foreach($arDatasInicialFinal as $arPeriodo) {
+    list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
     $arFiltros = Sessao::read('filtroRelatorio');
-    $arArquivo = array(0 => array( 'mes'                        => $arFiltros['inPeriodo'],
-                                   'fundacoes_transf_corrente'  => '000',
-                                   'autarquias_transf_corrente' => '000',
-                                   'emprestdep_transf_corrente' => '000',
-                                   'demaisent_transf_corrente'  => '000',
-                                   'fundacoes_transf_capital'   => '000',
-                                   'autarquias_transf_capital'  => '000',
-                                   'emprestdep_transf_capital'  => '000',
-                                   'demaisent_transf_capital'   => '000',
-                                   'cod_tipo'                   => '04',
+    $arArquivo = array(0 => array( 'bimestre'                   => $inMes,
+                                   'fundacoes_transf_corrente'  => '0',
+                                   'autarquias_transf_corrente' => '0',
+                                   'emprestdep_transf_corrente' => '0',
+                                   'demaisent_transf_corrente'  => '0',
+                                   'fundacoes_transf_capital'   => '0',
+                                   'autarquias_transf_capital'  => '0',
+                                   'emprestdep_transf_capital'  => '0',
+                                   'demaisent_transf_capital'   => '0',
+                                   'cod_tipo'                   => '4',
                                  ),
-                       1 => array( 'mes'                        => $arFiltros['inPeriodo'],
-                                   'fundacoes_transf_corrente'  => '000',
-                                   'autarquias_transf_corrente' => '000',
-                                   'emprestdep_transf_corrente' => '000',
-                                   'demaisent_transf_corrente'  => '000',
-                                   'fundacoes_transf_capital'   => '000',
-                                   'autarquias_transf_capital'  => '000',
-                                   'emprestdep_transf_capital'  => '000',
-                                   'demaisent_transf_capital'   => '000',
-                                   'cod_tipo'                   => '05',
+                       1 => array( 'bimestre'                   => $inMes,
+                                   'fundacoes_transf_corrente'  => '0',
+                                   'autarquias_transf_corrente' => '0',
+                                   'emprestdep_transf_corrente' => '0',
+                                   'demaisent_transf_corrente'  => '0',
+                                   'fundacoes_transf_capital'   => '0',
+                                   'autarquias_transf_capital'  => '0',
+                                   'emprestdep_transf_capital'  => '0',
+                                   'demaisent_transf_capital'   => '0',
+                                   'cod_tipo'                   => '5',
                                  ),
                       );
 
@@ -67,27 +68,56 @@
     $rsArquivo->preenche($arArquivo);
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('mes');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('bimestre');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_corrente');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_corrente');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_capital');
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('fundacoes_transf_capital');
-    
-    
-    
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('autarquias_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('emprestdep_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('demaisent_transf_capital');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+}
+
+?>

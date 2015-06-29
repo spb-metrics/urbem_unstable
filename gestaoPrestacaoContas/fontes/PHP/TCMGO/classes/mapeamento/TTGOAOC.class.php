@@ -22,8 +22,6 @@
     *                                                                                *
     **********************************************************************************
 */
-?>
-<?
 /**
     * Classe de mapeamento da tabela compras.compra_direta
     * Data de Criação:  27/04/2007
@@ -35,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     
-    $Id: TTGOAOC.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTGOAOC.class.php 62672 2015-06-03 13:34:20Z evandro $
     
     * Casos de uso: uc-06.04.00
 */
@@ -68,7 +66,7 @@ class TTGOAOC extends Persistente{
         ,despesa.num_unidade
         ,despesa.cod_funcao
         ,despesa.cod_subfuncao
-        ,substr(orcamento.despesa.num_pao::varchar,1,1) AS nat_acao
+        ,substr(acao.num_acao::varchar,1,1) AS nat_acao
         ,substr(acao.num_acao::varchar,2,3) AS num_seqproj
         ,ROUND(SUM(( SELECT
                    ( COALESCE(SUM(odespesa.vl_original),0)
@@ -338,9 +336,10 @@ class TTGOAOC extends Persistente{
          ) AS supl ON
              supl.exercicio   = orcamento.despesa.exercicio AND
              supl.cod_despesa = orcamento.despesa.cod_despesa
+        
         JOIN orcamento.despesa_acao
           ON despesa_acao.exercicio_despesa = despesa.exercicio
-         AND despesa.cod_despesa = despesa.cod_despesa
+         AND despesa_acao.cod_despesa = despesa.cod_despesa
         JOIN ppa.acao
           ON acao.cod_acao = despesa_acao.cod_acao
         JOIN ppa.programa
@@ -373,12 +372,12 @@ class TTGOAOC extends Persistente{
         ,despesa.num_unidade
         ,despesa.cod_funcao
         ,despesa.cod_subfuncao
-        ,substr(orcamento.despesa.num_pao::varchar,1,1) AS nat_acao
+        ,substr(acao.num_acao::varchar,1,1) AS nat_acao
         ,substr(acao.num_acao::varchar,2,3) AS num_seqproj
         ,substr(replace(orcamento.conta_despesa.cod_estrutural,'.',''),1,6) AS cod_estrutural
         ,supl.dt_suplementacao
         ,supl.cod_suplementacao
---Tipo de Alteração Orçamentária:   SIMWEB      TCM-GO
+        --Tipo de Alteração Orçamentária:   SIMWEB      TCM-GO
         ,CASE WHEN (supl.cod_tipo = 5  )  THEN '01'
               WHEN (supl.cod_tipo = 4  )  THEN '02'
               WHEN (supl.cod_tipo = 1 AND supl.reducao = true )  THEN '09'
@@ -393,204 +392,15 @@ class TTGOAOC extends Persistente{
               ELSE '99'
           END AS tipo_alteracao
         ,supl.cod_tipo
-        ,ROUND(SUM(supl.valor),2) AS vl_alteracao
-        ,ROUND(SUM(( SELECT
-                   ( COALESCE(SUM(odespesa.vl_original),0) + COALESCE(SUM(osuplementacao.valor),0) -
-                     COALESCE(SUM(oreducao.valor),0) - COALESCE(SUM(oempenho.vl_empenho),0) +
-                     COALESCE(SUM(oempenho.vl_empenho_anulado),0)
-                   )
-               FROM
-                   orcamento.despesa AS odespesa
-               LEFT JOIN  (  SELECT
-                                 suplementacao.dt_suplementacao
-                                ,suplementacao_suplementada.cod_despesa
-                                ,SUM(suplementacao_suplementada.valor) AS valor
-                                ,suplementacao_suplementada.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_suplementada
-                                 ON  suplementacao_suplementada.cod_suplementacao =
-                                     suplementacao.cod_suplementacao  AND
-                                     suplementacao_suplementada.exercicio = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                              GROUP BY
-                                  dt_suplementacao
-                                 ,cod_despesa
-                                 ,suplementacao_suplementada.exercicio
-                          )   AS osuplementacao
-                              ON (
-                                     osuplementacao.cod_despesa = odespesa.cod_despesa  AND
-                                     osuplementacao.exercicio = odespesa.exercicio      AND
-                                     osuplementacao.dt_suplementacao BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
-                                 )
-               LEFT JOIN  (  SELECT  suplementacao.dt_suplementacao
-                                    ,suplementacao_reducao.cod_despesa
-                                    ,SUM(suplementacao_reducao.valor) AS valor
-                                    ,suplementacao_reducao.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_reducao
-                                 ON  suplementacao_reducao.cod_suplementacao =
-                                     suplementacao.cod_suplementacao       AND
-                                     suplementacao_reducao.exercicio  = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                             GROUP BY
-                                dt_suplementacao
-                               ,cod_despesa
-                               ,suplementacao_reducao.exercicio
-                          )  AS  oreducao
-                             ON  oreducao.cod_despesa = odespesa.cod_despesa  AND
-                                 oreducao.exercicio = odespesa.exercicio      AND
-                                 oreducao.dt_suplementacao BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
-               LEFT JOIN  (  SELECT  SUM(vl_total) AS vl_empenho
-                                    ,SUM(vl_anulado) AS vl_empenho_anulado
-                                    ,pre_empenho_despesa.cod_despesa
-                                    ,pre_empenho_despesa.exercicio
-                             FROM  empenho.pre_empenho_despesa
-                            INNER JOIN  empenho.pre_empenho
-                                    ON  pre_empenho.exercicio = pre_empenho_despesa.exercicio
-                                   AND  pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
-                            INNER JOIN  empenho.item_pre_empenho
-                                    ON  item_pre_empenho.exercicio = pre_empenho.exercicio
-                                   AND  item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                             LEFT JOIN  empenho.empenho_anulado_item
-                                    ON  empenho_anulado_item.exercicio = item_pre_empenho.exercicio
-                                   AND  empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-                            INNER JOIN  empenho.empenho
-                                    ON  empenho.exercicio = pre_empenho.exercicio
-                                   AND  empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
-                              GROUP BY  pre_empenho_despesa.exercicio, pre_empenho_despesa.cod_despesa
-                          ) AS oempenho
-                            ON oempenho.cod_despesa = odespesa.cod_despesa  AND
-                               oempenho.exercicio = odespesa.exercicio
-               WHERE  odespesa.exercicio = despesa.exercicio   AND
-                      odespesa.cod_despesa = despesa.cod_despesa
-                )),2)   AS  vl_saldo_anterior
-
-        ,ROUND(SUM(( SELECT
-                   ( COALESCE(SUM(odespesa.vl_original),0) + COALESCE(SUM(osuplementacao.valor),0) -
-                     COALESCE(SUM(oreducao.valor),0) - COALESCE(SUM(oempenho.vl_empenho),0) +
-                     COALESCE(SUM(oempenho.vl_empenho_anulado),0)
-                   )
-               FROM
-                   orcamento.despesa AS odespesa
-               LEFT JOIN  (  SELECT
-                                 suplementacao.dt_suplementacao
-                                ,suplementacao_suplementada.cod_despesa
-                                ,SUM(suplementacao_suplementada.valor) AS valor
-                                ,suplementacao_suplementada.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_suplementada
-                                 ON  suplementacao_suplementada.cod_suplementacao =
-                                     suplementacao.cod_suplementacao  AND
-                                     suplementacao_suplementada.exercicio = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                             GROUP BY
-                                  dt_suplementacao
-                                 ,cod_despesa
-                                 ,suplementacao_suplementada.exercicio
-                          )   AS osuplementacao
-                              ON (
-                                     osuplementacao.cod_despesa = odespesa.cod_despesa  AND
-                                     osuplementacao.exercicio = odespesa.exercicio      AND
-                                     osuplementacao.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                 )
-               LEFT JOIN  (  SELECT  suplementacao.dt_suplementacao
-                                    ,suplementacao_reducao.cod_despesa
-                                    ,SUM(suplementacao_reducao.valor) AS valor
-                                    ,suplementacao_reducao.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_reducao
-                                 ON  suplementacao_reducao.cod_suplementacao =
-                                     suplementacao.cod_suplementacao       AND
-                                     suplementacao_reducao.exercicio  = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                             GROUP BY
-                                dt_suplementacao
-                               ,cod_despesa
-                               ,suplementacao_reducao.exercicio
-                          )  AS  oreducao
-                             ON  oreducao.cod_despesa = odespesa.cod_despesa  AND
-                                 oreducao.exercicio = odespesa.exercicio      AND
-                                 oreducao.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-               LEFT JOIN  (  SELECT  SUM(vl_total) AS vl_empenho
-                                    ,SUM(vl_anulado) AS vl_empenho_anulado
-                                    ,pre_empenho_despesa.cod_despesa
-                                    ,pre_empenho_despesa.exercicio
-                             FROM  empenho.pre_empenho_despesa
-                            INNER JOIN  empenho.pre_empenho
-                                    ON  pre_empenho.exercicio = pre_empenho_despesa.exercicio
-                                   AND  pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
-                            INNER JOIN  empenho.item_pre_empenho
-                                    ON  item_pre_empenho.exercicio = pre_empenho.exercicio
-                                   AND  item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                             LEFT JOIN  empenho.empenho_anulado_item
-                                    ON  empenho_anulado_item.exercicio = item_pre_empenho.exercicio
-                                   AND  empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-                            INNER JOIN  empenho.empenho
-                                    ON  empenho.exercicio = pre_empenho.exercicio
-                                   AND  empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
-                              GROUP BY  pre_empenho_despesa.exercicio, pre_empenho_despesa.cod_despesa
-                          ) AS oempenho
-                            ON oempenho.cod_despesa = odespesa.cod_despesa  AND
-                               oempenho.exercicio = odespesa.exercicio
-               WHERE  odespesa.exercicio = despesa.exercicio   AND
-                      odespesa.cod_despesa = despesa.cod_despesa
-                )),2)   AS  vl_saldo_atual
-              , '' AS brancos
-              , '0' AS nro_sequencial2
+        ,supl.valor AS vl_alteracao
+        ,despesa_anterior.saldo_anterior AS  vl_saldo_anterior        
+        ,CASE WHEN (supl.cod_tipo = 1 AND supl.reducao = true ) THEN 
+                    despesa_anterior.saldo_anterior - supl.valor   
+              WHEN (supl.cod_tipo = 1 AND supl.reducao = false ) THEN
+                    despesa_anterior.saldo_anterior + supl.valor   
+         END AS  vl_saldo_atual
+        , '' AS brancos
+        , '0' AS nro_sequencial2
 
     FROM
         orcamento.conta_despesa,
@@ -667,86 +477,32 @@ class TTGOAOC extends Persistente{
          ) AS supl ON
              supl.exercicio   = orcamento.despesa.exercicio AND
              supl.cod_despesa = orcamento.despesa.cod_despesa
-        JOIN orcamento.despesa_acao
-          ON despesa_acao.exercicio_despesa = despesa.exercicio
-         AND despesa.cod_despesa = despesa.cod_despesa
-        JOIN ppa.acao
-          ON acao.cod_acao = despesa_acao.cod_acao
-        JOIN ppa.programa
-          ON programa.cod_programa = despesa.cod_programa
-    WHERE
-        despesa.exercicio       = '".$this->getDado('exercicio')."'    AND
-        despesa.cod_entidade IN (".$this->getDado('stEntidades').") AND
-        conta_despesa.exercicio = orcamento.despesa.exercicio        AND
-        conta_despesa.cod_conta = orcamento.despesa.cod_conta
-    GROUP BY
-        programa.num_programa
-       ,despesa.num_orgao
-       ,despesa.num_unidade
-       ,despesa.cod_funcao
-       ,despesa.cod_subfuncao
-       ,acao.num_acao
-       ,conta_despesa.cod_estrutural
-       ,supl.dt_suplementacao
-       ,supl.cod_suplementacao
-       ,supl.cod_tipo
-       ,supl.reducao
-       ,despesa.num_pao
-        ";
-        return $stSql;
-    }
-
-    function recuperaAlteracoesOrcamentariasPorRecurso(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao=""){
-        return $this->executaRecupera("montaRecuperaAlteracoesOrcamentariasPorRecurso",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
-    }
-
-    function montaRecuperaAlteracoesOrcamentariasPorRecurso(){
-        $stSql = "
-
-    SELECT
-        '12' AS tipo_registro
-        ,programa.num_programa
-        ,despesa.num_orgao
-        ,despesa.num_unidade
-        ,despesa.cod_funcao
-        ,despesa.cod_subfuncao
-        ,substr(orcamento.despesa.num_pao::varchar,1,1) AS nat_acao
-        ,substr(acao.num_acao::varchar,2,3) AS num_seqproj
-        ,substr(replace(orcamento.conta_despesa.cod_estrutural,'.',''),1,6) AS cod_estrutural
-        ,supl.dt_suplementacao
-        ,supl.cod_suplementacao
-        ,CASE WHEN (supl.cod_tipo = 5  )  THEN '01'
-              WHEN (supl.cod_tipo = 4  )  THEN '02'
-              WHEN (supl.cod_tipo = 1 AND supl.reducao = true )  THEN '09'
-              WHEN (supl.cod_tipo = 1 AND supl.reducao = false )  THEN '03'
-              WHEN (supl.cod_tipo = 2  )  THEN '04'
-              WHEN (supl.cod_tipo = 10 )  THEN '05'
-              WHEN (supl.cod_tipo = 9  )  THEN '06'
-              WHEN (supl.cod_tipo = 6  )  THEN '07'
-              WHEN (supl.cod_tipo = 7  )  THEN '08'
-              WHEN (supl.cod_tipo = 11 )  THEN '11'
-              WHEN (supl.cod_tipo = 999 ) THEN '09'
-              ELSE '99'
-          END AS tipo_alteracao
-        ,substr(recurso.cod_fonte::varchar, 1, 3) AS cod_fonte
-        ,ROUND(SUM(supl.valor),2) AS vl_alteracao
-        ,ROUND(SUM(( SELECT
-                   ( COALESCE(SUM(odespesa.vl_original),0) + COALESCE(SUM(osuplementacao.valor),0) -
-                     COALESCE(SUM(oreducao.valor),0) - COALESCE(SUM(oempenho.vl_empenho),0) +
+        
+        JOIN ( SELECT
+                   ( COALESCE(SUM(odespesa.vl_original),0)
+                     +
+                     COALESCE(SUM(osuplementacao.valor),0)
+                     -
+                     COALESCE(SUM(oreducao.valor),0) 
+                     -
+                     COALESCE(SUM(oempenho.vl_empenho),0)
+                     +
                      COALESCE(SUM(oempenho.vl_empenho_anulado),0)
-                   )
+                   )as saldo_anterior
+                    ,odespesa.cod_despesa
+                    ,odespesa.exercicio
                FROM
                    orcamento.despesa AS odespesa
                LEFT JOIN  (  SELECT
-                                 suplementacao.dt_suplementacao
-                                ,suplementacao_suplementada.cod_despesa
-                                ,SUM(suplementacao_suplementada.valor) AS valor
-                                ,suplementacao_suplementada.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_suplementada
-                                 ON  suplementacao_suplementada.cod_suplementacao =
-                                     suplementacao.cod_suplementacao  AND
-                                     suplementacao_suplementada.exercicio = suplementacao.exercicio
+                                    suplementacao.dt_suplementacao
+                                  , suplementacao_suplementada.cod_despesa
+                                  , SUM(suplementacao_suplementada.valor) AS valor
+                                  , suplementacao_suplementada.exercicio
+                               FROM orcamento.suplementacao
+                         INNER JOIN orcamento.suplementacao_suplementada
+                                 ON suplementacao_suplementada.cod_suplementacao =
+                                    suplementacao.cod_suplementacao  AND
+                                    suplementacao_suplementada.exercicio = suplementacao.exercicio
                               WHERE NOT EXISTS
                                     (
                                         SELECT 1
@@ -802,7 +558,6 @@ class TTGOAOC extends Persistente{
                              ON  oreducao.cod_despesa = odespesa.cod_despesa  AND
                                  oreducao.exercicio = odespesa.exercicio      AND
                                  oreducao.dt_suplementacao BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
-
                LEFT JOIN  (  SELECT  SUM(vl_total) AS vl_empenho
                                     ,SUM(vl_anulado) AS vl_empenho_anulado
                                     ,pre_empenho_despesa.cod_despesa
@@ -820,114 +575,77 @@ class TTGOAOC extends Persistente{
                             INNER JOIN  empenho.empenho
                                     ON  empenho.exercicio = pre_empenho.exercicio
                                    AND  empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
+                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
                               GROUP BY  pre_empenho_despesa.exercicio, pre_empenho_despesa.cod_despesa
                           ) AS oempenho
                             ON oempenho.cod_despesa = odespesa.cod_despesa  AND
                                oempenho.exercicio = odespesa.exercicio
-               WHERE  odespesa.exercicio = despesa.exercicio   AND
-                      odespesa.cod_despesa = despesa.cod_despesa
-                )),2)   AS  vl_saldo_anterior
+                    GROUP BY 
+                            odespesa.cod_despesa
+                            ,odespesa.exercicio
+        ) as despesa_anterior
+            ON despesa_anterior.exercicio = despesa.exercicio   
+            AND despesa_anterior.cod_despesa = despesa.cod_despesa
 
-        ,ROUND(SUM(( SELECT
-                   ( COALESCE(SUM(odespesa.vl_original),0) + COALESCE(SUM(osuplementacao.valor),0) -
-                     COALESCE(SUM(oreducao.valor),0) - COALESCE(SUM(oempenho.vl_empenho),0) +
-                     COALESCE(SUM(oempenho.vl_empenho_anulado),0)
-                   )
-               FROM
-                   orcamento.despesa AS odespesa
-               LEFT JOIN  (  SELECT
-                                 suplementacao.dt_suplementacao
-                                ,suplementacao_suplementada.cod_despesa
-                                ,SUM(suplementacao_suplementada.valor) AS valor
-                                ,suplementacao_suplementada.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_suplementada
-                                 ON  suplementacao_suplementada.cod_suplementacao =
-                                     suplementacao.cod_suplementacao  AND
-                                     suplementacao_suplementada.exercicio = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                              GROUP BY
-                                  dt_suplementacao
-                                 ,cod_despesa
-                                 ,suplementacao_suplementada.exercicio
-                          )   AS osuplementacao
-                              ON (
-                                     osuplementacao.cod_despesa = odespesa.cod_despesa  AND
-                                     osuplementacao.exercicio = odespesa.exercicio      AND
-                                     osuplementacao.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-                                 )
-               LEFT JOIN  (  SELECT  suplementacao.dt_suplementacao
-                                    ,suplementacao_reducao.cod_despesa
-                                    ,SUM(suplementacao_reducao.valor) AS valor
-                                    ,suplementacao_reducao.exercicio
-                             FROM  orcamento.suplementacao
-                             INNER JOIN  orcamento.suplementacao_reducao
-                                 ON  suplementacao_reducao.cod_suplementacao =
-                                     suplementacao.cod_suplementacao       AND
-                                     suplementacao_reducao.exercicio  = suplementacao.exercicio
-                              WHERE NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
-                                    )
-                                AND NOT EXISTS
-                                    (
-                                        SELECT 1
-                                          FROM orcamento.suplementacao_anulada
-                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
-                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                                    )
-                             GROUP BY
-                                dt_suplementacao
-                               ,cod_despesa
-                               ,suplementacao_reducao.exercicio
-                          )  AS  oreducao
-                             ON  oreducao.cod_despesa = odespesa.cod_despesa  AND
-                                 oreducao.exercicio = odespesa.exercicio      AND
-                                 oreducao.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
-               LEFT JOIN  (  SELECT  SUM(vl_total) AS vl_empenho
-                                    ,SUM(vl_anulado) AS vl_empenho_anulado
-                                    ,pre_empenho_despesa.cod_despesa
-                                    ,pre_empenho_despesa.exercicio
-                             FROM  empenho.pre_empenho_despesa
-                            INNER JOIN  empenho.pre_empenho
-                                    ON  pre_empenho.exercicio = pre_empenho_despesa.exercicio
-                                   AND  pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
-                            INNER JOIN  empenho.item_pre_empenho
-                                    ON  item_pre_empenho.exercicio = pre_empenho.exercicio
-                                   AND  item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                             LEFT JOIN  empenho.empenho_anulado_item
-                                    ON  empenho_anulado_item.exercicio = item_pre_empenho.exercicio
-                                   AND  empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
-                            INNER JOIN  empenho.empenho
-                                    ON  empenho.exercicio = pre_empenho.exercicio
-                                   AND  empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
-                              GROUP BY  pre_empenho_despesa.exercicio, pre_empenho_despesa.cod_despesa
-                          ) AS oempenho
-                            ON oempenho.cod_despesa = odespesa.cod_despesa  AND
-                               oempenho.exercicio = odespesa.exercicio
-               WHERE  odespesa.exercicio = despesa.exercicio   AND
-                      odespesa.cod_despesa = despesa.cod_despesa
-                )),2)   AS  vl_saldo_atual
-              , '' AS brancos
-              , '0' AS nro_sequencial
+        JOIN orcamento.despesa_acao
+          ON despesa_acao.exercicio_despesa = despesa.exercicio
+         AND despesa_acao.cod_despesa = despesa.cod_despesa
+        JOIN ppa.acao
+          ON acao.cod_acao = despesa_acao.cod_acao
+        JOIN ppa.programa
+          ON programa.cod_programa = despesa.cod_programa
+    WHERE
+        despesa.exercicio       = '".$this->getDado('exercicio')."'    AND
+        despesa.cod_entidade IN (".$this->getDado('stEntidades').") AND
+        conta_despesa.exercicio = orcamento.despesa.exercicio        AND
+        conta_despesa.cod_conta = orcamento.despesa.cod_conta
+    
+        ";
+        return $stSql;
+    }
+
+    function recuperaAlteracoesOrcamentariasPorRecurso(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao=""){
+        return $this->executaRecupera("montaRecuperaAlteracoesOrcamentariasPorRecurso",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    function montaRecuperaAlteracoesOrcamentariasPorRecurso(){
+        $stSql = "
+
+    SELECT
+        '12' AS tipo_registro
+        ,programa.num_programa
+        ,despesa.num_orgao
+        ,despesa.num_unidade
+        ,despesa.cod_funcao
+        ,despesa.cod_subfuncao
+        ,substr(acao.num_acao::varchar,1,1) AS nat_acao
+        ,substr(acao.num_acao::varchar,2,3) AS num_seqproj
+        ,substr(replace(orcamento.conta_despesa.cod_estrutural,'.',''),1,6) AS cod_estrutural
+        ,supl.dt_suplementacao
+        ,supl.cod_suplementacao
+        ,CASE WHEN (supl.cod_tipo = 5  )  THEN '01'
+              WHEN (supl.cod_tipo = 4  )  THEN '02'
+              WHEN (supl.cod_tipo = 1 AND supl.reducao = true )  THEN '09'
+              WHEN (supl.cod_tipo = 1 AND supl.reducao = false )  THEN '03'
+              WHEN (supl.cod_tipo = 2  )  THEN '04'
+              WHEN (supl.cod_tipo = 10 )  THEN '05'
+              WHEN (supl.cod_tipo = 9  )  THEN '06'
+              WHEN (supl.cod_tipo = 6  )  THEN '07'
+              WHEN (supl.cod_tipo = 7  )  THEN '08'
+              WHEN (supl.cod_tipo = 11 )  THEN '11'
+              WHEN (supl.cod_tipo = 999 ) THEN '09'
+              ELSE '99'
+          END AS tipo_alteracao
+        ,substr(recurso.cod_fonte::varchar, 1, 3) AS cod_fonte
+        ,supl.valor AS vl_alteracao
+        ,despesa_anterior.saldo_anterior AS  vl_saldo_anterior        
+        ,CASE WHEN (supl.cod_tipo = 1 AND supl.reducao = true ) THEN 
+                    despesa_anterior.saldo_anterior - supl.valor   
+              WHEN (supl.cod_tipo = 1 AND supl.reducao = false ) THEN
+                    despesa_anterior.saldo_anterior + supl.valor   
+         END AS  vl_saldo_atual
+        , '' AS brancos
+        , '0' AS nro_sequencial
 
     FROM
         orcamento.conta_despesa,
@@ -1006,9 +724,118 @@ class TTGOAOC extends Persistente{
          ) AS supl ON
              supl.exercicio   = orcamento.despesa.exercicio AND
              supl.cod_despesa = orcamento.despesa.cod_despesa
+        JOIN ( SELECT
+                   ( COALESCE(SUM(odespesa.vl_original),0)
+                     +
+                     COALESCE(SUM(osuplementacao.valor),0)
+                     -
+                     COALESCE(SUM(oreducao.valor),0) 
+                     -
+                     COALESCE(SUM(oempenho.vl_empenho),0)
+                     +
+                     COALESCE(SUM(oempenho.vl_empenho_anulado),0)
+                   )as saldo_anterior
+                    ,odespesa.cod_despesa
+                    ,odespesa.exercicio
+               FROM
+                   orcamento.despesa AS odespesa
+               LEFT JOIN  (  SELECT
+                                    suplementacao.dt_suplementacao
+                                  , suplementacao_suplementada.cod_despesa
+                                  , SUM(suplementacao_suplementada.valor) AS valor
+                                  , suplementacao_suplementada.exercicio
+                               FROM orcamento.suplementacao
+                         INNER JOIN orcamento.suplementacao_suplementada
+                                 ON suplementacao_suplementada.cod_suplementacao =
+                                    suplementacao.cod_suplementacao  AND
+                                    suplementacao_suplementada.exercicio = suplementacao.exercicio
+                              WHERE NOT EXISTS
+                                    (
+                                        SELECT 1
+                                          FROM orcamento.suplementacao_anulada
+                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
+                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
+                                    )
+                                AND NOT EXISTS
+                                    (
+                                        SELECT 1
+                                          FROM orcamento.suplementacao_anulada
+                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
+                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+                                    )
+                              GROUP BY
+                                  dt_suplementacao
+                                 ,cod_despesa
+                                 ,suplementacao_suplementada.exercicio
+                          )   AS osuplementacao
+                              ON (
+                                     osuplementacao.cod_despesa = odespesa.cod_despesa  AND
+                                     osuplementacao.exercicio = odespesa.exercicio      AND
+                                     osuplementacao.dt_suplementacao BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
+                                 )
+               LEFT JOIN  (  SELECT  suplementacao.dt_suplementacao
+                                    ,suplementacao_reducao.cod_despesa
+                                    ,SUM(suplementacao_reducao.valor) AS valor
+                                    ,suplementacao_reducao.exercicio
+                             FROM  orcamento.suplementacao
+                             INNER JOIN  orcamento.suplementacao_reducao
+                                 ON  suplementacao_reducao.cod_suplementacao =
+                                     suplementacao.cod_suplementacao       AND
+                                     suplementacao_reducao.exercicio  = suplementacao.exercicio
+                              WHERE NOT EXISTS
+                                    (
+                                        SELECT 1
+                                          FROM orcamento.suplementacao_anulada
+                                         WHERE suplementacao_anulada.exercicio                  = suplementacao.exercicio   
+                                           AND suplementacao_anulada.cod_suplementacao_anulacao = suplementacao.cod_suplementacao
+                                    )
+                                AND NOT EXISTS
+                                    (
+                                        SELECT 1
+                                          FROM orcamento.suplementacao_anulada
+                                         WHERE suplementacao_anulada.exercicio         = suplementacao.exercicio   
+                                           AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+                                    )
+                             GROUP BY
+                                dt_suplementacao
+                               ,cod_despesa
+                               ,suplementacao_reducao.exercicio
+                          )  AS  oreducao
+                             ON  oreducao.cod_despesa = odespesa.cod_despesa  AND
+                                 oreducao.exercicio = odespesa.exercicio      AND
+                                 oreducao.dt_suplementacao BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') 
+               LEFT JOIN  (  SELECT  SUM(vl_total) AS vl_empenho
+                                    ,SUM(vl_anulado) AS vl_empenho_anulado
+                                    ,pre_empenho_despesa.cod_despesa
+                                    ,pre_empenho_despesa.exercicio
+                             FROM  empenho.pre_empenho_despesa
+                            INNER JOIN  empenho.pre_empenho
+                                    ON  pre_empenho.exercicio = pre_empenho_despesa.exercicio
+                                   AND  pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+                            INNER JOIN  empenho.item_pre_empenho
+                                    ON  item_pre_empenho.exercicio = pre_empenho.exercicio
+                                   AND  item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                             LEFT JOIN  empenho.empenho_anulado_item
+                                    ON  empenho_anulado_item.exercicio = item_pre_empenho.exercicio
+                                   AND  empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                            INNER JOIN  empenho.empenho
+                                    ON  empenho.exercicio = pre_empenho.exercicio
+                                   AND  empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                 WHERE  empenho.dt_empenho BETWEEN TO_DATE('01/01/".$this->getDado('exercicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
+                              GROUP BY  pre_empenho_despesa.exercicio, pre_empenho_despesa.cod_despesa
+                          ) AS oempenho
+                            ON oempenho.cod_despesa = odespesa.cod_despesa  AND
+                               oempenho.exercicio = odespesa.exercicio
+                    GROUP BY 
+                            odespesa.cod_despesa
+                            ,odespesa.exercicio
+        ) as despesa_anterior
+            ON despesa_anterior.exercicio = despesa.exercicio   
+            AND despesa_anterior.cod_despesa = despesa.cod_despesa
+
         JOIN orcamento.despesa_acao
           ON despesa_acao.exercicio_despesa = despesa.exercicio
-         AND despesa.cod_despesa = despesa.cod_despesa
+         AND despesa_acao.cod_despesa = despesa.cod_despesa
         JOIN ppa.acao
           ON acao.cod_acao = despesa_acao.cod_acao
         JOIN ppa.programa
@@ -1020,21 +847,7 @@ class TTGOAOC extends Persistente{
         recurso.cod_recurso =  orcamento.despesa.cod_recurso         AND
         conta_despesa.exercicio =  orcamento.despesa.exercicio       AND
         conta_despesa.cod_conta =  orcamento.despesa.cod_conta
-
-    GROUP BY
-        programa.num_programa
-       ,despesa.num_orgao
-       ,despesa.num_unidade
-       ,despesa.cod_funcao
-       ,despesa.cod_subfuncao
-       ,acao.num_acao
-       ,conta_despesa.cod_estrutural
-       ,supl.dt_suplementacao
-       ,supl.cod_suplementacao
-       ,supl.cod_tipo
-       ,supl.reducao
-       ,recurso.cod_fonte
-       ,despesa.num_pao
+        
         ";      
         return $stSql;
     }

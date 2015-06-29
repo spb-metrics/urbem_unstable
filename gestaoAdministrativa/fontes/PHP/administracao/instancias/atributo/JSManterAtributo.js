@@ -40,7 +40,7 @@ Casos de uso: uc-01.03.96
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function goOculto(stControle){
     var stAction = document.frm.action;

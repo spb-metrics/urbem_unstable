@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterRegistroPreco.php 62567 2015-05-20 19:39:59Z evandro $
-  * $Date: 2015-05-20 16:39:59 -0300 (Qua, 20 Mai 2015) $
-  * $Author: evandro $
-  * $Rev: 62567 $
+  * $Id: OCManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
+  * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+  * $Author: michel $
+  * $Rev: 62832 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -71,30 +71,24 @@ function validaNroAdesao($stCodAdesao, $inCodEntidade) {
     return $stJs;
 }
 
-function validaNroProcesso($stCodProcesso, $inCodEntidade) {
+function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEntidade) {
+    if($stCodProcesso!=NULL&&$stExercicioRegistroPrecos!=NULL&&$inCodEntidade!=NULL){
+        $rsProcessoRegistroPrecos = new RecordSet();
+        $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
+        $obTTCEMGRegistroPrecos->setDado('cod_entidade'          , $inCodEntidade);
+        $obTTCEMGRegistroPrecos->setDado('numero_registro_precos', $stCodProcesso);
+        $obTTCEMGRegistroPrecos->setDado('exercicio'             , $stExercicioRegistroPrecos);
+        $obTTCEMGRegistroPrecos->recuperaPorChave($rsProcessoRegistroPrecos);
+        
+        if ( $rsProcessoRegistroPrecos->getNumLinhas() > 0 ) {
+            $stJs .= "jQuery('#stCodigoProcesso').val(''); \n";
+            $stJs .= "alertaAviso('Já existe um número de processo igual para a mesma entidade no mesmo exercício (".str_pad($stCodProcesso, 7, "0", STR_PAD_LEFT) .'/'.$stExercicioRegistroPrecos.")','form','erro','".Sessao::getId()."'); \n";
+        }else{
+            $stCodProcesso = str_pad($stCodProcesso, 12, "0", STR_PAD_LEFT);
+            $stJs .= "jQuery('#stCodigoProcesso').val('".$stCodProcesso."'); \n";
+        }
+    }
 
-    $stCodProcessoRegistroPrecos = explode('/', $stCodProcesso);
-    
-    if ( array_key_exists( 1, $stCodProcessoRegistroPrecos) ) {
-        $stExercicioRegistroPrecos = (int)$stCodProcessoRegistroPrecos[1];
-    } else {
-        $stExercicioRegistroPrecos = Sessao::getExercicio();
-    }
-    
-    $rsProcessoRegistroPrecos = new RecordSet();
-    $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
-    $obTTCEMGRegistroPrecos->setDado('cod_entidade'          , $inCodEntidade);
-    $obTTCEMGRegistroPrecos->setDado('numero_registro_precos', (int)$stCodProcessoRegistroPrecos[0]);
-    $obTTCEMGRegistroPrecos->setDado('exercicio'             , $stExercicioRegistroPrecos);
-    $obTTCEMGRegistroPrecos->recuperaPorChave($rsProcessoRegistroPrecos);
-    
-    if ( $rsProcessoRegistroPrecos->getNumLinhas() < 0 ) {
-        $stCodProcessoRegistroPrecosTMP = str_pad($stCodProcessoRegistroPrecos[0], 12, "0", STR_PAD_LEFT) .'/'.$stExercicioRegistroPrecos;
-        $stJs .= "jQuery('#stCodigoProcesso').val('".$stCodProcessoRegistroPrecosTMP."'); \n";
-    } else {
-        $stJs .= "jQuery('#stCodigoProcesso').val(''); \n";
-        $stJs .= "alertaAviso('Já existe um número de processo igual para a mesma entidade no mesmo exerício (".str_pad($stCodProcessoRegistroPrecos[0], 7, "0", STR_PAD_LEFT) .'/'.$stExercicioRegistroPrecos.")','form','erro','".Sessao::getId()."'); \n";
-    }
     return $stJs;
 }
 
@@ -588,18 +582,6 @@ function alterarItem()
     
     foreach ($arItens as $arItem) {
         if ($arItem['inId'] == $_REQUEST['inId']) {
-
-            //Validacao comentada porque existe dados que foram importados e essa regra nao é aplicada
-            // foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {                
-            //     if ($arQuantitativo['inCodLoteQ'] == $arItem['stCodigoLote'] &&
-            //         $arQuantitativo['inNumItemQ'] == $arItem['inNumItemLote'] &&
-            //         $arQuantitativo['inCodItemQ'] == $arItem['inCodItem'] &&
-            //         $arQuantitativo['inCodFornecedorQ'] == $arItem['inNumCGMVencedor']) {
-
-            //         $obErro->setDescricao("Item ".$arItem['inNumItemLote']." do Lote ".$arItem['stCodigoLote']." não pode ser alterado, pois está sendo utilizado na aba Quantitativos por Orgão!");
-            //     }
-            // }
-
             if ($obErro->ocorreu()) {
                 $stJs  = limparFormItem();
                 $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
@@ -1847,46 +1829,91 @@ function limparFormOrgaoItemQuantitativos()
 
 function carregaLicitacao()
 {
-    $stExercicioLicitacao = $_REQUEST['stExercicioProcessoLicitacao'];
-    $inCodEntidade = $_REQUEST['inCodEntidade'];
-    $inCodModalidade = $_REQUEST['inCodModalidadeLicitacao'];
-    $stNroProcessoLicitacao = (isset($_REQUEST['stNroProcessoLicitacao'])) ? $_REQUEST['stNroProcessoLicitacao'] : NULL;
-    if($stNroProcessoLicitacao!=NULL){
-        $arProcessoLicitacao = explode('_', $stNroProcessoLicitacao);
-        $inCodModalidade = $arProcessoLicitacao[1];
-    }
+    //$inCodModalidadeLicitacao = Modalidade da Licitação:Concorrência(1)/Pregão(2)
+    $inCodModalidadeLicitacao   = ( isset($_REQUEST['inCodModalidadeLicitacao'])    ) ? $_REQUEST['inCodModalidadeLicitacao']   : NULL;
+    $inCodEntidade              = ( isset($_REQUEST['inCodEntidade'])               ) ? $_REQUEST['inCodEntidade']              : NULL;
+    $stExercicioLicitacao       = ( isset($_REQUEST['stExercicioLicitacao'])        ) ? $_REQUEST['stExercicioLicitacao']       : NULL;
+    $inCodModalidade            = ( isset($_REQUEST['inCodModalidade'])             ) ? $_REQUEST['inCodModalidade']            : NULL;
+    $inCodLicitacao             = ( isset($_REQUEST['inCodLicitacao'])              ) ? $_REQUEST['inCodLicitacao']             : NULL;
 
-    if($inCodModalidade==1)
-        $inCodModalidade = 3;
-    elseif($inCodModalidade==2)
-        $inCodModalidade = '6,7';
+    //Filtro para Modalidades de Licitação e Licitação
+    include_once CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php";
+    include_once TLIC."TLicitacaoLicitacao.class.php";
+
+    $obComprasModalidade = new TComprasModalidade();
+    $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
     
-    if($stExercicioLicitacao!=NULL&&$inCodEntidade!=NULL&&$inCodModalidade!=NULL){
-        $stJs  = "f.stNroProcessoLicitacao.length = 0;\n";
-        $stJs .= "f.stNroProcessoLicitacao.options[0] = new Option('Selecione',''); \n";
+    if($inCodModalidadeLicitacao==1)
+        $stCodModalidade = '3';
+    elseif($inCodModalidadeLicitacao==2)
+        $stCodModalidade = '6,7';
+    else
+        $stCodModalidade = '3,6,7';
+    $stFiltro = " WHERE cod_modalidade IN (".$stCodModalidade.") ";
+    $stOrdem  = " ORDER BY cod_modalidade, descricao ";
+    $obComprasModalidade->recuperaTodos($rsModalidade, $stFiltro, $stOrdem);
+    
+    $inCount = 0;
+    $stJs .= "f.inCodModalidade.options.length = ".$inCount.";                                  \n";
+    $stJs .= "f.inCodModalidade.options[".$inCount."] = new Option('Selecione','');             \n";
 
-        include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNumeroLicitacao.class.php";
-        
-        $obTTCEMGNumeroLicitacao = new TTCEMGNumeroLicitacao();
-        $obTTCEMGNumeroLicitacao->setDado( 'exercicio' , $stExercicioLicitacao );
-        $obTTCEMGNumeroLicitacao->setDado( 'cod_entidade', $inCodEntidade );
-        $obTTCEMGNumeroLicitacao->setDado( 'cod_modalidade', $inCodModalidade );
+    while (!($rsModalidade->eof())) {
+        $inCount++;
+        $stJs .= "f.inCodModalidade.options[".$inCount."] = new Option('".$rsModalidade->getCampo('cod_modalidade')." - ".$rsModalidade->getCampo('descricao')."','".$rsModalidade->getCampo('cod_modalidade')."'); \n";
+        if($rsModalidade->getCampo('cod_modalidade')==$inCodModalidade){
+            $stJs .= "d.getElementById('inCodModalidade').selectedIndex = ".$inCount.";         \n";
+            $stJs .= "jQuery('#inCodModalidade').val('".$inCodModalidade."');                   \n";
+            $boMontaLicitacao = true;
+        }
 
-        $obTTCEMGNumeroLicitacao->recuperaNumeroLicitacaoHomologado( $rsLicitacao );
-        $x = 1;
-        while ( !$rsLicitacao->eof() ) {
-            $stComparaValor = $rsLicitacao->getCampo('cod_licitacao')."_".$rsLicitacao->getCampo('cod_modalidade');
-            if($stComparaValor == $stNroProcessoLicitacao)
-                $selected = $stNroProcessoLicitacao;
-            
-            $stJs .= "f.stNroProcessoLicitacao.options[".$x++."] = new Option('".$rsLicitacao->getCampo('num_licitacao')."/".$rsLicitacao->getCampo('exercicio_licitacao')."','".$rsLicitacao->getCampo('cod_licitacao')."_".$rsLicitacao->getCampo('cod_modalidade')."');\n";
-            
+        $rsModalidade->proximo();
+    }
+    
+    $inCount = 0;
+    $stJs .= "var boFocusLicitacao = true;                                                      \n";
+    $stJs .= "var cod_licitacao = d.getElementById('inCodLicitacao').value;                     \n";
+    $stJs .= "var stCodLicitacao = cod_licitacao+'/'+d.getElementById('inCodModalidade').value; \n";
+    $stJs .= "f.inCodLicitacao.options.length = ".$inCount.";                                   \n";
+    $stJs .= "f.inCodLicitacao.options[".$inCount."] = new Option('Selecione','');              \n";
+    
+    if($stExercicioLicitacao!=NULL&&$inCodEntidade!=NULL&&$inCodModalidade!=NULL&&$boMontaLicitacao){
+        $obTLicitacaoLicitacao->setDado( 'exercicio'        , $stExercicioLicitacao );
+        $obTLicitacaoLicitacao->setDado( 'cod_entidade'     , $inCodEntidade        );
+        $obTLicitacaoLicitacao->setDado( 'cod_modalidade'   , $inCodModalidade      );
+
+        $stFiltro = " AND (   SELECT cod_licitacao
+                                FROM tcemg.registro_precos_licitacao AS RPL
+                               WHERE RPL.cod_licitacao = ll.cod_licitacao
+                                 AND RPL.cod_modalidade = ll.cod_modalidade
+                                 AND RPL.cod_entidade_licitacao = ll.cod_entidade
+                                 AND RPL.exercicio_licitacao = ll.exercicio";
+        if ($_REQUEST['stAcao']=='alterar'&&$inCodLicitacao!=NULL)
+            $stFiltro .= "       AND RPL.cod_licitacao||'/'||RPL.exercicio_licitacao != '".$inCodLicitacao."'";
+        $stFiltro .= "    ) IS NULL ";
+
+        $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao, $stFiltro );
+
+        while (!($rsLicitacao->eof())) {
+            $inCount++;
+            $stJs .= "f.inCodLicitacao.options[".$inCount."] = new Option('".$rsLicitacao->getCampo('cod_licitacao')."','".$rsLicitacao->getCampo('cod_licitacao')."/".$rsLicitacao->getCampo('exercicio')."'); \n";
+            $stCodLicitacao = $rsLicitacao->getCampo('cod_licitacao').'/'.$rsLicitacao->getCampo('exercicio').'/'.$rsLicitacao->getCampo('cod_modalidade');
+            if(($inCodLicitacao.'/'.$inCodModalidade)==$stCodLicitacao){
+                $stJs .= "d.getElementById('inCodLicitacao').selectedIndex = ".$inCount.";      \n";
+            }else{
+                $stJs .= "if(stCodLicitacao=='".$stCodLicitacao."')                             \n";
+                $stJs .= "  d.getElementById('inCodLicitacao').selectedIndex = ".$inCount.";    \n";
+                $stJs .= "if(stCodLicitacao=='".$stCodLicitacao."')                             \n";
+                $stJs .= "  boFocusLicitacao=false;                                             \n";
+            }
+            unset($stCodLicitacao);
+
             $rsLicitacao->proximo();
         }
-        
-        $stJs .= "f.stNroProcessoLicitacao.value = '".$selected."';\n";
     }
     
+    $stJs .= "if(cod_licitacao!=''&&boFocusLicitacao)                                           \n";
+    $stJs .= "  d.getElementById('inCodLicitacao').focus();                                     \n";
+
     return $stJs;
 }
 
@@ -2034,17 +2061,37 @@ function alterarListaQuantitativo()
     return $stJs;
 }
 
-if ( array_key_exists('stCtrl',$_REQUEST)){
-    $stCtrl = $_REQUEST['stCtrl'];
-} else if (array_key_exists('stCtrl',$_POST)) {
-    $stCtrl = $_POST['stCtrl'];
-} else {
-    $stCtrl = $_REQUEST['stCtrl'];
+function verificaExercicioLicitacao()
+{
+    $stExercicioRegistroPrecos      = ( isset($_REQUEST['stExercicioRegistroPreco'])    ) ? $_REQUEST['stExercicioRegistroPreco']       : NULL;
+    $stExercicioProcessoLicitacao   = ( isset($_REQUEST['stExercicioProcessoLicitacao'])) ? $_REQUEST['stExercicioProcessoLicitacao']   : NULL;
+    $stExercicioLicitacao           = ( isset($_REQUEST['stExercicioLicitacao'])        ) ? $_REQUEST['stExercicioLicitacao']           : NULL;
+    
+    if(($stExercicioRegistroPrecos!=NULL&&$stExercicioProcessoLicitacao!=NULL)&&$stExercicioProcessoLicitacao<$stExercicioRegistroPrecos){
+        $stJs .= "jQuery('#stExercicioProcessoLicitacao').val(''); \n";
+        $stMsg .= "@Exercício do Processo de Licitação deve ser maior ou igual ao Exercício do Registro de Preços";
+    }
+    if(($stExercicioRegistroPrecos!=NULL&&$stExercicioLicitacao!=NULL)&&$stExercicioLicitacao<$stExercicioRegistroPrecos){
+        $stJs .= "jQuery('#stExercicioLicitacao').val(''); \n";
+        $stJs .= "f.inCodLicitacao.options.length = 0; \n";
+        $stJs .= "f.inCodLicitacao.options[0] = new Option('Selecione',''); \n";
+        $stMsg .= "@Exercício da Licitação deve ser maior ou igual ao Exercício do Registro de Preços";
+    }
+
+    if($stMsg)
+        $stJs .= "alertaAviso('".$stMsg."','form','erro','".Sessao::getId()."'); \n";
+    elseif(!is_null($stExercicioLicitacao))
+        $stJs .= carregaLicitacao();
+
+    return $stJs;
 }
+
+$stCtrl = $request->get('stCtrl');
+
 switch ($stCtrl)
 {
     case 'validaNroProcesso':
-        $stJs .= validaNroProcesso($request->get('stNumProcesso'), $request->get('inCodEntidade'));
+        $stJs .= validaNroProcesso($request->get('stNumProcesso'), $request->get('stExercicioRegistroPreco'), $request->get('inCodEntidade'));
     break;
     case 'validaNroAdesao':
         $stJs .= validaNroAdesao($request->get('stCodigoProcessoAdesao'), $request->get('inCodEntidade'));
@@ -2089,7 +2136,7 @@ switch ($stCtrl)
     break;
 
     case "buscaDescricaoLote":
-        echo buscaDescricaoLote($_REQUEST['inCodLote']);
+        echo buscaDescricaoLote($request->get('inCodLote'));
     break;
 
     case "incluirEmpenho":
@@ -2102,14 +2149,16 @@ switch ($stCtrl)
     
     case "preencheInner":
 
-        $numEmpenho = $_REQUEST['numEmpenho'];
-    
-        if ($_REQUEST['inCodEntidade'] and $_REQUEST['stExercicioEmpenho'] and $numEmpenho) {
+        $numEmpenho = $request->get('numEmpenho');
+        $inCodEntidade = $request->get('inCodEntidade');
+        $stExercicioEmpenho = $request->get('stExercicioEmpenho');
+
+        if ($inCodEntidade!=NULL and $stExercicioEmpenho!=NULL and $numEmpenho!=NULL) {
             include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
             $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
             $obTEmpenhoEmpenho->setDado('cod_empenho'  , $numEmpenho );
-            $obTEmpenhoEmpenho->setDado('exercicio'    , $_REQUEST['stExercicioEmpenho']);
-            $obTEmpenhoEmpenho->setDado('cod_entidade' , $_REQUEST['inCodEntidade']);
+            $obTEmpenhoEmpenho->setDado('exercicio'    , $stExercicioEmpenho);
+            $obTEmpenhoEmpenho->setDado('cod_entidade' , $inCodEntidade);
             
             # Busca somente os Empenhos da modalidade Registro De Preços
             $obTEmpenhoEmpenho->setDado('registro_precos', true);
@@ -2124,15 +2173,15 @@ switch ($stCtrl)
                 $stJs .= "f.numEmpenho.value = '';";
             }
         } else {
-            if (!$_REQUEST['inCodEntidade']) {
+            if ($inCodEntidade==NULL) {
                 $stJs  = "alertaAviso('Informe a entidade.','form','erro','".Sessao::getId()."');\n";
                 $stJs .= "f.inCodEntidade.focus();\n";
             }
-            if (!$_REQUEST['stExercicioEmpenho']) {
+            if ($stExercicioEmpenho==NULL) {
                 $stJs  = "alertaAviso('Informe o exercício do empenho.','form','erro','".Sessao::getId()."');\n";
                 $stJs .= "f.stExercicioEmpenho.focus();\n";
             }
-            if (!$numEmpenho) {
+            if ($numEmpenho==NULL) {
                 $stJs  = 'd.getElementById("stEmpenho").innerHTML = "&nbsp;";';
                 $stJs .= "f.numEmpenho.value = '';";
             }
@@ -2189,7 +2238,8 @@ switch ($stCtrl)
         $stJs .= limparFormOrgaoItemQuantitativos();
         break;
     case "preencheNumItemAbaQuantitativo":
-        $boLote = (isset($_REQUEST['inCodLoteQ'])) ? TRUE : FALSE;
+        $inCodLoteQ = $request->get('inCodLoteQ');
+        $boLote = (isset($inCodLoteQ)) ? TRUE : FALSE;
         $stJs .= preencheNumItemAbaQuantitativo($boLote);
         break;
     case "carregaLicitacao":
@@ -2197,6 +2247,9 @@ switch ($stCtrl)
         break;
     case 'alterarListaQuantitativo':
         $stJs .= alterarListaQuantitativo();
+        break;
+    case 'verificaExercicioLicitacao':
+        $stJs .= verificaExercicioLicitacao();
         break;
 }
 

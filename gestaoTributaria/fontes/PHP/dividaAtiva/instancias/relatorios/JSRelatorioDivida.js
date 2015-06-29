@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSRelatorioDivida.js 59913 2014-09-19 20:19:05Z lisiane $
+    * $Id: JSRelatorioDivida.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-05.04.10
 */
@@ -46,7 +46,7 @@ Revision 1.1  2007/04/19 16:06:56  cercato
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValor(tipoBusca){
     document.frm.stCtrl.value = tipoBusca;

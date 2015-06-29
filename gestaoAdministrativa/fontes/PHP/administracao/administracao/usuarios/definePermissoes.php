@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.03.93
 
-    $Id: definePermissoes.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: definePermissoes.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     */
 session_cache_limiter('private_no_expire');
@@ -53,7 +53,7 @@ setAjuda("UC-01.03.93");
 
     $PHP_SELF = 'definePermissoes.php';
 ?>
-<script language="javascript">
+<script type="text/javascript">
     function zebra(id, classe)
     {
        var tabela = document.getElementById(id);
@@ -76,7 +76,7 @@ setAjuda("UC-01.03.93");
             $pagina = $_REQUEST['pagina'];
             $inNumeroCgm = Sessao::read('numCgm');
 ?>
-            <script language="javascript">
+            <script type="text/javascript">
                 function Importar()
                 {
                     document.frm.action = "definePermissoes.php?<?=Sessao::getId();?>&controle=6&cgm=<?=$inNumeroCgm;?>";
@@ -260,7 +260,7 @@ setAjuda("UC-01.03.93");
 
     case 2:
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
                 function Valida()
                 {
@@ -329,7 +329,7 @@ setAjuda("UC-01.03.93");
         $nomeUsuario = $_REQUEST['nomeUsuario'];
 
         if ($flag == 1) {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                     alertaAviso("Marque Pelo Menos 1 Módulo!","unica","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("definePermissoes.php?'.Sessao::getId().'");
                   </script>';
@@ -355,7 +355,7 @@ setAjuda("UC-01.03.93");
         $conectaBD->abreBD();
         $conectaBD->abreSelecao($sSQL);
         $conectaBD->vaiPrimeiro(); ?>
-        <script language="javascript">
+        <script type="text/javascript">
            function marcarTodos()
            {
                var cont = 0;
@@ -446,7 +446,7 @@ setAjuda("UC-01.03.93");
             $modulosSelecionados = implode(",",$modulosSelecionados);
         } else {
             $modulosSelecionados = "";
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                     alertaAviso("Marque Pelo Menos 1 Módulo!","unica","erro","'.Sessao::getId().'");
                     mudaTelaPrincipal("definePermissoes.php?'.Sessao::getId().'&controle=3&flag=1&cgm'.$cgm.'");
                   </script>';
@@ -536,7 +536,7 @@ setAjuda("UC-01.03.93");
         $moduloProx = -1;
         $funcAtual = $conectaBD->pegaCampo("cod_funcionalidade");
         $funcProx = -1;  ?>
-        <script language="javascript">
+        <script type="text/javascript">
             function marcarTodosF(contador, nome)
             {
                 var cont  = document.frm.elements.length;
@@ -730,7 +730,7 @@ setAjuda("UC-01.03.93");
         $cgm = $_REQUEST['cgm'];
         $numCgmU = $_REQUEST['numCgmU'];
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function Importar()
             {
                 document.frm.action = "definePermissoes.php?<?=Sessao::getId()?>&controle=7&cgm=<?=$cgm;?>";
@@ -744,7 +744,7 @@ setAjuda("UC-01.03.93");
             }
         </script>
 
-        <script language="javascript">
+        <script type="text/javascript">
             function buscaUsuario()
             {
                 document.frm.action = "definePermissoes.php?<?=Sessao::getId();?>&controle=6";
@@ -817,12 +817,12 @@ setAjuda("UC-01.03.93");
         $result = $dbConfig->executaSql($insert);
         $dbConfig->fechaBd();
         if ($result) {
-            echo '<script language="JavaScript1.2" type="text/javascript">
+            echo '<script type="text/javascript">
                     alertaAviso("Permissões Importadas com Sucesso","unica","aviso","'.Sessao::getId().'");
                     window.location = "definePermissoes.php?'.Sessao::getId().'&controle=1&pagina='.$pagina.'";
                 </script>';
         } else {
-           echo '<script language="JavaScript1.2" type="text/javascript">
+           echo '<script type="text/javascript">
                     alertaAviso("Permissões não puderam ser importadas, entre em contato com o administrador","unica","erro","'.Sessao::getId().'");
                     window.location = "definePermissoes.php?'.Sessao::getId().'&controle=1&pagina='.$pagina.'";
                 </script>';

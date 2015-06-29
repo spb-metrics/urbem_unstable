@@ -64,7 +64,7 @@ switch ($ctrl) {
         $centroCustoSim  = ($centroCusto=='true') ? 'CHECKED' : '';
 
         ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -424,19 +424,19 @@ document.frm.caminhoRecibo.focus();
                 $audicao = new auditoriaLegada;
                 $audicao->setaAuditoria(Sessao::read('numCgm'), Sessao::read('acao'), $audit );
                 $audicao->insereAuditoria();
-                echo 	'<script language="JavaScript1.2" type="text/javascript">
+                echo 	'<script type="text/javascript">
                             alertaAviso("Parâmetros do protocolo","incluir","aviso","'.Sessao::getId().'");
                             window.location = "configuracaoProtocolo.php?'.Sessao::getId().'&ctrl=0";
                         </script>';
             } else {
-                echo 	'<script language="JavaScript1.2" type="text/javascript">
+                echo 	'<script type="text/javascript">
                             alertaAviso("Parâmetros do protocolo","erro","aviso","'.Sessao::getId().'");
                             window.location = "configuracaoProtocolo.php?'.Sessao::getId().'&ctrl=0";
                         </script>';
             }
             $dbConfig->fechaBd();
         } else {
-            echo 	'<script language="JavaScript1.2" type="text/javascript">
+            echo 	'<script type="text/javascript">
                     alertaAviso("Parâmetros do protocolo","incluir","aviso","'.Sessao::getId().'");
                     window.location = "configuracaoProtocolo.php?'.Sessao::getId().'&ctrl=0";
                     </script>';

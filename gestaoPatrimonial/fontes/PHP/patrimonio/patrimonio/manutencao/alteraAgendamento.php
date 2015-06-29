@@ -153,7 +153,7 @@ href='alteraAgendamento.php?<?=Sessao::getId();?>&codbem=<?=$codbem;?>&empenho=<
     case 2:
 
         ?>
-            <script language="javascript">
+            <script type="text/javascript">
             function Cancela()
             {
                 mudaTelaPrincipal("alteraAgendamento.php?<?=Sessao::getId()?>&ctrl=0&ctrl_frm=2");
@@ -170,7 +170,7 @@ href='alteraAgendamento.php?<?=Sessao::getId();?>&codbem=<?=$codbem;?>&empenho=<
         $numPlaca = str_replace('\\\'','&#039;',$numPlaca);
         $numPlaca = str_replace('\\"','&#034;',$numPlaca);
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
             function Valida()
             {
                 var mensagem = "";

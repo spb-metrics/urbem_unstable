@@ -40,7 +40,7 @@
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
     function excluirDocumentos(inIndice){
      ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice,'excluirDocumentos');

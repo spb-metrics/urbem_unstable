@@ -56,6 +56,8 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
+include_once $pgJS;
+
 Sessao::write('arContratos',array());
 Sessao::write('inQtnEventos',6);
 
@@ -254,7 +256,14 @@ $obFormulario->addComponente                    ( $obChkApresentarPorContrato5  
 $obIFiltroComponentes->geraFormulario($obFormulario);
 $obFormulario->agrupaComponentes                ( array($obRdbAtivo,$obRdbInativo,$obRdbRescindido,$obRdbPensionista,$obRdbTodos ) );
 $obFormulario->agrupaComponentes                ( array($obRdoOrdenacao1,$obRdoOrdenacao2)                  );
-$obFormulario->ok(true);
+
+$obOk  = new Ok(true);
+$obOk->obEvento->setOnClick("if ( validaSelectMultiplo() ){ Salvar(); }else{ alertaAviso('Você deve selecionar ao menos um item do tipo de filtro selecionado','n_incluir','erro','<?=Sessao::getId()?>'); }");
+
+$obLimpar  = new Limpar;
+$obFormulario->defineBarra( array( $obOk, $obLimpar ) );
+
+
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

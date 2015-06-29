@@ -45,7 +45,7 @@ Bug #9639#
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaLogradouro(){
     document.frm.stCtrl.value = 'buscaLogradouro';

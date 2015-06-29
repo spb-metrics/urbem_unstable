@@ -51,7 +51,7 @@ Bug #9211#
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaValorFiltro(tipoBusca){
      target = document.frm.target ;

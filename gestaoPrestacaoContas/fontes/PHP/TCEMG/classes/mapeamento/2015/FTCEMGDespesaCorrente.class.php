@@ -53,18 +53,25 @@ function FTCEMGDespesaCorrente()
 
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
     $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
+    $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
-    SELECT *
+    SELECT LPAD(periodo::VARCHAR,2,'0') AS periodo,
+           LPAD(cod_tipo::VARCHAR,2,'0') AS cod_tipo,
+           LPAD(despPesEncSoc::VARCHAR,16,'0') AS despPesEncSoc,
+           LPAD(despJurDivInt::VARCHAR,16,'0') AS despJurDivInt,
+           LPAD(despJurDivExt::VARCHAR,16,'0') AS despJurDivExt,
+           LPAD(despOutDespCor::VARCHAR,16,'0') AS despOutDespCor
+
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
+                                     , '".$this->getDado("data_inicial")."'
+                                     , '".$this->getDado("data_final")."'
                                      ) AS retorno(
-                                                  mes                      INTEGER,
+                                                  periodo                  INTEGER,
                                                   cod_tipo                 TEXT,
                                                   despPesEncSoc            TEXT,
                                                   despJurDivInt            TEXT,
@@ -72,6 +79,7 @@ function montaRecuperaTodos()
                                                   despOutDespCor           TEXT
                                                  )
           ORDER BY cod_tipo";
+
 return $stSql;
 }
 

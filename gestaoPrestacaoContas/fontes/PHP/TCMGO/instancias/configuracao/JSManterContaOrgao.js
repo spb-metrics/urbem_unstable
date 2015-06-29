@@ -46,7 +46,7 @@ Arquivos para geração do TCEPB
 
 */
 ?>
-<script language="javascript">
+<script type="text/javascript">
         
     function excluirListaItens( id ){
         ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+id,'excluirListaItens');

@@ -160,7 +160,7 @@ $agencia->retornaAgencia();
 $nomBanco = $agencia->nomBanco;
 $nomAgencia = $agencia->nomAgencia;
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
     function retornaCodBanco(cod)
     {
         var f;

@@ -585,7 +585,7 @@ switch ($ctrl) {
        </tr>
       </table>
       </form>
-      <script language='javaScript'>
+      <script type='text/javascript'>
               function Valida()
               {
             var mensagem = "";

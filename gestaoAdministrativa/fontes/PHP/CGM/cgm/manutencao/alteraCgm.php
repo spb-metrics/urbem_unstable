@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: alteraCgm.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: alteraCgm.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 */
 
@@ -50,8 +50,8 @@ if (!isset($_REQUEST["controle"])) {
 }
 
 ?>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
-<script language="JavaScript1.2" src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/ifuncoesJs.js" type="text/javascript"></script>
+<script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 $html = new interfaceCgm;
 
@@ -647,7 +647,7 @@ switch ($controle) {
                 }
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("O cpf '.$cpfigual.' já existe","unica","erro","'.Sessao::getId().'");
                     </script>';
                     $html->formCgm($dadosCgm,$_SERVER['PHP_SELF'],0);
@@ -668,7 +668,7 @@ switch ($controle) {
                 }
             } else {
                 echo '
-                    <script language="JavaScript1.2" type="text/javascript">
+                    <script type="text/javascript">
                     alertaAviso("O cnpj '.$cnpjigual.' já existe","unica","erro","'.Sessao::getId().'");
                     </script>';
                     $html->formCgm($dadosCgm,$_SERVER['PHP_SELF'],0);

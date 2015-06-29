@@ -39,7 +39,7 @@ $Date: $
 Casos de uso:
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
     function setaUnidade(cod_unidade, cod_grandeza, nom_unidade, simbolo)
     {

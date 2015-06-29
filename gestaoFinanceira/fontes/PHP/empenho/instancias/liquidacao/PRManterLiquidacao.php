@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterLiquidacao.php 61229 2014-12-18 17:10:10Z lisiane $
+    $Id: PRManterLiquidacao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     $Revision: 32142 $
     $Name$
@@ -794,14 +794,14 @@ switch ($stAcao) {
                     $stFiltroEmissaoOP .= "&acaoEmpenho=".$acaoEmpenho."&moduloEmpenho=".$moduloEmpenho."&funcionalidadeEmpenho=".$funcionalidadeEmpenho;
                     $stFiltroEmissaoOP .= "&acaoLiquidacao=812&moduloLiquidacao=10&funcionalidadeLiquidacao=202";
                     $stFiltroEmissaoOP .= "&pgDespesasFixas=".$_REQUEST['pgDespesasFixas'];
-                    print '<script language="JavaScript1.2" type="text/javascript">
+                    print '<script type="text/javascript">
                                 mudaMenu         ( "Ordem de Pagamento","203" );
                            </script>';
 
                     SistemaLegado::alertaAviso($pgProx.'?'.Sessao::getId()."&stAcao=incluir".$stFiltroEmissaoOP,"Liquidar Empenho concluído com sucesso!Nota n.(".$obREmpenhoNotaLiquidacao->getCodNota()."/".Sessao::getExercicio().")","", "aviso",Sessao::getId(), "../");
 
                 } else {
-                    print '<script language="JavaScript1.2" type="text/javascript">
+                    print '<script type="text/javascript">
                                 mudaMenu         ( "Empenho","82" );
                            </script>';
                     $stFiltro  = "&acao=".$acaoEmpenho."&cod_gestao_pass=2&stNomeGestao=Financeira&modulos=Empenho&modulo=".$moduloEmpenho."&funcionalidade=".$funcionalidadeEmpenho."&nivel=1&acaoLiquidar=812";
@@ -829,7 +829,7 @@ switch ($stAcao) {
                     $stFiltroEmissaoOP .= "&stAcaoLiquidacao=liquidar";
                     $stFiltroEmissaoOP .= "&acaoLiquidacao=812&moduloLiquidacao=10&funcionalidadeLiquidacao=202";
                     $stFiltroEmissaoOP .= "&pgProxLiquidacao=".$pgProxLiquidacao[0];
-                    print '<script language="JavaScript1.2" type="text/javascript">
+                    print '<script type="text/javascript">
                                 mudaMenu         ( "Ordem de Pagamento","203" );
                            </script>';
 

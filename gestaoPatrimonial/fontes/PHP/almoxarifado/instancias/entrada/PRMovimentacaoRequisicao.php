@@ -34,7 +34,7 @@
 
     Caso de uso: uc-03.03.11
 
-    $Id: PRMovimentacaoRequisicao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRMovimentacaoRequisicao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
 **/
 
@@ -234,7 +234,7 @@ function lightbox($arItens, $inCodLancamento = "", $stAcao)
     $stJs = "d.getElementById('conteudolightbox').innerHTML = '".$stHTML."';";
 
     if ( count( $arItensPontoPedido ) > 0 or count($arItensEstoqueMinimo) > 0 ) {
-        echo '<script language="JavaScript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'");'.$stJs.'</script>';
+        echo '<script type="text/javascript">criaFundo(); criaLightbox("'.$stCaminhoLighbox.'");'.$stJs.'</script>';
 
         return true;
     } else {

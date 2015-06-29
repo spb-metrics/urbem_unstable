@@ -33,10 +33,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 62838 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: diogo.zarpelon $
+    $Date: 2015-06-26 10:02:49 -0300 (Sex, 26 Jun 2015) $
 
     * Casos de uso: uc-02.08.09
 */
@@ -52,7 +52,7 @@ Adicionada tag Log aos arquivos
 */
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function buscaDado( BuscaDado ){
     document.frm.stCtrl.value = BuscaDado;

@@ -24,41 +24,24 @@
 ?>
 <?php
 
-    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGMedidas.class.php" );
+    include_once ( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGGestaoFiscalPL.class.php" );
+    include_once(CAM_FW_HTML."Bimestre.class.php");
 
+    $obBimestre = new Bimestre();
     $arFiltros = Sessao::read('filtroRelatorio');
 
-    $obTTCEMGMedidas = new TTCEMGMedidas();
-    
-    $stFiltro = ' WHERE medidas.cod_mes ='.$arFiltros['inPeriodo'];
-    
+    $obTTCEMGMedidas = new TTCEMGGestaoFiscalPL();
+
+    //Retirando o mes da data inicial e final
+    $inMeses = substr($obBimestre->getDataInicial($arFiltros['inPeriodo'],Sessao::read('exercicio')),3,2).",".substr($obBimestre->getDataFinal($arFiltros['inPeriodo'],Sessao::read('exercicio')),3,2);
+
+    $stFiltro = " WHERE medidas.cod_mes IN (".$inMeses.")";
+    $stFiltro .=" AND LOWER(poder_publico.nome) = '".$arFiltros['stTipoPoder']."'";
+
     $obTTCEMGMedidas->recuperaDados($rsArquivo, $stFiltro);
-    
-    while (  !$rsArquivo->eof() ) {
-        if($rsArquivo->getCampo('riscos_fiscais')=='t')
-            $rsArquivo->setCampo('riscos_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('riscos_fiscais', 'N');
-
-        if($rsArquivo->getCampo('metas_fiscais')=='t')
-            $rsArquivo->setCampo('metas_fiscais', 'S'); 
-        else
-            $rsArquivo->setCampo('metas_fiscais', 'N');
-
-        if($rsArquivo->getCampo('contratacao_aro')=='t')
-            $rsArquivo->setCampo('contratacao_aro', 'S'); 
-        else
-            $rsArquivo->setCampo('contratacao_aro', 'N');
-        
-        if($arFiltros['inPeriodo']!=12)
-            $rsArquivo->setCampo('contratacao_aro', '');
-
-        $rsArquivo->Proximo();
-    }
-
-    $rsArquivo->setPrimeiroElemento();
 
     $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_mes');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
@@ -66,5 +49,7 @@
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('medida');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4000);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4000);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+?>

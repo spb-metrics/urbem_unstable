@@ -36,7 +36,7 @@
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 /**
  * Método para verificar se já existe um

@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Tonismar R. Bernardo
 
-    * $Id: OCEmitirCertidao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCEmitirCertidao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
   Caso de uso: uc-05.03.11
 **/
@@ -297,21 +297,21 @@ switch ($stCtrl) {
     case "individual":
         $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                     mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
                </script>';
     break;
     case "parcial":
         $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                     mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
                </script>';
     break;
     case "geral":
         $arLink = explode('?',$_SERVER['REQUEST_URI']);
 
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                     mudaTelaPrincipal( "'.$pgFormVinculo.'?'.$arLink[1].'&stAcao='.$stAcao.'&stCtrl='.$_REQUEST['stCtrl'].'" );
                </script>';
     break;

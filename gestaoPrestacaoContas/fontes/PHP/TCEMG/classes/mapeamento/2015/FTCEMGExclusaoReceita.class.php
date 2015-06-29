@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGExclusaoReceita.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: FTCEMGExclusaoReceita.class.php 62755 2015-06-16 17:19:15Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -51,45 +51,44 @@ class FTCEMGExclusaoReceita extends Persistente
 
         $this->setTabela('tcemg.fn_exclusao_receita');
 
-        $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-        $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-        $this->AddCampo('mes'           ,'integer',false,''    ,false,false);
     }
 
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT mes
-                 , REPLACE(ROUND(contr_serv,2)::TEXT                , '.', '') AS contr_serv
-                 , REPLACE(ROUND(compens_reg_prev,2)::TEXT          , '.', '') AS compens_reg_prev
-                 , REPLACE(ROUND(fundacoes_transf_corrente,2)::TEXT , '.', '') AS fundacoes_transf_corrente
-                 , REPLACE(ROUND(autarquias_transf_corrente,2)::TEXT, '.', '') AS autarquias_transf_corrente
-                 , REPLACE(ROUND(empestdep_transf_corrente,2)::TEXT , '.', '') AS empestdep_transf_corrente
-                 , REPLACE(ROUND(demaisent_transf_corrente,2)::TEXT , '.', '') AS demaisent_transf_corrente
-                 , REPLACE(ROUND(fundacoes_transf_capital,2)::TEXT  , '.', '') AS fundacoes_transf_capital
-                 , REPLACE(ROUND(autarquias_transf_capital,2)::TEXT , '.', '') AS autarquias_transf_capital
-                 , REPLACE(ROUND(empestdep_transf_capital,2)::TEXT  , '.', '') AS empestdep_transf_capital
-                 , REPLACE(ROUND(demaisent_transf_capital,2)::TEXT  , '.', '') AS demaisent_transf_capital
-                 , REPLACE(ROUND(out_duplic,2)::TEXT                , '.', '') AS out_duplic
-                 , REPLACE(ROUND(contr_patronal,2)::TEXT            , '.', '') AS contr_patronal
-                 , '' AS desc_outras_duplic
-              FROM " . $this->getTabela() . "('" . $this->getDado('exercicio') . "','" . $this->getDado('cod_entidade') . "'," . $this->getDado('mes') . ") as tabela
-                                               ( mes                        INTEGER,
-                                                 contr_serv                 NUMERIC(14,2),
-                                                 compens_reg_prev           NUMERIC(14,2),
-                                                 fundacoes_transf_corrente   NUMERIC(14,2),
-                                                 autarquias_transf_corrente NUMERIC(14,2),
-                                                 empestdep_transf_corrente  NUMERIC(14,2),
-                                                 demaisent_transf_corrente  NUMERIC(14,2),
-                                                 fundacoes_transf_capital   NUMERIC(14,2),
-                                                 autarquias_transf_capital  NUMERIC(14,2),
-                                                 empestdep_transf_capital   NUMERIC(14,2),
-                                                 demaisent_transf_capital   NUMERIC(14,2),
-                                                 out_duplic                 NUMERIC(14,2),
-                                                 contr_patronal             NUMERIC(14,2)
+            SELECT ".$this->getDado('stMes')." AS mes
+                 , ROUND(contr_serv,2)::VARCHAR                 AS contr_serv
+                 , ROUND(compens_reg_prev,2)::VARCHAR           AS compens_reg_prev
+                 , ROUND(out_duplic,2)::VARCHAR                 AS out_duplic
+                 , ROUND(contr_patronal,2)::VARCHAR             AS contr_patronal
+                 , ROUND(contr_patronal,2)::VARCHAR             AS desc_outras_duplic
+                 , ROUND(fundacoes_transf_corrente,2)::VARCHAR  AS fundacoes_transf_corrente
+                 , ROUND(autarquias_transf_corrente,2)::VARCHAR AS autarquias_transf_corrente
+                 , ROUND(empestdep_transf_corrente,2)::VARCHAR  AS empestdep_transf_corrente
+                 , ROUND(demaisent_transf_corrente,2)::VARCHAR  AS demaisent_transf_corrente
+                 , ROUND(fundacoes_transf_capital,2)::VARCHAR   AS fundacoes_transf_capital
+                 , ROUND(autarquias_transf_capital,2)::VARCHAR  AS autarquias_transf_capital
+                 , ROUND(empestdep_transf_capital,2)::VARCHAR   AS empestdep_transf_capital
+                 , ROUND(demaisent_transf_capital,2)::VARCHAR   AS demaisent_transf_capital
+              FROM " . $this->getTabela() . "('".$this->getDado('exercicio')."','".$this->getDado('cod_entidade')."','".$this->getDado('stDataInicial')."','".$this->getDado('stDataFinal')."') AS tabela
+                                               ( mes                         INTEGER,
+                                                 contr_serv                  NUMERIC,
+                                                 compens_reg_prev            NUMERIC,
+                                                 out_duplic                  NUMERIC,
+                                                 contr_patronal              NUMERIC,
+                                                 desc_outras_duplic          NUMERIC,
+                                                 fundacoes_transf_corrente   NUMERIC,
+                                                 autarquias_transf_corrente  NUMERIC,
+                                                 empestdep_transf_corrente   NUMERIC,
+                                                 demaisent_transf_corrente   NUMERIC,
+                                                 fundacoes_transf_capital    NUMERIC,
+                                                 autarquias_transf_capital   NUMERIC,
+                                                 empestdep_transf_capital    NUMERIC,
+                                                 demaisent_transf_capital    NUMERIC
                                                 )";
 
         return $stSql;
     }
-
 }
+
+?>

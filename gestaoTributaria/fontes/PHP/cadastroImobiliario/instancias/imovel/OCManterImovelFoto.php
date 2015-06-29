@@ -67,7 +67,7 @@ case 'montaFileBox':
     echo $obFormulario->getHTML();
     if ($_REQUEST[inNumeroFoto]) {
 ?>
-    <script language='javascript'>
+    <script type='text/javascript'>
         jQuery('#stArquivo1').focus();
     </script>
 <?php

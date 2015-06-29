@@ -614,7 +614,7 @@ switch ($stAcao) {
             SistemaLegado::alertaAviso( "FMEmitirNotaAvulsa.php?stAcao=".$stAcao."&inCodLancamentoNotaAvul=".$inCodLancamentoNotaAvul."&inCodParcelaNotaAvul=".$inCodParcelaNotaAvul."&inscricao_economica=".$_REQUEST["inInscricaoEconomica"]."&inCodLancamento=".$inCodLancamento, "Inscrição Econômica: ".$_REQUEST["inInscricaoEconomica"], "incluir", "aviso", Sessao::getId(), "../");
 
             if (is_null($rsDesoneracao)) {
-                echo "<script language=\"javaScript\">\r\n";
+                echo "<script type=\"text/javascript\">\r\n";
                 echo "    var sAux = window.open('".CAM_GT_ARR_INSTANCIAS."documentos/OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";
                 echo "    eval(sAux)\r\n";
                 echo "</script>\r\n";

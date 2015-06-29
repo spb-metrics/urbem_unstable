@@ -74,12 +74,15 @@ BEGIN
     --para encontrar a quantidade de meses a serem pagos no démo
     dtCompetencia := pega0DataFinalCompetenciaDoPeriodoMovimento(inCodPeriodoMovimentacao);
     arDataArray := string_to_array(dtCompetencia::varchar,'-'::varchar);
-    stExercicio := arDataArray[1];
-    stAdmissaoPosse := selectIntoVarchar('SELECT configuracao.valor
-                                   FROM administracao.configuracao 
-                                  WHERE cod_modulo = 22
-                                    AND parametro =  ''dtContagemInicial'||stEntidade||' ''
-                                    AND exercicio = '||quote_literal(stExercicio));    
+    stExercicio := arDataArray[1];   
+   
+   SELECT TRIM(configuracao.valor)
+     INTO stAdmissaoPosse
+     FROM administracao.configuracao 
+    WHERE cod_modulo = 22
+      AND parametro = 'dtContagemInicial'||stEntidade
+      AND exercicio =  stExercicio;  
+                                        
     IF stAdmissaoPosse = 'dtPosse' THEN
         dtDataAdmissao := selectIntoVarchar('SELECT contrato_servidor_nomeacao_posse.dt_posse
                                        FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse

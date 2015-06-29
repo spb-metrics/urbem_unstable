@@ -61,7 +61,7 @@ Revision 1.3  2006/07/06 12:09:53  diego
 
 ?>
 
-<script language="javascript">
+<script type="text/javascript">
 
 function Limpar(){
 	executaFuncaoAjax('limparSessao');

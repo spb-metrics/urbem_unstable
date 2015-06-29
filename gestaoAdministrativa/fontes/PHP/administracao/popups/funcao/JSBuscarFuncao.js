@@ -39,7 +39,7 @@ $Date: 2007-03-28 16:43:59 -0300 (Qua, 28 Mar 2007) $
 Casos de uso: uc-01.03.95
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function setaFuncao(cod_modulo, cod_biblioteca, cod_funcao, nom_funcao ){
     stChaveFuncao = cod_modulo + '.' + cod_biblioteca + '.' + cod_funcao;

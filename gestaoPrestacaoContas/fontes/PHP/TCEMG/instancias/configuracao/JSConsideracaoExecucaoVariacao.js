@@ -35,7 +35,7 @@ Casos de uso: uc-01.05.03
 */
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 jq(document).ready(function(){

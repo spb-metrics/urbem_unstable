@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterOrdemPagamento.php 61064 2014-12-03 18:30:58Z franver $
+    * $Id: PRManterOrdemPagamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     * Casos de uso: uc-02.03.05
                     uc-02.03.04
@@ -209,7 +209,7 @@ case "incluir":
     if (!$obErro->ocorreu()) {
         if ($_REQUEST['stLiq']) {
             if ($_REQUEST['stEmitirEmpenho']) {
-                print '<script language="JavaScript1.2" type="text/javascript">
+                print '<script type="text/javascript">
                             mudaMenu         ( "Empenho","82",816);
                        </script>';
                 $stFiltro = "&acao=".$_REQUEST['acaoEmpenho']."&modulo=".$_REQUEST['moduloEmpenho']."&funcionalidade=".$_REQUEST['funcionalidadeEmpenho']."&acaoOrdem=816";
@@ -219,7 +219,7 @@ case "incluir":
                     SistemaLegado::alertaAviso($_REQUEST['pgProxEmpenho']."?".Sessao::getId()."&stAcao=".$_REQUEST['stAcaoEmpenho'].$stFiltro,"Código da Ordem: ".$obREmpenhoOrdemPagamento->getCodigoOrdem()."/".$obREmpenhoOrdemPagamento->getExercicio(),"incluir","aviso", Sessao::getId(), "../");
                 }
             } else {
-                print '<script language="JavaScript1.2" type="text/javascript">
+                print '<script type="text/javascript">
                             mudaMenu         ( "Liquidação","202",816);
                        </script>';
                 $stFiltro  = "&acao=".$_REQUEST['acaoLiquidacao']."&modulo=".$_REQUEST['moduloLiquidacao']."&funcionalidade=".$_REQUEST['funcionalidadeLiquidacao']."&acaoOrdem=816";;

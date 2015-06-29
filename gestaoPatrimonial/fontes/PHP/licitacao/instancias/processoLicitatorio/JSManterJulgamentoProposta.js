@@ -42,7 +42,7 @@
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 
 function alterar( ordem, codItem ) {

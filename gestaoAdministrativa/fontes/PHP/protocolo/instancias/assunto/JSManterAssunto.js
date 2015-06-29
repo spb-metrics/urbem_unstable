@@ -39,7 +39,7 @@ $Date: 2006-09-18 08:38:09 -0300 (Seg, 18 Set 2006) $
 Casos de uso: uc-01.06.95
 */
 ?>
-<script language='javascript'>
+<script type='text/javascript'>
 function incluirAcao(){
     if( document.frm.inCodigoAcao.value ){
         var stPagina ="<?=CAM_GA_PROT_INSTANCIAS.'assunto/'.$pgOcul.'?'.Sessao::getId();?>&inCodigoAcao=" + document.frm.inCodigoAcao.value;

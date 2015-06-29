@@ -29,12 +29,12 @@
 
     * @author Analista: Silvia Martins Silva
     * @author Desenvolvedor: Michel Teixeira
-    * $Id: JSManterCredor.js 60660 2014-11-06 16:28:53Z michel $
+    * $Id: JSManterCredor.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 ?>
 
-<script language="JavaScript">
+<script type="text/javascript">
 
 function addCmb(){
     if (document.frm.stPeriodo.value == 't') {

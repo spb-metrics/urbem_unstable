@@ -66,7 +66,7 @@ $Date: 2007-01-03 09:33:57 -0200 (Qua, 03 Jan 2007) $
                 unset($sessao->transf2);
             }
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
 
     function atualizaMunicipio()
     {
@@ -474,7 +474,7 @@ if ($fim[3]) {
             $cep = formataCep($cep);
             //echo $select;
 ?>
-<script language="JavaScript1.2" type="text/javascript">
+<script type="text/javascript">
       function Volta()
       {
             mudaTelaPrincipal("<?=$PHP_SELF?>?<?=$sessao->id?>&ctrl=0&pagina=<?=$pg?>");

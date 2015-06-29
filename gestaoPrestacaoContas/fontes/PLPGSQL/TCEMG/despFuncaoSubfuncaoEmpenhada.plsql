@@ -59,8 +59,9 @@ BEGIN
 		e.cod_entidade IN (' || stEntidades || ') AND 
 		e.dt_empenho BETWEEN to_date(''' || stDtIni || ''', ''dd/mm/yyyy'') AND 
 							 to_date(''' || stDtFim || ''', ''dd/mm/yyyy'') AND
-        ode.cod_despesa = ' || inCodDespesa || '                            AND
-        SUBSTRING(ocd.cod_estrutural, 5, 3) <> ''9.1''     ';
+        ode.cod_despesa = ' || inCodDespesa || '
+        AND substring(ocd.cod_estrutural, 5, 3) <> ''9.1''
+        ';
 
     OPEN crCursor FOR EXECUTE stSql;
     	FETCH crCursor INTO nuEmpenhado;
@@ -75,3 +76,4 @@ BEGIN
 END;
 
 $$ language 'PLPGSQL';
+

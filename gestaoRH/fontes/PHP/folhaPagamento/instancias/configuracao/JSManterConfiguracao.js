@@ -43,7 +43,7 @@ construção
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 function desbloqueiaImpressora(){
      document.frm.stImpressora.disabled = false;
 }

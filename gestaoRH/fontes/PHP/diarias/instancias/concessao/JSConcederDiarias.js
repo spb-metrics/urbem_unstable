@@ -33,12 +33,12 @@
     
     * @ignore
     
-    $Id: JSConcederDiarias.js 59612 2014-09-02 12:00:51Z gelson $
+    $Id: JSConcederDiarias.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
     
     * Casos de uso: uc-04.09.02
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function ValidaConcessao(){
       var erro = false;

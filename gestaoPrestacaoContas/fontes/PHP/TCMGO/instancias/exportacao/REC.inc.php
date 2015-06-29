@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: REC.inc.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: REC.inc.php 62759 2015-06-16 18:00:15Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -39,24 +39,25 @@
 include_once( CAM_GPC_TGO_MAPEAMENTO."TTCMGORecita.class.php" );
 
 $arFiltroRelatorio = Sessao::read('filtroRelatorio');
-$obTMapeamento = new TTCMGOReceita;
-$obTMapeamento->setDado('exercicio'  , Sessao::getExercicio() );
-$obTMapeamento->setDado('dtInicio'   , $arFiltroRelatorio['stDataInicial'] );
-$obTMapeamento->setDado('dtFim'      , $arFiltroRelatorio['stDataFinal']   );
-$obTMapeamento->setDado('stEntidades', $stEntidades );
+
+$obTTCMGOReceita = new TTCMGOReceita;
+$obTTCMGOReceita->setDado('exercicio'  , Sessao::getExercicio() );
+$obTTCMGOReceita->setDado('dtInicio'   , $arFiltroRelatorio['stDataInicial'] );
+$obTTCMGOReceita->setDado('dtFim'      , $arFiltroRelatorio['stDataFinal']   );
+$obTTCMGOReceita->setDado('stEntidades', $stEntidades );
 
 if ($arFiltroRelatorio['inPeriodicidade']) {
-    $obTMapeamento->recuperaTodos($rsDetalhamento);
+    $obTTCMGOReceita->recuperaTodos($rsDetalhamento);
 } else {
-    $obTMapeamento->recuperaBalanco($rsDetalhamento);
+    $obTTCMGOReceita->recuperaBalanco($rsDetalhamento);
 }
 
 if (Sessao::getExercicio() > 2010) {
-    $obTMapeamento->recuperaMovimentacaoFinanceira($rsMovimentacaoFinanceira);
-    $obTMapeamento->recuperaDetalhamentoFonteRecurso($rsDetalhamentoFonteRecurso);
+    $obTTCMGOReceita->recuperaMovimentacaoFinanceira($rsMovimentacaoFinanceira);
+    $obTTCMGOReceita->recuperaDetalhamentoFonteRecurso($rsDetalhamentoFonteRecurso);
 }
-$i = 0;
 
+$i = 0;
 $inCount = 0;
 
 //tipo10
@@ -71,7 +72,7 @@ foreach ($rsDetalhamento->arElementos as $arDetalhamento) {
     $$rsBloco->preenche(array($arDetalhamento));
 
     $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
-    $obExportador->roUltimoArquivo->setTipoDocumento('TCE_GO');
+    $obExportador->roUltimoArquivo->setTipoDocumento('TCM_GO');
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2 );
@@ -122,12 +123,13 @@ foreach ($rsDetalhamento->arElementos as $arDetalhamento) {
         foreach ($rsMovimentacaoFinanceira->arElementos as $arMovimentacaoFinanceira) {
             $stChaveElemento = $arMovimentacaoFinanceira['cod_orgao'].$arMovimentacaoFinanceira['rubrica'];
 
-        $stChaveElemento2 = $arMovimentacaoFinanceira['cod_orgao'].$arMovimentacaoFinanceira['rubrica'].$arMovimentacaoFinanceira['banco'].$arMovimentacaoFinanceira['agencia'].$arMovimentacaoFinanceira['conta_corrente'].$arMovimentacaoFinanceira['digito'].$arMovimentacaoFinanceira['tipo_conta'];
-        $boChave = false;
+            $stChaveElemento2 = $arMovimentacaoFinanceira['cod_orgao'].$arMovimentacaoFinanceira['rubrica'].$arMovimentacaoFinanceira['banco'].$arMovimentacaoFinanceira['agencia'].$arMovimentacaoFinanceira['conta_corrente'].$arMovimentacaoFinanceira['digito'].$arMovimentacaoFinanceira['tipo_conta'];
+            $boChave = false;
 
             if ($stChave == $stChaveElemento) {
                 $arMovimentacaoFinanceira['numero_registro'] = ++$inCount;
-        $boChave = true;
+        
+                $boChave = true;
 
                 $rsBloco = 'rsBloco_'.$inCount;
                 unset($$rsBloco);
@@ -149,7 +151,6 @@ foreach ($rsDetalhamento->arElementos as $arDetalhamento) {
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
         }
-
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("rubrica");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(9);
@@ -350,3 +351,5 @@ if (Sessao::getExercicio() > '2011') {
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+?>

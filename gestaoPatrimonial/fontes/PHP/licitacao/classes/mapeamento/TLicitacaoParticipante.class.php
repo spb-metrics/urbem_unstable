@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoParticipante.class.php 62309 2015-04-20 19:43:33Z arthur $
+    $Id: TLicitacaoParticipante.class.php 62829 2015-06-24 19:41:26Z jean $
 
     * Casos de uso: uc-03.05.18
             uc-03.05.19
@@ -313,6 +313,10 @@ function montaRecuperaParticipanteLicitacaoHabilitacaoLista()
 
     if ( $this->getDado( 'cod_comissao' ) ) {
         $stSql .= " AND comissao_licitacao.cod_comissao = ". $this->getDado( 'cod_comissao' )." \n";
+    }
+
+    if ( $this->getDado( 'numcgm_representante' ) ) {
+        $stSql .= " AND participante.numcgm_representante = ". $this->getDado( 'numcgm_representante' )." \n";
     }
 
     $stSql .="

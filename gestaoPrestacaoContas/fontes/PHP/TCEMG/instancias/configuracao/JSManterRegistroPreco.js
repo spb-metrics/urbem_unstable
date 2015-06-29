@@ -21,7 +21,21 @@
     *                        
     **********************************************************************************                                                           
 */
+</script>
+<?php
+/**
+  * Página de JavaScript de Configuração de Registro de Preços
+  * Data de Criação: 07/01/2014
 
+  * @author Analista:      Eduardo Paculski Schitz
+  * @author Desenvolvedor: Franver Sarmento de Moraes
+  *
+  * @ignore
+  * $Id: JSManterRegistroPreco.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+  *
+*/
+?>
+<script type="text/javascript">
 function modificaDado(tipoBusca, inId){
     var stAction = document.frm.action;
     var stTarget = document.frm.target;
@@ -56,12 +70,10 @@ function alterarOrgao() {
 /**
 * Faz o chamada de alerta de Questão.
 */
-function alertaQuestaoValor(pagina,tipo,sessao,valorEnt = ''){
+function alertaQuestaoValor(pagina,tipo,sessao,valorEnt){
     var x = 350;
     var y = 200;
-    var valor = 'teste';
-    var chave = 1;
-    if (valorEnt=='') {
+    if (typeof valorEnt == 'undefined') {
         valorEnt = "&chave=1&valor=teste";
     }
     var sessaoid = sessao.substr(15,8);

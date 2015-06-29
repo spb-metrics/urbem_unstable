@@ -54,13 +54,12 @@ function FTCEMGDespFuncaoSubfuncao()
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
     $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
     $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
-    $this->AddCampo('tipo_periodo'  ,'varchar',false,''    ,false,false);
 }
 
 function montaRecuperaTodos()
 {
     $stSql  = "
-        SELECT mes
+        SELECT periodo
              , cod_vinculo
              , vl_inicial
              , vl_atualizada
@@ -72,9 +71,10 @@ function montaRecuperaTodos()
              , cod_entidade_relacionada
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'
-                                     , ".$this->getDado("mes")."
+                                     , '".$this->getDado("data_inicial")."'
+                                     , '".$this->getDado("data_final")."'
                                      ) AS retorno (
-                                            mes INTEGER
+                                            periodo                  INTEGER
                                           , cod_vinculo              VARCHAR
                                           , vl_inicial               NUMERIC
                                           , vl_atualizada            NUMERIC
@@ -83,7 +83,7 @@ function montaRecuperaTodos()
                                           , vl_anulada               NUMERIC
                                           , cod_funcao               VARCHAR
                                           , cod_subfuncao            VARCHAR
-                                          , cod_entidade_relacionada VARCHAR
+                                          , cod_entidade_relacionada integer
                                       ); ";
 
     return $stSql;

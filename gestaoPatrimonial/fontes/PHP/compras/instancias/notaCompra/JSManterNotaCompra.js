@@ -55,7 +55,7 @@ arquivo javascript
 
 */
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 
 function consultarNotaCompra( num_nota, cod_ordem , cod_empenho ){
     

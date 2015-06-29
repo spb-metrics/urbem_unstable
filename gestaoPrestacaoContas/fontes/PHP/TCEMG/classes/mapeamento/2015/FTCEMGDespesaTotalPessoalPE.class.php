@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGDespesaTotalPessoalPE.class.php 62558 2015-05-19 20:36:20Z evandro $
+    $Id: FTCEMGDespesaTotalPessoalPE.class.php 62814 2015-06-23 14:42:37Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -60,47 +60,47 @@ function FTCEMGDespesaTotalPessoalPE()
 
 function montaRecuperaTodos()
 {
- $stSql  = "
+    $stSql  = "
         SELECT ".$this->getDado('mes')." as mes
-             , REPLACE(vencVantagens            ::TEXT, '.', '') AS vencVantagens
-             , REPLACE(inativos                 ::TEXT, '.', '') AS inativos
-             , REPLACE(pensionistas             ::TEXT, '.', '') AS pensionistas
-             , REPLACE(salarioFamilia           ::TEXT, '.', '') AS salarioFamilia
-             , REPLACE(subsPrefeito             ::TEXT, '.', '') AS subsPrefeito
-             , REPLACE(subsVice                 ::TEXT, '.', '') AS subsVice
-             , REPLACE(subsSecret               ::TEXT, '.', '') AS subsSecret
-             , REPLACE(obrigPatronais           ::TEXT, '.', '') AS obrigPatronais
-             , REPLACE(repassePatronal          ::TEXT, '.', '') AS repassePatronal
-             , REPLACE(sentJudPessoal           ::TEXT, '.', '') AS sentJudPessoal
-             , REPLACE(indenDemissao            ::TEXT, '.', '') AS indenDemissao
-             , REPLACE(incDemVolunt             ::TEXT, '.', '') AS incDemVolunt
-             , REPLACE(sentJudAnt               ::TEXT, '.', '') AS sentJudAnt
-             , REPLACE(inatPensFontCustProp     ::TEXT, '.', '') AS inatPensFontCustProp
-             , REPLACE(outrasDespesasPessoal    ::TEXT, '.', '') AS outrasDespesasPessoal
-             , REPLACE(nadaDeclararPessoal      ::TEXT, '.', '') AS nadaDeclararPessoal
-             , REPLACE(despExercAnt             ::TEXT, '.', '') AS despExercAnt
-             , REPLACE(exclusaoDespAnteriores   ::TEXT, '.', '') AS exclusaoDespAnteriores
-             , REPLACE(corrPerApurac            ::TEXT, '.', '') AS corrPerApurac
-             , REPLACE(despCorres               ::TEXT, '.', '') AS despCorres
-             , REPLACE(despAnteriores           ::TEXT, '.', '') AS despAnteriores
+             , ABS(vencVantagens) as vencVantagens         
+             , ABS(inativos) as  inativos            
+             , ABS(pensionistas) as    pensionistas     
+             , ABS(salarioFamilia) as      salarioFamilia  
+             , ABS(subsPrefeito) as      subsPrefeito    
+             , ABS(subsVice) as   subsVice           
+             , ABS(subsSecret) as  subsSecret          
+             , ABS(obrigPatronais) as  obrigPatronais      
+             , ABS(repassePatronal) as  repassePatronal     
+             , ABS(sentJudPessoal) as  sentJudPessoal      
+             , ABS(indenDemissao) as      indenDemissao   
+             , ABS(incDemVolunt) as incDemVolunt         
+             , ABS(sentJudAnt) as   sentJudAnt         
+             , ABS(inatPensFontCustProp) as inatPensFontCustProp 
+             , ABS(outrasDespesasPessoal) as outrasDespesasPessoal
+             , nadaDeclararPessoal
+             , ABS(despExercAnt) as   despExercAnt       
+             , ABS(exclusaoDespAnteriores) as exclusaoDespAnteriores
+             , ABS(corrPerApurac) as      corrPerApurac   
+             , ABS(despCorres) as       despCorres     
+             , ABS(despAnteriores) as    despAnteriores    
           FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
                                      , '".$this->getDado("cod_entidade")."'                                     
-                                     , '".$this->getDado("data_inicial")."'
-                                     , '".$this->getDado("data_final")."'
-                                     ) AS retorno(
-                                                  vencVantagens    NUMERIC,
-                                                  inativos         NUMERIC,
-                                                  pensionistas     NUMERIC,
-                                                  salarioFamilia   NUMERIC,
-                                                  subsPrefeito     NUMERIC,
-                                                  subsVice         NUMERIC,
-                                                  subsSecret       NUMERIC,
-                                                  obrigPatronais   NUMERIC,
-                                                  repassePatronal  NUMERIC,
-                                                  sentJudPessoal   NUMERIC,
-                                                  indenDemissao    NUMERIC,
-                                                  incDemVolunt     NUMERIC,
-                                                  sentJudAnt       NUMERIC,
+                                     , '".SistemaLegado::dataToSql($this->getDado("data_inicial"))."'
+                                     , '".SistemaLegado::dataToSql($this->getDado("data_final"))."'
+                                     ) AS retorno (
+                                                  vencVantagens          NUMERIC,
+                                                  inativos               NUMERIC,
+                                                  pensionistas           NUMERIC,
+                                                  salarioFamilia         NUMERIC,
+                                                  subsPrefeito           NUMERIC,
+                                                  subsVice               NUMERIC,
+                                                  subsSecret             NUMERIC,
+                                                  obrigPatronais         NUMERIC,
+                                                  repassePatronal        NUMERIC,
+                                                  sentJudPessoal         NUMERIC,
+                                                  indenDemissao          NUMERIC,
+                                                  incDemVolunt           NUMERIC,
+                                                  sentJudAnt             NUMERIC,
                                                   inatPensFontCustProp   NUMERIC,
                                                   outrasDespesasPessoal  NUMERIC,
                                                   despExercAnt           NUMERIC,
@@ -109,9 +109,10 @@ function montaRecuperaTodos()
                                                   despCorres             NUMERIC,
                                                   despAnteriores         NUMERIC,
                                                   nadaDeclararPessoal    VARCHAR
-                                                 )";
-
+                                                 )
+        ";
     return $stSql;
-     }
-   }
+}
+
+}//END CLASS
 

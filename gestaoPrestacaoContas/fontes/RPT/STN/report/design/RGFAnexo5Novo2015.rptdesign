@@ -320,9 +320,25 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="query" id="6966">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150" extends="urbem_250.postgres">
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
+ extends="urbem_250.postgres">
             <list-property name="privateDriverProperties">
                 <ex-property>
                     <name>metadataBidiFormatStr</name>
@@ -456,6 +472,7 @@
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[//params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[	SELECT lpad(tb.cod_recurso::VARCHAR,4,'0'::VARCHAR) as cod_recurso
          , tb.tipo

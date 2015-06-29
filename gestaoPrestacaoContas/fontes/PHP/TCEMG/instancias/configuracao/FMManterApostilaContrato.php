@@ -35,7 +35,7 @@
     
     * @ignore
     
-    $Id: FMManterApostilaContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterApostilaContrato.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -336,7 +336,7 @@ if ($stAcao == "incluir") {
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {
-    echo "<script language=\"javascript\" type=\"text/javascript\">             \r\n";
+    echo "<script type=\"text/javascript\">             \r\n";
     echo "    ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumContrato=".$_REQUEST['inNumContrato']. "&inCodEntidade=".$_REQUEST['inCodEntidade']. "&stExercicioContrato=".$_REQUEST['stExercicioContrato']. "&inCodApostila=".$_REQUEST['inCodApostila'] . "&stExercicioApostila=".$_REQUEST['stExercicioApostila']. "', 'carregaLista');  \r\n";
     echo "</script>                                                             \r\n";
 }

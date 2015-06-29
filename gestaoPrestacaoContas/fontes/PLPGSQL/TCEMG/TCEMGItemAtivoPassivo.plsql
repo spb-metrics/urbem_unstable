@@ -46,151 +46,48 @@ DECLARE
     arRetorno           NUMERIC[];
 
 BEGIN
+    
+    CREATE TEMPORARY TABLE tmp_ativo_passivo AS
+        SELECT * 
+        FROM contabilidade.fn_rl_balancete_verificacao(stExercicio
+                                                        ,'cod_entidade IN  ('||stCodEntidades||') '
+                                                        , stDtInicial
+                                                        , stDtFinal
+                                                        ,'A'::CHAR)
+        as retorno
+                    ( cod_estrutural varchar                                                    
+                    ,nivel integer                                                               
+                    ,nom_conta varchar                                                           
+                    ,cod_sistema integer                                                         
+                    ,indicador_superavit char(12)                                                    
+                    ,vl_saldo_anterior numeric                                                   
+                    ,vl_saldo_debitos  numeric                                                   
+                    ,vl_saldo_creditos numeric                                                   
+                    ,vl_saldo_atual    numeric                                                   
+                    );
 
-    stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
-                SELECT *
-                FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                    FROM
-                         contabilidade.plano_conta       as pc
-                        ,contabilidade.plano_analitica   as pa
-                        ,contabilidade.conta_debito      as cd
-                        ,contabilidade.valor_lancamento  as vl
-                        ,contabilidade.lancamento        as la
-                        ,contabilidade.lote              as lo
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cd.cod_plano
-                    AND     pa.exercicio    = cd.exercicio
-                    AND     cd.cod_lote     = vl.cod_lote
-                    AND     cd.tipo         = vl.tipo
-                    AND     cd.sequencia    = vl.sequencia
-                    AND     cd.exercicio    = vl.exercicio
-                    AND     cd.tipo_valor   = vl.tipo_valor
-                    AND     cd.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''D''
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    AND     lo.cod_entidade IN (' || stCodEntidades || ')
-                    AND     pa.exercicio    = ' || quote_literal(stExercicio) || '
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                ';
-    EXECUTE stSql;
+    stSql := '  SELECT 
+                    (SELECT vl_saldo_debitos 
+                            FROM tmp_ativo_passivo
+                            WHERE cod_estrutural like ''1.0.0.0.0.00.00.00.00.00%''
+                    ) as valor_acrescimo
+                    
+                    ,(0.00) as vl_reducao
+                    , ''01''::varchar as cod_tipo
 
-    stSql := 'CREATE TEMPORARY TABLE tmp_credito AS
-                SELECT *
-                FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                    FROM
-                         contabilidade.plano_conta       as pc
-                        ,contabilidade.plano_analitica   as pa
-                        ,contabilidade.conta_credito     as cc
-                        ,contabilidade.valor_lancamento  as vl
-                        ,contabilidade.lancamento        as la
-                        ,contabilidade.lote              as lo
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cc.cod_plano
-                    AND     pa.exercicio    = cc.exercicio
-                    AND     cc.cod_lote     = vl.cod_lote
-                    AND     cc.tipo         = vl.tipo
-                    AND     cc.sequencia    = vl.sequencia
-                    AND     cc.exercicio    = vl.exercicio
-                    AND     cc.tipo_valor   = vl.tipo_valor
-                    AND     cc.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''C''
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    AND     lo.cod_entidade IN (' || stCodEntidades || ')
-                    AND     pa.exercicio = ' || quote_literal(stExercicio) || '
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                ';
-    EXECUTE stSql;
+            UNION
 
-    CREATE UNIQUE INDEX unq_debito              ON tmp_debito           (cod_estrutural varchar_pattern_ops, oid_temp);
-    CREATE UNIQUE INDEX unq_credito             ON tmp_credito          (cod_estrutural varchar_pattern_ops, oid_temp);
-
-    stSql := ' CREATE TEMPORARY TABLE tmp_totaliza_ativo AS
-        SELECT SUM(tmp_debito.vl_lancamento)::NUMERIC(14,2) AS valorAcrescimo
-             , SUM(tmp_credito.vl_lancamento)::NUMERIC(14,2) AS vl_reducao
-             , ''01''::VARCHAR AS cod_tipo
-        FROM  tmp_debito
-        JOIN  tmp_credito
-          ON  tmp_credito.dt_lote BETWEEN to_date('''|| stDtInicial||''' , ''dd/mm/yyyy'' ) AND   to_date( '''||stDtFinal||''' , ''dd/mm/yyyy'' )
-         AND  tmp_credito.tipo <> ''I''
-         AND  tmp_credito.cod_estrutural ilike ''1.%''
-        WHERE tmp_debito.dt_lote BETWEEN to_date( '''||stDtInicial||''' , ''dd/mm/yyyy'' ) AND   to_date( '''||stDtFinal||''' , ''dd/mm/yyyy'' )
-        AND   tmp_debito.tipo <> ''I''
-        AND  tmp_debito.cod_estrutural ilike ''1.%'' ';
- EXECUTE stSql;
-
-   stSql := ' CREATE TEMPORARY TABLE tmp_totaliza_passivo AS
-        SELECT SUM(tmp_credito.vl_lancamento)::NUMERIC(14,2) AS valorAcrescimo
-             , SUM(tmp_debito.vl_lancamento)::NUMERIC(14,2) AS vl_reducao
-             , ''02''::VARCHAR AS cod_tipo
-        FROM  tmp_debito
-        JOIN  tmp_credito
-          ON  tmp_credito.dt_lote BETWEEN to_date( '''|| stDtInicial||''' , ''dd/mm/yyyy'' ) AND   to_date( '''||stDtFinal||''' , ''dd/mm/yyyy'' )
-         AND  tmp_credito.tipo <> ''I''
-         AND  tmp_credito.cod_estrutural ilike ''2.%''
-        WHERE tmp_debito.dt_lote BETWEEN to_date( '''|| stDtInicial||''' , ''dd/mm/yyyy'' ) AND   to_date( '''||stDtFinal||''' , ''dd/mm/yyyy'' )
-        AND   tmp_debito.tipo <> ''I''
-        AND  tmp_debito.cod_estrutural ilike ''2.%''
-        ';
- EXECUTE stSql;
-
-    CREATE UNIQUE INDEX unq_totaliza_ativo ON tmp_totaliza_ativo (cod_tipo);
-    CREATE UNIQUE INDEX unq_totaliza_passivo  ON tmp_totaliza_passivo  (cod_tipo);
-/*
-    IF substr(stDtInicial,1,5) = '01/01' THEN
-        stSqlComplemento := ' dt_lote = to_date( ' || quote_literal(stDtInicial) || ',' || quote_literal('dd/mm/yyyy') || ') ';
-        stSqlComplemento := stSqlComplemento || ' AND tipo = '||quote_literal('I')||' ';
-    ELSE
-        stSqlComplemento := ' dt_lote <= to_date( ' || quote_literal(stDtInicial) || ',' || quote_literal('dd/mm/yyyy') || ')-1 ';
-    END IF;
-*/
-    stSql := '
-        SELECT * FROM tmp_totaliza_ativo
-       UNION ALL
-        SELECT * FROM tmp_totaliza_passivo
+                SELECT
+                    (SELECT vl_saldo_creditos 
+                            FROM tmp_ativo_passivo
+                            WHERE cod_estrutural like ''2.0.0.0.0.00.00.00.00.00%''
+                    ) as valor_acrescimo
+                    
+                    ,(SELECT vl_saldo_creditos 
+                            FROM tmp_ativo_passivo
+                            WHERE cod_estrutural like ''1.0.0.0.0.00.00.00.00.00%''
+                    ) as vl_reducao
+                    , ''02''::varchar as cod_tipo
     ';
     
     FOR reRegistro IN EXECUTE stSql
@@ -198,15 +95,7 @@ BEGIN
         RETURN NEXT reRegistro;
     END LOOP;
 
-    DROP INDEX unq_totaliza_ativo;
-    DROP INDEX unq_totaliza_passivo;
-    DROP INDEX unq_debito;
-    DROP INDEX unq_credito;
-    
-    DROP TABLE tmp_totaliza_ativo;
-    DROP TABLE tmp_debito;
-    DROP TABLE tmp_credito;
-    DROP TABLE tmp_totaliza_passivo;
+    DROP TABLE tmp_ativo_passivo;
 
     RETURN;
 END;

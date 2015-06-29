@@ -161,7 +161,7 @@ setAjuda("UC-03.01.10");
 
         $altera->mostraSituacao($cod);
 ?>
-        <script language="JavaScript1.2" type="text/javascript">
+        <script type="text/javascript">
 
             function Valida()
             {
@@ -253,7 +253,7 @@ setAjuda("UC-03.01.10");
                 $audicao->insereAuditoria();
 
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                     alertaAviso("'.$objeto.'","alterar","aviso","'.Sessao::getId().'");
                     mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'&pagina='.$pagina.'");
                 </script>';
@@ -262,7 +262,7 @@ setAjuda("UC-03.01.10");
             // exibe msg de rro
             } else {
                 echo '
-                <script language="JavaScript1.2" type="text/javascript">
+                <script type="text/javascript">
                 alertaAviso("'.$objeto.'","n_alterar","erro","'.Sessao::getId().'");
                 mudaTelaPrincipal("'.$PHP_SELF.'?'.Sessao::getId().'");
                 </script>';
@@ -272,7 +272,7 @@ setAjuda("UC-03.01.10");
         // nao atualiza a situcao de bem e exibe msg de erro
         } else {
             echo '
-            <script language="JavaScript1.2" type="text/javascript">
+            <script type="text/javascript">
             alertaAviso("A Situação '.$nom.' já existe","unica","erro","'.Sessao::getId().'");
             mudaTelaPrincipal("alteraSituacao.php?'.Sessao::getId().'&nom='.$nom.'&cod='.$cod.'&ctrl=1");
             </script>';

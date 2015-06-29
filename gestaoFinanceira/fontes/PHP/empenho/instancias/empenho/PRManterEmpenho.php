@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenho.php 60049 2014-09-26 13:59:27Z eduardoschitz $
+    $Id: PRManterEmpenho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     $Revision: 32828 $
     $Name$
@@ -310,7 +310,7 @@ switch ($stAcao) {
             $stFiltroLiquidacao .= "&pgProxEmpenho=".$pgFilt;
             $stFiltroLiquidacao .= "&acao=812&modulo=10&funcionalidade=202";
             $stFiltroLiquidacao .= "&acaoEmpenho=256&moduloEmpenho=10&funcionalidadeEmpenho=82";
-            print '<script language="JavaScript1.2" type="text/javascript">
+            print '<script type="text/javascript">
                         mudaMenu         ( "Liquidação","202" );
                    </script>';
             SistemaLegado::alertaAviso($pgProx.'?'.Sessao::getId()."&stAcao=liquidar".$stFiltroLiquidacao, $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho()."/".Sessao::getExercicio(), "incluir", "aviso", Sessao::getId(), "../");

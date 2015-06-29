@@ -30,7 +30,7 @@
     * @author Analista:
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: OCManterCalculo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterCalculo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
 
     Caso de uso: uc-05.03.05
 **/
@@ -1088,7 +1088,7 @@ switch ($_REQUEST ["stCtrl"]) {
     case "grupo":
         $arLink = explode('?',$_SERVER['REQUEST_URI']);
         $stAcao = $request->get('stAcao');
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                     mudaTelaPrincipal( "'.$pgFormGrupo.'?'.$arLink[1].'&stAcao='.$stAcao.'" );
             </script>';
         break;
@@ -1096,7 +1096,7 @@ switch ($_REQUEST ["stCtrl"]) {
     case "credito":
         $arLink = explode('?',$_SERVER['REQUEST_URI']);
         $stAcao = $request->get('stAcao');
-        print '<script language="JavaScript1.2" type="text/javascript">
+        print '<script type="text/javascript">
                     mudaTelaPrincipal( "'.$pgFormCredito.'?'.$arLink[1].'&stAcao='.$stAcao.'" );
             </script>';
         break;
