@@ -31,10 +31,10 @@
 
     * @ignore
 
-    $Revision: 62759 $
+    $Revision: 62845 $
     $Name$
     $Author: jean $
-    $Date: 2015-06-16 15:00:15 -0300 (Ter, 16 Jun 2015) $
+    $Date: 2015-06-29 10:16:59 -0300 (Seg, 29 Jun 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -62,15 +62,19 @@ Revision 1.1  2007/05/18 16:02:16  bruce
         $obTMapeamento->recuperaRegistro10($rsRegistro10);
 
         $i = 1;
+        $arRegistro = array();
+
         foreach ($rsRegistro10->arElementos as $stChave) {
-            $rsRegistro10->arElementos[$i]['numero_registro']    = $i;
-            $rsRegistro10->arElementos[$i]['tipo_registro']      = 10;
-            $rsRegistro10->arElementos[$i]['vl_cancelamento']    = 0;
-            $rsRegistro10->arElementos[$i]['vl_encampacao']      = 0;
+            $stChave['numero_registro'] = $i;
+            $stChave['tipo_registro'] = 10;
+            $stChave['vl_cancelamento'] = 0.00;
+            $stChave['vl_encampacao'] = 0.00;
+            $arRegistro[] = $stChave;
             $i++;
         }
+
+        $rsRegistro10->preenche($arRegistro);
        
-  
         $obExportador->roUltimoArquivo->addBloco($rsRegistro10);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");

@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisiane Morais
   *
   * @ignore
-  * $Id: FMManterConsideracao.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: FMManterConsideracao.php 62857 2015-06-30 13:53:56Z franver $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -89,6 +89,15 @@ $obITextBoxSelectEntidadeGeral->setNull(false);
 $obITextBoxSelectEntidadeGeral->obSelect->obEvento->setOnChange(" limpaSpan();");
 $obITextBoxSelectEntidadeGeral->obTextBox->obEvento->setOnChange(" limpaSpan();");
 
+$obSlcTipoExportacao = new Select();
+$obSlcTipoExportacao->setRotulo("Módulo de exportação");
+$obSlcTipoExportacao->setId('stTipoExportacao');
+$obSlcTipoExportacao->setNull(false);
+$obSlcTipoExportacao->setName('stTipoExportacao');
+$obSlcTipoExportacao->addOption('mensal','Acompanhamento Mesal');
+$obSlcTipoExportacao->addOption('balancete','Balancete Contabil');
+$obSlcTipoExportacao->obEvento->setOnChange(" document.getElementById('inMes').value = ''; ");
+
 $obPeriodoMes = new Mes;
 $obPeriodoMes->obMes->setId ('inMes');
 $obPeriodoMes->setExercicio ( Sessao::getExercicio() );
@@ -104,6 +113,7 @@ $obFormulario->addTitulo     ( "Considerações por arquivo" );
 $obFormulario->addHidden     ( $obHdnCtrl );
 $obFormulario->addHidden     ( $obHdnAcao );
 $obFormulario->addComponente ( $obITextBoxSelectEntidadeGeral );
+$obFormulario->addComponente ( $obSlcTipoExportacao );
 $obFormulario->addComponente ( $obPeriodoMes );
 $obFormulario->addSpan       ( $obSpnCodigos);
 

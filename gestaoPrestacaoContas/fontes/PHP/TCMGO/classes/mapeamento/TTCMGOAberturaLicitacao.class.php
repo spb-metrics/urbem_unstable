@@ -271,26 +271,30 @@ class TTCMGOAberturaLicitacao extends Persistente
                                )
 
                     GROUP BY tipo_registro
-                           , cod_orgao
-                           , cod_unidade
-                           , num_processo_licitatorio
-                           , licitacao.exercicio
-                           , modalidade.cod_modalidade
-                           , sw_processo.timestamp
-                           , edital.dt_aprovacao_juridico
-                           , edital.num_edital
-                           , edital.exercicio
-                           , criterio_julgamento.cod_criterio
-                           , tipo_objeto.cod_tipo_objeto
-                           , objeto.descricao
-                           , mapa.cod_tipo_licitacao
-                           , fornecedor.tipo
-                           , contrato.inicio_execucao
-                           , contrato.fim_execucao
-                           , licitacao.cod_licitacao
-                           , licitacao.cod_modalidade
-                           , licitacao.cod_entidade
-                           , convidados.nrm_convidado
+                            , cod_orgao
+                            , cod_unidade
+                            , licitacao.exercicio
+                            , num_processo_licitatorio
+                            , cod_modalidade_licitacao
+                            , num_modalidade
+                            , natureza_procedimento
+                            , dt_abertura
+                            , dt_edital_convite
+                            , dt_edital_publicacao_do
+                            , dt_recebimento_doc
+                            , tipo_licitacao
+                            , natureza_objeto
+                            , objeto
+                            , regime_execucao_obras
+                            , num_convidado
+                            , clausula_prorrogacao
+                            , undade_medida_prazo_execucao
+                            , prazo_execucao
+                            , forma_pagamento
+                            , citerio_aceitabilidade
+                            , desconto_tabela
+                            , licitacao.cod_licitacao
+                            , licitacao.cod_modalidade
 
                     ORDER BY licitacao.cod_licitacao
                            , licitacao.cod_modalidade
@@ -346,75 +350,75 @@ class TTCMGOAberturaLicitacao extends Persistente
                           
                     FROM licitacao.licitacao
                     
-                    JOIN licitacao.participante
+                    INNER JOIN licitacao.participante
                          ON participante.cod_licitacao  = licitacao.cod_licitacao
                         AND participante.cod_modalidade = licitacao.cod_modalidade
                         AND participante.cod_entidade   = licitacao.cod_entidade 
                         AND participante.exercicio      = licitacao.exercicio
                     
-                    JOIN compras.mapa
+                    INNER JOIN compras.mapa
                          ON mapa.exercicio = licitacao.exercicio_mapa
                         AND mapa.cod_mapa  = licitacao.cod_mapa
                      
-                    JOIN compras.mapa_solicitacao
+                    INNER JOIN compras.mapa_solicitacao
                          ON mapa_solicitacao.exercicio = mapa.exercicio
                         AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
                      
-                    JOIN compras.mapa_item
+                    INNER JOIN compras.mapa_item
                          ON mapa_item.exercicio             = mapa_solicitacao.exercicio
                         AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
                         AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                         AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                         AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
                     
-                    JOIN compras.solicitacao_item
+                    INNER JOIN compras.solicitacao_item
                         ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
                         AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
                         AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
                         AND solicitacao_item.cod_centro         = mapa_item.cod_centro
                         AND solicitacao_item.cod_item           = mapa_item.cod_item
 
-                    JOIN compras.solicitacao_item_dotacao
+                    INNER JOIN compras.solicitacao_item_dotacao
                         ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
                         AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
                         AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
                         AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
                         AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
                                             
-                    JOIN orcamento.despesa
+                    INNER JOIN orcamento.despesa
                         ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
                         AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                     
-                    JOIN compras.mapa_cotacao
+                    INNER JOIN compras.mapa_cotacao
                          ON mapa_cotacao.exercicio_mapa = mapa.exercicio
                         AND mapa_cotacao.cod_mapa       = mapa.cod_mapa
                      
-                    JOIN compras.cotacao
+                    INNER JOIN compras.cotacao
                          ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
                         AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
 
-                    JOIN compras.cotacao_item
+                    INNER JOIN compras.cotacao_item
                          ON cotacao_item.exercicio   = cotacao.exercicio
                         AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
                         AND cotacao_item.cod_item    = mapa_item.cod_item
 
-                    JOIN almoxarifado.catalogo_item
+                    INNER JOIN almoxarifado.catalogo_item
                         ON catalogo_item.cod_item = cotacao_item.cod_item
 
-                    JOIN administracao.unidade_medida
+                    INNER JOIN administracao.unidade_medida
                          ON unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
                         AND unidade_medida.cod_unidade  = catalogo_item.cod_unidade
 
-                    JOIN compras.julgamento
+                    INNER JOIN compras.julgamento
                          ON julgamento.exercicio    = cotacao.exercicio
                         AND julgamento.cod_cotacao  = cotacao.cod_cotacao
                      
-                    JOIN compras.julgamento_item
+                    INNER JOIN compras.julgamento_item
                          ON julgamento_item.exercicio   = julgamento.exercicio
                         AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
                         AND julgamento_item.cod_item    = mapa_item.cod_item 
 
-                    JOIN licitacao.homologacao
+                    INNER JOIN licitacao.homologacao
                          ON homologacao.cod_licitacao       = licitacao.cod_licitacao
                         AND homologacao.cod_modalidade      = licitacao.cod_modalidade
                         AND homologacao.cod_entidade        = licitacao.cod_entidade
@@ -432,10 +436,10 @@ class TTCMGOAberturaLicitacao extends Persistente
                                 AND homologacao.lote                        = homologacao_anulada.lote
                          ) IS NULL
                                     
-                    JOIN sw_cgm AS responsavel
+                    INNER JOIN sw_cgm AS responsavel
                       ON responsavel.numcgm = participante.numcgm_representante
                       
-                    JOIN ( SELECT num_documento, numcgm, tipo_documento
+                    INNER JOIN ( SELECT num_documento, numcgm, tipo_documento
                             FROM (
                                     SELECT  cpf AS num_documento
                                             , numcgm
@@ -484,8 +488,7 @@ class TTCMGOAberturaLicitacao extends Persistente
     
     public function montaRecuperaExportacao12()
     {
-        $stSql = " 
-                   SELECT 12 AS tipo_registro
+        $stSql = "  SELECT 12 AS tipo_registro
 		                    , LPAD(''||despesa.num_orgao,2, '0') AS cod_orgao
                         , LPAD(''||despesa.num_unidade,2, '0') AS cod_unidade
                         , licitacao.exercicio AS exercicio_licitacao
@@ -493,79 +496,80 @@ class TTCMGOAberturaLicitacao extends Persistente
                         , mapa_item.lote AS num_lote
                         , mapa_item.cod_item AS num_item
                         , remove_acentos(REPLACE(REPLACE(catalogo_item.descricao,Chr('216'),'diametro'),Chr('8221'),'\"'))::VARCHAR(250) AS descricao_item
+                        , despesa.cod_despesa as elemento_despesa
                         , (mapa_item.vl_total / mapa_item.quantidade)::numeric(14,2) AS vl_item
-                          
+
                     FROM licitacao.licitacao
                     
-                    JOIN licitacao.participante
+                    INNER JOIN licitacao.participante
                          ON participante.cod_licitacao  = licitacao.cod_licitacao
                         AND participante.cod_modalidade = licitacao.cod_modalidade
                         AND participante.cod_entidade   = licitacao.cod_entidade 
                         AND participante.exercicio      = licitacao.exercicio
                     
-                    JOIN compras.mapa
+                    INNER JOIN compras.mapa
                          ON mapa.exercicio = licitacao.exercicio_mapa
                         AND mapa.cod_mapa  = licitacao.cod_mapa
                      
-                    JOIN compras.mapa_solicitacao
+                    INNER JOIN compras.mapa_solicitacao
                          ON mapa_solicitacao.exercicio = mapa.exercicio
                         AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
                      
-                    JOIN compras.mapa_item
+                    INNER JOIN compras.mapa_item
                          ON mapa_item.exercicio             = mapa_solicitacao.exercicio
                         AND mapa_item.cod_entidade          = mapa_solicitacao.cod_entidade
                         AND mapa_item.cod_solicitacao       = mapa_solicitacao.cod_solicitacao
                         AND mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                         AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
                     
-                    JOIN compras.solicitacao_item
+                    INNER JOIN compras.solicitacao_item
                         ON solicitacao_item.exercicio           = mapa_item.exercicio_solicitacao
                         AND solicitacao_item.cod_entidade       = mapa_item.cod_entidade
                         AND solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
                         AND solicitacao_item.cod_centro         = mapa_item.cod_centro
                         AND solicitacao_item.cod_item           = mapa_item.cod_item
 
-                    JOIN compras.solicitacao_item_dotacao
+                    INNER JOIN compras.solicitacao_item_dotacao
                         ON solicitacao_item_dotacao.exercicio           = solicitacao_item.exercicio
                         AND solicitacao_item_dotacao.cod_entidade       = solicitacao_item.cod_entidade
                         AND solicitacao_item_dotacao.cod_solicitacao    = solicitacao_item.cod_solicitacao
                         AND solicitacao_item_dotacao.cod_centro         = solicitacao_item.cod_centro
                         AND solicitacao_item_dotacao.cod_item           = solicitacao_item.cod_item
                                             
-                    JOIN orcamento.despesa
+                    INNER JOIN orcamento.despesa
                         ON despesa.exercicio    = solicitacao_item_dotacao.exercicio
                         AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                     
-                    JOIN compras.mapa_cotacao
+                    INNER JOIN compras.mapa_cotacao
                          ON mapa_cotacao.exercicio_mapa = mapa.exercicio
                         AND mapa_cotacao.cod_mapa       = mapa.cod_mapa
                      
-                    JOIN compras.cotacao
+                    INNER JOIN compras.cotacao
                          ON cotacao.exercicio   = mapa_cotacao.exercicio_cotacao
                         AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
 
-                    JOIN compras.cotacao_item
+                    INNER JOIN compras.cotacao_item
                          ON cotacao_item.exercicio   = cotacao.exercicio
                         AND cotacao_item.cod_cotacao = cotacao.cod_cotacao
                         AND cotacao_item.cod_item    = mapa_item.cod_item
 
-                    JOIN almoxarifado.catalogo_item
+                    INNER JOIN almoxarifado.catalogo_item
                         ON catalogo_item.cod_item = cotacao_item.cod_item
 
-                    JOIN administracao.unidade_medida
+                    INNER JOIN administracao.unidade_medida
                          ON unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
                         AND unidade_medida.cod_unidade  = catalogo_item.cod_unidade
 
-                    JOIN compras.julgamento
+                    INNER JOIN compras.julgamento
                          ON julgamento.exercicio    = cotacao.exercicio
                         AND julgamento.cod_cotacao  = cotacao.cod_cotacao
                      
-                    JOIN compras.julgamento_item
+                    INNER JOIN compras.julgamento_item
                          ON julgamento_item.exercicio   = julgamento.exercicio
                         AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
                         AND julgamento_item.cod_item    = mapa_item.cod_item 
 
-                    JOIN licitacao.homologacao
+                    INNER JOIN licitacao.homologacao
                          ON homologacao.cod_licitacao       = licitacao.cod_licitacao
                         AND homologacao.cod_modalidade      = licitacao.cod_modalidade
                         AND homologacao.cod_entidade        = licitacao.cod_entidade
@@ -583,10 +587,10 @@ class TTCMGOAberturaLicitacao extends Persistente
                                 AND homologacao.lote                        = homologacao_anulada.lote
                          ) IS NULL
                                     
-                    JOIN sw_cgm AS responsavel
+                    INNER JOIN sw_cgm AS responsavel
                       ON responsavel.numcgm = participante.numcgm_representante
                       
-                    JOIN ( SELECT num_documento, numcgm, tipo_documento
+                    INNER JOIN ( SELECT num_documento, numcgm, tipo_documento
                             FROM (
                                     SELECT  cpf AS num_documento
                                             , numcgm
@@ -617,7 +621,7 @@ class TTCMGOAberturaLicitacao extends Persistente
                                           AND licitacao_anulada.exercicio       = licitacao.exercicio
                         )
                       
-                 GROUP BY 1,2,3,4,5,6,7,8,9
+                 GROUP BY 1,2,3,4,5,6,7,8,9,10
                  ORDER BY num_processo_licitatorio ";
 
         return $stSql;
@@ -650,6 +654,8 @@ class TTCMGOAberturaLicitacao extends Persistente
                 , despesa.cod_despesa AS elemento_despesa
                 , orcamento.recuperaEstruturalDespesa(despesa.cod_conta, despesa.exercicio, 2, TRUE, FALSE) AS subelemento
                 , recurso.cod_fonte AS cod_fonte_recursos
+                , mapa_item_dotacao.cod_item as num_item
+                , mapa_item_dotacao.lote AS num_lote
                 , SUM(mapa_item_dotacao.vl_dotacao)::numeric(14,2) AS vl_recurso
                 
             FROM licitacao.licitacao
@@ -809,6 +815,8 @@ class TTCMGOAberturaLicitacao extends Persistente
                 , despesa.cod_despesa 
                 , subelemento
                 , recurso.cod_fonte 
+                , num_item
+                , num_lote
 
          ORDER BY num_processo_licitatorio
                 , cod_unidade ";

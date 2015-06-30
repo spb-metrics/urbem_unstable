@@ -2,30 +2,30 @@
 /*
     **********************************************************************************
     *                                                                                *
-    * @package URBEM CNM - Solu›es em Gest‹o Pœblica                                *
-    * @copyright (c) 2013 Confedera‹o Nacional de Munic’pos                         *
-    * @author Confedera‹o Nacional de Munic’pios                                    *
+    * @package URBEM CNM - SoluÃ§Ãµes em GestÃ£o PÃºblica                                *
+    * @copyright (c) 2013 ConfederaÃ§Ã£o Nacional de MunicÃ­pos                         *
+    * @author ConfederaÃ§Ã£o Nacional de MunicÃ­pios                                    *
     *                                                                                *
-    * Este programa Ž software livre; voc pode redistribu’-lo e/ou modific‡-lo  sob *
-    * os termos da Licena Pœblica Geral GNU conforme publicada pela  Free  Software *
-    * Foundation; tanto a vers‹o 2 da Licena, como (a seu critŽrio) qualquer vers‹o *
+    * O URBEM CNM Ã© um software livre; vocÃª pode redistribuÃ­-lo e/ou modificÃ¡-lo sob *
+    * os  termos  da LicenÃ§a PÃºblica Geral GNU conforme  publicada  pela FundaÃ§Ã£o do *
+    * Software Livre (FSF - Free Software Foundation); na versÃ£o 2 da LicenÃ§a.       *
     *                                                                                *
-    * Este  programa  Ž  distribu’do  na  expectativa  de  que  seja  œtil,   porŽm, *
-    * SEM NENHUMA GARANTIA; nem mesmo a garantia impl’cita  de  COMERCIABILIDADE  OU *
-    * ADEQUA‚ÌO A UMA FINALIDADE ESPECêFICA. Consulte a Licena Pœblica Geral do GNU *
+    * Este  programa  Ã©  distribuÃ­do  na  expectativa  de  que  seja  Ãºtil,   porÃ©m, *
+    * SEM NENHUMA GARANTIA; nem mesmo a garantia implÃ­cita  de  COMERCIABILIDADE  OU *
+    * ADEQUAÃ‡ÃƒO A UMA FINALIDADE ESPECÃFICA. Consulte a LicenÃ§a PÃºblica Geral do GNU *
     * para mais detalhes.                                                            *
     *                                                                                *
-    * Voc deve ter recebido uma c—pia da Licena Pœblica Geral  do  GNU  junto  com *
-    * este programa; se n‹o, escreva para  a  Free  Software  Foundation,  Inc.,  no *
-    * endereo 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.               *
+    * VocÃª deve ter recebido uma cÃ³pia da LicenÃ§a PÃºblica Geral do GNU "LICENCA.txt" *
+    * com  este  programa; se nÃ£o, escreva para  a  Free  Software Foundation  Inc., *
+    * no endereÃ§o 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
 */
 ?>
 <?php
 /**
-    * Classe de mapeamento do arquivo CVC.inc.php
-    * Data de Cria‹o:  27/01/2014
+    * Classe de mapeamento do arquivo TTCEMGArquivoMensalIDE.class.php
+    * Data de CriaÃ§Ã£o :  27/01/2014
 
     * @author Analista: Sergio
     * @author Desenvolvedor: Lisiane Morais
@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalIDE.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: TTCEMGArquivoMensalIDE.class.php 62857 2015-06-30 13:53:56Z franver $
 
 */
 

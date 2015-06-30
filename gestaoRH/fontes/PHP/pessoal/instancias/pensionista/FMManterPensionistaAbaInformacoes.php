@@ -306,7 +306,7 @@ if ($stAcao == "alterar") {
 if ($stAcao == "alterar") {
     include_once ( CAM_GRH_PES_NEGOCIO."RPessoalRescisaoContrato.class.php" );
     $obRPessoalRescisaoContrato = new RPessoalRescisaoContrato();
-SistemaLegado::mostraVar($_REQUEST);
+
     if ($obRPessoalRescisaoContrato->desabilitarDataRescisaoPensionista($_REQUEST['inCodContratoPensionista'])) {
         $obDtaEncerramentoBeneficio->setReadOnly    ( true );
     }

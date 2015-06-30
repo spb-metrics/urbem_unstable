@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterBem.php 61522 2015-01-29 18:33:35Z carlos.silva $
+    * $Id: OCManterBem.php 62852 2015-06-29 20:56:46Z arthur $
 
 */
 
@@ -687,14 +687,14 @@ case 'montaListaReavaliacoes':
         $inCodReavaliacao       = 0;
         $inCodBem     		= $_REQUEST['inCodBem'];
         $inVidaUtilReavaliacao  = $_REQUEST['inVidaUtilReavaliacao'];
-        $flValorBemReavaliacao  = $_REQUEST['flValorBemReavaliacao'];
+        $flValorBemReavaliacao  = floatval(str_replace(",",".",str_replace(".", "", $_REQUEST['flValorBemReavaliacao'])));
         $stMotivoReavaliacao    = $_REQUEST['stMotivoReavaliacao'];
-        
+                
         if ($dtReavaliacao === '') {
             $obErro->setDescricao('Campo Data da Reavaliação inválido!');
         } elseif (substr($dtReavaliacao,0,6) <= $dtUltimaDepreciacao) {
             $obErro->setDescricao('Campo Data da Reavaliação deve ser maior que a competência da última depreciação!');
-        } elseif ($dtUltimaReavaliacao > $dtReavaliacao) {
+        } elseif (intval($dtUltimaReavaliacao) > intval($dtReavaliacao)) {
             $obErro->setDescricao('Campo Data da Reavaliação deve ser maior que a última Reavaliação informada!');
         } elseif ($dtAquisicao > $dtReavaliacao) {
             $obErro->setDescricao('Campo Data da Reavaliação deve ser maior que a Data de Aquisição do Bem!');
@@ -721,10 +721,11 @@ case 'montaListaReavaliacoes':
                 'inCodBem'		        => $inCodBem,
                 'dtReavaliacao'                 => $_REQUEST['dtReavaliacao'],
                 'inVidaUtilReavaliacao'         => $inVidaUtilReavaliacao,
-                'flValorBemReavaliacao'         => str_replace(',','.',str_replace('.','',$flValorBemReavaliacao)),
+                'flValorBemReavaliacao'         => $flValorBemReavaliacao,
                 'stMotivoReavaliacao'           => $stMotivoReavaliacao,
                 'inserir'    	                => 'true',
             );
+
             Sessao::write('dtUltimaReavaliacao',$_REQUEST['dtReavaliacao']);
             Sessao::write('arReavaliacao',$arReavaliacao);
         }

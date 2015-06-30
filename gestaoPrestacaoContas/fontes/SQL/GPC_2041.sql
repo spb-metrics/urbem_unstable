@@ -315,3 +315,18 @@ CREATE TABLE tcmgo.configuracao_orgao_unidade(
 );
 GRANT ALL ON tcmgo.configuracao_orgao_unidade TO urbem;
 
+
+----------------
+-- Ticket #23072
+----------------
+
+ALTER TABLE tcemg.consideracao_arquivo_descricao ADD   COLUMN modulo_sicom VARCHAR(10);
+UPDATE      tcemg.consideracao_arquivo_descricao SET          modulo_sicom = 'mensal';
+ALTER TABLE tcemg.consideracao_arquivo_descricao ALTER COLUMN modulo_sicom SET NOT NULL;
+
+ALTER TABLE tcemg.consideracao_arquivo_descricao DROP CONSTRAINT pk_consideracao_arquivo_descricao;
+ALTER TABLE tcemg.consideracao_arquivo_descricao ADD  CONSTRAINT pk_consideracao_arquivo_descricao
+               PRIMARY KEY (cod_arquivo, periodo, cod_entidade, exercicio, modulo_sicom);
+
+INSERT INTO tcemg.consideracao_arquivo VALUES (42, 'BALANCETE');
+

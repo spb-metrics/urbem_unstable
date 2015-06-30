@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoPermanenteCreditos.class.php 62759 2015-06-16 18:00:15Z jean $
+    $Id: TTCMGOAtivoPermanenteCreditos.class.php 62845 2015-06-29 13:16:59Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -74,22 +74,22 @@ class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
                        ,*
                      FROM
                        tcmgo.ativo_permanente_creditos ( '" .$this->getDado( 'exercicio' ) .  "'::VARCHAR
-                                                        , ' cod_entidade IN  ( " . $this->getDado ( 'stEntidades' ) ." ) and cod_estrutural like ''1.2%'' '::VARCHAR
+                                                        , ' cod_estrutural ilike ''1.2%'' '::VARCHAR
                                                         ,'".$stDataIni."'::VARCHAR
                                                         ,'".$stDataFim."'::VARCHAR
                                                         ,'".$this->getDado ( 'stEntidades' )."'::VARCHAR
                                                        )
                          as retorno ( cod_estrutural varchar
-                                     ,nivel integer
-                                     ,nom_conta varchar
-                                     ,num_orgao VARCHAR
-                                     ,cod_unidade VARCHAR
-                                     ,vl_saldo_anterior numeric
-                                     ,vl_saldo_debitos  numeric
-                                     ,vl_saldo_creditos numeric
-                                     ,vl_saldo_atual    numeric
-                                     ,nom_sistema varchar
-                                     ,tipo_lancamento integer
+                                     ,nivel             INTEGER
+                                     ,nom_conta         VARCHAR
+                                     ,num_orgao         INTEGER
+                                     ,cod_unidade       INTEGER
+                                     ,vl_saldo_anterior NUMERIC
+                                     ,vl_saldo_debitos  NUMERIC
+                                     ,vl_saldo_creditos NUMERIC
+                                     ,vl_saldo_atual    NUMERIC
+                                     ,nom_sistema       VARCHAR
+                                     ,tipo_lancamento   INTEGER
                                     )
                     where vl_saldo_anterior <> 0
                        or vl_saldo_debitos <> 0

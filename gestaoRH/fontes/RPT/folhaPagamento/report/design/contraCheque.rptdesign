@@ -3,6 +3,7 @@
     <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
     <property name="units">in</property>
+    <method name="initialize"><![CDATA[params['query'] = this.queryText;]]></method>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="bidiLayoutOrientation">ltr</property>
     <list-property name="libraries">
@@ -310,101 +311,68 @@
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="cabecalho" id="210">
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">exercicio</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">exercicio2</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">2</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">periodoMovimentacao</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
-                    <property name="position">3</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">param_2</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="dataType">string</property>
-                    <property name="position">4</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[this.queryText = "SELECT \n";
+this.queryText += "       (    SELECT \n";
+this.queryText += "                    valor\n";
+this.queryText += "              FROM administracao.configuracao\n";
+this.queryText += "             WHERE cod_modulo = 2\n";
+this.queryText += "               AND parametro = 'nom_prefeitura'\n";
+this.queryText += "               AND exercicio = '"+params['exercicio']+"'\n";
+this.queryText += "       ) AS prefeitura\n";
+this.queryText += "     , (   SELECT \n";
+this.queryText += "                    valor\n";
+this.queryText += "              FROM administracao.configuracao\n";
+this.queryText += "             WHERE cod_modulo = 2\n";
+this.queryText += "               AND parametro = 'cnpj'\n";
+this.queryText += "               AND exercicio = '"+params['exercicio']+"'\n";
+this.queryText += "       ) AS cnpj\n";
+this.queryText += "     , (    SELECT \n";
+this.queryText += "                    to_char(dt_inicial, 'MM/YYYY')\n";
+this.queryText += "              FROM folhapagamento"+params['entidade']+".periodo_movimentacao\n";
+this.queryText += "             WHERE cod_periodo_movimentacao = '"+params['periodoMovimentacao']+"'\n";
+this.queryText += "       ) AS periodo\n";
+this.queryText += "     ,(    SELECT \n";
+this.queryText += "                    '../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/' || valor AS logotipo\n";
+this.queryText += "           FROM administracao.configuracao\n";
+this.queryText += "           WHERE parametro = 'logotipo'\n";
+this.queryText += "           AND exercicio = '"+params['exercicio']+"'\n";
+this.queryText += "       ) AS logotipo\n";
+
+//params["query"] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[SELECT 
-	   (    SELECT 
-	   				valor
-              FROM administracao.configuracao
-             WHERE cod_modulo = 2
-               AND parametro = 'nom_prefeitura'
-               AND exercicio = ?
-       ) AS prefeitura
-     , (   SELECT 
-     				valor
-              FROM administracao.configuracao
-             WHERE cod_modulo = 2
-               AND parametro = 'cnpj'
-               AND exercicio = ?
-       ) AS cnpj
-     , (    SELECT 
-     				to_char(dt_inicial, 'MM/YYYY')
-              FROM folhapagamento.periodo_movimentacao
-             WHERE cod_periodo_movimentacao = ?
-       ) AS periodo
-     ,(    SELECT 
-     				'../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/' || valor AS logotipo
-           FROM administracao.configuracao
-           WHERE parametro = 'logotipo'
-           AND exercicio = ?
-       ) AS logotipo
-       
-       
-       
-       ]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[select 
+from ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
-  <Version>1.0</Version>
-  <design:DataSetParameters>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>3</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
-        <design:precision>0</design:precision>
-        <design:scale>0</design:scale>
-        <design:nullability>Unknown</design:nullability>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes/>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-  </design:DataSetParameters>
+  <Version>2.0</Version>
+  <DataSetParameters>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>3</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+          <design:precision>0</design:precision>
+          <design:scale>0</design:scale>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+        <design:inputAttributes>
+          <design:elementAttributes/>
+        </design:inputAttributes>
+      </design:ParameterDefinition>
+    </parameter>
+  </DataSetParameters>
   <design:ResultSets derivedMetaData="true">
     <design:resultSetDefinitions>
       <design:resultSetColumns>
@@ -1266,7 +1234,7 @@ this.queryText = this.queryText + "     , funcao_especialidade      ";
 this.queryText = this.queryText + "     , cbo                       ";
 this.queryText = this.queryText + "     , dt_admissao               ";
 this.queryText = this.queryText + "     , cod_periodo_movimentacao  ";
-this.queryText = this.queryText + "     , orgao                     ";
+this.queryText = this.queryText + "     , SUBSTR(orgao,1,30) AS orgao";
 this.queryText = this.queryText + "     , local                     ";
 this.queryText = this.queryText + "     , mes_nascimento            ";
 this.queryText = this.queryText + "     , inOffSet                  ";
@@ -1308,7 +1276,7 @@ if (params["codConfiguracao"] == '2'){
 }
 
 if (params["codConfiguracao"] == '3'){
-	params["descTipoFolha"] = "Folha Décimo";
+	params["descTipoFolha"] = "Folha 13º Salário";
 }
 
 if (params["codConfiguracao"] == '4'){

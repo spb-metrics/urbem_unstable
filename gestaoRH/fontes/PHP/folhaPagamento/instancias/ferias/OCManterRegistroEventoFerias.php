@@ -259,6 +259,7 @@ function montaListaEventos($arEventos)
             break;
         }
         $arEvento['nuQuantidadeEvento'] = ($arEvento['nuQuantidadeParcelasEvento'] != "" ? number_format($arEvento['nuQuantidadeEvento'])."/".$arEvento['nuQuantidadeParcelasEvento'] : $arEvento['nuQuantidadeEvento']);
+        $arEvento['stCampoNomEvento'] = 'inCodigoEvento';
         $arEventos[$inIndex] = $arEvento;
     }
     $rsEventos = new Recordset;
@@ -325,6 +326,7 @@ function montaListaEventos($arEventos)
     $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('montaAlterarEvento');");
     $obLista->ultimaAcao->addCampo("1","inId");
     $obLista->ultimaAcao->addCampo("2","inCodigoEvento");
+    $obLista->ultimaAcao->addCampo("3","stCampoNomEvento");
     $obLista->commitAcao();
 
     $obLista->addAcao();

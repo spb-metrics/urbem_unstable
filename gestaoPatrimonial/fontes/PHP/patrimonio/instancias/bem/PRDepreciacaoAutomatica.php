@@ -26,7 +26,9 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';	
 include_once ( CAM_GP_PAT_MAPEAMENTO."FPatrimonioDepreciacaoAutomatica.class.php"     );
+include_once ( CAM_GP_PAT_MAPEAMENTO."FPatrimonioReavaliacaoDepreciacaoAutomatica.class.php" );
 include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoDepreciacao.class.php" );
 include_once ( CAM_GP_PAT_MAPEAMENTO."TPatrimonioDepreciacao.class.php"               );
 include_once ( CAM_GP_PAT_MAPEAMENTO."TPatrimonioDepreciacaoAnulada.class.php"        );
@@ -97,7 +99,7 @@ switch ($stAcao) {
                 }
                 
                 if (!$obErro->ocorreu()) {
-		    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens anulados com sucesso até a competência: ".str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
+		    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens anulados com sucesso até a competência: ".str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
                 } else {
                     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
                 }
@@ -106,14 +108,15 @@ switch ($stAcao) {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
         
-        }else{             
+        }else{
+	    
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCompetenciaDepreciada($rsMaxCompetenciaDepreciada);
 	    
             $stFiltroDepreciacao = "\n WHERE competencia = '".$inMesCompetenciaFiltro."'";
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCodDepreciacao($rsMaxDepreciacao, $stFiltroDepreciacao );
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCodDepreciacaoAnulada($rsMaxAnulada, $stFiltroDepreciacao );
 
-            $stFiltroAnterior = "\n WHERE competencia = '".($request->get("inExercicio").str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT) - 1)."'";
+            $stFiltroAnterior = "\n WHERE competencia = '".($request->get("inExercicio").str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT) - 1)."'";
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCodDepreciacao($rsMaxDepreciacaoAnterior, $stFiltroAnterior);
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCodDepreciacaoAnulada($rsMaxAnuladaAnterior, $stFiltroAnterior);
             $obErro = $obTPatrimonioDepreciacaoAnulada->recuperaMaxCompetenciaAnulada($rsMxCompetenciaAnterior, $stFiltroAnterior);
@@ -139,22 +142,50 @@ switch ($stAcao) {
                     $obErro->setDescricao("A competência selecionada não pode ser maior que ".$stProximaCompetencia);
                 
                 // Não pode ser maior que a competência logada do sistema.
-                } elseif (((int) $_REQUEST['inExercicio'] == date('Y') && (int) $_REQUEST['inCompetencia'] > date('m')) || ((int) $_REQUEST['inExercicio'] != date('Y'))) {
+                } elseif (((int) $request->get("inExercicio") == date('Y') && (int) $request->get("inCompetencia") > date('m')) || ((int) $request->get("inExercicio") != date('Y'))) {
 		    $obErro->setDescricao("A competência selecionada não pode ser maior que a atual do sistema!");
     
                 } else {
 		    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica;
-    
-                    $stParametros  = '\''.$_REQUEST['inExercicio'].'\',';
-                    $stParametros .= '\''.str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'\',';
+		    $obFPAtrimonioReavaliacaoDepreciacaoAutomatica = new FPatrimonioReavaliacaoDepreciacaoAutomatica;
+		    
+                    $stParametros  = '\''.$request->get("inExercicio").'\',';
+                    $stParametros .= '\''.str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'\',';
                     $stParametros .= 'null,null,null,';
-                    $stParametros .= '\''.($_REQUEST['stMotivo'] ? $_REQUEST['stMotivo'] : 'Depreciação Automática').'\'';
+                    $stParametros .= '\''.($request->get("stMotivo") ? $request->get("stMotivo") : 'Depreciação Automática').'\'';
     
-                    $obErro = $obFPAtrimonioDepreciacaoAutomatica->executaFuncao($stParametros,$boTransacao);
+                    // Verifica quais bens comprados antes do exercicio corrente, precisam de reavaliação para serem depreciados
+		    $obErro = $obFPAtrimonioReavaliacaoDepreciacaoAutomatica->recuperaReavaliacao($rsReavaliacao, $stParametros, $boTransacao);
+		    
+		    if ($rsReavaliacao->getNumLinhas() > 0 ){
+			SistemaLegado::LiberaFrames(true,true);
+			SistemaLegado::exibeAviso(urlencode("Existem bens a serem reavaliados até a competência ".str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio']),"n_incluir","erro");
+			
+			$preview = new PreviewBirt(3,6,24);
+			$preview->setVersaoBirt( '2.5.0' );
+					    
+			$preview->setTitulo('Log de Reavaliação de Depreciação');
+			$preview->setNomeArquivo('log_depreciacao_'.sistemaLegado::mesExtensoBR($request->get("inCompetencia"))."_".$request->get("inExercicio"));
+			
+			$preview->addParametro( 'exercicio'   , Sessao::getExercicio() );
+			$preview->addParametro( 'stExercicio' , Sessao::getExercicio() );
+			$preview->addParametro( 'stMes'       , str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT) );
+			$preview->addParametro( 'stMesExtenso', sistemaLegado::mesExtensoBR($request->get("inCompetencia")) );
+			$preview->addParametro( 'stMotivo'    , "Reavaliação de Depreciação" );
+			$preview->addParametro( 'stCabecalho' , "Log de Depreciação ".sistemaLegado::mesExtensoBR($request->get("inCompetencia"))." de ".$request->get("inExercicio") );
+		    
+			$preview->preview();
+		       
+			//Parar o processamento e carregar o relatório
+			die;
+		    } else {
+			$obErro = $obFPAtrimonioDepreciacaoAutomatica->executaFuncao($rsDepreciacao, $stParametros, $boTransacao);
+		    }
+
                 }
-                                    
+
                 if (!$obErro->ocorreu()) {
-                    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens depreciados com sucesso até a competência: ".str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
+		    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,"Bens depreciados com sucesso até a competência: ".str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio'],"$stAcao","aviso", Sessao::getId(), "../");
                 } else {
                     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
                 }
@@ -168,6 +199,7 @@ switch ($stAcao) {
     break;
 }
 
+SistemaLegado::mudaFramePrincipal($pgFilt);
 SistemaLegado::LiberaFrames(true,true);
 
 ?>

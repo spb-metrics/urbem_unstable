@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CONSID.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
-  * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
+  * $Id: CONSID.csv.inc.php 62857 2015-06-30 13:53:56Z franver $
+  * $Date: 2015-06-30 10:53:56 -0300 (Ter, 30 Jun 2015) $
   * $Author: franver $
-  * $Rev: 62269 $
+  * $Rev: 62857 $
   *
 */
 /**
@@ -45,10 +45,10 @@ include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConsideraca
 $rsRecuperaConsid10 = new RecordSet();
 
 $obTTCEMGConsideracaoArquivo = new TTCEMGConsideracaoArquivo();
-$obTTCEMGConsideracaoArquivo->setDado('exercicio', Sessao::getExercicio());
-$obTTCEMGConsideracaoArquivo->setDado('entidade' , $stEntidades);
-$obTTCEMGConsideracaoArquivo->setDado('mes'      , $stMes);
-
+$obTTCEMGConsideracaoArquivo->setDado('exercicio'   , Sessao::getExercicio());
+$obTTCEMGConsideracaoArquivo->setDado('entidade'    , $stEntidades);
+$obTTCEMGConsideracaoArquivo->setDado('mes'         , $stMes);
+$obTTCEMGConsideracaoArquivo->setDado('modulo_sicom','mensal');
 //10 – Considerações
 $obTTCEMGConsideracaoArquivo->recuperaConsid($rsRecuperaConsid10);
 

@@ -26,33 +26,33 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-class FPatrimonioDepreciacaoAutomatica extends Persistente
+class FPatrimonioReavaliacaoDepreciacaoAutomatica extends Persistente
 {
     /**
      * Método Construtor
      * @access Private
      */
-    public function FPatrimonioDepreciacaoAutomatica()
+    public function FPatrimonioReavaliacaoDepreciacaoAutomatica()
     {
         parent::Persistente();
     }
 
-    public function executaFuncao(&$rsRecordSet, $stParametros, $boTransacao = "")
+    public function recuperaReavaliacao(&$rsRecordSet, $stParametros = "", $boTransacao = "")
     {
         $obErro      = new Erro;
         $obConexao   = new Conexao;
 	$rsRecordSet = new RecordSet;
 
-        $stSql  = $this->montaExecutaFuncao($stParametros);
+        $stSql  = $this->montaRecuperaReavaliacao($stParametros);
         $this->setDebug($stSql);
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
         
         return $obErro;
     }
 
-    public function montaExecutaFuncao($stParametros)
+    public function montaRecuperaReavaliacao($stParametros)
     {
-        $stSql  = " SELECT * FROM patrimonio.fn_depreciacao_automatica(".$stParametros."); ";
+        $stSql  = " SELECT * FROM patrimonio.fn_reavaliacao_depreciacao_automatica(".$stParametros."); ";
 
         return $stSql;
     }

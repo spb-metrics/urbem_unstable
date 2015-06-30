@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: PRManterConsideracao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterConsideracao.php 62857 2015-06-30 13:53:56Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -60,9 +60,10 @@ switch ($stAcao) {
                 if ($arCodigo[0]=='stConsideracao') {
                     $stConsideracao = $_REQUEST['stConsideracao_'.$arCodigo[1]."_".$arCodigo[2]];
                     $TTCEMGConsideracaoArquivoDescricao->setDado('cod_arquivo' , $arCodigo[1] );
-                    $TTCEMGConsideracaoArquivoDescricao->setDado('periodo'     , $request->get('inMes') );
+                    $TTCEMGConsideracaoArquivoDescricao->setDado('periodo'     , (int)$request->get('inMes') );
                     $TTCEMGConsideracaoArquivoDescricao->setDado('cod_entidade', $request->get('inCodEntidade') );
                     $TTCEMGConsideracaoArquivoDescricao->setDado('exercicio'   , Sessao::getExercicio() );
+                    $TTCEMGConsideracaoArquivoDescricao->setDado('modulo_sicom', $request->get('stTipoExportacao') );
                     $TTCEMGConsideracaoArquivoDescricao->setDado('descricao'   , $stConsideracao );
 
                     $TTCEMGConsideracaoArquivoDescricao->recuperaPorChave($rsRecordSet);

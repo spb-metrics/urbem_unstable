@@ -92,22 +92,31 @@ $obTPessoalContratoPensionistaProcessao->obTPessoalContratoPensionista      = &$
 $obTPessoalContratoPensionistaContaSalario->obTPessoalContratoPensionista   = &$obTPessoalContratoPensionista;
 $obTPessoalAtributoContratoPensionista->obTPessoalContratoPensionista       = &$obTPessoalContratoPensionista;
 
+
+        
 switch ($stAcao) {
     case "incluir":
-        Sessao::setTrataExcecao(true);
+        $boFlagTransacao = false;
+        $obTransacao = new Transacao;
+        $obTransacao->begin();
+        $boTransacao = $obTransacao->getTransacao();
+        $obErro = new Erro();
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        
         $obTPessoalContrato->proximoCod( $inCodContrato );
         $obTPessoalContrato->setDado("registro" ,($_POST['inContratoPensionista'])?$_POST['inContratoPensionista'] : $_REQUEST['inCodContratoPensionista']);
         $obTPessoalContrato->setDado("cod_contrato",$inCodContrato);
-        $obTPessoalContrato->inclusao();
+        $obTPessoalContrato->inclusao($boTransacao);
+       
         $stFiltro = " WHERE registro = ".$_POST['inContrato'];
-        $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
+        $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro,'',$boTransacao);
         $obTPessoalPensionista->setDado("cod_contrato_cedente"  ,$rsContrato->getCampo("cod_contrato"));
         $obTPessoalPensionista->setDado("numcgm"                ,$_POST['inCGM']);
         $obTPessoalPensionista->setDado("cod_grau"              ,$_POST['inCodGrauParentesco']);
         $obTPessoalPensionista->setDado("cod_profissao"         ,$_POST['inCodProfissao']);
-        $obTPessoalPensionista->inclusao();
+        $obTPessoalPensionista->inclusao($boTransacao);
         if ($_REQUEST['inSiglaCID'] != "") {
-            $inCodCID = SistemaLegado::pegaDado('cod_cid', 'pessoal.cid',' WHERE sigla = '."'".$_REQUEST['inSiglaCID']."'");
+            $inCodCID = SistemaLegado::pegaDado('cod_cid', 'pessoal.cid',' WHERE sigla = '."'".$_REQUEST['inSiglaCID']."'",$boTransacao);
             $obTPessoalPensionistaCid->setDado("cod_cid"            ,$inCodCID);
         }
         
@@ -115,7 +124,7 @@ switch ($stAcao) {
             $obTPessoalPensionistaCid->setDado("data_laudo"         ,$_REQUEST['dtDataLaudo']);
         }
         if ($_REQUEST['dtDataLaudo'] != "" || $_REQUEST['inSiglaCID'] != "") {
-            $obTPessoalPensionistaCid->inclusao();
+            $obTPessoalPensionistaCid->inclusao($boTransacao);
         }
 
         $obTPessoalContratoPensionista->setDado("cod_dependencia"       ,$_POST['inCodTipoDependencia']);
@@ -124,21 +133,21 @@ switch ($stAcao) {
         $obTPessoalContratoPensionista->setDado("dt_inicio_beneficio"   ,$_POST['dtInicioBeneficio']);
         $obTPessoalContratoPensionista->setDado("dt_encerramento"       ,$_POST['dtEncerramentoBeneficio']);
         $obTPessoalContratoPensionista->setDado("motivo_encerramento"   ,$_POST['stMotivoEncerramento']);
-        $obTPessoalContratoPensionista->inclusao();
+        $obTPessoalContratoPensionista->inclusao($boTransacao);
         $obTPessoalContratoPensionistaOrgao->setDado("cod_orgao",$_POST["hdnUltimoOrgaoSelecionado"]);
-        $obTPessoalContratoPensionistaOrgao->inclusao();
+        $obTPessoalContratoPensionistaOrgao->inclusao($boTransacao);
         foreach ($_POST as $stCampo=>$stValor) {
             if ( substr($stCampo,0,16) == "inCodPrevidencia" ) {
                 $arPrevidencia = explode("_",$stCampo);
                 $obTPessoalContratoPensionistaPrevidencia->setDado("cod_previdencia",$arPrevidencia[2]);
-                $obTPessoalContratoPensionistaPrevidencia->inclusao();
+                $obTPessoalContratoPensionistaPrevidencia->inclusao($boTransacao);
             }
         }
         if ($_POST['stChaveProcesso'] != "") {
             $arChaveProcesso = explode("/",$_POST['stChaveProcesso']);
             $obTPessoalContratoPensionistaProcessao->setDado("ano_exercicio",$arChaveProcesso[1]);
             $obTPessoalContratoPensionistaProcessao->setDado("cod_processo",$arChaveProcesso[0] );
-            $obTPessoalContratoPensionistaProcessao->inclusao();
+            $obTPessoalContratoPensionistaProcessao->inclusao($boTransacao);
         }
         $obTMONBanco = new TMONBanco;
         $stFiltro = " WHERE num_banco = '".$_POST['inCodBancoTxt']."'";
@@ -146,12 +155,12 @@ switch ($stAcao) {
         $stFiltro = " WHERE num_agencia = '".$_POST['stNumAgenciaTxt']."'";
 
         $obTMONAgencia = new TMONAgencia;
-        $obTMONAgencia->recuperaTodos($rsAgencia,$stFiltro);
+        $obTMONAgencia->recuperaTodos($rsAgencia,$stFiltro,'',$boTransacao);
 
         $obTPessoalContratoPensionistaContaSalario->setDado("cod_banco",$rsBanco->getCampo("cod_banco"));
         $obTPessoalContratoPensionistaContaSalario->setDado("cod_agencia",$rsAgencia->getCampo("cod_agencia"));
         $obTPessoalContratoPensionistaContaSalario->setDado("nr_conta",$_POST['stNumConta']);
-        $obTPessoalContratoPensionistaContaSalario->inclusao();
+        $obTPessoalContratoPensionistaContaSalario->inclusao($boTransacao);
         $obAtributos = new MontaAtributos;
         $obAtributos->setName      ( "Atributo_" );
         $obAtributos->recuperaVetor( $arChave    );
@@ -168,23 +177,30 @@ switch ($stAcao) {
         $obRCadastroDinamico->setCodCadastro(7);
         $obRCadastroDinamico->obRModulo->setCodModulo ( 22 );
         $obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoCandidato );
-        $obRCadastroDinamico->salvarValores();
-        Sessao::encerraExcecao();
+        $obRCadastroDinamico->salvarValores($boTransacao);
         $stMensagem = "Pensionista cadastrado com sucesso.";
         sistemaLegado::alertaAviso($pgFilt,$stMensagem ,"incluir","aviso", Sessao::getId(), "../");
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalPensionista );
     break;
     case "alterar":
-        Sessao::setTrataExcecao(true);
+        //Abre uma transacao para salvar na auditoria os dados da alteracao
+        $boFlagTransacao = false;
+        $obTransacao = new Transacao;
+        $obTransacao->begin();
+        $boTransacao = $obTransacao->getTransacao();
+        $obErro = new Erro();
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
         $obTPessoalPensionista->setDado("cod_pensionista"       ,$_POST['inCodPensionista']);
         $obTPessoalPensionista->setDado("cod_contrato_cedente"  ,$_POST['inCodContratoServidor']);
         $obTPessoalPensionista->setDado("numcgm"                ,$_POST['inCGM']);
         $obTPessoalPensionista->setDado("cod_grau"              ,$_POST['inCodGrauParentesco']);
         $obTPessoalPensionista->setDado("cod_profissao"         ,$_POST['inCodProfissao']);
-        $obTPessoalPensionista->alteracao();
+        $obTPessoalPensionista->alteracao($boTransacao);
         if ($_POST['inCodCID'] != "") {
             $obTPessoalPensionistaCid->setDado("cod_cid"            ,$_POST['inCodCID']);
             $inCodCID = SistemaLegado::pegaDado('cod_cid', 'pessoal.pensionista_cid',
-                                                ' WHERE cod_pensionista = '.$obTPessoalPensionista->getDado("cod_pensionista"). " and cod_contrato_cedente = ".$obTPessoalPensionista->getDado("cod_contrato_cedente"));
+                                                ' WHERE cod_pensionista = '.$obTPessoalPensionista->getDado("cod_pensionista"). " and cod_contrato_cedente = ".$obTPessoalPensionista->getDado("cod_contrato_cedente"),$boTransacao);
             //if (empty($inCodCID)) {
            //     $obTPessoalPensionistaCid->inclusao();
            // } else {
@@ -196,9 +212,9 @@ switch ($stAcao) {
         }
         if ($_POST['dtDataLaudo'] != "" || $_POST['inCodCID'] != "") {
             if (empty($inCodCID)) {
-                $obTPessoalPensionistaCid->inclusao();
+                $obTPessoalPensionistaCid->inclusao($boTransacao);
             } else {
-                $obTPessoalPensionistaCid->alteracao();
+                $obTPessoalPensionistaCid->alteracao($boTransacao);
             }
         }
 
@@ -209,21 +225,21 @@ switch ($stAcao) {
         $obTPessoalContratoPensionista->setDado("dt_inicio_beneficio"   ,$_POST['dtInicioBeneficio']);
         $obTPessoalContratoPensionista->setDado("dt_encerramento"       ,$_POST['dtEncerramentoBeneficio']);
         $obTPessoalContratoPensionista->setDado("motivo_encerramento"   ,$_POST['stMotivoEncerramento']);
-        $obTPessoalContratoPensionista->alteracao();
+        $obTPessoalContratoPensionista->alteracao($boTransacao);
         $stFiltro  = " AND contrato_pensionista_orgao.cod_contrato = ".$_POST['inCodContratoPensionista'];
-        $obTPessoalContratoPensionistaOrgao->recuperaRelacionamento($rsPensionistaOrgao,$stFiltro);
+        $obTPessoalContratoPensionistaOrgao->recuperaRelacionamento($rsPensionistaOrgao,$stFiltro,'',$boTransacao);
         if ( $rsPensionistaOrgao->getCampo("cod_orgao") != $_POST["hdnUltimoOrgaoSelecionado"] ) {
             $obTPessoalContratoPensionistaOrgao->setDado("cod_orgao",$_POST["hdnUltimoOrgaoSelecionado"]);
-            $obTPessoalContratoPensionistaOrgao->inclusao();
+            $obTPessoalContratoPensionistaOrgao->inclusao($boTransacao);
         }
         $boPrevidenciaExclusao = true;
         foreach ($_POST as $stCampo=>$stValor) {
             $stFiltro = " WHERE cod_contrato = ".$_POST['inCodContratoPensionista'];
-            $obTPessoalContratoPensionistaPrevidencia->recuperaTodos($rsContratoPensionistaPrevidencia,$stFiltro);
+            $obTPessoalContratoPensionistaPrevidencia->recuperaTodos($rsContratoPensionistaPrevidencia,$stFiltro,'',$boTransacao);
             if ( substr($stCampo,0,16) == "inCodPrevidencia") {
                 $arPrevidencia = explode("_",$stCampo);
                 $obTPessoalContratoPensionistaPrevidencia->setDado("cod_previdencia",$arPrevidencia[2]);
-                $obTPessoalContratoPensionistaPrevidencia->inclusao();
+                $obTPessoalContratoPensionistaPrevidencia->inclusao($boTransacao);
                 $boPrevidenciaExclusao = false;
             }
         }
@@ -231,32 +247,32 @@ switch ($stAcao) {
             $obTPessoalContratoPensionistaPrevidencia->setDado("cod_contrato",$rsContratoPensionistaPrevidencia->getCampo("cod_contrato"));
             $obTPessoalContratoPensionistaPrevidencia->setDado("cod_previdencia",$rsContratoPensionistaPrevidencia->getCampo("cod_previdencia"));
             $obTPessoalContratoPensionistaPrevidencia->setDado("bo_excluido",true);
-            $obTPessoalContratoPensionistaPrevidencia->inclusao();
+            $obTPessoalContratoPensionistaPrevidencia->inclusao($boTransacao);
         }
         if ($_POST['stChaveProcesso'] != "") {
             $arChaveProcesso = explode("/",$_POST['stChaveProcesso']);
             $obTPessoalContratoPensionistaProcessao->setDado("ano_exercicio",$arChaveProcesso[1]);
             $obTPessoalContratoPensionistaProcessao->setDado("cod_processo",$arChaveProcesso[0] );
-            $obTPessoalContratoPensionistaProcessao->alteracao();
+            $obTPessoalContratoPensionistaProcessao->alteracao($boTransacao);
         }
         $stFiltro = " AND contrato_pensionista_conta_salario.cod_contrato = ".$_POST['inCodContratoPensionista'];
-        $obTPessoalContratoPensionistaContaSalario->recuperaRelacionamento($rsContaSalario,$stFiltro);
+        $obTPessoalContratoPensionistaContaSalario->recuperaRelacionamento($rsContaSalario,$stFiltro,'',$boTransacao);
         if( $rsContaSalario->getCampo("num_agencia") != $_POST['stNumAgenciaTxt']
          or $rsContaSalario->getCampo("num_banco") != $_POST['inCodBancoTxt']
          or $rsContaSalario->getCampo("nr_conta") != $_POST['stNumConta'] ){
             $obTMONBanco = new TMONBanco;
             $stFiltro = " WHERE num_banco = '".$_POST['inCodBancoTxt']."'";
-            $obTMONBanco->recuperaTodos($rsBanco,$stFiltro);
+            $obTMONBanco->recuperaTodos($rsBanco,$stFiltro,'',$boTransacao);
 
             $stFiltro  = " WHERE num_agencia = '".$_POST['stNumAgenciaTxt']."'";
             $stFiltro .= "   AND cod_banco = ".$rsBanco->getCampo("cod_banco");
             $obTMONAgencia = new TMONAgencia;
-            $obTMONAgencia->recuperaTodos($rsAgencia,$stFiltro);
+            $obTMONAgencia->recuperaTodos($rsAgencia,$stFiltro,'',$boTransacao);
 
             $obTPessoalContratoPensionistaContaSalario->setDado("cod_banco",$rsBanco->getCampo("cod_banco"));
             $obTPessoalContratoPensionistaContaSalario->setDado("cod_agencia",$rsAgencia->getCampo("cod_agencia"));
             $obTPessoalContratoPensionistaContaSalario->setDado("nr_conta",$_POST['stNumConta']);
-            $obTPessoalContratoPensionistaContaSalario->inclusao();
+            $obTPessoalContratoPensionistaContaSalario->inclusao($boTransacao);
         }
         $obAtributos = new MontaAtributos;
         $obAtributos->setName      ( "Atributo_" );
@@ -274,20 +290,19 @@ switch ($stAcao) {
         $obRCadastroDinamico->setCodCadastro(7);
         $obRCadastroDinamico->obRModulo->setCodModulo ( 22 );
         $obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoCandidato );
-        $obRCadastroDinamico->alterarValores();
+        $obRCadastroDinamico->alterarValores($boTransacao);
 
         // Se a pensionista já tem rescisão de contrato com opção para calculo, resgata valor da data de rescisão
-        $dataRescisaoContrato = SistemaLegado::pegaDado("dt_rescisao", "pessoal.contrato_pensionista_caso_causa", "WHERE cod_contrato = ".$_REQUEST['inCodContratoPensionista']);
+        $dataRescisaoContrato = SistemaLegado::pegaDado("dt_rescisao", "pessoal.contrato_pensionista_caso_causa", "WHERE cod_contrato = ".$_REQUEST['inCodContratoPensionista'],$boTransacao);
         $dataRescisaoContrato = SistemaLegado::dataToBr($dataRescisaoContrato);
         // Caso sua data de encerramento tenha sido alterada e possua rescisão, é necessário excluir seus antigos valores de calculo
         if (!empty($dataRescisaoContrato)) {
             if ($dataRescisaoContrato != $obTPessoalContratoPensionista->getDado("dt_encerramento")) {
                 $obRPessoalRescisaoContrato->obRPessoalContrato->setCodContrato( $_POST['inCodContratoPensionista'] );
-                $obRPessoalRescisaoContrato->excluirRescisaoContratoPensionista();
+                $obRPessoalRescisaoContrato->excluirRescisaoContratoPensionista($boTransacao);
             }
         }
 
-        Sessao::encerraExcecao();
 
         // Caso tenha marcado opção de Rescisão de contrato encaminhará para a tela de rescindir para que sejam calculados os valores
         if ($_REQUEST['boCalculoPensao'] == 'true') {
@@ -308,17 +323,24 @@ switch ($stAcao) {
             $stMensagem = "Pensionista alterado com sucesso.";
             sistemaLegado::alertaAviso($pgList,$stMensagem ,"incluir","aviso", Sessao::getId(), "../");
         }
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalPensionista );
 
     break;
     case "excluir":
-        $obErro = false;
-        //Início da verificação da exclusão do pensionista
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoConcessaoDecimo.class.php"   );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorComplementar.class.php"   );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php"   );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoIRRF.class.php"   );
         include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoPrevidencia.class.php"   );
-
+        
+        $boFlagTransacao = false;
+        $obTransacao = new Transacao;
+      //  $obTransacao->begin();
+        $boTransacao = $obTransacao->getTransacao();
+        $obErro = new Erro();
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        
+        //Início da verificação da exclusão do pensionista
         $arTabelasVerificacao = array(  "TFolhaPagamentoConcessaoDecimo",
                                         "TFolhaPagamentoContratoServidorComplementar",
                                         "TFolhaPagamentoContratoServidorPeriodo",
@@ -328,38 +350,35 @@ switch ($stAcao) {
 
         $stFiltro = " WHERE cod_contrato = ".$_GET['inCodContratoPensionista'];
         foreach ($arTabelasVerificacao as $stTabela) {
-            if ($obErro == false) {
-                $obTVerificacaoExclusao = new $stTabela;
-                $obTVerificacaoExclusao->recuperaTodos($rsVerificacao,$stFiltro,"",$boTransacao);
-                if ($rsVerificacao->getNumLinhas() > 0) {
-                    $obErro = true;
-                    break;
-                }
+            $obTVerificacaoExclusao = new $stTabela;
+            $obTVerificacaoExclusao->recuperaTodos($rsVerificacao,$stFiltro,"",$boTransacao);
+            if ($rsVerificacao->getNumLinhas() > 0) {
+                $stMensagem = "Exclusão não permitida, pensionista possui histórico de dados no sistema.";
+                sistemaLegado::alertaAviso($pgList,$stMensagem ,"","error", Sessao::getId(), "../");
+                $obErro->setDescricao($stMensagem);
+                break;
             }
         }
         //Fim da verificação da exclusão do pensionista
-
-        if ($obErro == true) {
-            $stMensagem = "Exclusão não permitida, pensionista possui histórico de dados no sistema.";
-            sistemaLegado::alertaAviso($pgList,$stMensagem ,"","aviso", Sessao::getId(), "../");
-        } else {
-            Sessao::setTrataExcecao(true);
-            $obTPessoalPensionista->setDado("cod_pensionista",  $_GET['inCodPensionista']);
-            $obTPessoalPensionista->setDado("cod_contrato_cedente", $_GET['inCodContratoServidor']);
-            $obTPessoalContratoPensionista->setDado("cod_contrato",$_GET['inCodContratoPensionista']);
-            $obTPessoalContratoPensionistaOrgao->exclusao();
-            $obTPessoalContratoPensionistaProcessao->exclusao();
-            $obTPessoalContratoPensionistaPrevidencia->exclusao();
-            $obTPessoalContratoPensionistaContaSalario->exclusao();
-            $obTPessoalAtributoContratoPensionista->exclusao();
-            $obTPessoalContratoPensionista->exclusao();
-            $obTPessoalPensionistaCid->exclusao();
-            $obTPessoalPensionista->exclusao();
-            $obTPessoalContrato->exclusao();
-            Sessao::encerraExcecao();
-            $stMensagem = "Pensionista excluído com sucesso.";
-            sistemaLegado::alertaAviso($pgList,$stMensagem ,"incluir","aviso", Sessao::getId(), "../");
+   
+        if(!$obErro->ocorreu()) {
+              $obTPessoalPensionista->setDado("cod_pensionista",  $_GET['inCodPensionista']);
+              $obTPessoalPensionista->setDado("cod_contrato_cedente", $_GET['inCodContratoServidor']);
+              $obTPessoalContratoPensionista->setDado("cod_contrato",$_GET['inCodContratoPensionista']);
+              $obTPessoalContratoPensionistaOrgao->exclusao($boTransacao);
+              $obTPessoalContratoPensionistaProcessao->exclusao($boTransacao);
+              $obTPessoalContratoPensionistaPrevidencia->exclusao($boTransacao);
+              $obTPessoalContratoPensionistaContaSalario->exclusao($boTransacao);
+              $obTPessoalAtributoContratoPensionista->exclusao($boTransacao);
+              $obTPessoalContratoPensionista->exclusao($boTransacao);
+              $obTPessoalPensionistaCid->exclusao($boTransacao);
+              $obTPessoalPensionista->exclusao($boTransacao);
+              $obTPessoalContrato->exclusao($boTransacao);
+              $stMensagem = "Pensionista excluído com sucesso.";
+              sistemaLegado::alertaAviso($pgList,$stMensagem ,"incluir","aviso", Sessao::getId(), "../");
+              $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalPensionista );
         }
     break;
 }
+
 ?>

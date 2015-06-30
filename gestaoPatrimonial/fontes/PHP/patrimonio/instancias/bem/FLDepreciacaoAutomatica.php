@@ -115,7 +115,7 @@ $obIntExercicio->setReadOnly(true);
 //cria um novo formulario
 $obForm = new Form;
 $obForm->setAction ($pgProc);
-$obForm->setTarget ("oculto");
+$obForm->setTarget ("telaPrincipal");
 
 //Cria o hidden da acao
 $obHdnAcao = new Hidden;

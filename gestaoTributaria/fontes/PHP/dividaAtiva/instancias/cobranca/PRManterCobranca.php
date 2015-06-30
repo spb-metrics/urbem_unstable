@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: PRManterCobranca.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRManterCobranca.php 62849 2015-06-29 18:55:59Z evandro $
 
     Caso de uso: uc-05.04.04
 **/
@@ -995,9 +995,8 @@ switch ($stAcao) {
 
             include_once( CAM_GT_ARR_CLASSES."boletos/".$stArquivoModelo );
             $obRModeloCarne = new $stObjModelo( $arEmissao );
-            $obRModeloCarne->setCobranca(true);
+            //$obRModeloCarne->setCobranca(true);
             $obRModeloCarne->imprimirCarne();
-            
             
             echo "<script type=\"text/javascript\">\r\n";
             echo "    var sAux = window.open('OCImpressaoPDFEmissao.php?".Sessao::getId()."','','width=20,height=10,resizable=1,scrollbars=1,left=100,top=100');\r\n";

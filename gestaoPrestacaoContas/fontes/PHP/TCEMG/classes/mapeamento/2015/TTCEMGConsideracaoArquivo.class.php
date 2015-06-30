@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCEMGConsideracaoArquivo.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: TTCEMGConsideracaoArquivo.class.php 62857 2015-06-30 13:53:56Z franver $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -106,7 +106,7 @@ class TTCEMGConsideracaoArquivo extends Persistente
              
              WHERE CAD.periodo      = '".$this->getDado('mes')."'
                AND CAD.cod_entidade IN(".$this->getDado('entidade').")
-          
+               AND CAD.modulo_sicom = '".$this->getDado('modulo_sicom')."'
           ORDER BY consideracao_arquivo.cod_arquivo";
         return $stSql;
     }

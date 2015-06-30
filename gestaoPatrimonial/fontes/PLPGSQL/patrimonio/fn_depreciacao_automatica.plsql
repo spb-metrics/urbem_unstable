@@ -21,12 +21,31 @@
     **********************************************************************************
 */
 
+/*
+CREATE TYPE depreciacao_automatica AS (
+      cod_bem                           INTEGER
+    , descricao                         VARCHAR
+    , dt_incorporacao                   DATE
+    , dt_aquisicao                      DATE
+    , competencia_incorporacao          TEXT
+    , vl_bem                            NUMERIC
+    , quota_depreciacao_anual           NUMERIC
+    , quota_depreciacao_anual_acelerada NUMERIC
+    , depreciacao_acelerada             BOOLEAN
+    , cod_plano                         INTEGER
+    , cod_reavaliacao                   INTEGER
+    , dt_reavaliacao                    DATE
+    , vida_util                         INTEGER
+    , motivo                            VARCHAR
+);
+*/
+
 CREATE OR REPLACE FUNCTION patrimonio.fn_depreciacao_automatica(stExercicio   VARCHAR,
                                                                 stCompetencia VARCHAR,
                                                                 inCodNatureza INTEGER,
                                                                 inCodGrupo    INTEGER,
                                                                 inCodEspecie  INTEGER,
-                                                                stMotivo      VARCHAR) RETURNS VOID
+                                                                stMotivo      VARCHAR) RETURNS SETOF depreciacao_automatica
 AS $$ DECLARE
     
     stQuery                   VARCHAR;
@@ -89,6 +108,7 @@ arCompetencia := STRING_TO_ARRAY(stCompetencia,',');
 stQuery := '   SELECT  bem.cod_bem
                     ,  bem.descricao
                     ,  COALESCE(reavaliacao.dt_reavaliacao,bem.dt_incorporacao,bem.dt_aquisicao) AS dt_incorporacao
+                    ,  bem.dt_aquisicao
                     ,  TO_CHAR(COALESCE(reavaliacao.dt_reavaliacao,bem.dt_incorporacao,bem.dt_aquisicao),''YYYYMM'' ) AS competencia_incorporacao
                     ,  COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem ) AS vl_bem
                     ,  CASE WHEN bem.quota_depreciacao_anual > 0
@@ -112,6 +132,8 @@ stQuery := '   SELECT  bem.cod_bem
                    ON  especie.cod_natureza = bem.cod_natureza
                   AND  especie.cod_grupo    = bem.cod_grupo
                   AND  especie.cod_especie  = bem.cod_especie
+                  -- Não pode depreciar bens adquiridos após a competencia da depreciação
+                  AND to_char(bem.dt_aquisicao, ''YYYYMM'')::INTEGER <= '|| stExercicio || stCompetencia ||'
 
            INNER JOIN  patrimonio.grupo
                    ON  grupo.cod_natureza = especie.cod_natureza
@@ -295,6 +317,9 @@ FOR rcBens IN EXECUTE stQuery LOOP
         EXIT WHEN vlBem = 0;
         
     END LOOP;
+    
+    RETURN next rcBens;
+    
 END LOOP;
 
 IF boPlanoAtivoExercicio = false THEN

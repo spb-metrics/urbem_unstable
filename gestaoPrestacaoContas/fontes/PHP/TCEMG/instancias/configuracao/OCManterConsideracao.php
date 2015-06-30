@@ -30,7 +30,7 @@
   * @author Desenvolvedor: Evandro Melos
   *
   * @ignore
-  * $Id: OCManterConsideracao.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCManterConsideracao.php 62857 2015-06-30 13:53:56Z franver $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -61,9 +61,11 @@ function montaSpanCodigos(){
   $inCodEntidade = $request->get('inCodEntidade');
   $inMes = $request->get('inMes');
   $stExercicio = Sessao::getExercicio();
-
+  $stTipoExportacao = $request->get('stTipoExportacao');
+  
   $stFiltro = " WHERE cod_entidade = ".$inCodEntidade;
   $stFiltro .= " AND periodo = ".$inMes;
+  $stFiltro .= " AND modulo_sicom = '".$stTipoExportacao."'";
   $stFiltro .= " AND exercicio = '".$stExercicio."'";
   
   //Lista de códigos cadastrados para cada entidade
@@ -73,7 +75,8 @@ function montaSpanCodigos(){
   //se não existir arquivos para aquela entidade naquele periodo e exercicio cria novos arquivos em branco
   if ($rsConsideracao->getNumLinhas() < 1) {
     $TTCEMGConsideracaoArquivoDescricao->setDado('cod_entidade',$inCodEntidade);
-    $TTCEMGConsideracaoArquivoDescricao->setDado('periodo'     ,$inMes);
+    $TTCEMGConsideracaoArquivoDescricao->setDado('periodo'     ,$inMes );
+    $TTCEMGConsideracaoArquivoDescricao->setDado('modulo_sicom', $stTipoExportacao );
     $TTCEMGConsideracaoArquivoDescricao->setDado('exercicio'   ,"'".$stExercicio."'");
     $TTCEMGConsideracaoArquivoDescricao->insereNovosArquivosPeriodo($boTransacao);
     $TTCEMGConsideracaoArquivoDescricao->recuperaDescricaoArquivos($rsConsideracao, $stFiltro, $boTransacao);
