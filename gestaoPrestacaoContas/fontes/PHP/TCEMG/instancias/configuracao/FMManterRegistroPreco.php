@@ -118,7 +118,7 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     $obTTCEMGRegistroPrecosOrgao->setDado('interno'                  , $request->get('boInterno'));
     $obTTCEMGRegistroPrecosOrgao->setDado('numcgm_gerenciador'       , $request->get('numcgmGerenciador'));
     
-    $obTTCEMGRegistroPrecosOrgao->recuperaPorChave($rsOrgao);
+    $obTTCEMGRegistroPrecosOrgao->recuperaProcessoOrgao($rsOrgao);
 
     $arOrgaos = array();
     $inCount = 0;
@@ -138,6 +138,9 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
         $arOrgaos[$inCount]['stCodigoProcessoAdesao']    = ($rsOrgao->getCampo('exercicio_adesao')!=NULL) ? str_pad($rsOrgao->getCampo('numero_processo_adesao'), 12, "0", STR_PAD_LEFT)."/".$rsOrgao->getCampo('exercicio_adesao') : '';
         $arOrgaos[$inCount]['dtAdesao']                  = $rsOrgao->getCampo('dt_adesao');
         $arOrgaos[$inCount]['dtPublicacaoAvisoIntencao'] = $rsOrgao->getCampo('dt_publicacao_aviso_intencao');
+        $arOrgaos[$inCount]['inResponsavel']             = $rsOrgao->getCampo('numcgm_responsavel');
+        $arOrgaos[$inCount]['stNomResponsavel']          = $rsOrgao->getCampo('nomcgm_responsavel');
+        $arOrgaos[$inCount]['inStNomResponsavel']        = $rsOrgao->getCampo('st_cgm_responsavel'); 
         $arOrgaos[$inCount]['inId'] = ($inCount + 1);
 
         $inCount++;
@@ -198,7 +201,7 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     
     $arQuantitativos = array();
     $inCount = 0;
-    
+    $rsQuantitativo->ordena('num_item');
     while ( !($rsQuantitativo->eof()) ) {
         $arQuantitativos[$inCount]['stExercicioOrgao'] = $rsQuantitativo->getCampo('exercicio_unidade');
         $arQuantitativos[$inCount]['inCodOrgaoQ']      = $rsQuantitativo->getCampo('num_orgao');
@@ -481,7 +484,7 @@ $obBscCGMResponsavel->setFuncaoBusca( "abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLPro
 if ( $stAcao == 'incluir' ) {
     $obDescontoTabelaSim = new Radio();
     $obDescontoTabelaSim->setName('inDescontoTabela');
-    $obDescontoTabelaSim->setId('inDescontoTabela');
+    $obDescontoTabelaSim->setId('inDescontoTabelaSim');
     $obDescontoTabelaSim->setRotulo('Desconto Tabela');
     $obDescontoTabelaSim->setTitle('Informar se foi utilizado como critério de adjudicação a oferta de desconto sobre tabela de preços praticados no mercado.');
     $obDescontoTabelaSim->setLabel('Sim');
@@ -494,7 +497,7 @@ if ( $stAcao == 'incluir' ) {
     
     $obDescontoTabelaNao = new Radio();
     $obDescontoTabelaNao->setName('inDescontoTabela');
-    $obDescontoTabelaNao->setId('inDescontoTabela');
+    $obDescontoTabelaNao->setId('inDescontoTabelaNao');
     $obDescontoTabelaNao->setLabel('Não');
     $obDescontoTabelaNao->setValue(2);
     $obDescontoTabelaNao->setNull(false);
@@ -505,7 +508,7 @@ if ( $stAcao == 'incluir' ) {
     
     $obProcessoPorLoteSim = new Radio();
     $obProcessoPorLoteSim->setName('inProcessoPorLote');
-    $obProcessoPorLoteSim->setId('inProcessoPorLote');
+    $obProcessoPorLoteSim->setId('inProcessoPorLoteSim');
     $obProcessoPorLoteSim->setRotulo('Processo por Lote');
     $obProcessoPorLoteSim->setTitle('Informar se o processo foi realizado por lote.');
     $obProcessoPorLoteSim->setLabel('Sim');
@@ -518,7 +521,7 @@ if ( $stAcao == 'incluir' ) {
     
     $obProcessoPorLoteNao = new Radio();
     $obProcessoPorLoteNao->setName('inProcessoPorLote');
-    $obProcessoPorLoteNao->setId('inProcessoPorLote');
+    $obProcessoPorLoteNao->setId('inProcessoPorLoteNao');
     $obProcessoPorLoteNao->setLabel('Não');
     $obProcessoPorLoteNao->setValue('2');
     $obProcessoPorLoteNao->setNull(false);
@@ -655,6 +658,7 @@ $obFormulario->addComponente($obTxtExercicio);
 $obIMontaUnidadeOrcamentaria->geraFormulario( $obFormulario );
 $obFormulario->agrupaComponentes (array($obRdoGerenciadorSim,$obRdoGerenciadorNao));
 $obFormulario->agrupaComponentes (array($obRadioNaturezaProcedimentoParticipante, $obRadioNaturezaProcedimentoNaoParticipante));
+$obFormulario->addComponente( $obIPopUpCGMResponsavel );
 $obFormulario->addComponente($obTxtCodigoProcessoAdesao);
 $obFormulario->addComponente($obDtAdesao);
 $obFormulario->addComponente($obDtPublicacaoAvisoIntencao);
@@ -668,7 +672,6 @@ $obFormulario->addTitulo( "Dados do Item" );
 $obFormulario->addHidden($obHdnIdItem);
 $obFormulario->addComponente( $obDtContacao );
 $obFormulario->addSpan ( $obSpnItemBuscaInner );
-$obMontaItemUnidade->geraFormulario($obFormulario);
 $obFormulario->addComponente($obIntNumItem);
 $obMontaQuantidadeValores->geraFormulario($obFormulario);
 $obFormulario->addComponente( $obVlrPrecoUnitario );
@@ -706,12 +709,15 @@ $obFormulario->addComponente( $obBscEmpenho );
 $obFormulario->addComponente( $obBtnIncluirEmpenho );
 $obFormulario->addSpan ( $obSpnEmpenhos );
 
+$obOk = new Ok();
+$obLimpar = new Limpar;
+$obLimpar->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."', 'LimparForm');");
 
-$obFormulario->OK();
+$obFormulario->defineBarra( array( $obOk, $obLimpar ) );
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {
-    $stJs  = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stAcao=".$stAcao."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$inCodLicitacao."&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');";
+    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stAcao=".$stAcao."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$inCodLicitacao."&inCodModalidadeLicitacao='+frm.inCodModalidadeLicitacao.value, 'carregaLicitacao');";
     $stJs .= preencheComboOrgaoAbaQuantitativo();
     
     $boLote = false;

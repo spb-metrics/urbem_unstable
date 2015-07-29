@@ -30,7 +30,7 @@
 * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
 * @author Documentor: Cassiano de Vasconcellos Ferreira
 
-  $Id: ArquivoExportador.class.php 61661 2015-02-23 17:39:34Z jean $
+  $Id: ArquivoExportador.class.php 63058 2015-07-20 19:42:03Z jean $
 
 * @package framework
 * @subpackage componentes
@@ -72,6 +72,10 @@ var $roExportador;
 */
 var $obTConfiguracao;
 
+var $stNomeArquivo;
+
+public function setTitulo ( $valor = "" ) { $this->stTitulo = $valor; }
+public function getTitulo ( ) { return $this->stTitulo; }
 /**
     * @access Public
     * @param String $valor
@@ -215,7 +219,7 @@ function FormataTipoDocumento()
             $arCabecalho[0]['sistema']      = 'SIGA';
             $arCabecalho[0]['cod_unidade']  = Sessao::read('cod_unidade_gestora');//$rsEntidade->getCampo('cod_unidade_gestora');
             $arCabecalho[0]['nom_unidade']  = Sessao::read('nom_unidade');//$rsEntidade->getCampo('nom_entidade');
-            $arCabecalho[0]['titulo']       = Sessao::read('titulo');//Sessao::write('titulo', 'patrimonio');
+            $arCabecalho[0]['titulo']       = $this->getTitulo();
 
             $rsCabecalho = new RecordSet();
             $rsCabecalho->preenche($arCabecalho);
@@ -297,7 +301,7 @@ function FormataTipoDocumento()
         case "TCE_RN":
             $arquivos         = array('ANEXO21', 'ANEXO23', 'ANEXO26');
             ### Os arquivos em que não deve aparecer o sequencial
-            $excluiSequencial = array('ANEXO26', 'ANEXO23', 'ANEXO01DESPESA','ANEXO02DESPESAFUNCAO', 'ANEXO01RECEITA', 'ANEXO42', 'ANEXO27FUNDEFBBAAS');
+            $excluiSequencial = array('ANEXO26', 'ANEXO28', 'ANEXO23', 'ANEXO01DESPESA','ANEXO02DESPESAFUNCAO', 'ANEXO01RECEITA', 'ANEXO42', 'ANEXO27FUNDEFBBAAS');
 
             $arArquivo = explode('_',$this->getNomeArquivo());
             $arArquivo = explode('.',$arArquivo[1]);
@@ -415,7 +419,7 @@ function FormataTipoDocumento()
                 $this->arBlocos[ 0 ]->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                 $this->arBlocos[ 0 ]->roUltimaColuna->setTamanhoFixo(100);
 
-                if (!in_array($arArquivo[0], $excluiSequencial) || $arArquivo[0] == 'ANEXO42' || $arArquivo[0] == 'ANEXO27FUNDEFBBAAS') {
+                if (!in_array($arArquivo[0], $excluiSequencial) || $arArquivo[0] == 'ANEXO28' || $arArquivo[0] == 'ANEXO42' || $arArquivo[0] == 'ANEXO27FUNDEFBBAAS') {
                     $this->arBlocos[ 0 ]->addColuna("[]");
                     $this->arBlocos[ 0 ]->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
                     $this->arBlocos[ 0 ]->roUltimaColuna->setTamanhoFixo($inTamanhoColuna-150);
@@ -436,7 +440,7 @@ function FormataTipoDocumento()
             $this->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
             $this->roUltimoBloco->roUltimaColuna->setTamanhoFixo($inTamanhoColuna-11);
 
-            if (!in_array($arArquivo[0], $excluiSequencial) || $arArquivo[0] == 'ANEXO27FUNDEFBBAAS') {
+            if (!in_array($arArquivo[0], $excluiSequencial) || $arArquivo[0] == 'ANEXO28' || $arArquivo[0] == 'ANEXO27FUNDEFBBAAS') {
                 $this->roUltimoBloco->addColuna("quantidade_registros");
                 $this->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
                 $this->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);

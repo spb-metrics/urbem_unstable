@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterBem.php 62852 2015-06-29 20:56:46Z arthur $
+    * $Id: OCManterBem.php 62897 2015-07-06 21:55:07Z jean $
 
 */
 
@@ -826,6 +826,21 @@ case 'montaListaDepreciacoes':
         $obTPatrimonioDepreciacao = new TPatrimonioDepreciacao();
         $obTPatrimonioDepreciacao->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
         $obTPatrimonioDepreciacao->recuperaDepreciacao( $rsDepreciacao );
+
+        $arDtReavaliacao = explode('/',Sessao::read('dtUltimaReavaliacao'));
+        $stDtReavaliacao = $arDtReavaliacao[2].$arDtReavaliacao[1];
+
+        if ($stDtReavaliacao != '') {
+            if ($rsDepreciacao->getNumLinhas() > 0) {
+                foreach ($rsDepreciacao->getElementos() as $i => $val) {
+                    if ($val['competencia'] >= $stDtReavaliacao) {
+                        $arDepreciacaoAux[] = $val;
+                    }
+                }
+
+                $rsDepreciacao->preenche($arDepreciacaoAux);
+            }
+        }
         
         $rsSaldoBem = new RecordSet;
         $rsBem = new RecordSet;

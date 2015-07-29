@@ -98,6 +98,146 @@ BEGIN
                     ,vl_saldo_atual         numeric                                                   
                 );                                                
     
+
+    --Cria tabela pra inserir os valore de compromissado RPPS de acordo com o somatorio das obrigações financeiras do relatorio RGF ANEXO 5 de 2015
+    CREATE TEMPORARY TABLE tmp_compromissado_entidade_rpps AS (
+        SELECT 
+            (   liquidados_nao_pagos_exercicios_anteriores 
+                + 
+                liquidados_nao_pagos 
+                + 
+                empenhados_nao_liquidados_exercicios_anteriores 
+                + 
+                obrigacoes_financeiras
+            ) as compromissado_rpps
+        FROM(
+            SELECT 
+                  sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) AS liquidados_nao_pagos_exercicios_anteriores
+                , sum(tb.liquidados_nao_pagos) AS liquidados_nao_pagos
+                , sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) AS empenhados_nao_liquidados_exercicios_anteriores         
+                , sum(tb2.consignacoes) AS obrigacoes_financeiras
+            FROM ( 
+                SELECT 
+                      cod_recurso
+                    , entidade
+                    , tipo
+                    , SUM(total_processados_exercicios_anteriores) AS total_processados_exercicios_anteriores
+                    , SUM(total_processados_exercicio_anterior) AS total_processados_exercicio_anterior
+                    , SUM(total_nao_processados_exercicios_anteriores) AS total_nao_processados_exercicios_anteriores
+                    , SUM(total_nao_processados_exercicio_anterior) AS total_nao_processados_exercicio_anterior
+                    , SUM(liquidados_nao_pagos) AS liquidados_nao_pagos
+                    , SUM(empenhados_nao_liquidados) AS empenhados_nao_liquidados
+                    , SUM(empenhados_nao_liquidados_cancelados) AS empenhados_nao_liquidados_cancelados
+                    , SUM(caixa_liquida) AS caixa_liquida
+                FROM stn.fn_rgf_anexo6novo_recurso(stExercicio,inEntidadeRPPS::varchar,stDtFinal) AS stn_fn
+                (   cod_recurso                                   integer
+                    , tipo                                        varchar
+                    , entidade                                    integer
+                    , total_processados_exercicios_anteriores     numeric
+                    , total_processados_exercicio_anterior        numeric
+                    , total_nao_processados_exercicios_anteriores numeric
+                    , total_nao_processados_exercicio_anterior    numeric
+                    , liquidados_nao_pagos                        numeric
+                    , empenhados_nao_liquidados                   numeric
+                    , empenhados_nao_liquidados_cancelados        numeric
+                    , caixa_liquida                               numeric 
+                )
+                GROUP BY cod_recurso
+                        , entidade
+                        , tipo
+            ) as tb
+            
+            INNER JOIN stn.pl_recurso_descricao(stExercicio,stDtInicial,stDtFinal,' '::varchar,inEntidadeRPPS::varchar,'true') AS tb2
+            (   tipo_recurso                   char(1)
+                , cod_recurso                  integer
+                , exercicio                    varchar
+                , nom_recurso                  varchar
+                , positivo                     numeric
+                , negativo                     numeric
+                , saldo                        numeric
+                , a_pagar_exercicio            numeric
+                , a_pagar_exercicio_anteriores numeric
+                , valor_consignacao_positivo   numeric
+                , valor_consignacao_negativo   numeric
+                , consignacoes                 numeric
+                , caixa                        numeric 
+            )
+                ON tb2.cod_recurso = tb.cod_recurso
+                AND tb2.exercicio  = stExercicio
+            WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = stExercicio))
+        ) as foo
+    );
+    
+    --Cria tabela pra inserir os valore de compromissado de acordo com o somatorio das obrigações financeiras do relatorio RGF ANEXO 5 de 2015
+    CREATE TEMPORARY TABLE tmp_compromissado_outras_entidades AS (
+        SELECT 
+            (   liquidados_nao_pagos_exercicios_anteriores 
+                + 
+                liquidados_nao_pagos 
+                + 
+                empenhados_nao_liquidados_exercicios_anteriores 
+                + 
+                obrigacoes_financeiras
+            ) as compromissado
+        FROM(
+            SELECT 
+                  sum(tb.total_processados_exercicios_anteriores) + sum(tb.total_processados_exercicio_anterior) AS liquidados_nao_pagos_exercicios_anteriores
+                , sum(tb.liquidados_nao_pagos) AS liquidados_nao_pagos
+                , sum(tb.total_nao_processados_exercicios_anteriores) + sum(tb.total_nao_processados_exercicio_anterior) AS empenhados_nao_liquidados_exercicios_anteriores         
+                , sum(tb2.consignacoes) AS obrigacoes_financeiras
+            FROM ( 
+                SELECT 
+                      cod_recurso
+                    , entidade
+                    , tipo
+                    , SUM(total_processados_exercicios_anteriores) AS total_processados_exercicios_anteriores
+                    , SUM(total_processados_exercicio_anterior) AS total_processados_exercicio_anterior
+                    , SUM(total_nao_processados_exercicios_anteriores) AS total_nao_processados_exercicios_anteriores
+                    , SUM(total_nao_processados_exercicio_anterior) AS total_nao_processados_exercicio_anterior
+                    , SUM(liquidados_nao_pagos) AS liquidados_nao_pagos
+                    , SUM(empenhados_nao_liquidados) AS empenhados_nao_liquidados
+                    , SUM(empenhados_nao_liquidados_cancelados) AS empenhados_nao_liquidados_cancelados
+                    , SUM(caixa_liquida) AS caixa_liquida
+                FROM stn.fn_rgf_anexo6novo_recurso(stExercicio,stCodEntidade,stDtFinal) AS stn_fn
+                (   cod_recurso                                   integer
+                    , tipo                                        varchar
+                    , entidade                                    integer
+                    , total_processados_exercicios_anteriores     numeric
+                    , total_processados_exercicio_anterior        numeric
+                    , total_nao_processados_exercicios_anteriores numeric
+                    , total_nao_processados_exercicio_anterior    numeric
+                    , liquidados_nao_pagos                        numeric
+                    , empenhados_nao_liquidados                   numeric
+                    , empenhados_nao_liquidados_cancelados        numeric
+                    , caixa_liquida                               numeric 
+                )
+                GROUP BY cod_recurso
+                        , entidade
+                        , tipo
+            ) as tb
+            
+            INNER JOIN stn.pl_recurso_descricao(stExercicio,stDtInicial,stDtFinal,' '::varchar,stCodEntidade,'false') AS tb2
+            (   tipo_recurso                   char(1)
+                , cod_recurso                  integer
+                , exercicio                    varchar
+                , nom_recurso                  varchar
+                , positivo                     numeric
+                , negativo                     numeric
+                , saldo                        numeric
+                , a_pagar_exercicio            numeric
+                , a_pagar_exercicio_anteriores numeric
+                , valor_consignacao_positivo   numeric
+                , valor_consignacao_negativo   numeric
+                , consignacoes                 numeric
+                , caixa                        numeric 
+            )
+                ON tb2.cod_recurso = tb.cod_recurso
+                AND tb2.exercicio  = stExercicio
+            WHERE tb.entidade NOT IN ((SELECT valor::integer FROM administracao.configuracao WHERE configuracao.parametro = 'cod_entidade_rpps' AND configuracao.exercicio = stExercicio))
+        ) as foo
+    );
+
+    --Consulta para buscar os valores
     stSql := '  SELECT   
                 (SELECT vl_saldo_atual
                         FROM tmp_balanco_outras_entidade
@@ -120,22 +260,8 @@ BEGIN
                         OR cod_estrutural like ''1.1.4%''
                 ) as aplicacoes_financeiras                
 
-                ,(  SELECT ABS(COALESCE(SUM(consignacoes),0.00))
-                    FROM stn.pl_recurso_descricao('''||stExercicio||''','''||stDtInicial||''','''||stDtFinal||''','' '','''||stCodEntidade||''',''false'') AS
-                    ( tipo_recurso                  char(1)
-                     , cod_recurso                  integer
-                     , exercicio                    varchar
-                     , nom_recurso                  varchar
-                     , positivo                     numeric
-                     , negativo                     numeric
-                     , saldo                        numeric
-                     , a_pagar_exercicio            numeric
-                     , a_pagar_exercicio_anteriores numeric
-                     , valor_consignacao_positivo   numeric
-                     , valor_consignacao_negativo   numeric
-                     , consignacoes                 numeric
-                     , caixa                        numeric       
-                    )
+                ,(  SELECT SUM(compromissado) as compromissado
+                        FROM tmp_compromissado_outras_entidades
                 ) as compromissado
 
                 ,(SELECT vl_saldo_atual
@@ -159,22 +285,8 @@ BEGIN
                         OR cod_estrutural like ''1.1.4%''
                 ) as aplicacoes_financeiras_rpps
 
-                ,(SELECT ABS(SUM(consignacoes))
-                    FROM stn.pl_recurso_descricao('''||stExercicio||''','''||stDtFinal||''','''||stDtInicial||''','' '','''||stCodEntidade||''',''true'') AS
-                    ( tipo_recurso                  char(1)
-                     , cod_recurso                  integer
-                     , exercicio                    varchar
-                     , nom_recurso                  varchar
-                     , positivo                     numeric
-                     , negativo                     numeric
-                     , saldo                        numeric
-                     , a_pagar_exercicio            numeric
-                     , a_pagar_exercicio_anteriores numeric
-                     , valor_consignacao_positivo   numeric
-                     , valor_consignacao_negativo   numeric
-                     , consignacoes                 numeric
-                     , caixa                        numeric       
-                    )
+                ,(  SELECT SUM(compromissado_rpps) as compromissado_rpps
+                        FROM tmp_compromissado_entidade_rpps
                 ) as compromissado_rpps
 
             ';                                                 

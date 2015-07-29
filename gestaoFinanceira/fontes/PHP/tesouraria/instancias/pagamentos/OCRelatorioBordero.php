@@ -40,19 +40,9 @@
     * Casos de uso: uc-02.04.20
 */
 
-/*
-$Log$
-Revision 1.5  2007/03/30 21:58:02  cako
-Bug #7884#
-
-Revision 1.4  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_FW_PDF."RRelatorio.class.php"                             );
+include_once ( CAM_FW_PDF."RRelatorio.class.php" );
 
 $arFiltro = Sessao::read('filtro');
 $arFiltroRelatorio = Sessao::read('filtroRelatorio');
@@ -78,10 +68,15 @@ if ($arFiltroRelatorio['stTipoBordero'] == "T") {
 
     include_once( CAM_GF_TES_NEGOCIO."RTesourariaRelatorioBorderoPagamento.class.php"  );
 
-    $obRRelatorio                          = new RRelatorio;
+    $obRRelatorio                           = new RRelatorio;
     $obRTesourariaRelatorioBorderoPagamento = new RTesourariaRelatorioBorderoPagamento;
-    $arFiltro = Sessao::read('filtroRelatorio');
-
+    
+    // Seta os dados conforme exercicio, vindo da PR ou OCRelatorio, pois muda a forma de geração
+    if ( Sessao::getExercicio() >= '2015' )
+        $arFiltro = Sessao::read('relatorioBordero');
+    else
+        $arFiltro = Sessao::read('filtroRelatorio');
+    
     $obRTesourariaBoletim = new RTesourariaBoletim();
     $obRTesourariaBoletim->addBordero();
     $obRTesourariaBoletim->roUltimoBordero->setExercicio($arFiltro['stExercicio'] );
@@ -108,4 +103,5 @@ if ($arFiltroRelatorio['stTipoBordero'] == "T") {
 
     $obRRelatorio->executaFrameOculto( "OCGeraRelatorioBorderoPagamento.php" );
 }
+
 ?>

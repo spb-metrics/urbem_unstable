@@ -34,8 +34,8 @@ BEGIN
     SELECT * INTO reRegistro FROM patrimonio.reavaliacao WHERE cod_bem = inCodBem;
     IF FOUND THEN
        stQuery := '   SELECT bem.cod_bem
-                           , (COALESCE(SUM(reavaliacao.valor_depreciado),0) + COALESCE(bem.vl_depreciacao,0))::NUMERIC(14,2) AS vl_acumulado
-                           , (COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem) - (COALESCE(ABS(SUM(reavaliacao.valor_depreciado)),0) + bem.vl_depreciacao))::NUMERIC(14,2) AS vl_atualizado
+                           , (COALESCE(SUM(reavaliacao.valor_depreciado),0))::NUMERIC(14,2) AS vl_acumulado
+                           , (COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem) - (COALESCE(ABS(SUM(reavaliacao.valor_depreciado)),0)))::NUMERIC(14,2) AS vl_atualizado
                            , COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem)::NUMERIC(14,2) AS vl_bem
                            , min_competencia::VARCHAR 
                            , max_competencia::VARCHAR

@@ -185,7 +185,7 @@ stQuery := '
                           
                            WHERE reavaliacao.cod_bem = tmp_bem_depreciacao.cod_bem 
                              AND TO_CHAR(reavaliacao.dt_reavaliacao, ''YYYY'') = ' || quote_literal(stExercicio) || ' 
-                             AND reavaliacao.dt_reavaliacao BETWEEN TO_DATE('|| quote_literal( arDatas[0] ) || ', ''DD/MM/YYYY'') AND TO_DATE('|| quote_literal( arDatas[1] ) ||', ''DD/MM/YYYY'')
+                             AND reavaliacao.dt_reavaliacao BETWEEN TO_DATE(''01/01/'|| stExercicio || ''', ''DD/MM/YYYY'') AND TO_DATE('|| quote_literal( arDatas[1] ) ||', ''DD/MM/YYYY'')
                              /* Recupera todos as reavaliações, inclusive dos meses anteriores e não somente a última, devido a sequencia dos meses depreciados.
                              AND reavaliacao.cod_reavaliacao = (SELECT MAX(reavaliacao.cod_reavaliacao)
                                                                   FROM patrimonio.reavaliacao

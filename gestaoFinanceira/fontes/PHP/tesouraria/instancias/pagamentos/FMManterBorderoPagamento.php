@@ -41,20 +41,11 @@
 
 */
 
-/*
-$Log$
-Revision 1.17  2006/10/23 16:32:50  domluc
-Add opção para multiplos boletins
-
-Revision 1.16  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CLA_IAPPLETTERMINAL                                                                   );
 include_once( CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php"                                     );
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterBorderoPagamento";
@@ -68,7 +59,7 @@ $pgJs   = "JS".$stPrograma.".js";
 //valida a utilização da rotina de encerramento do mês contábil
 $mesAtual = date('m');
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
-include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
+
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
@@ -179,7 +170,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     if ($rsEntidade->getNumLinhas() > 1) {
         $obCmbEntidade->addOption    ( ""            ,"Selecione" );
         $obCmbEntidade->obEvento->setOnChange( "mostraSpanBoletim();" );
-    } else $jsSL = "mostraSpanBoletim();";
+    } else {
+        $jsSL = "mostraSpanBoletim();";
+    }
     $obCmbEntidade->preencheCombo( $rsEntidade                );
 
     $obSpanBoletim = new Span;
@@ -382,8 +375,11 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->defineBarra( array($obBtnOk, $obBtnCancelar) );
 
     $obFormulario->show();
-    if ($jsSL) SistemaLegado::executaFrameOculto($jsSL);
+
+    if ($jsSL)
+        SistemaLegado::executaFrameOculto($jsSL);
 }
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

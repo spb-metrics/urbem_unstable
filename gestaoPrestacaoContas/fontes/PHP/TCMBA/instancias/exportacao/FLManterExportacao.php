@@ -29,7 +29,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
     * @ignore
-    * $Revision: 62823 $
+    * $Revision: 63139 $
     * $Name$
     * $Autor: $
     * $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
@@ -169,10 +169,13 @@ switch ($request->get('stAcao')) {
                                     ,"PagEmp2.txt"  
                                     ,"PartConv.txt" 
                                     ,"PartLic.txt"  
-                                    ,"Public.txt"   
+                                    ,"PubLic.txt"
+                                    ,"RecArrec.txt"   
                                     ,"RecLanc2.txt" 
                                     ,"ResCont.txt"  
-                                    ,"Retencao.txt" 
+                                    ,"Retencao.txt"
+                                    ,"Subempenho.txt"
+                                    ,"LancExtraOrc.txt"
                                 );
     break;
 }

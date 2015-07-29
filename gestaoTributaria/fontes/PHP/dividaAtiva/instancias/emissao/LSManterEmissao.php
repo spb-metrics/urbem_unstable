@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: LSManterEmissao.php 60506 2014-10-24 17:17:18Z michel $
+    * $Id: LSManterEmissao.php 63083 2015-07-22 19:44:59Z evandro $
 
   Caso de uso: uc-05.04.03
 **/
@@ -133,6 +133,18 @@ if ( $stFiltro )
 $stOrdem = " ORDER BY ddd.num_parcelamento, ddd.cod_documento";
 
 $obTDATDividaDocumento = new TDATDividaDocumento;
+
+/* 
+    Validacao para quando a listagem vier da acao Gestão Tributária :: Dívida Ativa :: Cobrança Administrativa :: Cobrar Dívida Ativa
+    já que o agrupamento pelo cod de inscrição da divida traz valores pra cada divida e queremos agrupar pela cobrança
+    seta a coluna do SELECT da consulta como vazio para realizar o agrupamento pela cobrança 
+*/
+if ($request->get("stOrigemFormulario") == 'cobranca_divida'){
+    $obTDATDividaDocumento->setDado('cod_inscricao_divida_ativa','');
+}else{
+    $obTDATDividaDocumento->setDado('cod_inscricao_divida_ativa','divida_ativa.cod_inscricao AS cod_inscricao_divida_ativa,');
+}
+  
 $obTDATDividaDocumento->recuperaListaDocumentoLS( $rsDocumentos, $stFiltro, $stOrdem );
 
 $obForm = new Form;

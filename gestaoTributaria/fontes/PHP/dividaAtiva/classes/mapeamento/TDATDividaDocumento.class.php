@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TDATDividaDocumento.class.php 60506 2014-10-24 17:17:18Z michel $
+    * $Id: TDATDividaDocumento.class.php 63083 2015-07-22 19:44:59Z evandro $
 
 * Casos de uso: uc-05.04.03
 */
@@ -160,143 +160,112 @@ class TDATDividaDocumento extends Persistente
 
     public function montaRecuperaListaDocumentoLS()
     {
-        $stSql  = " SELECT DISTINCT \n";
-        $stSql .= "     ddd.*, \n";
-        $stSql .= "     divida_ativa.cod_inscricao AS cod_inscricao_divida_ativa, \n"; 
-        $stSql .= "     divida_ativa.exercicio AS exercicio_divida_ativa, \n"; 
-        $stSql .= "     ded.num_emissao, \n";
-        $stSql .= "     ded.num_documento, \n";
-        $stSql .= "     ded.exercicio, \n";
-        $stSql .= "     CASE WHEN dp.numero_parcelamento = -1 THEN
-                            ' '
-                        ELSE
-                            dp.numero_parcelamento::text
-                        END AS numero_parcelamento, \n";
-        $stSql .= "     CASE WHEN dp.exercicio = '-1' THEN
-                            ' '
-                        ELSE
-                            dp.exercicio::text
-                        END AS exercicio_cobranca,  \n";
-        $stSql .= "     ( \n";
-        $stSql .= "         SELECT \n";
-        $stSql .= "             swc.nom_cgm \n";
-        $stSql .= "         FROM \n";
-        $stSql .= "             sw_cgm AS swc \n";
-        $stSql .= "         WHERE \n";
-        $stSql .= "             swc.numcgm = ddc.numcgm \n";
-        $stSql .= "     )AS nom_cgm, \n";
-        $stSql .= "     ddc.numcgm, \n";
-        $stSql .= "     amd.nome_documento, \n";
-        $stSql .= "     amd.nome_arquivo_agt, \n";
-        $stSql .= "     aad.nome_arquivo_swx, \n";
-        $stSql .= "     (
-                            SELECT
-                                to_char(emissao_documento.timestamp, 'dd/mm/YYYY')
-                            FROM
-                                divida.emissao_documento
-                            WHERE
-                                emissao_documento.num_parcelamento = ded.num_parcelamento
-                                AND emissao_documento.cod_tipo_documento = ded.cod_tipo_documento
-                                AND emissao_documento.cod_documento = ded.cod_documento
-                                AND emissao_documento.num_documento = ded.num_documento
-                            ORDER BY
-                                emissao_documento.timestamp ASC
+        /* 
+            Caso a consulta NAO seja executada pela acao Gestão Tributária :: Dívida Ativa :: Cobrança Administrativa :: Cobrar Dívida Ativa
+            Concatena a string 'divida_ativa.cod_inscricao AS cod_inscricao_divida_ativa,' 
+        */
+        $stSql  = " SELECT DISTINCT 
+                        ddd.*, 
+                        ".$this->getDado('cod_inscricao_divida_ativa')."
+                        divida_ativa.exercicio AS exercicio_divida_ativa,  
+                        ded.num_emissao, 
+                        ded.num_documento, 
+                        ded.exercicio, 
+                        CASE WHEN dp.numero_parcelamento = -1 THEN
+                                       ' '
+                                   ELSE
+                                       dp.numero_parcelamento::text
+                                   END AS numero_parcelamento, 
+                        CASE WHEN dp.exercicio = '-1' THEN
+                                       ' '
+                                   ELSE
+                                       dp.exercicio::text
+                                   END AS exercicio_cobranca,  
+                        ( 
+                            SELECT 
+                                swc.nom_cgm 
+                            FROM 
+                                sw_cgm AS swc 
+                            WHERE 
+                                swc.numcgm = ddc.numcgm 
+                        )AS nom_cgm, 
+                        ddc.numcgm, 
+                        amd.nome_documento, 
+                        amd.nome_arquivo_agt, 
+                        aad.nome_arquivo_swx, 
+                        (   SELECT to_char(emissao_documento.timestamp, 'dd/mm/YYYY')
+                              FROM divida.emissao_documento
+                            WHERE emissao_documento.num_parcelamento = ded.num_parcelamento
+                              AND emissao_documento.cod_tipo_documento = ded.cod_tipo_documento
+                              AND emissao_documento.cod_documento = ded.cod_documento
+                              AND emissao_documento.num_documento = ded.num_documento
+                            ORDER BY emissao_documento.timestamp ASC
                             LIMIT 1
-                        ) AS data_emissao, \n";
-        $stSql .= "     (
-                            SELECT
-                                emissao_documento.num_emissao
-                            FROM
-                                divida.emissao_documento
-                            WHERE
-                                emissao_documento.num_parcelamento = ded.num_parcelamento
-                                AND emissao_documento.cod_tipo_documento = ded.cod_tipo_documento
-                                AND emissao_documento.cod_documento = ded.cod_documento
-                                AND emissao_documento.num_documento = ded.num_documento
-                            ORDER BY
-                                emissao_documento.timestamp DESC
+                        ) AS data_emissao, 
+                        (   SELECT emissao_documento.num_emissao
+                              FROM divida.emissao_documento
+                            WHERE emissao_documento.num_parcelamento = ded.num_parcelamento
+                              AND emissao_documento.cod_tipo_documento = ded.cod_tipo_documento
+                              AND emissao_documento.cod_documento = ded.cod_documento
+                              AND emissao_documento.num_documento = ded.num_documento
+                            ORDER BY emissao_documento.timestamp DESC
                             LIMIT 1
-                        ) AS num_emissao \n";
-        $stSql .= " FROM  \n";
-        $stSql .= "     divida.documento AS ddd \n";
-        $stSql .= " LEFT JOIN
-                        divida.emissao_documento AS ded
-                    ON
-                        ded.num_parcelamento = ddd.num_parcelamento
-                        AND ded.cod_documento = ddd.cod_documento
-                        AND ded.cod_tipo_documento = ddd.cod_tipo_documento \n";
-        $stSql .= " INNER JOIN \n";
-        $stSql .= "     divida.divida_parcelamento AS ddp \n";
-        $stSql .= " ON \n";
-        $stSql .= "     ddp.num_parcelamento = ddd.num_parcelamento \n";
+                        ) AS num_emissao 
+                    FROM  divida.documento AS ddd 
+                    
+                    LEFT JOIN divida.emissao_documento AS ded
+                           ON ded.num_parcelamento = ddd.num_parcelamento
+                          AND ded.cod_documento = ddd.cod_documento
+                          AND ded.cod_tipo_documento = ddd.cod_tipo_documento 
+                    
+                    INNER JOIN divida.divida_parcelamento AS ddp 
+                            ON ddp.num_parcelamento = ddd.num_parcelamento 
 
-        $stSql .= " INNER JOIN \n";
-        $stSql .= "    divida.parcelamento AS dp \n";
-        $stSql .= " ON \n";
-        $stSql .= "    dp.num_parcelamento = ddd.num_parcelamento \n";
+                    INNER JOIN divida.parcelamento AS dp 
+                            ON dp.num_parcelamento = ddd.num_parcelamento 
 
-        $stSql .= " INNER JOIN \n";
-        $stSql .= "     divida.divida_cgm AS ddc \n";
-        $stSql .= " ON \n";
-        $stSql .= "     ddc.exercicio = ddp.exercicio \n";
-        $stSql .= "     AND ddc.cod_inscricao = ddp.cod_inscricao \n";
-        $stSql .= " INNER JOIN  \n";
-        $stSql .= "     administracao.modelo_documento AS amd \n";
-        $stSql .= " ON  \n";
-        $stSql .= "     amd.cod_documento = ddd.cod_documento \n";
-        $stSql .= "     AND amd.cod_tipo_documento = ddd.cod_tipo_documento \n";
+                    INNER JOIN divida.divida_cgm AS ddc 
+                            ON ddc.exercicio = ddp.exercicio 
+                           AND ddc.cod_inscricao = ddp.cod_inscricao 
+         
+                    INNER JOIN administracao.modelo_documento AS amd 
+                            ON amd.cod_documento = ddd.cod_documento 
+                           AND amd.cod_tipo_documento = ddd.cod_tipo_documento 
 
-        $stSql .= " INNER JOIN  \n";
-        $stSql .= "     administracao.modelo_arquivos_documento AS amad \n";
-        $stSql .= " ON  \n";
-        $stSql .= "     amad.cod_documento = ddd.cod_documento \n";
-        $stSql .= "     AND amad.cod_tipo_documento = ddd.cod_tipo_documento \n";
+                    INNER JOIN administracao.modelo_arquivos_documento AS amad 
+                            ON amad.cod_documento = ddd.cod_documento 
+                           AND amad.cod_tipo_documento = ddd.cod_tipo_documento 
 
-        $stSql .= " INNER JOIN  \n";
-        $stSql .= "     administracao.arquivos_documento AS aad \n";
-        $stSql .= " ON  \n";
-        $stSql .= "     aad.cod_arquivo = amad.cod_arquivo \n";
+                    INNER JOIN administracao.arquivos_documento AS aad 
+                            ON aad.cod_arquivo = amad.cod_arquivo 
 
-        $stSql .= " LEFT JOIN \n";
-        $stSql .= "     divida.divida_imovel AS ddi \n";
-        $stSql .= " ON \n";
-        $stSql .= "     ddi.exercicio = ddp.exercicio \n";
-        $stSql .= "     AND ddi.cod_inscricao = ddp.cod_inscricao \n";
-        $stSql .= " LEFT JOIN \n";
-        $stSql .= "     divida.divida_empresa AS dde \n";
-        $stSql .= " ON \n";
-        $stSql .= "     dde.exercicio = ddp.exercicio \n";
-        $stSql .= "     AND dde.cod_inscricao = ddp.cod_inscricao
+                    LEFT JOIN divida.divida_imovel AS ddi 
+                           ON ddi.exercicio = ddp.exercicio 
+                          AND ddi.cod_inscricao = ddp.cod_inscricao 
+                    
+                    LEFT JOIN divida.divida_empresa AS dde 
+                           ON dde.exercicio = ddp.exercicio 
+                          AND dde.cod_inscricao = ddp.cod_inscricao
 
-                    LEFT JOIN
-                        divida.divida_cancelada AS ddcanc
-                    ON
-                        ddcanc.cod_inscricao = ddp.cod_inscricao
-                        AND ddcanc.exercicio = ddp.exercicio
+                    LEFT JOIN divida.divida_cancelada AS ddcanc
+                           ON ddcanc.cod_inscricao = ddp.cod_inscricao
+                          AND ddcanc.exercicio = ddp.exercicio
 
-                    LEFT JOIN
-                        divida.divida_remissao
-                    ON
-                        divida_remissao.cod_inscricao = ddp.cod_inscricao
-                        AND divida_remissao.exercicio = ddp.exercicio
+                    LEFT JOIN divida.divida_remissao
+                           ON divida_remissao.cod_inscricao = ddp.cod_inscricao
+                          AND divida_remissao.exercicio = ddp.exercicio
                         
-                    LEFT JOIN
-                        divida.divida_ativa
-                    ON
-                        divida_ativa.cod_inscricao = ddp.cod_inscricao
-                        AND divida_ativa.exercicio = ddp.exercicio  
+                    LEFT JOIN divida.divida_ativa
+                           ON divida_ativa.cod_inscricao = ddp.cod_inscricao
+                          AND divida_ativa.exercicio = ddp.exercicio  
                         
-                    LEFT JOIN
-                        divida.modalidade_vigencia
-                    ON
-                        modalidade_vigencia.cod_modalidade = dp.cod_modalidade 
-                        AND modalidade_vigencia.timestamp = dp.timestamp_modalidade
+                    LEFT JOIN divida.modalidade_vigencia
+                           ON modalidade_vigencia.cod_modalidade = dp.cod_modalidade 
+                          AND modalidade_vigencia.timestamp = dp.timestamp_modalidade
                         
-                    LEFT JOIN
-                        divida.modalidade
-                    ON
-                        modalidade.cod_modalidade = modalidade_vigencia.cod_modalidade   \n";
-
+                    LEFT JOIN divida.modalidade
+                           ON modalidade.cod_modalidade = modalidade_vigencia.cod_modalidade   
+            ";
         return $stSql;
     }
 

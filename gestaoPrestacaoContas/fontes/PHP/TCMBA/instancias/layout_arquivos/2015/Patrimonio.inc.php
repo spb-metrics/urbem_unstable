@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 62965 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
@@ -41,23 +41,22 @@
     * Casos de uso: uc-06.05.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAPatrimonio.class.php" );
-    $obTMapeamento = new TTBAPatrimonio();
-    $obTMapeamento->setDado('exercicio',Sessao::getExercicio());
-    $obTMapeamento->setDado('cod_entidade',$stEntidades);
-    $obTMapeamento->setDado('dt_inicio',$arFiltro['stDataInicial']);
-    $obTMapeamento->setDado('dt_fim',$arFiltro['stDataFinal']);
-    $obTMapeamento->recuperaDadosTribunal($rsPatrimonio);
-
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBAPatrimonio.class.php" );
+    
+    $obTTCMBAPatrimonio = new TTCMBAPatrimonio();
+    $obTTCMBAPatrimonio->setDado('exercicio',Sessao::getExercicio());
+    $obTTCMBAPatrimonio->setDado('cod_entidade',$stEntidades);
+    $obTTCMBAPatrimonio->setDado('dt_inicio', $arFiltro['stDataInicial']);
+    $obTTCMBAPatrimonio->setDado('dt_fim'   , $arFiltro['stDataFinal']);
+    $obTTCMBAPatrimonio->setDado('inCodGestora', $inCodUnidadeGestora );
+    
+    $obTTCMBAPatrimonio->recuperaDadosTribunal($rsPatrimonio);
+    
     $inCount = 1;
-    //Numero de linhas limite menos 2, para considerar o cabecalho e o rodape
     $inLimite = 4998;
 
     $arNewPatrimonio = array();
     $arRSPatrimonio = array();
-
-    //Adiciona string 'patrimonio' na primeira linha do arquivo
-    Sessao::write('titulo', 'patrimonio');
 
     if ($rsPatrimonio->getNumLinhas() > $inLimite) {
         foreach ($rsPatrimonio->arElementos as $arElementos) {
@@ -81,54 +80,70 @@
 
     foreach ($arRSPatrimonio as $inKey => $rsNewPatrimonio) {
 
-        $arArquivo = explode('.',$stArquivo);
-
-        $obExportador->addArquivo($arArquivo[0] . ($inKey + 1) . '.' . $arArquivo[1]);
-        $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+        if ($rsPatrimonio->getNumLinhas() > $inLimite) {
+            $arArquivo = explode('.',$stArquivo);
+            
+            $obExportador->addArquivo($arArquivo[0] . ($inKey + 1) . '.' . $arArquivo[1]);
+            $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+        }
 
         $obExportador->roUltimoArquivo->addBloco($rsNewPatrimonio);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1"); //Reservado
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]".$inCodUnidadeGestora); //unidade_gestora
+        
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tombo_bem");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_bem");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_empenho");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("anterior_siga");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_bem");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("funcionario_responsavel");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_aquisicao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_baixa");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_orgao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+        
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
@@ -136,8 +151,7 @@
         unset($rsNewPatrimonio);
     }
 
-/*
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-*/
+    unset($obTTBAPatrimonio);
+    unset($rsPatrimonio);
+    
+?>

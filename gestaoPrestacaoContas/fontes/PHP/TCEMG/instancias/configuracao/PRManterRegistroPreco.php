@@ -32,10 +32,10 @@
   * 
   * @ignore
   * 
-  * $Id: PRManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
-  * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+  * $Id: PRManterRegistroPreco.php 62915 2015-07-08 14:10:35Z michel $
+  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
   * $Author: michel $
-  * $Rev: 62832 $
+  * $Rev: 62915 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -258,6 +258,7 @@ switch ($stAcao) {
                             $obTTCEMGRegistroPrecosOrgao->setDado('dt_publicacao_aviso_intencao',$arOrgao['dtPublicacaoAvisoIntencao']);
                             $obTTCEMGRegistroPrecosOrgao->setDado('dt_adesao'                   ,$arOrgao['dtAdesao']);
                             $obTTCEMGRegistroPrecosOrgao->setDado('gerenciador'                 ,($arOrgao['inOrgaoGerenciador'] == 1)? true : false );
+                            $obTTCEMGRegistroPrecosOrgao->setDado('cgm_aprovacao'               ,$arOrgao['inResponsavel']);
                             
                             $obErro = $obTTCEMGRegistroPrecosOrgao->inclusao($boTransacao);
                         }

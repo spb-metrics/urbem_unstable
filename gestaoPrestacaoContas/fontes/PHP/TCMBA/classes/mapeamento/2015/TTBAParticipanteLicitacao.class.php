@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63144 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -88,65 +88,93 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   lici.exercicio         \n";
-    $stSql .= "         ,lici.cod_licitacao       \n";
-    $stSql .= "         ,case when  pf.numcgm is not null then 1       \n";
-    $stSql .= "                else 2       \n";
-    $stSql .= "         end as pf_pj_part       \n";
-    $stSql .= "         ,case when  pf.cpf is not null  then pf.cpf       \n";
-    $stSql .= "               when pj.cnpj is not null  then pj.cnpj       \n";
-    $stSql .= "                else ''       \n";
-    $stSql .= "         end as cpf_cnpj_part       \n";
-    $stSql .= "         ,case when paco.exercicio is not null then 1 else 2 end as tipo_participante       \n";
-    $stSql .= "         ,cgm.nom_cgm as nome_participante       \n";
-    $stSql .= "         ,pjco.cnpj as cnpj_consorcio    \n";
-    $stSql .= "         ,to_char(part.dt_inclusao,'yyyymm') as competencia       \n";
-    $stSql .= "         ,CASE WHEN (       \n";
-    $stSql .= "             SELECT  count(*) /*qtd_docs_part*/       \n";
-    $stSql .= "             FROM    licitacao.participante_documentos as pado       \n";
-    $stSql .= "             WHERE   part.exercicio      = pado.exercicio       \n";
-    $stSql .= "             AND     part.cod_entidade   = pado.cod_entidade       \n";
-    $stSql .= "             AND     part.cod_modalidade = pado.cod_modalidade       \n";
-    $stSql .= "             AND     part.cod_licitacao  = pado.cod_licitacao       \n";
-    $stSql .= "             AND     part.cgm_fornecedor = pado.cgm_fornecedor       \n";
-    $stSql .= "         ) >= (       \n";
-    $stSql .= "             SELECT  count(*) /*qtd_docs_lic*/       \n";
-    $stSql .= "             FROM    licitacao.licitacao_documentos as lido       \n";
-    $stSql .= "             WHERE   lici.exercicio      = lido.exercicio       \n";
-    $stSql .= "             AND     lici.cod_entidade   = lido.cod_entidade       \n";
-    $stSql .= "             AND     lici.cod_modalidade = lido.cod_modalidade       \n";
-    $stSql .= "             AND     lici.cod_licitacao  = lido.cod_licitacao       \n";
-    $stSql .= "         ) then 'S' else 'N' end as indicador_habilitacao       \n";
-    $stSql .= " FROM     licitacao.licitacao    as lici       \n";
-    $stSql .= "         ,sw_cgm                 as cgm       \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_fisica as pf       \n";
-    $stSql .= "             ON ( cgm.numcgm = pf.numcgm )       \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_juridica as pj       \n";
-    $stSql .= "             ON ( cgm.numcgm = pj.numcgm )       \n";
-    $stSql .= "         ,licitacao.participante as part       \n";
-    $stSql .= "         LEFT JOIN       \n";
-    $stSql .= "          licitacao.participante_consorcio paco       \n";
-    $stSql .= "         ON (    part.exercicio      = paco.exercicio       \n";
-    $stSql .= "             AND part.cod_entidade   = paco.cod_entidade       \n";
-    $stSql .= "             AND part.cod_modalidade = paco.cod_modalidade       \n";
-    $stSql .= "             AND part.cod_licitacao  = paco.cod_licitacao       \n";
-    $stSql .= "             AND part.cgm_fornecedor = paco.cgm_fornecedor       \n";
-    $stSql .= "         )       \n";
-    $stSql .= "        LEFT JOIN      \n";
-    $stSql .= "         sw_cgm_pessoa_juridica as pjco  \n";
-    $stSql .= "        ON (     \n";
-    $stSql .= "            paco.cgm_fornecedor = pjco.numcgm    \n";
-    $stSql .= "        )    \n";
-    $stSql .= " WHERE   lici.exercicio      = part.exercicio       \n";
-    $stSql .= " AND     lici.cod_entidade   = part.cod_entidade       \n";
-    $stSql .= " AND     lici.cod_modalidade = part.cod_modalidade       \n";
-    $stSql .= " AND     lici.cod_licitacao  = part.cod_licitacao       \n";
-    $stSql .= " AND     part.cgm_fornecedor = cgm.numcgm       \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     lici.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
-    $stSql .= " AND     lici.exercicio='".$this->getDado('exercicio')."'                     \n";
+    $stSql .= " SELECT   licitacao.exercicio         
+                        ,licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS cod_licitacao 
+                        ,CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1 ELSE 2 END AS pf_pj_part       
+                        ,CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf       
+                              WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj       
+                              ELSE ''       
+                        END AS cpf_cnpj_part       
+                        ,3 AS tipo_participante    -- fixado em participante comum      
+                        ,sw_cgm.nom_cgm AS nome_participante       
+                        ,pjco.cnpj AS cnpj_consorcio    
+                        ,".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia       
+                        ,CASE WHEN (       
+                                    SELECT count(*)       
+                                      FROM licitacao.participante_documentos AS pado       
+                                     WHERE participante.exercicio      = pado.exercicio       
+                                       AND participante.cod_entidade   = pado.cod_entidade       
+                                       AND participante.cod_modalidade = pado.cod_modalidade       
+                                       AND participante.cod_licitacao  = pado.cod_licitacao       
+                                       AND participante.cgm_fornecedor = pado.cgm_fornecedor       
+                                    ) >= (       
+                                            SELECT count(*)       
+                                              FROM licitacao.licitacao_documentos AS lido       
+                                             WHERE licitacao.exercicio      = lido.exercicio       
+                                               AND licitacao.cod_entidade   = lido.cod_entidade       
+                                               AND licitacao.cod_modalidade = lido.cod_modalidade       
+                                               AND licitacao.cod_licitacao  = lido.cod_licitacao       
+                                        ) THEN 'S'
+                              ELSE 'N'
+                        END AS indicador_habilitacao
+                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                        , 1 AS tipo_registro
 
+                 FROM licitacao.licitacao
+
+           INNER JOIN licitacao.participante
+                   ON participante.exercicio = licitacao.exercicio
+                  AND participante.cod_entidade = licitacao.cod_entidade
+                  AND participante.cod_modalidade = licitacao.cod_modalidade
+                  AND participante.cod_licitacao = licitacao.cod_licitacao
+
+           INNER JOIN licitacao.homologacao
+                   ON homologacao.cod_licitacao = licitacao.cod_licitacao
+                  AND homologacao.cod_modalidade = licitacao.cod_modalidade
+                  AND homologacao.cod_entidade = licitacao.cod_entidade
+                  AND homologacao.exercicio_licitacao = licitacao.exercicio
+
+           INNER JOIN sw_cgm
+                   ON sw_cgm.numcgm = participante.cgm_fornecedor
+
+            LEFT JOIN sw_cgm_pessoa_fisica
+                   ON sw_cgm.numcgm = sw_cgm_pessoa_fisica.numcgm
+
+            LEFT JOIN sw_cgm_pessoa_juridica       
+                   ON sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm
+
+            LEFT JOIN licitacao.participante_consorcio       
+                   ON participante.exercicio      = participante_consorcio.exercicio       
+                  AND participante.cod_entidade   = participante_consorcio.cod_entidade       
+                  AND participante.cod_modalidade = participante_consorcio.cod_modalidade       
+                  AND participante.cod_licitacao  = participante_consorcio.cod_licitacao       
+                  AND participante.cgm_fornecedor = participante_consorcio.cgm_fornecedor       
+
+            LEFT JOIN sw_cgm_pessoa_juridica as pjco  
+                   ON participante_consorcio.cgm_fornecedor = pjco.numcgm    
+
+                WHERE homologacao.cod_entidade IN (".$this->getDado('entidades').")              
+                  AND homologacao.exercicio_licitacao = '".$this->getDado('exercicio')."'
+                  AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN
+                                                                                        TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                                                        AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                  AND licitacao.cod_modalidade NOT IN (8,9)      
+
+                GROUP BY licitacao.exercicio
+                       , licitacao.cod_licitacao
+                       , cpf_cnpj_part
+                       , tipo_participante
+                       , nome_participante
+                       , pjco.cnpj
+                       , competencia
+                       , indicador_habilitacao
+                       , unidade_gestora
+                       , sw_cgm_pessoa_fisica.numcgm
+                       ,licitacao.cod_entidade
+                       ,licitacao.cod_modalidade
+
+                ORDER BY cod_licitacao, unidade_gestora, cpf_cnpj_part
+        ";                    
     return $stSql;
 }
 

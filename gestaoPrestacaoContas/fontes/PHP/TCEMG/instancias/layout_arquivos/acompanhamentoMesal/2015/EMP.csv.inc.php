@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EMP.csv.inc.php 62412 2015-05-05 19:49:47Z jean $
-  * $Date: 2015-05-05 16:49:47 -0300 (Ter, 05 Mai 2015) $
-  * $Author: jean $
-  * $Rev: 62412 $
+  * $Id: EMP.csv.inc.php 63118 2015-07-28 12:03:49Z evandro $
+  * $Date: 2015-07-28 09:03:49 -0300 (Ter, 28 Jul 2015) $
+  * $Author: evandro $
+  * $Rev: 63118 $
   *
 */
 /**
@@ -65,50 +65,8 @@ $arRecordSetEMP99 = array(
     )
 );
 
-$map = array(
-    'á' => 'a',
-    'à' => 'a',
-    'ã' => 'a',
-    'â' => 'a',
-    'é' => 'e',
-    'ê' => 'e',
-    'í' => 'i',
-    'ó' => 'o',
-    'ô' => 'o',
-    'õ' => 'o',
-    'ú' => 'u',
-    'ü' => 'u',
-    'ç' => 'c',
-    'Á' => 'A',
-    'À' => 'A',
-    'Ã' => 'A',
-    'Â' => 'A',
-    'É' => 'E',
-    'Ê' => 'E',
-    'Í' => 'I',
-    'Ó' => 'O',
-    'Ô' => 'O',
-    'Õ' => 'O',
-    'Ú' => 'U',
-    'Ü' => 'U',
-    'Ç' => 'C',
-    "'" => '',
-    'ª' => '',
-    'º' => '',
-    '¿' => '',
-    '°' => '',
-    '²' => '',
-    ';' => '',
-    '"' => '',
-    'ñ' => 'n',
-    'Ñ' => 'N',
-    '–' => '-',
-    '¨' => ' '
-);
-
 $rsRecordSetEMP99 = new RecordSet();
 $rsRecordSetEMP99->preenche($arRecordSetEMP99);
-
 
 if (count($rsRecordSetEMP10->getElementos()) > 0) {
     $inCount=0;
@@ -116,7 +74,7 @@ if (count($rsRecordSetEMP10->getElementos()) > 0) {
         $inCount++;
         $stChave = $arEMP10['nroempenho'];
 
-        $arEMP10['especificacaoempenho'] =  strtr($arEMP10['especificacaoempenho'], $map);
+        SistemaLegado::removeAcentosSimbolos($arEMP10['especificacaoempenho']);
 
         /* previstas no art. 24, I e II da Lei n. 8.666/93, nao demonstrar os campos nroProcessoLicitatorio, exercicioProcessoLicitatorio e tipoProcesso.
            A partir do somatório e pelo compras.compra_direta.cod_tipo_objeto -> compras.tipo_objeto, quando for "2 | Obras e Serviços de Engenharia"

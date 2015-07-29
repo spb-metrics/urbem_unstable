@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaComprasConsulta.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterMapaComprasConsulta.php 63099 2015-07-24 18:30:55Z franver $
 
  */
 
@@ -102,6 +102,11 @@ $obLblTipoLicitacao->setRotulo ( 'Tipo de Cotação' );
 $obLblTipoLicitacao->setName   ( 'stTipoLicitacao'   );
 $obLblTipoLicitacao->setValue  ( $rsMapa->getCampo('cod_tipo_licitacao').' - '.$rsMapa->getCampo('descricao_tipo_licitacao'));
 
+$obLblTipoRegistroPrecos = new Label;
+$obLblTipoRegistroPrecos->setRotulo( 'Registro de Preços' );
+$obLblTipoRegistroPrecos->setName  ( 'stTipoRegistroPrecos' );
+$obLblTipoRegistroPrecos->setId    ( 'stTipoRegistroPrecos' );
+
 // Objetos utilizados para emitir o Mapa de Compras.
 $obCheckBoxEmitirMapa = new CheckBox;
 $obCheckBoxEmitirMapa->setName  ('boEmitirMapa');
@@ -153,6 +158,7 @@ $obFormulario->addTitulo     ( "Dados do Mapa"       );
 $obFormulario->addComponente ( $obLblExercicio       );
 $obFormulario->addComponente ( $obTxtCodMapa         );
 $obFormulario->addComponente ( $obLblTipoLicitacao   );
+$obFormulario->addComponente ( $obLblTipoRegistroPrecos );
 $obFormulario->addTitulo     ( "Impressão"           );
 $obFormulario->addComponente ( $obCheckBoxEmitirMapa );
 $obFormulario->addComponenteComposto($obRadioMostraDadoSim, $obRadioMostraDadoNao);
@@ -178,7 +184,6 @@ $obBtnListagemSolicitacao->obEvento->setOnClick("javascript:location.href='".$pg
 $obButtonEmitirMapa = new Button;
 $obButtonEmitirMapa->setId       ('btnOk');
 $obButtonEmitirMapa->setValue    ('Ok');
-//$obButtonEmitirMapa->setDisabled (true);
 $obButtonEmitirMapa->obEvento->setOnClick("Salvar();");
 
 $obFormulario->defineBarra ( array($obButtonEmitirMapa, $obBtnListagemSolicitacao),"left","" );
@@ -189,7 +194,9 @@ montaMapa($inCodMapa, $stExercicio);
 
 $stJs  = montaListaSolicitacoes($rsMapa->getCampo('cod_tipo_licitacao'), $stAcao);
 $stJs .= montaListaItens($rsRecordSet, $rsMapa->getCampo('cod_tipo_licitacao'), $stAcao);
+$stJs .= preencheRegistroPrecos($inCodMapa, $stExercicio);
 
 SistemaLegado::executaFrameOculto($stJs);
+
 
 ?>

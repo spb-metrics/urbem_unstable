@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGRegistroPrecosOrgao.class.php 61913 2015-03-13 18:55:57Z franver $
-  $Date: 2015-03-13 15:55:57 -0300 (Sex, 13 Mar 2015) $
-  $Author: franver $
-  $Rev: 61913 $
+  $Id: TTCEMGRegistroPrecosOrgao.class.php 62915 2015-07-08 14:10:35Z michel $
+  $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
+  $Author: michel $
+  $Rev: 62915 $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
@@ -50,10 +50,10 @@ class TTCEMGRegistroPrecosOrgao extends Persistente {
         parent::Persistente();
         $this->setTabela('tcemg.registro_precos_orgao');
         $this->setComplementoChave('cod_entidade, numero_registro_precos, exercicio_registro_precos, interno, numcgm_gerenciador, exercicio_unidade, num_unidade, num_orgao');
-        
-	    $this->AddCampo('cod_entidade'                , 'integer', true,  '',  true,  true);
+
+        $this->AddCampo('cod_entidade'                , 'integer', true,  '',  true,  true);
         $this->AddCampo('numero_registro_precos'      , 'integer', true,  '',  true,  true);
-	    $this->AddCampo('exercicio_registro_precos'   , 'varchar', true, '4',  true,  true);
+        $this->AddCampo('exercicio_registro_precos'   , 'varchar', true, '4',  true,  true);
         $this->AddCampo('interno'                     , 'boolean', true,  '',  true,  true);
         $this->AddCampo('numcgm_gerenciador'          , 'integer', true,  '',  true,  true);
         $this->AddCampo('exercicio_unidade'           , 'varchar', true, '4',  true,  true);
@@ -65,6 +65,55 @@ class TTCEMGRegistroPrecosOrgao extends Persistente {
         $this->AddCampo('dt_publicacao_aviso_intencao',    'date',false,  '', false, false);
         $this->AddCampo('dt_adesao'                   ,    'date',false,  '', false, false);
         $this->AddCampo('gerenciador'                 , 'boolean', true, '4', false, false);
+        $this->AddCampo('cgm_aprovacao'               , 'integer', true,  '', false,  true);
+    }
+
+    public function recuperaProcessoOrgao(&$rsRecordSet)
+    {
+        $rsRecordSet = new RecordSet();
+        $obConexao   = new Conexao();
+
+        $stSQL = $this->montaRecuperaProcessoOrgao($stFiltro, $stOrdem);
+        $this->setDebug($stSQL);
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSQL, $boTransacao);
+
+        return $obErro;
+    }
+
+    public function montaRecuperaProcessoOrgao()
+    {
+        $stSql = "
+            SELECT registro_precos_orgao.cod_entidade
+                 , registro_precos_orgao.numero_registro_precos
+                 , registro_precos_orgao.exercicio_registro_precos
+                 , registro_precos_orgao.interno
+                 , registro_precos_orgao.numcgm_gerenciador
+                 , registro_precos_orgao.exercicio_unidade
+                 , registro_precos_orgao.num_unidade
+                 , registro_precos_orgao.num_orgao
+                 , registro_precos_orgao.participante
+                 , registro_precos_orgao.numero_processo_adesao
+                 , registro_precos_orgao.exercicio_adesao
+                 , registro_precos_orgao.gerenciador
+                 , registro_precos_orgao.cgm_aprovacao
+                 , TO_CHAR(dt_publicacao_aviso_intencao,'dd/mm/yyyy') AS dt_publicacao_aviso_intencao
+                 , TO_CHAR(dt_adesao,'dd/mm/yyyy') AS dt_adesao
+                 , sw_cgm.numcgm  AS numcgm_responsavel
+                 , sw_cgm.nom_cgm AS nomcgm_responsavel
+                 , sw_cgm.numcgm||' - '||sw_cgm.nom_cgm AS st_cgm_responsavel
+              FROM tcemg.registro_precos_orgao
+
+         LEFT JOIN sw_cgm
+                ON sw_cgm.numcgm = registro_precos_orgao.cgm_aprovacao
+               AND registro_precos_orgao.cgm_aprovacao NOT IN (0)
+
+             WHERE registro_precos_orgao.exercicio_registro_precos	= '".$this->getDado('exercicio_registro_precos')."'
+               AND registro_precos_orgao.numero_registro_precos 	= ".$this->getDado('numero_registro_precos')."
+               AND registro_precos_orgao.interno                	= ".$this->getDado('interno')."
+               AND registro_precos_orgao.numcgm_gerenciador     	= ".$this->getDado('numcgm_gerenciador')."
+               AND registro_precos_orgao.cod_entidade           	= ".$this->getDado('cod_entidade') ;
+
+        return $stSql;
     }
 
     public function __destruct(){}

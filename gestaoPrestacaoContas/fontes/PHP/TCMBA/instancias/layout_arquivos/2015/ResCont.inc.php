@@ -38,7 +38,7 @@
     * Casos de uso: uc-06.05.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAResCont.class.php" );
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAResCont.class.php" );
     $obTMapeamento = new TTBAResCont();
     $obTMapeamento->recuperaDadosRescisaoContrato($rsContratoRescisao);
 

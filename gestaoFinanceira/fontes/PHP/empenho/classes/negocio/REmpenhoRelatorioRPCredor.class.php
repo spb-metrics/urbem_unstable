@@ -314,7 +314,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFEmpenhoRPCredor->setDado("exercicio",         $this->getExercicio());
     $obFEmpenhoRPCredor->setDado("stFiltro",          $this->getFiltro());
     $obFEmpenhoRPCredor->setDado("stEntidade",        $this->getCodEntidade());
-    $obFEmpenhoRPCredor->setDado("stDataInicial",     $this->getDataInicial());
+    $obFEmpenhoRPCredor->setDado("stDataInicial",       $this->getDataInicial());
     $obFEmpenhoRPCredor->setDado("stDataFinal",       $this->getDataFinal());
     $obFEmpenhoRPCredor->setDado("inCodEmpenhoInicial",$this->obREmpenhoEmpenho->getCodEmpenhoInicial());
     $obFEmpenhoRPCredor->setDado("inCodEmpenhoFinal", $this->obREmpenhoEmpenho->getCodEmpenhoFinal());
@@ -333,7 +333,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFEmpenhoRPCredor->setDado("stMascara",         $rsMascara->getCampo('masc_despesa'));
 
     $stOrder = "";
-    $obErro = $obFEmpenhoRPCredor->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder ); 
+    $obErro = $obFEmpenhoRPCredor->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
 
     $inCount            = 0;
     $inTotal            = 0;
@@ -411,11 +411,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
 
         $stTotalGeralLiquidosApagar = $stTotalGeralLiquidosApagar + ( $rsRecordSet->getCampo('vl_liquidado') - $rsRecordSet->getCampo('vl_empenhado_pago') );
         $stTotalGeralRestosApagar   = $stTotalGeralRestosApagar + $rsRecordSet->getCampo('vl_apagar');
-        $stTotalGeralEmpenhado      = $stTotalGeralEmpenhado + $rsRecordSet->getCampo('vl_empenhado');
-        $stTotalGeralLiquidado      = $stTotalGeralLiquidado + $rsRecordSet->getCampo('vl_liquidado');
-        $stTotalGeralAnulado        = $stTotalGeralAnulado + $rsRecordSet->getCampo('vl_anulado');
-        $stTotalGeralPago           = $stTotalGeralPago + $rsRecordSet->getCampo('vl_empenhado_pago');
-        
         $inCount++;
         $rsRecordSet->proximo();
 
@@ -427,10 +422,10 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $arRecord[$inCount]['razao_social']   = "Total Geral de liquidados a pagar: ";
     $arRecord[$inCount]['data_empenho']   = "";
     $arRecord[$inCount]['data_vencimento']= "";
-    $arRecord[$inCount]['empenhado']      = number_format($stTotalGeralEmpenhado,2,',','.');
-    $arRecord[$inCount]['liquidado']      = number_format($stTotalGeralLiquidado,2,',','.');
-    $arRecord[$inCount]['anulado']        = number_format($stTotalGeralAnulado,2,',','.');
-    $arRecord[$inCount]['pago']           = number_format($stTotalGeralPago,2,',','.');
+    $arRecord[$inCount]['empenhado']      = "";
+    $arRecord[$inCount]['liquidado']      = "";
+    $arRecord[$inCount]['anulado']        = "";
+    $arRecord[$inCount]['pago']           = "";
     $arRecord[$inCount]['apagar']         = number_format($stTotalGeralLiquidosApagar,2,',','.');
     $inCount++;
 

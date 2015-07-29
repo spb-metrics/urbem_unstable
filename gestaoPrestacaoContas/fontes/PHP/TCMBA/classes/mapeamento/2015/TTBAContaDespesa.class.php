@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63115 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,61 +41,58 @@
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/07/05 03:38:25  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoContaDespesa.class.php" );
 
-/**
-  *
-  * Data de Criação: 15/06/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAContaDespesa extends TOrcamentoContaDespesa
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function TTBAContaDespesa()
-{
-    parent::TOrcamentoContaDespesa();
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    function TTBAContaDespesa()
+    {
+        parent::TOrcamentoContaDespesa();
+        $this->setDado('exercicio', Sessao::getExercicio() );
+    }
+    
+    function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        $stSql = $this->montaRecuperaDadosTribunal().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+    
+    function montaRecuperaDadosTribunal()
+    {
+        $stSql = "
+                    SELECT 1 AS tipo_registro
+                         , ".$this->getDado('inCodGestora')." AS unidade_gestora
+                         , REPLACE( conta_despesa.cod_estrutural, '.', '') AS item_despesa
+                         , REPLACE( conta_despesa.cod_estrutural, '.', '') AS item_despesa_tcm
+                         , conta_despesa.descricao
+                         , conta_despesa.exercicio
+                         , CASE WHEN orcamento.fn_tipo_conta_despesa(exercicio, cod_estrutural) = 'A' 
+                                THEN 1 
+                                ELSE 2 
+                           END AS recebe_lancamento 
+            
+                     FROM orcamento.conta_despesa
+                 
+                    WHERE conta_despesa.exercicio = '".$this->getDado('stExercicio')."' 
+                 ORDER BY conta_despesa.exercicio
+                        , conta_despesa.cod_estrutural 
+        ";
+        return $stSql;
+    }
 
-    $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    $stSql = $this->montaRecuperaDadosTribunal().$stCondicao.$stOrdem;
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-function montaRecuperaDadosTribunal()
-{
-    $stSql .= " SELECT   c.*      \n";
-    $stSql .= "         ,replace(c.cod_estrutural,'.','') as estrutural      \n";
-    $stSql .= "         ,case when orcamento.fn_tipo_conta_despesa(exercicio,cod_estrutural) = 'A' then 'S' else 'N' end as tipo_conta \n";
-    $stSql .= " FROM     orcamento.conta_despesa as c \n";
-    $stSql .= " WHERE   c.exercicio='".$this->getDado('exercicio')."' \n";
-    $stSql .= " ORDER BY c.exercicio, c.cod_estrutural  \n";
-
-    return $stSql;
-}
-
-}
+?>

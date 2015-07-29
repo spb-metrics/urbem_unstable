@@ -43,9 +43,38 @@ class TTCEMGEMP extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTCEMGEMP()
+    public function __construct()
     {
         parent::Persistente();
+    }
+
+    /**
+        * Executa uma funcao para importar os empenhos do registro de preço antes da geracao do arquivo EMP
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stCondicao  String de condição do SQL (WHERE)
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function importaEmpenhoRegistroPrecos(&$rsRecordSet, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        
+        $stSql = $this->montaImportaEmpenhoRegistroPrecos();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    function montaImportaEmpenhoRegistroPrecos()
+    {
+        $stSql = "SELECT importa_empenho_registro_precos('".$this->getDado('exercicio')."',".$this->getDado('entidade').");";
+
+        return $stSql;
     }
 
     /**
@@ -440,13 +469,13 @@ class TTCEMGEMP extends Persistente
                     AND E_AEVALOR.cod_cadastro=1
                     
                     LEFT JOIN tcemg.empenho_registro_precos
-                    ON empenho_registro_precos.cod_entidade=EE.cod_entidade
-                    AND empenho_registro_precos.cod_empenho=EE.cod_empenho
-                    AND empenho_registro_precos.exercicio_empenho=EE.exercicio
+                    ON empenho_registro_precos.cod_entidade_empenho = EE.cod_entidade
+                    AND empenho_registro_precos.cod_empenho         = EE.cod_empenho
+                    AND empenho_registro_precos.exercicio_empenho   = EE.exercicio
 
                     LEFT JOIN tcemg.registro_precos AS RegPreco
                      ON RegPreco.numero_registro_precos = empenho_registro_precos.numero_registro_precos
-                    AND RegPreco.exercicio      = empenho_registro_precos.exercicio
+                    AND RegPreco.exercicio              = empenho_registro_precos.exercicio
                     AND RegPreco.cod_entidade           = empenho_registro_precos.cod_entidade
                     AND RegPreco.interno                = empenho_registro_precos.interno
                     AND RegPreco.numcgm_gerenciador     = empenho_registro_precos.numcgm_gerenciador

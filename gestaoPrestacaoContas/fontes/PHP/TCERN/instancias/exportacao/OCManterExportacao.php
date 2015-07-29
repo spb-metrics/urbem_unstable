@@ -137,53 +137,6 @@ foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
         }
         $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
 
-        /*$arCabecalho = array();
-        $arCabecalho[0]['nome_arquivo']         = $arArquivo[0];
-        $arCabecalho[0]['bimestre_mes']         = $inBimestre;
-        $arCabecalho[0]['bimestre_exercicio']   = Sessao::getExercicio();
-        $arCabecalho[0]['nome_arquivo']         = date('d/m/Y',time());
-        $arCabecalho[0]['hr_geracao']           = date('H:i:s',time());
-        $arCabecalho[0]['cod_orgao']            = $rsEntidade->getCampo('cod_entidade');
-        $arCabecalho[0]['nom_orgao']            = $rsEntidade->getCampo('nom_cgm');
-        $rsCabecalho = new RecordSet;
-        $rsCabecalho->preenche($arCabecalho);*/
-/*
-        $obExportador->roUltimoArquivo->addBloco($rsCabecalho);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]0");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna( "nome_arquivo" );
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna( "bimestre_exercicio" );
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna( "bimestre_mes" );
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]O");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_geracao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("hr_geracao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_orgao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-*/
-
         $obExportador->roUltimoArquivo->addBloco( new RecordSet );
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");

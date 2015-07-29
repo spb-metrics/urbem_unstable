@@ -26,15 +26,14 @@
 /**
   * Página de Include Oculta - Exportação Arquivos TCEMG - ANL.csv
   * Data de Criação: 04/09/2014
-
   * @author Analista:      Eduardo Paculski Schitz
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ITEM.csv.inc.php 62333 2015-04-24 16:58:03Z michel $
-  * $Date: 2015-04-24 13:58:03 -0300 (Sex, 24 Abr 2015) $
-  * $Author: michel $
-  * $Rev: 62333 $
+  * $Id: ITEM.csv.inc.php 63085 2015-07-22 20:32:35Z evandro $
+  * $Date: 2015-07-22 17:32:35 -0300 (Qua, 22 Jul 2015) $
+  * $Author: evandro $
+  * $Rev: 63085 $
   *
 */
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TExportacaoTCEMGItem.class.php";
@@ -44,6 +43,7 @@ $rsRecordSetITEM10 = new RecordSet();
 $obTExportacaoTCEMGItem = new TExportacaoTCEMGItem();
 $obTExportacaoTCEMGItem->setDado('exercicio', Sessao::getExercicio());
 $obTExportacaoTCEMGItem->setDado('mes'      , $stMes );
+$obTExportacaoTCEMGItem->setDado('mes_ano'  , $stMes.Sessao::getExercicio());
 $obTExportacaoTCEMGItem->criaTabelaItem($rsTabelaItem,"","",$boTransacao);
 $obTExportacaoTCEMGItem->recuperaTodos($rsRecordSetITEM10);
 
@@ -54,53 +54,14 @@ $arRecordSetITEM99 = array(
     )
 );
 
-$map = array(
-    'á' => 'a',
-    'à' => 'a',
-    'ã' => 'a',
-    'â' => 'a',
-    'é' => 'e',
-    'ê' => 'e',
-    'í' => 'i',
-    'ó' => 'o',
-    'ô' => 'o',
-    'õ' => 'o',
-    'ú' => 'u',
-    'ü' => 'u',
-    'ç' => 'c',
-    'Á' => 'A',
-    'À' => 'A',
-    'Ã' => 'A',
-    'Â' => 'A',
-    'É' => 'E',
-    'Ê' => 'E',
-    'Í' => 'I',
-    'Ó' => 'O',
-    'Ô' => 'O',
-    'Õ' => 'O',
-    'Ú' => 'U',
-    'Ü' => 'U',
-    'Ç' => 'C',
-    "'" => '',
-    'ª' => '',
-    'º' => '',
-    '¿' => '',
-    '°' => '',
-    '²' => '',
-    ';' => '',
-    '"' => '',
-    'ñ' => 'n',
-    'Ñ' => 'N',
-    '–' => '-'
-);
-
 $rsRecordSetITEM99 = new RecordSet();
 $rsRecordSetITEM99->preenche($arRecordSetITEM99);
 
 $arRecordSetITEM10 = $rsRecordSetITEM10->getElementos();
 if (count($arRecordSetITEM10) > 0) {
-    for($i=0; $i<count($arRecordSetITEM10);$i++){   
-        $arRecordSetITEM10[$i]['dscitem']=  strtr($arRecordSetITEM10[$i]['dscitem'], $map);
+    SistemaLegado::removeAcentosSimbolos($arRecordSetITEM10['dscitem']);
+    $inCount = count($arRecordSetITEM10);
+    for($i = 0; $i < $inCount; $i++){   
         $arRecordSetITEM10[$i]['unidademedida']=utf8_encode($arRecordSetITEM10[$i]['unidademedida']);
     }
 

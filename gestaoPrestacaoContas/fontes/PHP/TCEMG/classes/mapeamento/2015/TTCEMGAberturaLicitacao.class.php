@@ -353,6 +353,8 @@ class TTCEMGAberturaLicitacao extends Persistente
                , destinacao_exclusiva
                , subcontratacao
                , limite_contratacao
+               , objeto.descricao
+               , edital.condicoes_pagamento
         ";
         return $stSql;
     }

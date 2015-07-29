@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Fernando Zank Correa Evangelista
 
-    $Id: FMManterProcessoLicitatorio.php 62555 2015-05-19 19:30:22Z evandro $
+    $Id: FMManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
 
     * Casos de uso : uc-03.04.15
 */
@@ -132,7 +132,7 @@ if ($stAcao == 'alterar') {
         }
     }
 }
-// $compraJulgamento = false;
+
 if ($stAcao == 'alterar') {    
     $stUnidadeOrcamentaria = $_REQUEST['stUnidadeOrcamentaria'];
     $jsOnload = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stEntidade=".$_REQUEST['stEntidade']."&stProcesso=".$_REQUEST['stProcesso']."&stMapaCompra=".$_REQUEST['stMapaCompra']."&inCodLicitacao=".$_REQUEST['inCodLicitacao']."&stModalidade=".$_REQUEST['stModalidade']."&stCodObjeto=".$_REQUEST['stCodObjeto']."&inCodTipoObjeto=".$_REQUEST['inCodTipoObjeto']."&inCodComissao=".$_REQUEST['inCodComissao']."&inCodTipoLicitacao=".$_REQUEST['inCodTipoLicitacao']."&inCodCriterio=".$_REQUEST['inCodCriterio']."&vlCotado=".$_REQUEST['vlCotado']."&stExercicioLicitacao=".$_REQUEST['stExercicioLicitacao']."&inCodRegime=".$_REQUEST['inCodRegime']."&boJulgamento=".$compraJulgamento."','preencheAlteracao');\n";
@@ -252,6 +252,16 @@ $obHdnTipoCotacao = new Hidden;
 $obHdnTipoCotacao->setName  ( 'inCodTipoCotacao' );
 $obHdnTipoCotacao->setValue ( '' );
 
+$obLblTipoRegistroPrecos = new Label();
+$obLblTipoRegistroPrecos->setRotulo('Registro de Preços');
+$obLblTipoRegistroPrecos->setName('txtTipoRegistroPrecos');
+$obLblTipoRegistroPrecos->setId('txtTipoRegistroPrecos');
+
+$obHdnTipoRegistroPrecos = new Hidden();
+$obHdnTipoRegistroPrecos->setName('boHdnTipoRegistroPrecos');
+$obHdnTipoRegistroPrecos->setId('boHdnTipoRegistroPrecos');
+$obHdnTipoRegistroPrecos->setValue('');
+
 $obHdnValorReferencia = new Hidden();
 $obHdnValorReferencia->setName('stValorReferencial');
 $obHdnValorReferencia->setId('stValorReferencial');
@@ -259,18 +269,6 @@ $obHdnValorReferencia->setValue( $stValorReferencia == '' ? "0,00" : number_form
 
 //Define objeto de select modalidade licitacao
 if ($stAcao == 'incluir') {
-
-    include_once(CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php");
-    $obComprasModalidade = new TComprasModalidade();
-    $rsRecordSet = new RecordSet;
-    //$stFiltro = "	WHERE	cod_modalidade NOT IN(8,9)  "; pedido para ser liberado o 8 e 9 - ticket #12862
-
-    // Solicitado pelo Gelson que não aparece essas modalidades por enquanto.
-    //$stFiltro = " WHERE	cod_modalidade NOT IN(4,5,6,7)  ";
-    $stFiltro = " WHERE	cod_modalidade NOT IN(4,5,10,11)  ";
-
-    $obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro,"ORDER BY cod_modalidade",$boTransacao);
-
     $obISelectModalidadeLicitacao = new Select();
     $obISelectModalidadeLicitacao->setRotulo     ("Modalidade"                            );
     $obISelectModalidadeLicitacao->setTitle      ("Selecione a modalidade."               );
@@ -279,8 +277,6 @@ if ($stAcao == 'incluir') {
     $obISelectModalidadeLicitacao->setNull       (true                                    );
     $obISelectModalidadeLicitacao->setCampoID    ("cod_modalidade"                        );
     $obISelectModalidadeLicitacao->addOption     ("","Selecione"                          );
-    $obISelectModalidadeLicitacao->setCampoDesc  ("[cod_modalidade] - [descricao]"        );
-    $obISelectModalidadeLicitacao->preencheCombo ($rsRecordSet                            );
     $obISelectModalidadeLicitacao->setNull       ( false                                  );
     $obISelectModalidadeLicitacao->obEvento->setOnChange ("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodModalidade='+this.value,'recuperaRegistroModalidade');");
 }
@@ -380,17 +376,26 @@ $obSpnMembroAdicional->setId( "spnMembroAdicional" );
 $obSpnDocumento = new Span();
 $obSpnDocumento->setId( "spnDocumento" );
 
+if($stAcao != "incluir") {
+    $stComplementoOnBlur1 = "&stAcao=".$stAcao."&stExercicioLicitacao=".$request->get('stExercicioLicitacao')."&inCodModalidade='+jQuery('#hdnModalidade').val()+'&inCodLicitacao='+jQuery('#hdnCodLicitacao').val()+'";
+    $stComplementoOnBlur2 = ",hdnModalidade,stAcao";
+} else {
+    $stComplementoOnBlur1 = "";
+    $stComplementoOnBlur2 = "";
+}
+
 $obPopUpMapa = new IPopUpMapaCompras($obForm);
 $obPopUpMapa->setTipoBusca ( 'processoLicitatorio' );
 $obPopUpMapa->setExercicio(Sessao::getExercicio());
 $obPopUpMapa->setNull(false);
 $obPopUpMapa->setAutEmp(true);
-$obPopUpMapa->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&mapaCompras='+this.value,'vlTotalReferencia');");
-$obPopUpMapa->obCampoCod->obEvento->setOnBlur($obPopUpMapa->obCampoCod->obEvento->getOnBlur()."montaParametrosGET('validaMapa','stDtLicitacao, stMapaCompras');");
+$obPopUpMapa->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId().$stComplementoOnBlur1."&mapaCompras='+this.value,'vlTotalReferencia');");
+$obPopUpMapa->obCampoCod->obEvento->setOnBlur($obPopUpMapa->obCampoCod->obEvento->getOnBlur()."montaParametrosGET('validaMapa','stDtLicitacao, stMapaCompras".$stComplementoOnBlur2."');");
 $obPopUpMapa->obCampoCod->obEvento->setOnBlur($obPopUpMapa->obCampoCod->obEvento->getOnBlur()."montaParametrosGET('montaItensAlterar','stMapaCompras');");
 
 $obHdnLicitacao = new Hidden;
 $obHdnLicitacao->setName('hdnCodLicitacao');
+$obHdnLicitacao->setId('hdnCodLicitacao');
 $obHdnLicitacao->setValue($request->get('inCodLicitacao'));
 
 $obHdnstExercicioLicitacao = new Hidden;
@@ -414,6 +419,7 @@ if ($stAcao != "incluir") {
 
     $obHdnModalidade = new Hidden();
     $obHdnModalidade->setName('hdnModalidade');
+    $obHdnModalidade->setId('hdnModalidade');
     $obHdnModalidade->setValue($_REQUEST['stModalidade']);
 
     $obLblLicitacao = new Label();
@@ -548,7 +554,7 @@ $obFormulario->addHidden        ( $obHdnValorReferencia            );
 $obFormulario->addHidden        ( $obHdnLicitacao                  );
 $obFormulario->addHidden        ( $obHdnstExercicioLicitacao       );
 $obFormulario->addHidden        ( $obHdnTipoCotacao                );
-
+$obFormulario->addHidden        ( $obHdnTipoRegistroPrecos         );
 
 if ($stAcao != 'incluir') {
     $obFormulario->addComponente ($obLblEntidade);
@@ -584,8 +590,9 @@ if ($stAcao != 'anular' ) {
     }else{
         $obFormulario->addComponente    ( $obDtLicitacao                   );
     }
-    $obFormulario->addComponente    ( $obLblValorReferencia            );
-    $obFormulario->addComponente    ( $obLblTipoCotacao                );
+    $obFormulario->addComponente( $obLblValorReferencia            );
+    $obFormulario->addComponente( $obLblTipoCotacao                );
+    $obFormulario->addComponente( $obLblTipoRegistroPrecos         );
 
     if ($stAcao == 'incluir') {
         $obFormulario->addComponente( $obISelectModalidadeLicitacao    );

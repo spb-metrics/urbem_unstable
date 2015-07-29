@@ -35,27 +35,6 @@
                 uc-02.08.07
 */
 
-/*
-$Log$
-Revision 1.14  2006/11/09 15:34:45  cako
-Bug #6787#
-
-Revision 1.13  2006/10/27 17:28:23  cako
-Bug #6787#
-
-Revision 1.12  2006/07/18 20:02:10  eduardo
-Bug #6556#
-
-Revision 1.11  2006/07/14 17:58:30  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.10  2006/07/05 20:37:31  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 CREATE OR REPLACE FUNCTION contabilidade.fn_variacao_patrimonial(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$ 
 DECLARE
     stExercicio         ALIAS FOR $1;
@@ -64,16 +43,17 @@ DECLARE
     stDtFinal           ALIAS FOR $4;
     stExercicioAnterior ALIAS FOR $5;
     inCod               ALIAS FOR $6;
+    
     arCount             INTEGER[];
-    stSql               VARCHAR     := '';
-    stSqlComplemento    VARCHAR     := '';
+    stSql               VARCHAR := '';
+    stSqlComplemento    VARCHAR := '';
     inEntidade          INTEGER := 0;
     arEntidades         INTEGER[];
     inIndex             INTEGER := 1;
+    
     reRegistro          RECORD;
     reRegistroAux       RECORD;
     arRetorno           NUMERIC[];
-
 BEGIN
     arEntidades := regexp_split_to_array(stEntidade, ',');
     While inIndex <= array_length(arEntidades ,1)
@@ -87,123 +67,134 @@ BEGIN
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
                 FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                        ,sc.cod_sistema
-                        ,pc.escrituracao
-                        ,pc.indicador_superavit
-                    FROM
-                         contabilidade.plano_conta            as pc
-                        ,contabilidade.plano_analitica        as pa
-                        ,contabilidade.conta_debito           as cd
-                        ,contabilidade.valor_lancamento       as vl
-                        ,contabilidade.lancamento             as la
-                        ,contabilidade.lote                   as lo
-                        ,contabilidade.sistema_contabil       as sc
-                        ,contabilidade.historico_contabil     as hc
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cd.cod_plano
-                    AND     pa.exercicio    = cd.exercicio
-                    AND     cd.cod_lote     = vl.cod_lote
-                    AND     cd.tipo         = vl.tipo
-                    AND     cd.sequencia    = vl.sequencia
-                    AND     cd.exercicio    = vl.exercicio
-                    AND     cd.tipo_valor   = vl.tipo_valor
-                    AND     cd.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ' || quote_literal('D') || '
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    --AND     pa.exercicio IN (' || quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) || ')
-                    AND     pa.exercicio IN (' || quote_literal(stExercicio) || ')
-                    AND     sc.cod_sistema  = pc.cod_sistema
-                    AND     sc.exercicio    = pc.exercicio
-                    AND     hc.exercicio    = la.exercicio
-                    AND     hc.cod_historico = la.cod_historico
-                    AND     (hc.cod_historico::varchar) NOT LIKE ''8%''
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                 WHERE
-                        cod_entidade IN (' || stEntidade || ')';
-                       
+                        SELECT plano_conta.cod_estrutural
+                            , plano_analitica.cod_plano
+                            , valor_lancamento.tipo_valor
+                            , valor_lancamento.vl_lancamento
+                            , valor_lancamento.cod_entidade
+                            , lote.cod_lote
+                            , lote.dt_lote
+                            , lote.exercicio
+                            , lote.tipo
+                            , valor_lancamento.sequencia
+                            , valor_lancamento.oid as oid_temp
+                            , sistema_contabil.cod_sistema
+                            , plano_conta.escrituracao
+                            , plano_conta.indicador_superavit
+                             
+                         FROM contabilidade.plano_conta            
+     
+                    INNER JOIN contabilidade.plano_analitica
+                            ON plano_conta.cod_conta    = plano_analitica.cod_conta
+                           AND plano_conta.exercicio    = plano_analitica.exercicio
+                           
+                    INNER JOIN contabilidade.conta_debito
+                            ON plano_analitica.cod_plano    = conta_debito.cod_plano
+                           AND plano_analitica.exercicio    = conta_debito.exercicio
+                     
+                    INNER JOIN contabilidade.valor_lancamento   
+                            ON conta_debito.cod_lote     = valor_lancamento.cod_lote
+                           AND conta_debito.tipo         = valor_lancamento.tipo
+                           AND conta_debito.sequencia    = valor_lancamento.sequencia
+                           AND conta_debito.exercicio    = valor_lancamento.exercicio
+                           AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                           AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                    
+                    INNER JOIN contabilidade.lancamento             
+                            ON valor_lancamento.cod_lote     = lancamento.cod_lote
+                           AND valor_lancamento.tipo         = lancamento.tipo
+                           AND valor_lancamento.sequencia    = lancamento.sequencia
+                           AND valor_lancamento.exercicio    = lancamento.exercicio
+                           AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                           AND valor_lancamento.tipo_valor   = ' || quote_literal('D') || '
+                           
+                    INNER JOIN contabilidade.lote
+                            ON lancamento.cod_lote     = lote.cod_lote
+                           AND lancamento.exercicio    = lote.exercicio
+                           AND lancamento.tipo         = lote.tipo
+                           AND lancamento.cod_entidade = lote.cod_entidade
+                           
+                    INNER JOIN contabilidade.sistema_contabil       
+                            ON sistema_contabil.cod_sistema  = plano_conta.cod_sistema
+                           AND sistema_contabil.exercicio    = plano_conta.exercicio
+                     
+                    INNER JOIN contabilidade.historico_contabil       
+                            ON historico_contabil.exercicio     = lancamento.exercicio
+                           AND historico_contabil.cod_historico = lancamento.cod_historico
+                         
+                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||')
+                           AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
+                         --AND plano_analitica.exercicio IN ('|| quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) ||')
+     
+                      ORDER BY plano_conta.cod_estrutural
+                ) AS tabela
+              WHERE cod_entidade IN (' || stEntidade || ')';
+    
     EXECUTE stSql;
     
     stSql := 'CREATE TEMPORARY TABLE tmp_credito AS
                 SELECT *
-                FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                        ,sc.cod_sistema
-                        ,pc.escrituracao
-                        ,pc.indicador_superavit
-                    FROM
-                         contabilidade.plano_conta       as pc
-                        ,contabilidade.plano_analitica   as pa
-                        ,contabilidade.conta_credito     as cc
-                        ,contabilidade.valor_lancamento  as vl
-                        ,contabilidade.lancamento        as la
-                        ,contabilidade.lote              as lo
-                        ,contabilidade.sistema_contabil  as sc
-                        ,contabilidade.historico_contabil     as hc
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cc.cod_plano
-                    AND     pa.exercicio    = cc.exercicio
-                    AND     cc.cod_lote     = vl.cod_lote
-                    AND     cc.tipo         = vl.tipo
-                    AND     cc.sequencia    = vl.sequencia
-                    AND     cc.exercicio    = vl.exercicio
-                    AND     cc.tipo_valor   = vl.tipo_valor
-                    AND     cc.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = '|| quote_literal('C') ||'
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    --AND     pa.exercicio IN (' || quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) || ')
-                    AND     pa.exercicio IN (' || quote_literal(stExercicio) || ')
-                    AND     sc.cod_sistema  = pc.cod_sistema
-                    AND     sc.exercicio    = pc.exercicio
-                    AND     hc.exercicio    = la.exercicio
-                    AND     hc.cod_historico = la.cod_historico
-                    AND     (hc.cod_historico::varchar) NOT LIKE ''8%''
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                 WHERE
-                        cod_entidade IN (' || stEntidade || ')';
-                        
+                  FROM (
+                        SELECT plano_conta.cod_estrutural
+                             , plano_analitica.cod_plano
+                             , valor_lancamento.tipo_valor
+                             , valor_lancamento.vl_lancamento
+                             , valor_lancamento.cod_entidade
+                             , lote.cod_lote
+                             , lote.dt_lote
+                             , lote.exercicio
+                             , lote.tipo
+                             , valor_lancamento.sequencia
+                             , valor_lancamento.oid as oid_temp
+                             , sistema_contabil.cod_sistema
+                             , plano_conta.escrituracao
+                             , plano_conta.indicador_superavit
+                          FROM contabilidade.plano_conta 
+     
+                    INNER JOIN contabilidade.plano_analitica
+                            ON plano_conta.cod_conta    = plano_analitica.cod_conta
+                           AND plano_conta.exercicio    = plano_analitica.exercicio
+     
+                    INNER JOIN contabilidade.conta_credito
+                            ON plano_analitica.cod_plano    = conta_credito.cod_plano
+                           AND plano_analitica.exercicio    = conta_credito.exercicio
+                    
+                    INNER JOIN contabilidade.valor_lancamento
+                            ON conta_credito.cod_lote     = valor_lancamento.cod_lote
+                           AND conta_credito.tipo         = valor_lancamento.tipo
+                           AND conta_credito.sequencia    = valor_lancamento.sequencia
+                           AND conta_credito.exercicio    = valor_lancamento.exercicio
+                           AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
+                           AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                    
+                    INNER JOIN contabilidade.lancamento
+                            ON valor_lancamento.cod_lote     = lancamento.cod_lote
+                           AND valor_lancamento.tipo         = lancamento.tipo
+                           AND valor_lancamento.sequencia    = lancamento.sequencia
+                           AND valor_lancamento.exercicio    = lancamento.exercicio
+                           AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                           AND valor_lancamento.tipo_valor   = '|| quote_literal('C') ||'
+                    
+                    INNER JOIN contabilidade.lote
+                            ON lancamento.cod_lote     = lote.cod_lote
+                           AND lancamento.exercicio    = lote.exercicio
+                           AND lancamento.tipo         = lote.tipo
+                           AND lancamento.cod_entidade = lote.cod_entidade
+     
+                    INNER JOIN contabilidade.sistema_contabil
+                            ON sistema_contabil.cod_sistema  = plano_conta.cod_sistema
+                           AND sistema_contabil.exercicio    = plano_conta.exercicio
+     
+                    INNER JOIN contabilidade.historico_contabil
+                            ON historico_contabil.exercicio     = lancamento.exercicio
+                           AND historico_contabil.cod_historico = lancamento.cod_historico
+                           
+                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||')
+                         --AND plano_analitica.exercicio IN ('|| quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) ||')
+                           AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
+                    ) AS tabela
+                WHERE cod_entidade IN (' || stEntidade || ')';
+               
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_debito              ON tmp_debito           (cod_estrutural varchar_pattern_ops, oid_temp);
@@ -228,7 +219,7 @@ BEGIN
         stSqlComplemento := ' dt_lote = to_date( ' || quote_literal(stDtInicial) || '::varchar,' || quote_literal('dd/mm/yyyy') || ') ';
         stSqlComplemento := stSqlComplemento || ' AND tipo = '||quote_literal('I')||' ';
     ELSE
-        stSqlComplemento := 'dt_lote BETWEEN to_date( '|| quote_literal('01/01/')  || 'substr(to_char(to_date(' || stDtInicial || '::varchar,' || quote_literal('dd/mm/yyyy') || ') - 1,'|| quote_literal('dd/mm/yyyy') || '),7),'|| quote_literal('dd/mm/yyyy') || ') AND to_date( ' || quote_literal(stDtInicial) || '::varchar,' || quote_literal('dd/mm/yyyy') || ')-1';
+        stSqlComplemento := 'dt_lote BETWEEN to_date( ''01/01/'' || substr(to_char(to_date(' || quote_literal( stDtInicial )|| ',' || quote_literal('dd/mm/yyyy') || ') - 1,'|| quote_literal('dd/mm/yyyy') || '),7),'|| quote_literal('dd/mm/yyyy') || ') AND to_date( ' || quote_literal(stDtInicial) || '::varchar,' || quote_literal('dd/mm/yyyy') || ')-1';
     END IF;
     stSql := 'CREATE TEMPORARY TABLE tmp_totaliza AS
         SELECT *
@@ -1909,6 +1900,7 @@ BEGIN
             GROUP BY cod_estrutural, grupo, descricao, borda, linha';
             
     END IF;
+    
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;

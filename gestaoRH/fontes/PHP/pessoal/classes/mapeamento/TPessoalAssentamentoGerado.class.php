@@ -60,7 +60,7 @@ function TPessoalAssentamentoGerado()
     $this->setComplementoChave('cod_assentamento_gerado, timestamp');
 
     $this->AddCampo('cod_assentamento_gerado' , 'integer'   ,  true,    '',  true,  true);
-    $this->AddCampo('timestamp'               , 'timestamp' ,  true,    '',  true, false);
+    $this->AddCampo('timestamp'               , 'timestamp_now' ,  true,    '',  true, false);
     $this->AddCampo('cod_assentamento'        , 'integer'   ,  true,    '', false,  true);
     $this->AddCampo('observacao'              , 'char'      , false, '200', false, false);
     $this->AddCampo('automatico'              , 'boolean'   ,  true,    '', false, false);

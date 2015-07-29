@@ -51,116 +51,76 @@ CREATE TEMPORARY TABLE tmp_arquivo (
         , valorProvisaoRPPS     NUMERIC
     );
 
+stSql := ' CREATE TEMPORARY TABLE tmp_passivo_perm AS
+                SELECT cod_estrutural
+                     , COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) AS vl_lancamento
+                     
+                  FROM contabilidade.plano_conta      
+          
+            INNER JOIN contabilidade.plano_analitica
+                    ON plano_conta.cod_conta = plano_analitica.cod_conta
+                   AND plano_conta.exercicio = plano_analitica.exercicio
+                 
+            INNER JOIN contabilidade.conta_debito          
+                    ON plano_analitica.cod_plano = conta_debito.cod_plano
+                   AND plano_analitica.exercicio = conta_debito.exercicio
+                 
+            INNER JOIN contabilidade.valor_lancamento     
+                    ON conta_debito.cod_lote     = valor_lancamento.cod_lote
+                   AND conta_debito.tipo         = valor_lancamento.tipo
+                   AND conta_debito.sequencia    = valor_lancamento.sequencia
+                   AND conta_debito.exercicio    = valor_lancamento.exercicio
+                   AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                   AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+            
+            INNER JOIN contabilidade.lancamento
+                    ON valor_lancamento.cod_lote     = lancamento.cod_lote
+                   AND valor_lancamento.tipo         = lancamento.tipo
+                   AND valor_lancamento.sequencia    = lancamento.sequencia
+                   AND valor_lancamento.exercicio    = lancamento.exercicio
+                   AND valor_lancamento.tipo         = lancamento.tipo
+                   AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+            
+            INNER JOIN contabilidade.lote
+                    ON lancamento.cod_lote     = lote.cod_lote
+                   AND lancamento.exercicio    = lote.exercicio
+                   AND lancamento.tipo         = lote.tipo
+                   AND lancamento.cod_entidade = lote.cod_entidade        
+                   AND lancamento.tipo <> ''I''
+                   
+                 WHERE plano_conta.exercicio  = '|| quote_literal(stExercicio) || '
+                   AND conta_debito.cod_entidade IN ( ' || stCodEntidade || ' )
+                   AND plano_conta.indicador_superavit like ''p%''
+                   
+              GROUP BY cod_estrutural ';
+              
+EXECUTE stSql;
+
 stSql := '
-INSERT INTO tmp_arquivo(mes,valorEmp,valorTransConcedidas,valorProvisaoRPPS)VALUES(''12'' ,
-
- (SELECT
-            coalesce(sum(vl.vl_lancamento),0.00)
-        FROM
-             contabilidade.plano_conta      as pc
-            ,contabilidade.plano_analitica  as pa
-            ,contabilidade.conta_debito     as cd
-            ,contabilidade.valor_lancamento as vl
-            ,contabilidade.lancamento       as la
-            ,contabilidade.lote             as lo
-        WHERE   pc.cod_conta = pa.cod_conta
-        AND     pc.exercicio = pa.exercicio
-        AND     pa.cod_plano = cd.cod_plano
-        AND     pa.exercicio = cd.exercicio
-        AND     cd.cod_lote  = vl.cod_lote
-        AND     cd.tipo      = vl.tipo
-        AND     cd.sequencia = vl.sequencia
-        AND     cd.exercicio = vl.exercicio
-        AND     cd.tipo_valor= vl.tipo_valor
-        AND     cd.cod_entidade= vl.cod_entidade
-        AND     vl.cod_lote  = la.cod_lote
-        AND     vl.tipo      = la.tipo
-        AND     vl.sequencia = la.sequencia
-        AND     vl.exercicio = la.exercicio
-        AND     vl.tipo      = la.tipo
-        AND     vl.cod_entidade= la.cod_entidade
-        AND     la.cod_lote  = lo.cod_lote
-        AND     la.exercicio = lo.exercicio
-        AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade        
-        AND     la.tipo <> ''I''
-        AND     pc.exercicio  = '''|| stExercicio|| '''
-        AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''2.1.2%''
-        AND     pc.indicador_superavit like ''p%''),
-
- (SELECT
-            coalesce(sum(vl.vl_lancamento),0.00)
-        FROM
-             contabilidade.plano_conta      as pc
-            ,contabilidade.plano_analitica  as pa
-            ,contabilidade.conta_debito     as cd
-            ,contabilidade.valor_lancamento as vl
-            ,contabilidade.lancamento       as la
-            ,contabilidade.lote             as lo
-        WHERE   pc.cod_conta = pa.cod_conta
-        AND     pc.exercicio = pa.exercicio
-        AND     pa.cod_plano = cd.cod_plano
-        AND     pa.exercicio = cd.exercicio
-        AND     cd.cod_lote  = vl.cod_lote
-        AND     cd.tipo      = vl.tipo
-        AND     cd.sequencia = vl.sequencia
-        AND     cd.exercicio = vl.exercicio
-        AND     cd.tipo_valor= vl.tipo_valor
-        AND     cd.cod_entidade= vl.cod_entidade
-        AND     vl.cod_lote  = la.cod_lote
-        AND     vl.tipo      = la.tipo
-        AND     vl.sequencia = la.sequencia
-        AND     vl.exercicio = la.exercicio
-        AND     vl.tipo      = la.tipo
-        AND     vl.cod_entidade= la.cod_entidade
-        AND     la.cod_lote  = lo.cod_lote
-        AND     la.exercicio = lo.exercicio
-        AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade
-        AND     la.tipo <> ''I''
-        AND     pc.exercicio  = '''|| stExercicio|| '''  
-        AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''3.5%''
-        AND     pc.indicador_superavit like ''p%''),
-
-  (SELECT
-            coalesce(sum(vl.vl_lancamento),0.00)
-        FROM
-             contabilidade.plano_conta      as pc
-            ,contabilidade.plano_analitica  as pa
-            ,contabilidade.conta_debito     as cd
-            ,contabilidade.valor_lancamento as vl
-            ,contabilidade.lancamento       as la
-            ,contabilidade.lote             as lo
-        WHERE   pc.cod_conta = pa.cod_conta
-        AND     pc.exercicio = pa.exercicio
-        AND     pa.cod_plano = cd.cod_plano
-        AND     pa.exercicio = cd.exercicio
-        AND     cd.cod_lote  = vl.cod_lote
-        AND     cd.tipo      = vl.tipo
-        AND     cd.sequencia = vl.sequencia
-        AND     cd.exercicio = vl.exercicio
-        AND     cd.tipo_valor= vl.tipo_valor
-        AND     cd.cod_entidade= vl.cod_entidade
-
-        AND     vl.cod_lote  = la.cod_lote
-        AND     vl.tipo      = la.tipo
-        AND     vl.sequencia = la.sequencia
-        AND     vl.exercicio = la.exercicio
-        AND     vl.tipo      = la.tipo
-        AND     vl.cod_entidade= la.cod_entidade
-        AND     la.cod_lote  = lo.cod_lote
-        AND     la.exercicio = lo.exercicio
-        AND     la.tipo      = lo.tipo
-        AND     la.cod_entidade=lo.cod_entidade
-        AND     la.tipo <> ''I''
-        AND     pc.exercicio  = '''|| stExercicio|| '''  
-        AND     cd.cod_entidade IN ( ' || stCodEntidade || ' )
-        AND     cod_estrutural like  ''2.2.7.2%''
-        AND     pc.indicador_superavit like ''p%'')
-)';
-
+    INSERT INTO tmp_arquivo
+        (  mes
+         , valorEmp
+         , valorTransConcedidas
+         , valorProvisaoRPPS
+        ) VALUES (
+           ''12''
+         , (
+                SELECT tmp_passivo_perm.vl_lancamento
+                  FROM tmp_passivo_perm
+                 WHERE tmp_passivo_perm.cod_estrutural like  ''2.1.2%''
+            )
+          , (
+                SELECT tmp_passivo_perm.vl_lancamento
+                  FROM tmp_passivo_perm
+                 WHERE tmp_passivo_perm.cod_estrutural like  ''3.5%''
+            )
+          , (
+                SELECT tmp_passivo_perm.vl_lancamento
+                  FROM tmp_passivo_perm
+                 WHERE tmp_passivo_perm.cod_estrutural like  ''2.2.7.2%''
+          )
+        )';
+        
 EXECUTE stSql;
 
 --lançamento a débito com sinal positivo, então será com o codtipo 01 - acréscimo)
@@ -212,12 +172,10 @@ LOOP
     RETURN NEXT reRegistro;
 END LOOP;
 
+DROP TABLE tmp_passivo_perm;
 DROP TABLE tmp_arquivo;
 
 RETURN;
 
 END;
 $$ LANGUAGE 'plpgsql';
-
-
-

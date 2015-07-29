@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.04.05
 
-  $Id: OCManterMapaCompras.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: OCManterMapaCompras.php 63099 2015-07-24 18:30:55Z franver $
 
   */
 
@@ -71,7 +71,7 @@ include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php";
 
 $stAcao = $request->get('stAcao');
 
-function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuValorReserva, $nuSaldoDotacao, $inCodDespesa, $inCodConta, $inCodLote, $stTipoCotacao)
+function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuValorReserva, $nuSaldoDotacao, $inCodDespesa, $inCodConta, $inCodLote, $stTipoCotacao, $boRegistroPreco)
 {
     $inTipoLicitacao = Sessao::read('inTipoLicitacao');
     $itens           = Sessao::read('itens');
@@ -92,9 +92,9 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
         $stMensagem = "Informe a Quantidade.";
     } elseif (($nuVlTotal == 0) || (!$nuVlTotal)) {
         $stMensagem = "Informe o Valor Total.";
-    } elseif (($nuSaldoDotacao > 0) && ($nuVlTotal > $nuSaldoDotacao)) {
+    } elseif ( $nuSaldoDotacao > 0 && $nuVlTotal > $nuSaldoDotacao && $boRegistroPreco == 'false' ) {
         $stMensagem = "O Valor de Reserva não pode ser <strong>maior</strong> que o Saldo da Dotação.";
-    } elseif (($nuSaldoDotacao == 0) && $nuValorReserva > 0) {
+    } elseif ( $nuSaldoDotacao == 0 && $nuValorReserva > 0 && $boRegistroPreco == 'false' ) {
         $stMensagem = "O Valor de Reserva não pode ser <strong>maior</strong> que o Saldo da Dotação.";
     } elseif (($inTipoLicitacao == 2) and (!$inCodLote)) {
         $stMensagem = "Informe o número do Lote.";
@@ -114,7 +114,8 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
                     $itens[$item]['valor_unitario']   = $nuVlUnitario;
                     $itens[$item]['valor_total_mapa'] = $nuVlTotal;
                     $itens[$item]['quantidade_mapa']  = $nuQuantidade;
-                    $itens[$item]['vl_reserva']       = $nuValorReserva;
+                    if( $boRegistroPreco == 'false' )
+                        $itens[$item]['vl_reserva']   = $nuValorReserva;
                     $itens[$item]['lote']             = $inCodLote;
 
                     # Caso o item não tenha dotação informada na solicitação
@@ -342,13 +343,13 @@ function alterarItem($inId, $stTipoCotacao)
     $obHdnValorReserva = new Hidden;
     $obHdnValorReserva->setId     ( "nuValorReserva" );
     $obHdnValorReserva->setName   ( "nuValorReserva" );
-    $obHdnValorReserva->setValue  ( number_format($arItem['valor_total_mapa'], 2, ",",".") );
+    $obHdnValorReserva->setValue  ( number_format($arItem['vl_reserva'], 2, ",",".") );
 
     $obLblValorReserva = new Label;
     $obLblValorReserva->setRotulo ( "Valor Reservado no Exercício" );
     $obLblValorReserva->setId     ( "stValorReserva" );
     $obLblValorReserva->setName   ( "stValorReserva" );
-    $obLblValorReserva->setValue  ( number_format($arItem['valor_total_mapa'], 2, ",",".") );
+    $obLblValorReserva->setValue  ( number_format($arItem['vl_reserva'], 2, ",",".") );
 
     if (Sessao::read('inTipoLicitacao') == 2) {
         $obTxtLote = new TextBox;
@@ -358,6 +359,11 @@ function alterarItem($inId, $stTipoCotacao)
         $obTxtLote->setInteiro  ( true             );
         $obTxtLote->setValue    ( $arItem['lote']  );
         $obTxtLote->setNull     ( false );
+    }else{
+        $obHdnInLote = new Hidden;
+        $obHdnInLote->setName  ('inCodLote');
+        $obHdnInLote->setValue ( $arItem['lote'] );
+        $obHdnInLote->setId    ('inCodLote');
     }
 
     $obHdnInId = new Hidden;
@@ -367,6 +373,8 @@ function alterarItem($inId, $stTipoCotacao)
 
     $obFormItem->addComponente ( $obLblItem );
     $obFormItem->addHidden     ( $obHdnInId );
+    if (Sessao::read('inTipoLicitacao') != 2) 
+        $obFormItem->addHidden     ( $obHdnInLote );
     $obFormItem->addComponente ( $obLblUnMedida );
     $obFormItem->addComponente ( $obLblComplemento  );
     $obFormItem->addComponente ( $obLblCentroCusto  );
@@ -415,7 +423,8 @@ function alterarItem($inId, $stTipoCotacao)
                                                                  , inCodDespesa
                                                                  , stCodClassificacao
                                                                  , inCodLote
-                                                                 , inCodTipoLicitacao'); ");
+                                                                 , inCodTipoLicitacao
+                                                                 , boRegistroPreco'); ");
     $obFormItem->defineBarraAba(array($obBtnSalvar ) ,'','');
     $obFormItem->montaInnerHtml();
 
@@ -550,6 +559,12 @@ function delItem($inId, $stTipo, $stTipoCotacao)
         }
 
         $itens = $arTMP;
+
+        if(count($itens)==0){
+            $stJs .= " jQuery('#boRegistroPrecoSim').removeAttr('disabled'); \n";
+            $stJs .= " jQuery('#boRegistroPrecoNao').removeAttr('disabled'); \n"; 
+        }
+
         Sessao::write('itens' , $itens);
         Sessao::write('itens_excluidos', $itens_excluidos);
 
@@ -595,7 +610,7 @@ function delSolicitacao($inId, $stTipoCotacao)
     return $stJs;
 }
 
-function addSolicitacao($stExercicio, $inCodEntidade, $inCodSolicitacao, $stTipoCotacao, $stIncluir = true)
+function addSolicitacao($stExercicio, $inCodEntidade, $inCodSolicitacao, $stTipoCotacao, $stIncluir = true, $boRegistroPreco)
 {
     $arSolicitacao = Sessao::read('solicitacoes');
     $ultimoCodigo  = count($arSolicitacao);
@@ -624,9 +639,14 @@ function addSolicitacao($stExercicio, $inCodEntidade, $inCodSolicitacao, $stTipo
             $arItens['incluir']               = $stIncluir;
 
             # Função que busca os itens da solicitação para adicionar ao Mapa.
-            if (addItens($arItens, $stTipoCotacao, $stIncluir)) {
+            if (addItens($arItens, $stTipoCotacao, $stIncluir, $boRegistroPreco)) {
                 $arSolicitacao[] = $arItens;
                 Sessao::write('solicitacoes' , $arSolicitacao);
+
+                if($boRegistroPreco=='false')
+                    $stJs .= " jQuery('#boRegistroPrecoSim').attr('disabled', 'disabled'); \n";
+                else
+                    $stJs .= " jQuery('#boRegistroPrecoNao').attr('disabled', 'disabled'); \n";
             } else {
                 $stJs .= "alertaAviso('Esta solicitação não contém itens ou seus itens já foram atendidos.','form','erro','".Sessao::getId()."');\n";
             }
@@ -638,7 +658,7 @@ function addSolicitacao($stExercicio, $inCodEntidade, $inCodSolicitacao, $stTipo
     return $stJs;
 }
 
-function addItens($arItem, $stTipoCotacao, $incluir = true)
+function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
 {
     $boRetorno = true;
 
@@ -784,6 +804,11 @@ function addItens($arItem, $stTipoCotacao, $incluir = true)
                 } else {
                     $arItens['boReserva']  = 'F';
                     $arItens['vl_reserva'] = $arItens['valor_total_mapa'];
+                }
+
+                if($boRegistroPreco=='true'){
+                    $arItens['vl_reserva']             = '0.00';
+                    $arItens['vl_reserva_homologacao'] = '0.00';
                 }
 
                 $arItens['incluir'] = $incluir;
@@ -1316,6 +1341,14 @@ function montaMapa($inCodMapa, $stExercicio)
 
         $solicitacoes[] = $arSolicitacao;
 
+        if($rsMapaSolicitacao->getCampo('registro_precos') == 't'){
+            $stJs .= " jQuery('#boRegistroPrecoNao').attr('disabled', 'disabled');  \n";
+            $stJs .= " jQuery('#boRegistroPrecoSim').attr('checked', true);         \n";
+        }else{
+            $stJs  = " jQuery('#boRegistroPrecoSim').attr('disabled', 'disabled');  \n";
+            $stJs .= " jQuery('#boRegistroPrecoNao').attr('checked', true);         \n";
+        }
+
         # Recupera todos os itens da Solicitação que serão importados no Mapa de Compras.
         $inCodEntidade          = $rsMapaSolicitacao->getCampo('cod_entidade');
         $inCodSolicitacao       = $rsMapaSolicitacao->getCampo('cod_solicitacao');
@@ -1471,6 +1504,9 @@ function montaMapa($inCodMapa, $stExercicio)
 
         $rsMapaSolicitacao->proximo();
     }
+
+    if(isset($stJs))
+        SistemaLegado::executaFrameOculto($stJs);
 
     Sessao::write('itens', $itens);
     Sessao::write('solicitacoes', $solicitacoes);
@@ -1687,6 +1723,23 @@ function liberaMapaAnulacao($inCodMapa, $stExercicio)
 
 }
 
+function preencheRegistroPrecos($inCodMapa, $stExercicio)
+{
+    $rsMapaTipoRegistroPrecos = new RecordSet();
+    $obTComprasMapa = new TComprasMapa();
+    # Recupera os dados do Mapa de Compras.
+    $obTComprasMapa->setDado ('cod_mapa'  , $inCodMapa);
+    $obTComprasMapa->setDado ('exercicio' , $stExercicio);
+    $obTComprasMapa->recuperaTipoMapa($rsMapaTipoRegistroPrecos,'','','');
+
+    if( $rsMapaTipoRegistroPrecos->getCampo('registro_precos') == 't' )
+        $stJs .= " jQuery('#stTipoRegistroPrecos').html('Sim');  \n";
+    else
+        $stJs .= " jQuery('#stTipoRegistroPrecos').html('Não');  \n";
+        
+    return $stJs;
+}
+
 switch ($request->get("stCtrl")) {
     case 'detalhaItem':
         $stJs = detalhaItem( $_REQUEST['cod_item'] );
@@ -1710,11 +1763,11 @@ switch ($request->get("stCtrl")) {
     break;
 
     case 'incluirSolicitacao':
-
-        $stExercicioSolicitacao   = $_GET['stExercicioSolicitacao'];
-        $inCodEntidadeSolicitacao = $_GET['inCodEntidadeSolicitacao'];
-        $inCodSolicitacao         = $_GET['inCodSolicitacao'];
-        $inCodTipoLicitacao       = $_GET['inCodTipoLicitacao'];
+        $stExercicioSolicitacao   = $_REQUEST['stExercicioSolicitacao'];
+        $inCodEntidadeSolicitacao = $_REQUEST['inCodEntidadeSolicitacao'];
+        $inCodSolicitacao         = $_REQUEST['inCodSolicitacao'];
+        $inCodTipoLicitacao       = $_REQUEST['inCodTipoLicitacao'];
+        $boRegistroPreco          = $_REQUEST['boRegistroPreco'];
 
         $boIncluir = true;
 
@@ -1741,7 +1794,7 @@ switch ($request->get("stCtrl")) {
 
         if ($boIncluir) {
             # Função que adiciona a solicitação no Mapa e seus itens.
-            $stJs .= addSolicitacao($stExercicioSolicitacao, $inCodEntidadeSolicitacao, $inCodSolicitacao, $inCodTipoLicitacao);
+            $stJs .= addSolicitacao($stExercicioSolicitacao, $inCodEntidadeSolicitacao, $inCodSolicitacao, $inCodTipoLicitacao, true, $boRegistroPreco);
         } else {
             $stJs .= "alertaAviso('".$stErro."','form','erro','".Sessao::getId()."');\n";
         }
@@ -1752,63 +1805,65 @@ switch ($request->get("stCtrl")) {
     break;
 
     case 'delSolicitacao':
-        $stJs = delSolicitacao($_GET['inId'], $_GET['stTipoCotacao']);
+        $stJs = delSolicitacao($_REQUEST['inId'], $_REQUEST['stTipoCotacao']);
     break;
 
     case 'delItem':
-        $stJs = delItem( $_GET['inId'], $_GET['stTipo'], $_GET['stTipoCotacao'] );
+        $stJs = delItem( $_REQUEST['inId'], $_REQUEST['stTipo'], $_REQUEST['stTipoCotacao'] );
     break;
 
     case 'alterarItem':
-        $stJs = alterarItem($_GET['inId'], $_GET['stTipoCotacao']);
+        $stJs = alterarItem($_REQUEST['inId'], $_REQUEST['stTipoCotacao']);
     break;
 
     case 'salvarDadosItem':
-
         $stJs .= salvarDadosItem
-                 (    $_GET['inId']
-                    , $_GET['nuVlUnitario']
-                    , $_GET['nuQuantidade']
-                    , $_GET['nuVlTotal']
-                    , $_GET['nuValorReserva']
-                    , $_GET['nuHdnSaldoDotacao']
-                    , $_GET['inCodDespesa']
-                    , $_GET['stCodClassificacao']
-                    , $_GET['inCodLote']
-                    , $_GET['obHdnTipoCotacao']
+                 (    $_REQUEST['inId']
+                    , $_REQUEST['nuVlUnitario']
+                    , $_REQUEST['nuQuantidade']
+                    , $_REQUEST['nuVlTotal']
+                    , $_REQUEST['nuValorReserva']
+                    , $_REQUEST['nuHdnSaldoDotacao']
+                    , $_REQUEST['inCodDespesa']
+                    , $_REQUEST['stCodClassificacao']
+                    , $_REQUEST['inCodLote']
+                    , $_REQUEST['obHdnTipoCotacao']
+                    , $_REQUEST['boRegistroPreco']
                  );
     break;
 
     case 'limpaFormulario':
         Sessao::write('solicitacoes' , array());
         Sessao::write('itens'        , array());
-        $stJs .= " f.reset();\n";
-        $stJs .= " jQuery('#spnSolicitacoes').html('&nbsp;'); \n";
-        $stJs .= " jQuery('#spnItens').html('&nbsp;');        \n";
-        $stJs .= " jQuery('#Ok').attr('disabled', '');        \n";
+
+        $stJs .= " f.reset();                                               \n";
+        $stJs .= " jQuery('#boRegistroPrecoSim').removeAttr('disabled');    \n";
+        $stJs .= " jQuery('#boRegistroPrecoNao').removeAttr('disabled');    \n";        
+        $stJs .= " jQuery('#spnSolicitacoes').html('&nbsp;');               \n";
+        $stJs .= " jQuery('#spnItens').html('&nbsp;');                      \n";
+        $stJs .= " jQuery('#Ok').attr('disabled', '');                      \n";
     break;
 
     case 'anularItem':
-        $stJs = montaAnulacaoItem( $_GET['inId']);
+        $stJs = montaAnulacaoItem( $_REQUEST['inId']);
     break;
 
     case 'salvaAnularItem':
-        $stJs = anularItem($_GET['inId'], $_GET['flValorAnular'], $_GET['flQuantidadeAnular'], $_GET['hdnValorUnitario']);
+        $stJs = anularItem($_REQUEST['inId'], $_REQUEST['flValorAnular'], $_REQUEST['flQuantidadeAnular'], $_REQUEST['hdnValorUnitario']);
     break;
 
     case 'tipoLicitacao':
         //// isto foi jogado para a sessão pra ter que refazer toda a lista de itens nem ter
         //  que bloquear o select de tipo de licitação apos a primeira inclusão de solicitação na listagem
-        Sessao::write( 'inTipoLicitacao' , $_GET['inCodTipoLicitacao']);
+        Sessao::write( 'inTipoLicitacao' , $_REQUEST['inCodTipoLicitacao']);
     break;
 
     case 'calculaValorReservaXTotal':
-
-        $inQuantidade = $_GET['nuQuantidade'];
+        $inQuantidade = $_REQUEST['nuQuantidade'];
 
         if ($inQuantidade > 0) {
-            $inQuantidade = str_replace(',','.',(str_replace('.','',$_GET['nuQuantidade'])));
-            $vlTotal      = str_replace(',','.',(str_replace('.','',$_GET['nuVlTotal'])));
+            $inQuantidade = str_replace(',','.',(str_replace('.','',$_REQUEST['nuQuantidade'])));
+            $vlTotal      = str_replace(',','.',(str_replace('.','',$_REQUEST['nuVlTotal'])));
             $vlUnitario = ($vlTotal / $inQuantidade);
 
             $stJs .= "jQuery('#nuVlTotal').val('".number_format($vlTotal, 2, ',', '.' )."');        \n";
@@ -1820,9 +1875,8 @@ switch ($request->get("stCtrl")) {
     break;
 
     case "calculaValorReserva":
-
-        $quantidade = str_replace(',','.',(str_replace('.','',$_GET['nuQuantidade'])));
-        $vlUnitario = str_replace(',','.',(str_replace('.','',$_GET['nuVlUnitario'])));
+        $quantidade = str_replace(',','.',(str_replace('.','',$_REQUEST['nuQuantidade'])));
+        $vlUnitario = str_replace(',','.',(str_replace('.','',$_REQUEST['nuVlUnitario'])));
 
         $valorTotal = $vlUnitario * $quantidade;
 
@@ -1832,7 +1886,6 @@ switch ($request->get("stCtrl")) {
         $stJs .= "jQuery('#stValorReserva').html('".number_format ( $valorTotal, 2, ',', '.' )."'); \n";
 
     break;
-
 }
 
 # Imprime os comandos JS.

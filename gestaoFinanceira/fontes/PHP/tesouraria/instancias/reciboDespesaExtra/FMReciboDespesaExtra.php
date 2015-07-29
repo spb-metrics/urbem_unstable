@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMReciboDespesaExtra.php 61703 2015-02-26 14:35:46Z arthur $
+    $Id: FMReciboDespesaExtra.php 63075 2015-07-21 19:15:24Z evandro $
 
     * Casos de uso: uc-02.04.30
 */
@@ -118,6 +118,10 @@ $obTextHistorico->setName  ( 'txtHistorico'        );
 $obTextHistorico->setID    ( 'txtHistorico'        );
 $obTextHistorico->setRotulo( 'Histórico'           );
 $obTextHistorico->setTitle ( 'Informe o histórico' );
+$obTextHistorico->setCols  ( 10 );
+$obTextHistorico->setRows  ( 3 );
+$obTextHistorico->setStyle ( "width: 48%" );
+$obTextHistorico->setMaxCaracteres(445);
 
 //Define o objeto da ação stAcao
 $obHdnAcao = new Hidden;

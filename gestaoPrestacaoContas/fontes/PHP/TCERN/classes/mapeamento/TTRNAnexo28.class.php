@@ -93,44 +93,39 @@ class TTRNAnexo28 extends Persistente
     {
 	$stSql = "
 	     SELECT '1' AS tipo_registro
-		    , bem_processo.cod_processo AS processo_origem
-		    , sw_cgm_pessoa_juridica.cnpj AS cnpj
-		    , sw_cgm.nom_cgm AS nome_contratado
-		    , TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') AS dt_aquisicao
-		    , bem.vl_bem AS vl_aquisicao
-	 
-		FROM frota.veiculo
-	 
-	  INNER JOIN frota.veiculo_propriedade
-		  ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-		 AND veiculo_propriedade.proprio = TRUE
-		 AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
-							 FROM frota.veiculo_propriedade as vp
-							WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
-						     )
-	  INNER JOIN frota.proprio
-		  ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-		 AND proprio.timestamp   = veiculo_propriedade.timestamp   
-	 
-	  INNER JOIN patrimonio.bem
-		  ON bem.cod_bem = proprio.cod_bem
-	 
-	  INNER JOIN patrimonio.bem_comprado
-		  ON bem_comprado.cod_bem = bem.cod_bem
-		 
-	  INNER JOIN patrimonio.bem_processo
-		  ON bem_processo.cod_bem = bem.cod_bem
-	 
-	  INNER JOIN sw_cgm
-		  ON bem.numcgm = sw_cgm.numcgm
-	 
-	  INNER JOIN sw_cgm_pessoa_juridica
-		  ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-
-	       WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
-		 AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
-		 AND TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'";
-
+		      , bem_processo.cod_processo AS processo_origem
+		      , sw_cgm_pessoa_juridica.cnpj AS cnpj
+		      , sw_cgm.nom_cgm AS nome_contratado
+		      , TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') AS dt_aquisicao
+		      , bem.vl_bem AS vl_aquisicao
+			  , veiculo.cod_veiculo
+           FROM frota.veiculo
+     INNER JOIN frota.veiculo_propriedade
+    	     ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+    	    AND veiculo_propriedade.proprio = TRUE
+    	    AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+    							 FROM frota.veiculo_propriedade as vp
+    							WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
+    						     )
+     INNER JOIN frota.proprio
+		     ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+		    AND proprio.timestamp   = veiculo_propriedade.timestamp   
+     INNER JOIN patrimonio.bem
+             ON bem.cod_bem = proprio.cod_bem
+     INNER JOIN patrimonio.bem_comprado
+    		 ON bem_comprado.cod_bem = bem.cod_bem
+     INNER JOIN patrimonio.bem_processo
+    		 ON bem_processo.cod_bem = bem.cod_bem
+     INNER JOIN sw_cgm
+    		 ON bem.numcgm = sw_cgm.numcgm
+     INNER JOIN sw_cgm_pessoa_juridica
+    		 ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+      LEFT JOIN frota.veiculo_cessao
+             ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
+    	  WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
+    		AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
+    		AND TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
+            AND veiculo_cessao.cod_veiculo IS NULL ";
         return $stSql;
     }
 
@@ -143,42 +138,38 @@ class TTRNAnexo28 extends Persistente
     {
 	$stSql = " 
 		SELECT  '2' AS tipo_registro
-		    , veiculo_locacao.cod_processo AS processo_origem
-		    , sw_cgm_pessoa_juridica.cnpj AS cnpj
-		    , sw_cgm.nom_cgm AS nome_locatario
-		    , TO_CHAR(veiculo_locacao.dt_contrato , 'dd/mm/yyyy') AS dt_contrato
-		    , TO_CHAR(veiculo_locacao.dt_inicio   , 'dd/mm/yyyy') AS ini_locacao
-		    , TO_CHAR(veiculo_locacao.dt_termino  , 'dd/mm/yyyy') AS fim_locacao
-		    , veiculo_locacao.vl_locacao AS vl_locacao
-	 
-		FROM frota.veiculo
-	 
-	  INNER JOIN frota.veiculo_propriedade
-		  ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-		 AND veiculo_propriedade.proprio     = FALSE
-		 AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+		     , veiculo_locacao.cod_processo AS processo_origem
+		     , sw_cgm_pessoa_juridica.cnpj AS cnpj
+		     , sw_cgm.nom_cgm AS nome_locatario
+		     , TO_CHAR(veiculo_locacao.dt_contrato , 'dd/mm/yyyy') AS dt_contrato
+		     , TO_CHAR(veiculo_locacao.dt_inicio   , 'dd/mm/yyyy') AS ini_locacao
+		     , TO_CHAR(veiculo_locacao.dt_termino  , 'dd/mm/yyyy') AS fim_locacao
+		     , veiculo_locacao.vl_locacao AS vl_locacao
+	         , veiculo.cod_veiculo
+		  FROM frota.veiculo
+	INNER JOIN frota.veiculo_propriedade
+	        ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+	       AND veiculo_propriedade.proprio     = FALSE
+	       AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
 							 FROM frota.veiculo_propriedade as vp
 							WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
 						     )
-						     
-	  INNER JOIN frota.terceiros
-		  ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
-		 AND terceiros.timestamp   = veiculo_propriedade.timestamp
-	 
-	  INNER JOIN frota.veiculo_locacao
-		  ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
-	  
-	  INNER JOIN sw_cgm_pessoa_juridica
-		  ON sw_cgm_pessoa_juridica.numcgm = veiculo_locacao.cgm_locatario
-	 
-	  INNER JOIN sw_cgm 
-		  ON sw_cgm.numcgm = veiculo_locacao.cgm_locatario
-
-	       WHERE veiculo_locacao.exercicio = '".$this->getDado('exercicio')."'
-		 AND veiculo_locacao.cod_entidade IN (".$this->getDado('inCodEntidade').")
-		 AND TO_CHAR(veiculo_locacao.dt_inicio , 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."' 
-		 AND TO_CHAR(veiculo_locacao.dt_termino, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'";
-		 
+    INNER JOIN frota.terceiros
+		    ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+		   AND terceiros.timestamp   = veiculo_propriedade.timestamp
+    INNER JOIN frota.veiculo_locacao
+		    ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
+	INNER JOIN sw_cgm_pessoa_juridica
+		    ON sw_cgm_pessoa_juridica.numcgm = veiculo_locacao.cgm_locatario
+    INNER JOIN sw_cgm 
+	    	ON sw_cgm.numcgm = veiculo_locacao.cgm_locatario
+	 LEFT JOIN frota.veiculo_cessao
+            ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
+	     WHERE veiculo_locacao.exercicio = '".$this->getDado('exercicio')."'
+		   AND veiculo_locacao.cod_entidade IN (".$this->getDado('inCodEntidade').")
+		   AND ( TO_DATE( TO_CHAR(veiculo_locacao.dt_inicio , 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy') 
+              OR TO_DATE( TO_CHAR(veiculo_locacao.dt_termino, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy')  )
+		   AND veiculo_cessao.cod_veiculo IS NULL ";
         return $stSql;
     }
 
@@ -191,46 +182,51 @@ class TTRNAnexo28 extends Persistente
     {
 	$stSql = "
 		SELECT '3' AS tipo_registro
-		    , veiculo_cessao.cod_processo AS processo_origem
-		    , sw_cgm_pessoa_juridica.cnpj AS cnpj_cedente
-		    , sw_cgm.nom_cgm AS orgao_cedente
-		    , veiculo_cessao.dt_inicio AS dt_inicio
-		    , veiculo_cessao.dt_termino AS dt_final
-	  
-		 FROM frota.veiculo
-	  
-	   INNER JOIN frota.veiculo_propriedade
-		   ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-		  AND veiculo_propriedade.proprio = TRUE
-		  AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+		     , veiculo_cessao.cod_processo AS processo_origem
+		     , sw_cgm_pessoa_juridica.cnpj AS cnpj_cedente
+		     , sw_cgm.nom_cgm AS orgao_cedente
+		     , TO_CHAR(veiculo_cessao.dt_inicio   , 'dd/mm/yyyy') AS ini_cessao
+             , TO_CHAR(veiculo_cessao.dt_termino  , 'dd/mm/yyyy') AS fim_cessao
+			 , veiculo.cod_veiculo
+		  FROM frota.veiculo
+	INNER JOIN frota.veiculo_propriedade
+		    ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+		   AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
 							  FROM frota.veiculo_propriedade as vp
 							 WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
 						      )
-	  
-	   INNER JOIN frota.proprio
-		   ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-		  AND proprio.timestamp   = veiculo_propriedade.timestamp   
-	  
-	   INNER JOIN frota.veiculo_cessao
-		   ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
-	  
-	   INNER JOIN patrimonio.bem
-		   ON bem.cod_bem = proprio.cod_bem
-	  
-	   INNER JOIN patrimonio.bem_comprado
-		   ON bem_comprado.cod_bem = bem.cod_bem  
-	   
-	   INNER JOIN sw_cgm_pessoa_juridica
-		   ON sw_cgm_pessoa_juridica.numcgm = veiculo_cessao.cgm_cedente
-	  
-	   INNER JOIN sw_cgm 
-		   ON sw_cgm.numcgm = veiculo_cessao.cgm_cedente
-	  
-		WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
-		  AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
-		  AND TO_CHAR(veiculo_cessao.dt_inicio , 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
-		  AND TO_CHAR(veiculo_cessao.dt_termino, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'";
-		  
+    INNER JOIN ( SELECT cod_veiculo
+                      , bem_comprado.cod_entidade
+                   FROM frota.proprio
+             INNER JOIN patrimonio.bem
+                     ON bem.cod_bem = proprio.cod_bem
+             INNER JOIN patrimonio.bem_comprado
+                     ON bem_comprado.cod_bem = bem.cod_bem  
+                  WHERE proprio.timestamp = ( SELECT MAX(vp.timestamp)
+                                                FROM frota.proprio as vp
+                                               WHERE vp.cod_veiculo = proprio.cod_veiculo)       
+                  UNION 
+
+                 SELECT veiculo_locacao.cod_veiculo
+                      , veiculo_locacao.cod_entidade
+                   FROM frota.terceiros
+             INNER JOIN frota.veiculo_locacao
+                     ON veiculo_locacao.cod_veiculo = terceiros.cod_veiculo
+                  WHERE terceiros.timestamp = ( SELECT MAX(ft.timestamp)
+                                                  FROM frota.terceiros as ft
+                                                 WHERE ft.cod_veiculo = terceiros.cod_veiculo)       
+             ) AS dados_veiculo
+            ON dados_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo							  
+    INNER JOIN frota.veiculo_cessao
+    		ON veiculo_cessao.cod_veiculo = dados_veiculo.cod_veiculo
+    INNER JOIN sw_cgm_pessoa_juridica
+	    	ON sw_cgm_pessoa_juridica.numcgm = veiculo_cessao.cgm_cedente
+	INNER JOIN sw_cgm 
+	   	    ON sw_cgm.numcgm = veiculo_cessao.cgm_cedente
+	 	 WHERE  dados_veiculo.cod_entidade IN (".$this->getDado('inCodEntidade').")
+		   AND ( TO_DATE( TO_CHAR(veiculo_cessao.dt_inicio , 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy') 
+              OR TO_DATE( TO_CHAR(veiculo_cessao.dt_termino, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy')  )
+		  ";
         return $stSql;
     }
 
@@ -241,150 +237,129 @@ class TTRNAnexo28 extends Persistente
 
     public function montaRecuperaRegistro4()
     {
-        $stSql = " 
-                   SELECT '4' AS tipo_registro
-			, CASE WHEN veiculo_aquisicao.cod_veiculo IS NOT NULL 
-			           THEN 'Aquisição'
-				WHEN veiculo_locacao.cod_veiculo IS NOT NULL 
-				   THEN 'locação'
-				WHEN veiculo_cessao.cod_veiculo IS NOT NULL 
-				   THEN 'cessão'
-			   END AS situacao
-                         , CASE WHEN veiculo_aquisicao.cod_veiculo IS NOT NULL 
-			           THEN veiculo_aquisicao.cod_processo
-				WHEN veiculo_locacao.cod_veiculo IS NOT NULL 
-				   THEN veiculo_locacao.cod_processo
-				WHEN veiculo_cessao.cod_veiculo IS NOT NULL 
-				   THEN veiculo_cessao.cod_processo
-			   END AS processo_origem
-			, especie_veiculo_tce.nom_especie_tce AS id_especie
-			, tipo_veiculo_tce.nom_tipo_tce AS id_tipo
-			, marca.nom_marca||' '||modelo.nom_modelo AS id_marca
-			, veiculo.ano_fabricacao AS ano_fabricacao
-			, veiculo.placa AS placa
-			, veiculo.num_certificado AS renavam
-			, combustivel.nom_combustivel AS id_combustivel
-			, veiculo.capacidade_tanque AS tanque
-			, categoria_veiculo_tce.nom_categoria AS id_categoria
-
-		    FROM frota.veiculo
-
-	      INNER JOIN frota.veiculo_propriedade
-		      ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-		     AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
-							     FROM frota.veiculo_propriedade as vp
-						            WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
-						         )
-	        
+        $stSql = " SELECT distinct '4' AS tipo_registro
+			            , CASE WHEN veiculo_aquisicao.cod_veiculo IS NOT NULL THEN 'Aquisição'
+				               WHEN veiculo_locacao.cod_veiculo IS NOT NULL THEN 'locação'
+				               WHEN veiculo_cessao.cod_veiculo IS NOT NULL THEN 'cessão'
+			              END AS situacao
+                        , CASE WHEN veiculo_aquisicao.cod_veiculo IS NOT NULL THEN veiculo_aquisicao.cod_processo
+				               WHEN veiculo_locacao.cod_veiculo IS NOT NULL THEN veiculo_locacao.cod_processo
+				               WHEN veiculo_cessao.cod_veiculo IS NOT NULL THEN veiculo_cessao.cod_processo
+			              END AS processo_origem
+			            , especie_veiculo_tce.nom_especie_tce AS id_especie
+			            , tipo_veiculo_tce.nom_tipo_tce AS id_tipo
+			            , marca.nom_marca||' '||modelo.nom_modelo AS id_marca
+			            , veiculo.ano_fabricacao AS ano_fabricacao
+			            , veiculo.placa AS placa
+			            , veiculo.num_certificado AS renavam
+			            , combustivel.nom_combustivel AS id_combustivel
+			            , veiculo.capacidade_tanque AS tanque
+			            , categoria_veiculo_tce.nom_categoria AS id_categoria
+						, veiculo.cod_veiculo
+		             FROM frota.veiculo
+	           INNER JOIN frota.veiculo_propriedade
+		               ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+		              AND veiculo_propriedade.timestamp = ( SELECT MAX(vp.timestamp)
+					 		                                  FROM frota.veiculo_propriedade as vp
+						                                     WHERE vp.cod_veiculo = veiculo_propriedade.cod_veiculo
+						                                  )
                INNER JOIN frota.veiculo_combustivel
                        ON veiculo_combustivel.cod_veiculo = veiculo.cod_veiculo
-
                INNER JOIN frota.combustivel
                        ON combustivel.cod_combustivel = veiculo_combustivel.cod_combustivel
-
                INNER JOIN frota.marca
                        ON marca.cod_marca = veiculo.cod_marca
-
                INNER JOIN frota.modelo
                        ON modelo.cod_modelo = veiculo.cod_modelo
                       AND modelo.cod_marca = veiculo.cod_marca
-
                INNER JOIN frota.tipo_veiculo
                        ON tipo_veiculo.cod_tipo = veiculo.cod_tipo_veiculo
-
                INNER JOIN tcern.tipo_veiculo_vinculo 
                        ON tipo_veiculo_vinculo.cod_tipo = tipo_veiculo.cod_tipo
-
                INNER JOIN tcern.especie_veiculo_tce
                        ON especie_veiculo_tce.cod_especie_tce = tipo_veiculo_vinculo.cod_especie_tce
-
                INNER JOIN tcern.tipo_veiculo_tce
                        ON tipo_veiculo_tce.cod_tipo_tce = tipo_veiculo_vinculo.cod_tipo_tce
-
                INNER JOIN tcern.veiculo_categoria_vinculo
                        ON veiculo_categoria_vinculo.cod_veiculo = veiculo.cod_veiculo
-
                INNER JOIN tcern.categoria_veiculo_tce
                        ON categoria_veiculo_tce.cod_categoria = veiculo_categoria_vinculo.cod_categoria
-
                 LEFT JOIN  frota.proprio
-		       ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-		      AND proprio.timestamp   = veiculo_propriedade.timestamp   
-
-		 LEFT JOIN patrimonio.bem
-		        ON bem.cod_bem = proprio.cod_bem
-
-	          LEFT JOIN (
-                            SELECT proprio.cod_veiculo
+		               ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+		              AND proprio.timestamp   = veiculo_propriedade.timestamp   
+		        LEFT JOIN patrimonio.bem
+		               ON bem.cod_bem = proprio.cod_bem
+   	            LEFT JOIN ( SELECT proprio.cod_veiculo
                                  , bem_processo.cod_processo
                               FROM frota.proprio
-				
-			 INNER JOIN patrimonio.bem
-				 ON bem.cod_bem = proprio.cod_bem
-
-			 INNER JOIN patrimonio.bem_comprado
-				 ON bem_comprado.cod_bem = bem.cod_bem
-				
-			 INNER JOIN patrimonio.bem_processo
-				 ON bem_processo.cod_bem = bem.cod_bem
-
-			      WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
-				AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
-				AND TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'                               
-                         ) AS veiculo_aquisicao
-                      ON veiculo_aquisicao.cod_veiculo = veiculo.cod_veiculo
-
-               LEFT JOIN (
-                            SELECT veiculo.cod_veiculo
+			            INNER JOIN patrimonio.bem
+			  	                ON bem.cod_bem = proprio.cod_bem
+			            INNER JOIN patrimonio.bem_comprado
+  			  	                ON bem_comprado.cod_bem = bem.cod_bem
+			            INNER JOIN patrimonio.bem_processo
+           				        ON bem_processo.cod_bem = bem.cod_bem
+						 LEFT JOIN frota.veiculo_cessao
+                                ON veiculo_cessao.cod_veiculo = proprio.cod_veiculo
+            			     WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
+				               AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
+				               AND TO_CHAR(bem.dt_aquisicao, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
+							   AND veiculo_cessao.cod_veiculo IS NULL
+                        ) AS veiculo_aquisicao
+                       ON veiculo_aquisicao.cod_veiculo = veiculo.cod_veiculo
+                LEFT JOIN ( SELECT veiculo.cod_veiculo
                                  , veiculo_locacao.cod_processo
                               FROM frota.veiculo
-
-			INNER JOIN frota.veiculo_propriedade
-				ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-			       AND veiculo_propriedade.proprio     = FALSE
-			       
-			 INNER JOIN frota.terceiros
-				 ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
-				AND terceiros.timestamp   = veiculo_propriedade.timestamp
-
-			 INNER JOIN frota.veiculo_locacao 
-				 ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
-				 
-			      WHERE veiculo_locacao.exercicio = '".$this->getDado('exercicio')."'
-				AND veiculo_locacao.cod_entidade IN (".$this->getDado('inCodEntidade').")
-				AND TO_CHAR(veiculo_locacao.dt_inicio , 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."' 
-				AND TO_CHAR(veiculo_locacao.dt_termino, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
-                   ) AS veiculo_locacao
-                ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
-
-         LEFT JOIN (  
-		     SELECT veiculo.cod_veiculo
-		          , veiculo_cessao.cod_processo
-                       FROM frota.veiculo
-
-		 INNER JOIN frota.veiculo_propriedade
-			 ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-                        AND veiculo_propriedade.proprio     = FALSE
-       
-		 INNER JOIN frota.proprio
-			 ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
-			AND proprio.timestamp   = veiculo_propriedade.timestamp   
-
-		 INNER JOIN frota.veiculo_cessao
-			 ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
-
-		 INNER JOIN patrimonio.bem
-			 ON bem.cod_bem = proprio.cod_bem
-
-		 INNER JOIN patrimonio.bem_comprado
-			 ON bem_comprado.cod_bem = bem.cod_bem
-
-	              WHERE bem_comprado.exercicio = '".$this->getDado('exercicio')."'
-		        AND bem_comprado.cod_entidade IN (".$this->getDado('inCodEntidade').")
-		        AND TO_CHAR(veiculo_cessao.dt_inicio , 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
-		        AND TO_CHAR(veiculo_cessao.dt_termino, 'dd/mm/yyyy') BETWEEN '".$this->getDado('dtInicial')."' AND '".$this->getDado('dtFinal')."'
-                  ) AS veiculo_cessao
-            ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo ";
+			            INNER JOIN frota.veiculo_propriedade
+				                ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+			                   AND veiculo_propriedade.proprio     = FALSE
+			            INNER JOIN frota.terceiros
+				                ON terceiros.cod_veiculo = veiculo_propriedade.cod_veiculo
+				               AND terceiros.timestamp   = veiculo_propriedade.timestamp
+			            INNER JOIN frota.veiculo_locacao 
+				                ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
+						 LEFT JOIN frota.veiculo_cessao
+                                ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
+			                 WHERE veiculo_locacao.exercicio = '".$this->getDado('exercicio')."'
+				               AND veiculo_locacao.cod_entidade IN (".$this->getDado('inCodEntidade').")
+				               AND ( TO_DATE( TO_CHAR(veiculo_locacao.dt_inicio , 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy') 
+                                  OR TO_DATE( TO_CHAR(veiculo_locacao.dt_termino, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy')  )
+							   AND veiculo_cessao.cod_veiculo IS NULL
+                        ) AS veiculo_locacao
+                       ON veiculo_locacao.cod_veiculo = veiculo.cod_veiculo
+                LEFT JOIN ( SELECT veiculo.cod_veiculo
+		                         , veiculo_cessao.cod_processo
+                              FROM frota.veiculo
+ 		                INNER JOIN frota.veiculo_propriedade
+			                    ON veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+					    INNER JOIN ( SELECT cod_veiculo
+                                          , bem_comprado.cod_entidade
+                                       FROM frota.proprio
+                                 INNER JOIN patrimonio.bem
+                                         ON bem.cod_bem = proprio.cod_bem
+                                 INNER JOIN patrimonio.bem_comprado
+                                         ON bem_comprado.cod_bem = bem.cod_bem  
+                                      WHERE proprio.timestamp = ( SELECT MAX(vp.timestamp)
+                                                                    FROM frota.proprio as vp
+                                                                   WHERE vp.cod_veiculo = proprio.cod_veiculo)       
+                                      UNION 
+                                
+                                     SELECT veiculo_locacao.cod_veiculo
+                                          , veiculo_locacao.cod_entidade
+                                       FROM frota.terceiros
+                                 INNER JOIN frota.veiculo_locacao
+                                         ON veiculo_locacao.cod_veiculo = terceiros.cod_veiculo
+                                      WHERE terceiros.timestamp = ( SELECT MAX(ft.timestamp)
+                                                                      FROM frota.terceiros as ft
+                                                                     WHERE ft.cod_veiculo = terceiros.cod_veiculo)       
+                                ) AS dados_veiculo
+					           ON dados_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo			
+		               INNER JOIN frota.veiculo_cessao
+			                   ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo
+	                        WHERE  dados_veiculo.cod_entidade IN (".$this->getDado('inCodEntidade').")
+		                      AND ( TO_DATE( TO_CHAR(veiculo_cessao.dt_inicio , 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy') 
+                                 OR TO_DATE( TO_CHAR(veiculo_cessao.dt_termino, 'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFinal')."' , 'dd/mm/yyyy')  )
+                    ) AS veiculo_cessao
+                   ON veiculo_cessao.cod_veiculo = veiculo.cod_veiculo ";
 	    
         return $stSql;
     }

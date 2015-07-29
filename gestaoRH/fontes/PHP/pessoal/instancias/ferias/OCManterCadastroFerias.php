@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 62702 2015-06-09 20:53:34Z carlos.silva $
+    $Id: OCManterCadastroFerias.php 62879 2015-07-02 18:03:08Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -96,7 +96,7 @@ function gerarSpan1Form($inPosicao="")
     return $stJs;
 }
 
-function gerarSpan2Form($boConsultar=false,$inCodFerias="")
+function gerarSpan2Form($boConsultar=false,$inCodFerias="",$boValidaFolha=true)
 {
     include_once ( CAM_GRH_PES_COMPONENTES."IFiltroCompetencia.class.php" );
     $obDtaDataInicialFerias = new Data;
@@ -133,13 +133,21 @@ function gerarSpan2Form($boConsultar=false,$inCodFerias="")
     $obHdnDataRetornoFerias->setName                ( "dtRetornoFerias"                                                     );
     $obHdnDataRetornoFerias->setValue               ( $dtRetornoFerias                                                      );
 
+    $obHdninAno = new Hidden;
+    $obHdninAno->setName                            ( "hdninAno"                                                            );
+    $obHdninAno->setId                              ( "hdninAno"                                                            );
+
+    $obHdninCodMes = new Hidden;
+    $obHdninCodMes->setName                         ( "hdninCodMes"                                                         );
+    $obHdninCodMes->setId                           ( "hdninCodMes"                                                         );
+
     $rsLancamentoFerias = new recordset;
     if (!Sessao::read("boConcederFeriasLote")) {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php");
         $obTPessoalFerias = new TPessoalFerias;
         $stFiltro = " AND cod_contrato = ".$_GET['inCodContrato'];
         if ($boConsultar) {
-            $stFiltro = " AND ferias.cod_ferias = $inCodFerias";
+            $stFiltro = " AND ferias.cod_ferias = ".$inCodFerias;
         }
         $obTPessoalFerias->recuperaRelacionamento($rsLancamentoFerias,$stFiltro);
         $rsLancamentoFerias->setUltimoElemento();
@@ -190,38 +198,44 @@ function gerarSpan2Form($boConsultar=false,$inCodFerias="")
     $obHdnAno->setName                              ( "inAno"    );
     $obHdnAno->setValue                             ( $arCompetencia[1] );
 
-    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoTipoFolha.class.php");
-    $obTFolhaPagamentoTipoFolha = new TFolhaPagamentoTipoFolha;
-    $obTFolhaPagamentoTipoFolha->recuperaTodos($rsTipoFolha);
-    $obCmbFolhaPagar = new Select;
-    $obCmbFolhaPagar->setRotulo                     ( "Folha em que Será Pago"                                              );
-    $obCmbFolhaPagar->setName                       ( "inCodTipo"                                                           );
-    $obCmbFolhaPagar->setValue                      ( $inCodTipo                                                            );
-    $obCmbFolhaPagar->setStyle                      ( "width: 200px"                                                        );
-    $obCmbFolhaPagar->setCampoID                    ( "cod_tipo"                                                            );
-    $obCmbFolhaPagar->setCampoDesc                  ( "descricao"                                                           );
-    $obCmbFolhaPagar->addOption                     ( "", "Selecione"                                                       );
-    $obCmbFolhaPagar->setTitle                      ( "Informe a folha em que as férias deverá ser paga."                   );
-    $obCmbFolhaPagar->setNull                       ( false                                                                 );
-    $obCmbFolhaPagar->preencheCombo                 ( $rsTipoFolha                                                          );
+    if ($boValidaFolha) {
+        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoTipoFolha.class.php");
+        $obTFolhaPagamentoTipoFolha = new TFolhaPagamentoTipoFolha;
+        $obTFolhaPagamentoTipoFolha->recuperaTodos($rsTipoFolha);
+        
+        $obCmbFolhaPagar = new Select;
+        $obCmbFolhaPagar->setRotulo                     ( "Folha em que Será Pago"                                              );
+        $obCmbFolhaPagar->setName                       ( "inCodTipo"                                                           );
+        $obCmbFolhaPagar->setId                         ( "inCodTipo"                                                           );
+        $obCmbFolhaPagar->setValue                      ( $inCodTipo                                                            );
+        $obCmbFolhaPagar->setStyle                      ( "width: 200px"                                                        );
+        $obCmbFolhaPagar->setCampoID                    ( "cod_tipo"                                                            );
+        $obCmbFolhaPagar->setCampoDesc                  ( "descricao"                                                           );
+        $obCmbFolhaPagar->addOption                     ( "", "Selecione"                                                       );
+        $obCmbFolhaPagar->setTitle                      ( "Informe a folha em que as férias deverá ser paga."                   );
+        $obCmbFolhaPagar->setNull                       ( false                                                                 );
+        
+        $obCmbFolhaPagar->preencheCombo                 ( $rsTipoFolha                                                          );
 
-    $obLblFolhaPagar = new Label;
-    $obLblFolhaPagar->setRotulo                     ( "Folha em que Será Pago"                                              );
-    $obLblFolhaPagar->setName                       ( "stFolhaPago"                                                         );
-    $obLblFolhaPagar->setId                         ( "stFolhaPago"                                                         );
-    $obLblFolhaPagar->setValue                      ( $_GET['stFolhaPago']                                                  );
+        $obLblFolhaPagar = new Label;
+        $obLblFolhaPagar->setRotulo                     ( "Folha em que Será Pago"                                              );
+        $obLblFolhaPagar->setName                       ( "stFolhaPago"                                                         );
+        $obLblFolhaPagar->setId                         ( "stFolhaPago"                                                         );
+        $obLblFolhaPagar->setValue                      ( $_GET['stFolhaPago']                                                  );
 
-    $obCkbPagamento13 = new Checkbox;
-    $obCkbPagamento13->setName                      ( "boPagamento13"                                                       );
-    $obCkbPagamento13->setValue                     ( true                                                                  );
-    $obCkbPagamento13->setRotulo                    ( "Efetuar Pagamento apenas de 1/3"                                     );
-    $obCkbPagamento13->setTitle                     ( "Selecione se deverá ser efetuado o pagamento de apenas 1/3 das férias." );
+        $obCkbPagamento13 = new Checkbox;
+        $obCkbPagamento13->setName                      ( "boPagamento13"                                                       );
+        $obCkbPagamento13->setId                        ( "boPagamento13"                                                       );
+        $obCkbPagamento13->setValue                     ( true                                                                  );
+        $obCkbPagamento13->setRotulo                    ( "Efetuar Pagamento apenas de 1/3"                                     );
+        $obCkbPagamento13->setTitle                     ( "Selecione se deverá ser efetuado o pagamento de apenas 1/3 das férias." );
 
-    $obLblPagamento13 = new Label;
-    $obLblPagamento13->setRotulo                    ( "Efetuar Pagamento apenas de 1/3"                                     );
-    $obLblPagamento13->setName                      ( "stPagamento13"                                                       );
-    $obLblPagamento13->setId                        ( "stPagamento13"                                                       );
-    $obLblPagamento13->setValue                     ( $_GET['stPagamento13']                                                );
+        $obLblPagamento13 = new Label;
+        $obLblPagamento13->setRotulo                    ( "Efetuar Pagamento apenas de 1/3"                                     );
+        $obLblPagamento13->setName                      ( "stPagamento13"                                                       );
+        $obLblPagamento13->setId                        ( "stPagamento13"                                                       );
+        $obLblPagamento13->setValue                     ( $_GET['stPagamento13']                                                );
+    }
 
     if ($boConsultar) {
         if ( $rsLancamentoFerias->getNumLinhas() > 0 ) {
@@ -234,8 +248,10 @@ function gerarSpan2Form($boConsultar=false,$inCodFerias="")
             $obFormulario->addComponente            ( $obLblCompetencia                                                     );
             $obFormulario->addHidden                ( $obHdnCodMes                                                          );
             $obFormulario->addHidden                ( $obHdnAno                                                             );
-            $obFormulario->addComponente            ( $obLblFolhaPagar                                                      );
-            $obFormulario->addComponente            ( $obLblPagamento13                                                     );
+            if ($boValidaFolha) {
+                $obFormulario->addComponente            ( $obLblFolhaPagar                                                      );
+                $obFormulario->addComponente            ( $obLblPagamento13                                                     );
+            }
             $obFormulario->montaInnerHTML();
             $obFormulario->obJavaScript->montaJavaScript();
             $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
@@ -249,9 +265,15 @@ function gerarSpan2Form($boConsultar=false,$inCodFerias="")
         $obFormulario->addHidden                    ( $obHdnDataFinalFerias                                                 );
         $obFormulario->addComponente                ( $obLblDataRetornoFerias                                               );
         $obFormulario->addHidden                    ( $obHdnDataRetornoFerias                                               );
+        $obFormulario->addHidden                    ( $obHdninAno                                                           );
+        $obFormulario->addHidden                    ( $obHdninCodMes                                                        );
         $obIFiltroCompetencia->geraFormulario       ( $obFormulario                                                         );
-        $obFormulario->addComponente                ( $obCmbFolhaPagar                                                      );
-        $obFormulario->addComponente                ( $obCkbPagamento13                                                     );
+        
+        if ($boValidaFolha) {
+            $obFormulario->addComponente                ( $obCmbFolhaPagar                                                      );
+            $obFormulario->addComponente                ( $obCkbPagamento13                                                     );    
+        }
+        
         $obFormulario->montaInnerHTML();
         $obFormulario->obJavaScript->montaJavaScript();
         $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
@@ -589,6 +611,8 @@ function preencherQuantDiasGozo()
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFormaPagamentoFerias.class.php");
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalConfiguracaoFerias.class.php");
+            include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php");
+            $obTPessoalFerias = new TPessoalFerias;
             $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
             $obTPessoalConfiguracaoFerias   = new TPessoalConfiguracaoFerias;
             $obTPessoalFormaPagamentoFerias->setDado("cod_forma",$_GET['inCodFormaPagamento']);
@@ -622,10 +646,33 @@ function preencherQuantDiasGozo()
             $stJs .= "d.getElementById('inQuantDiasAbono').innerHTML = '".$inQuantDiasAbono."'; \n";
             $stJs .= "f.inQuantDiasAbono.value = '".$inQuantDiasAbono."';                       \n";
             if ($inQuantDiasGozo > 0) {
-                $stJs .= gerarSpan2Form();
+                /*  Validação para não realizar o pagamento mais de 1 vez quando a forma for...
+                cod_forma 3 (3 periodos de 10 dias)
+                ou
+                cod_forma 4 (2 periodos de 15 dias)
+                */
+                $stFiltroFerias  = " AND cod_contrato = ".$_GET['inCodContrato'];
+                $stFiltroFerias .= "\n AND ferias.cod_forma = ".$_GET['inCodFormaPagamento']." ";
+                $stFiltroFerias .= "\n AND ferias.dt_inicial_aquisitivo = TO_DATE('".$_GET['dtInicial']."','dd/mm/yyyy') ";
+                $stFiltroFerias .= "\n AND ferias.dt_final_aquisitivo = TO_DATE('".$_GET['dtFinal']."','dd/mm/yyyy')     ";
+                $obTPessoalFerias->recuperaRelacionamento($rsLancamentoFerias,$stFiltroFerias," ORDER BY ferias.cod_ferias",$boTransacao);
+                if ($rsLancamentoFerias->getNumLinhas() > 0){
+                    $stJs .= gerarSpan2Form(false,"",false);
+                    
+                    //Atribui os valores para o hidden e desabilita os campos para o usuario
+                    $stJs .= " jQuery('#hdninAno').val(jQuery('#inAno').val()); ";
+                    $stJs .= " jQuery('#hdninCodMes').val(jQuery('#inCodMes').val()); ";
+                    $stJs .= " jQuery('#inAno').prop('disabled',true); ";
+                    $stJs .= " jQuery('#inCodMes').prop('disabled',true); ";
+                
+                }else{
+                    $stJs .= gerarSpan2Form(false,"",true);
+                }
+
                 if ($_GET['dtInicialFerias'] != "") {
                     $stJs .= validarDataInicioFerias($inQuantDiasGozo);
                 }
+            
             } else {
                 $stJs .= gerarSpan3Form();
             }
@@ -818,8 +865,6 @@ function validaDatasInicialFinalPeriodoAquisitivo($stDataIncial, $stDataFinal, &
     $obTPessoalFerias->setDado("dt_inicial_aquisitivo", $stDataIncial);
     $obTPessoalFerias->setDado("dt_final_aquisitivo", $stDataFinal);
     $obTPessoalFerias->verificaDatasPeriodoAquisitivo($rsPeriodoAquisitivo,"","",$boTransacao);
-
-    //SistemaLegado::mostravar($rsPeriodoAquisitivo->getElementos());
     
     if($rsPeriodoAquisitivo->getCampo('dias_ferias') == 10) {
         $numDias=0;

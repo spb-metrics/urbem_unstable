@@ -25,96 +25,32 @@
 <?php
 /**
  * Página de processamento oculto para o relatório de logradouros
- * Data de Criação   : 28/03/2005
-
- * @author Analista: Fábio Bertoldi Rodrigues
- * @author Desenvolvedor: Marcelo Boezio Paulino
-
- * @ignore
-
- * $Id: OCGeraRelatorioLogradouros.php 59612 2014-09-02 12:00:51Z gelson $
-
- * Casos de uso: uc-05.01.20
+ * Data de Criação   : 15/07/2015
+ * @author Analista: Gelson Wolowski Gonçalves
+ * @author Desenvolvedor: Evandro Melos
+ * $Id: OCGeraRelatorioLogradouros.php 63009 2015-07-16 14:36:54Z evandro $
  */
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once CAM_FW_PDF."RRelatorio.class.php";
-include_once CAM_FW_PDF."ListaPDF.class.php";
+require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once CLA_MPDF;
 
-$obRRelatorio = new RRelatorio;
-$obPDF = new ListaPDF();
+$rsDadosRelatorio  = Sessao::read('dados_relatorio');
+$boMostrarHisorico = Sessao::read('mostra_historico');
 
-$arFiltro = Sessao::read('filtroRelatorio');
-$arNomFiltro = Sessao::read( "NomFiltro" );
+if ($boMostrarHisorico == 'true'){
+    $arDados['boMostrarHistorico'] = 'true';
+}else{
+    $arDados['boMostrarHistorico'] = 'false';
+}
 
-$obRRelatorio->setExercicio  ( Sessao::getExercicio() );
-$obRRelatorio->recuperaCabecalho( $arConfiguracao );
-$obPDF->setModulo            ( "Cadastro Imobiliário:"   );
-$obPDF->setTitulo            ( "Relatório de Logradouros:" );
-$obPDF->setSubTitulo         ( "Exercício - ".Sessao::getExercicio() );
-$obPDF->setUsuario           ( Sessao::getUsername() );
-$obPDF->setEnderecoPrefeitura( $arConfiguracao );
+$arDados['arDadosLogradouro'] = $rsDadosRelatorio->getElementos();
 
-$arTransf5Sessao = Sessao::read('sessao_transf5');
-$obPDF->addRecordSet( $arTransf5Sessao );
+$obMPDF = new FrameWorkMPDF(5,12,2);
+$obMPDF->setFormatoFolha("A4-L");
 
-$obPDF->setAlinhamento ( "C" );
-$obPDF->addCabecalho   ( "CÓD."               ,7  , 9);
-$obPDF->setAlinhamento ( "L" );
-$obPDF->addCabecalho   ( "TIPO"               ,9  , 9);
-$obPDF->addCabecalho   ( "NOME DO LOGRADOURO" ,40 , 9);
-$obPDF->addCabecalho   ( "BAIRROS"            ,17 , 9);
-$obPDF->addCabecalho   ( "CEPs"               ,7 , 9);
-$obPDF->setAlinhamento ( "C" );
-$obPDF->addCabecalho   ( "UF"                 ,7  , 9);
-$obPDF->setAlinhamento ( "L" );
-$obPDF->addCabecalho   ( "MUNICÍPIO"          ,15 , 9);
+$obMPDF->setNomeRelatorio("Relatorio Logradouros");
 
-$obPDF->setAlinhamento ( "C" );
-$obPDF->addCampo       ( "cod_logradouro"  , 7 );
-$obPDF->setAlinhamento ( "L" );
-$obPDF->addCampo       ( "nom_tipo"        , 7 );
-$obPDF->addCampo       ( "nom_logradouro"  , 7 );
-$obPDF->addCampo       ( "bairros"         , 7 );
-$obPDF->addCampo       ( "cep"             , 7 );
-$obPDF->setAlinhamento ( "C" );
-$obPDF->addCampo       ( "sigla_uf"        , 7 );
-$obPDF->setAlinhamento ( "L" );
-$obPDF->addCampo       ( "nom_municipio"   , 7 );
+$obMPDF->setConteudo($arDados);
 
-$obPDF->addFiltro( 'Tipo de Logradouro'        , $arNomFiltro['tipo_logradouro'][$arFiltro[ 'inCodTipoLogradouro' ]] );
-$obPDF->addFiltro( 'Nome do Logradouro'        , $arFiltro['stNomLogradouro']    );
-$obPDF->addFiltro( 'Código Logradouro Inicial' , $arFiltro['inCodInicio']        );
-$obPDF->addFiltro( 'Código Logradouro Final'   , $arFiltro['inCodTermino']       );
-$obPDF->addFiltro( 'Nome do Bairro'            , $arFiltro['stNomBairro']        );
-$obPDF->addFiltro( 'Código Bairro Inicial'     , $arFiltro['inCodInicioBairro']  );
-$obPDF->addFiltro( 'Código Bairro Final'       , $arFiltro['inCodTerminoBairro'] );
-$obPDF->addFiltro( 'CEP Inicial'               , $arFiltro['inCEPInicio']        );
-$obPDF->addFiltro( 'CEP Final'                 , $arFiltro['inCEPTermino']       );
-$obPDF->addFiltro( 'Estado'                    , $arNomFiltro['uf'][$arFiltro[ 'inCodigoUF' ]]              );
-$obPDF->addFiltro( 'Município'                 , $arNomFiltro['municipio'][$arFiltro[ 'inCodigoMunicipio']] );
-$obPDF->addFiltro( 'Ordenação'                 , $arNomFiltro['ordenacao'][$arFiltro[ 'stOrder']]           );
-
-$rsDados = Sessao::read('sessao_transf5');
-$rsTotais = new RecordSet;
-$arTeste  = array();
-$inTotalRegs = $rsDados->getNumLinhas();
-
-if ( $inTotalRegs < 0)
-    $inTotalRegs = 0;
-
-$arTeste[0]["total"] = $inTotalRegs;
-$rsTotais->preenche( $arTeste );
-
-$obPDF->addRecordSet         ($rsTotais);
-
-$obPDF->setQuebraPaginaLista ( false         );
-$obPDF->setAlinhamento       ( "L"           );
-$obPDF->addCabecalho         ( "Total de registros", 100, 10  );
-
-$obPDF->setAlinhamento       ( "L"           );
-$obPDF->addCampo             ( "total",  8  );
-
-$obPDF->show();
+$obMPDF->gerarRelatorio();
 ?>

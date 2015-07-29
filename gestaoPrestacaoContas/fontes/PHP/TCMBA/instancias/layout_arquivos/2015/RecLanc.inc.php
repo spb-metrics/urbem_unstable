@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 62874 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -41,7 +41,7 @@
     * Casos de uso: uc-06.05.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAReceitaArrecadada.class.php" );
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAReceitaArrecadada.class.php" );
     $obTMapeamento = new TTBAReceitaArrecadada();
     $obTMapeamento->setDado('inMes'      , $inMes );
     $obTMapeamento->setDado('stEntidades', $stEntidades );

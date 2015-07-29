@@ -42,7 +42,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 
 class TTipoLogradouro extends Persistente
 {
-    public function TTipoLogradouro()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('sw_tipo_logradouro');

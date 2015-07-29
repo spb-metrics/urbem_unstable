@@ -81,10 +81,21 @@ if ($request->get('inCodExecutivo')) {
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_unidade", substr($request->get('inCodExecutivo'),2,2) );
     $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->recuperaPorChave( $rsRecordSet, $boTransacao );
 
-    if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+    $resultado = SistemaLegado::pegaValor("SELECT LPAD(num_orgao::VARCHAR,2,'0')||LPAD(num_unidade::VARCHAR,2,'0') AS resultado
+                                             FROM orcamento.unidade
+                                             WHERE num_orgao = ".substr($request->get('inCodExecutivo'),0,2)."
+                                               AND num_unidade = ".substr($request->get('inCodExecutivo'),2,2)."
+                                               AND exercicio = '".Sessao::getExercicio()."'"
+                                        ,"resultado"
+                                        );
+    if ($resultado == '') {
+        $obErro->setDescricao("Esse órgão e unidade não existem no urbem!");
     } else {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+        } else {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        }
     }
 }
 
@@ -96,10 +107,21 @@ if ($request->get('inCodLegislativo')) {
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_unidade", substr($request->get('inCodLegislativo'),2,2) );
     $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->recuperaPorChave( $rsRecordSet, $boTransacao );
     
-    if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+    $resultado = SistemaLegado::pegaValor("SELECT LPAD(num_orgao::VARCHAR,2,'0')||LPAD(num_unidade::VARCHAR,2,'0') AS resultado
+                                             FROM orcamento.unidade
+                                             WHERE num_orgao = ".substr($request->get('inCodLegislativo'),0,2)."
+                                               AND num_unidade = ".substr($request->get('inCodLegislativo'),2,2)."
+                                               AND exercicio = '".Sessao::getExercicio()."'"
+                                        ,"resultado"
+                                        );
+    if ($resultado == '') {
+        $obErro->setDescricao("Esse órgão e unidade não existem no urbem!");
     } else {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+        } else {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        }
     }
 }
 
@@ -110,11 +132,22 @@ if ($request->get('inCodRPPS')) {
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_orgao", substr($request->get('inCodRPPS'),0,2) );
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_unidade", substr($request->get('inCodRPPS'),2,2) );
     $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->recuperaPorChave( $rsRecordSet, $boTransacao );
-    
-    if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+
+    $resultado = SistemaLegado::pegaValor("SELECT LPAD(num_orgao::VARCHAR,2,'0')||LPAD(num_unidade::VARCHAR,2,'0') AS resultado
+                                             FROM orcamento.unidade
+                                             WHERE num_orgao = ".substr($request->get('inCodRPPS'),0,2)."
+                                               AND num_unidade = ".substr($request->get('inCodRPPS'),2,2)."
+                                               AND exercicio = '".Sessao::getExercicio()."'"
+                                        ,"resultado"
+                                        );
+    if ($resultado == '') {
+        $obErro->setDescricao("Esse órgão e unidade não existem no urbem!");
     } else {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+        } else {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        }
     }
 }
 
@@ -125,11 +158,22 @@ if ($request->get('inCodOutros')) {
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_orgao", substr($request->get('inCodOutros'),0,2) );
     $obTTCMGOConfiguracaoOrgaoUnidade->setDado("num_unidade", substr($request->get('inCodOutros'),2,2) );
     $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->recuperaPorChave( $rsRecordSet, $boTransacao );
-    
-    if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+
+    $resultado = SistemaLegado::pegaValor("SELECT LPAD(num_orgao::VARCHAR,2,'0')||LPAD(num_unidade::VARCHAR,2,'0') AS resultado
+                                             FROM orcamento.unidade
+                                             WHERE num_orgao = ".substr($request->get('inCodOutros'),0,2)."
+                                               AND num_unidade = ".substr($request->get('inCodOutros'),2,2)."
+                                               AND exercicio = '".Sessao::getExercicio()."'"
+                                        ,"resultado"
+                                        );
+    if ($resultado == '') {
+        $obErro->setDescricao("Esse órgão e unidade não existem no urbem!");
     } else {
-        $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        if ( !$obErro->ocorreu() && !$rsRecordSet->eof() ) {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->alteracao( $boTransacao );
+        } else {
+            $obErro = $obTTCMGOConfiguracaoOrgaoUnidade->inclusao( $boTransacao );
+        }
     }
 }
 

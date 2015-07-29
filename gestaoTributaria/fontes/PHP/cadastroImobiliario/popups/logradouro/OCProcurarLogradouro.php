@@ -34,7 +34,7 @@
 
     * @ignore
 
-    * $Id: OCProcurarLogradouro.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCProcurarLogradouro.php 62960 2015-07-13 14:00:58Z evandro $
 
     * Casos de uso: uc-05.01.04
 */
@@ -204,7 +204,7 @@ function montaListaCEP($arListaCEP, $boRetorna = false)
         $obLista->commitAcao                   (                  );
 
         $obLista->montaHTML                    (                  );
-        $stHTML =  $obLista->getHtml           (                  );
+        $stHTML = $obLista->getHtml            (                  );
         $stHTML = str_replace                  ( "\n","",$stHTML  );
         $stHTML = str_replace                  ( "  ","",$stHTML  );
         $stHTML = str_replace                  ( "'","\\'",$stHTML);
@@ -223,6 +223,103 @@ function montaListaCEP($arListaCEP, $boRetorna = false)
         sistemaLegado::executaIFrameOculto($js);
     }
 }
+
+function montaListaHistorico()
+{
+    
+    $obRCIMLogradouro = new RCIMLogradouro;    
+    
+    $obRCIMLogradouro->setCodigoUF( $_REQUEST["inCodUF"] );
+    $obRCIMLogradouro->setCodigoMunicipio( $_REQUEST["inCodMunicipio"] );
+    $obRCIMLogradouro->setCodigoLogradouro( $_REQUEST["inCodigoLogradouro"] );
+
+    $obRCIMLogradouro->listarHistoricoLogradouros( $rsLista, $boTransacao, "" );
+
+    if ($rsLista->getNumLinhas() > 0) {
+        
+        $obLista = new Lista;
+        $obLista->setRecordSet                 ( $rsLista     );
+        $obLista->setTitulo                    ( "Histórico do Logradouro" );
+        $obLista->setMostraPaginacao           ( false            );
+        
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+        $obLista->ultimoCabecalho->setWidth( 5 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Código ");
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Nome do Logradouro" );
+        $obLista->ultimoCabecalho->setWidth( 30 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Nome do Bairro" );
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Município" );
+        $obLista->ultimoCabecalho->setWidth( 20 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "CEP" );
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo( "Data Logradouro" );
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento("DIREITA");
+        $obLista->ultimoDado->setCampo( "cod_logradouro" );
+        $obLista->commitDado();
+
+        $obLista->addDado();        
+        $obLista->ultimoDado->setCampo( "tipo_nome" );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento("CENTRO");
+        $obLista->ultimoDado->setCampo( "nom_bairro" );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento("CENTRO");
+        $obLista->ultimoDado->setCampo( "[sigla_uf] - [nom_municipio]" );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento("CENTRO");
+        $obLista->ultimoDado->setCampo( "cep" );
+        $obLista->commitDado();
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento("CENTRO");
+        $obLista->ultimoDado->setCampo( "data_logradouro" );
+        $obLista->commitDado();
+
+        $obLista->montaHTML                    (                  );
+        $stHTML = $obLista->getHtml            (                  );
+        $stHTML = str_replace                  ( "\n","",$stHTML  );
+        $stHTML = str_replace                  ( "  ","",$stHTML  );
+        $stHTML = str_replace                  ( "'","\\'",$stHTML);
+        
+        $js .= "d.getElementById('spanListarHistorico').innerHTML = '".$stHTML."';\n";
+    
+        return $js;
+    }    
+    
+}
+
 
 // SELECIONA ACAO
 switch ($_REQUEST ["stCtrl"]) {
@@ -569,6 +666,8 @@ switch ($_REQUEST ["stCtrl"]) {
         if ($arCepSessao) {
             $stJs .= montaListaCEP ( $arCepSessao, true);
         }
+
+        $stJs .= montaListaHistorico();
 
         SistemaLegado::executaIFrameOculto($stJs);
     break;

@@ -33,7 +33,7 @@
 
     Caso de uso: uc-03.01.09
 
-    $Id: OCGeraFichaPatrimonial.php 62830 2015-06-25 14:49:46Z jean $
+    $Id: OCGeraFichaPatrimonial.php 62897 2015-07-06 21:55:07Z jean $
 
     */
 
@@ -64,54 +64,3 @@ $obRelatorio->addParametro('stDepreciacoes'               , $_REQUEST['stDepreci
 $obRelatorio->preview();
 
 ?>
-
-
-
-
-
-
-
-            
-this.queryText += "            FROM  patrimonio.bem                                                                      
-this.queryText += "
-this.queryText += "      INNER JOIN  sw_cgm
-this.queryText += "              ON  sw_cgm.numcgm = bem.numcgm                                                                      
-this.queryText += "
-this.queryText += "      INNER JOIN  patrimonio.especie
-this.queryText += "              ON  especie.cod_natureza = bem.cod_natureza
-this.queryText += "             AND  especie.cod_grupo    = bem.cod_grupo
-this.queryText += "             AND  especie.cod_especie  = bem.cod_especie                                                           
-this.queryText += "      
-this.queryText += "      INNER JOIN  patrimonio.grupo
-this.queryText += "              ON  grupo.cod_natureza = especie.cod_natureza
-this.queryText += "             AND  grupo.cod_grupo    = especie.cod_grupo                                                           
-this.queryText += "        
-this.queryText += "      INNER JOIN  patrimonio.natureza
-this.queryText += "              ON  natureza.cod_natureza = grupo.cod_natureza                                                      
-this.queryText += "
-this.queryText += "       LEFT JOIN  patrimonio.historico_bem
-this.queryText += "              ON  historico_bem.cod_bem = bem.cod_bem                                                                   
-this.queryText += "
-this.queryText += "      INNER JOIN  organograma.local
-this.queryText += "              ON  local.cod_local = historico_bem.cod_local                                                   
-this.queryText += "     
-this.queryText += "      INNER JOIN  organograma.orgao
-this.queryText += "              ON  orgao.cod_orgao = historico_bem.cod_orgao               
-this.queryText += "     
-this.queryText += "      INNER JOIN  organograma.orgao_descricao
-this.queryText += "              ON  orgao_descricao.cod_orgao = orgao.cod_orgao               
-this.queryText += "     
-this.queryText += "      INNER JOIN  patrimonio.situacao_bem
-this.queryText += "              ON  situacao_bem.cod_situacao = historico_bem.cod_situacao
-this.queryText += "
-this.queryText += "       LEFT JOIN  patrimonio.bem_comprado
-this.queryText += "              ON  bem_comprado.cod_bem = bem.cod_bem                                                                    
-this.queryText += "
-this.queryText += "       LEFT JOIN  patrimonio.bem_baixado
-this.queryText += "              ON  bem_baixado.cod_bem = bem.cod_bem
-this.queryText += "                                                                                                                                                                                                               ";
-this.queryText += "       LEFT JOIN ( SELECT *                                                                                                                                                                                    ";
-this.queryText += "                     FROM patrimonio.reavaliacao                                                                                                                                                               ";
-this.queryText += "                    WHERE reavaliacao.dt_reavaliacao = (SELECT MAX(dt_reavaliacao) FROM patrimonio.reavaliacao AS r WHERE reavaliacao.cod_bem = r.cod_bem AND reavaliacao.cod_reavaliacao = r.cod_reavaliacao) ";
-this.queryText += "                 ) AS reavaliacao
-this.queryText += "              ON reavaliacao.cod_bem = bem.cod_bem

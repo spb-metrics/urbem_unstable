@@ -1,11 +1,5 @@
         <footer>
-            <table>
-                <tfoot>
-                    <tr>
-                        <td><?php echo $stRodape; ?> </td>
-                    </tr>
-                </tfoot>
-            </table>    
+            <?php echo $stRodape; ?>
         </footer>
     </body>
 </html>

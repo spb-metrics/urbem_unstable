@@ -32,14 +32,14 @@
 
     * @ignore
 
-    * $Id: PRManterUnidadeGestora.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterUnidadeGestora.php 62862 2015-06-30 20:37:22Z jean $
 
     * Casos de uso: uc-06.05.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GPC_TCMBA_MAPEAMENTO."TTBAConfiguracaoEntidade.class.php");
+include_once(CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAConfiguracaoEntidade.class.php");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterUnidadeGestora";

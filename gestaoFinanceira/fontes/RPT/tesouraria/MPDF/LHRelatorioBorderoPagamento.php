@@ -97,8 +97,8 @@
                         echo "<td class=\"border text_align_left\" width=5%  > Credor: </td>";
                         echo "<td class=\"border text_align_left\" width=40% colspan=3 > " .$dados_credor['credor']. " </td>";
                         
-                        echo "<td class=\"border text_align_left\" width=5%  > CPF/CNPJ: </td>";
-                        echo "<td class=\"border text_align_left\" width=25% colspan=3 > " .$dados_credor['cpf_cnpj']. " </td>";
+                        echo "<td class=\"border text_align_left\" width=10%  > CPF/CNPJ: </td>";
+                        echo "<td class=\"border text_align_left\" width=20% colspan=3 > " .$dados_credor['cpf_cnpj']. " </td>";
 
                         echo "<td class=\"border text_align_left\" width=5% > Banco/Agência/CC: </td>";
                         echo "<td class=\"border text_align_left\" width=20% > " .$dados_credor['banco_agencia_cc']. " </td>";
@@ -109,16 +109,16 @@
                             echo "<td class=\"border text_align_left\" width=5%  > OP: </td>";
                             echo "<td class=\"border text_align_left\" width=10% > " .$dados_op['op']. " </td>";
                         
-                            echo "<td class=\"border text_align_left\" width=5%  > Empenho: </td>";
-                            echo "<td class=\"border text_align_left\" width=20% > " .$dados_op['empenho']. " </td>";
+                            echo "<td class=\"border text_align_left\" width=10%  > Empenho: </td>";
+                            echo "<td class=\"border text_align_left\" width=15% > " .$dados_op['empenho']. " </td>";
 
-                            echo "<td class=\"border text_align_left\" width=5% > Valor Bruto: </td>";
+                            echo "<td class=\"border text_align_left\" width=10% > Valor Bruto: </td>";
                             echo "<td class=\"border text_align_left\" width=10% > " .number_format($dados_op['valor_bruto'],2,",","."). " </td>";
                         
-                            echo "<td class=\"border text_align_left\" width=5% > Retenções: </td>";
+                            echo "<td class=\"border text_align_left\" width=10% > Retenções: </td>";
                             echo "<td class=\"border text_align_left\" width=10% > " .number_format($dados_op['valor_retencao'],2,",","."). " </td>";
 
-                            echo "<td class=\"border text_align_left\" width=5% > Valor Liquido: </td>";
+                            echo "<td class=\"border text_align_left\" width=10% > Valor Liquido: </td>";
                             echo "<td class=\"border text_align_left\" width=10% > R$ " .number_format($dados_op['valor_liquido'],2,",","."). " </td>";
                         echo "</tr>";
                         echo "<tr >";

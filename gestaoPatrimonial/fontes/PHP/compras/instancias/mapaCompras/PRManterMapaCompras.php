@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: PRManterMapaCompras.php 61787 2015-03-04 13:26:46Z evandro $
+ $Id: PRManterMapaCompras.php 63032 2015-07-17 18:04:12Z michel $
 
  */
 
@@ -52,14 +52,12 @@ include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaSolicitacaoAnulacao.class.php';
 include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacao.class.php';
 include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItemDotacao.class.php';
 include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoHomologadaReserva.class.php';
-
 include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php";
-
 include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoReservaSaldos.class.php';
 include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoReservaSaldosAnulada.class.php';
 
 $link = Sessao::read('link');
-$stLink = "&pg=".$link["pg"]."&pos=".$link["pos"];
+$stLink = "&pg=".$link['pg']."&pos=".$link['pos'];
 
 $stPrograma = "ManterMapaCompras";
 $pgFilt = "FL".$stPrograma.".php";
@@ -159,7 +157,20 @@ function excluirItemMapa($arItemExcluido, $inCodMapa, $stExercicioMapa)
             }
         }
 
-        if (is_numeric($registro['cod_reserva'])) {
+        $obTComprasMapaItemReserva->setDado('cod_mapa'              , $inCodMapa);
+        $obTComprasMapaItemReserva->setDado('exercicio_mapa'        , $stExercicioMapa);
+        $obTComprasMapaItemReserva->setDado('cod_entidade'          , $registro['cod_entidade']);
+        $obTComprasMapaItemReserva->setDado('cod_solicitacao'       , $registro['cod_solicitacao']);
+        $obTComprasMapaItemReserva->setDado('exercicio_solicitacao' , $registro['exercicio_solicitacao']);
+        $obTComprasMapaItemReserva->setDado('cod_item'              , $registro['cod_item']);
+        $obTComprasMapaItemReserva->setDado('cod_centro'            , $registro['cod_centro']);
+        $obTComprasMapaItemReserva->setDado('lote'				    , $registro['lote']);
+        $obTComprasMapaItemReserva->setDado('cod_despesa'           , $registro['cod_despesa']);
+        $obTComprasMapaItemReserva->setDado('cod_conta'             , $registro['cod_conta']);
+        $obTComprasMapaItemReserva->recuperaPorChave($rsMapaItemReserva);
+
+        //Se a Reserva de Saldo foi realizada por Mapa de Compras, Faz Anulação da Reserva.
+        if (is_numeric($registro['cod_reserva']) && $rsMapaItemReserva->getNumLinhas() > 0) {
             # Dados para montar as mensagens de anulação de reserva de saldo.
             $inNumCgm      = SistemaLegado::pegaDado('numcgm','orcamento.entidade', "where cod_entidade = ".$registro['cod_entidade']." and exercicio = '".Sessao::getExercicio()."'");
             $stNomEntidade = SistemaLegado::pegaDado('nom_cgm','sw_cgm', "where numcgm =".$inNumCgm);
@@ -182,16 +193,7 @@ function excluirItemMapa($arItemExcluido, $inCodMapa, $stExercicioMapa)
             $obTOrcamentoReservaSaldosAnulada->inclusao();
         }
 
-        $obTComprasMapaItemReserva->setDado('cod_mapa'              , $inCodMapa);
-        $obTComprasMapaItemReserva->setDado('exercicio'             , $stExercicioMapa);
-        $obTComprasMapaItemReserva->setDado('cod_entidade'          , $registro['cod_entidade']);
-        $obTComprasMapaItemReserva->setDado('cod_solicitacao'       , $registro['cod_solicitacao']);
-        $obTComprasMapaItemReserva->setDado('exercicio_solicitacao' , $registro['exercicio_solicitacao']);
-        $obTComprasMapaItemReserva->setDado('cod_item'              , $registro['cod_item']);
-        $obTComprasMapaItemReserva->setDado('cod_centro'            , $registro['cod_centro']);
-        $obTComprasMapaItemReserva->setDado('lote'				    , $registro['lote']);
-        $obTComprasMapaItemReserva->setDado('cod_despesa'           , $registro['cod_despesa']);
-        $obTComprasMapaItemReserva->setDado('cod_conta'             , $registro['cod_conta']);
+        # Excluindo  da tabela mapa_item_reserva os itens das solicitações excluidas do mapa
         $obTComprasMapaItemReserva->exclusao();
 
         # Excluindo  da tabela mapa_item os itens das solicitações excluidas do mapa
@@ -327,6 +329,8 @@ if ($stAcao == 'incluir') {
 
     $arSolicitacao = Sessao::read('solicitacoes');
 
+    $boRegistroPreco = $_REQUEST['boRegistroPreco'];
+
     if (count($arSolicitacao) == 0) {
         SistemaLegado::LiberaFrames(true,true);
         SistemaLegado::exibeAviso('É preciso incluir ao menos uma solicitação para salvar o mapa.', "n_incluir", "erro");
@@ -388,7 +392,6 @@ if ($stAcao == 'incluir') {
             $arAgrupadoValores = array();
 
             if (is_array($arValores)) {
-
                 # Laço que agrupa itens por id e centro de custo para somar o
                 # o total de quantidade e valor.
                 foreach ($arValores as $inChave => $arDados) {
@@ -515,6 +518,10 @@ if ($stAcao == 'incluir') {
                         # Pega a configuração do Compras sobre Reserva Rígida.
                         $boReservaRigida = (SistemaLegado::pegaConfiguracao('reserva_rigida', 35) == 'true');
 
+                        if($boRegistroPreco=='true'){
+                            $boReservaRigida = false;
+                        }
+
                         # Dados para montar as mensagens de inclusão/anulação de reserva de saldo.
                         $inNumCgm      = SistemaLegado::pegaDado('numcgm','orcamento.entidade', "where cod_entidade =".$registro_item['cod_entidade']." and exercicio = '".Sessao::getExercicio()."'");
                         $stNomEntidade = SistemaLegado::pegaDado('nom_cgm','sw_cgm', "where numcgm =".$inNumCgm);
@@ -523,8 +530,7 @@ if ($stAcao == 'incluir') {
                         $stSolicitacao = $registro_item['cod_solicitacao'].'/'.$registro_item['exercicio_solicitacao'];
                         # Fim dados mensagem.
 
-                        if (is_numeric($registro_item['cod_reserva'])) {
-
+                        if (is_numeric($registro_item['cod_reserva'])&&$boRegistroPreco=='false') {
                             # A reserva que já é referente a solicitação este deve ser abatida e será lançada outra para o mapa
                             $flValor = $registro_item['vl_reserva_homologacao'] - $registro_item['vl_reserva'];
 
@@ -561,8 +567,7 @@ if ($stAcao == 'incluir') {
                         }
 
                         # Tenta criar a nova reserva que será usada pelo Mapa de Compras.
-                        if ($registro_item['vl_reserva'] > 0) {
-
+                        if ($registro_item['vl_reserva'] > 0 && $boRegistroPreco=='false') {
                             # Mensagem do motivo da criação da Reserva de Saldo.
                             $stMsgReserva  = "Entidade: ".$stEntidade.", ";
                             $stMsgReserva .= "Mapa de Compras: ".$inCodMapa."/".$stExercicioMapa.", ";
@@ -630,6 +635,7 @@ if ($stAcao == 'incluir') {
     $inCodMapa          = $_REQUEST['inCodMapa'];
     $stExercicioMapa    = Sessao::getExercicio();
     $inCodTipoLicitacao = $_REQUEST['inCodTipoLicitacao'];
+    $boRegistroPreco    = $_REQUEST['boRegistroPreco'];
 
     # Validação para o mapa ter ao mínimo uma solicitação vinculada.
     if (count(Sessao::read('solicitacoes')) == 0) {
@@ -878,8 +884,7 @@ if ($stAcao == 'incluir') {
                     # Fim dados mensagem.
 
                     # Caso exista uma reserva criada na Solicitação de Compras.
-                    if (is_numeric($registro_item['cod_reserva_solicitacao'])) {
-
+                    if (is_numeric($registro_item['cod_reserva_solicitacao'])&&$boRegistroPreco=='false') {
                         # Se a quantidade foi alterada no Mapa de Compras.
                         if (($registro_item['quantidade_mapa'] != $registro_item['quantidade_mapa_original']) ||
                             ($registro_item['valor_total_mapa'] != $registro_item['valor_total_mapa_original'])){
@@ -894,7 +899,6 @@ if ($stAcao == 'incluir') {
                             $obTOrcamentoReservaSaldosAnulada->recuperaPorChave($rsReservaSaldosAnulada);
 
                             if ($nuQtdSaldoSolicitacao > 0) {
-
                                 # Caso exista uma anulação para a reserva da Solicitação e tiver saldo,
                                 # exclui a anulação e atualiza o valor da reserva da Solicitação.
                                 if ($rsReservaSaldosAnulada->getNumLinhas() > 0) {
@@ -911,7 +915,6 @@ if ($stAcao == 'incluir') {
                                 }
 
                             } elseif ($nuQtdSaldoSolicitacao == 0 && $rsReservaSaldosAnulada->getNumLinhas() < 1) {
-
                                 $stMsgReservaAnulada  = "Entidade: ".$stEntidade.", ";
                                 $stMsgReservaAnulada .= "Solicitação de Compras: ".$stSolicitacao.", ";
                                 $stMsgReservaAnulada .= "Item: ".$registro_item['cod_item'].", ";
@@ -940,7 +943,7 @@ if ($stAcao == 'incluir') {
                     } else {
                         # Se não existir cod_reserva e tiver algum valor setado para reserva,
                         # cria uma nova reserva de saldo para o Mapa de Compras.
-                        if ($registro_item['vl_reserva'] > 0 && !is_numeric($registro_item['cod_reserva'])) {
+                        if ($registro_item['vl_reserva'] > 0 && !is_numeric($registro_item['cod_reserva']) && $boRegistroPreco=='false') {
                             $boReservaHomologacao = true;
 
                             # Pega a configuração do Compras sobre Reserva Rígida.
@@ -990,8 +993,7 @@ if ($stAcao == 'incluir') {
                             } else {
                                $stMensagem .= "Não foi possível reservar saldo para o item ".$registro_item['cod_item']."/".$registro_item['cod_solicitacao']." devido a falta de saldo. ";
                             }
-                        } elseif ($registro_item['vl_reserva'] > 0 && is_numeric($registro_item['cod_reserva'])) {
-
+                        } elseif ($registro_item['vl_reserva'] > 0 && is_numeric($registro_item['cod_reserva']) && $boRegistroPreco=='false') {
                             # Altera a reserva do Mapa de Compras caso seja modificado algum valor no Mapa.
                             $obTOrcamentoReservaSaldos = new TOrcamentoReservaSaldos;
                             $obTOrcamentoReservaSaldos->setDado('cod_reserva' , $registro_item['cod_reserva']);

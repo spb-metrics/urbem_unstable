@@ -50,8 +50,6 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
-//include_once( $pgJs );
-
 Sessao::remove('filtroRelatorio');
 
 $obREntidade = new ROrcamentoEntidade;
@@ -62,7 +60,6 @@ $rsRecordset = new RecordSet;
 $obForm = new Form;
 $obForm->setAction( CAM_GF_CONT_INSTANCIAS."relatorio/OCGeraRelatorioDemoVariacoesPatrimoniais.php" );
 $obForm->setTarget( "telaPrincipal" );
-//$obForm->setAction( CAM_FW_POPUPS."relatorio/OCRelatorio.php" );
 
 $obHdnValidaData = new HiddenEval;
 $obHdnValidaData->setName  ( "hdnValidaData" );
@@ -104,6 +101,21 @@ $obPeriodo->setValue           (4);
 $obMontaAssinaturas = new IMontaAssinaturas;
 $obMontaAssinaturas->setEventosCmbEntidades ($obCmbEntidades);
 
+// Define Objeto Radio para opção de exibição da coluna código estrutural
+$obRadioEstruturalSim = new Radio();
+$obRadioEstruturalSim->setName  ( "stEstrutural" );
+$obRadioEstruturalSim->setId    ( "stEstrutural" );
+$obRadioEstruturalSim->setLabel ( "Sim" );
+$obRadioEstruturalSim->setValue ( "true" );
+$obRadioEstruturalSim->setRotulo( "Emitir por estrutural" );
+
+$obRadioEstruturalNao = new Radio();
+$obRadioEstruturalNao->setName  ( "stEstrutural" );
+$obRadioEstruturalNao->setId    ( "stEstrutural" );
+$obRadioEstruturalNao->setLabel ( "Não" );
+$obRadioEstruturalNao->setValue ( "false" );
+$obRadioEstruturalNao->setChecked(true);
+
 //------------------
 // Monta Formulario
 //------------------
@@ -116,6 +128,7 @@ $obFormulario->addTitulo ("Dados para Filtro");
 
 $obFormulario->addComponente ($obCmbEntidades);
 $obFormulario->addComponente ($obPeriodo);
+$obFormulario->agrupaComponentes( array( $obRadioEstruturalSim, $obRadioEstruturalNao) );
 
 $obMontaAssinaturas->geraFormulario ($obFormulario);
 

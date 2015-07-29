@@ -48,5 +48,50 @@ INSERT
      , 'Relatório Pagamentos Borderô'
      , 'LHRelatorioBorderoPagamento.php'
      );
- 
+
+UPDATE administracao.acao SET ativo = TRUE WHERE cod_acao = 1412;
+
+
+----------------
+-- Ticket #23111
+----------------
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+     VALUES
+     ( 2
+     , 9
+     , 19
+     , 'Demonstração das Variações Patrimoniais'
+     , 'demonstrarVariacoesPatrimoniaisEstrutural.rptdesign'
+     ); 
+
+
+----------------
+-- Ticket #23111
+----------------
+
+CREATE TYPE variacao_patrimonial_estrutural AS (
+    cod_estrutural      VARCHAR,
+    nivel               INTEGER,
+    nom_conta           VARCHAR,
+    cod_sistema         INTEGER,
+    indicador_superavit CHAR,
+    vl_saldo_anterior   NUMERIC,
+    vl_saldo_debitos    NUMERIC,
+    vl_saldo_creditos   NUMERIC,
+    vl_saldo_atual      NUMERIC
+);
+
+
+----------------
+-- Ticket #23130
+----------------
+
+ALTER TABLE tesouraria.recibo_extra ALTER COLUMN historico TYPE TEXT;
 

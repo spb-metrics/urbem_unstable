@@ -87,3 +87,27 @@ CREATE TYPE reavaliacao_depreciacao_automatica AS (
     , motivo                            VARCHAR
 );
 
+
+----------------
+-- Ticket #22988
+----------------
+
+ALTER TABLE compras.solicitacao ADD COLUMN registro_precos BOOLEAN NOT NULL DEFAULT FALSE;
+
+
+----------------
+-- Ticket #23125
+----------------
+
+INSERT INTO licitacao.tipo_contrato (cod_tipo, sigla, descricao) VALUES (45, 'TPO', 'Termo de Parceria/OSCIP'  );
+INSERT INTO licitacao.tipo_contrato (cod_tipo, sigla, descricao) VALUES (46, 'OTP', 'Outros Termos de Parceria');
+
+
+----------------
+-- Ticket #
+----------------
+
+UPDATE compras.tipo_objeto SET descricao = 'Concessões' WHERE cod_tipo_objeto = 3;
+INSERT INTO compras.tipo_objeto (cod_tipo_objeto, descricao) VALUES (5, 'Permissões');
+INSERT INTO compras.tipo_objeto (cod_tipo_objeto, descricao) VALUES (6, 'Locações de Imóveis');
+

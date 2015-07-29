@@ -33,53 +33,45 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 63040 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
-
+    
+    $Id: UnidOrca.inc.php 63040 2015-07-20 13:04:55Z lisiane $
+    
     * Casos de uso: uc-06.03.00
 */
-
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAUnidade.class.php" );
-    $obTMapeamento = new TTBAUnidade();
-    $obTMapeamento->setDado('exercicio', Sessao::getExercicio() );
-    $obTMapeamento->setDado('cod_entidade', $stEntidades );
-    $obTMapeamento->recuperaDadosTribunal($arRecordSet[$stArquivo]);
-    $inCount = 0;
-
-/*
-    foreach ($arRecordSet[$stArquivo]->arElementos as $stChave) {
-        $arRecordSet[$stArquivo]->arElementos[$inCount]['numero_sequencial'] = $inCount+2;
-        $inCount++;
-    }
-*/
-
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1"); //Reservado
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBAUnidade.class.php" );
+    $obTTCMBAUnidade = new TTCMBAUnidade();
+    $obTTCMBAUnidade->setDado('exercicio', Sessao::getExercicio() );
+    $obTTCMBAUnidade->setDado('cod_entidade', $stEntidades );
+    $obTTCMBAUnidade->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTCMBAUnidade->recuperaDadosTribunal($rsRecordSet);
+    
+    $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade_gestora"); //unidade_gestora
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_unidade");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]"); //Reservado
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_orgao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-/*
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-*/
+
+
+    $obTTCMBAUnidade = null;
+    $rsRecordSet = null;

@@ -62,6 +62,7 @@ define( "CAM_GPC_SIOPE_SIOPS",        CAM_GPC."PHP/SIOPE_SIOPS/");
 define( "CAM_GPC_TCEAL",              CAM_GPC."PHP/TCEAL/" );
 define( "CAM_GPC_TCEPE",              CAM_GPC."PHP/TCEPE/" );
 define( "CAM_GPC_TCETO",              CAM_GPC."PHP/TCETO/" );
+define( "CAM_GPC_SICONFI",            CAM_GPC."PHP/SICONFI/" );
 
 
 // RELATÓRIOS DE SIOPE / SIOPS
@@ -213,3 +214,12 @@ define( "CAM_GPC_TCETO_CONTROLE"  , CAM_GPC_TCETO_CLASSES."controle/"  );
 define( "CAM_GPC_TCETO_INSTANCIAS", CAM_GPC_TCETO."instancias/"        );
 define( "CAM_GPC_TCETO_POPUPS"    , CAM_GPC_TCETO."popups/"            );
 define( "TTTO"                    , CAM_GPC_TCETO_MAPEAMENTO           );
+
+// RELATÓRIOS DE SIOPE / SIOPS
+define( "CAM_GPC_SICONFI_CLASSES",          CAM_GPC_SICONFI."classes/"      );
+define( "CAM_GPC_SICONFI_MAPEAMENTO",       CAM_GPC_SICONFI_CLASSES."mapeamento/"  );
+define( "CAM_GPC_SICONFI_NEGOCIO",          CAM_GPC_SICONFI_CLASSES."negocio/"     );
+define( "CAM_GPC_SICONFI_INSTANCIAS",       CAM_GPC_SICONFI."instancias/"   );
+define( "CAM_GPC_SICONFI_POPUPS",           CAM_GPC_SICONFI."popups/"       );
+define( "CAM_GPC_SICONFI_RELATORIOS",       CAM_GPC_SICONFI_INSTANCIAS."relatorios/");
+define( "SICONFI",                          CAM_GPC_SICONFI_MAPEAMENTO               );

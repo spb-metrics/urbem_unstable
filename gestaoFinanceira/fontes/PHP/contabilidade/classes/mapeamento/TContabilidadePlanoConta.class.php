@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 62430 2015-05-07 20:35:00Z evandro $
+    $Id: TContabilidadePlanoConta.class.php 62886 2015-07-03 19:16:30Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -49,16 +49,23 @@ function TContabilidadePlanoConta()
     $this->setTabela('contabilidade.plano_conta');
 
     $this->setCampoCod('cod_conta');
-    $this->setComplementoChave('exercicio');
+    $this->setComplementoChave('exercicio,cod_estrutural,indicador_superavit');
 
-    $this->AddCampo('cod_conta','integer',true,'',true,false);
-    $this->AddCampo('exercicio','char',true,'04',true,true);
-    $this->AddCampo('nom_conta','varchar',true,'160',false,false);
-    $this->AddCampo('cod_classificacao','integer',true,'',false,true);
-    $this->AddCampo('cod_sistema','integer',true,'',false,true);
-    $this->AddCampo('cod_estrutural','varchar',false,'150',false,false);
-    $this->AddCampo('atributo_tcepe','integer',false,'',false,false);
-    $this->AddCampo('atributo_tcemg','integer',false,'',false,false);
+    $this->AddCampo('cod_conta'          ,'integer', true,   '', true,false);
+    $this->AddCampo('exercicio'          ,   'char', true, '04', true, true);
+    $this->AddCampo('nom_conta'          ,'varchar', true,'200',false,false);
+    $this->AddCampo('cod_classificacao'  ,'integer', true,   '',false, true);
+    $this->AddCampo('cod_sistema'        ,'integer', true,   '',false, true);
+    $this->AddCampo('cod_estrutural'     ,'varchar', true,'160',false,false);
+    $this->AddCampo('escrituracao'       ,'   char',false,  '9',false,false);
+    $this->AddCampo('natureza_saldo'     ,'   char',false,  '7',false,false);
+    $this->AddCampo('indicador_superavit','   char',false, '12',false,false);
+    $this->AddCampo('funcao'             ,'   text',false, '12',false,false);
+    $this->AddCampo('atributo_tcepe'     ,'integer',false,   '',false, true);
+    $this->AddCampo('atributo_tcemg'     ,'integer',false,   '',false, true);
+    $this->AddCampo('escrituracao_pcasp' ,'   char', true,  '1',false,false);
+    $this->AddCampo('obrigatorio_tcmgo'  ,'boolean', true,   '',false,false);
+    $this->AddCampo('sequencial'         ,'integer',false,   '',false,false);
 }
 
 function montaRecuperaGrupos()

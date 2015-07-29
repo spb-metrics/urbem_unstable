@@ -38,8 +38,8 @@ $pgFilt = 'FL'.$stProg.'.php';
 
 SistemaLegado::BloqueiaFrames(true,true);
 
-$boTransacao = new Transacao;
-$obErro      = new Erro;
+$boTransacao = new Transacao();
+$obErro      = new Erro();
 $obTContabilidadeLancamentoDepreciacao  = new TContabilidadeLancamentoDepreciacao();
 $obTPatrimonioDepreciacao               = new TPatrimonioDepreciacao();
 $obTPatrimonioDepreciacaoAnulada        = new TPatrimonioDepreciacaoAnulada();
@@ -47,7 +47,7 @@ $obTPatrimonioDepreciacaoAnulada        = new TPatrimonioDepreciacaoAnulada();
 $stAcao                   = $request->get("stAcao");
 $inMesCompetenciaFiltro   = $request->get("inExercicio").str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT);
 $inMesCompetenciaMensagem = str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT)."/".$request->get("inExercicio");
-$inCodEntidade            = SistemaLegado::pegaDado("valor","administracao.configuracao","WHERE cod_modulo = 8 AND parametro ilike 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."';");
+$inCodEntidade            = SistemaLegado::pegaDado("valor","administracao.configuracao","WHERE cod_modulo = 8 AND parametro ilike 'cod_entidade_prefeitura' AND exercicio = '".$request->get("inExercicio")."';");
 
 switch ($stAcao) {
     case 'depreciar':
@@ -109,6 +109,7 @@ switch ($stAcao) {
             }
         
         }else{
+	    $obTPatrimonioDepreciacao->recuperaDepreciacao($rsPrimeiraDepreciacao, "\n AND depreciacao.competencia = '".$request->get("inExercicio")."01' ");
 	    
             $obErro = $obTPatrimonioDepreciacao->recuperaMaxCompetenciaDepreciada($rsMaxCompetenciaDepreciada);
 	    
@@ -140,11 +141,9 @@ switch ($stAcao) {
                 // Quando existir ao menos uma depreciação, A competencia selecionada nao pode ser maior que a última depreciada.
                 } elseif ( $rsMaxCompetenciaDepreciada->getCampo('max_competencia') != "" && $inMesCompetenciaFiltro > ($rsMaxCompetenciaDepreciada->getCampo('max_competencia') + 1) ) {
                     $obErro->setDescricao("A competência selecionada não pode ser maior que ".$stProximaCompetencia);
-                
-                // Não pode ser maior que a competência logada do sistema.
-                } elseif (((int) $request->get("inExercicio") == date('Y') && (int) $request->get("inCompetencia") > date('m')) || ((int) $request->get("inExercicio") != date('Y'))) {
-		    $obErro->setDescricao("A competência selecionada não pode ser maior que a atual do sistema!");
-    
+		// Verifica se não existe nenhuma depreciação na competencia inicial, janeiro, e se está tentando depreciar um mês diferente de janeiro
+		} elseif ($inMesCompetenciaFiltro != $request->get("inExercicio")."01" && $rsPrimeiraDepreciacao->getNumLinhas() <= 0) {
+		    $obErro->setDescricao("A depreciação deve iniciar na competência de Janeiro!");
                 } else {
 		    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica;
 		    $obFPAtrimonioReavaliacaoDepreciacaoAutomatica = new FPatrimonioReavaliacaoDepreciacaoAutomatica;
@@ -159,7 +158,7 @@ switch ($stAcao) {
 		    
 		    if ($rsReavaliacao->getNumLinhas() > 0 ){
 			SistemaLegado::LiberaFrames(true,true);
-			SistemaLegado::exibeAviso(urlencode("Existem bens a serem reavaliados até a competência ".str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'/'.$_REQUEST['inExercicio']),"n_incluir","erro");
+			SistemaLegado::exibeAviso(urlencode("Existem bens a serem reavaliados até a competência ".str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'/'.$request->get("inExercicio")),"n_incluir","erro");
 			
 			$preview = new PreviewBirt(3,6,24);
 			$preview->setVersaoBirt( '2.5.0' );
@@ -167,8 +166,8 @@ switch ($stAcao) {
 			$preview->setTitulo('Log de Reavaliação de Depreciação');
 			$preview->setNomeArquivo('log_depreciacao_'.sistemaLegado::mesExtensoBR($request->get("inCompetencia"))."_".$request->get("inExercicio"));
 			
-			$preview->addParametro( 'exercicio'   , Sessao::getExercicio() );
-			$preview->addParametro( 'stExercicio' , Sessao::getExercicio() );
+			$preview->addParametro( 'exercicio'   , $request->get("inExercicio") );
+			$preview->addParametro( 'stExercicio' , $request->get("inExercicio") );
 			$preview->addParametro( 'stMes'       , str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT) );
 			$preview->addParametro( 'stMesExtenso', sistemaLegado::mesExtensoBR($request->get("inCompetencia")) );
 			$preview->addParametro( 'stMotivo'    , "Reavaliação de Depreciação" );
@@ -199,7 +198,14 @@ switch ($stAcao) {
     break;
 }
 
-SistemaLegado::mudaFramePrincipal($pgFilt);
+$obErro      = null;
+$boTransacao = null;
+$obTPatrimonioDepreciacao        = null;
+$obTPatrimonioDepreciacaoAnulada = null;
+$obTContabilidadeLancamentoDepreciacao = null;
+$obTContabilidadeLancamentoDepreciacao = null;
+
+SistemaLegado::mudaFramePrincipal($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao);
 SistemaLegado::LiberaFrames(true,true);
 
 ?>

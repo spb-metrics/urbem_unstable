@@ -32,7 +32,7 @@
 
   * Casos de uso: uc-03.04.05, uc-03.03.05, uc-03.03.06
 
-  $Id: OCIMontaSolicitacao.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: OCIMontaSolicitacao.php 63099 2015-07-24 18:30:55Z franver $
 
   */
 
@@ -72,10 +72,12 @@ switch ($_REQUEST["stCtrl"]) {
     case "limpaSolicitacao":
        $stJs .= " d.getElementById('inCodSolicitacao').value = '';";
        $stJs .= " d.getElementById('stNomSolicitacao').innerHTML = '&nbsp;';";
+       $stJs .= " d.getElementById('inCodEntidadeSolicitacao').focus(); ";
+       $stJs .= " d.getElementById('inCodSolicitacao').focus(); ";
     break;
 
     case "verificaFiltro":
-       $stJs .= "if ((d.getElementById('".$_GET['idEntidade']."').value == '') || (d.getElementById('".$_GET['idExercicio']."').value == '')) { \n
+       $stJs .= "if ((d.getElementById('".$_REQUEST['idEntidade']."').value == '') || (d.getElementById('".$_REQUEST['idExercicio']."').value == '')) { \n
                      if (d.getElementById('imgSolicitacao')) {
                         d.getElementById('imgSolicitacao').style.display = 'none';\n
                         d.getElementById('inCodSolicitacao').disabled = true;\n
@@ -91,46 +93,48 @@ switch ($_REQUEST["stCtrl"]) {
     # TIPOS DE BUSCA
 
     case "solicitacao":
-
-        if ($_GET['stExercicio']) {
-            if ($_GET['inCodEntidade']) {
-                if ($_GET['inCodSolicitacao']) {
+        if ($_REQUEST['stExercicio']) {
+            if ($_REQUEST['inCodEntidade']) {
+                if ($_REQUEST['inCodSolicitacao']) {
                     include_once( CAM_GP_COM_MAPEAMENTO."TComprasSolicitacao.class.php" );
                     $obTComprasSolicitacao = new TComprasSolicitacao;
-                    $obTComprasSolicitacao->setDado('exercicio', $_GET['stExercicio'] );
-                    $obTComprasSolicitacao->setDado('cod_entidade' , $_GET['inCodEntidade'] );
-                    $obTComprasSolicitacao->setDado('cod_solicitacao' , $_GET['inCodSolicitacao'] );
-                    if ($_REQUEST['inCodSolicitacaoExcluida']!="") {
-                      $stFiltro.=" AND solicitacao.cod_solicitacao != ".$_GET['inCodSolicitacaoExcluida']." \n";
+                    $obTComprasSolicitacao->setDado('exercicio', $_REQUEST['stExercicio'] );
+                    $obTComprasSolicitacao->setDado('cod_entidade' , $_REQUEST['inCodEntidade'] );
+                    $obTComprasSolicitacao->setDado('cod_solicitacao' , $_REQUEST['inCodSolicitacao'] );
+                    if ($_REQUEST['stCodSolicitacaoExcluida']!="") {
+                      $stFiltro.=" AND solicitacao.exercicio||solicitacao.cod_solicitacao||solicitacao.cod_entidade !='".$_REQUEST['stCodSolicitacaoExcluida']."' \n";
                     }
                     $obErro = $obTComprasSolicitacao->recuperaRelacionamentoSolicitacao( $rsRecordSet, $stFiltro );
                     if (!$obErro->ocorreu()) {
                         if ($rsRecordSet->getNumLinhas() > 0) {
                             $stDescricao = $rsRecordSet->getCampo('solicitante');
-                            $stJs .= " d.getElementById('".$_GET['campoDesc']."').innerHTML = '".$stDescricao."'; ";
+                            $stJs .= " d.getElementById('".$_REQUEST['campoDesc']."').innerHTML = '".$stDescricao."'; ";
                         } else {
-                            $stJs .= "alertaAviso('Código de solicitação inválido (".$_GET['inCodSolicitacao'].") para a entidade informada.','form','erro','".Sessao::getId()."');\n";
-                            $stJs .= "d.getElementById('".$_GET['campoCod']."').value = ''; ";
-                            $stJs .= "d.getElementById('".$_GET['campoDesc']."').innerHTML = '&nbsp;'; ";
+                            $stJs .= "alertaAviso('Código de solicitação inválido (".$_REQUEST['inCodSolicitacao'].") para a entidade informada.','form','erro','".Sessao::getId()."');\n";
+                            $stJs .= "d.getElementById('".$_REQUEST['campoCod']."').value = ''; ";
+                            $stJs .= "d.getElementById('".$_REQUEST['campoDesc']."').innerHTML = '&nbsp;'; ";
                         }
                     }
                 }
             } else {
                 $stJs .= "alertaAviso('Selecione uma entidade.','form','erro','".Sessao::getId()."');\n";
-                $stJs .= "d.getElementById('".$_GET['campoCod']."').value = ''; ";
-                $stJs .= "d.getElementById('".$_GET['campoDesc']."').innerHTML = '&nbsp;'; ";
+                $stJs .= "d.getElementById('".$_REQUEST['campoCod']."').value = ''; ";
+                $stJs .= "d.getElementById('".$_REQUEST['campoDesc']."').innerHTML = '&nbsp;'; ";
 
             }
         } else $stJs .= "alertaAviso('Informe um exercício.','form','erro','".Sessao::getId()."');\n";
     break;
 
     case "mapa_compras":
-
         $inCodSolicitacao = $_REQUEST['inCodSolicitacao'];
         $inCodEntidade    = $_REQUEST['inCodEntidade'];
         $stExercicio      = $_REQUEST['stExercicio'];
+        $boRegistroPreco  = (isset($_REQUEST['boRegistroPreco'])) ? $_REQUEST['boRegistroPreco'] : 'false';
         $stMsgAviso       = "";
 
+        $stJs  = "jQuery('#".$_REQUEST['campoCod']."').val('');                                     \n";
+        $stJs .= "jQuery('#".$_REQUEST['campoDesc']."').html('&nbsp;');                             \n";
+        
         if (is_numeric($stExercicio)) {
             if (is_numeric($inCodEntidade)) {
                 if (is_numeric($inCodSolicitacao)) {
@@ -167,21 +171,34 @@ switch ($_REQUEST["stCtrl"]) {
                     }
 
                     if ($inTotalDisponivel == 0) {
-                        $stMsgAviso = "Essa Solicitação (".$inCodSolicitacao.") não possui saldo disponível para ser utilizada no Mapa de Compras.";
+                        $stMsgAviso = "As Solcitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas Não devem ser de Registro de Preços.";
+                    }
+                    
+                    if (empty($stMsgAviso)) {
+                        include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacao.class.php';
+                        $obTComprasSolicitacao = new TComprasSolicitacao();
+
+                        $stFiltro  = " AND solicitacao.cod_entidade     = ".$inCodEntidade."    \n";
+                        $stFiltro .= " AND solicitacao.exercicio        = '".$stExercicio."'    \n";
+                        $stFiltro .= " AND solicitacao.cod_solicitacao  = ".$inCodSolicitacao." \n";
+                        $stFiltro .= " AND solicitacao.registro_precos  = ".$boRegistroPreco."  \n";
+            
+                        $obTComprasSolicitacao->recuperaSolicitacoesNaoAtendidas( $rsLista, $stFiltro);
+                        
+                        if ($rsLista->getNumLinhas() != 1) {
+                            $stMsgAviso = "As Solcitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas Não devem ser de Registro de Preços.";
+                        }
                     }
 
                     if (empty($stMsgAviso)) {
-                        $stJs .= "jQuery('#".$_GET['campoDesc']."').html('".$stDescricao."'); \n";
+                        $stJs .= "jQuery('#".$_REQUEST['campoCod']."').val('".$inCodSolicitacao."'); \n";
+                        $stJs .= "jQuery('#".$_REQUEST['campoDesc']."').html('".$stDescricao."'); \n";
                     } else {
-                        $stJs .= "jQuery('#".$_GET['campoCod']."').val('');                           \n";
-                        $stJs .= "jQuery('#".$_GET['campoDesc']."').html('&nbsp;');                   \n";
                         $stJs .= "alertaAviso('".$stMsgAviso."','form','erro','".Sessao::getId()."'); \n";
                     }
                 }
             } else {
                 $stJs .= "alertaAviso('Selecione uma entidade.','form','erro','".Sessao::getId()."');  \n";
-                $stJs .= "jQuery('#".$_GET['campoCod']."').val('');                                     \n";
-                $stJs .= "jQuery('#".$_GET['campoDesc']."').html('&nbsp;');                             \n";
             }
         } else {
             $stJs .= "alertaAviso('Informe o Exercício da Solicitação.','form','erro','".Sessao::getId()."'); \n";

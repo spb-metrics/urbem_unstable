@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63125 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -90,52 +90,101 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   lici.exercicio      \n";
-    $stSql .= "         ,lici.cod_licitacao      \n";
-    $stSql .= "         ,to_char(pube.data_publicacao,'dd/mm/yyyy') as data_licitacao      \n";
-    $stSql .= "         ,cgm.nom_cgm as nom_cgm_imprensa      \n";
-    $stSql .= "         ,obj.descricao as descricao_objeto      \n";
-    $stSql .= "         ,case   when lici.cod_modalidade = 1 then 5      \n";
-    $stSql .= "                 when lici.cod_modalidade = 2 then 10      \n";
-    $stSql .= "                 when lici.cod_modalidade = 3 then 1      \n";
-    $stSql .= "                 when lici.cod_modalidade = 5 then 4      \n";
-    $stSql .= "          end as modalidade      \n";
-    $stSql .= "         ,edit.num_edital      \n";
-    $stSql .= "         ,to_char(lici.timestamp,'yyyymm') as competencia      \n";
-    $stSql .= "         ,lici.vl_cotado      \n";
-    $stSql .= "         ,case   when lici.cod_tipo_licitacao = 1 then 3      \n";
-    $stSql .= "                 when lici.cod_tipo_licitacao = 2 then 7      \n";
-    $stSql .= "                 when lici.cod_tipo_licitacao = 3 then 2      \n";
-    $stSql .= "          end as tipo_licitacao      \n";
-    $stSql .= "         ,9 as regime_execucao      \n";
-    $stSql .= "         ,case when edit.dt_aprovacao_juridico is not null then 1 else 2 end as juridico      \n";
-    $stSql .= "         ,to_char(edit.dt_validade_proposta,'dd/mm/yyyy') as data_homologacao      \n";
-    $stSql .= "         ,to_char(edit.dt_entrega_propostas,'dd/mm/yyyy') as data_propostas      \n";
-    $stSql .= " FROM     licitacao.licitacao            as lici      \n";
-    $stSql .= "         ,licitacao.edital               as edit      \n";
-    $stSql .= "         ,licitacao.publicacao_edital    as pube      \n";
-    $stSql .= "         ,licitacao.veiculos_publicidade as veic      \n";
-    $stSql .= "         ,sw_cgm                         as cgm      \n";
-    $stSql .= "         ,compras.objeto                 as obj      \n";
-    $stSql .= " WHERE   lici.exercicio      = edit.exercicio      \n";
-    $stSql .= " AND     lici.cod_entidade   = edit.cod_entidade      \n";
-    $stSql .= " AND     lici.cod_modalidade = edit.cod_modalidade      \n";
-    $stSql .= " AND     lici.cod_licitacao  = edit.cod_licitacao      \n";
-    $stSql .= "       \n";
-    $stSql .= " AND     edit.exercicio      = pube.exercicio      \n";
-    $stSql .= " AND     edit.num_edital     = pube.num_edital      \n";
-    $stSql .= "       \n";
-    $stSql .= " AND     pube.numcgm         = veic.numcgm      \n";
-    $stSql .= "       \n";
-    $stSql .= " AND     veic.numcgm         = cgm.numcgm      \n";
-    $stSql .= "       \n";
-    $stSql .= " AND     lici.cod_objeto     = obj.cod_objeto      \n";
-    $stSql .= "       \n";
-    $stSql .= " AND     lici.cod_modalidade NOT IN (8,9)      \n";
-    $stSql .= " AND     lici.exercicio  = '".$this->getDado('exercicio')."'    \n";
-    if (trim($this->getDado('stEntidades'))) {
-        //$stSql .= " AND     lici.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
+    $stSql = " SELECT 1 AS tipo_registro
+                     ,licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS cod_licitacao
+                     ,".$this->getDado("unidade_gestora")." AS unidade_gestora
+                     ,TO_CHAR(publicacao_edital.data_publicacao,'dd/mm/yyyy') AS data_licitacao      
+                     ,sw_cgm.nom_cgm as nom_cgm_imprensa      
+                     ,objeto.descricao as descricao_objeto      
+                     ,CASE WHEN licitacao.cod_modalidade = 1 THEN 5       --convite
+                           WHEN licitacao.cod_modalidade = 2 THEN 10      --tomada de precos
+                           WHEN licitacao.cod_modalidade = 3 THEN 1       --Concorrência
+                           WHEN licitacao.cod_modalidade = 5 THEN 4       --concurso
+                           WHEN licitacao.cod_modalidade = 4 THEN 7       --leilao
+                           WHEN licitacao.cod_modalidade = 6 THEN 14       --pregao presencial
+                           WHEN licitacao.cod_modalidade = 7 THEN 15       --pregao eletronico
+                           WHEN licitacao.cod_modalidade = 11 THEN 17      --tomada de registro precos
+                      END AS modalidade      
+                     ,edital.num_edital      
+                     ,TO_CHAR(licitacao.timestamp,'yyyymm') AS competencia      
+                     ,licitacao.vl_cotado AS vl_estimado    
+                     , CASE WHEN licitacao.cod_regime = 1 THEN 7
+                            WHEN licitacao.cod_regime = 2 THEN 5
+                            WHEN licitacao.cod_regime = 3 THEN 8  
+                            WHEN licitacao.cod_regime = 4 THEN 6
+                            WHEN licitacao.cod_regime = 5 THEN 4
+                       ELSE 9 END AS regime_execucao      
+                     , CASE WHEN licitacao.cod_criterio = 1 THEN
+                            CASE WHEN licitacao.cod_tipo_licitacao = 1 THEN 3 --ITEM 
+                                 WHEN licitacao.cod_tipo_licitacao = 2 THEN 9 --LOTE
+                                 WHEN licitacao.cod_tipo_licitacao = 3 THEN 2 --GLOBAL
+                            END
+                            WHEN licitacao.cod_criterio = 2 THEN 4
+                            WHEN licitacao.cod_criterio = 3 THEN 7
+                            WHEN licitacao.cod_criterio = 4 THEN 1
+                            END AS tipo_licitacao    
+                     ,CASE WHEN edital.dt_aprovacao_juridico IS NOT NULL THEN 1 ELSE 2 END AS juridico      
+                     ,TO_CHAR(homologacao.timestamp,'dd/mm/yyyy') AS data_homologacao      
+                     ,TO_CHAR(edital.dt_abertura_propostas,'dd/mm/yyyy') AS data_propostas
+                     ,'' AS orgao_internacional
+
+                  FROM licitacao.licitacao
+
+            INNER JOIN licitacao.edital
+                    ON edital.cod_licitacao = licitacao.cod_licitacao
+                   AND edital.cod_modalidade = licitacao.cod_modalidade
+                   AND edital.cod_entidade = licitacao.cod_entidade
+                   AND edital.exercicio_licitacao = licitacao.exercicio
+
+            INNER JOIN licitacao.publicacao_edital
+                    ON publicacao_edital.num_edital = edital.num_edital
+                   AND publicacao_edital.exercicio = edital.exercicio
+
+            INNER JOIN licitacao.veiculos_publicidade
+                    ON veiculos_publicidade.numcgm = publicacao_edital.numcgm
+
+            INNER JOIN sw_cgm
+                    ON sw_cgm.numcgm = veiculos_publicidade.numcgm
+
+            INNER JOIN compras.objeto
+                    ON objeto.cod_objeto = licitacao.cod_objeto
+
+            INNER JOIN licitacao.cotacao_licitacao
+                    ON cotacao_licitacao.cod_licitacao = licitacao.cod_licitacao
+                   AND cotacao_licitacao.cod_modalidade = licitacao.cod_modalidade
+                   AND cotacao_licitacao.cod_entidade = licitacao.cod_entidade
+                   AND cotacao_licitacao.exercicio_licitacao = licitacao.exercicio
+
+            INNER JOIN licitacao.adjudicacao
+                    ON adjudicacao.cod_licitacao = cotacao_licitacao.cod_licitacao
+                   AND adjudicacao.cod_modalidade = cotacao_licitacao.cod_modalidade
+                   AND adjudicacao.cod_entidade = cotacao_licitacao.cod_entidade
+                   AND adjudicacao.exercicio_licitacao = cotacao_licitacao.exercicio_licitacao
+                   AND adjudicacao.lote = cotacao_licitacao.lote
+                   AND adjudicacao.cod_cotacao = cotacao_licitacao.cod_cotacao
+                   AND adjudicacao.cod_item = cotacao_licitacao.cod_item
+                   AND adjudicacao.exercicio_cotacao = cotacao_licitacao.exercicio_cotacao
+                   AND adjudicacao.cgm_fornecedor = cotacao_licitacao.cgm_fornecedor
+
+            INNER JOIN licitacao.homologacao
+                    ON homologacao.num_adjudicacao = adjudicacao.num_adjudicacao
+                   AND homologacao.cod_entidade = adjudicacao.cod_entidade
+                   AND homologacao.cod_modalidade = adjudicacao.cod_modalidade
+                   AND homologacao.cod_licitacao = adjudicacao.cod_licitacao
+                   AND homologacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
+                   AND homologacao.cod_item = adjudicacao.cod_item
+                   AND homologacao.cod_cotacao = adjudicacao.cod_cotacao
+                   AND homologacao.lote = adjudicacao.lote
+                   AND homologacao.exercicio_cotacao = adjudicacao.exercicio_cotacao
+                   AND homologacao.cgm_fornecedor = adjudicacao.cgm_fornecedor
+
+                 WHERE licitacao.cod_modalidade NOT IN (8,9)      
+                   AND licitacao.exercicio = '".$this->getDado('exercicio')."'
+                   AND licitacao.cod_entidade IN (".$this->getDado('entidade').")
+                   AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_fim')."','dd/mm/yyyy')
+
+                GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+                ";
 
     return $stSql;
 }

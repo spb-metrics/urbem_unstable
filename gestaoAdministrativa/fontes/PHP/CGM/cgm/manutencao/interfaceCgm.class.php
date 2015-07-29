@@ -35,7 +35,7 @@
 
 * Casos de uso: uc-01.02.92, uc-01.02.93
 
-  $Id: interfaceCgm.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+  $Id: interfaceCgm.class.php 62988 2015-07-14 18:32:16Z evandro $
 
 */
 
@@ -1065,16 +1065,16 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
             //Carrega os telefones em partes para preencher os campos segmentados
             if (!isset($dddRes)) {
                 $foneRes = isset($foneRes) ? $foneRes : "";
-        $dddRes = substr($foneRes,0,2);
+                $dddRes = substr($foneRes,0,2);
                 $foneRes = substr($foneRes,2,8);
             }
             if (!isset($dddCom)) {
-        $foneCom = isset($foneCom) ? $foneCom : "";
+                $foneCom = isset($foneCom) ? $foneCom : "";
                 $dddCom = substr($foneCom,0,2);
                 $foneCom = substr($foneCom,2,8);
             }
             if (!isset($dddCel)) {
-        $foneCel = isset($foneCel) ? $foneCel : "";
+                $foneCel = isset($foneCel) ? $foneCel : "";
                 $dddCel = substr($foneCel,0,2);
                 $foneCel = substr($foneCel,2,8);
             }
@@ -1753,6 +1753,12 @@ if ($pessoa == 'juridica') {
         $obLblMunicipio->setValue      ( $dadosCgm["nomMunicipio"] );
         $obLblMunicipio->setId         ('lblCidade');
 
+        $obLblTipoLogradouro = new Label();
+        $obLblTipoLogradouro->setRotulo ("Tipo");
+        $obLblTipoLogradouro->setName   ("inCodigoTipo");
+        $obLblTipoLogradouro->setId     ("inCodigoTipo");
+        $obLblTipoLogradouro->setValue  ($dadosCgm['tipoLogradouro']);        
+
         $obLblLogradouro = new Label;
         $obLblLogradouro->setName       ('lblLogradouro');
         $obLblLogradouro->setRotulo     ('Logradouro');
@@ -1788,7 +1794,6 @@ if ($pessoa == 'juridica') {
         echo "  <td colspan='2' class='alt_dados'>Dados de endereço atual</td></tr>";
         echo "<tr>";
 
-
         $obLblPais->montaHTML();
         $stHTML = $obLblPais->getHtml ();
 
@@ -1810,6 +1815,14 @@ if ($pessoa == 'juridica') {
 
         echo "<tr>";
         echo "<td class=\"label\" title=\"Cidade.\">Cidade</td>";
+        echo "<td class=\"field\">".$stHTML."</td>";
+        echo "</tr>";
+
+        $obLblTipoLogradouro->montaHTML();
+        $stHTML = $obLblTipoLogradouro->getHtml ();
+
+        echo "<tr>";
+        echo "<td class=\"label\" title=\"Tipo.\">Tipo</td>";
         echo "<td class=\"field\">".$stHTML."</td>";
         echo "</tr>";
 

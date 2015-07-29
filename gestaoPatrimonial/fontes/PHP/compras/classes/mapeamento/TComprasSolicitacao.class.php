@@ -35,7 +35,7 @@
 
   * Casos de uso: uc-03.04.01
 
-  $Id: TComprasSolicitacao.class.php 62339 2015-04-24 20:31:35Z arthur $
+  $Id: TComprasSolicitacao.class.php 63032 2015-07-17 18:04:12Z michel $
 
   */
 
@@ -76,7 +76,7 @@ class TComprasSolicitacao extends Persistente
         $this->AddCampo('observacao','text',true,true,'',false,false);
         $this->AddCampo('prazo_entrega','integer',true,true,'',false,false);
         $this->AddCampo('timestamp','timestamp',true,true,'',false,false);
-
+        $this->AddCampo('registro_precos','boolean',true,'',false,false);
     }
 
     /*
@@ -703,9 +703,9 @@ class TComprasSolicitacao extends Persistente
 		  SELECT solicitacao.exercicio                                                                                             
 		        , solicitacao.cod_entidade                                                                                          
 		        , solicitacao.cod_solicitacao                                                                                       
-		        , total_solicitacao_item.vl_total_solicitacao
-		        , total_mapa_item.vl_total_mapa                                                                  
-		        , total_anulado_mapa.vl_total_mapa_anulado
+		        , COALESCE(total_solicitacao_item.vl_total_solicitacao,0.00) AS vl_total_solicitacao
+		        , COALESCE(total_mapa_item.vl_total_mapa,0.00) AS vl_total_mapa                                                          
+		        , COALESCE(total_anulado_mapa.vl_total_mapa_anulado,0.00) AS vl_total_mapa_anulado
 						
 		     FROM compras.solicitacao                                                                                               
 		   			   
@@ -789,7 +789,11 @@ class TComprasSolicitacao extends Persistente
          WHERE  1=1
            -- se os valores forem iguias é pq já foram utilizados totalemnte e nao parcialmente, entao nao deve trazer.
            AND totais.vl_total_solicitacao <> totais.vl_total_mapa                                                                  
-           AND totais.vl_total_mapa <> totais.vl_total_mapa_anulado
+           AND (
+                (totais.vl_total_mapa > 0.00 AND totais.vl_total_mapa <> totais.vl_total_mapa_anulado)
+                OR
+                (totais.vl_total_mapa = 0.00)
+               )
          
            -- A SOLICITAÇÃO NÃO PODE ESTAR ANULADA.
            AND  NOT EXISTS

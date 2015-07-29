@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63128 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -76,44 +76,77 @@ function TTBAPAO()
     $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+function recuperaDados(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
 
-    $stSql = $this->montaRecuperaDadosTribunal().$stCondicao.$stOrdem;
+    $stSql = $this->montaRecuperaDados().$stCondicao.$stOrdem;
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+function montaRecuperaDados()
 {
-    $stSql .= " SELECT   pao.exercicio                                                      \n";
-    $stSql .= "         ,des.cod_entidade                                                   \n";
-    $stSql .= "         ,pao.num_pao                                                        \n";
-    $stSql .= "         ,pao.nom_pao                                                        \n";
-    $stSql .= "         ,des.cod_funcao                                                     \n";
-    $stSql .= "         ,des.cod_subfuncao                                                  \n";
-    $stSql .= "         ,des.cod_programa                                                   \n";
-    $stSql .= "         ,orcamento.fn_consulta_tipo_pao(pao.exercicio,pao.num_pao) as tipo  \n";
-    $stSql .= "         ,substr(detalhamento,1,120) as detalha                              \n";
-    $stSql .= " FROM     orcamento.pao as pao                                               \n";
-    $stSql .= "         ,orcamento.despesa as des                                           \n";
-    $stSql .= " WHERE   pao.exercicio   = des.exercicio                                     \n";
-    $stSql .= " AND     pao.num_pao     = des.num_pao                                       \n";
-    $stSql .= " AND     pao.exercicio='".$this->getDado('exercicio')."'                     \n";
-    $stSql .= " GROUP BY pao.exercicio                                                      \n";
-    $stSql .= "         ,des.cod_entidade                                                   \n";
-    $stSql .= "         ,pao.num_pao                                                        \n";
-    $stSql .= "         ,pao.nom_pao                                                        \n";
-    $stSql .= "         ,des.cod_funcao                                                     \n";
-    $stSql .= "         ,des.cod_subfuncao                                                  \n";
-    $stSql .= "         ,des.cod_programa                                                   \n";
-    $stSql .= "         ,substr(detalhamento,1,120)                                         \n";
+    $stSql .= " 
+              SELECT * FROM (
 
+              SELECT 1 AS tipo_registro
+                     , pao.exercicio                                                      
+                     , ( SELECT valor
+                              FROM administracao.configuracao_entidade
+                             WHERE cod_modulo = 45
+                               AND parametro = 'tceba_codigo_unidade_gestora'
+                               AND cod_entidade = '".$this->getDado('entidade')."'
+                        ) AS unidade_gestora
+                     , orcamento.fn_consulta_tipo_pao(pao.exercicio,pao.num_pao) as tipo
+                     , acao.num_acao AS num_projatv
+                     , pao.nom_pao AS descricao
+                     , produto.descricao AS produto
+                     , 0 AS reservado_tcm
+                     , acao_dados.cod_funcao
+                     , acao_dados.cod_subfuncao
+                     , acao.cod_programa
+                     , unidade_medida.nom_unidade AS unidade_medida
+                     , REPLACE(COALESCE(meta_estimada,0.00)::VARCHAR,'.',',') AS meta
+
+                  FROM orcamento.pao
+            INNER JOIN orcamento.pao_ppa_acao
+                    ON pao_ppa_acao.exercicio = pao.exercicio
+                   AND pao_ppa_acao.num_pao = pao.num_pao
+            INNER JOIN ppa.acao
+                    ON acao.cod_acao = pao_ppa_acao.cod_acao
+            INNER JOIN ppa.acao_dados
+                    ON acao_dados.cod_acao = acao.cod_acao
+                   AND acao_dados.timestamp_acao_dados = acao.ultimo_timestamp_acao_dados
+            INNER JOIN ppa.produto
+                    ON produto.cod_produto = acao_dados.cod_produto
+            INNER JOIN administracao.unidade_medida
+                    ON unidade_medida.cod_unidade = acao_dados.cod_unidade_medida
+                   AND unidade_medida.cod_grandeza = acao_dados.cod_grandeza
+
+                 WHERE pao.exercicio = '".$this->getDado('exercicio')."'
+
+              GROUP BY tipo_registro                                                    
+                      ,pao.exercicio                                                   
+                      ,unidade_gestora                                                        
+                      ,pao.num_pao                                                        
+                      ,pao.nom_pao                                                    
+                      ,produto.descricao                                                 
+                      ,reservado_tcm                                             
+                      ,acao_dados.cod_funcao
+                      ,acao_dados.cod_subfuncao
+                      ,acao.cod_programa
+                      ,unidade_medida.nom_unidade
+                      ,meta
+                      ,acao.num_acao
+            ) AS tabela
+        WHERE tipo <> 4
+    ";
+    
     return $stSql;
 }
 

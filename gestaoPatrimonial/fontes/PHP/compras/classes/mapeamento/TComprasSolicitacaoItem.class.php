@@ -35,7 +35,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: TComprasSolicitacaoItem.class.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: TComprasSolicitacaoItem.class.php 62979 2015-07-14 16:18:54Z michel $
 
  */
 
@@ -677,142 +677,38 @@ function montaRecuperaSolicitacaoItemReserva()
                 ,  unidade_medida.nom_unidade
                 ,  centro_custo.cod_centro
                 ,  centro_custo.descricao
-
-                -- QUANTIDADE DO ITEM MENOS A QUANTIDADE ANULADA
-                ,  solicitacao_item.quantidade -
-                   COALESCE((SELECT SUM(solicitacao_item_anulacao.quantidade )
-                              FROM compras.solicitacao_item_anulacao
-                             WHERE solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                               AND solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                               AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                               AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                               AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
-                            ),0.00) as quantidade_item
-
-                -- VALOR DO ITEM - VALOR DO ITEM ANULADO
-                ,  CASE WHEN solicitacao_item_dotacao.vl_reserva IS NULL THEN
-                        COALESCE(solicitacao_item.vl_total, 0.00) -
-                        COALESCE((SELECT SUM(solicitacao_item_anulacao.vl_total )
-                                   FROM compras.solicitacao_item_anulacao
-                                  WHERE solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                                    AND solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                                    AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                                    AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                                    AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
-                                   ),0.00)::numeric(14,2)
-                   ELSE
-                        COALESCE(solicitacao_item.vl_total, 0.00) -
-                        COALESCE((SELECT SUM(solicitacao_item_anulacao.vl_total )
-                                   FROM compras.solicitacao_item_anulacao
-                                  WHERE solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                                    AND solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                                    AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                                    AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                                    AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
-                                 ),0.00)::numeric(14,2)
-                   END as vl_total_item
-
-                -- QUANTIDADE - QUANTIDADE ANULADA
+                ,  COALESCE(solicitacao_item.quantidade,0.00) - COALESCE(solicitacao_item_anulacao.quantidade,0.00) AS quantidade_item
+                ,  COALESCE(solicitacao_item.vl_total,0.00) - COALESCE(solicitacao_item_anulacao.vl_total,0.00)::numeric(14,2) AS vl_total_item
                 ,  CASE WHEN solicitacao_item_dotacao.quantidade IS NULL THEN
-                       COALESCE(solicitacao_item.quantidade, 0.00) -
-                       COALESCE((SELECT  SUM(solicitacao_item_anulacao.quantidade) as quantidade
-                                  FROM  compras.solicitacao_item_anulacao
-                                 WHERE  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                                   AND  solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                                   AND  solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                                   AND  solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                               ),0.00)
+                        COALESCE(solicitacao_item.quantidade,0.00) - COALESCE(solicitacao_item_anulacao.quantidade,0.00)
                    ELSE
-                       COALESCE(solicitacao_item_dotacao.quantidade, 0.00) -
-                       COALESCE((SELECT SUM(solicitacao_item_dotacao_anulacao.quantidade )
-                                 FROM compras.solicitacao_item_dotacao_anulacao
-                                WHERE solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                                  AND solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
-                                  AND solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
-                                  AND solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                                  AND solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
-                                  AND solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-                               ),0.00)
-                   END as quantidade
-
-                -- VALOR DO ITEM POR CENTRO DE CUSTO E DOTAÇÃO MENOS O VALOR ANULADO
+                        COALESCE(solicitacao_item_dotacao.quantidade,0.00) - COALESCE(solicitacao_item_dotacao_anulacao.quantidade,0.00)
+                   END AS quantidade
                 ,  CASE WHEN conta_despesa.cod_conta IS NOT NULL THEN
-                    ((solicitacao_item.vl_total/solicitacao_item.quantidade) * solicitacao_item_dotacao.quantidade) -
-                         COALESCE((SELECT SUM(solicitacao_item_dotacao_anulacao.vl_anulacao )
-                                     FROM compras.solicitacao_item_dotacao_anulacao
-                                    WHERE solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                                      AND solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
-                                      AND solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
-                                      AND solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                                      AND solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
-                                      AND solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-                                   ),0.00)
+                        COALESCE(solicitacao_item_dotacao.vl_reserva,0.00) - COALESCE(solicitacao_item_dotacao_anulacao.vl_anulacao,0.00)
                     ELSE
-                    ((solicitacao_item.vl_total/solicitacao_item.quantidade) * solicitacao_item.quantidade) -
-                         COALESCE((SELECT SUM(solicitacao_item_anulacao.vl_total)
-                                     FROM compras.solicitacao_item_anulacao
-                                    WHERE solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                                      AND solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                                      AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                                      AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                                      AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
-                                   ),0.00)
-                    END as vl_total
-
-                -- QUANTIDADE ANULADA
+                        COALESCE(solicitacao_item.vl_total,0.00) - COALESCE(solicitacao_item_anulacao.vl_total,0.00)
+                   END::numeric(14,2) AS vl_total
                 ,  CASE WHEN solicitacao_item_dotacao.cod_conta IS NOT NULL THEN
-                        ( SELECT  SUM(solicitacao_item_dotacao_anulacao.quantidade)::numeric(14,4)
-                            FROM  compras.solicitacao_item_dotacao_anulacao
-                           WHERE  solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                             AND  solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
-                             AND  solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
-                             AND  solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                             AND  solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                             AND  solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
-                             AND  solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa )
+                        COALESCE(solicitacao_item_dotacao_anulacao.quantidade,0.00)
                    ELSE
-                        ( SELECT  SUM(solicitacao_item_anulacao.quantidade)::numeric(14,4)
-                             FROM  compras.solicitacao_item_anulacao
-                            WHERE  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                              AND  solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                              AND  solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                              AND  solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                              AND  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                              AND  solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro )
-                   END AS quantidade_anulada
-
-                -- VALOR ANULADO
+                        COALESCE(solicitacao_item_anulacao.quantidade,0.00)
+                   END::numeric(14,4) AS quantidade_anulada
                 ,  CASE WHEN solicitacao_item_dotacao.cod_conta IS NOT NULL THEN
-                        ( SELECT  SUM(solicitacao_item_dotacao_anulacao.vl_anulacao)::numeric(14,4)
-                            FROM  compras.solicitacao_item_dotacao_anulacao
-                           WHERE  solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                             AND  solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
-                             AND  solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
-                             AND  solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                             AND  solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                             AND  solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
-                             AND  solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa )
+                        COALESCE(solicitacao_item_dotacao_anulacao.vl_anulacao,0.00)
                    ELSE
-                        ( SELECT  SUM(solicitacao_item_anulacao.vl_total)::numeric(14,4)
-                            FROM  compras.solicitacao_item_anulacao
-                           WHERE  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                             AND  solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                             AND  solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                             AND  solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                             AND  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
-                             AND  solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro )
-                   END AS vl_anulado
-
-                ,  CASE WHEN solicitacao_item.vl_total > 0 THEN
-                      (solicitacao_item.vl_total / solicitacao_item.quantidade)::numeric(14,2)
-                   END as vl_unitario
-
+                        COALESCE(solicitacao_item_anulacao.vl_total,0.00)
+                   END::numeric(14,2) AS vl_anulado
+                ,  CASE WHEN conta_despesa.cod_conta IS NOT NULL THEN
+                        COALESCE((solicitacao_item_dotacao.vl_reserva/solicitacao_item_dotacao.quantidade),0.00)
+                   ELSE
+                        COALESCE((solicitacao_item.vl_total/solicitacao_item.quantidade),0.00)
+                   END::numeric(14,2) AS vl_unitario
                 ,  despesa.cod_despesa
                 ,  conta_despesa.descricao AS nomdespesa
                 ,  conta_despesa.cod_conta
-                ,  conta_despesa.cod_estrutural as desdobramento
-                ,  empenho.fn_saldo_dotacao(solicitacao_item_dotacao.exercicio, solicitacao_item_dotacao.cod_despesa) as saldo
-
+                ,  conta_despesa.cod_estrutural AS desdobramento
+                ,  empenho.fn_saldo_dotacao(solicitacao_item_dotacao.exercicio, solicitacao_item_dotacao.cod_despesa) AS saldo
                 ,  solicitacao_item_dotacao.vl_reserva
                 ,  solicitacao_item_dotacao.exercicio
 
@@ -834,6 +730,49 @@ function montaRecuperaSolicitacaoItemReserva()
               AND  solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
               AND  solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
               AND  solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
+              
+        LEFT JOIN  (SELECT SUM(solicitacao_item_anulacao.quantidade ) AS quantidade
+                         , SUM(solicitacao_item_anulacao.vl_total ) AS vl_total
+                         , solicitacao_item_anulacao.cod_item
+                         , solicitacao_item_anulacao.exercicio 
+                         , solicitacao_item_anulacao.cod_entidade
+                         , solicitacao_item_anulacao.cod_solicitacao
+                         , solicitacao_item_anulacao.cod_centro
+                      FROM compras.solicitacao_item_anulacao
+                  GROUP BY solicitacao_item_anulacao.cod_item
+                         , solicitacao_item_anulacao.exercicio
+                         , solicitacao_item_anulacao.cod_entidade
+                         , solicitacao_item_anulacao.cod_solicitacao
+                         , solicitacao_item_anulacao.cod_centro
+                   ) AS solicitacao_item_anulacao
+               ON  solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
+              AND  solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
+              AND  solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
+              AND  solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+              AND  solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
+
+        LEFT JOIN  (SELECT SUM(solicitacao_item_dotacao_anulacao.quantidade ) AS quantidade
+                         , SUM(solicitacao_item_dotacao_anulacao.vl_anulacao ) AS vl_anulacao
+                         , solicitacao_item_dotacao_anulacao.cod_item 
+                         , solicitacao_item_dotacao_anulacao.exercicio 
+                         , solicitacao_item_dotacao_anulacao.cod_entidade
+                         , solicitacao_item_dotacao_anulacao.cod_solicitacao
+                         , solicitacao_item_dotacao_anulacao.cod_centro 
+                         , solicitacao_item_dotacao_anulacao.cod_despesa
+                      FROM compras.solicitacao_item_dotacao_anulacao
+                  GROUP BY solicitacao_item_dotacao_anulacao.cod_item 
+                         , solicitacao_item_dotacao_anulacao.exercicio 
+                         , solicitacao_item_dotacao_anulacao.cod_entidade
+                         , solicitacao_item_dotacao_anulacao.cod_solicitacao
+                         , solicitacao_item_dotacao_anulacao.cod_centro 
+                         , solicitacao_item_dotacao_anulacao.cod_despesa
+                   ) AS solicitacao_item_dotacao_anulacao      
+               ON  solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
+              AND  solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
+              AND  solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
+              AND  solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
+              AND  solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
+              AND  solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa           
 
         -- RECUPERA A DOTAÇÃO
         LEFT JOIN  orcamento.despesa

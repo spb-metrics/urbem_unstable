@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCIMontaDotacaoDesdobramento.php 61949 2015-03-18 14:06:06Z evandro $
+ $Id: OCIMontaDotacaoDesdobramento.php 62979 2015-07-14 16:18:54Z michel $
 
  */
 
@@ -127,7 +127,7 @@ function montaComboDiverso()
                         $selected = "";
                     }
                     $arOptions[]['reduzido']                  = $stMascaraReduzidaOld;
-                    $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."'";
+                    $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."','".$selected."'";
                     $inContador++;
                 }
             }
@@ -145,7 +145,7 @@ function montaComboDiverso()
                 $selected = "";
             }
             $arOptions[]['reduzido'] = $stMascaraReduzidaOld;
-            $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."'";
+            $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."','".$selected."'";
 
         }
 

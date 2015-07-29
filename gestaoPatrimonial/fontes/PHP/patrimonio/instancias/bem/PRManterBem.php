@@ -26,7 +26,7 @@
  * @author Analista: Gelson W. Gonçalves
  * @author Desenvolvedor: Henrique Boaventura
 
- * $Id: PRManterBem.php 62215 2015-04-08 21:28:32Z jean $
+ * $Id: PRManterBem.php 63088 2015-07-23 17:04:56Z arthur $
 
  * Casos de uso: uc-03.01.06
  */
@@ -120,6 +120,7 @@ switch ($stAcao) {
              }elseif($_REQUEST['stNumNotaFiscal'] == '' && $_REQUEST['dataNotaFiscal'] != '' ){
                 $stMensagem = 'O campo Data da Nota Fiscal não deve ser preenchido, quando não houver  um Número da Nota Fiscal';
              }
+             
             if ($_REQUEST['inValorBem'] == '0,00') {
                 $stMensagem = 'Valor do bem inválido';
             } elseif (!empty($_REQUEST['inValorDepreciacao']) && (str_replace(",",".",str_replace(".", "", $_REQUEST['inValorDepreciacao'])) > str_replace(",",".",str_replace(".", "", $_REQUEST['inValorBem'])))) {
@@ -146,7 +147,7 @@ switch ($stAcao) {
                 $stMensagem = 'O valor da quota acelerada deve ser informado e maior que zero';
             }elseif($boDepreciavel === 'true' && !empty($_REQUEST['inCodContaDepreciacao']) && ($_REQUEST['flQuotaDepreciacaoAnual'] == '0,00' || $_REQUEST['flQuotaDepreciacaoAnual'] == '0.00' || $_REQUEST['flQuotaDepreciacaoAnual'] == '')){
                 $stMensagem = 'O valor da quota de depreciação Anual deve ser maior que zero';
-            }elseif(empty($_REQUEST['inCodContaDepreciacao']) && isset($_REQUEST['flQuotaDepreciacaoAnual']) && $_REQUEST['flQuotaDepreciacaoAnual'] != '0,00'){
+            }elseif(empty($_REQUEST['inCodContaDepreciacao']) && isset($_REQUEST['flQuotaDepreciacaoAnual']) && $_REQUEST['flQuotaDepreciacaoAnual'] != '0,00' && $_REQUEST['flQuotaDepreciacaoAnual'] != ''){
                 $stMensagem = 'O valor da Conta Contábil de Depreciação Acumulada deve ser informado.';
             }elseif(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 02 ){
                 if($_REQUEST['stNumNotaFiscal'] != '' and  $_REQUEST['inCodTipoDocFiscal'] == ''){
@@ -168,8 +169,7 @@ switch ($stAcao) {
             }
             }
         }
-        
-            //se nao há mensagens de erro setadas
+
         if (!$stMensagem) {
             //loop acrescentado para a inclusão em lote
             //se não for em lote, inclui apenas uma vez
@@ -605,50 +605,45 @@ switch ($stAcao) {
         $stFiltro = " WHERE num_placa = '".$_REQUEST['stNumeroPlaca']."' AND cod_bem  <> ".$_REQUEST['inCodBem'];
         $obTPatrimonioBem->recuperaTodos($rsBem, $stFiltro);
         
+        // Reupera alguma depreciação na competencia se o bem possuir
+        $obTPatrimonioDepreciacao = new TPatrimonioDepreciacao();
+        $obTPatrimonioDepreciacao->setDado('cod_bem', $inCodBem);
+        $obTPatrimonioDepreciacao->recuperaDepreciacao($rsDepreciado, " AND SUBSTR(depreciacao.competencia, 0,5) = '".Sessao::getExercicio()."'");
+        
+        // Recupera o cod_plano se estiver cadastrado no bem
         $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_bem'   , $inCodBem );
         $obTPatrimonioBemPlanoDepreciacao->setDado( 'exercicio' , $inExercicio);
         $obTPatrimonioBemPlanoDepreciacao->recuperaBemPlanoDepreciacao( $rsBemPlanoDepreciacao );
         
+        // Recupera o cod_plano se estiver cadastrado no grupo        
         $obTPatrimonioGrupo = new TPatrimonioGrupo();
         $obTPatrimonioGrupo->setDado('cod_bem' , $inCodBem);
         $obTPatrimonioGrupo->recuperaGrupoPlanoDepreciacao( $rsGrupoPlanoDepreciacao );
-        
-        if(!empty($inCodContaDepreciacao)){
+                
+        // Verifica se o bem possui depreicação na competencia atual, caso sim, não poderá alterar o valor da conta contabil de depreciação até que anule todas as depreciações
+        if( $rsDepreciado->getNumLinhas() >= 1 ){
             
-            if (($rsBemPlanoDepreciacao->getNumLinhas() >= 1 && $rsBemPlanoDepreciacao->getCampo("cod_plano") != $inCodContaDepreciacao )
-                 || ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo("cod_plano") != $inCodContaDepreciacao)) {
+            // Verifica se a conta foi modificada e está cadastrada no bem, pois é a que prevalece sobre o grupo
+            if ( $rsBemPlanoDepreciacao->getNumLinhas() >= 1 && $rsBemPlanoDepreciacao->getCampo("cod_plano") != $inCodContaDepreciacao ) {
                 $stMensagem = "Já existem depreciações lançadas para este bem. Anule-as para alterar a Conta Contábil de Depreciação.";
-            } else {
-                $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_plano' , $inCodContaDepreciacao );
-                $obTPatrimonioBemPlanoDepreciacao->inclusao();    
+            // se não verifica se sofreu alteração e está diferente da cadastrada no grupo
+            } else if ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo('cod_plano') != $inCodContaDepreciacao && !empty($inCodContaDepreciacao)) {
+                $stMensagem = "Já existem depreciações lançadas para este bem. Anule-as para alterar a Conta Contábil de Depreciação.";
             }
-                            
-        }else{
             
-            if ($rsBemPlanoDepreciacao->getNumLinhas() >= 1 || $rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 ) {
-                $stMensagem = "Já existem depreciações lançadas para este bem. Anule-as para alterar a Conta Contábil de Depreciação.";
+        } else {    
+            //Caso não exista depreciação faz o processo de incluir ou excluir um conta contabil de depreciação para o bem
+            $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_bem'  , $inCodBem );
+            $obTPatrimonioBemPlanoDepreciacao->setDado( 'exercicio', $inExercicio);
+            
+            if (!empty($inCodContaDepreciacao)) {
+                $obTPatrimonioBemPlanoDepreciacao->setDado( 'cod_plano', $inCodContaDepreciacao);
+                $obTPatrimonioBemPlanoDepreciacao->inclusao();
             } else {
-                
-                $obTPatrimonioDepreciacaoAnulada = new TPatrimonioDepreciacaoAnulada();
-                $obTPatrimonioDepreciacao->recuperaTodos($rsBemDepreciado, ' WHERE cod_bem = '.$inCodBem.' ' );
-                
-                while ( !$rsBemDepreciado->eof() ) {
-                    
-                    $obTPatrimonioDepreciacaoAnulada->setDado( 'cod_depreciacao', $rsBemDepreciado->getCampo('cod_depreciacao'));
-                    $obTPatrimonioDepreciacaoAnulada->setDado( 'cod_bem', $inCodBem );
-                    $obTPatrimonioDepreciacaoAnulada->exclusao();
-
-                    $obTPatrimonioDepreciacao->setDado( 'cod_depreciacao', $rsBemDepreciado->getCampo('cod_depreciacao'));
-                    $obTPatrimonioDepreciacao->setDado( 'cod_bem', $inCodBem );
-                    $obTPatrimonioDepreciacao->exclusao();
-                    
-                    $rsBemDepreciado->proximo();
-                }
-                
                 $obTPatrimonioBemPlanoDepreciacao->exclusao();
             }
-        }
-       
+        } 
+        
         //verifica a integridade dos valores
         if ($_REQUEST['inValorBem'] == '0,00') {
             $stMensagem = 'Valor do bem inválido';

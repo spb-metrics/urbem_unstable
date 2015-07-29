@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.07.01
 
-    $Id: OCManterEstagiario.php 61562 2015-02-05 13:03:54Z evandro $
+    $Id: OCManterEstagiario.php 63142 2015-07-29 14:37:29Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -397,9 +397,6 @@ function _Salvar()
     if (!$obErro->ocorreu()) {
         if ($_GET['inCodBancoTxt'] != "" and $_GET['stNumAgenciaTxt'] == "") {
             $obErro->setDescricao("A agência do banco deve ser informada!");
-        }
-        if ($_REQUEST['inCodCalendario'] == "") {
-            $obErro->setDescricao("O calendário deve ser informada!");   
         }
     }
     if (!$obErro->ocorreu()) {
@@ -805,6 +802,7 @@ function preencherSpanValeTransporte()
         $obFormulario->montaInnerHTML();
         $stHTML = $obFormulario->getHTML();
     }
+    
     $stJs .= "d.getElementById('spnVT').innerHTML = '".$stHTML."';";
     $stJs .= "$('hdnVT').value = '".$stEval."';";
 

@@ -33,7 +33,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-    $Id: TPessoalSubDivisao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TPessoalSubDivisao.class.php 62865 2015-06-30 21:05:01Z lisiane $
 
     Caso de uso: uc-04.04.06
 */
@@ -145,6 +145,34 @@ class TPessoalSubDivisao extends Persistente
         $stSql .= "        ON regime.cod_regime = sub_divisao.cod_regime                        \n";
         $stSql .= " LEFT JOIN pessoal".Sessao::getEntidade().".de_para_tipo_cargo               \n";
         $stSql .= "        ON de_para_tipo_cargo.cod_sub_divisao = sub_divisao.cod_sub_divisao  \n";
+
+        return $stSql;
+    }
+    
+    public function recuperaDeParaTipoCargoTCMBA(&$rsRecordSet, $stFiltro = "", $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaDeParaTipoCargoTCMBA().$stFiltro.$stOrdem;
+        $this->setDebug($stSql);
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
+
+        return $obErro;
+    }
+
+    public function montaRecuperaDeParaTipoCargoTCMBA()
+    {
+        $stSql  = "    SELECT sub_divisao.cod_sub_divisao                                       \n";
+        $stSql .= "         , sub_divisao.cod_regime                                            \n";
+        $stSql .= "         , sub_divisao.descricao                                             \n";
+        $stSql .= "         , de_para_tipo_cargo_tcmba.cod_tipo_cargo_tce                             \n";
+        $stSql .= "         , regime.descricao AS descricao_regime                              \n";
+        $stSql .= "      FROM pessoal".Sessao::getEntidade().".sub_divisao                      \n";
+        $stSql .= "      JOIN pessoal".Sessao::getEntidade().".regime                           \n";
+        $stSql .= "        ON regime.cod_regime = sub_divisao.cod_regime                        \n";
+        $stSql .= " LEFT JOIN pessoal".Sessao::getEntidade().".de_para_tipo_cargo_tcmba         \n";
+        $stSql .= "        ON de_para_tipo_cargo_tcmba.cod_sub_divisao = sub_divisao.cod_sub_divisao  \n";
 
         return $stSql;
     }

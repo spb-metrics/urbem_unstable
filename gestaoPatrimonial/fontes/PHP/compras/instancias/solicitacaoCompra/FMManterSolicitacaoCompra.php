@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompra.php 61756 2015-03-02 16:03:30Z michel $
+ $Id: FMManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
 
  */
 
@@ -85,6 +85,36 @@ $mes = substr($data, 5, 2); // dia
 $dia = substr($data, 8, 2); // ano
 $dataFormatada = $dia.'/'.$mes.'/'.$ano;
 
+//Define Registro de Preço
+$obRadioRegistroPrecoSim = new Radio;
+$obRadioRegistroPrecoSim->setRotulo( "Registro de Preços" );
+$obRadioRegistroPrecoSim->setTitle( "Selecione se esta Solicitação de Compras servirá para um Registro de Preços." );
+$obRadioRegistroPrecoSim->setName( "boRegistroPreco" );
+$obRadioRegistroPrecoSim->setId( "boRegistroPrecoSim" );
+$obRadioRegistroPrecoSim->setValue( "true" );
+$obRadioRegistroPrecoSim->setLabel( "Sim" );
+$obRadioRegistroPrecoSim->setNull( false );
+$obRadioRegistroPrecoSim->obEvento->setOnChange( "montaParametrosGET('montaDotacao', 'inCodEntidade, inCodCentroCusto,nuVlTotal,boRegistroPreco');" );
+
+$obRadioRegistroPrecoNao = new Radio;
+$obRadioRegistroPrecoNao->setRotulo( "Registro de Preços" );
+$obRadioRegistroPrecoNao->setTitle( "Selecione se esta Solicitação de Compras servirá para um Registro de Preços." );
+$obRadioRegistroPrecoNao->setName( "boRegistroPreco" );
+$obRadioRegistroPrecoNao->setId( "boRegistroPrecoNao" );
+$obRadioRegistroPrecoNao->setValue( "false" );
+$obRadioRegistroPrecoNao->setLabel( "Não" );
+$obRadioRegistroPrecoNao->setNull( false );
+$obRadioRegistroPrecoNao->obEvento->setOnChange( "montaParametrosGET('montaDotacao', 'inCodEntidade, inCodCentroCusto,nuVlTotal,boRegistroPreco');montaParametrosGET('calculaValorReservadoDotacao', 'boRegistroPreco');" );
+
+if($obTComprasSolicitacao->getDado('registro_precos') == 't'){
+    $obRadioRegistroPrecoSim->setChecked( true );
+    $obRadioRegistroPrecoNao->setChecked( false );
+}
+else{
+    $obRadioRegistroPrecoSim->setChecked( false );
+    $obRadioRegistroPrecoNao->setChecked( true );
+}
+
 //Define o exercicio corrente
 $obLblExercicio = new Label;
 $obLblExercicio->setRotulo( "Exercício" );
@@ -108,6 +138,7 @@ if ($stAcao == 'alterar') {
 
 //Define o objeto da ação stAcao
 $obHdnAcao = new Hidden;
+$obHdnAcao->setId   ( "stAcao" );
 $obHdnAcao->setName ( "stAcao" );
 $obHdnAcao->setValue( $stAcao  );
 
@@ -146,12 +177,14 @@ $obHdnUnidade->setValue ( "" );
 
 if ($stAcao=="alterar") {
     $obHdnSolicitacao = new Hidden;
-    $obHdnSolicitacao->setName  ( "HdnInSolicitacao" );
-    $obHdnSolicitacao->setValue ( $_REQUEST['cod_solicitacao']);
+    $obHdnSolicitacao->setId    ( "HdnInSolicitacao"            );
+    $obHdnSolicitacao->setName  ( "HdnInSolicitacao"            );
+    $obHdnSolicitacao->setValue ( $_REQUEST['cod_solicitacao']  );
 
     $obHdnExercicio = new Hidden;
-    $obHdnExercicio->setName  ('hdnExercicio');
-    $obHdnExercicio->setValue ( $_REQUEST['exercicio'] );
+    $obHdnExercicio->setId    ( 'hdnExercicio'          );
+    $obHdnExercicio->setName  ( 'hdnExercicio'          );
+    $obHdnExercicio->setValue ( $_REQUEST['exercicio']  );
 }
 
 $obHdnCodItem= new Hidden;
@@ -177,8 +210,8 @@ $obISelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
 $obISelectEntidadeUsuario->setNull(false);
 $obISelectEntidadeUsuario->obSelect->setNull(false);
 $obISelectEntidadeUsuario->obTextBox->setNull(false);
-$obISelectEntidadeUsuario->obSelect->obEvento->setOnChange( "montaParametrosGET( 'montaDotacao', 'inCodEntidade', 'inCodCentroCusto' ); document.getElementById('HdnCodEntidade').value = this.value; montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');" );
-$obISelectEntidadeUsuario->obTextBox->obEvento->setOnChange( "montaParametrosGET( 'montaDotacao', 'inCodEntidade', 'inCodCentroCusto' );document.getElementById('HdnCodEntidade').value = this.value; montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');" );
+$obISelectEntidadeUsuario->obSelect->obEvento->setOnChange( "montaParametrosGET('montaDotacao', 'inCodEntidade,inCodCentroCusto,nuVlTotal,boRegistroPreco'); document.getElementById('HdnCodEntidade').value = this.value; montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');" );
+$obISelectEntidadeUsuario->obTextBox->obEvento->setOnChange( "montaParametrosGET('montaDotacao', 'inCodEntidade,inCodCentroCusto,nuVlTotal,boRegistroPreco'); document.getElementById('HdnCodEntidade').value = this.value; montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');" );
 
 if ($obISelectEntidadeUsuario->inCodEntidade != '') {
     $obHdnCodEntidade->setValue( $obISelectEntidadeUsuario->inCodEntidade );
@@ -186,7 +219,7 @@ if ($obISelectEntidadeUsuario->inCodEntidade != '') {
 
 // Se houver um único registro de Entidade, executa comando para preencher Data solicitação
 if ((count($obISelectEntidadeUsuario->obSelect->arOption) == 1) && ($stAcao=="incluir")) {
-    $stJs .= "montaParametrosGET( 'montaDotacao', 'inCodEntidade', 'inCodCentroCusto' ); montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');";
+    $stJs .= "montaParametrosGET('montaDotacao', 'inCodEntidade,inCodCentroCusto,nuVlTotal,boRegistroPreco'); montaParametrosGET('recuperaDataContabil', 'inCodEntidade', '');";
 }
 
 // Define objeto Data da Solicitação
@@ -290,7 +323,7 @@ $obRdbItensOutraSolicitacaoSim->setName('boItensOutraSolicitacao');
 $obRdbItensOutraSolicitacaoSim->setId('boItensOutraSolicitacaoSim');
 $obRdbItensOutraSolicitacaoSim->setLabel('Sim');
 $obRdbItensOutraSolicitacaoSim->setValue('sim');
-$obRdbItensOutraSolicitacaoSim->obEvento->setOnClick( "executaFuncaoAjax('preencheSpnItensOutraSolicitacao');" );
+$obRdbItensOutraSolicitacaoSim->obEvento->setOnClick( "montaParametrosGET('preencheSpnItensOutraSolicitacao', 'HdnInSolicitacao, HdnCodEntidade, hdnExercicio, stAcao');" );
 
 $obRdbItensOutraSolicitacaoNao = new Radio;
 $obRdbItensOutraSolicitacaoNao->setRotulo('Incluir Itens de Outra Solicitação');
@@ -324,6 +357,31 @@ $obMontaItemUnidade = new IMontaItemUnidade($obForm);
 $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
 $obMontaItemUnidade->obIPopUpCatalogoItem->setNull(true);
 
+//Em IMontaItemUnidade, os Hiddens stNomUnidade e inCodUnidadeMedida estão desabilitados.
+//Habilitando estes campos, necessários no funcionamento da ação.
+$obLblUnidadeMedida = new Label;
+$obLblUnidadeMedida->setRotulo  ('Unidade de Medida'    );
+$obLblUnidadeMedida->setId      ('stUnidadeMedida'      );
+$obLblUnidadeMedida->setValue   ('&nbsp;'               );
+
+$obHdnCodUnidadeMedida = new Hidden;
+$obHdnCodUnidadeMedida->setName ( 'inCodUnidadeMedida'  );
+$obHdnCodUnidadeMedida->setId   ( 'inCodUnidadeMedida'  );
+
+$obHdnNomUnidadeMedida = new Hidden;
+$obHdnNomUnidadeMedida->setName ( 'stNomUnidade'        );
+$obHdnNomUnidadeMedida->setId   ( 'stNomUnidade'        );
+
+$obFormularioSpan = new Formulario;
+$obFormularioSpan->addComponente( $obLblUnidadeMedida       );
+$obFormularioSpan->addHidden    ( $obHdnCodUnidadeMedida    );
+$obFormularioSpan->addHidden    ( $obHdnNomUnidadeMedida    );
+$obFormularioSpan->montaInnerHTML();
+$stHtmlSpanItem = $obFormularioSpan->getHTML();
+
+$obMontaItemUnidade->obSpnInformacoesItem->setValue( $stHtmlSpanItem );
+//Fim da Habilitação dos Hiddens stNomUnidade e inCodUnidadeMedida.
+
 $stJsOnBlur  = "";
 $stJsOnBlur .= "montaParametrosGET('valorUnitarioUltimaCompra');";
 $stJsOnBlur .= "montaParametrosGET('saldoEstoque', 'inCodItem, inCodCentroCusto');";
@@ -352,7 +410,7 @@ $obCentroCustoUsuario->obCampoCod->setId ('inCodCentroCusto');
 
 $stJsOnBlur  = "";
 $stJsOnBlur .= "if (saldoCentroItem(this.value)) { ";
-$stJsOnBlur .= "montaParametrosGET('montaDotacao', 'inCodEntidade, inCodCentroCusto,nuVlTotal');";
+$stJsOnBlur .= "montaParametrosGET('montaDotacao', 'inCodEntidade, inCodCentroCusto,nuVlTotal,boRegistroPreco');";
 $stJsOnBlur .= "montaParametrosGET('saldoEstoque', 'inCodItem, inCodCentroCusto');";
 $stJsOnBlur .= "montaParametrosGET('BuscaComplemento'); }";
 
@@ -421,6 +479,7 @@ if ($stAcao == "alterar") {
 $obFormulario->addHidden  ( $obHdnCodItem );
 $obFormulario->addHidden  ( $obHdnCentroDeCusto );
 $obFormulario->addTitulo  ( "Dados da Solicitação" );
+$obFormulario->agrupaComponentes( array( $obRadioRegistroPrecoSim, $obRadioRegistroPrecoNao ) );
 
 if ($stAcao == "alterar") {
    $obFormulario->addComponente ( $obLblSolicitacao );
@@ -429,13 +488,13 @@ if ($stAcao == "alterar") {
 $obFormulario->addComponente    ( $obLblExercicio );
 
 if ($stAcao == "alterar") {
-    $obFormulario->addComponente    ( $obLblDataSolicitacao );
+    $obFormulario->addComponente( $obLblDataSolicitacao );
 }
 $obFormulario->addComponente    ( $obISelectEntidadeUsuario );
 if ($stAcao == "incluir") {
-    $obFormulario->addComponente    ( $obDtSolicitacao );
+    $obFormulario->addComponente( $obDtSolicitacao );
 }
-$obFormulario->addHidden		( $obHdnDtSolicitacao );
+$obFormulario->addHidden        ( $obHdnDtSolicitacao );
 $obFormulario->addComponente    ( $obObjeto );
 $obFormulario->addComponente    ( $obLblRequisitante );
 $obFormulario->addComponente    ( $obSolicitante );
@@ -447,21 +506,21 @@ $obFormulario->addComponente    ( $obCmbConvenio );
 $obFormulario->agrupaComponentes( array( $obRdbItensOutraSolicitacaoSim, $obRdbItensOutraSolicitacaoNao ) );
 $obFormulario->addSpan          ( $obSpnItensOutraSolicitacao );
 
-$obFormulario->addTitulo         ( "Dotação Padrão" );
-$obDotacaoPadrao->geraFormulario ( $obFormulario );
+$obFormulario->addTitulo        ( "Dotação Padrão" );
+$obDotacaoPadrao->geraFormulario( $obFormulario );
 
 $obFormulario->addTitulo        ( "Dados do Item" );
 $obMontaItemUnidade->geraFormulario( $obFormulario );
 $obFormulario->addComponente    ( $obTxtComplemento );
 $obFormulario->addComponente    ( $obCentroCustoUsuario );
 $obFormulario->addComponente    ( $obLblSaldoEstoque );
-$obFormulario->addSpan			( $obSpnVlrReferencia );
+$obFormulario->addSpan          ( $obSpnVlrReferencia );
 $obMontaQuantidadeValores->geraFormulario($obFormulario );
-$obMontaQuantidadeValores->obQuantidade->obEvento->setOnChange( $obMontaQuantidadeValores->obQuantidade->obEvento->getOnChange()."preencheValorReservado($('nuVlTotal').value);" );
-$obMontaQuantidadeValores->obValorTotal->obEvento->setOnChange( $obMontaQuantidadeValores->obValorTotal->obEvento->getOnChange()."preencheValorReservado(this.value);" );
-$obMontaQuantidadeValores->obValorUnitario->obEvento->setOnChange( $obMontaQuantidadeValores->obValorUnitario->obEvento->getOnChange()."preencheValorReservado($('nuVlTotal').value);" );
+$obMontaQuantidadeValores->obQuantidade->obEvento->setOnChange( $obMontaQuantidadeValores->obQuantidade->obEvento->getOnChange()."montaParametrosGET( 'calculaValorReservadoDotacao' );" );
+$obMontaQuantidadeValores->obValorTotal->obEvento->setOnChange( $obMontaQuantidadeValores->obValorTotal->obEvento->getOnChange()."montaParametrosGET( 'calculaValorReservadoDotacao' );" );
+$obMontaQuantidadeValores->obValorUnitario->obEvento->setOnChange( $obMontaQuantidadeValores->obValorUnitario->obEvento->getOnChange()."montaParametrosGET( 'calculaValorReservadoDotacao' );" );
 
-$obFormulario->addSpan			( $obSpanDotacao );
+$obFormulario->addSpan          ( $obSpanDotacao );
 $obFormulario->agrupaComponentes( array($obBtnIncluirItemSolicitacao, $obBtnLimparItemSolicitacao) );
 $obFormulario->addSpan          ( $obSpnListaSolicitacoes );
 

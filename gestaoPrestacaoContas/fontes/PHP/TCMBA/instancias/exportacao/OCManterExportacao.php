@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 62963 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
@@ -62,10 +62,10 @@ $stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
 
 $arFiltro = Sessao::read('filtroRelatorio');
 
-$inMes          = $arFiltro['inMes'];
-$stEntidades    = $arFiltro['inCodEntidade'];
-
+$inMes           = $arFiltro['stMes'];
+$stEntidades     = $arFiltro['inCodEntidade'];
 $stTipoDocumento = "TCM_BA";
+
 $obExportador    = new Exportador();
 
 $obTMapeamento = new TTBAConfiguracao();
@@ -80,12 +80,20 @@ $stDataFinal   = $arFiltro['stDataFinal'];
 Sessao::write('cod_unidade_gestora',$rsEntidade->getCampo('cod_unidade_gestora'));
 Sessao::write('nom_unidade'        ,$rsEntidade->getCampo('nom_entidade'));
 
+if (SistemaLegado::pegaDado('parametro','administracao.configuracao', " WHERE valor = '".$stEntidades."' AND exercicio = '".Sessao::getExercicio()."' AND cod_modulo = 8") == 'cod_entidade_prefeitura') {
+    $stEntidadeRH = '';
+} else {
+    $stEntidadeRH = "_".$stEntidades;
+}
+
 foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
-
+    
+    $obExportador->addArquivo($stArquivo);
+    $obExportador->roUltimoArquivo->setTitulo(substr($stArquivo,0,strpos($stArquivo,'.txt')));
+    $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+   
     include( CAM_GPC_TCMBA_INSTANCIAS."layout_arquivos/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
-
     $arRecordSet = null;
-
 }
 
 if ($arFiltro['stTipoExport'] == 'compactados') {
@@ -95,4 +103,5 @@ if ($arFiltro['stTipoExport'] == 'compactados') {
 $obExportador->show();
 SistemaLegado::LiberaFrames();
 ob_end_flush();
+
 ?>

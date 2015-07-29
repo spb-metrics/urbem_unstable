@@ -26,7 +26,7 @@
  * URBEM Soluções de Gestão Pública Ltda
  * www.urbem.cnm.org.br
  *
- $Id: balancoPatrimonialPatrimonioLiquido.plsql 62473 2015-05-13 13:25:59Z michel $
+ $Id: balancoPatrimonialPatrimonioLiquido.plsql 62920 2015-07-08 16:48:00Z evandro $
  *
  * Casos de uso: uc-02.02.11
  */
@@ -531,11 +531,20 @@ ELSE
             
                 --CONTA RESULTADO DO EXERCICIO
                 SELECT '||quote_literal('2.3.7.0.0.01.00')||' as cod_estrutural
-                     , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.0.0.00.00')||') ) as valores
+                     , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.0.0.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
                      , -1 as  multiplicador
-                     
+            
+            UNION ALL         
+                
+                --CONTA RESULTADO DO EXERCICIO
+                SELECT '||quote_literal('2.3.7.0.0.01.00')||' as cod_estrutural
+                     , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.1.01.00')||') ) as valores
+                     , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
+                     , ''Resultado do Exercício'' as nom_conta
+                     , -1 as  multiplicador
+
             UNION ALL
                 
                 --CONTA RESULTADOS ACUMULADOS

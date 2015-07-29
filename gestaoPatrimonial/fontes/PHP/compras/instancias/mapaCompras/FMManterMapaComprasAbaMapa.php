@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaComprasAbaMapa.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterMapaComprasAbaMapa.php 63032 2015-07-17 18:04:12Z michel $
 
  */
 
@@ -121,22 +121,24 @@ if ($stAcao != 'anular') {
 }
 
 $obSolicitacao = new IMontaSolicitacao( $obForm );
-$obSolicitacao->obExercicio->setRotulo("Exercício da Solicitação");
-$obSolicitacao->obExercicio->setReadOnly  ( true );
-$obSolicitacao->obExercicio->setObrigatorioBarra( true );
-$obSolicitacao->obExercicio->setNull ( true );
-$obSolicitacao->setTipoBusca ( 'mapa_compras' );
-
-$obSolicitacao->obITextBoxSelectEntidade->setRotulo("Entidade da Solicitação");
-$obSolicitacao->obITextBoxSelectEntidade->setObrigatorioBarra ( true );
-$obSolicitacao->obITextBoxSelectEntidade->setNull ( true );
-
-$obSolicitacao->obPopUpSolicitacao->obCampoCod->setRotulo("Número da Solicitacao");
-$obSolicitacao->obPopUpSolicitacao->setObrigatorioBarra ( true );
-$obSolicitacao->obPopUpSolicitacao->setNull ( true );
-
-$obSolicitacao->setObrigatorioBarra(true);
-$obSolicitacao->setNull ( true );
+$obSolicitacao->obExercicio->setRotulo                          ( "Exercício da Solicitação");
+$obSolicitacao->obExercicio->setReadOnly                        ( true );
+$obSolicitacao->obExercicio->setObrigatorioBarra                ( true );
+$obSolicitacao->obExercicio->setNull                            ( true );
+$obSolicitacao->setTipoBusca                                    ( 'mapa_compras'            );
+$obSolicitacao->obITextBoxSelectEntidade->setRotulo             ( "Entidade da Solicitação" );
+$obSolicitacao->obITextBoxSelectEntidade->setObrigatorioBarra   ( true );
+$obSolicitacao->obITextBoxSelectEntidade->setNull               ( true );
+$obSolicitacao->obPopUpSolicitacao->obCampoCod->setRotulo       ( "Número da Solicitacao"   );
+$obSolicitacao->obPopUpSolicitacao->setObrigatorioBarra         ( true );
+$obSolicitacao->obPopUpSolicitacao->setNull                     ( true );
+$obSolicitacao->obRdRegistroPrecoSim->setNull                   ( true );
+$obSolicitacao->obRdRegistroPrecoSim->setObrigatorioBarra       ( true );
+$obSolicitacao->obRdRegistroPrecoNao->setNull                   ( true );
+$obSolicitacao->obRdRegistroPrecoNao->setObrigatorioBarra       ( true );
+$obSolicitacao->setObrigatorioBarra                             ( true );
+$obSolicitacao->setNull                                         ( true );
+$obSolicitacao->setRegistroPreco                                ( true );
 
 $arIncluirSolicitacao =  array( &$obSolicitacao->obPopUpSolicitacao, &$obSolicitacao->obITextBoxSelectEntidade );
 
@@ -147,7 +149,7 @@ $obBtnIncluirForm = new Button;
 $obBtnIncluirForm->setName               ( "btnIncluirSolicitacao"   );
 $obBtnIncluirForm->setValue              ( "Incluir"                 );
 $obBtnIncluirForm->setTipo               ( "button"                  );
-$obBtnIncluirForm->obEvento->setOnClick  ( " montaParametrosGET('incluirSolicitacao','stExercicioSolicitacao, inCodEntidadeSolicitacao, inCodSolicitacao, inCodTipoLicitacao, stCtrl, stAcao'); limparDadosSolicitacao();" );
+$obBtnIncluirForm->obEvento->setOnClick  ( " montaParametrosGET('incluirSolicitacao','stExercicioSolicitacao, inCodEntidadeSolicitacao, inCodSolicitacao, inCodTipoLicitacao, boRegistroPreco, stCtrl, stAcao'); limparDadosSolicitacao();" );
 
 $obBtnLimparSolicitacaoForm = new Button;
 $obBtnLimparSolicitacaoForm->setName               ( "btnLimparSolicitacao"       );

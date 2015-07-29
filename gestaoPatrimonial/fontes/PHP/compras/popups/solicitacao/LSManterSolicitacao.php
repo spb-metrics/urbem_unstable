@@ -35,33 +35,34 @@
 
  * @ignore
 
- $Id: LSManterSolicitacao.php 62339 2015-04-24 20:31:35Z arthur $
+ $Id: LSManterSolicitacao.php 63032 2015-07-17 18:04:12Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
-$stFncJavaScript .= " function insereSolicitacao(cod,desc) {  \n";
-$stFncJavaScript .= " var sCod;                  \n";
-$stFncJavaScript .= " var sDesc;                  \n";
-$stFncJavaScript .= " sCod = cod;                \n";
-$stFncJavaScript .= " sDesc = desc;                \n";
-$stFncJavaScript .= " if ( window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."') ) { \n;";
-$stFncJavaScript .= "       window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sDesc;\n; ";
-$stFncJavaScript .= " } \n";
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sCod; \n";
+$stFncJavaScript .= " function insereSolicitacao(cod,desc) {                                    \n";
+$stFncJavaScript .= "   var sCod;                                                               \n";
+$stFncJavaScript .= "   var sDesc;                                                              \n";
+$stFncJavaScript .= "   var d = window.opener.parent.frames['telaPrincipal'].document;          \n";
+$stFncJavaScript .= "   sCod = cod;                                                             \n";
+$stFncJavaScript .= "   sDesc = desc;                                                           \n";
+$stFncJavaScript .= "   if ( d.getElementById('".$_REQUEST["campoNom"]."') ) {                  \n";
+$stFncJavaScript .= "       d.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sDesc;    \n";
+$stFncJavaScript .= "   }                                                                       \n";
+$stFncJavaScript .= "   d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sCod;      \n";
 if ($inner!=0) {
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".Hdn".$_REQUEST["campoNum"].".value = sCod; \n";
+$stFncJavaScript .= "   d.".$_REQUEST["nomForm"].".Hdn".$_REQUEST["campoNum"].".value = sCod;   \n";
 }
 if ($_REQUEST["campoNom"]) {
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNom"].".value = sDesc; \n";
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus(); \n";
+$stFncJavaScript .= "   d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNom"].".value = sDesc;     \n";
+$stFncJavaScript .= "   d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus();           \n";
 }
-$stFncJavaScript .= " window.close();            \n";
-$stFncJavaScript .= " }                          \n";
+$stFncJavaScript .= "   window.close();                                                         \n";
+$stFncJavaScript .= " }                                                                         \n";
 
 if ($_REQUEST['stTipoBusca']) {
-    include_once( CAM_GP_COM_MAPEAMENTO ."TComprasSolicitacao.class.php"               				 );
+    include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacao.class.php';
     $obTSolicitacao = new TComprasSolicitacao();
 
     $stLink   = "&stTipoBusca=".$_REQUEST['stTipoBusca'];
@@ -84,11 +85,11 @@ if ($_REQUEST['stTipoBusca']) {
             }
             if ($_REQUEST['stExercicio']) {
                 $obTSolicitacao->setDado('exercicio',$_REQUEST['stExercicio']);
-                //$stFiltro .= " AND solicitacao.exercicio = '".$_REQUEST['stExercicio']."' \n";
                 $stLink .= "&stExercicio=".$_REQUEST['stExercicio'];
             }
-            if ($_REQUEST['inCodSolicitacaoExcluida']!="") {
-                $stFiltro .= " AND solicitacao.cod_solicitacao != " . $_REQUEST['inCodSolicitacaoExcluida'] . "\n";
+            if ($_REQUEST['stCodSolicitacaoExcluida']!="") {
+                $stFiltro .= " AND solicitacao.exercicio||solicitacao.cod_solicitacao||solicitacao.cod_entidade != '".$_REQUEST['stCodSolicitacaoExcluida']."'\n";
+                $stLink   .= "&stCodSolicitacaoExcluida=".$_REQUEST["stCodSolicitacaoExcluida"];
             }
             $stOrdem.= "GROUP BY solicitacao.exercicio                                  \n";
             $stOrdem.= "        ,solicitacao.cod_entidade                               \n";
@@ -112,18 +113,21 @@ if ($_REQUEST['stTipoBusca']) {
                 $stLink .= '&campoNum='.$_REQUEST['campoNum'];
             }
             if ($_REQUEST['inCodEntidade']) {
-                $stFiltro = " AND solicitacao.cod_entidade = ".$_REQUEST['inCodEntidade'];
+                $stFiltro = " AND solicitacao.cod_entidade = ".$_REQUEST['inCodEntidade']." \n";
                 $stLink   .= "&inCodEntidade=".$_REQUEST["inCodEntidade"];
             }
             if ($_REQUEST['stExercicio']) {
-                $stFiltro.= " AND solicitacao.exercicio = '".$_REQUEST['stExercicio']."'";
+                $stFiltro.= " AND solicitacao.exercicio = '".$_REQUEST['stExercicio']."'\n";
                 $stLink .= "&stExercicio=".$_REQUEST['stExercicio'];
             }
+            
+            $boRegistroPreco  = (isset($_REQUEST['boRegistroPreco'])) ? $_REQUEST['boRegistroPreco'] : 'false';
+            $stFiltro .= " AND solicitacao.registro_precos = ".$boRegistroPreco." \n";
+            $stLink   .= "&boRegistroPreco=".$boRegistroPreco;
 
             $stOrderBy = " ORDER BY solicitacao.timestamp DESC ";
 
             $obTSolicitacao->recuperaSolicitacoesNaoAtendidas( $rsLista, $stFiltro, $stOrderBy );
-
         break;
 
         // Adicionar novos cases de tipo de busca aqui.

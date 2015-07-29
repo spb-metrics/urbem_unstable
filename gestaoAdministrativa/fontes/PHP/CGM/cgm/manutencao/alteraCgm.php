@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: alteraCgm.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: alteraCgm.php 62988 2015-07-14 18:32:16Z evandro $
 
 */
 
@@ -426,8 +426,9 @@ switch ($controle) {
         if ( strtolower($catHabilitacao) == "xxx" ) {
             $catHabilitacao = '0';
         }
-
-        $sSQL = "SELECT * FROM sw_nome_logradouro WHERE cod_logradouro = ".$_REQUEST["inNumLogradouro"];
+                
+        $sSQL =  "SELECT * FROM sw_nome_logradouro WHERE cod_logradouro = ".$_REQUEST["inNumLogradouro"];
+        $sSQL .= " AND  timestamp = (SELECT max(timestamp) FROM sw_nome_logradouro where cod_logradouro = ".$_REQUEST["inNumLogradouro"].") ";
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);
@@ -476,6 +477,7 @@ switch ($controle) {
         $stNomeBairroCorresp = "";
         if ($_REQUEST["inNumLogradouroCorresp"]) {
             $sSQL = "SELECT * FROM sw_nome_logradouro WHERE cod_logradouro = ".$_REQUEST["inNumLogradouroCorresp"];
+            $sSQL .= " AND  timestamp = (SELECT max(timestamp) FROM sw_nome_logradouro where cod_logradouro = ".$_REQUEST["inNumLogradouroCorresp"].") ";
             $dbEmp = new dataBaseLegado;
             $dbEmp->abreBD();
             $dbEmp->abreSelecao($sSQL);

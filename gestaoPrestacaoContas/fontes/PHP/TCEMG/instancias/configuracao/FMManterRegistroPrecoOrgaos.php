@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoOrgaos.php 62200 2015-04-07 18:09:25Z michel $
-  * $Date: 2015-04-07 15:09:25 -0300 (Ter, 07 Abr 2015) $
+  * $Id: FMManterRegistroPrecoOrgaos.php 62915 2015-07-08 14:10:35Z michel $
+  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
   * $Author: michel $
-  * $Rev: 62200 $
+  * $Rev: 62915 $
   **/
   
 $obHdnInId = new Hidden;
@@ -86,6 +86,16 @@ $obRadioNaturezaProcedimentoNaoParticipante->setId('inNaturezaProcedimento2');
 $obRadioNaturezaProcedimentoNaoParticipante->setLabel("Órgão Não Participante");
 $obRadioNaturezaProcedimentoNaoParticipante->setValue("2");
 $obRadioNaturezaProcedimentoNaoParticipante->setDisabled(false);
+
+$obIPopUpCGMResponsavel = new IPopUpCGM($obForm);
+$obIPopUpCGMResponsavel->setRotulo          ( "*CGM do Responsável pela Aprovação"              );
+$obIPopUpCGMResponsavel->setTitle           ( "Selecione o CGM do Responsável pela Aprovação."  );
+$obIPopUpCGMResponsavel->setTipo            ( "fisica"          );
+$obIPopUpCGMResponsavel->setObrigatorio     ( false             );
+$obIPopUpCGMResponsavel->setId              ( 'stNomResponsavel');
+$obIPopUpCGMResponsavel->setName            ( 'stNomResponsavel');
+$obIPopUpCGMResponsavel->obCampoCod->setId  ( 'inResponsavel'   );
+$obIPopUpCGMResponsavel->obCampoCod->setName( 'inResponsavel'   );
 
 $obTxtCodigoProcessoAdesao = new TextBox();
 $obTxtCodigoProcessoAdesao->setName('stCodigoProcessoAdesao');

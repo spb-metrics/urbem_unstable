@@ -175,10 +175,55 @@ if (params['numcgm_assinatura'] != "") {
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="boRegistroPreco" id="1649">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="data_solicitacao" id="1651">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="hora_solicitacao" id="1652">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234"
+ extends="urbem.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="consultaSolicitacao" id="382">
@@ -375,22 +420,29 @@ WHERE
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="itensSolicitacao" id="465">
+            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param1</property>
                     <property name="paramName">cod_solicitacao</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">integer</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">0</expression>
+                    <expression name="defaultValue" type="javascript">0</expression>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">param2</property>
                     <property name="paramName">cod_entidade</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">integer</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">2</property>
-                    <expression name="defaultValue">0</expression>
+                    <expression name="defaultValue" type="javascript">0</expression>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -402,17 +454,19 @@ WHERE
 	this.queryText=this.queryText+" and solicitacao_item.exercicio = '"+params["exercicio_solicitacao"]+"' "
 }
 
-this.queryText=this.queryText+" ORDER BY codigo_item "]]></method>
+this.queryText=this.queryText+" ORDER BY codigo_item "
+params['query'] = this.queryText;]]></method>
             <property name="dataSource">Postgres</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT
-    solicitacao_item.cod_item as codigo_item,
-    catalogo_item.descricao as descricao_item,
-    unidade_medida.nom_unidade as unidade,
-    solicitacao_item.cod_centro as centro,
+    solicitacao_item.cod_item AS codigo_item,
+    catalogo_item.descricao AS descricao_item,
+    unidade_medida.nom_unidade AS unidade,
+    solicitacao_item.cod_centro AS centro,
     solicitacao_item.complemento,
     solicitacao_item_dotacao.cod_despesa,
-    despesa.cod_recurso as recurso,
-    REPLACE (conta_despesa.descricao,'  ','') as descricao_desdob,
+    despesa.cod_recurso AS recurso,
+    TRIM(conta_despesa.descricao) AS descricao_desdob,
     despesa.num_orgao,
     despesa.num_unidade,
     despesa.cod_funcao,
@@ -422,75 +476,27 @@ this.queryText=this.queryText+" ORDER BY codigo_item "]]></method>
     ppa.acao.num_acao AS num_acao,
     despesa.num_pao,
     orcamento.orgao.nom_orgao,
-    funcao.descricao as funcao,
-    subfuncao.descricao as subfuncao,
-    orcamento.programa.descricao as programa,
+    funcao.descricao AS funcao,
+    subfuncao.descricao AS subfuncao,
+    orcamento.programa.descricao AS programa,
     pao.nom_pao,
-    conta_despesa.cod_estrutural as clasificacao,
+    conta_despesa.cod_estrutural AS clasificacao,
     solicitacao_item_dotacao.cod_conta ,
     recurso.nom_recurso,
-    centro_custo.descricao as centrocusto,
-    (  solicitacao_item.quantidade - solicitacao_item_anulacao.quantidade  ) as quantidade,
-    (  solicitacao_item.vl_total   - solicitacao_item_anulacao.vl_total    ) as vl_total,
-    -- ROUND (solicitacao_item_dotacao.quantidade,4) as quantidade_dotacao,
-    coalesce (solicitacao_item_dotacao.quantidade, 0.0000) 
-    - 
-    coalesce (
-                (select sum(solicitacao_item_dotacao_anulacao.quantidade)
-                from compras.solicitacao_item_dotacao_anulacao
-               where solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio                          
-                 and solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade                       
-                 and solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                 and solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                 and solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-                ), 0.0000) as quantidade_dotacao,
-    
-    coalesce (((solicitacao_item.vl_total/solicitacao_item.quantidade)*solicitacao_item_dotacao.quantidade), 0.0000) 
-    - 
-    coalesce (
-                (select sum(solicitacao_item_dotacao_anulacao.vl_anulacao)
-                from compras.solicitacao_item_dotacao_anulacao
-               where solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio                          
-                 and solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade                       
-                 and solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
-                 and solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
-                 and solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-        ), 0.00) as vl_total_dotacao,
-
-  --  ROUND (((solicitacao_item.vl_total/solicitacao_item.quantidade)*solicitacao_item_dotacao.quantidade),2) as vl_total_dotacao,
-    (solicitacao_item.vl_total/solicitacao_item.quantidade)::numeric(14,2) as vl_unitario,
-
-    ( SELECT REPLACE (conta_despesa.descricao,'  ','')
-        FROM orcamento.conta_despesa
-            WHERE cod_conta  = despesa.cod_conta
-            AND   exercicio  = despesa.exercicio) as descricao,
-    ( SELECT cod_estrutural
-        FROM orcamento.conta_despesa
-            WHERE cod_conta  = despesa.cod_conta
-            AND   exercicio  = despesa.exercicio) as cod_estrutural        
+    centro_custo.descricao AS centrocusto,
+    COALESCE (solicitacao_item.quantidade, 0.0000) - COALESCE (solicitacao_item_anulacao.quantidade, 0.0000) AS quantidade,
+    COALESCE (solicitacao_item.vl_total, 0.0000) - COALESCE (solicitacao_item_anulacao.vl_total, 0.00) AS vl_total,
+    COALESCE (solicitacao_item_dotacao.quantidade, 0.0000) - COALESCE(solicitacao_item_dotacao_anulacao.quantidade,0.00) AS quantidade_dotacao,
+    COALESCE (solicitacao_item_dotacao.vl_reserva, 0.00) - COALESCE(solicitacao_item_dotacao_anulacao.vl_anulacao,0.00) AS vl_total_dotacao,
+    CASE WHEN conta_despesa.cod_conta IS NOT NULL THEN
+		COALESCE((solicitacao_item_dotacao.vl_reserva/solicitacao_item_dotacao.quantidade),0.00)::numeric(14,2)
+    ELSE
+		COALESCE((solicitacao_item.vl_total/solicitacao_item.quantidade),0.00)::numeric(14,2)
+    END AS vl_unitario,
+    TRIM(conta_despesa.descricao) AS descricao,
+    conta_despesa.cod_estrutural  
 FROM
     compras.solicitacao_item
-
-            LEFT JOIN(
-                       SELECT sum(coalesce(solicitacao_item_anulacao.vl_total   , 0.00   ))  as vl_total
-                            , sum(coalesce(solicitacao_item_anulacao.quantidade , 0.0000 ))  as quantidade
-                            , solicitacao_item_anulacao.exercicio
-                            , solicitacao_item_anulacao.cod_entidade
-                            , solicitacao_item_anulacao.cod_solicitacao
-                            , solicitacao_item_anulacao.cod_centro
-                            , solicitacao_item_anulacao.cod_item
-                         FROM compras.solicitacao_item_anulacao
-                     GROUP BY solicitacao_item_anulacao.exercicio
-                            , solicitacao_item_anulacao.cod_entidade
-                            , solicitacao_item_anulacao.cod_solicitacao
-                            , solicitacao_item_anulacao.cod_centro
-                            , solicitacao_item_anulacao.cod_item
-                     ) as solicitacao_item_anulacao
-                   ON(     solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
-                       AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
-                       AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                       AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
-                       AND solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item  )
 
 INNER JOIN
     almoxarifado.catalogo_item
@@ -504,6 +510,49 @@ AND  	solicitacao_item.exercicio = solicitacao_item_dotacao.exercicio
 AND  	solicitacao_item.cod_entidade = solicitacao_item_dotacao.cod_entidade
 AND  	solicitacao_item.cod_centro = solicitacao_item_dotacao.cod_centro
 AND  	solicitacao_item.cod_item = solicitacao_item_dotacao.cod_item
+
+LEFT JOIN ( SELECT SUM(solicitacao_item_anulacao.quantidade ) AS quantidade
+		 		 , SUM(solicitacao_item_anulacao.vl_total ) AS vl_total
+				 , solicitacao_item_anulacao.cod_item
+			     , solicitacao_item_anulacao.exercicio 
+			     , solicitacao_item_anulacao.cod_entidade
+			     , solicitacao_item_anulacao.cod_solicitacao
+			     , solicitacao_item_anulacao.cod_centro
+	      	  FROM compras.solicitacao_item_anulacao
+	  	  GROUP BY solicitacao_item_anulacao.cod_item
+		 		 , solicitacao_item_anulacao.exercicio
+		 		 , solicitacao_item_anulacao.cod_entidade
+			     , solicitacao_item_anulacao.cod_solicitacao
+			     , solicitacao_item_anulacao.cod_centro
+	   	  ) AS solicitacao_item_anulacao   	   
+       ON solicitacao_item_anulacao.cod_item        = solicitacao_item.cod_item
+      AND solicitacao_item_anulacao.exercicio       = solicitacao_item.exercicio
+      AND solicitacao_item_anulacao.cod_entidade    = solicitacao_item.cod_entidade
+      AND solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+      AND solicitacao_item_anulacao.cod_centro      = solicitacao_item.cod_centro
+
+LEFT JOIN ( SELECT SUM(solicitacao_item_dotacao_anulacao.quantidade ) AS quantidade
+		 		 , SUM(solicitacao_item_dotacao_anulacao.vl_anulacao ) AS vl_anulacao
+			     , solicitacao_item_dotacao_anulacao.cod_item 
+			     , solicitacao_item_dotacao_anulacao.exercicio 
+			     , solicitacao_item_dotacao_anulacao.cod_entidade
+			     , solicitacao_item_dotacao_anulacao.cod_solicitacao
+			     , solicitacao_item_dotacao_anulacao.cod_centro 
+			     , solicitacao_item_dotacao_anulacao.cod_despesa
+	      	  FROM compras.solicitacao_item_dotacao_anulacao
+	  	  GROUP BY solicitacao_item_dotacao_anulacao.cod_item 
+		 		 , solicitacao_item_dotacao_anulacao.exercicio 
+		 		 , solicitacao_item_dotacao_anulacao.cod_entidade
+		 		 , solicitacao_item_dotacao_anulacao.cod_solicitacao
+		 		 , solicitacao_item_dotacao_anulacao.cod_centro 
+		 		 , solicitacao_item_dotacao_anulacao.cod_despesa
+	   	  ) AS solicitacao_item_dotacao_anulacao      
+       ON solicitacao_item_dotacao_anulacao.cod_item        = solicitacao_item_dotacao.cod_item
+      AND solicitacao_item_dotacao_anulacao.exercicio       = solicitacao_item_dotacao.exercicio
+      AND solicitacao_item_dotacao_anulacao.cod_entidade    = solicitacao_item_dotacao.cod_entidade
+      AND solicitacao_item_dotacao_anulacao.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
+      AND solicitacao_item_dotacao_anulacao.cod_centro      = solicitacao_item_dotacao.cod_centro
+      AND solicitacao_item_dotacao_anulacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa 
     
 INNER JOIN
     almoxarifado.centro_custo
@@ -576,8 +625,6 @@ LEFT JOIN
 WHERE
     solicitacao_item.cod_solicitacao = ? AND
     solicitacao_item.cod_entidade = ? 
-    
-
 ]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="assinaturas" id="1568">
@@ -777,7 +824,7 @@ WHERE assinatura.exercicio = ?::varchar]]></xml-property>
                     <overridden-values>
                         <ref-entry baseId="937" id="937"/>
                         <ref-entry baseId="938" id="938">
-                            <property name="width">168mm</property>
+                            <property name="width">158mm</property>
                         </ref-entry>
                         <ref-entry baseId="939" id="939">
                             <property name="width">92mm</property>
@@ -792,9 +839,15 @@ WHERE assinatura.exercicio = ?::varchar]]></xml-property>
                         <ref-entry baseId="947" id="947"/>
                         <ref-entry baseId="948" id="948"/>
                         <ref-entry baseId="949" id="949"/>
-                        <ref-entry baseId="950" id="950"/>
-                        <ref-entry baseId="951" id="951"/>
-                        <ref-entry baseId="952" id="952"/>
+                        <ref-entry baseId="950" id="950">
+                            <property name="width">6mm</property>
+                        </ref-entry>
+                        <ref-entry baseId="951" id="951">
+                            <property name="width">4mm</property>
+                        </ref-entry>
+                        <ref-entry baseId="952" id="952">
+                            <property name="width">6mm</property>
+                        </ref-entry>
                         <ref-entry baseId="953" id="953"/>
                         <ref-entry baseId="954" id="954"/>
                         <ref-entry baseId="955" name="NewData12121" id="955"/>
@@ -824,26 +877,54 @@ WHERE assinatura.exercicio = ?::varchar]]></xml-property>
                         <ref-entry baseId="970" id="970"/>
                         <ref-entry baseId="971" name="NewText721" id="971">
                             <property name="content">Emissão: &lt;VALUE-OF>
-params['data'];
+var obData = new Date();
+var stDia = obData.getDate();
+if( stDia &lt; 10 ){
+	stDia = '0'+stDia;
+} 
+var stMes  = obData.getMonth()+1;
+if( stMes &lt; 10 ){
+   stMes = "0"+stMes;
+}
+stDia+"/"+stMes+"/"+obData.getFullYear();
 &lt;/VALUE-OF></property>
                             <property name="contentType">html</property>
                         </ref-entry>
                         <ref-entry baseId="972" id="972"/>
                         <ref-entry baseId="973" name="NewText1121" id="973">
                             <property name="content">Hora:
-&lt;VALUE-OF>
-params['hora'];
+&lt;VALUE-OF>var obData = new Date();
+    var stHora = obData.getHours();
+    if(stHora &lt; 10)
+    {
+        stHora = "0"+stHora;
+    }
+    var stMinutos = obData.getMinutes();
+    if(stMinutos &lt; 10)
+    {
+        stMinutos = "0"+stMinutos;
+    }   
+    stHora+":"+stMinutos;
 &lt;/VALUE-OF></property>
                             <property name="contentType">html</property>
                         </ref-entry>
                         <ref-entry baseId="974" id="974"/>
                         <ref-entry baseId="975" name="NewLabel2121" id="975"/>
-                        <ref-entry baseId="976" id="976"/>
+                        <ref-entry baseId="976" id="976">
+                            <property name="verticalAlign">top</property>
+                        </ref-entry>
                         <ref-entry baseId="977" id="977"/>
-                        <ref-entry baseId="978" id="978"/>
+                        <ref-entry baseId="978" id="978">
+                            <property name="verticalAlign">top</property>
+                        </ref-entry>
                         <ref-entry baseId="979" id="979"/>
-                        <ref-entry baseId="980" id="980"/>
-                        <ref-entry baseId="981" id="981"/>
+                        <ref-entry baseId="980" id="980">
+                            <property name="textAlign">right</property>
+                            <property name="verticalAlign">top</property>
+                        </ref-entry>
+                        <ref-entry baseId="981" id="981">
+                            <property name="marginTop">0pt</property>
+                        </ref-entry>
                         <ref-entry baseId="982" id="982"/>
                         <ref-entry baseId="983" id="983"/>
                         <ref-entry baseId="984" name="NewData6111" id="984"/>
@@ -885,12 +966,38 @@ params['hora'];
             <property name="marginBottom">10pt</property>
             <property name="height">0in</property>
             <property name="width">285mm</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">boRegistroPreco</property>
+                    <expression name="expression" type="javascript">': '+params["boRegistroPreco"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
             <column id="398">
                 <property name="width">2.0520833333in</property>
             </column>
             <column id="399">
                 <property name="width">8.9130434783in</property>
             </column>
+            <row id="1645">
+                <cell id="1646">
+                    <label id="1648">
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">8pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">left</property>
+                        <text-property name="text">Registro de Preços</text-property>
+                    </label>
+                </cell>
+                <cell id="1647">
+                    <data id="1650">
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">8pt</property>
+                        <property name="resultSetColumn">boRegistroPreco</property>
+                    </data>
+                </cell>
+            </row>
             <row id="403">
                 <cell id="404">
                     <label id="436">
@@ -2419,15 +2526,5 @@ if(dataSetRow["clasificacao"] != ""){
                 </cell>
             </row>
         </grid>
-        <data id="1642">
-            <list-property name="boundDataColumns">
-                <structure>
-                    <property name="name">query</property>
-                    <expression name="expression">params["query"].value</expression>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
-            <property name="resultSetColumn">query</property>
-        </data>
     </body>
 </report>

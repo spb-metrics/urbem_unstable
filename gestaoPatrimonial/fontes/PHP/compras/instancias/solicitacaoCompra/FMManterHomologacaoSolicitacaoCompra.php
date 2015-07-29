@@ -30,16 +30,18 @@
 * @author Analista     : Cleisson
 * @author Desenvolvedor: Bruce Cruz de Sena
 
+  $Id: FMManterHomologacaoSolicitacaoCompra.php 62986 2015-07-14 18:08:54Z michel $
+
 * Casos de uso: uc-03.04.02
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_ORC_COMPONENTES."ILabelEntidade.class.php"                                               );
-include_once ( CAM_GP_ALM_COMPONENTES."ILabelAlmoxarifado.class.php"                                           );
+include_once CAM_GF_ORC_COMPONENTES.'ILabelEntidade.class.php';
+include_once CAM_GP_ALM_COMPONENTES.'ILabelAlmoxarifado.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/CGM/classes/componentes/ILabelCGM.class.php';
-include_once(CAM_GP_COM_MAPEAMENTO."TComprasSolicitacao.class.php"                                             );
-include_once(CAM_GP_COM_COMPONENTES.'ILabelEditObjeto.class.php'                                               );
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacao.class.php';
+include_once CAM_GP_COM_COMPONENTES.'ILabelEditObjeto.class.php';
 
 SistemaLegado::LiberaFrames(true,true);
 
@@ -52,26 +54,27 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 $obTComprasSolicitacao = new TComprasSolicitacao;
-$obTComprasSolicitacao->setDado( 'cod_solicitacao', $_GET['cod_solicitacao'] );
-$obTComprasSolicitacao->setDado( 'exercicio'      , $_GET['exercicio']       );
-$obTComprasSolicitacao->setDado( 'cod_entidade'   , $_GET['cod_entidade']    );
+$obTComprasSolicitacao->setDado( 'cod_solicitacao', $_REQUEST['cod_solicitacao'] );
+$obTComprasSolicitacao->setDado( 'exercicio'      , $_REQUEST['exercicio']       );
+$obTComprasSolicitacao->setDado( 'cod_entidade'   , $_REQUEST['cod_entidade']    );
 
 $obHdnExercicio = new Hidden;
 $obHdnExercicio->setName ( "stExercicio" );
-$obHdnExercicio->setValue( $_GET['exercicio'] );
+$obHdnExercicio->setValue( $_REQUEST['exercicio'] );
 
 $obHdnCodEntidade = new Hidden;
 $obHdnCodEntidade->setName ( "stCodEntidade" );
-$obHdnCodEntidade->setValue( $_GET['cod_entidade'] );
+$obHdnCodEntidade->setValue( $_REQUEST['cod_entidade'] );
 
 $obHdnCodSolicitacao = new Hidden;
 $obHdnCodSolicitacao->setName ( "stCodSolicitacao" );
-$obHdnCodSolicitacao->setValue( $_GET['cod_solicitacao'] );
+$obHdnCodSolicitacao->setValue( $_REQUEST['cod_solicitacao'] );
 
 $obTComprasSolicitacao->consultar();
+
 include_once ( $pgOcul );
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $_REQUEST["stAcao"];
 
 //Define o objeto da ação stAcao
 $obHdnAcao = new Hidden;
@@ -88,29 +91,35 @@ $obForm = new Form;
 $obForm->setAction ( $pgProc  );
 $obForm->setTarget ( "oculto" );
 
+//Registro de Preço
+$obLblRegistroPreco = new Label;
+$obLblRegistroPreco->setId     ( 'stRegistroPreco' );
+$obLblRegistroPreco->setrotulo ( 'Registro de Preço' );
+$obLblRegistroPreco->setValue  ( ($obTComprasSolicitacao->getDado('registro_precos') == 't') ? 'Sim' : 'Não' );
+
 ////Exercicio
 $obLblExercicio = new Label;
 $obLblExercicio->setId     ( 'stExercicio' );
 $obLblExercicio->setrotulo ( 'Exercício'   );
-$obLblExercicio->setValue  ( $obTComprasSolicitacao->getDado('exercicio')   );
+$obLblExercicio->setValue  ( $obTComprasSolicitacao->getDado('exercicio') );
 
 ///Entidade
 $obILabelEntidade = new ILabelEntidade( $obForm );
 $obILabelEntidade->setMostraCodigo( true           );
-$obILabelEntidade->setCodEntidade ( $obTComprasSolicitacao->getDado( 'cod_entidade' )   );
+$obILabelEntidade->setCodEntidade ( $obTComprasSolicitacao->getDado( 'cod_entidade' ) );
 
 /// Solicitação
 $obLblSolicitacao = new Label;
 $obLblSolicitacao->setId     ( 'stSolicitacao' );
 $obLblSolicitacao->setrotulo ( 'Solicitação'   );
-$obLblSolicitacao->setValue  ( $_GET['cod_solicitacao']  );
+$obLblSolicitacao->setValue  ( $_REQUEST['cod_solicitacao'] );
 
 /// almoxarifado
 $obLblAlmoxarifado = new ILabelAlmoxarifado($obForm);
 $obLblAlmoxarifado->setCodAlmoxarifado( $obTComprasSolicitacao->getDado( 'cod_almoxarifado' ) );
 
 /// Data da solicitação
-$arDataSolicitacao =  substr( $obTComprasSolicitacao->getDado( 'timestamp' ),0,10) ;
+$arDataSolicitacao = substr( $obTComprasSolicitacao->getDado( 'timestamp' ),0,10);
 $arDataSolicitacao = explode ("-", $arDataSolicitacao);
 $arDataSolicitacao = $arDataSolicitacao[2]."/".$arDataSolicitacao[1].'/'.$arDataSolicitacao[0];
 
@@ -159,6 +168,7 @@ $obFormulario->addHidden     ( $obHdnExercicio        );
 $obFormulario->addHidden     ( $obHdnCodEntidade      );
 $obFormulario->addHidden     ( $obHdnCodSolicitacao   );
 $obFormulario->addTitulo     ( 'Dados da Solicitação' );
+$obFormulario->addComponente ( $obLblRegistroPreco    );
 $obFormulario->addComponente ( $obLblExercicio        );
 $obFormulario->addComponente ( $obLblDataSolicitacao  );
 $obFormulario->addComponente ( $obILabelEntidade      );
@@ -173,7 +183,8 @@ $obFormulario->show();
 
 sistemaLegado::executaFrameOculto(  montaSpanItens ($obTComprasSolicitacao->getDado('exercicio'),
                                                     $obTComprasSolicitacao->getDado( 'cod_entidade' ),
-                                                    $_GET['cod_solicitacao'] )
+                                                    $_REQUEST['cod_solicitacao'],
+                                                    $obTComprasSolicitacao->getDado('registro_precos'))
                                  );
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

@@ -20,40 +20,6 @@
     *                                                                                *
     **********************************************************************************
 */
-/*
-* Script de função PLPGSQL
-*
-* URBEM Soluções de Gestão Pública Ltda
-* www.urbem.cnm.org.br
-*
-* $Revision: 59612 $
-* $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
-*
-* Casos de uso: uc-02.02.11
-*/
-
-/*
-$Log$
-Revision 1.3  2007/05/24 20:51:57  bruce
-corrigido o retorno da pl e feita ligação com a Unidade
-
-Revision 1.2  2007/05/15 20:46:31  bruce
-acrescentado o tipo de lançamento
-
-Revision 1.1  2007/05/15 13:43:55  bruce
-*** empty log message ***
-
-Revision 1.9  2006/07/14 17:58:30  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.8  2006/07/05 20:37:31  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 
 CREATE OR REPLACE FUNCTION tcmgo.arquivo_afr_exportacao10 (varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
 DECLARE
@@ -126,6 +92,16 @@ BEGIN
         FROM tcmgo.configuracao_orgao_unidade 
         WHERE exercicio = stExercicio
         AND cod_entidade = arEntidades[i]::integer;
+        
+        -- Caso não haja registros cadastrados na tabela tcmgo.configuracao_orgao_unidade, os campos abaixo vem nulos e gera erro na consulta que insere os dados na tmp_balanco_verificacao_afr
+        -- Por isso foi criada a validação
+        IF inOrgao IS NULL THEN
+            inOrgao := 0;
+        END IF;
+        
+        IF inUnidade IS NULL THEN
+            inUnidade := 0;
+        END IF;      
 
         stSql := 'INSERT INTO tmp_balanco_verificacao_afr
                     SELECT  '''||inTipoLancamento||''' as tipo_lancamento
@@ -150,7 +126,9 @@ BEGIN
                                 ,vl_saldo_atual         numeric
                                 )
                     WHERE cod_estrutural SIMILAR TO ''1.1.2%|1.1.3%|1.1.4%''
-                    AND cod_sistema <> 4 ; ';
+                    AND cod_sistema <> 4';
+        
+        RAISE NOTICE '%', stSql;
         
         EXECUTE stSql;
 

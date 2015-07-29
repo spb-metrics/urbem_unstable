@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoPermanenteCreditos.class.php 62845 2015-06-29 13:16:59Z jean $
+    $Id: TTCMGOAtivoPermanenteCreditos.class.php 63111 2015-07-27 18:34:04Z arthur $
 
     * Casos de uso: uc-06.04.00
 */
@@ -42,59 +42,55 @@ include_once( CAM_GF_CONT_MAPEAMENTO."TContabilidadeBalancoFinanceiro.class.php"
 
 class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
 {
-    public function TTCMGOAtivoPermanenteCreditos()
+    public function __construct()
     {
         parent::TContabilidadeBalancoFinanceiro();
-        $this->setDado('exercicio', Sessao::getExercicio() );
     }
 
     function recuperaRegistro10(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    $stSql = $this->montaRecuperaRegistro10().$stCondicao.$stOrdem;
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        $stSql = $this->montaRecuperaRegistro10().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
     public function montaRecuperaRegistro10()
     {
-        $stDataIni = '01/01/'.$this->getDado( 'exercicio' );
-        $stDataFim = '31/12/'.$this->getDado( 'exercicio' );
-        $stSql = "
-                    SELECT
-                        0 AS numero_registro
+        $stSql = " SELECT DISTINCT 
+                         0 AS numero_registro
                        , 10 AS tipo_registro
-                       , LPAD('0,00'::VARCHAR,13,'0')::VARCHAR AS vl_cancelamento
-                       , LPAD('0,00'::VARCHAR,13,'0')::VARCHAR AS vl_encampacao
-                       ,*
-                     FROM
-                       tcmgo.ativo_permanente_creditos ( '" .$this->getDado( 'exercicio' ) .  "'::VARCHAR
-                                                        , ' cod_estrutural ilike ''1.2%'' '::VARCHAR
-                                                        ,'".$stDataIni."'::VARCHAR
-                                                        ,'".$stDataFim."'::VARCHAR
-                                                        ,'".$this->getDado ( 'stEntidades' )."'::VARCHAR
+                       , 0.00 AS vl_cancelamento
+                       , 0.00 AS vl_encampacao
+                       , *
+                    FROM tcmgo.ativo_permanente_creditos ( '".$this->getDado( 'stExercicio' )."'
+                                                          , ' cod_estrutural ilike ''1.2%'' '
+                                                          ,'".$this->getDado( 'stDataInicio' )."'
+                                                          ,'".$this->getDado( 'stDataFim' )."'
+                                                          ,'".$this->getDado ( 'stEntidades' )."'
                                                        )
-                         as retorno ( cod_estrutural varchar
-                                     ,nivel             INTEGER
-                                     ,nom_conta         VARCHAR
-                                     ,num_orgao         INTEGER
-                                     ,cod_unidade       INTEGER
-                                     ,vl_saldo_anterior NUMERIC
-                                     ,vl_saldo_debitos  NUMERIC
-                                     ,vl_saldo_creditos NUMERIC
-                                     ,vl_saldo_atual    NUMERIC
-                                     ,nom_sistema       VARCHAR
-                                     ,tipo_lancamento   INTEGER
+                         AS retorno (  cod_estrutural    VARCHAR
+                                     , nivel             INTEGER
+                                     , nom_conta         VARCHAR
+                                     , num_orgao         INTEGER
+                                     , cod_unidade       INTEGER
+                                     , vl_saldo_anterior NUMERIC
+                                     , vl_saldo_debitos  NUMERIC
+                                     , vl_saldo_creditos NUMERIC
+                                     , vl_saldo_atual    NUMERIC
+                                     , nom_sistema       VARCHAR
+                                     , tipo_lancamento   INTEGER
                                     )
-                    where vl_saldo_anterior <> 0
-                       or vl_saldo_debitos <> 0
-                       or vl_saldo_creditos <> 0
-                    ORDER BY cod_estrutural ";
+                    WHERE vl_saldo_anterior <> 0
+                       OR vl_saldo_debitos  <> 0
+                       OR vl_saldo_creditos <> 0
+                    
+                 ORDER BY cod_estrutural ";
         return $stSql;
     }
 

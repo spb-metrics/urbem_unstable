@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63123 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -87,114 +87,115 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   desp.exercicio           \n";
-    $stSql .= "         ,desp.num_orgao          \n";
-    $stSql .= "         ,desp.num_unidade          \n";
-    $stSql .= "         ,desp.cod_funcao          \n";
-    $stSql .= "         ,desp.cod_subfuncao          \n";
-    $stSql .= "         ,desp.cod_programa          \n";
-    $stSql .= "         ,replace(cont.cod_estrutural,'.','') as estrutural          \n";
-    $stSql .= "         ,desp.num_pao          \n";
-    $stSql .= "         ,orcamento.fn_consulta_tipo_pao(desp.exercicio,desp.num_pao) as tipo_pao          \n";
-    $stSql .= "         ,desp.cod_recurso          \n";
-    $stSql .= "         ,desp.vl_original          \n";
-    $stSql .= "         ,su.cod_tipo          \n";
-    $stSql .= "         ,su.cod_norma          \n";
-    $stSql .= "         ,to_char(su.dt_suplementacao,'dd/mm/yyyy') as data_suplementacao          \n";
-    $stSql .= "         ,coalesce(vl_suplementado,0.00)+coalesce(vl_reducao,0.00) as vl_suplementacao          \n";
-    $stSql .= "         ,cod_tipo_tcm  as tipo_fundamento        \n";
-    $stSql .= "         ,norm.num_norma          \n";
-    $stSql .= "         ,norm.nom_norma          \n";
-    $stSql .= "         ,to_char(norm.dt_publicacao,'dd/mm/yyyy') as data_publicacao          \n";
-    $stSql .= "         ,CASE WHEN (su.cod_tipo = 15 )  THEN '1'          \n";
-    $stSql .= "               WHEN (su.cod_tipo = 1  )  THEN '26'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 2  )  THEN '15'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 3  )  THEN '28'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 4  )  THEN '9'          \n";
-    $stSql .= "               WHEN (su.cod_tipo = 5  )  THEN '12'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 6  )  THEN '25'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 7  )  THEN '13'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 8  )  THEN '28'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 9  )  THEN '7'          \n";
-    $stSql .= "               WHEN (su.cod_tipo = 10 )  THEN '10'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 11 )  THEN '5'          \n";
-    $stSql .= "               WHEN (su.cod_tipo = 12 )  THEN '30'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 13 )  THEN '29'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 14 )  THEN '31'         \n";
-    $stSql .= "               WHEN (su.cod_tipo = 15 )  THEN '1'          \n";
-    $stSql .= "               WHEN (su.cod_tipo = 16 )  THEN '1'          \n";
-    $stSql .= "           END AS tipo_alteracao         \n";
-    $stSql .= "           \n";
-    $stSql .= " FROM    (          \n";
-    $stSql .= "         SELECT exercicio          \n";
-    $stSql .= "               ,cod_norma          \n";
-    $stSql .= "               ,cod_tipo          \n";
-    $stSql .= "               ,dt_suplementacao          \n";
-    $stSql .= "               ,cod_despesa          \n";
-    $stSql .= "               ,sum(vl_suplementado) as vl_suplementado          \n";
-    $stSql .= "               ,sum(vl_reducao) as vl_reducao          \n";
-    $stSql .= "         FROM (          \n";
-    $stSql .= "             SELECT OS.exercicio          \n";
-    $stSql .= "                   ,OS.cod_suplementacao          \n";
-    $stSql .= "                   ,OS.cod_norma          \n";
-    $stSql .= "                   ,OS.cod_tipo          \n";
-    $stSql .= "                   ,OS.dt_suplementacao          \n";
-    $stSql .= "                   ,OSS.cod_despesa          \n";
-    $stSql .= "                   ,OSS.valor as vl_suplementado          \n";
-    $stSql .= "                   ,0.00 as vl_reducao          \n";
-    $stSql .= "             FROM orcamento.suplementacao AS OS          \n";
-    $stSql .= "             LEFT JOIN orcamento.suplementacao_suplementada AS OSS          \n";
-    $stSql .= "             ON( OSS.exercicio = OS.exercicio          \n";
-    $stSql .= "             AND OSS.cod_suplementacao = OS.cod_suplementacao )          \n";
-    $stSql .= "             AND OS.exercicio='".$this->getDado('exercicio')."'                    \n";
-    $stSql .= "             UNION          \n";
-    $stSql .= "             SELECT OS.exercicio          \n";
-    $stSql .= "                   ,OS.cod_suplementacao          \n";
-    $stSql .= "                   ,OS.cod_norma          \n";
-    $stSql .= "                   ,OS.cod_tipo          \n";
-    $stSql .= "                   ,OS.dt_suplementacao          \n";
-    $stSql .= "                   ,OSR.cod_despesa          \n";
-    $stSql .= "                   ,0.00 as vl_suplementado          \n";
-    $stSql .= "                   ,OSR.valor as vl_reducao          \n";
-    $stSql .= "             FROM orcamento.suplementacao AS OS          \n";
-    $stSql .= "             LEFT JOIN orcamento.suplementacao_reducao AS OSR          \n";
-    $stSql .= "             ON( OSR.exercicio = OS.exercicio          \n";
-    $stSql .= "             AND OSR.cod_suplementacao = OS.cod_suplementacao )          \n";
-    $stSql .= "             AND OS.exercicio='".$this->getDado('exercicio')."'                    \n";
-    $stSql .= "             ) as tbl          \n";
-    $stSql .= "         GROUP BY exercicio          \n";
-    $stSql .= "               ,cod_despesa          \n";
-    $stSql .= "               ,cod_norma          \n";
-    $stSql .= "               ,cod_tipo          \n";
-    $stSql .= "               ,dt_suplementacao          \n";
-    $stSql .= "         ) as su          \n";
-    $stSql .= "         ,orcamento.despesa          as desp          \n";
-    $stSql .= "         ,orcamento.conta_despesa    as cont          \n";
-    $stSql .= "         ,normas.norma               as norm          \n";
-    $stSql .= "         LEFT JOIN tcmba.tipo_norma  as ttno          \n";
-    $stSql .= "         ON (norm.cod_tipo_norma=ttno.cod_tipo)          \n";
-    $stSql .= " WHERE   desp.exercicio  = cont.exercicio          \n";
-    $stSql .= " AND     desp.cod_conta  = cont.cod_conta          \n";
-    $stSql .= "           \n";
-    $stSql .= " AND     desp.exercicio  = su.exercicio          \n";
-    $stSql .= " AND     desp.cod_despesa=su.cod_despesa          \n";
-    $stSql .= "           \n";
-    $stSql .= " AND     su.cod_norma    = norm.cod_norma          \n";
-    $stSql .= "           \n";
-    $stSql .= " AND     desp.exercicio = 2007          \n";
-    $stSql .= " AND     desp.exercicio='".$this->getDado('exercicio')."'                    \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "           AND   desp.cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= " ORDER BY  desp.exercicio          \n";
-    $stSql .= "         ,desp.num_orgao          \n";
-    $stSql .= "         ,desp.num_unidade          \n";
-    $stSql .= "         ,desp.cod_funcao          \n";
-    $stSql .= "         ,desp.cod_subfuncao          \n";
-    $stSql .= "         ,desp.cod_programa          \n";
-    $stSql .= "         ,replace(cont.cod_estrutural,'.','')          \n";
-    $stSql .= "         ,desp.cod_recurso          \n";
+    $stSql .= " SELECT 1 AS tipo_registro
+                      ,".$this->getDado('unidade_gestora')." AS unidade_gestora
+                      ,despesa.exercicio           
+                      ,despesa.num_orgao          
+                      ,despesa.num_unidade          
+                      ,despesa.cod_funcao          
+                      ,despesa.cod_subfuncao          
+                      ,despesa.cod_programa          
+                      ,REPLACE(conta_despesa.cod_estrutural,'.','') AS estrutural          
+                      ,despesa.num_pao
+                      ,orcamento.fn_consulta_tipo_pao(despesa.exercicio,despesa.num_pao) AS tipo_pao          
+                      ,despesa.cod_recurso          
+                      ,despesa.vl_original          
+                      ,su.cod_tipo          
+                      ,su.cod_norma          
+                      ,TO_CHAR(su.dt_suplementacao,'dd/mm/yyyy') AS data_suplementacao          
+                      ,COALESCE(su.vl_suplementado,0.00) + COALESCE(su.vl_reducao,0.00) AS vl_suplementacao          
+                      ,tipo_norma.cod_tipo_tcm  AS tipo_fundamento        
+                      ,norma.num_norma          
+                      ,norma.nom_norma
+                      ,despesa.exercicio::VARCHAR || '".$this->getDado('mes')."' AS competencia    
+                      ,TO_CHAR(norma.dt_publicacao,'dd/mm/yyyy') AS data_publicacao          
+                      ,CASE WHEN (su.cod_tipo = 15 )  THEN '1'          
+                            WHEN (su.cod_tipo = 1  )  THEN '26'         
+                            WHEN (su.cod_tipo = 2  )  THEN '15'         
+                            WHEN (su.cod_tipo = 3  )  THEN '28'         
+                            WHEN (su.cod_tipo = 4  )  THEN '9'          
+                            WHEN (su.cod_tipo = 5  )  THEN '12'         
+                            WHEN (su.cod_tipo = 6  )  THEN '25'         
+                            WHEN (su.cod_tipo = 7  )  THEN '13'         
+                            WHEN (su.cod_tipo = 8  )  THEN '28'         
+                            WHEN (su.cod_tipo = 9  )  THEN '7'          
+                            WHEN (su.cod_tipo = 10 )  THEN '10'         
+                            WHEN (su.cod_tipo = 11 )  THEN '5'          
+                            WHEN (su.cod_tipo = 12 )  THEN '30'         
+                            WHEN (su.cod_tipo = 13 )  THEN '29'         
+                            WHEN (su.cod_tipo = 14 )  THEN '31'         
+                            WHEN (su.cod_tipo = 15 )  THEN '1'          
+                            WHEN (su.cod_tipo = 16 )  THEN '1'          
+                        END AS tipo_alteracao         
 
+                FROM  (          
+                        SELECT exercicio          
+                              ,cod_norma          
+                              ,cod_tipo          
+                              ,dt_suplementacao          
+                              ,cod_despesa          
+                              ,SUM(vl_suplementado) AS vl_suplementado          
+                              ,SUM(vl_reducao) AS vl_reducao          
+                        FROM (          
+                                SELECT OS.exercicio          
+                                      ,OS.cod_suplementacao          
+                                      ,OS.cod_norma          
+                                      ,OS.cod_tipo          
+                                      ,OS.dt_suplementacao          
+                                      ,OSS.cod_despesa          
+                                      ,OSS.valor as vl_suplementado          
+                                      ,0.00 as vl_reducao          
+                                FROM orcamento.suplementacao AS OS          
+                           LEFT JOIN orcamento.suplementacao_suplementada AS OSS          
+                                  ON OSS.exercicio = OS.exercicio          
+                                 AND OSS.cod_suplementacao = OS.cod_suplementacao         
+                                 AND OS.exercicio='".$this->getDado('exercicio')."'                    
+                               UNION          
+                               SELECT OS.exercicio          
+                                     ,OS.cod_suplementacao          
+                                     ,OS.cod_norma          
+                                     ,OS.cod_tipo          
+                                     ,OS.dt_suplementacao          
+                                     ,OSR.cod_despesa          
+                                     ,0.00 as vl_suplementado          
+                                     ,OSR.valor as vl_reducao          
+                                FROM orcamento.suplementacao AS OS          
+                           LEFT JOIN orcamento.suplementacao_reducao AS OSR          
+                                  ON OSR.exercicio = OS.exercicio          
+                                 AND OSR.cod_suplementacao = OS.cod_suplementacao
+                                 AND OS.exercicio='".$this->getDado('exercicio')."'                    
+                            ) as tbl          
+                        GROUP BY exercicio,cod_despesa,cod_norma,cod_tipo,dt_suplementacao          
+                    ) as su
+
+                INNER JOIN orcamento.despesa
+                        ON despesa.exercicio = su.exercicio
+                       AND despesa.cod_despesa = su.cod_despesa
+
+                INNER JOIN orcamento.conta_despesa
+                        ON conta_despesa.exercicio = despesa.exercicio
+                       AND conta_despesa.cod_conta = despesa.cod_conta
+
+                INNER JOIN normas.norma
+                        ON norma.cod_norma = su.cod_norma
+
+                 LEFT JOIN tcmba.tipo_norma
+                        ON tipo_norma.cod_tipo = norma.cod_tipo_norma
+
+                WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
+                  AND   despesa.cod_entidade IN ( ".$this->getDado('entidades')." )
+                  AND su.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+
+                ORDER BY  despesa.exercicio          
+                         ,despesa.num_orgao          
+                         ,despesa.num_unidade          
+                         ,despesa.cod_funcao          
+                         ,despesa.cod_subfuncao          
+                         ,despesa.cod_programa          
+                         ,estrutural       
+                         ,despesa.cod_recurso          
+            ";
+            
     return $stSql;
 }
 

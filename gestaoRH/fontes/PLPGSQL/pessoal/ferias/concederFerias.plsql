@@ -33,6 +33,7 @@ DECLARE
     inCodRegime                 ALIAS FOR $9; 
     stSql                       VARCHAR;
     stContagemTempo             VARCHAR;
+    stSqlAux                    VARCHAR;
     reRegistro                  RECORD;
     reFerias                    RECORD;
     nuRetorno                   NUMERIC;
@@ -41,7 +42,11 @@ DECLARE
     dtCompetencia               DATE;
     inDataInicioDif             INTEGER;
     inDataFinalDif              INTEGER;
-    inContador                  INTEGER;
+    inContador                  INTEGER:=0;
+    inQntCodForma3              INTEGER;
+    inQntCodForma4              INTEGER;
+    inCodFormaAnterior          INTEGER;
+    boRestaDiasFerias           BOOLEAN:=false;
     rwConcederFerias            colunasConcederFerias%ROWTYPE;
 BEGIN 
     dtCompetencia := selectIntoVarchar('SELECT dt_final FROM folhapagamento'||stEntidade||'.periodo_movimentacao WHERE cod_periodo_movimentacao = '||inCodPeriodoMovimentacao);
@@ -77,7 +82,7 @@ BEGIN
         END IF;
                                              
     END IF;
-    
+
     FOR reRegistro IN EXECUTE stSql LOOP
         stSql := 'SELECT ferias.*
                        , lancamento_ferias.mes_competencia
@@ -101,6 +106,8 @@ BEGIN
         -- Instancia a variável para zerar a data a cada contrato
         dtInicial := null;
         
+        
+
         -- LOOP das férias pagas
         FOR reFerias IN EXECUTE stSql LOOP
         
@@ -133,62 +140,100 @@ BEGIN
                 rwConcederFerias.dt_fim                 := reFerias.dt_fim;
                 RETURN NEXT rwConcederFerias;
             END IF;
-            
-            IF dtInicial != reFerias.dt_inicial_aquisitivo THEN
-                inDataInicioDif = CAST(SUBSTR(dtInicial::varchar,1,4) AS INTEGER);
-                inDataFinalDif = CAST(SUBSTR(reFerias.dt_inicial_aquisitivo::varchar,1,4) AS INTEGER);
-                inContador = inDataFinalDif - inDataInicioDif;
-                
-                FOR i IN 1..inContador LOOP
-                    IF recuperarSituacaoDoContrato(reRegistro.cod_contrato,inCodPeriodoMovimentacao,stEntidade) = 'A' AND stAcao = 'incluir' THEN
-                        dtVencimentoFerias := dtInicial::date + '1 year'::interval - '1 day'::interval;
-                        rwConcederFerias.numcgm                 := reRegistro.numcgm;
-                        rwConcederFerias.nom_cgm                := reRegistro.nom_cgm;
-                        rwConcederFerias.nom_cgm                := reRegistro.nom_cgm;    
-                        rwConcederFerias.registro               := reRegistro.registro;   
-                        rwConcederFerias.cod_contrato           := reRegistro.cod_contrato;
-                        rwConcederFerias.desc_local             := reRegistro.desc_local; 
-                        rwConcederFerias.desc_orgao             := reRegistro.desc_orgao; 
-                        rwConcederFerias.orgao                  := reRegistro.orgao; 
-                        rwConcederFerias.dt_posse               := reRegistro.dt_posse;   
-                        rwConcederFerias.dt_admissao            := reRegistro.dt_admissao;
-                        rwConcederFerias.dt_nomeacao            := reRegistro.dt_nomeacao;
-                        rwConcederFerias.desc_funcao            := reRegistro.desc_funcao;
-                        rwConcederFerias.cod_regime_funcao      := reRegistro.cod_regime_funcao;
-                        rwConcederFerias.desc_regime_funcao     := reRegistro.desc_regime_funcao;
-                        rwConcederFerias.cod_funcao             := reRegistro.cod_funcao;
-                        rwConcederFerias.cod_local              := reRegistro.cod_local; 
-                        rwConcederFerias.cod_orgao              := reRegistro.cod_orgao; 
-                        rwConcederFerias.bo_cadastradas         := FALSE;
-                        
-                        IF dtVencimentoFerias > dtCompetencia THEN
-                            rwConcederFerias.situacao               := 'A Vencer';
-                        ELSE
-                            rwConcederFerias.situacao               := 'Vencida';
-                        END IF;
-                        
-                        rwConcederFerias.dt_inicial_aquisitivo  := dtInicial;
-                        rwConcederFerias.dt_final_aquisitivo    := dtVencimentoFerias;
-                        
-                        IF boFeriasVencidas IS TRUE THEN
-                            IF rwConcederFerias.situacao = 'Vencida' THEN
+
+            IF ( dtInicial IS NOT NULL ) THEN                    
+                IF (dtInicial != reFerias.dt_inicial_aquisitivo) OR (reFerias.cod_forma IN (3,4)) THEN
+                    inDataInicioDif := CAST(SUBSTR(dtInicial::varchar,1,4) AS INTEGER);
+                    inDataFinalDif := CAST(SUBSTR(reFerias.dt_inicial_aquisitivo::varchar,1,4) AS INTEGER);
+                    inContador := inDataFinalDif - inDataInicioDif;
+
+                    --Conta quantos periodos de 10 dias(cod_forma 3) ou de 15 dias(cod_forma 4) foram gozados e se necessita retirar periodo restante
+                    --Calcula a quantidade de vezes que o cada forma de ferias se repete 
+                    --visto que a logica antes implementava não possibilitava somar o total dos dias gozados por cada forma
+                    --Divide pela quantidade que cada forma exige pegando o resto para validacao
+                    --cod_forma 3 =  3 periodos de 10 dias tirados separados
+                    --cod_forma 4 =  2 periodos de 15 dias tirados separados
+                    stSqlAux := 'SELECT SUM(dias_ferias)
+                                    FROM pessoal'||stEntidade||'.ferias
+                                WHERE cod_contrato = '||reRegistro.cod_contrato||'
+                                  AND cod_forma = 3
+                                  AND dt_inicial_aquisitivo = '''||reFerias.dt_inicial_aquisitivo||'''
+                                  AND dt_final_aquisitivo = '''||reFerias.dt_final_aquisitivo||'''
+                                ';
+                    EXECUTE stSqlAux INTO inQntCodForma3;
+
+                    stSqlAux := 'SELECT SUM(dias_ferias)
+                                FROM pessoal'||stEntidade||'.ferias
+                                WHERE cod_contrato = '||reRegistro.cod_contrato||'
+                                  AND cod_forma = 4
+                                  AND dt_inicial_aquisitivo = '''||reFerias.dt_inicial_aquisitivo||'''
+                                  AND dt_final_aquisitivo = '''||reFerias.dt_final_aquisitivo||'''
+                                ';
+                    EXECUTE stSqlAux INTO inQntCodForma4;
+                    
+                    --Nao demonstrar se ja foi tirado os 30 dias de ferias
+                    IF (inQntCodForma3 = 30) OR (inQntCodForma4 = 30) THEN
+                        boRestaDiasFerias := false;
+                    ELSE
+                        boRestaDiasFerias := true;
+                    END IF;
+
+                    IF (inContador = 0) AND (boRestaDiasFerias = true) AND (reFerias.cod_forma <> inCodFormaAnterior ) THEN
+                        inContador := 1;
+                    END IF;
+    
+                    FOR i IN 1..inContador LOOP
+                        IF recuperarSituacaoDoContrato(reRegistro.cod_contrato,inCodPeriodoMovimentacao,stEntidade) = 'A' AND stAcao = 'incluir' THEN
+                            dtVencimentoFerias := dtInicial::date + '1 year'::interval - '1 day'::interval;
+                            rwConcederFerias.numcgm                 := reRegistro.numcgm;
+                            rwConcederFerias.nom_cgm                := reRegistro.nom_cgm;
+                            rwConcederFerias.nom_cgm                := reRegistro.nom_cgm;    
+                            rwConcederFerias.registro               := reRegistro.registro;   
+                            rwConcederFerias.cod_contrato           := reRegistro.cod_contrato;
+                            rwConcederFerias.desc_local             := reRegistro.desc_local; 
+                            rwConcederFerias.desc_orgao             := reRegistro.desc_orgao; 
+                            rwConcederFerias.orgao                  := reRegistro.orgao; 
+                            rwConcederFerias.dt_posse               := reRegistro.dt_posse;   
+                            rwConcederFerias.dt_admissao            := reRegistro.dt_admissao;
+                            rwConcederFerias.dt_nomeacao            := reRegistro.dt_nomeacao;
+                            rwConcederFerias.desc_funcao            := reRegistro.desc_funcao;
+                            rwConcederFerias.cod_regime_funcao      := reRegistro.cod_regime_funcao;
+                            rwConcederFerias.desc_regime_funcao     := reRegistro.desc_regime_funcao;
+                            rwConcederFerias.cod_funcao             := reRegistro.cod_funcao;
+                            rwConcederFerias.cod_local              := reRegistro.cod_local; 
+                            rwConcederFerias.cod_orgao              := reRegistro.cod_orgao; 
+                            rwConcederFerias.bo_cadastradas         := FALSE;
+                            
+                            IF dtVencimentoFerias > dtCompetencia THEN
+                                rwConcederFerias.situacao               := 'A Vencer';
+                            ELSE
+                                rwConcederFerias.situacao               := 'Vencida';
+                            END IF;
+                            
+                            rwConcederFerias.dt_inicial_aquisitivo  := dtInicial;
+                            rwConcederFerias.dt_final_aquisitivo    := dtVencimentoFerias;
+                            
+                            IF boFeriasVencidas IS TRUE THEN
+                                IF rwConcederFerias.situacao = 'Vencida' THEN
+                                    RETURN NEXT rwConcederFerias;
+                                END IF;
+                            ELSE
                                 RETURN NEXT rwConcederFerias;
                             END IF;
-                        ELSE
-                            RETURN NEXT rwConcederFerias;
+                            
                         END IF;
                         
-                    END IF;
-                    
-                    dtInicial := dtVencimentoFerias+1;
-                    
-                END LOOP;
+                        dtInicial := dtVencimentoFerias+1;
+                    END LOOP;
+                END IF;
                 
             END IF;
             
             dtInicial := reFerias.dt_final_aquisitivo+1;
+            inCodFormaAnterior := reFerias.cod_forma;
+
         END LOOP;
-        
+
         IF dtInicial IS NULL THEN
             stSql := 'SELECT valor 
                         FROM administracao.configuracao 

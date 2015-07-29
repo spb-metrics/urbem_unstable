@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGerarRelatorioExecucaoCalculo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGerarRelatorioExecucaoCalculo.php 62975 2015-07-14 14:03:02Z gelson $
 
     * Casos de uso: uc-05.03.05
 */
@@ -98,7 +98,7 @@ if ( Sessao::read( "grupo_automatico" ) ) {
                             ON alc.cod_calculo    = acgr.cod_calculo
 
                         WHERE cod_grupo          = ".$inCodGrupo."
-                        AND acgr.ano_exercicio = ".$inExercicio."
+                        AND acgr.ano_exercicio = '".$inExercicio."'
                         AND alc.cod_calculo IS NULL ";
     } else {
         $stSql = "   SELECT acgr.cod_calculo

@@ -121,7 +121,7 @@ if ($_REQUEST['inCodComissao']) {
 }
 
 if ($request->get('inCGM')) {
-    $obTLicitacaoParticipante->setDado( 'numcgm_representante', $request->get('inCGM') );
+    $obTLicitacaoParticipante->setDado( 'cgm_fornecedor', $request->get('inCGM') );
 }
 
 $obTLicitacaoParticipante->recuperaParticipanteLicitacaoHabilitacaoLista($rsLicitacaoParticipante);

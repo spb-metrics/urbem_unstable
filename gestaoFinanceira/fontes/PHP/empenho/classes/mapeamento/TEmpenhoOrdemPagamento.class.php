@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamento.class.php 62712 2015-06-11 15:00:29Z evandro $
+    $Id: TEmpenhoOrdemPagamento.class.php 63098 2015-07-24 17:29:01Z arthur $
 
     * Casos de uso: uc-02.03.12,uc-02.03.16,uc-02.03.05,uc-02.04.05,uc-02.03.28
 */
@@ -1240,151 +1240,177 @@ class TEmpenhoOrdemPagamento extends Persistente
 
     public function montaRecuperaDadosPagamentoBordero()
     {
-        $stSql  = "                                                                                                                                      \n";
-        $stSql .= " SELECT * FROM                                                                                                                        \n";
-        $stSql .= " (    SELECT                                                                                                                          \n";
-        $stSql .= "             EOP.COD_ORDEM,                                                                                                           \n";
-        $stSql .= "             EMP.EXERCICIO_EMPENHO,                                                                                                   \n";
-        $stSql .= "             EOP.EXERCICIO,                                                                                                           \n";
-        $stSql .= "             EOP.COD_ENTIDADE,                                                                                                        \n";
-        $stSql .= "             TO_CHAR(EOP.DT_VENCIMENTO, 'dd/mm/yyyy') AS DT_VENCIMENTO,                                                               \n";
-        $stSql .= "             TO_CHAR(EOP.DT_EMISSAO, 'dd/mm/yyyy') AS DT_EMISSAO,                                                                     \n";
-        $stSql .= "             CGMEMP.NOM_CGM AS BENEFICIARIO ,                                                                                            \n";
-        $stSql .= "             EMPENHO.fn_consultar_valor_pagamento_ordem(eop.EXERCICIO,eop.COD_ORDEM,eop.COD_ENTIDADE) AS VALOR_PAGAMENTO,             \n";
-        $stSql .= "             coalesce(eopa.vl_anulado,0.00) as vl_anulado,                                                                            \n";
-        $stSql .= "             EMP.CGM_BENEFICIARIO,                                                                                                    \n";
-        $stSql .= "             coalesce(sum(emp.vl_pago_nota),0.00) as vl_pago_nota,                                                                    \n";
-        $stSql .= "             replace(empenho.retorna_notas_empenhos(eop.exercicio,eop.cod_ordem,eop.cod_entidade),'','<br>') as nota_empenho,         \n";
-        $stSql .= "             EMP.implantado                                                                                                           \n";
-        $stSql .= "        FROM                                                                                                                          \n";
-        $stSql .= "             EMPENHO.ORDEM_PAGAMENTO AS EOP                                                                                           \n";
-        $stSql .= "             LEFT JOIN (                                                                                                              \n";
-        $stSql .= "                     SELECT opa.cod_ordem                                                                                             \n";
-        $stSql .= "                           ,opa.exercicio                                                                                             \n";
-        $stSql .= "                           ,opa.cod_entidade                                                                                          \n";
-        $stSql .= "                           ,coalesce(sum(opla.vl_anulado),0.00) as vl_anulado                                                         \n";
-        $stSql .= "                     FROM  EMPENHO.ORDEM_PAGAMENTO_ANULADA AS OPA                                                                     \n";
-        $stSql .= "                           JOIN empenho.ordem_pagamento_liquidacao_anulada as opla                                                    \n";
-        $stSql .= "                           ON (    opa.exercicio    = opla.exercicio                                                                  \n";
-        $stSql .= "                               AND opa.cod_ordem    = opla.cod_ordem                                                                  \n";
-        $stSql .= "                               AND opa.cod_entidade = opla.cod_entidade                                                               \n";
-        $stSql .= "                               AND opa.timestamp    = opla.timestamp                                                                  \n";
-        $stSql .= "                           )                                                                                                          \n";
-        $stSql .= "                  GROUP BY opa.cod_ordem, opa.exercicio, opa.cod_entidade                                                             \n";
-        $stSql .= "             ) as EOPA ON (  eopa.cod_ordem = eop.cod_ordem                                                                           \n";
-        $stSql .= "                         AND eopa.exercicio = eop.exercicio                                                                           \n";
-        $stSql .= "                         AND eopa.cod_entidade = eop.cod_entidade                                                                     \n";
-        $stSql .= "             )                                                                                                                        \n";
-        $stSql .= "         LEFT JOIN                                                                                                                    \n";
-        $stSql .= "             (                                                                                                                        \n";
-        $stSql .= "             SELECT                                                                                                                   \n";
-        $stSql .= "                 PL.COD_ORDEM,                                                                                                        \n";
-        $stSql .= "                 PL.EXERCICIO,                                                                                                        \n";
-        $stSql .= "                 PL.COD_ENTIDADE,                                                                                                     \n";
-        $stSql .= "                 PE.CGM_BENEFICIARIO,                                                                                                 \n";
-        $stSql .= "                 PE.IMPLANTADO,                                                                                                       \n";
-        $stSql .= "                 NL.EXERCICIO_EMPENHO,                                                                                                \n";
-        $stSql .= "                 NL.COD_EMPENHO,                                                                                                      \n";
-        $stSql .= "                 NL.COD_NOTA,                                                                                                         \n";
-        $stSql .= "                 sum(NLP.vl_pago) as vl_pago_nota                                                                                     \n";
-        $stSql .= "             FROM                                                                                                                     \n";
-        $stSql .= "                 EMPENHO.PAGAMENTO_LIQUIDACAO    as PL,                                                                               \n";
-        $stSql .= "                 EMPENHO.NOTA_LIQUIDACAO         as NL                                                                                \n";
-        $stSql .= "                 LEFT JOIN (                                                                                                          \n";
-        $stSql .= "                          SELECT nlp.exercicio                                                                                        \n";
-        $stSql .= "                                ,nlp.cod_entidade                                                                                     \n";
-        $stSql .= "                                ,nlp.cod_nota                                                                                         \n";
-        $stSql .= "                                ,nlp.timestamp                                                                                        \n";
-        $stSql .= "                                ,coalesce(sum(nlp.vl_pago),0.00) - coalesce(sum(nlp.vl_anulado),0.00) as vl_pago                      \n";
-        $stSql .= "                            FROM (SELECT  cod_nota                                                                                    \n";
-        $stSql .= "                                         ,cod_entidade                                                                                \n";
-        $stSql .= "                                         ,exercicio                                                                                   \n";
-        $stSql .= "                                         ,timestamp                                                                                   \n";
-        $stSql .= "                                         ,sum(vl_pago) as vl_pago                                                                     \n";
-        $stSql .= "                                         ,0.00 as vl_anulado                                                                          \n";
-        $stSql .= "                                  FROM empenho.nota_liquidacao_paga                                                                   \n";
-        $stSql .= "                                 GROUP BY cod_nota, timestamp, cod_entidade, exercicio, vl_anulado                                    \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "                            UNION                                                                                                     \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "                                  SELECT cod_nota                                                                                     \n";
-        $stSql .= "                                        ,cod_entidade                                                                                 \n";
-        $stSql .= "                                        ,exercicio                                                                                    \n";
-        $stSql .= "                                        ,timestamp                                                                                    \n";
-        $stSql .= "                                        ,0.00 as vl_pago                                                                              \n";
-        $stSql .= "                                        ,sum(vl_anulado) as vl_anulado                                                                \n";
-        $stSql .= "                                  FROM  empenho.nota_liquidacao_paga_anulada                                                          \n";
-        $stSql .= "                                 GROUP BY cod_nota, timestamp, cod_entidade, exercicio, vl_pago                                       \n";
-        $stSql .= "                                ) as NLP                                                                                              \n";
-        $stSql .= "                            JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga as PLNLP                                           \n";
-        $stSql .= "                            ON (                                                                                                      \n";
-        $stSql .= "                                  nlp.cod_nota     = plnlp.cod_nota       AND                        \n";
-        $stSql .= "                                  nlp.exercicio    = plnlp.exercicio_liquidacao AND                  \n";
-        $stSql .= "                                  nlp.cod_entidade = plnlp.cod_entidade   AND                        \n";
-        $stSql .= "                                  nlp.timestamp    = plnlp.timestamp                                 \n";
-        if($this->getDado('cod_ordem'))
-            $stSql .= "                          AND plnlp.cod_ordem = ".$this->getDado('cod_ordem')."                  \n";
-        $stSql .= "                            )                                                                                                         \n";
-        $stSql .= "                         GROUP BY nlp.exercicio, nlp.timestamp, nlp.cod_entidade, nlp.cod_nota                                        \n";
-        $stSql .= "                 ) as NLP ON (   nlp.cod_nota = nl.cod_nota                                                                           \n";
-        $stSql .= "                             AND nlp.exercicio = nl.exercicio                                                                         \n";
-        $stSql .= "                             AND nlp.cod_entidade = nl.cod_entidade                                                                   \n";
-        $stSql .= "                 ),                                                                                                                   \n";
-        $stSql .= "                 EMPENHO.EMPENHO                 as E,                                                                                \n";
-        $stSql .= "                 EMPENHO.PRE_EMPENHO             as PE                                                                               \n";
-        $stSql .= "             WHERE                                                                                                                    \n";
-        $stSql .= "                 PL.COD_NOTA             = NL.COD_NOTA       AND                                                                      \n";
-        $stSql .= "                 PL.EXERCICIO_LIQUIDACAO = NL.EXERCICIO      AND                                                                      \n";
-        $stSql .= "                 PL.COD_ENTIDADE         = NL.COD_ENTIDADE   AND                                                                      \n";
-        if($this->getDado('cod_ordem'))
-            $stSql .= "             pl.cod_ordem = ".$this->getDado('cod_ordem')." AND                                                                   \n";
-        if($this->getDado('exercicio'))
-            $stSql .= "             pl.exercicio = '".$this->getDado('exercicio')."' AND                                                                 \n";
-        if($this->getDado('cod_entidade'))
-            $stSql .= "             pl.cod_entidade = ".$this->getDado('cod_entidade')." AND                                                             \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "                 NL.COD_EMPENHO          = E.COD_EMPENHO     AND                                                                      \n";
-        $stSql .= "                 NL.EXERCICIO_EMPENHO    = E.EXERCICIO       AND                                                                      \n";
-        $stSql .= "                 NL.COD_ENTIDADE         = E.COD_ENTIDADE    AND                                                                      \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "                 E.COD_PRE_EMPENHO       = PE.COD_PRE_EMPENHO    AND                                                                  \n";
-        $stSql .= "                 E.EXERCICIO             = PE.EXERCICIO                                                                            \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "         GROUP BY                                                                                                                     \n";
-        $stSql .= "                 PL.COD_ORDEM,                                                                                                        \n";
-        $stSql .= "                 PL.EXERCICIO,                                                                                                        \n";
-        $stSql .= "                 PL.COD_ENTIDADE,                                                                                                     \n";
-        $stSql .= "                 PE.CGM_BENEFICIARIO,                                                                                                 \n";
-        $stSql .= "                 PE.IMPLANTADO,                                                                                                       \n";
-        $stSql .= "                 NL.EXERCICIO_EMPENHO,                                                                                                \n";
-        $stSql .= "                 NL.COD_EMPENHO,                                                                                                      \n";
-        $stSql .= "                 NL.COD_NOTA                                                                                                          \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "         ) AS EMP ON (                                                                                                                \n";
-        $stSql .= "             EOP.COD_ORDEM       = EMP.COD_ORDEM AND                                                                                  \n";
-        $stSql .= "             EOP.EXERCICIO       = EMP.EXERCICIO AND                                                                                  \n";
-        $stSql .= "             EOP.COD_ENTIDADE    = EMP.COD_ENTIDADE                                                                                   \n";
-        $stSql .= "         )                                                                                                                            \n";
-        $stSql .= "         LEFT JOIN                                                                                                                    \n";
-        $stSql .= "             ORCAMENTO.ENTIDADE AS OE                                                                                                 \n";
-        $stSql .= "         ON                                                                                                                           \n";
-        $stSql .= "           ( OE.COD_ENTIDADE = EOP.COD_ENTIDADE                                                                                       \n";
-        $stSql .= "         AND OE.EXERCICIO    = EOP.EXERCICIO    )                                                                                     \n";
-        $stSql .= "         LEFT JOIN SW_CGM as CGMEMP ON CGMEMP.NUMCGM = EMP.CGM_BENEFICIARIO                                                          \n";
-        $stSql .= "     WHERE eop.cod_ordem is not null                                                                                                  \n";
-        if($this->getDado('cod_ordem'))
-            $stSql .= "     AND EOP.cod_ordem = ".$this->getDado('cod_ordem')."                                                                         \n";
-        if($this->getDado('exercicio'))
-            $stSql .= "     AND eop.exercicio = '".$this->getDado('exercicio')."'                                                                       \n";
-        if($this->getDado('cod_entidade'))
-            $stSql .= "     AND eop.cod_entidade = ".$this->getDado('cod_entidade')."                                                                   \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "     GROUP BY eop.exercicio,eop.dt_vencimento,eop.dt_emissao,emp.exercicio_empenho,eop.COD_ORDEM,eop.COD_ENTIDADE,EMP.CGM_BENEFICIARIO,CGMEMP.nom_cgm,VALOR_PAGAMENTO,EMP.implantado,eopa.vl_anulado \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= "     ORDER BY eop.cod_ordem                                                                                                           \n";
-        $stSql .= " ) as tbl                                                                                                                             \n";
-        $stSql .= "                                                                                                                                      \n";
-        $stSql .= " where (valor_pagamento - vl_anulado ) > vl_pago_nota                                                                                 \n";
+        $stSql  = " 
+            SELECT * FROM                                                                                                                        
+                 ( SELECT EOP.COD_ORDEM                                                                                                    
+                        , EMP.EXERCICIO_EMPENHO
+                        , EOP.EXERCICIO                                                                                                    
+                        , EOP.COD_ENTIDADE
+                        , TO_CHAR(EOP.DT_VENCIMENTO, 'dd/mm/yyyy') AS DT_VENCIMENTO
+                        , TO_CHAR(EOP.DT_EMISSAO, 'dd/mm/yyyy') AS DT_EMISSAO
+                        , CGMEMP.NOM_CGM AS BENEFICIARIO 
+                        , EMPENHO.fn_consultar_valor_pagamento_ordem(eop.EXERCICIO,eop.COD_ORDEM,eop.COD_ENTIDADE) AS VALOR_PAGAMENTO
+                        , coalesce(eopa.vl_anulado,0.00) AS vl_anulado              
+                        , EMP.CGM_BENEFICIARIO
+                        , coalesce(sum(emp.vl_pago_nota),0.00) AS vl_pago_nota
+                        , replace(empenho.retorna_notas_empenhos(eop.exercicio,eop.cod_ordem,eop.cod_entidade),'','<br>') AS nota_empenho
+                        , EMP.implantado
+
+                     FROM EMPENHO.ORDEM_PAGAMENTO AS EOP                                                                                           
+
+                LEFT JOIN ( SELECT opa.cod_ordem                                                                                             
+                                 , opa.exercicio                                                                                             
+                                 , opa.cod_entidade                                                                                          
+                                 , coalesce(sum(opla.vl_anulado),0.00) as vl_anulado                                                         
+                              FROM  EMPENHO.ORDEM_PAGAMENTO_ANULADA AS OPA                                                                     
+                        INNER JOIN empenho.ordem_pagamento_liquidacao_anulada as opla                                                    
+                                ON opa.exercicio    = opla.exercicio                                                                  
+                               AND opa.cod_ordem    = opla.cod_ordem                                                                  
+                               AND opa.cod_entidade = opla.cod_entidade                                                               
+                               AND opa.timestamp    = opla.timestamp                                                                  
+                               
+                          GROUP BY opa.cod_ordem
+                                 , opa.exercicio
+                                 , opa.cod_entidade
+                        ) AS EOPA
+                       ON eopa.cod_ordem    = eop.cod_ordem                                                                           
+                      AND eopa.exercicio    = eop.exercicio                                                                           
+                      AND eopa.cod_entidade = eop.cod_entidade                                                                     
+            
+                LEFT JOIN( SELECT PL.COD_ORDEM
+                                , PL.EXERCICIO
+                                , PL.COD_ENTIDADE
+                                , PE.CGM_BENEFICIARIO
+                                , PE.IMPLANTADO
+                                , NL.EXERCICIO_EMPENHO
+                                , NL.COD_EMPENHO
+                                , NL.COD_NOTA
+                                , sum(NLP.vl_pago) AS vl_pago_nota
+                             FROM EMPENHO.PAGAMENTO_LIQUIDACAO AS PL                                                                              
+                                , EMPENHO.NOTA_LIQUIDACAO      AS NL                                                                                
+                         
+                         LEFT JOIN (  SELECT nlp.exercicio                                                                                        
+                                           , nlp.cod_entidade                                                                                     
+                                           , nlp.cod_nota                                                                                         
+                                           , nlp.timestamp                                                                                        
+                                           , coalesce(sum(nlp.vl_pago),0.00) - coalesce(sum(nlp.vl_anulado),0.00) as vl_pago                      
+                                        
+                                        FROM ( SELECT cod_nota                                                                                    
+                                                    , cod_entidade                                                                                
+                                                    , exercicio                                                                                   
+                                                    , timestamp                                                                                   
+                                                    , sum(vl_pago) AS vl_pago                                                                     
+                                                    , 0.00 as vl_anulado                                                                          
+                                                 FROM empenho.nota_liquidacao_paga                                                                   
+                                             GROUP BY cod_nota
+                                                    , timestamp
+                                                    , cod_entidade
+                                                    , exercicio
+                                                    , vl_anulado                                    
+
+                                        UNION                                                                                                     
+
+                                              SELECT cod_nota                                                                                     
+                                                   , cod_entidade                                                                                 
+                                                   , exercicio                                                                                    
+                                                   , timestamp                                                                                    
+                                                   , 0.00 as vl_pago                                                                              
+                                                   , sum(vl_anulado) AS vl_anulado                                                                
+                                                FROM  empenho.nota_liquidacao_paga_anulada                                                          
+                                            GROUP BY cod_nota
+                                                   , timestamp
+                                                   , cod_entidade
+                                                   , exercicio
+                                                   , vl_pago
+                                           ) AS NLP
+
+                                 INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga AS PLNLP
+                                         ON nlp.cod_nota     = plnlp.cod_nota
+                                        AND nlp.exercicio    = plnlp.exercicio_liquidacao
+                                        AND nlp.cod_entidade = plnlp.cod_entidade
+                                        AND nlp.timestamp    = plnlp.timestamp  \n";
+            
+            if ( $this->getDado('cod_ordem') )
+                $stSql .= "            AND plnlp.cod_ordem = ".$this->getDado('cod_ordem')." \n";
+
+            $stSql .= "           GROUP BY nlp.exercicio, nlp.timestamp, nlp.cod_entidade, nlp.cod_nota                                        
+                               ) AS NLP
+                               ON nlp.cod_nota     = nl.cod_nota                                                                           
+                              AND nlp.exercicio    = nl.exercicio                                                                         
+                              AND nlp.cod_entidade = nl.cod_entidade                                                                   
+                            
+                             , EMPENHO.EMPENHO     AS E
+                             , EMPENHO.PRE_EMPENHO AS PE                                                                               
+                         
+                         WHERE PL.COD_NOTA             = NL.COD_NOTA       
+                           AND PL.EXERCICIO_LIQUIDACAO = NL.EXERCICIO      
+                           AND PL.COD_ENTIDADE         = NL.COD_ENTIDADE  \n"; 
+                            
+        if ( $this->getDado('cod_ordem') )
+            $stSql .= " AND pl.cod_ordem = ".$this->getDado('cod_ordem')." \n";
+        
+        if ( $this->getDado('exercicio') )
+            $stSql .= " AND pl.exercicio = '".$this->getDado('exercicio')."' \n";
+        
+        if ( $this->getDado('cod_entidade') )
+            $stSql .= " AND pl.cod_entidade = ".$this->getDado('cod_entidade')." \n";
+
+        $stSql .= "        AND NL.COD_EMPENHO          = E.COD_EMPENHO
+                           AND NL.EXERCICIO_EMPENHO    = E.EXERCICIO
+                           AND NL.COD_ENTIDADE         = E.COD_ENTIDADE
+
+                           AND E.COD_PRE_EMPENHO       = PE.COD_PRE_EMPENHO
+                           AND E.EXERCICIO             = PE.EXERCICIO                                                                            
+
+                     GROUP BY PL.COD_ORDEM
+                            , PL.EXERCICIO
+                            , PL.COD_ENTIDADE
+                            , PE.CGM_BENEFICIARIO
+                            , PE.IMPLANTADO
+                            , NL.EXERCICIO_EMPENHO
+                            , NL.COD_EMPENHO
+                            , NL.COD_NOTA
+
+                     ) AS EMP
+                    ON EOP.COD_ORDEM    = EMP.COD_ORDEM 
+                   AND EOP.EXERCICIO    = EMP.EXERCICIO
+                   AND EOP.COD_ENTIDADE = EMP.COD_ENTIDADE                                                                                   
+            
+              LEFT JOIN ORCAMENTO.ENTIDADE AS OE                                                                                                 
+                     ON OE.COD_ENTIDADE = EOP.COD_ENTIDADE                                                                                       
+                    AND OE.EXERCICIO    = EOP.EXERCICIO
+                     
+              LEFT JOIN SW_CGM AS CGMEMP
+                     ON CGMEMP.NUMCGM = EMP.CGM_BENEFICIARIO
+                     
+                  WHERE eop.cod_ordem IS NOT NULL ";
+        
+        if ( $this->getDado('cod_ordem') )
+            $stSql .= " AND EOP.cod_ordem = ".$this->getDado('cod_ordem')." \n";
+        
+        if ( $this->getDado('exercicio') )
+            $stSql .= " AND eop.exercicio = '".$this->getDado('exercicio')."' \n";
+        
+        if ( $this->getDado('cod_entidade') )
+            $stSql .= " AND eop.cod_entidade = ".$this->getDado('cod_entidade')." \n";
+    
+        $stSql .= "
+              GROUP BY eop.exercicio
+                    , eop.dt_vencimento
+                    , eop.dt_emissao
+                    , emp.exercicio_empenho
+                    , eop.COD_ORDEM
+                    , eop.COD_ENTIDADE
+                    , EMP.CGM_BENEFICIARIO
+                    , CGMEMP.nom_cgm
+                    , VALOR_PAGAMENTO
+                    , EMP.implantado
+                    , eopa.vl_anulado 
+
+                 ORDER BY eop.cod_ordem                                                                                                           
+                ) AS tbl                                                                                                                             
+                
+            WHERE (valor_pagamento - vl_anulado ) >= vl_pago_nota ";
 
         return $stSql;
     }

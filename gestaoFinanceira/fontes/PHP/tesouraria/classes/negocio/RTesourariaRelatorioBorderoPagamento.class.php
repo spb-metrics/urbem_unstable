@@ -41,28 +41,6 @@
     * Casos de uso: uc-02.04.20,uc-02.03.28
 */
 
-/*
-$Log$
-Revision 1.20  2007/04/30 19:21:10  cako
-implementação uc-02.03.28
-
-Revision 1.19  2007/03/30 21:59:12  cako
-Bug #7884#
-
-Revision 1.18  2007/01/24 19:04:04  cako
-Bug #7884#
-
-Revision 1.17  2006/10/23 16:36:24  domluc
-*** empty log message ***
-
-Revision 1.16  2006/09/19 08:52:29  jose.eduardo
-Bug #6993#
-
-Revision 1.15  2006/07/05 20:38:41  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once( CLA_PERSISTENTE_RELATORIO   );
 include_once( CAM_FW_PDF."RRelatorio.class.php"                 );
@@ -1152,7 +1130,7 @@ function geraRecordSetBorderoPagamento2015(&$arRecordSet)
         } else {
             $nuVlRetencoes = 0.00;
             // Valor liquido da OP
-            $inValorLiquidoOP = bcsub($inValorOP,$rsLista->getCampo("vl_pago_nota"),2);
+            $inValorLiquidoOP = $inValorOP;
         }
 
         //verificando se o mesmo credor ja foi inserido no array para fazer o somatorio por credor
@@ -1166,7 +1144,6 @@ function geraRecordSetBorderoPagamento2015(&$arRecordSet)
                 $arDadosPagamento['dados_pagamento'][($chave-1)]['dados_op'][$chave]['observacao']     = $valor['stObservacao'];
                 $inValorTotalCredor += $inValorLiquidoOP;
                 $arDadosPagamento['dados_pagamento'][($chave-1)]['total_credor'] = $inValorTotalCredor;
-
             }else{
                 $arDadosPagamento['dados_pagamento'][$chave]['credor']                             = $valor["stCredor"];
                 $arDadosPagamento['dados_pagamento'][$chave]['cod_credor']                         = $valor["inCodCredor"];

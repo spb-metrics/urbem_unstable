@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCManterSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
 
  */
 
@@ -69,6 +69,16 @@ include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php";
 include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
 include_once CAM_GP_COM_COMPONENTES."IMontaDotacaoDesdobramento.class.php";
 
+function mascaraValorBD($value, $boNumberBR = false)
+{    
+    if($boNumberBR)
+        $value = number_format($value,2,',','.');
+    else
+        $value = str_replace(',','.',str_replace('.','',$value));
+    
+    return $value;
+}
+
 function montaListaDotacoesAnular($arRecordSetItem , $boExecuta = true)
 {
     $stPrograma = "ManterSolicitacaoCompra";
@@ -80,8 +90,6 @@ function montaListaDotacoesAnular($arRecordSetItem , $boExecuta = true)
     $table = new Table;
     $table->setRecordset( $rsDotacoesItem );
     $table->setSummary('Itens da Solicitação');
-
-    //$table->setConditional( true , "#efefef" );
 
     $table->Head->addCabecalho('Item'                , 35);
     $table->Head->addCabecalho('Unidade'             , 15);
@@ -131,16 +139,16 @@ function calculaTotalizador($arItens)
 
     foreach ($arItens as $value) {
         if ($value['bo_totalizar'] == "true") {
-            $nuTotalVlSolicitado  = $nuTotalVlSolicitado  + str_replace("," , ".",  str_replace("." , "" , $value['nuVlTotalSolicitada'] ));
-            $nuTotalVlAnulado     = $nuTotalVlAnulado     + str_replace("," , ".",  str_replace("." , "" , $value['nuVlTotalAnulada']    ));
-            $nuTotalVlMapa        = $nuTotalVlMapa        + str_replace("," , ".",  str_replace("." , "" , $value['nuVlTotalMapa']       ));
+            $nuTotalVlSolicitado  = $nuTotalVlSolicitado  + mascaraValorBD($value['nuVlTotalSolicitada']);
+            $nuTotalVlAnulado     = $nuTotalVlAnulado     + mascaraValorBD($value['nuVlTotalAnulada']   );
+            $nuTotalVlMapa        = $nuTotalVlMapa        + mascaraValorBD($value['nuVlTotalMapa']      );
         }
     }
 
     $arTotal = array();
-    $arTotal['nuTotalVlSolicitado']  = number_format( $nuTotalVlSolicitado  , 2, ",", "." );
-    $arTotal['nuTotalVlAnulado']     = number_format( $nuTotalVlAnulado     , 2, ",", "." );
-    $arTotal['nuTotalVlMapa']        = number_format( $nuTotalVlMapa        , 2, ",", "." );
+    $arTotal['nuTotalVlSolicitado']  = mascaraValorBD( $nuTotalVlSolicitado  , true);
+    $arTotal['nuTotalVlAnulado']     = mascaraValorBD( $nuTotalVlAnulado     , true);
+    $arTotal['nuTotalVlMapa']        = mascaraValorBD( $nuTotalVlMapa        , true);
 
     $stJs = montaTotalizador($arTotal);
 
@@ -196,8 +204,6 @@ function montaListaDotacoesConsulta($arRecordSetItem , $boExecuta = true)
     $table->setRecordset( $rsDotacoesItem );
     $table->setSummary('Itens da Solicitação');
 
-    //$table->setConditional( true , "#efefef" );
-
     $table->Head->addCabecalho('Item'             , 18);
     $table->Head->addCabecalho('Unidade'          , 10);
     $table->Head->addCabecalho('Centro de Custo'  , 10);
@@ -245,8 +251,6 @@ function montaListaDotacoes($arRecordSet , $boExecuta = true)
 
     $table->setSummary('Itens da Solicitação');
 
-    //$table->setConditional(true, "#efefef");
-
     $table->Head->addCabecalho('Item' 			   , 35);
     $table->Head->addCabecalho('Unidade de Medida' , 10);
     $table->Head->addCabecalho('Centro de Custo'   , 30);
@@ -261,15 +265,14 @@ function montaListaDotacoes($arRecordSet , $boExecuta = true)
     $table->Body->addCampo('nuQuantidade'							 ,"D", $stTitle);
     $table->Body->addCampo('nuVlTotal'								 ,"D", $stTitle);
 
-    $table->Body->addAcao('excluir', 'excluirListaItens(%s)', array('id'));
-    $table->Body->addAcao('alterar', 'alterarListaItens(%s)', array('id'));
+    $table->Body->addAcao('excluir', 'BloqueiaFrames(true,false);excluirListaItens(%s)', array('id'));
+    $table->Body->addAcao('alterar', 'BloqueiaFrames(true,false);alterarListaItens(%s)', array('id'));
 
     $table->Foot->addSoma('nuVlTotal', "D");
 
     $table->montaHTML();
-    $stHTML = $table->getHtml();
 
-    $stHTML = str_replace("\n" ,"" ,$stHTML);
+    $stHTML = str_replace("\n" ,"" ,$table->getHtml());
     $stHTML = str_replace("  " ,"" ,$stHTML);
     $stHTML = str_replace("'","\\'",$stHTML);
 
@@ -287,7 +290,6 @@ function montaListaDotacoes($arRecordSet , $boExecuta = true)
     } else {
         return $stHTML;
     }
-
 }
 
 function preencheSpnItensOutraSolicitacao()
@@ -305,14 +307,14 @@ function preencheSpnItensOutraSolicitacao()
     $obSolicitacao->obExercicio->setObrigatorioBarra( true );
     $obSolicitacao->obExercicio->setNull( true );
     $obSolicitacao->obITextBoxSelectEntidade->setRotulo('*Entidade');
-    if ($stAcao=="alterar") {
-      $obSolicitacao->setCodSolicitacaoExcluida($_REQUEST['cod_solicitacao']);
+    if ($_REQUEST['stAcao']=="alterar") {
+        $obSolicitacao->setCodSolicitacaoExcluida($_REQUEST['hdnExercicio'].$_REQUEST['HdnInSolicitacao'].$_REQUEST['HdnCodEntidade']);
     }
 
     // Define Objeto Button para Incluir Item
     $obBtnIncluirOutraSolicitacao = new Button;
     $obBtnIncluirOutraSolicitacao->setValue( "Incluir" );
-    $obBtnIncluirOutraSolicitacao->obEvento->setOnClick( "goOcultoOutraSolicitacao('incluirItensOutraSolicitacao',true,'false');");
+    $obBtnIncluirOutraSolicitacao->obEvento->setOnClick( "BloqueiaFrames(true,false);goOcultoOutraSolicitacao('incluirItensOutraSolicitacao',true,'false');");
 
     // Define Objeto Button para Limpar Item
     $obBtnLimparOutraSolicitacao = new Button;
@@ -325,51 +327,129 @@ function preencheSpnItensOutraSolicitacao()
     $obFormulario->agrupaComponentes( array( $obBtnIncluirOutraSolicitacao, $obBtnLimparOutraSolicitacao ) );
 
     $obFormulario->montaInnerHTML();
-    $stHtml .= $obFormulario->getHTML();
 
-    $stJs = "document.getElementById('spnItensOutraSolicitacao').innerHTML = '".$stHtml."';";
+    $stJs = "document.getElementById('spnItensOutraSolicitacao').innerHTML = '".$obFormulario->getHTML()."';";
 
     return $stJs;
+}
 
+function calculaValorReservadoDotacao()
+{
+    $arValores = Sessao::read('arValores');
+    $arSaldoDotacoes = array();
+    $arDespesas = array();
+
+    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                                            \n";
+    $stJs .= "jQuery('#inVlTotal').val('0,00');                                                                     \n";
+    $stJs .= "if(jQuery('#inVlTotal_label'))                                                                        \n";
+    $stJs .= "    jQuery('#inVlTotal_label').html('0,00');                                                          \n";
+
+    if($_REQUEST['nuVlTotal']&&$_REQUEST['inCodDespesa']){
+        $nuTotalReservadoDotacao = mascaraValorBD($_REQUEST['nuVlTotal']);
+        foreach ($arValores as $chave => $valor) {
+            if( $valor['inCodDespesa']==$_REQUEST['inCodDespesa'] && $valor['id'] != $_REQUEST['HdnCodItem'] ){
+                $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
+            }
+        }
+        $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuTotalReservadoDotacao,true);
+        $stJs .= "jQuery('#inVlTotal').val('".mascaraValorBD($nuTotalReservadoDotacao,true)."');                    \n";
+        $stJs .= "if(jQuery('#inVlTotal_label'))                                                                    \n";
+        $stJs .= "    jQuery('#inVlTotal_label').html('".$_REQUEST['nuVlTotal']."');                                \n";
+    }else{
+        $obTConfiguracao = new TAdministracaoConfiguracao();
+        $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
+        $obTConfiguracao->pegaConfiguracao( $boReservaRigida,'reserva_rigida' );
+        $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+        if($boReservaRigida&&$_REQUEST['boRegistroPreco']=='false'&&(!isset($_REQUEST['nuVlTotal']))&&!isset($_REQUEST['inCodDespesa'])){
+            foreach ($arValores as $value) {
+                if($value['inCodDespesa']!=''&&!isset($arDespesas[$value['inCodDespesa']])){
+                    $arDespesas[$value['inCodDespesa']] = $value['inCodDespesa'];
+
+                    $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
+                    $obTEmpenhoPreEmpenho->setDado( 'exercicio'  ,Sessao::getExercicio() );
+                    $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$value['inCodDespesa'] );
+                    $obTEmpenhoPreEmpenho->recuperaSaldoDotacaoCompra( $rsSaldoAnterior );
+
+                    $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
+                    $nuTotalReservadoDotacao = 0;
+                    foreach ($arValores as $chave => $valor) {
+                        if($valor['inCodDespesa']==$value['inCodDespesa']){
+                            $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
+                        }
+                    }
+                    $arSaldoDotacoes['saldo'][$value['inCodDespesa']] = $nuSaldoDotacao-$nuTotalReservadoDotacao;
+                    $arSaldoDotacoes['total'][$value['inCodDespesa']] = $nuSaldoDotacao;
+                }
+            }
+
+            $stMensagem = "";
+            $stDotacoes = "";
+            $arDotacoes = array();
+            asort($arDespesas);
+
+            foreach ($arDespesas as $key => $value) {
+                if($arSaldoDotacoes['saldo'][$key]<0){
+                    $arDotacoes[] = $key;
+                }
+            }
+
+            for($i=0;$i<count($arDotacoes);$i++){
+                if ($stDotacoes=='')
+                    $stDotacoes .= $arDotacoes[$i];
+                else if(($i+1)==count($arDotacoes))
+                    $stDotacoes .= " e ".$arDotacoes[$i];
+                else
+                    $stDotacoes .= ", ".$arDotacoes[$i];
+            }
+
+            if ($stDotacoes!='') {
+                $stMensagem .= "@Valor da Reserva é Superior ao Saldo da Dotação (".$stDotacoes.").";
+            }
+
+            if($stMensagem!='')
+                $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');                       \n";
+        }
+    }
+    $stJs .= "LiberaFrames(true,false);                                                                             \n";
+
+    return $stJs;
 }
 
 switch ($_REQUEST['stCtrl']) {
-
     case "alterarListaItens":
-
         $rsRecordSetItem = new RecordSet;
         $obTComprasSolicitacaoItem = new TComprasSolicitacaoItem;
 
         $arValores = Sessao::read('arValores');
+        $arSaldoDotacoes = Sessao::read('arSaldoDotacoes');
 
         foreach ($arValores as $key => $value) {
             if (($arValores[$key]['id']) == $_REQUEST['id']) {
-                $stJs .= "f.inCodItem.value                       = '".$arValores[$key]['inCodItem']."'; ";
-                $stJs .= "d.getElementById('stNomItem').innerHTML = '".addslashes($arValores[$key]['stNomItem'])."'; ";
-                $stJs .= "f.HdnNomItem.value       ='".addslashes($arValores[$key]['stNomItem'])."'; ";
-                $stJs .= "d.getElementById('stUnidadeMedida').innerHTML ='".$arValores[$key]['stNomUnidade']."'; ";
-                $stJs .= "f.stNomUnidade.value ='".$arValores[$key]['stNomUnidade']."';    ";
+                $stJs .= "f.inCodItem.value                             ='".$arValores[$key]['inCodItem']."';                               \n";
+                $stJs .= "d.getElementById('stNomItem').innerHTML       ='".addslashes($arValores[$key]['stNomItem'])."';                   \n";
+                $stJs .= "f.HdnNomItem.value                            ='".addslashes($arValores[$key]['stNomItem'])."';                   \n";
+                $stJs .= "d.getElementById('stUnidadeMedida').innerHTML ='".$arValores[$key]['stNomUnidade']."';                            \n";
+                $stJs .= "f.stNomUnidade.value                          ='".$arValores[$key]['stNomUnidade']."';                            \n";
 
                 $count=0;
                 foreach ($arValores as $valor) {
-                    if ($value['inCodItem'] == $valor['inCodItem']
-                        and $value['inCodCentroCusto'] == $valor['inCodCentroCusto']) {
+                    if ($value['inCodItem'] == $valor['inCodItem'] and $value['inCodCentroCusto'] == $valor['inCodCentroCusto'])
                         $count++;
-                    }
                 }
 
-                if ($count > 1) {
-                    $stJs .= "jq('#stComplemento').attr('readonly', 'readonly');";
-                } else {
-                    $stJs .= "jq('#stComplemento').attr('readonly', '');";
-                }
+                if ($count > 1)
+                    $stJs .= "jq('#stComplemento').attr('readonly', 'readonly');                                                            \n";
+                else
+                    $stJs .= "jq('#stComplemento').attr('readonly', '');                                                                    \n";
 
-                $stJs .= "f.stComplemento.value                         ='".nl2br(str_replace('\r\n', '\n', preg_replace('/(\r\n|\n|\r)/', ' ',addslashes($arValores[$key]['stComplemento']))))."';   ";
-                $stJs .= "f.inCodCentroCusto.value                      ='".$arValores[$key]['inCodCentroCusto']."';";
-                $stJs .= "d.getElementById('stNomCentroCusto').innerHTML='".$arValores[$key]['stNomCentroCusto']."';";
-                $stJs .= "if (f.inCodDespesa.value=='') { f.inCodDespesa.focus(); }                                                    ";
-                $stJs .= "f.inCodDespesa.value                          ='".$arValores[$key]['inCodDespesa']."';    ";
-                $stJs .= "f.HdnCodClassificacao.value ='".$arValores[$key]['inCodEstrutural']."';";
+                $stComplemento = nl2br(str_replace('\r\n', '\n', preg_replace('/(\r\n|\n|\r)/', ' ',addslashes($arValores[$key]['stComplemento']))));
+                $stJs .= "f.stComplemento.value                         ='".$stComplemento."';                                              \n";
+                $stJs .= "f.inCodCentroCusto.value                      ='".$arValores[$key]['inCodCentroCusto']."';                        \n";
+                $stJs .= "d.getElementById('stNomCentroCusto').innerHTML='".$arValores[$key]['stNomCentroCusto']."';                        \n";
+                $stJs .= "f.inCodDespesa.value                          ='".$arValores[$key]['inCodDespesa']."';                            \n";
+                $stJs .= "f.inCodDespesaAnterior.value                  ='".$arValores[$key]['inCodDespesa']."';                            \n";
+                $stJs .= "f.HdnCodClassificacao.value                   ='".$arValores[$key]['inCodEstrutural']."';                         \n";
 
                 # Recupera valor da última compra.
                 $obTAlmoxarifadoCatalogoItem = new TAlmoxarifadoCatalogoItem;
@@ -388,49 +468,83 @@ switch ($_REQUEST['stCtrl']) {
                 $obFormulario = new Formulario;
                 $obFormulario->addComponente( $obLblValorReferenciaUltimaCompra );
                 $obFormulario->montaInnerHTML();
-                $stHtml .= $obFormulario->getHTML();
 
-                $stHtml = str_replace( "\n", "", $stHtml);
+                $stHtml = str_replace( "\n", "", $obFormulario->getHTML());
                 $stHtml = str_replace( "  ", "", $stHtml);
                 $stHtml = str_replace( "'" , "\\'", $stHtml);
 
-                $stJs .= "jQuery('#spnVlrReferencia').html('".$stHtml."'); ";
-                $stJs .= "d.getElementById('nuQuantidade').value = '".$arValores[$key]['nuQuantidade']."'; ";
-                $stJs .= "d.getElementById('nuVlTotal').value = '".$arValores[$key]['nuVlTotal']."'; ";
-                $stJs .= "d.getElementById('hdnValorTotalReservado').value='".$arValores[$key]['nuVlTotalReservado']."'; ";
-                $stJs .= "f.nuVlTotalReservado.value = '".$arValores[$key]['nuVlTotalReservado']."'; ";
-                $stJs .= "document.getElementById('incluiItem').value = 'Alterar';";
-                $stJs .= "d.getElementById('incluiItem').setAttribute('onclick','JavaScript:goOculto(\'alteradoListaItens\',true,\'true\');');	 ";
-                $stJs .= "f.HdnCodItem.value = '".$_REQUEST['id']."'; ";
-                $stJs .= "f.inCodItem.focus(); ";
-                $stJs .= "var vlUnitario = parseToMoeda(parseFloat(d.getElementById('nuVlTotal').value.replace('.','').replace(',','.'))	 ";
-                $stJs .= "                 / parseFloat(d.getElementById('nuQuantidade').value.replace('.','').replace(',','.')).toFixed(4),4);   ";
-                $stJs .= "d.getElementById('nuVlUnitario').value = vlUnitario;                                                       ";
-                $stJs .= "f.stCtrl.value = 'alteradoListaItens'; ";
+                $stJs .= "jQuery('#spnVlrReferencia').html('".$stHtml."');                                                                          \n";
+                $stJs .= "d.getElementById('nuQuantidade').value = '".$arValores[$key]['nuQuantidade']."';                                          \n";
+                $stJs .= "d.getElementById('nuVlTotal').value = '".$arValores[$key]['nuVlTotal']."';                                                \n";
+                $stJs .= "d.getElementById('hdnValorTotalReservado').value='".$arValores[$key]['nuVlTotalReservado']."';                            \n";
+                $stJs .= "f.nuVlTotalReservado.value = '".$arValores[$key]['nuVlTotalReservado']."';                                                \n";
+                $stJs .= "document.getElementById('incluiItem').value = 'Alterar';                                                                  \n";
+                $stJs .= "d.getElementById('incluiItem').setAttribute('onclick','JavaScript:goOculto(\'alteradoListaItens\',true,\'true\');');	    \n";
+                $stJs .= "f.HdnCodItem.value = '".$_REQUEST['id']."';                                                                               \n";
+                $stJs .= "f.boRelatorio.focus();                                                                                                    \n";
+                $stJs .= "f.stCodClassificacaoPadrao.focus();                                                                                       \n";
+                $stJs .= "f.inCodItem.focus();                                                                                                      \n";
+                $nuVlUnitario = mascaraValorBD(mascaraValorBD($arValores[$key]['nuVlTotal']) / mascaraValorBD($arValores[$key]['nuQuantidade']), true);
+                $stJs .= "d.getElementById('nuVlUnitario').value = '".$nuVlUnitario."';                                                             \n";
+                $stJs .= "f.stCtrl.value = 'alteradoListaItens';                                                                                    \n";
 
                 if ($arValores[$key]['inCodDespesa'] != "") {
-                    $stJs .= "var stTarget = document.frm.target; ";
-                    $stJs .= "var stAction = document.frm.action; ";
-                    $stJs .= "f.stCtrl.value = 'buscaDespesaDiverso'; ";
-                    $stJs .= "d.getElementById('stNomDespesa').innerHTML   = '&nbsp;'; ";
-                    $stJs .= "d.getElementById('nuSaldoDotacao').innerHTML = '&nbsp;'; ";
-                    $stJs .= "f.target ='oculto';                                                                                 ";
-                    $stJs .= "f.action ='../../instancias/processamento/OCIMontaDotacaoDesdobramento.php?".Sessao::getId()."&stCodEstrutural=".$arValores[$key]['stCodEstrutural']."&codClassificacao=".$arValores[$key]['inCodEstrutural']."';        ";
-                    $stJs .= "f.submit();                                                                                         ";
-                    $stJs .= "f.action = '".$pgOcul."?".Sessao::getId()."';                                                           ";
-                    $stJs .= "f.action = stAction;                                                                                ";
-                    $stJs .= "f.target = stTarget;                                                                                ";
+                    $obREmpenhoAutorizacaoEmpenho = new REmpenhoAutorizacaoEmpenho;
+                    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $arValores[$key]['inCodDespesa'] );
+                    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $arValores[$key]['inCodCentroCusto'] );
+                    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+                    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
+                    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
+                    if ( $rsDespesa->getNumLinhas() > -1 ) {
+                        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
+                        $obTEmpenhoPreEmpenho->setDado( 'exercicio'  ,Sessao::getExercicio() );
+                        $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$arValores[$key]['inCodDespesa'] );
+                        $obTEmpenhoPreEmpenho->recuperaSaldoDotacaoCompra( $rsSaldoAnterior );
+            
+                        $nuSaldoDotacao = mascaraValorBD($rsSaldoAnterior->getCampo('saldo_anterior'),true);
+                        $nuTotalReservadoDotacao = 0;
+
+                        foreach ($arValores as $chave => $valor) {
+                            if($valor['inCodDespesa']==$arValores[$key]['inCodDespesa']){
+                                $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
+                            }
+                        }
+                        $arSaldoDotacoes['saldo'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuSaldoDotacao)-mascaraValorBD($nuTotalReservadoDotacao);
+                        $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuSaldoDotacao);
+                        $stJs .= "d.getElementById('inVlTotal').value='".mascaraValorBD($nuTotalReservadoDotacao,true)."';                  \n";
+                        $stJs .= "if(d.getElementById('inVlTotal_label'))                                                                   \n";
+                        $stJs .= "  d.getElementById('inVlTotal_label').innerHTML='".$arValores[$key]['nuVlTotal']."';                      \n";
+                    }                    
+                    
+                    $stJs .= "var stTarget = document.frm.target;                                                                           \n";
+                    $stJs .= "var stAction = document.frm.action;                                                                           \n";
+                    $stJs .= "f.stCtrl.value = 'buscaDespesaDiverso';                                                                       \n";
+                    $stJs .= "d.getElementById('stNomDespesa').innerHTML   = '&nbsp;';                                                      \n";
+                    $stJs .= "d.getElementById('nuSaldoDotacao').innerHTML = '&nbsp;';                                                      \n";
+                    $stJs .= "f.target ='oculto';                                                                                           \n";
+                    
+                    $stCaminhoOcultoDesdobramento  = "../../instancias/processamento/OCIMontaDotacaoDesdobramento.php?".Sessao::getId();
+                    $stCaminhoOcultoDesdobramento .= "&stCodEstrutural=".$arValores[$key]['stCodEstrutural'];
+                    $stCaminhoOcultoDesdobramento .= "&codClassificacao=".$arValores[$key]['inCodEstrutural'];
+                    $stJs .= "f.action ='".$stCaminhoOcultoDesdobramento."';                                                                \n";
+                    $stJs .= "f.submit();                                                                                                   \n";
+                    $stJs .= "f.action = stAction;                                                                                          \n";
+                    $stJs .= "f.target = stTarget;                                                                                          \n";
+                    
+                    unset($stCaminhoOcultoDesdobramento);
                 }
 
-                $stJs .= "f.stCtrl.value = 'alteradoListaItens'; ";
+                $stJs .= "f.stCtrl.value = 'alteradoListaItens';                                                                            \n";
             }
         }
-
+        $stJs .= "LiberaFrames(true,false);                                                                                                 \n";
+        
+        Sessao::write('arSaldoDotacoes' , $arSaldoDotacoes);
     break;
 
     case "alteradoListaItens":
-
         $arValores = Sessao::read('arValores');
+        $arSaldoDotacoes = Sessao::read('arSaldoDotacoes');
 
         $inCodItem        = $_REQUEST['inCodItem'];
         # Pega o id do array de itens.
@@ -438,13 +552,13 @@ switch ($_REQUEST['stCtrl']) {
         $inCodCentroCusto = $_REQUEST['inCodCentroCusto'];
         $inCodDespesa     = $_REQUEST['inCodDespesa'];
         $inCodConta       = $_REQUEST['stCodClassificacao'];
+        $boRegistroPreco  = $_REQUEST['boRegistroPreco'];
         $stJs 			  = "";
 
         $boErro    = false;
         $boAlterar = true;
 
         if (is_array($arValores)) {
-
             $obTConfiguracao = new TAdministracaoConfiguracao();
             $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
             $obTConfiguracao->pegaConfiguracao($boFormaExecucao,'forma_execucao_orcamento');
@@ -500,17 +614,22 @@ switch ($_REQUEST['stCtrl']) {
             $boFormaExecucao 	  = ($boFormaExecucao == 1          ) ? true : false;
             $boReservaRigida      = ($boReservaRigida == 'true'     ) ? true : false;
             $boDotacaoObrigatoria = ($boDotacaoObrigatoria == 'true') ? true : false;
+            
+            if($boRegistroPreco=='true'){
+                $boReservaRigida = false;
+                $boDotacaoObrigatoria = false;
+            }
 
             $boDotacaoSaldo         = true;
             $boValorReservado       = true;
             $boDotacaoDesdobramento = true;
 
             if (!isset($arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']])) {
-                $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
+                $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = mascaraValorBD($_REQUEST['nuHdnSaldoDotacao'])-mascaraValorBD($_REQUEST['nuVlTotalReservado']);
                 $arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
             }
 
-            if (($arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] + str_replace(',','.',str_replace('.','',$_REQUEST['hdnValorTotalReservado'])) ) < str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado'])) AND ( $boReservaRigida ) AND ( $_REQUEST['inCodDespesa'] !='')) {
+            if ( ($arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']]<mascaraValorBD($_REQUEST['nuVlTotalReservado'])) && $boReservaRigida && $_REQUEST['inCodDespesa']!='' ) {
                 $boDotacaoSaldo = false;
             }
 
@@ -520,14 +639,9 @@ switch ($_REQUEST['stCtrl']) {
                 }
             }
 
-            if (str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado'])) > str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotal']))) {
-                $stJs .= "alertaAviso('Valor Reservado no exercício deve ser igual ou menor ao valor total do item!','form','erro','".Sessao::getId()."');";
-                $boErro = true;
-            }
-
-            $nuVlUnitario = str_replace(',','.', str_replace('.','',$_REQUEST['nuVlUnitario']));
-            $nuVlTotal    = str_replace(',','.', str_replace('.','',$_REQUEST['nuVlTotal']   ));
-            $nuQuantidade = str_replace(',','.', str_replace('.','',$_REQUEST['nuQuantidade']));
+            $nuVlUnitario = mascaraValorBD($_REQUEST['nuVlUnitario']);
+            $nuVlTotal    = mascaraValorBD($_REQUEST['nuVlTotal']   );
+            $nuQuantidade = mascaraValorBD($_REQUEST['nuQuantidade']);
 
             # Retirada a obrigatoriedade de o valor do item ser > 0
             if ($nuQuantidade == 0.0000) {
@@ -586,8 +700,9 @@ switch ($_REQUEST['stCtrl']) {
                                         $arValores[$key]['stCodEstrutural'] = '';
                                         $arValores[$key]['stTitle'] = '';
                                     }
-                                    $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] += str_replace(',','.',str_replace('.','',$_REQUEST['hdnValorTotalReservado']));
-                                    $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] -= str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado']));
+
+                                    $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = mascaraValorBD($_REQUEST['nuHdnSaldoDotacao'])-mascaraValorBD($_REQUEST['nuVlTotalReservado']);
+                                    $arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
                                 }
                             }
                             $stJs .= "jQuery('#incluiItem').val('Incluir');";
@@ -605,18 +720,15 @@ switch ($_REQUEST['stCtrl']) {
 
             $stJs .= montaListaDotacoes($arValores);
         }
-
     break;
 
     case 'carregaConsultaSolicitacao' :
-
         $stAcao 		  = $_REQUEST['stAcao'];
         $inCodSolicitacao = $_REQUEST['cod_solicitacao'];
         $inCodEntidade    = $_REQUEST['cod_entidade'];
         $stExercicio      = $_REQUEST['exercicio'];
 
         if (is_numeric($inCodSolicitacao) && is_numeric($inCodEntidade) && is_numeric($stExercicio)) {
-
             $arValores = Sessao::read('arValores');
 
             $rsRecordSetItem = new RecordSet;
@@ -651,11 +763,11 @@ switch ($_REQUEST['stCtrl']) {
                     }
                     $arValores[$inCount]['stTitle']             = $stTitle;
                     $arValores[$inCount]['nuQtTotalSolicitada'] = number_format($rsRecordSetItem->getCampo('qnt_solicitada'),4,',','.');
-                    $arValores[$inCount]['nuVlTotalSolicitada'] = number_format($rsRecordSetItem->getCampo('vl_solicitado'),2,',','.');
-                    $arValores[$inCount]['nuQtTotalAnulada']    = number_format($rsRecordSetItem->getCampo('qnt_anulada'), 4, ",", ".");
-                    $arValores[$inCount]['nuVlTotalAnulada']    = number_format($rsRecordSetItem->getCampo('vl_anulado'), 2, ",", ".");
-                    $arValores[$inCount]['nuQtTotalMapa']       = number_format($rsRecordSetItem->getCampo('qnt_mapa'), 4, ",", ".");
-                    $arValores[$inCount]['nuVlTotalMapa']       = number_format($rsRecordSetItem->getCampo('vl_mapa'), 2, "," ,".");
+                    $arValores[$inCount]['nuVlTotalSolicitada'] = number_format($rsRecordSetItem->getCampo('vl_solicitado') ,2,',','.');
+                    $arValores[$inCount]['nuQtTotalAnulada']    = number_format($rsRecordSetItem->getCampo('qnt_anulada')   ,4,",",".");
+                    $arValores[$inCount]['nuVlTotalAnulada']    = number_format($rsRecordSetItem->getCampo('vl_anulado')    ,2,",",".");
+                    $arValores[$inCount]['nuQtTotalMapa']       = number_format($rsRecordSetItem->getCampo('qnt_mapa')      ,4,",",".");
+                    $arValores[$inCount]['nuVlTotalMapa']       = number_format($rsRecordSetItem->getCampo('vl_mapa')       ,2,",",".");
 
                     $inCount++;
 
@@ -672,11 +784,9 @@ switch ($_REQUEST['stCtrl']) {
                 $stJs .= montaListaDotacoesAnular($arValores);
             }
         }
-
     break;
 
     case 'carregaSolicitacao':
-
         $rsRecordSet                      = new RecordSet;
         $rsRecordSetItem                  = new RecordSet;
         $rsRecordSetEntrega               = new RecordSet;
@@ -700,7 +810,6 @@ switch ($_REQUEST['stCtrl']) {
         }
 
         if (!($rsRecordSet->EOF())) {
-
             $stFiltroEntrega  = " WHERE  cod_solicitacao = ".$inCodSolicitacao;
             $stFiltroEntrega .= "   AND  cod_entidade    = ".$inCodEntidade;
             $stFiltroEntrega .= "   AND  exercicio       = '".$stExercicio."'";
@@ -759,7 +868,6 @@ switch ($_REQUEST['stCtrl']) {
                 }
 
                 if (!($boDotacaoRepetida)) {
-
                     $inCount = sizeof($arValores);
 
                     $arValores[$inCount]['id']               = $inCount + 1;
@@ -770,11 +878,11 @@ switch ($_REQUEST['stCtrl']) {
                     $arValores[$inCount]['stNomCentroCusto'] = stripslashes($rsRecordSet->getCampo('descricao'));
                     $arValores[$inCount]['stComplemento']    = stripslashes($rsRecordSet->getCampo('complemento'));
                     $arValores[$inCount]['nuQuantidade']     = number_format($rsRecordSet->getCampo('quantidade'),4,',','.');
-                    $arValores[$inCount]['nuVlTotal']        = number_format($rsRecordSet->getCampo('vl_total'),2,',','.');
+                    $arValores[$inCount]['nuVlTotal']        = mascaraValorBD($rsRecordSet->getCampo('vl_total'),true);
 
                     $arValores[$inCount]['inCodDespesa']       = $rsRecordSet->getCampo('cod_despesa');
                     $arValores[$inCount]['inCodEstrutural']    = $rsRecordSet->getCampo('cod_conta');
-                    $arValores[$inCount]['nuVlTotalReservado'] = number_format($rsRecordSet->getCampo('vl_reserva')?$rsRecordSet->getCampo('vl_reserva'):$rsRecordSet->getCampo('vl_total'),2,',','.');
+                    $arValores[$inCount]['nuVlTotalReservado'] = mascaraValorBD($rsRecordSet->getCampo('vl_reserva')?$rsRecordSet->getCampo('vl_reserva'):$rsRecordSet->getCampo('vl_total'),true);
                     $arValores[$inCount]['stCodEstrutural']    = $rsRecordSet->getCampo('desdobramento');
                     $arValores[$inCount]['stTitle']            = $rsRecordSet->getCampo('cod_despesa').' - '.$rsRecordSet->getCampo('nomdespesa').' - '.$rsRecordSet->getCampo('desdobramento');
                 }
@@ -791,16 +899,17 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case 'excluirListaItens':
+        $boDotacaoRepetida  = false;
+        $arTEMP             = array();
+        $inCount            = 0;
+        $inCountE           = 0;
 
-        $arValores = Sessao::read('arValores');
-
-        $boDotacaoRepetida = false;
-        $arTEMP            = array();
-        $inCount           = 0;
-        $inCountE          = 0;
-
-        $arExclui =  Sessao::read('arValoresExcluidos');
-        $inCountE = count($arExclui);
+        $arValores          = Sessao::read('arValores');
+        $arExclui           = Sessao::read('arValoresExcluidos');
+        $arSaldoDotacoes    = Sessao::read('arSaldoDotacoes');
+        $inCountE           = count($arExclui);
+        
+        $stJs .= "document.frm.boRelatorio.focus(); \n";
 
         foreach ($arValores as $key => $value) {
             if (($key+1) != $_REQUEST['id']) {
@@ -816,14 +925,9 @@ switch ($_REQUEST['stCtrl']) {
                 $arTEMP[$inCount]['inCodDespesa'      ] = $value[ "inCodDespesa"      ];
                 $arTEMP[$inCount]['inCodEstrutural'   ] = $value[ "inCodEstrutural"   ];
                 $arTEMP[$inCount]['nuVlTotalReservado'] = $value[ "nuVlTotalReservado"];
-                $arTEMP[$inCount]['stTitle'		      ] = $value[ "stTitle" 		  ];
+                $arTEMP[$inCount]['stTitle'           ] = $value[ "stTitle"           ];
                 $inCount++;
             } else {
-                $arSaldoDotacoes = Sessao::read('arSaldoDotacoes');
-                $arSaldoDotacoes['saldo'][$value[ "inCodDespesa" ]] += str_replace(',','.',str_replace('.','',$value[ "nuVlTotal" ]));
-                echo "alertaAviso('".$arSaldoDotacoes[$value[ "inCodDespesa" ]]."','form','erro','".Sessao::getId()."');";
-                Sessao::write('arSaldoDotacoes', $arSaldoDotacoes);
-
                 $arExclui[$inCountE]['id'                ] = $inCountE + 1;
                 $arExclui[$inCountE]['inCodItem'         ] = $value[ "inCodItem"         ];
                 $arExclui[$inCountE]['stNomItem'         ] = $value[ "stNomItem"         ];
@@ -836,65 +940,98 @@ switch ($_REQUEST['stCtrl']) {
                 $arExclui[$inCountE]['inCodDespesa'      ] = $value[ "inCodDespesa"      ];
                 $arExclui[$inCountE]['inCodEstrutural'   ] = $value[ "inCodEstrutural"   ];
                 $arExclui[$inCountE]['nuVlTotalReservado'] = $value[ "nuVlTotalReservado"];
-                $arExclui[$inCountE]['stTitle'		     ] = $value[ "stTitle" 		  ];
+                $arExclui[$inCountE]['stTitle'           ] = $value[ "stTitle"           ];
+                
+                $arSaldoDotacoes['saldo'][$value[ "inCodDespesa" ]] = $arSaldoDotacoes['saldo'][$value['inCodDespesa']] + mascaraValorBD($value['nuVlTotal']);                
+                $stJs .= "alertaAviso('".mascaraValorBD($arSaldoDotacoes['saldo'][$value[ "inCodDespesa" ]],true)."','form','erro','".Sessao::getId()."');\n";
             }
         }
-        Sessao::write('arValoresExcluidos', $arExclui);
-        Sessao::write('arValores', $arTEMP);
 
-        echo montaListaDotacoes($arTEMP);
+        Sessao::write('arValoresExcluidos'  , $arExclui         );
+        Sessao::write('arValores'           , $arTEMP           );
+        Sessao::write('arSaldoDotacoes'     , $arSaldoDotacoes  );
 
+        $stJs .= montaListaDotacoes($arTEMP);
     break;
 
     # Recurso que permite importar os itens de outra solicitação.
     case 'incluirItensOutraSolicitacao':
         $rsRecordSetItem           = new RecordSet;
         $obTComprasSolicitacaoItem = new TComprasSolicitacaoItem();
-        $js                        = "";
+        $stJs 		               = "";
+        $stMensagem	               = "";
+
         $obTComprasSolicitacaoItem->setDado( 'exercicio'      , $_REQUEST['stExercicioSolicitacao']   );
         $obTComprasSolicitacaoItem->setDado( 'cod_entidade'   , $_REQUEST['inCodEntidadeSolicitacao'] );
         $obTComprasSolicitacaoItem->setDado( 'cod_solicitacao', $_REQUEST['inCodSolicitacao']         );
 
-        $stFiltro = " WHERE solicitacao_item.cod_entidade = ".$obTComprasSolicitacaoItem->getDado('cod_entidade')."      \n";
-        $stFiltro.= "   AND solicitacao_item.exercicio    = '".$obTComprasSolicitacaoItem->getDado('exercicio'   )."'    \n";
-        $stFiltro.= "   AND solicitacao_item.cod_solicitacao=".$obTComprasSolicitacaoItem->getDado('cod_solicitacao')."  \n";
-        $stFiltro.= "   AND solicitacao_item.cod_item     = catalogo_item.cod_item                                       \n";
-        $stFiltro.= "   AND solicitacao_item.cod_centro   = centro_custo.cod_centro                                      \n";
-        $stFiltro.= "   AND catalogo_item.cod_unidade     = unidade_medida.cod_unidade                                   \n";
-        $stFiltro.= "   AND catalogo_item.cod_grandeza    = unidade_medida.cod_grandeza                                  \n";
+        $stFiltro = " WHERE solicitacao_item.cod_entidade   = ".$obTComprasSolicitacaoItem->getDado('cod_entidade')."   \n";
+        $stFiltro.= "   AND solicitacao_item.exercicio      = '".$obTComprasSolicitacaoItem->getDado('exercicio'   )."' \n";
+        $stFiltro.= "   AND solicitacao_item.cod_solicitacao=".$obTComprasSolicitacaoItem->getDado('cod_solicitacao')." \n";
+        $stFiltro.= "   AND solicitacao_item.cod_item       = catalogo_item.cod_item                                    \n";
+        $stFiltro.= "   AND solicitacao_item.cod_centro     = centro_custo.cod_centro                                   \n";
+        $stFiltro.= "   AND catalogo_item.cod_unidade       = unidade_medida.cod_unidade                                \n";
+        $stFiltro.= "   AND catalogo_item.cod_grandeza      = unidade_medida.cod_grandeza                               \n";
 
         $obTComprasSolicitacaoItem->recuperaRelacionamentoItem( $rsRecordSet, $stFiltro );
 
         $obTConfiguracao = new TAdministracaoConfiguracao();
         $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
         $obTConfiguracao->pegaConfiguracao( $boReservaRigida,'reserva_rigida' );
-        $boReservaRigida      = ($boReservaRigida == 'true'     ) ? true : false;
+        $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+        
+        if($_REQUEST['boRegistroPreco']=='true')
+            $boReservaRigida = false;
 
         if (!($rsRecordSet->EOF())) {
             $arValores = Sessao::read('arValores');
+            $arSaldoDotacoes = Sessao::read('arSaldoDotacoes');
+            $arDespesas = array();
+            $arItensDotacaoRepetida = array();
+            $arItensRepetido = array();
+            
             while (!($rsRecordSet->EOF())) {
-                if ( !isset($arSaldoDotacoes['saldo'][$rsRecordSet->getCampo('cod_despesa')]) ) {
-                $arSaldoDotacoes['saldo'][$rsRecordSet->getCampo('cod_despesa')] = $_REQUEST['nuHdnSaldoDotacao'];
-                }
-
+                $boItemRepetido = $boDotacaoRepetida = false;
                 $inCodDespesa = $rsRecordSet->getCampo('cod_despesa');
+                
+                if (count($arValores) > 0) {
+                    foreach ($arValores as $key => $arDados) {
+                        if (($arDados['inCodItem']        == $rsRecordSet->getCampo('cod_item')     ) &&
+                            ($arDados['inCodCentroCusto'] == $rsRecordSet->getCampo('cod_centro')   ) &&
+                            ($arDados['inCodDespesa'] 	  == $rsRecordSet->getCampo('cod_despesa')  ) &&
+                            ($arDados['inCodEstrutural']  == $rsRecordSet->getCampo('cod_conta')    )
+                        ) {
+                            $boDotacaoRepetida = true ;
+                            break;
+                        } elseif (($arDados['inCodItem']        == $rsRecordSet->getCampo('cod_item')   ) &&
+                                  ($arDados['inCodCentroCusto'] == $rsRecordSet->getCampo('cod_centro') ) &&
+                                  (empty($arDados['inCodDespesa'])                                      )
+                        ) {
+                            # Verifica se o item já não existe na lista porém sem dotação vinculada.
+                            $boItemRepetido = true;
+                            break;
+                        }
+                    }
+                }
 
                 if (is_numeric($inCodDespesa) && isset($inCodDespesa)) {
                     $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
                     $obTEmpenhoPreEmpenho->setDado('exercicio'   , Sessao::getExercicio());
-                    $obTEmpenhoPreEmpenho->setDado('cod_despesa' , $rsRecordSet->getCampo('cod_despesa'));
+                    $obTEmpenhoPreEmpenho->setDado('cod_despesa' , $inCodDespesa);
                     $obTEmpenhoPreEmpenho->recuperaSaldoAnterior($rsSaldoAnterior);
 
                     $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
                 }
 
-                $boDotacaoSaldo = true;
-
-                if (($nuSaldoDotacao < $rsRecordSet->getCampo('vl_reserva')) AND ($rsRecordSet->getCampo('cod_despesa') != '')) {
-                    $boDotacaoSaldo = false;
+                if ( !isset($arSaldoDotacoes['saldo'][$inCodDespesa]) ) {
+                    $arSaldoDotacoes['saldo'][$inCodDespesa] = $nuSaldoDotacao;
+                    $arSaldoDotacoes['total'][$inCodDespesa] = $nuSaldoDotacao;
                 }
+                
+                $arSaldoDotacoes['saldo'][$inCodDespesa] = $arSaldoDotacoes['saldo'][$inCodDespesa] - $rsRecordSet->getCampo('vl_reserva');
 
-                if (!($boDotacaoRepetida)) {
+                if (!($boDotacaoRepetida)&&!($boItemRepetido)) {
+                    $arDespesas[$inCodDespesa] = $inCodDespesa;
                     $inCount = sizeof($arValores);
                     $arValores[$inCount]['id'              ] = $inCount + 1;
                     $arValores[$inCount]['inCodItem'       ] = $rsRecordSet->getCampo('cod_item'      );
@@ -905,10 +1042,10 @@ switch ($_REQUEST['stCtrl']) {
                     $arValores[$inCount]['stComplemento'   ] = $rsRecordSet->getCampo('complemento'   );
                     if ($rsRecordSet->getCampo('quantidade_dotacao')) {
                         $arValores[$inCount]['nuQuantidade'    ] = number_format($rsRecordSet->getCampo('quantidade_dotacao'),4,',','.');
-                        $arValores[$inCount]['nuVlTotal'       ] = number_format($rsRecordSet->getCampo('vl_total_dotacao'),2,',','.');
+                        $arValores[$inCount]['nuVlTotal'       ] = mascaraValorBD($rsRecordSet->getCampo('vl_total_dotacao'),true);
                     } else {
                         $arValores[$inCount]['nuQuantidade'    ] = number_format($rsRecordSet->getCampo('quantidade'),4,',','.');
-                        $arValores[$inCount]['nuVlTotal'       ] = number_format($rsRecordSet->getCampo('vl_total'),2,',','.');
+                        $arValores[$inCount]['nuVlTotal'       ] = mascaraValorBD($rsRecordSet->getCampo('vl_total'),true);
                     }
 
                     if ($_REQUEST['inCodEntidade'] == $_REQUEST['inCodEntidadeSolicitacao']
@@ -916,13 +1053,12 @@ switch ($_REQUEST['stCtrl']) {
                         $arValores[$inCount]['inCodDespesa'    ] = $rsRecordSet->getCampo('cod_despesa'   );
                         $arValores[$inCount]['inNomDespesa'    ] = $rsRecordSet->getCampo('nomdespesa'   );
                         $arValores[$inCount]['inCodEstrutural' ] = $rsRecordSet->getCampo('cod_conta');
-                        $arValores[$inCount]['nuVlTotalReservado'] = number_format($rsRecordSet->getCampo('vl_reserva'),2,',','.');
+                        $arValores[$inCount]['nuVlTotalReservado'] = mascaraValorBD($rsRecordSet->getCampo('vl_reserva'),true);
                     } elseif ($_REQUEST['inCodDespesaPadrao']) {
                        //incluir o padrão se existir
                         $arValores[$inCount]['inCodDespesa'    ]   = $_REQUEST['inCodDespesaPadrao'];
                         $arValores[$inCount]['inCodEstrutural' ]   = $_REQUEST['stCodClassificacaoPadrao'];
-                        $arValores[$inCount]['nuVlTotalReservado'] = number_format( $_REQUEST['nuSaldoDotacaoPadrao'],2,',','.');
-
+                        $arValores[$inCount]['nuVlTotalReservado'] = mascaraValorBD($_REQUEST['nuSaldoDotacaoPadrao'],true);
                     }
 
                     $rsDotacao = new RecordSet;
@@ -943,31 +1079,68 @@ switch ($_REQUEST['stCtrl']) {
                     unset( $rsDotacao );
                 }
 
-                if (!$boDotacaoSaldo) {
-                    echo "alertaAviso('Existem Itens com Valor da Reserva superior ao Saldo da Dotação (Não foram efetuadas reservas para estes itens).','form','erro','".Sessao::getId()."');";
+                if ($boDotacaoRepetida) {
+                    $arItensDotacaoRepetida[$rsRecordSet->getCampo('cod_item')] = $rsRecordSet->getCampo('cod_item');
+                }
+
+                if ($boItemRepetido) {
+                    $arItensRepetido[$rsRecordSet->getCampo('cod_item')] = $rsRecordSet->getCampo('cod_item');
                 }
 
                 $rsRecordSet->Proximo();
             }
-
-            if (isset($stMensagem)) {
-                $js="alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');";
+            
+            if(count($arItensDotacaoRepetida)>0){
+                $stMensagem .= "@Itens com o mesmo Código, Centro de Custo, Dotação e Desdobramento Não foram inclusos na lista de itens.";
+            }
+            
+            if(count($arItensRepetido)>0){
+                $stMensagem .= "@Itens com o mesmo Código Não foram inclusos na lista de itens.";
+            }
+            
+            if($boReservaRigida){
+                $stDotacoes = "";
+                $arDotacoes = array();
+                asort($arDespesas);
+                foreach ($arDespesas as $key => $value) {
+                    if($arSaldoDotacoes['saldo'][$key]<0){
+                        $arDotacoes[] = $key;
+                    }
+                }
+                
+                for($i=0;$i<count($arDotacoes);$i++){
+                    if ($stDotacoes=='')
+                        $stDotacoes .= $arDotacoes[$i];
+                    else if(($i+1)==count($arDotacoes))
+                        $stDotacoes .= " e ".$arDotacoes[$i];
+                    else
+                        $stDotacoes .= ", ".$arDotacoes[$i];
+                }
+                
+                if ($stDotacoes!='') {
+                    $stMensagem .= "@Existem Itens com Valor da Reserva superior ao Saldo da Dotação(".$stDotacoes."). Não foram efetuadas reservas para estes itens.";
+                }
             }
 
-            Sessao::write('arValores' , $arValores);
-            echo $js.montaListaDotacoes($arValores);
-        } else {
-            echo "alertaAviso('Nenhum item consta nessa solicitacao.','form','erro','".Sessao::getId()."');";
-            echo 'document.getElementById("stNomSolicitacao").innerHTML = "&nbsp;";';
-        }
+            if ($stMensagem!='') {
+                $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');";
+            }
 
+            Sessao::write('arValores'       , $arValores        );
+            Sessao::write('arSaldoDotacoes' , $arSaldoDotacoes  );
+            
+            $stJs .= montaListaDotacoes($arValores);
+        } else {
+            $stJs .= "alertaAviso('Nenhum item consta nessa solicitacao.','form','erro','".Sessao::getId()."');";
+            $stJs .= 'document.getElementById("stNomSolicitacao").innerHTML = "&nbsp;";';
+        }
+        $stJs .= "LiberaFrames(); \n";
     break;
 
     # Realiza a inclusão dos itens na listagem da solicitação.
     # É possível incluir o mesmo item, mesmo centro de custo, mesma dotação
     # porém com desdobramentos diferentes, sendo o último nível de repetição.
     case 'incluirListaItens':
-
         # Busca algumas configurações.
         $obTConfiguracao = new TAdministracaoConfiguracao;
         $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
@@ -988,12 +1161,17 @@ switch ($_REQUEST['stCtrl']) {
         $inCodCentroCusto = $_REQUEST['inCodCentroCusto'];
         $inCodDespesa     = $_REQUEST['inCodDespesa'];
         $inCodConta       = $_REQUEST['stCodClassificacao'];
+        $boRegistroPreco  = $_REQUEST['boRegistroPreco'];
         $stJs 			  = "";
+        
+        if($boRegistroPreco=='true'){
+            $boReservaRigida = false;
+            $boDotacaoObrigatoria = false;
+        }
 
         $arValores = Sessao::read('arValores');
 
         if (is_array($arValores)) {
-
             $obTConfiguracao = new TAdministracaoConfiguracao();
             $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
             $obTConfiguracao->pegaConfiguracao($boFormaExecucao,'forma_execucao_orcamento');
@@ -1039,11 +1217,11 @@ switch ($_REQUEST['stCtrl']) {
         $arSaldoDotacoes = Sessao::read('arSaldoDotacoes');
 
         if (!isset($arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']])) {
-            $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
+            $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = mascaraValorBD($_REQUEST['nuHdnSaldoDotacao'])-mascaraValorBD($_REQUEST['nuVlTotalReservado']);
             $arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
         }
 
-        if ($arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] < str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado'])) AND ($boReservaRigida) AND ($_REQUEST['inCodDespesa'] != '')) {
+        if ( ($arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']]<mascaraValorBD($_REQUEST['nuVlTotalReservado'])) && $boReservaRigida && $_REQUEST['inCodDespesa']!='' ) {
             $boDotacaoSaldo = false;
         }
 
@@ -1062,18 +1240,13 @@ switch ($_REQUEST['stCtrl']) {
             break;
         }
 
-        if (str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotal'])) <= 0.00) {
+        if (mascaraValorBD($_REQUEST['nuVlTotal']) <= 0.00) {
             $stJs .= "alertaAviso('O valor total dos itens deve ser maior que zero!','form','erro','".Sessao::getId()."');";
             $boErro = true;
         }
 
-        if (str_replace(',','.',str_replace('.','',$_REQUEST['nuQuantidade'])) <= 0) {
+        if (mascaraValorBD($_REQUEST['nuQuantidade']) <= 0) {
             $stJs .= "alertaAviso('A quantidade deve ser maior que zero!','form','erro','".Sessao::getId()."');";
-            $boErro = true;
-        }
-
-        if (str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado'])) > str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotal'])) ) {
-            $stJs .= "alertaAviso('Valor Reservado no exercício deve ser igual ou menor ao valor total do item!','form','erro','".Sessao::getId()."');";
             $boErro = true;
         }
 
@@ -1087,42 +1260,39 @@ switch ($_REQUEST['stCtrl']) {
                     if ($boCentroCustoRepetido == false) {
                         if ($boItemRepetido == false) {
                             if ($boDotacaoSaldo) {
-                                    $inCount = count($arValores);
-                                    $arValores[$inCount]['id'] 				   = $inCount + 1;
-                                    $arValores[$inCount]['inCodItem']		   = $inCodItem;
-                                    $arValores[$inCount]['stNomItem']		   = stripslashes($_REQUEST["stNomItem"]);
-                                    $arValores[$inCount]['inCodCentroCusto']   = $_REQUEST["inCodCentroCusto"];
-                                    $arValores[$inCount]['stNomUnidade']	   = stripslashes($_REQUEST["stNomUnidade"]);
-                                    $arValores[$inCount]['stNomCentroCusto']   = stripslashes($_REQUEST["stNomCentroCusto"]);
-                                    $arValores[$inCount]['stComplemento']	   = stripslashes($_REQUEST["stComplemento"]);
-                                    $arValores[$inCount]['nuQuantidade']	   = $_REQUEST["nuQuantidade"];
-                                    $arValores[$inCount]['nuVlTotal']		   = $_REQUEST["nuVlTotal"];
-                                    $arValores[$inCount]['inCodDespesa']	   = $_REQUEST["inCodDespesa"];
-                                    $arValores[$inCount]['nuVlTotalReservado'] = $_REQUEST["nuVlTotalReservado"];
-                                    $arValores[$inCount]['nuVlReferencia']     = Sessao::read('vl_unitario_ultima_compra');
+                                $inCount = count($arValores);
+                                $arValores[$inCount]['id']                  = $inCount + 1;
+                                $arValores[$inCount]['inCodItem']           = $inCodItem;
+                                $arValores[$inCount]['stNomItem']           = stripslashes($_REQUEST["stNomItem"]);
+                                $arValores[$inCount]['inCodCentroCusto']    = $_REQUEST["inCodCentroCusto"];
+                                $arValores[$inCount]['stNomUnidade']        = stripslashes($_REQUEST["stNomUnidade"]);
+                                $arValores[$inCount]['stNomCentroCusto']    = stripslashes($_REQUEST["stNomCentroCusto"]);
+                                $arValores[$inCount]['stComplemento']       = stripslashes($_REQUEST["stComplemento"]);
+                                $arValores[$inCount]['nuQuantidade']        = $_REQUEST["nuQuantidade"];
+                                $arValores[$inCount]['nuVlTotal']           = $_REQUEST["nuVlTotal"];
+                                $arValores[$inCount]['inCodDespesa']        = $_REQUEST["inCodDespesa"];
+                                $arValores[$inCount]['nuVlTotalReservado']  = $_REQUEST["nuVlTotalReservado"];
+                                $arValores[$inCount]['nuVlReferencia']      = Sessao::read('vl_unitario_ultima_compra');
 
-                                    if (is_numeric($inCodDespesa) && isset($inCodDespesa)) {
-
-                                        if ($_REQUEST['stCodClassificacao'] == '') {
-                                            $obTOrcamentoDespesa = new TOrcamentoDespesa();
-                                            $stFiltro = " AND D.cod_despesa = ".$_REQUEST['inCodDespesa']." AND D.exercicio = '".Sessao::getExercicio()."' ";
-                                            $obTOrcamentoDespesa->recuperaListaDotacao( $rsDotacao, $stFiltro );
-                                        } else {
-                                            $obTOrcamentoContaDespesa = new TOrcamentoContaDespesa();
-                                            $stFiltro = " cod_conta = ".$_REQUEST['stCodClassificacao']." AND exercicio = '".Sessao::getExercicio()."' ";
-                                            $obTOrcamentoContaDespesa->recuperaCodEstrutural( $rsDotacao, $stFiltro );
-                                        }
-                                        $arValores[$inCount]['inCodEstrutural'] = $rsDotacao->getCampo('cod_conta');
-                                        $arValores[$inCount]['stCodEstrutural'] = $rsDotacao->getCampo('cod_estrutural');
-                                        $arValores[$inCount]['stTitle'		  ] = $_REQUEST[ "inCodDespesa" ].' - '.$rsDotacao->getCampo('descricao').' - '.$rsDotacao->getCampo('cod_estrutural');
+                                if (is_numeric($inCodDespesa) && isset($inCodDespesa)) {
+                                    if ($_REQUEST['stCodClassificacao'] == '') {
+                                        $obTOrcamentoDespesa = new TOrcamentoDespesa();
+                                        $stFiltro = " AND D.cod_despesa = ".$_REQUEST['inCodDespesa']." AND D.exercicio = '".Sessao::getExercicio()."' ";
+                                        $obTOrcamentoDespesa->recuperaListaDotacao( $rsDotacao, $stFiltro );
+                                    } else {
+                                        $obTOrcamentoContaDespesa = new TOrcamentoContaDespesa();
+                                        $stFiltro = " cod_conta = ".$_REQUEST['stCodClassificacao']." AND exercicio = '".Sessao::getExercicio()."' ";
+                                        $obTOrcamentoContaDespesa->recuperaCodEstrutural( $rsDotacao, $stFiltro );
                                     }
+                                    $arValores[$inCount]['inCodEstrutural'] = $rsDotacao->getCampo('cod_conta');
+                                    $arValores[$inCount]['stCodEstrutural'] = $rsDotacao->getCampo('cod_estrutural');
+                                    $arValores[$inCount]['stTitle'		  ] = $_REQUEST[ "inCodDespesa" ].' - '.$rsDotacao->getCampo('descricao').' - '.$rsDotacao->getCampo('cod_estrutural');
+                                }
 
-                                    $stJs .= "LimparItensSolicitacao();";
+                                $stJs .= "LimparItensSolicitacao();";
 
-                                    $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] -= str_replace(',','.',str_replace('.','',$_REQUEST['nuVlTotalReservado']));
-                                    if (($arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] < 0 ) AND ( $_REQUEST['inCodDespesa'] != '')) {
-                                        $stJs .= "alertaAviso('Valor da Reserva é Superior ao Saldo da Dotação (Não foi efetuada reserva para este item).','form','erro','".Sessao::getId()."');";
-                                    }
+                                $arSaldoDotacoes['saldo'][$_REQUEST['inCodDespesa']] = mascaraValorBD($_REQUEST['nuHdnSaldoDotacao'])-mascaraValorBD($_REQUEST['nuVlTotalReservado']);
+                                $arSaldoDotacoes['total'][$_REQUEST['inCodDespesa']] = $_REQUEST['nuHdnSaldoDotacao'];
                             } else {
                                 $stJs .= "alertaAviso('Valor da Reserva é Superior ao Saldo da Dotação (".$_REQUEST['inCodDespesa'].").','form','erro','".Sessao::getId()."');";
                             }
@@ -1174,19 +1344,15 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case "saldoEstoque":
-
         $inCodItem 		  = $_REQUEST['inCodItem'];
         $inCodCentroCusto = $_REQUEST['inCodCentroCusto'];
 
-        if ((is_numeric($inCodItem) && isset($inCodItem)) &&
-            (is_numeric($inCodCentroCusto) && isset($inCodCentroCusto))){
-
+        if ((is_numeric($inCodItem) && isset($inCodItem)) && (is_numeric($inCodCentroCusto) && isset($inCodCentroCusto))){
             $obEstoqueItem = new RAlmoxarifadoEstoqueItem();
             $obEstoqueItem->obRCentroDeCustos->setCodigo($inCodCentroCusto);
             $obEstoqueItem->obRCatalogoItem->setCodigo($inCodItem);
 
             $obEstoqueItem->retornaSaldoEstoque($inSaldoEstoque);
-                                      //$arTmp[$inContador]['saldo_formatado'] = number_format(str_replace('.',',',$rsRequisicaoItens->getCampo('saldo_estoque')),4,',','.');
             $inSaldoEstoque = (is_numeric($inSaldoEstoque)) ? $inSaldoEstoque : '0.00';
             $stJs .= "jQuery('#lblSaldoEstoque').html('".number_format($inSaldoEstoque,4,',','.')."'); ";
         } else {
@@ -1198,7 +1364,6 @@ switch ($_REQUEST['stCtrl']) {
 
     case "valorUnitarioUltimaCompra":
         if ($_REQUEST['inCodItem']) {
-
             $obTAlmoxarifadoCatalogoItem = new TAlmoxarifadoCatalogoItem();
 
             $obTAlmoxarifadoCatalogoItem->setDado('cod_item'  , $_REQUEST['inCodItem']);
@@ -1219,22 +1384,17 @@ switch ($_REQUEST['stCtrl']) {
             $obFormulario = new Formulario;
             $obFormulario->addComponente( $obLblValorReferenciaUltimaCompra );
             $obFormulario->montaInnerHTML();
-            $stHtml .= $obFormulario->getHTML();
 
-            $stHtml = str_replace( "\n", "", $stHtml);
+            $stHtml = str_replace( "\n", "", $obFormulario->getHTML());
             $stHtml = str_replace( "  ", "", $stHtml);
             $stHtml = str_replace( "'" , "\\'", $stHtml);
 
             $stJs .= "jQuery('#spnVlrReferencia').html('".$stHtml."'); ";
             $stJs .= "jQuery('#nuVlUnitario').val('".$vlUnitario."');";
 
-            $vlQuantidade = str_replace( ".", "", $_REQUEST["nuQuantidade"] );
-            $vlQuantidade = str_replace( ",", ".", $vlQuantidade );
-
-            $vlTotal = number_format( $vlQuantidade * $vlUnitario, 2, ",", "." );
-            $stJs .= "jQuery('#nuVlTotal').val('".$vlUnitario."');";
+            $vlTotal = mascaraValorBD( mascaraValorBD($_REQUEST["nuQuantidade"]) * $vlUnitario, true);
+            $stJs .= "jQuery('#nuVlTotal').val('".$vlTotal."');";
         }
-
     break;
 
     case "deletarListaItens":
@@ -1255,16 +1415,15 @@ switch ($_REQUEST['stCtrl']) {
 
     case "montaDotacao" :
         if ((($_REQUEST['inCodEntidade'] != "") AND ($_REQUEST['inCodCentroCusto'] != "")) OR ($_REQUEST['alterar'])) {
-
             //Define o objeto de configuracao
             $obTConfiguracao = new TAdministracaoConfiguracao();
-            $obTConfiguracao->setDado( "parametro" ,"dotacao_obrigatoria_solicitacao" );
-            $obTConfiguracao->setDado( "exercicio" , Sessao::getExercicio()                );
+            $obTConfiguracao->setDado( "parametro" ,"dotacao_obrigatoria_solicitacao"   );
+            $obTConfiguracao->setDado( "exercicio" , Sessao::getExercicio()             );
             $obTConfiguracao->recuperaPorChave( $rsConfiguracao );
 
             $obHdnConfiguracao = new Hidden;
-            $obHdnConfiguracao->setName  ( "boConfiguracao"                  );
-            $obHdnConfiguracao->setValue ( $rsConfiguracao->getCampo("valor") );
+            $obHdnConfiguracao->setName  ( "boConfiguracao"                     );
+            $obHdnConfiguracao->setValue ( $rsConfiguracao->getCampo("valor")   );
 
             $obMontaDotacao = new IMontaDotacaoDesdobramento();
 
@@ -1274,19 +1433,25 @@ switch ($_REQUEST['stCtrl']) {
             }
 
             $obMontaDotacao->setMostraSintetico( false );
+            $obMontaDotacao->obBscDespesa->obCampoCod->obEvento->setOnChange("montaParametrosGET( 'calculaValorReservadoDotacao' );");
 
             $obValorTotal = new ValorTotal();
-            $obValorTotal->setValue ( $_REQUEST["nuVlTotal"] );
-            $obValorTotal->setNull  ( true                           );
-            $obValorTotal->setId    ( "inVlTotal"                    );
-            $obValorTotal->setSize  ( 10                             );
-            $obValorTotal->setRotulo( "Valor a ser Reservado" );
-            $obValorTotal->setDisabled( true                         );
-            $obValorTotal->setName  ( "nuVlTotalReservado"           );
+            $obValorTotal->setValue     ( $_REQUEST["nuVlTotal"]    );
+            $obValorTotal->setNull      ( true                      );
+            $obValorTotal->setId        ( "inVlTotal"               );
+            $obValorTotal->setSize      ( 10                        );
+            $obValorTotal->setDecimais  ( 2                         );
+            $obValorTotal->setRotulo    ( "Valor a ser Reservado"   );
+            $obValorTotal->setLabel     ( true                      );
+            $obValorTotal->setName      ( "nuVlTotalReservado"      );
 
             $obHdnValorTotal = new Hidden();
             $obHdnValorTotal->setId( 'hdnValorTotalReservado' );
             $obHdnValorTotal->setName( 'hdnValorTotalReservado' );
+
+            $obHdnValorTotalRegPreco = new Hidden();
+            $obHdnValorTotalRegPreco->setId( 'inVlTotal' );
+            $obHdnValorTotalRegPreco->setName( 'nuVlTotalReservado' );
 
             $obForm = new Form;
             $obForm->setAction ( $pgProc  );
@@ -1295,12 +1460,16 @@ switch ($_REQUEST['stCtrl']) {
             $obFormulario = new Formulario();
             $obFormulario->addForm( $obForm );
             $obMontaDotacao->geraFormulario($obFormulario);
-            $obFormulario->addComponente( $obValorTotal );
+
+            if($_REQUEST['boRegistroPreco']=='false'||!isset($_REQUEST['boRegistroPreco']))
+                $obFormulario->addComponente( $obValorTotal );
+            else
+                $obFormulario->addHidden($obHdnValorTotalRegPreco );
+
             $obFormulario->addHidden( $obHdnValorTotal );
             $obFormulario->montaInnerHTML();
-            $stHTML = $obFormulario->getHTML();
 
-            $js.= "d.getElementById('spnDotacao').innerHTML = '".$stHTML."';";
+            $js.= "d.getElementById('spnDotacao').innerHTML = '".$obFormulario->getHTML()."';";
             if ($_REQUEST['alterar'] != 'true') {
                 $js.= "montaParametrosGET( 'preencheDotacaoPadrao');";
             }
@@ -1309,8 +1478,7 @@ switch ($_REQUEST['stCtrl']) {
         } else {
             echo "d.getElementById('spnDotacao').innerHTML = '';";
         }
-
-        break;
+    break;
 
     case 'preencheDotacaoPadrao':
         if ($_REQUEST['inCodDespesaPadrao'] != '') {
@@ -1334,21 +1502,18 @@ switch ($_REQUEST['stCtrl']) {
             $stJs .= "f.target ='oculto';";
             $stJs .= "f.action ='../../instancias/processamento/OCIMontaDotacaoDesdobramento.php?".Sessao::getId()."&codClassificacao=".$rsDotacao->getCampo('cod_conta')."';";
             $stJs .= "f.submit();";
-            $stJs .= "f.action = '".$pgOcul."?".Sessao::getId()."';";
             $stJs .= "f.action = stAction;";
             $stJs .= "f.target = stTarget;";
-
             $stJs .= "jQuery('#nuVlUnitario').focus();";
         }
     break;
 
     case 'calculaValorAnular':
-
         $inId = explode('_',$_REQUEST['id']);
         $arValores = Sessao::read('arValores');
 
-        $inVlTotal   = str_replace(',','.',str_replace('.','',$arValores[$inId[1]-1]['nuVlTotalSolicitada']));
-        $inQtdeTotal = str_replace(',','.',str_replace('.','',$arValores[$inId[1]-1]['nuQtTotalSolicitada']));
+        $inVlTotal   = mascaraValorBD($arValores[$inId[1]-1]['nuVlTotalSolicitada']);
+        $inQtdeTotal = mascaraValorBD($arValores[$inId[1]-1]['nuQtTotalSolicitada']);
 
         if ($inQtdeTotal > 0) {
             $inVlUnit = $inVlTotal / $inQtdeTotal;
@@ -1356,10 +1521,10 @@ switch ($_REQUEST['stCtrl']) {
             $inVlUnit = 0.00;
         }
 
-        $inVlAnular = str_replace(',','.',str_replace('.','',$_REQUEST['valorAnular']));
+        $inVlAnular = mascaraValorBD($_REQUEST['valorAnular']);
 
         if ($inVlAnular <= $inQtdeTotal) {
-            $stJs .= "d.getElementById('nuVlTotalAnulada_".$inId[1]."').value='".number_format($inVlUnit*$inVlAnular,2,',','.')."';";
+            $stJs .= "d.getElementById('nuVlTotalAnulada_".$inId[1]."').value='".mascaraValorBD($inVlUnit*$inVlAnular,true)."';";
         } else {
             $stJs .= "d.getElementById('nuVlTotalAnulada_".$inId[1]."').value='0,00';";
             $stJs .= "d.getElementById('nuQtTotalAnulada_".$inId[1]."').value='0,0000';";
@@ -1377,7 +1542,6 @@ switch ($_REQUEST['stCtrl']) {
 
     case 'recuperaDataContabil':
         if (!empty($_REQUEST['inCodEntidade'])) {
-
             $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
 
             $stFiltro  = " AND empenho.cod_entidade = ".$_REQUEST['inCodEntidade']." \n";
@@ -1420,6 +1584,10 @@ switch ($_REQUEST['stCtrl']) {
                 $stJs .= "jQuery('#HdnDtSolicitacao').val('');";
             }
         }
+    break;
+
+    case 'calculaValorReservadoDotacao':
+        $stJs .= calculaValorReservadoDotacao();
     break;
 }
 

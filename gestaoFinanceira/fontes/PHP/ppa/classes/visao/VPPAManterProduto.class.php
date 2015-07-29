@@ -147,7 +147,7 @@ class VPPAManterProduto
     /**
      *
      */
-    public function listarProdutos($_REQUEST)
+    public function listarProdutos()
     {
         $rsProdutos = $this->obNegocio->getListaProdutos();
         $obLista = $this->montarListaProdutos($rsProdutos, false);
@@ -156,7 +156,7 @@ class VPPAManterProduto
         return "$('spnListaProdutos').innerHTML = '".$this->quoteJavascript($obLista->getHTML())."'";
     }
 
-    public function listar($_REQUEST)
+    public function listar()
     {
         $stDescricao = stripslashes($_REQUEST['stDescricao']);
         $rsProdutos = $this->obNegocio->getListaProdutos('', $stDescricao);
@@ -164,7 +164,7 @@ class VPPAManterProduto
         $obLista->show();
     }
 
-    public function incluir($_REQUEST)
+    public function incluir()
     {
         $resultado = $this->obNegocio->checarCadastroProduto($_REQUEST['stDescricao'],$_REQUEST['stDescricao']);
         if ($resultado > 0) {
@@ -185,7 +185,7 @@ class VPPAManterProduto
         }
     }
 
-    public function alterar($_REQUEST)
+    public function alterar()
     {
         $obErro = $this->obNegocio->alterar($_REQUEST);
         if ($obErro->ocorreu()) {
@@ -197,7 +197,7 @@ class VPPAManterProduto
         }
     }
 
-    public function excluir($_REQUEST)
+    public function excluir()
     {
         $arRetorno = $this->obNegocio->excluir($_REQUEST);
 
@@ -211,7 +211,7 @@ class VPPAManterProduto
     /**
      * Executa ação recebida na página de processamento (PR).
      */
-    public function executarAcao($_REQUEST)
+    public function executarAcao()
     {
         Sessao::setTrataExcecao( true );
 

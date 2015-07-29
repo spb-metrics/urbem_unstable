@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63081 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -97,62 +97,100 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   des.exercicio                                                              \n";
-    $stSql .= "         ,des.num_orgao                                                              \n";
-    $stSql .= "         ,des.num_unidade                                                            \n";
-    $stSql .= "         ,des.cod_funcao                                                             \n";
-    $stSql .= "         ,des.cod_subfuncao                                                          \n";
-    $stSql .= "         ,des.cod_programa                                                           \n";
-    $stSql .= "         ,des.num_pao                                                                \n";
-    $stSql .= "         ,orcamento.fn_consulta_tipo_pao(des.exercicio,des.num_pao) as tipo_pao      \n";
-    $stSql .= "         ,des.cod_recurso                                                            \n";
-    $stSql .= "         ,replace(cde.cod_estrutural,'.','') as estrutural                           \n";
-    $stSql .= "         ,cgm.nom_cgm                                                                \n";
-    $stSql .= "         ,emp.cod_empenho                                                            \n";
-    $stSql .= "         ,case when pre.cod_tipo=1 then 3 when pre.cod_tipo=2 then 2 when pre.cod_tipo=3 then 1 end as tipo_empenho \n";
-    $stSql .= "         ,to_char(emp.dt_empenho,'dd/mm/yyyy') as dt_empenho                         \n";
-    $stSql .= "         ,case when  pf.cpf is not null  then pf.cpf                                 \n";
-    $stSql .= "               when pj.cnpj is not null  then pj.cnpj                                \n";
-    $stSql .= "                else ''                                                              \n";
-    $stSql .= "         end as cpf_cnpj                                                             \n";
-    $stSql .= "         ,case when  pf.numcgm is not null then 1                                    \n";
-    $stSql .= "                else 2                                                               \n";
-    $stSql .= "         end as pf_pj                                                                \n";
-    $stSql .= "         ,sume.valor_empenhado                                                       \n";
-    $stSql .= " FROM     empenho.empenho             as emp                                         \n";
-    $stSql .= "         ,empenho.pre_empenho         as pre                                         \n";
-    $stSql .= "         ,sw_cgm                      as cgm                                         \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_fisica as pf                                      \n";
-    $stSql .= "             ON ( cgm.numcgm = pf.numcgm )                                           \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_juridica as pj                                    \n";
-    $stSql .= "             ON ( cgm.numcgm = pj.numcgm )                                           \n";
-    $stSql .= "         ,empenho.pre_empenho_despesa as ped                                         \n";
-    $stSql .= "         ,orcamento.conta_despesa     as cde                                         \n";
-    $stSql .= "         ,orcamento.despesa           as des                                         \n";
-    $stSql .= "         ,(                                                                          \n";
-    $stSql .= "             SELECT   exercicio                                                      \n";
-    $stSql .= "                     ,cod_pre_empenho                                                \n";
-    $stSql .= "                     ,sum(vl_total) as valor_empenhado                               \n";
-    $stSql .= "             FROM    empenho.item_pre_empenho as ipe                                 \n";
-    $stSql .= "             WHERE   exercicio = '".$this->getDado('exercicio')."'                   \n";
-    $stSql .= "             GROUP BY exercicio, cod_pre_empenho                                     \n";
-    $stSql .= "         ) as sume                                                                   \n";
-    $stSql .= " WHERE   emp.exercicio       = pre.exercicio                                         \n";
-    $stSql .= " AND     emp.cod_pre_empenho = pre.cod_pre_empenho                                   \n";
-    $stSql .= " AND     pre.cgm_beneficiario= cgm.numcgm                                            \n";
-    $stSql .= " AND     pre.exercicio       = ped.exercicio                                         \n";
-    $stSql .= " AND     pre.cod_pre_empenho = ped.cod_pre_empenho                                   \n";
-    $stSql .= " AND     ped.exercicio       = des.exercicio                                         \n";
-    $stSql .= " AND     ped.cod_despesa     = des.cod_despesa                                       \n";
-    $stSql .= " AND     ped.exercicio       = cde.exercicio                                         \n";
-    $stSql .= " AND     ped.cod_conta       = cde.cod_conta                                         \n";
-    $stSql .= " AND     pre.exercicio       = sume.exercicio                                        \n";
-    $stSql .= " AND     pre.cod_pre_empenho = sume.cod_pre_empenho                                  \n";
-    $stSql .= " AND     des.exercicio='".$this->getDado('exercicio')."' \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "           AND   emp.cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
+    $stSql .= " SELECT despesa.exercicio                                                                  
+                      ,despesa.num_orgao                                                              
+                      ,despesa.num_unidade                                                            
+                      ,despesa.cod_funcao                                                             
+                      ,despesa.cod_subfuncao                                                          
+                      ,despesa.cod_programa                                                           
+                      ,despesa.num_pao                                                                
+                      ,orcamento.fn_consulta_tipo_pao(despesa.exercicio,despesa.num_pao) AS tipo_pao      
+                      ,despesa.cod_recurso                                                            
+                      ,REPLACE(conta_despesa.cod_estrutural,'.','') AS estrutural                           
+                      ,sw_cgm.nom_cgm                                                                
+                      ,empenho.cod_empenho                                                            
+                      ,CASE WHEN pre_empenho.cod_tipo = 1 THEN 3
+                            WHEN pre_empenho.cod_tipo = 2 THEN 2
+                            WHEN pre_empenho.cod_tipo = 3 THEN 1
+                      END AS tipo_empenho 
+                      ,TO_CHAR(empenho.dt_empenho,'dd/mm/yyyy') AS dt_empenho                         
+                      ,CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf                                 
+                            WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj                                
+                            ELSE ''                                                              
+                      END AS cpf_cnpj
+                      ,CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1
+                            ELSE 2
+                      END AS pf_pj
+                      ,sume.valor_empenhado
+                      , 1 AS tipo_registro
+                      , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                      , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia
+                      , licitacao.cod_licitacao AS processo_licitatorio
+                      , 'N' AS contrato_aplicavel
+                      , 'N' AS licitacao_sujeito
 
+                  FROM empenho.empenho
+
+            INNER JOIN empenho.pre_empenho
+                    ON empenho.exercicio = pre_empenho.exercicio
+                   AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+
+            INNER JOIN sw_cgm
+                    ON sw_cgm.numcgm = cgm_beneficiario
+
+             LEFT JOIN sw_cgm_pessoa_fisica
+                    ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+             LEFT JOIN sw_cgm_pessoa_juridica
+                    ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+
+            INNER JOIN empenho.pre_empenho_despesa
+                    ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                   AND pre_empenho_despesa.exercicio = pre_empenho.exercicio
+
+            INNER JOIN orcamento.conta_despesa
+                    ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                   AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+
+            INNER JOIN orcamento.despesa
+                    ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                   AND despesa.exercicio = pre_empenho_despesa.exercicio
+
+             LEFT JOIN empenho.empenho_contrato
+                    ON empenho_contrato.exercicio = empenho.exercicio
+                   AND empenho_contrato.cod_entidade = empenho.cod_entidade
+                   AND empenho_contrato.cod_empenho = empenho.cod_empenho
+
+             LEFT JOIN licitacao.contrato
+                    ON contrato.exercicio = empenho_contrato.exercicio
+                   AND contrato.cod_entidade = empenho_contrato.cod_entidade
+                   AND contrato.num_contrato = empenho_contrato.num_contrato
+
+             LEFT JOIN licitacao.contrato_licitacao
+                    ON contrato_licitacao.num_contrato = contrato.num_contrato
+                   AND contrato_licitacao.cod_entidade = contrato.cod_entidade
+                   AND contrato_licitacao.exercicio = contrato.exercicio
+
+             LEFT JOIN licitacao.licitacao
+                    ON licitacao.cod_licitacao = contrato_licitacao.cod_licitacao
+                   AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade
+                   AND licitacao.cod_entidade = contrato_licitacao.cod_entidade
+                   AND licitacao.exercicio = contrato_licitacao.exercicio
+
+            INNER JOIN (
+                        SELECT exercicio
+                             , cod_pre_empenho
+                             , COALESCE(SUM(vl_total),0.00) AS valor_empenhado
+                          FROM empenho.item_pre_empenho
+                         WHERE exercicio = '".$this->getDado('exercicio')."'
+                         GROUP BY exercicio,cod_pre_empenho
+                       ) AS sume
+                    ON sume.exercicio = pre_empenho.exercicio
+                   AND sume.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                                                  
+                 WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
+                  AND  empenho.cod_entidade IN ( ".$this->getDado('entidades')." )
+        ";
     return $stSql;
 }
 

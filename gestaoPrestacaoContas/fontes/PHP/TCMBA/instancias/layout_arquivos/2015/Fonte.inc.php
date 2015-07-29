@@ -20,47 +20,56 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
-/**
-    * Página de Include Oculta - Exportação Arquivos GF
 
+    * Página de Include Oculta - Exportação Arquivo Fonte.txt TCM-BA
     * Data de Criação   : 18/07/2007
-
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
-
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 63117 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
+    $Id: Fonte.inc.php 63117 2015-07-27 21:14:07Z arthur $
 
     * Casos de uso: uc-06.05.00
 */
-
-    include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php" );
-    $obTMapeamento = new TOrcamentoRecurso();
-    $obTMapeamento->recuperaTodos($arRecordSet[$stArquivo], " WHERE exercicio='".Sessao::getExercicio()."' ORDER BY exercicio, cod_recurso");
-
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1"); //Reservado
+    
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBAFonte.class.php" );
+    
+    $boTTCMBAFonte = new TTCMBAFonte();
+    $boTTCMBAFonte->setDado('stExercicio' , Sessao::getExercicio() );
+    $boTTCMBAFonte->setDado('inCodGestora', $inCodUnidadeGestora );
+    $boTTCMBAFonte->recuperaArquivo($rsFonte, $boTransacao);
+    
+    $obExportador->roUltimoArquivo->addBloco($rsFonte);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]".$inCodUnidadeGestora); //unidade_gestora
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("codigo_tc");
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("fonte_recurso_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_recurso");
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_fonte");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_recurso");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(80);
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+
+    unset($boTTCMBAFonte);
+    unset($rsFonte);
+
+?>

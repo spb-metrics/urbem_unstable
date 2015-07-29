@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: IMontaSolicitacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IMontaSolicitacao.class.php 63032 2015-07-17 18:04:12Z michel $
 
     * Casos de uso: uc-03.04.05, uc-03.03.05, uc-03.03.06
 
@@ -55,9 +55,12 @@ class  IMontaSolicitacao extends Objeto
     public $stDefinicao;
     public $boNull;
     public $boNullBarra;
-    public $inCodSolicitacaoExcluida;
+    public $stCodSolicitacaoExcluida;
     public $boMostraReduzido;
     public $inTotalEntidade;
+    public $boRegistroPreco;
+    public $obRdRegistroPrecoSim;
+    public $obRdRegistroPrecoNao;
 
     public function setCodSolicitacao($inCodSolicitacao)
     {
@@ -87,11 +90,14 @@ class  IMontaSolicitacao extends Objeto
     public function setRotulo($valor) {  $this->stRotulo = $valor;}
     public function getRotulo() { return $this->stRotulo; }
 
-    public function setCodSolicitacaoExcluida($valor = true) { $this->inCodSolicitacaoExcluida = $valor; }
-    public function getCodSolicitacaoExcluida() { return $this->inCodSolicitacaoExcluida; }
+    public function setCodSolicitacaoExcluida($valor = true) { $this->stCodSolicitacaoExcluida = $valor; }
+    public function getCodSolicitacaoExcluida() { return $this->stCodSolicitacaoExcluida; }
 
     public function setTotalEntidade($valor = true) { $this->inTotalEntidade = $valor; }
     public function getTotalEntidade() { return $this->inTotalEntidade; }
+
+    public function setRegistroPreco($valor = false) { $this->boRegistroPreco = $valor; }
+    public function getRegistroPreco() { return $this->boRegistroPreco; }
 
     public function IMontaSolicitacao(&$obForm)
     {
@@ -99,6 +105,32 @@ class  IMontaSolicitacao extends Objeto
 
         $pgOcul  = CAM_GP_COM_PROCESSAMENTO.'OCIMontaSolicitacao.php?'.Sessao::getId();
         $this->obForm = &$obForm;
+        
+        //Define Registro de Preço
+        $this->obRdRegistroPrecoSim = new Radio;
+        $this->obRdRegistroPrecoSim->setRotulo  ( "Registro de Preços"  );
+        $this->obRdRegistroPrecoSim->setName    ( "boRegistroPreco"     );
+        $this->obRdRegistroPrecoSim->setId      ( "boRegistroPrecoSim"  );
+        $this->obRdRegistroPrecoSim->setValue   ( "true"                );
+        $this->obRdRegistroPrecoSim->setLabel   ( "Sim"                 );
+        $this->obRdRegistroPrecoSim->setNull    ( $this->boNull         );
+        $this->obRdRegistroPrecoSim->setChecked ( false                 );
+        $this->obRdRegistroPrecoSim->setObrigatorioBarra( $this->getObrigatorioBarra()  );
+        $this->obRdRegistroPrecoSim->setNullBarra( $this->getNullBarra()                );
+        
+        $this->obRdRegistroPrecoNao = new Radio;
+        $this->obRdRegistroPrecoNao->setRotulo  ( "Registro de Preços"  );
+        $this->obRdRegistroPrecoNao->setName    ( "boRegistroPreco"     );
+        $this->obRdRegistroPrecoNao->setId      ( "boRegistroPrecoNao"  );
+        $this->obRdRegistroPrecoNao->setValue   ( "false"               );
+        $this->obRdRegistroPrecoNao->setLabel   ( "Não"                 );
+        $this->obRdRegistroPrecoNao->setNull    ( $this->boNull         );
+        $this->obRdRegistroPrecoNao->setChecked ( true                  );
+        $this->obRdRegistroPrecoNao->setObrigatorioBarra( $this->getObrigatorioBarra()  );
+        $this->obRdRegistroPrecoNao->setNullBarra( $this->getNullBarra()                );
+
+        //Filtro de Registro de Preço padrão Desativado.
+        $this->setRegistroPreco(false);
 
         $this->obExercicio = new Exercicio;
         $this->obExercicio->setId ('stExercicioSolicitacao');
@@ -166,8 +198,17 @@ class  IMontaSolicitacao extends Objeto
           $this->obPopUpSolicitacao->setValue($rsRecordSet->getCampo('observacao'));
         }
 
-        $this->obPopUpSolicitacao->setFuncaoBusca("abrePopUp('".CAM_GP_COM_POPUPS."solicitacao/LSManterSolicitacao.php','".$this->obForm->getName()."', '".$this->obPopUpSolicitacao->obCampoCod->getName()."','". $this->obPopUpSolicitacao->getId()."','&stTipoBusca=".$this->getTipoBusca()."&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodSolicitacaoExcluida=".$this->inCodSolicitacaoExcluida."','".Sessao::getId()."','800','550');");
-        $this->obPopUpSolicitacao->obCampoCod->obEvento->setOnChange(" ajaxJavaScript('".$pgOcul."&inCodSolicitacao='+this.value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&campoDesc=".$this->obPopUpSolicitacao->getId()."&campoCod=".$this->obPopUpSolicitacao->obCampoCod->getId()."&inCodSolicitacaoExcluida=".$this->inCodSolicitacaoExcluida."','".$this->getTipoBusca()."'); ");
+        if($this->getRegistroPreco()){
+            $this->obPopUpSolicitacao->setFuncaoBusca("abrePopUp('".CAM_GP_COM_POPUPS."solicitacao/LSManterSolicitacao.php','".$this->obForm->getName()."', '".$this->obPopUpSolicitacao->obCampoCod->getName()."','". $this->obPopUpSolicitacao->getId()."','&stTipoBusca=".$this->getTipoBusca()."&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&boRegistroPreco='+jQuery('input[name=boRegistroPreco]:checked').val()+'&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".Sessao::getId()."','800','550');");
+            $this->obPopUpSolicitacao->obCampoCod->obEvento->setOnChange(" ajaxJavaScript('".$pgOcul."&inCodSolicitacao='+this.value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&boRegistroPreco='+jQuery('input[name=boRegistroPreco]:checked').val()+'&campoDesc=".$this->obPopUpSolicitacao->getId()."&campoCod=".$this->obPopUpSolicitacao->obCampoCod->getId()."&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".$this->getTipoBusca()."'); ");
+            $this->obRdRegistroPrecoSim->obEvento->setOnChange(" ajaxJavaScript('".$pgOcul."&inCodSolicitacao='+this.value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&boRegistroPreco='+jQuery('input[name=boRegistroPreco]:checked').val()+'&campoDesc=".$this->obPopUpSolicitacao->getId()."&campoCod=".$this->obPopUpSolicitacao->obCampoCod->getId()."&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".$this->getTipoBusca()."'); ");
+            $this->obRdRegistroPrecoNao->obEvento->setOnChange(" ajaxJavaScript('".$pgOcul."&inCodSolicitacao='+this.value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&boRegistroPreco='+jQuery('input[name=boRegistroPreco]:checked').val()+'&campoDesc=".$this->obPopUpSolicitacao->getId()."&campoCod=".$this->obPopUpSolicitacao->obCampoCod->getId()."&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".$this->getTipoBusca()."'); ");
+
+            $obFormulario->agrupaComponentes( array( $this->obRdRegistroPrecoSim, $this->obRdRegistroPrecoNao ) );
+        }else{
+            $this->obPopUpSolicitacao->setFuncaoBusca("abrePopUp('".CAM_GP_COM_POPUPS."solicitacao/LSManterSolicitacao.php','".$this->obForm->getName()."', '".$this->obPopUpSolicitacao->obCampoCod->getName()."','". $this->obPopUpSolicitacao->getId()."','&stTipoBusca=".$this->getTipoBusca()."&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".Sessao::getId()."','800','550');");
+            $this->obPopUpSolicitacao->obCampoCod->obEvento->setOnChange(" ajaxJavaScript('".$pgOcul."&inCodSolicitacao='+this.value+'&stExercicio='+document.getElementById('".$this->obExercicio->getId()."').value+'&inCodEntidade='+document.getElementById('".$this->obITextBoxSelectEntidade->obTextBox->getId()."').value+'&campoDesc=".$this->obPopUpSolicitacao->getId()."&campoCod=".$this->obPopUpSolicitacao->obCampoCod->getId()."&stCodSolicitacaoExcluida=".$this->stCodSolicitacaoExcluida."','".$this->getTipoBusca()."'); ");
+        }
 
         $obFormulario->addComponente( $this->obExercicio );
         $obFormulario->addComponente( $this->obITextBoxSelectEntidade );

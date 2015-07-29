@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.02
 
- $Id: PRManterHomologacaoSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRManterHomologacaoSolicitacaoCompra.php 62986 2015-07-14 18:08:54Z michel $
 
  */
 
@@ -63,35 +63,42 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
  switch ($stAcao) {
 
     case 'incluir':
-
         Sessao::setTrataExcecao( true );
 
-        $numcgm = SistemaLegado::pegaDado('numcgm','orcamento.entidade', "where cod_entidade =".$_POST['stCodEntidade']." and exercicio = '".Sessao::getExercicio()."'");
+        $numcgm = SistemaLegado::pegaDado('numcgm','orcamento.entidade', "where cod_entidade =".$_REQUEST['stCodEntidade']." and exercicio = '".Sessao::getExercicio()."'");
         $nomEntidade = SistemaLegado::pegaDado('nom_cgm','sw_cgm', "where numcgm =".$numcgm);
+        
+        $obTComprasSolicitacao = new TComprasSolicitacao;
+        $obTComprasSolicitacao->setDado( 'cod_solicitacao', $_REQUEST['stCodSolicitacao'] );
+        $obTComprasSolicitacao->setDado( 'exercicio'      , $_REQUEST['stExercicio']      );
+        $obTComprasSolicitacao->setDado( 'cod_entidade'   , $_REQUEST['stCodEntidade']    );
+        $obTComprasSolicitacao->consultar();
+        
         ///////////// fazendo as reservas de saldos
         //// inclusão de reserva de saldo pra cada item da solicitação
         $obTCompraSolicitacaoItem = new TComprasSolicitacaoItem;
-        $obTCompraSolicitacaoItem->setDado('cod_entidade'       , $_POST['stCodEntidade']    );
-        $obTCompraSolicitacaoItem->setDado('cod_solicitacao'    , $_POST['stCodSolicitacao'] );
-        $obTCompraSolicitacaoItem->setDado('exercicio'          , $_POST['stExercicio']      );
+        $obTCompraSolicitacaoItem->setDado('cod_entidade'       , $_REQUEST['stCodEntidade']    );
+        $obTCompraSolicitacaoItem->setDado('cod_solicitacao'    , $_REQUEST['stCodSolicitacao'] );
+        $obTCompraSolicitacaoItem->setDado('exercicio'          , $_REQUEST['stExercicio']      );
         $obTCompraSolicitacaoItem->recuperaRelacionamentoItemHomologacao( $rsListaItens );
 
-        $stDtSolicitacao = SistemaLegado::pegaDado("timestamp", "compras.solicitacao", "where cod_solicitacao = ".$_POST['stCodSolicitacao']." and cod_entidade = ".$_POST['stCodEntidade']." and exercicio = '".$_POST['stExercicio']."'");
+        $stDtSolicitacao = SistemaLegado::pegaDado("timestamp", "compras.solicitacao", "where cod_solicitacao = ".$_REQUEST['stCodSolicitacao']." and cod_entidade = ".$_REQUEST['stCodEntidade']." and exercicio = '".$_REQUEST['stExercicio']."'");
         list($ano, $mes, $dia) = explode("-", substr($stDtSolicitacao,0, 10));
 
         $obTOrcamentoReservaSaldos = new TOrcamentoReservaSaldos;
 
         $boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', 35, Sessao::getExercicio());
         $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+        
+        if($obTComprasSolicitacao->getDado('registro_precos') == 't')
+            $boReservaRigida = false;
 
         include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItemDotacao.class.php';
         $obTComprasSolicitacaoItemDotacao = new TComprasSolicitacaoItemDotacao;
 
         /// se for reserva rigida este laço deve parar assim que não conseguir fazer uma reserva
-        while (!$rsListaItens->eof() and (!($boReservaRigida and $stMensagem))) {
-
+        while (!$rsListaItens->eof() and ($boReservaRigida) and (!$stMensagem)) {
             if ($rsListaItens->getCampo('cod_despesa') && $rsListaItens->getCampo('vl_item_solicitacao') > 0.00) {
-
                 //inclusão na tabela orcamento.reserva_saldo
                 $obTOrcamentoReservaSaldos->setDado( 'exercicio'          , $rsListaItens->getCampo ( 'exercicio'   ) );
                 $obTOrcamentoReservaSaldos->proximoCod( $inCodReserva );
@@ -100,16 +107,16 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
                 $obTOrcamentoReservaSaldos->setDado( 'dt_validade_inicial', $dia."/".$mes."/".$ano                    );
                 $obTOrcamentoReservaSaldos->setDado( 'tipo'               , 'A'                                       );
                 $obTOrcamentoReservaSaldos->setDado( 'dt_inclusao'        , $dia."/".$mes."/".$ano                    );
-                $obTOrcamentoReservaSaldos->setDado( 'motivo'             , "Entidade: ".$_POST['stCodEntidade']." - ".$nomEntidade.", solicitação de compras: ".$_POST['stCodSolicitacao']."/".$rsListaItens->getCampo ( 'exercicio').', Item:'.$rsListaItens->getCampo( 'cod_item' ));
+                $obTOrcamentoReservaSaldos->setDado( 'motivo'             , "Entidade: ".$_REQUEST['stCodEntidade']." - ".$nomEntidade.", solicitação de compras: ".$_REQUEST['stCodSolicitacao']."/".$rsListaItens->getCampo ( 'exercicio').', Item:'.$rsListaItens->getCampo( 'cod_item' ));
                 $obTOrcamentoReservaSaldos->setDado( 'vl_reserva'         , $rsListaItens->getCampo ( 'vl_item_solicitacao' )    );
                 $obTOrcamentoReservaSaldos->setDado( 'dt_validade_final'  , '31/12/'.$rsListaItens->getCampo('exercicio'));
 
                 if ( $obTOrcamentoReservaSaldos->incluiReservaSaldo() ) {
                     $rsListaItens->setCampo( 'codigo_reserva' , $inCodReserva );
                 } else {
-                    $stMensagem .= " Não foi possivel efetuar reserva de saldos para o item ".
-                                    $rsListaItens->getCampo( 'cod_item' ) . " - " . $rsListaItens->getCampo( 'descricao_resumida' ) .
-                               " a dotação ".  $rsListaItens->getCampo( 'cod_despesa' ). ' não possui saldo suficiente.' ;
+                    $stMensagem  = " Não foi possivel efetuar reserva de saldos para o item ";
+                    $stMensagem .= $rsListaItens->getCampo( 'cod_item' ) . " - " . $rsListaItens->getCampo( 'descricao_resumida' );
+                    $stMensagem .= " a dotação ".  $rsListaItens->getCampo( 'cod_despesa' ). ' não possui saldo suficiente.' ;
                 }
             }
             $rsListaItens->proximo();
@@ -119,9 +126,9 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 
         if ((!$boReservaRigida) or ($boReservaRigida and !$stMensagem)) {
             $obTComprasSolicitacaoHomologada = new TComprasSolicitacaoHomologada;
-            $obTComprasSolicitacaoHomologada->setDado('exercicio'       , $_POST['stExercicio']      );
-            $obTComprasSolicitacaoHomologada->setDado('cod_entidade'    , $_POST['stCodEntidade']    );
-            $obTComprasSolicitacaoHomologada->setDado('cod_solicitacao' , $_POST['stCodSolicitacao'] );
+            $obTComprasSolicitacaoHomologada->setDado('exercicio'       , $_REQUEST['stExercicio']      );
+            $obTComprasSolicitacaoHomologada->setDado('cod_entidade'    , $_REQUEST['stCodEntidade']    );
+            $obTComprasSolicitacaoHomologada->setDado('cod_solicitacao' , $_REQUEST['stCodSolicitacao'] );
             $obTComprasSolicitacaoHomologada->setDado('numcgm'          , Sessao::read('numCgm')     );
 
             // verifica se ja existe homologação inclusa para solicitação
@@ -131,9 +138,9 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
                 $obTComprasSolicitacaoHomologada->inclusao();
             } else {
                 $obTComprasSolicitacaoHomologadaAnulacao = new TComprasSolicitacaoHomologadaAnulacao;
-                $obTComprasSolicitacaoHomologadaAnulacao->setDado('exercicio'       , $_POST['stExercicio']      );
-                $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_entidade'    , $_POST['stCodEntidade']    );
-                $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_solicitacao' , $_POST['stCodSolicitacao'] );
+                $obTComprasSolicitacaoHomologadaAnulacao->setDado('exercicio'       , $_REQUEST['stExercicio']      );
+                $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_entidade'    , $_REQUEST['stCodEntidade']    );
+                $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_solicitacao' , $_REQUEST['stCodSolicitacao'] );
                 $obTComprasSolicitacaoHomologadaAnulacao->setDado('numcgm'          , Sessao::read('numCgm')     );
 
                 $obTComprasSolicitacaoHomologadaAnulacao->verificaExistenciaHomologacaoAnulada($rsDadosHomologacao);
@@ -153,9 +160,9 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
             while (!$rsListaItens->eof()) {
                 if ($rsListaItens->getCampo('codigo_reserva')) {
                     $obTComprasSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
-                    $obTComprasSolicitacaoHomologadaReserva->setDado('exercicio'       , $_POST['stExercicio']);
-                    $obTComprasSolicitacaoHomologadaReserva->setDado('cod_entidade'    , $_POST['stCodEntidade']);
-                    $obTComprasSolicitacaoHomologadaReserva->setDado('cod_solicitacao' , $_POST['stCodSolicitacao']);
+                    $obTComprasSolicitacaoHomologadaReserva->setDado('exercicio'       , $_REQUEST['stExercicio']);
+                    $obTComprasSolicitacaoHomologadaReserva->setDado('cod_entidade'    , $_REQUEST['stCodEntidade']);
+                    $obTComprasSolicitacaoHomologadaReserva->setDado('cod_solicitacao' , $_REQUEST['stCodSolicitacao']);
                     $obTComprasSolicitacaoHomologadaReserva->setDado('cod_item'        , $rsListaItens->getCampo('cod_item'));
                     $obTComprasSolicitacaoHomologadaReserva->setDado('cod_centro'      , $rsListaItens->getCampo('cod_centro'));
                     $obTComprasSolicitacaoHomologadaReserva->setDado('cod_reserva'     , $rsListaItens->getCampo('codigo_reserva'));
@@ -167,7 +174,7 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
             }
         }
         Sessao::encerraExcecao();
-        SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Número da solicitação: ".$_POST['stCodSolicitacao'] . $stMensagem , "excluir", "aviso", Sessao::getId(),"");
+        SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Número da solicitação: ".$_REQUEST['stCodSolicitacao'] . $stMensagem , "excluir", "aviso", Sessao::getId(),"");
 
     break;
 
@@ -197,15 +204,15 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
                 $obErro = new Erro;
 
                 $obTComprasSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
-                $stFiltro  = " WHERE  solicitacao_homologada_reserva.exercicio       = '".$_POST['stExercicio']."'     \n";
-                $stFiltro .= "   AND  solicitacao_homologada_reserva.cod_entidade    =  ".$_POST['stCodEntidade']."    \n";
-                $stFiltro .= "   AND  solicitacao_homologada_reserva.cod_solicitacao =  ".$_POST['stCodSolicitacao']." \n";
+                $stFiltro  = " WHERE  solicitacao_homologada_reserva.exercicio       = '".$_REQUEST['stExercicio']."'     \n";
+                $stFiltro .= "   AND  solicitacao_homologada_reserva.cod_entidade    =  ".$_REQUEST['stCodEntidade']."    \n";
+                $stFiltro .= "   AND  solicitacao_homologada_reserva.cod_solicitacao =  ".$_REQUEST['stCodSolicitacao']." \n";
                 $obTComprasSolicitacaoHomologadaReserva->recuperaTodosNomEntidade($rsReservas, $stFiltro);
 
                 # Exclui da tabela compras.solicitacao_homologada_reserva.
-                $obTComprasSolicitacaoHomologadaReserva->setDado('exercicio'       , $_POST['stExercicio']     );
-                $obTComprasSolicitacaoHomologadaReserva->setDado('cod_entidade'    , $_POST['stCodEntidade']   );
-                $obTComprasSolicitacaoHomologadaReserva->setDado('cod_solicitacao' , $_POST['stCodSolicitacao']);
+                $obTComprasSolicitacaoHomologadaReserva->setDado('exercicio'       , $_REQUEST['stExercicio']     );
+                $obTComprasSolicitacaoHomologadaReserva->setDado('cod_entidade'    , $_REQUEST['stCodEntidade']   );
+                $obTComprasSolicitacaoHomologadaReserva->setDado('cod_solicitacao' , $_REQUEST['stCodSolicitacao']);
                 $obTComprasSolicitacaoHomologadaReserva->exclusao();
 
                 $obReservaSaldoAnulada = new TOrcamentoReservaSaldosAnulada;
@@ -234,15 +241,15 @@ $pgOcul     = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
                 if (!$obErro->ocorreu()) {
                     # Inclui o registro de anulação da homologação da solicitação
                     $obTComprasSolicitacaoHomologadaAnulacao = new TComprasSolicitacaoHomologadaAnulacao;
-                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('exercicio'       , $_POST['stExercicio']      );
-                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_entidade'    , $_POST['stCodEntidade']    );
-                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_solicitacao' , $_POST['stCodSolicitacao'] );
+                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('exercicio'       , $_REQUEST['stExercicio']      );
+                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_entidade'    , $_REQUEST['stCodEntidade']    );
+                    $obTComprasSolicitacaoHomologadaAnulacao->setDado('cod_solicitacao' , $_REQUEST['stCodSolicitacao'] );
                     $obTComprasSolicitacaoHomologadaAnulacao->setDado('numcgm'          , Sessao::read('numCgm')     );
                     $obTComprasSolicitacaoHomologadaAnulacao->inclusao();
                 }
 
                 if (!$obErro->ocorreu()) {
-                    SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Número da solicitação: ".$_POST['stCodSolicitacao']."/".$_POST['stExercicio'], "excluir", "aviso", Sessao::getId(),"");
+                    SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Número da solicitação: ".$_REQUEST['stCodSolicitacao']."/".$_REQUEST['stExercicio'], "excluir", "aviso", Sessao::getId(),"");
                 }
             } else {
                 $stErro = "Essa Homologação não pode ser anulada porque possui mapa de compras e itens que não estão anulados!";

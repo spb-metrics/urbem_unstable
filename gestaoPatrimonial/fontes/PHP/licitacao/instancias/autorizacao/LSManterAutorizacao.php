@@ -32,12 +32,13 @@
 
     * @ignore
 
-     $Id: LSManterAutorizacao.php 62279 2015-04-16 18:38:45Z arthur $
+     $Id: LSManterAutorizacao.php 63116 2015-07-27 20:27:08Z franver $
 
     * Casos de uso: uc-uc-03.05.21
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php"  );
 include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoHomologacao.class.php");
@@ -108,95 +109,112 @@ if ($_REQUEST['inCodMapa']) {
     $stFiltros .= " AND mapa_cotacao.cod_mapa = ".$_REQUEST['inCodMapa'];
 }
 
-$stFiltros .= " AND NOT EXISTS
-                            (
-                                SELECT  1
-                                  FROM  licitacao.homologacao
-                                 WHERE  not homologacao.homologado
-                                   AND  ( not exists ( select 1
-                                           from licitacao.homologacao_anulada
-                                          where homologacao_anulada.num_homologacao     = homologacao.num_homologacao
-                                            and homologacao_anulada.cod_licitacao       = homologacao.cod_licitacao
-                                            and homologacao_anulada.cod_modalidade      = homologacao.cod_modalidade
-                                            and homologacao_anulada.cod_entidade        = homologacao.cod_entidade
-                                            and homologacao_anulada.num_adjudicacao     = homologacao.num_adjudicacao
-                                            and homologacao_anulada.exercicio_licitacao = homologacao.exercicio_licitacao
-                                            and homologacao_anulada.lote                = homologacao.lote
-                                            and homologacao_anulada.cod_cotacao         = homologacao.cod_cotacao
-                                            and homologacao_anulada.cod_item            = homologacao.cod_item
-                                            and homologacao_anulada.exercicio_cotacao   = homologacao.exercicio_cotacao
-                                            and homologacao_anulada.cgm_fornecedor      = homologacao.cgm_fornecedor ) )
-                      and homologacao.cod_cotacao       = mapa_cotacao.cod_cotacao
-                      and homologacao.exercicio_cotacao = mapa_cotacao.exercicio_cotacao  )
+$stFiltros .= "
+        AND NOT EXISTS ( SELECT 1
+                           FROM licitacao.homologacao
+                          WHERE NOT homologacao.homologado
+                            AND (NOT EXISTS (SELECT 1
+                                               FROM licitacao.homologacao_anulada
+                                              WHERE homologacao_anulada.num_homologacao     = homologacao.num_homologacao
+                                                AND homologacao_anulada.cod_licitacao       = homologacao.cod_licitacao
+                                                AND homologacao_anulada.cod_modalidade      = homologacao.cod_modalidade
+                                                AND homologacao_anulada.cod_entidade        = homologacao.cod_entidade
+                                                AND homologacao_anulada.num_adjudicacao     = homologacao.num_adjudicacao
+                                                AND homologacao_anulada.exercicio_licitacao = homologacao.exercicio_licitacao
+                                                AND homologacao_anulada.lote                = homologacao.lote
+                                                AND homologacao_anulada.cod_cotacao         = homologacao.cod_cotacao
+                                                AND homologacao_anulada.cod_item            = homologacao.cod_item
+                                                AND homologacao_anulada.exercicio_cotacao   = homologacao.exercicio_cotacao
+                                                AND homologacao_anulada.cgm_fornecedor      = homologacao.cgm_fornecedor )
+                                )
+                            AND homologacao.cod_cotacao       = mapa_cotacao.cod_cotacao
+                            AND homologacao.exercicio_cotacao = mapa_cotacao.exercicio_cotacao)
 
             -- A Licitação não pode estar anulada.
-            AND NOT EXISTS (
-                                SELECT	1
-                                  FROM	licitacao.licitacao_anulada
-                                 WHERE	licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
-                                   AND  licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                   AND  licitacao_anulada.cod_entidade   = licitacao.cod_entidade
-                                   AND  licitacao_anulada.exercicio      = licitacao.exercicio
-                            )
+        AND NOT EXISTS ( SELECT	1
+                           FROM licitacao.licitacao_anulada
+                          WHERE licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
+                            AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                            AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                            AND licitacao_anulada.exercicio      = licitacao.exercicio
+                       )
 
             -- Validação para não existir cotação anulada.
-            AND NOT EXISTS (
-                                SELECT  1
-                                  FROM  compras.cotacao_anulada
-                                 WHERE  cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
-                                   AND  cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
+        AND NOT EXISTS ( SELECT 1
+                           FROM compras.cotacao_anulada
+                          WHERE cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
+                            AND cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
                               )
 
-            AND NOT EXISTS (
-                                SELECT 1
-                                  FROM licitacao.edital_suspenso
-                                  JOIN licitacao.edital
-                                    ON edital_suspenso.num_edital = edital.num_edital
-                                   AND edital_suspenso.exercicio = edital.exercicio
-                                  JOIN licitacao.licitacao ll
-                                    ON ll.cod_licitacao = edital.cod_licitacao
-                                   AND ll.cod_modalidade = edital.cod_modalidade
-                                   AND ll.cod_entidade = edital.cod_entidade
-                                   AND ll.exercicio = edital.exercicio
-                                 WHERE ll.cod_licitacao = licitacao.cod_licitacao
-                                   AND ll.cod_modalidade = licitacao.cod_modalidade
-                                   AND ll.cod_entidade = licitacao.cod_entidade
-                                   AND ll.exercicio = licitacao.exercicio
-                           )
-                      
-             -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
-            AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
-                        
-                EXISTS (
-                    SELECT 1
-                      FROM licitacao.edital
-                     WHERE edital.cod_licitacao = licitacao.cod_licitacao
-                       AND edital.cod_modalidade = licitacao.cod_modalidade
-                       AND edital.cod_entidade = licitacao.cod_entidade
-                       AND edital.exercicio = licitacao.exercicio
-                )
-    
-                  -- Para as modalidades 8,9 é facultativo possuir um edital
-                  WHEN licitacao.cod_modalidade in (8,9) THEN
-                        
-                    EXISTS (
-                        SELECT 1
-                          FROM licitacao.edital
-                         WHERE edital.cod_licitacao = licitacao.cod_licitacao
-                           AND edital.cod_modalidade = licitacao.cod_modalidade
-                           AND edital.cod_entidade = licitacao.cod_entidade
-                           AND edital.exercicio = licitacao.exercicio
-                    )
-    
-                    OR NOT EXISTS (
-                           SELECT 1
-                             FROM licitacao.edital
-                            WHERE edital.cod_licitacao = licitacao.cod_licitacao
-                              AND edital.cod_modalidade = licitacao.cod_modalidade
-                              AND edital.cod_entidade = licitacao.cod_entidade
-                              AND edital.exercicio = licitacao.exercicio
-                    )
-                 END \n " ;
+        AND NOT EXISTS ( SELECT 1
+                           FROM licitacao.edital_suspenso
+                     INNER JOIN licitacao.edital
+                             ON edital_suspenso.num_edital = edital.num_edital
+                            AND edital_suspenso.exercicio = edital.exercicio
+                     INNER JOIN licitacao.licitacao ll
+                             ON ll.cod_licitacao = edital.cod_licitacao
+                            AND ll.cod_modalidade = edital.cod_modalidade
+                            AND ll.cod_entidade = edital.cod_entidade
+                            AND ll.exercicio = edital.exercicio
+                          WHERE ll.cod_licitacao = licitacao.cod_licitacao
+                            AND ll.cod_modalidade = licitacao.cod_modalidade
+                            AND ll.cod_entidade = licitacao.cod_entidade
+                            AND ll.exercicio = licitacao.exercicio
+                       )
+
+        -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+        AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11)
+                 THEN EXISTS ( SELECT 1
+                                 FROM licitacao.edital
+                                WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                                  AND edital.cod_modalidade = licitacao.cod_modalidade
+                                  AND edital.cod_entidade = licitacao.cod_entidade
+                                  AND edital.exercicio = licitacao.exercicio
+                             )
+                 -- Para as modalidades 8,9 é facultativo possuir um edital
+                 WHEN licitacao.cod_modalidade in (8,9)
+                 THEN EXISTS ( SELECT 1
+                                 FROM licitacao.edital
+                                WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                                  AND edital.cod_modalidade = licitacao.cod_modalidade
+                                  AND edital.cod_entidade = licitacao.cod_entidade
+                                  AND edital.exercicio = licitacao.exercicio
+                             )
+                   OR NOT EXISTS ( SELECT 1
+                                     FROM licitacao.edital
+                                    WHERE edital.cod_licitacao = licitacao.cod_licitacao
+                                      AND edital.cod_modalidade = licitacao.cod_modalidade
+                                      AND edital.cod_entidade = licitacao.cod_entidade
+                                      AND edital.exercicio = licitacao.exercicio
+                             )
+                  END AND EXISTS(SELECT mp.exercicio
+                                      , mp.cod_mapa
+                                      , mp.cod_objeto
+                                      , mp.timestamp
+                                      , mp.cod_tipo_licitacao
+                                      , solicitacao.registro_precos
+                                   FROM compras.mapa AS mp
+                             INNER JOIN compras.mapa_solicitacao
+                                     ON mapa_solicitacao.exercicio = mp.exercicio
+                                    AND mapa_solicitacao.cod_mapa  = mp.cod_mapa
+                             INNER JOIN compras.solicitacao_homologada
+                                     ON solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                                    AND solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                                    AND solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                             INNER JOIN compras.solicitacao
+                                     ON solicitacao.exercicio       = solicitacao_homologada.exercicio
+                                    AND solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                                    AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+                                  WHERE mp.cod_mapa = mapa_cotacao.cod_mapa
+                                    AND mp.exercicio = mapa_cotacao.exercicio_mapa
+                                    AND solicitacao.registro_precos IS FALSE
+                               GROUP BY mp.exercicio
+                                      , mp.cod_mapa
+                                      , mp.cod_objeto
+                                      , mp.timestamp
+                                      , mp.cod_tipo_licitacao
+                                      , solicitacao.registro_precos)
+                 \n " ;
 
 $obTLicitacaoHomolocacao = new TLicitacaoHomologacao;
 $obTLicitacaoHomolocacao->recuperaCotacoesParaEmpenho( $rsCotacoes, $stFiltros );
@@ -273,3 +291,4 @@ $obLista->ultimaAcao->setLink( $pgForm."?stAcao=$stAcao&".Sessao::getId().$stLin
 $obLista->commitAcao();
 
 $obLista->show();
+SistemaLegado::exibeAviso("Autorizações de Empenho de Registros de Preços devem ser feitas na ação: Gestão Financeira :: Empenho :: Autorização :: Incluir Autorização Diversos.","aviso","aviso");

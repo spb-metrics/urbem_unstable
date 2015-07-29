@@ -41,6 +41,7 @@
 include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/FTCEMGDispFinanceiras.class.php");
 
 $arFiltros = Sessao::read('filtroRelatorio');
+
 foreach($arDatasInicialFinal as $arPeriodo) {
     list($inDia, $inMes, $inAno) = explode('/',$arPeriodo['stDtInicial']);
 
@@ -50,10 +51,9 @@ foreach($arDatasInicialFinal as $arPeriodo) {
     $obFTCEMGDispFinanceiras->setDado('dtFinal'     , $arPeriodo['stDtFinal']);
     $obFTCEMGDispFinanceiras->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
     $obFTCEMGDispFinanceiras->setDado('bimestre'    , $inMes);
-
-    $obFTCEMGDispFinanceiras->recuperaTodos($rsArquivo);
-
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+    $obFTCEMGDispFinanceiras->recuperaTodos($rsDispFinanceiras);
+    
+    $obExportador->roUltimoArquivo->addBloco($rsDispFinanceiras);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('bimestre');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
@@ -64,12 +64,12 @@ foreach($arDatasInicialFinal as $arPeriodo) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('conta_movimento');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contas_vinculadas');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('contas_vinculadas');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('conta_movimento');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');

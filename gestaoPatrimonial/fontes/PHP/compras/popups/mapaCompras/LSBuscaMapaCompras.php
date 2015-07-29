@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: LSBuscaMapaCompras.php 60561 2014-10-29 18:45:03Z carolina $
+    $Id: LSBuscaMapaCompras.php 63094 2015-07-24 16:57:15Z franver $
 
     * Casos de uso: uc-03.04.05
 */
@@ -194,7 +194,7 @@ switch ($_REQUEST['stTipoBusca']) {
 case 'processoLicitatorio':
     if ( $stFiltro ) $stFiltro = " and  $stFiltro ";
 
-    $obTComprasMapa->recuperaMapaProcessoLicitatorio ( $rsMapas, $stFiltro, $stOrdem );
+    $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio( $rsMapas, $stFiltro, $stOrdem );
 
     break;
 
@@ -328,13 +328,6 @@ default:
 
 //// monta listagem
 $obLista = new Lista;
-
-//if ( $rsMapas->getNumLinhas() > 0 ) {
-//  $rsMapas->addStrPad('cod_mapa',6,'0');
-//    $rsMapas->arElementos = array_unique($rsMapas->arElementos);
-//    $rsMapas->setNumLinhas(count($rsMapas->arElementos));
-//}
-
 $obLista->setRecordSet( $rsMapas );
 
 $obLista->addCabecalho();

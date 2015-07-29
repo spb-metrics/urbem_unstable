@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Mapeamento
 
-    * $Id: TCIMTrecho.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TCIMTrecho.class.php 63138 2015-07-29 14:06:41Z evandro $
 
      * Casos de uso: uc-05.01.06
 */
@@ -146,6 +146,7 @@ function montaRecuperaRelacionamento()
     $stSQL .= "         , sw_logradouro.cod_logradouro                                                    \n";
     $stSQL .= "         , sw_nome_logradouro.nom_logradouro                                               \n";
     $stSQL .= "         , sw_tipo_logradouro.cod_tipo                                                     \n";
+    $stSQL .= "         , sw_tipo_logradouro.nom_tipo                                                     \n";
     $stSQL .= "         , sw_uf.cod_uf||' - '||sw_uf.nom_uf As uf_nome                                    \n";
     $stSQL .= "         , sw_tipo_logradouro.nom_tipo||' '||CASE                                          \n";
     $stSQL .= "                                            WHEN STRPOS(nom_logradouro,'\''') > 0 THEN                    \n";

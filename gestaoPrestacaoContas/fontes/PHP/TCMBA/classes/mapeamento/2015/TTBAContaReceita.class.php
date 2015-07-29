@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 62931 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -90,7 +90,8 @@ function montaRecuperaDadosTribunal()
 {
     $stSql .= " SELECT   c.*      \n";
     $stSql .= "         ,replace(c.cod_estrutural,'.','') as estrutural      \n";
-    $stSql .= "         ,case when orcamento.fn_tipo_conta_receita(exercicio,cod_estrutural) = 'A' then 'S' else 'N' end as tipo_conta \n";
+    $stSql .= "         ,''                               as cd_item_receita \n";
+    $stSql .= "         ,case when orcamento.fn_tipo_conta_receita(exercicio,cod_estrutural) = 'A' then '1' else '2' end as tipo_conta \n";
     $stSql .= " FROM     orcamento.conta_receita as c \n";
     $stSql .= " WHERE   c.exercicio='".$this->getDado('exercicio')."' \n";
     $stSql .= " ORDER BY c.exercicio, c.cod_estrutural  \n";

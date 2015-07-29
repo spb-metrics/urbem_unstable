@@ -30,16 +30,18 @@
 * @author Analista     : Cleisson
 * @author Desenvolvedor: Bruce Cruz de Sena
 
+  $Id: OCManterHomologacaoSolicitacaoCompra.php 62986 2015-07-14 18:08:54Z michel $
+
 * Casos de uso: uc-03.04.02
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao)
+function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_precos)
 {
-    include_once ( CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItem.class.php' );
-    include_once ( CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItemDotacao.class.php' );
+    include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItem.class.php';
+    include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItemDotacao.class.php';
 
     $obTComprasSolicitacaoItem = new TComprasSolicitacaoItem;
     $obTComprasSolicitacaoItem->setDado('cod_solicitacao' , $cod_solicitacao );
@@ -56,14 +58,14 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao)
             $nuVlUnitario = 0.00;
         }
 
-        $rsLista->setCampo('vl_unitario' ,   number_format($nuVlUnitario                              ,2,',','.') );
-        $rsLista->setCampo('quantidade'  ,   number_format($rsLista->getCampo('qnt_item_solicitacao' ),4,',','.') );
-        $rsLista->setCampo('vl_total'    ,	 number_format($rsLista->getCampo('vl_item_solicitacao'  ),2,',','.') );
-        $rsLista->setCampo('saldo'       ,   number_format($rsLista->getCampo('saldo'   	         ),2,',','.') );
+        $rsLista->setCampo('vl_unitario'    , number_format($nuVlUnitario                               ,2,',','.') );
+        $rsLista->setCampo('quantidade'     , number_format($rsLista->getCampo('qnt_item_solicitacao' ) ,4,',','.') );
+        $rsLista->setCampo('vl_total'       , number_format($rsLista->getCampo('vl_item_solicitacao' )  ,2,',','.') );
+        $rsLista->setCampo('saldo'          , number_format($rsLista->getCampo('saldo' )                ,2,',','.') );
         if ($_REQUEST['stAcao'] == 'anular') {
-            $rsLista->setCampo('vl_reserva'  ,   number_format($rsLista->getCampo('vl_reserva'           ),2,',','.') );
+            $rsLista->setCampo('vl_reserva' , number_format($rsLista->getCampo('vl_reserva' )           ,2,',','.') );
         } else {
-            $rsLista->setCampo('vl_reserva'  ,   number_format($rsLista->getCampo('vl_item_solicitacao'  ),2,',','.') );
+            $rsLista->setCampo('vl_reserva' , number_format($rsLista->getCampo('vl_item_solicitacao' )  ,2,',','.') );
         }
         $rsLista->proximo();
     }
@@ -74,7 +76,7 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao)
     $obLista->setMostraPaginacao( false );
     $obLista->setRecordSet( $rsLista );
     $obLista->setTitulo( $stTitulo );
-    $obLista->setTotaliza           ( "vl_total,Total,right,7"  );
+    $obLista->setTotaliza( "vl_total,Total,right,7" );
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
@@ -106,50 +108,55 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao)
     $obLista->ultimoCabecalho->setColSpan( 3 );
     $obLista->commitCabecalho();
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Reserva Saldos");
-    $obLista->ultimoCabecalho->setWidth( 27 );
-    $obLista->ultimoCabecalho->setColSpan( 4 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( true );
-    $obLista->ultimoCabecalho->addConteudo("Valor Unitário");
-    $obLista->ultimoCabecalho->setWidth( 8 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    $obLista->ultimoCabecalho->addConteudo("Quantidade");
-    $obLista->ultimoCabecalho->setWidth( 8 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    $obLista->ultimoCabecalho->addConteudo("Valor Total");
-    $obLista->ultimoCabecalho->setWidth( 8 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    $obLista->ultimoCabecalho->addConteudo("Dotação");
-    $obLista->ultimoCabecalho->setWidth( 6 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    $obLista->ultimoCabecalho->addConteudo("Desdobramento");
-    $obLista->ultimoCabecalho->setWidth( 12 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    $obLista->ultimoCabecalho->addConteudo("Saldo Dotação");
-    $obLista->ultimoCabecalho->setWidth( 8 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho( );
-    if ($_REQUEST['stAcao'] == 'anular') {
-        $obLista->ultimoCabecalho->addConteudo("Valor a Anular");
-    } else {
-        $obLista->ultimoCabecalho->addConteudo("Valor a Reservar");
+    
+    if($registro_precos=='f'){
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Reserva Saldos");
+        $obLista->ultimoCabecalho->setWidth( 27 );
+        $obLista->ultimoCabecalho->setColSpan( 4 );
+        $obLista->commitCabecalho();
     }
-    $obLista->ultimoCabecalho->setWidth( 8 );
-    $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( true );
+        $obLista->ultimoCabecalho->addConteudo("Valor Unitário");
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( );
+        $obLista->ultimoCabecalho->addConteudo("Quantidade");
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( );
+        $obLista->ultimoCabecalho->addConteudo("Valor Total");
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+    
+    if($registro_precos=='f'){
+        $obLista->addCabecalho( );
+        $obLista->ultimoCabecalho->addConteudo("Dotação");
+        $obLista->ultimoCabecalho->setWidth( 6 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( );
+        $obLista->ultimoCabecalho->addConteudo("Desdobramento");
+        $obLista->ultimoCabecalho->setWidth( 12 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( );
+        $obLista->ultimoCabecalho->addConteudo("Saldo Dotação");
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho( );
+        if ($_REQUEST['stAcao'] == 'anular') {
+            $obLista->ultimoCabecalho->addConteudo("Valor a Anular");
+        } else {
+            $obLista->ultimoCabecalho->addConteudo("Valor a Reservar");
+        }
+        $obLista->ultimoCabecalho->setWidth( 8 );
+        $obLista->commitCabecalho();
+    }
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( '[cod_item] - [descricao_completa]' );
@@ -177,29 +184,29 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao)
     $obLista->ultimoDado->setAlinhamento ( 'DIREITA' );
     $obLista->ultimoDado->setCampo( "vl_total" );
     $obLista->commitDado();
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "cod_despesa" );
-    $obLista->commitDado();
-
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "desdobramento" );
-    $obLista->commitDado();
-
-    $obLista->addDado();
-    $obLista->ultimoDado->setAlinhamento ( 'DIREITA' );
-    $obLista->ultimoDado->setCampo( "saldo" );
-    $obLista->commitDado();
-
-    $obLista->addDado();
-    $obLista->ultimoDado->setAlinhamento ( 'DIREITA' );
-
-    $obLista->ultimoDado->setCampo( "vl_reserva" );
-
-    $obLista->commitDado();
+    
+    if($registro_precos=='f'){
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "cod_despesa" );
+        $obLista->commitDado();
+    
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "desdobramento" );
+        $obLista->commitDado();
+    
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento ( 'DIREITA' );
+        $obLista->ultimoDado->setCampo( "saldo" );
+        $obLista->commitDado();
+    
+        $obLista->addDado();
+        $obLista->ultimoDado->setAlinhamento ( 'DIREITA' );
+        $obLista->ultimoDado->setCampo( "vl_reserva" );
+        $obLista->commitDado();
+    }
 
     $obLista->montaHTML();
-    $stHTML = $obLista->getHTML();
-    $stHTML = str_replace( "\n" ,"" ,$stHTML );
+    $stHTML = str_replace( "\n" ,"" ,$obLista->getHTML() );
     $stHTML = str_replace( chr(13) ,"<br>" ,$stHTML );
     $stHTML = str_replace( "  " ,"" ,$stHTML );
     $stHTML = str_replace( "'","\\'",$stHTML );

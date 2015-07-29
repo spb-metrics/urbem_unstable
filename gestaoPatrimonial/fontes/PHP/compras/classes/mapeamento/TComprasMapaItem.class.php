@@ -36,7 +36,7 @@
   * Casos de uso: uc-03.04.05
                   uc-03.05.26
 
-  $Id: TComprasMapaItem.class.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: TComprasMapaItem.class.php 63032 2015-07-17 18:04:12Z michel $
 
   */
 
@@ -905,19 +905,7 @@ class TComprasMapaItem extends Persistente
                               END AS valor_anulado
 
                            -- QUANTIDADE DO ITEM NO MAPA
-                           ,  CASE WHEN mapa_item_dotacao.cod_despesa IS NULL THEN
-                                (
-                                    SELECT  (COALESCE(SUM(mapa_item.quantidade), 0.00)) as quantidade
-                                      FROM  compras.mapa_item
-                                     WHERE  mapa_item.exercicio       = solicitacao_item.exercicio
-                                       AND  mapa_item.cod_entidade    = solicitacao_item.cod_entidade
-                                       AND  mapa_item.cod_solicitacao = solicitacao_item.cod_solicitacao
-                                       AND  mapa_item.cod_centro      = solicitacao_item.cod_centro
-                                       AND  mapa_item.cod_item        = solicitacao_item.cod_item
-                                       AND  mapa_item.cod_mapa        = mapa_solicitacao.cod_mapa
-                                       AND  mapa_item.exercicio       = mapa_solicitacao.exercicio
-                                )
-                              ELSE
+                           ,  CASE WHEN mapa_item_dotacao.cod_despesa IS NOT NULL THEN
                                 (
                                     SELECT  (COALESCE(SUM(mapa_item_dotacao.quantidade), 0.00)) as quantidade
                                       FROM  compras.mapa_item_dotacao
@@ -930,6 +918,30 @@ class TComprasMapaItem extends Persistente
                                        AND  mapa_item_dotacao.cod_conta       = solicitacao_item_dotacao.cod_conta
                                        AND  mapa_item_dotacao.cod_mapa        = mapa_solicitacao.cod_mapa
                                        AND  mapa_item_dotacao.exercicio       = mapa_solicitacao.exercicio
+                                )
+                              WHEN solicitacao_item_dotacao.cod_despesa IS NOT NULL THEN
+                                (
+                                    SELECT  (COALESCE(SUM(SID.quantidade), 0.00)) as quantidade
+                                      FROM  compras.solicitacao_item_dotacao AS SID
+                                     WHERE  SID.exercicio       = solicitacao_item_dotacao.exercicio
+                                       AND  SID.cod_entidade    = solicitacao_item_dotacao.cod_entidade
+                                       AND  SID.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
+                                       AND  SID.cod_centro      = solicitacao_item_dotacao.cod_centro
+                                       AND  SID.cod_item        = solicitacao_item_dotacao.cod_item
+                                       AND  SID.cod_despesa     = solicitacao_item_dotacao.cod_despesa
+                                       AND  SID.cod_conta       = solicitacao_item_dotacao.cod_conta
+                                )
+                              ELSE
+                                (
+                                    SELECT  (COALESCE(SUM(mapa_item.quantidade), 0.00)) as quantidade
+                                      FROM  compras.mapa_item
+                                     WHERE  mapa_item.exercicio       = solicitacao_item.exercicio
+                                       AND  mapa_item.cod_entidade    = solicitacao_item.cod_entidade
+                                       AND  mapa_item.cod_solicitacao = solicitacao_item.cod_solicitacao
+                                       AND  mapa_item.cod_centro      = solicitacao_item.cod_centro
+                                       AND  mapa_item.cod_item        = solicitacao_item.cod_item
+                                       AND  mapa_item.cod_mapa        = mapa_solicitacao.cod_mapa
+                                       AND  mapa_item.exercicio       = mapa_solicitacao.exercicio
                                 )
                               END AS quantidade_mapa
 
@@ -1014,24 +1026,38 @@ class TComprasMapaItem extends Persistente
                               ) as quantidade_anulada_em_mapas
 
                            -- VALOR MAPEADO MENOS O VALOR ANULADO DO MAPA
-                           ,  COALESCE (( SELECT  (COALESCE(SUM(mapa_item.vl_total ), 0.00)) -
-                                                  (COALESCE(SUM(mapa_item_anulacao.vl_total), 0.00)) as valor
-                                            FROM  compras.mapa_item
-                                       LEFT JOIN  compras.mapa_item_anulacao
-                                              ON  mapa_item.exercicio             = mapa_item_anulacao.exercicio
-                                             AND  mapa_item.cod_mapa              = mapa_item_anulacao.cod_mapa
-                                             AND  mapa_item.exercicio_solicitacao = mapa_item_anulacao.exercicio_solicitacao
-                                             AND  mapa_item.cod_entidade          = mapa_item_anulacao.cod_entidade
-                                             AND  mapa_item.cod_solicitacao       = mapa_item_anulacao.cod_solicitacao
-                                             AND  mapa_item.cod_centro            = mapa_item_anulacao.cod_centro
-                                             AND  mapa_item.cod_item              = mapa_item_anulacao.cod_item
-                                             AND  mapa_item.lote                  = mapa_item_anulacao.lote
-                                           WHERE  mapa_item.exercicio             = solicitacao_item.exercicio
-                                             AND  mapa_item.cod_entidade          = solicitacao_item.cod_entidade
-                                             AND  mapa_item.cod_solicitacao       = solicitacao_item.cod_solicitacao
-                                             AND  mapa_item.cod_centro            = solicitacao_item.cod_centro
-                                             AND  mapa_item.cod_item              = solicitacao_item.cod_item )
-                                   , 0.0 ) as vl_total_mapa_item
+                           ,  CASE WHEN mapa_item_dotacao.cod_despesa IS NOT NULL THEN
+                                COALESCE (( 	SELECT  (COALESCE(SUM(mapa_item.vl_total ), 0.00)) -
+                                                        (COALESCE(SUM(mapa_item_anulacao.vl_total), 0.00)) as valor
+                                                      FROM  compras.mapa_item
+                                                     LEFT JOIN  compras.mapa_item_anulacao
+                                                        ON  mapa_item.exercicio             = mapa_item_anulacao.exercicio
+                                                       AND  mapa_item.cod_mapa              = mapa_item_anulacao.cod_mapa
+                                                       AND  mapa_item.exercicio_solicitacao = mapa_item_anulacao.exercicio_solicitacao
+                                                       AND  mapa_item.cod_entidade          = mapa_item_anulacao.cod_entidade
+                                                       AND  mapa_item.cod_solicitacao       = mapa_item_anulacao.cod_solicitacao
+                                                       AND  mapa_item.cod_centro            = mapa_item_anulacao.cod_centro
+                                                       AND  mapa_item.cod_item              = mapa_item_anulacao.cod_item
+                                                       AND  mapa_item.lote                  = mapa_item_anulacao.lote
+                                                     WHERE  mapa_item.exercicio             = solicitacao_item.exercicio
+                                                       AND  mapa_item.cod_entidade          = solicitacao_item.cod_entidade
+                                                       AND  mapa_item.cod_solicitacao       = solicitacao_item.cod_solicitacao
+                                                       AND  mapa_item.cod_centro            = solicitacao_item.cod_centro
+                                                       AND  mapa_item.cod_item              = solicitacao_item.cod_item )
+                                        , 0.0 ) 
+                              ELSE 
+                                (
+                                    SELECT  (COALESCE(SUM(SID.vl_reserva), 0.00)) as valor
+                                      FROM  compras.solicitacao_item_dotacao AS SID
+                                     WHERE  SID.exercicio       = solicitacao_item_dotacao.exercicio
+                                       AND  SID.cod_entidade    = solicitacao_item_dotacao.cod_entidade
+                                       AND  SID.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
+                                       AND  SID.cod_centro      = solicitacao_item_dotacao.cod_centro
+                                       AND  SID.cod_item        = solicitacao_item_dotacao.cod_item
+                                       AND  SID.cod_despesa     = solicitacao_item_dotacao.cod_despesa
+                                       AND  SID.cod_conta       = solicitacao_item_dotacao.cod_conta
+                                )
+                              END AS vl_total_mapa_item
 
                            -- QUANTIDADE EM ESTOQUE
                            ,  (     SELECT  COALESCE(SUM(lancamento_material.quantidade), 0.0) as quantidade
@@ -1111,13 +1137,11 @@ class TComprasMapaItem extends Persistente
                         AND  solicitacao_item.cod_item        =  mapa_item.cod_item
 
                   LEFT JOIN  compras.solicitacao_item_dotacao
-                         ON  solicitacao_item_dotacao.exercicio       = mapa_item_dotacao.exercicio
-                        AND  solicitacao_item_dotacao.cod_entidade    = mapa_item_dotacao.cod_entidade
-                        AND  solicitacao_item_dotacao.cod_solicitacao = mapa_item_dotacao.cod_solicitacao
-                        AND  solicitacao_item_dotacao.cod_centro      = mapa_item_dotacao.cod_centro
-                        AND  solicitacao_item_dotacao.cod_item        = mapa_item_dotacao.cod_item
-                        AND  solicitacao_item_dotacao.cod_conta       = mapa_item_dotacao.cod_conta
-                        AND  solicitacao_item_dotacao.cod_despesa     = mapa_item_dotacao.cod_despesa
+                         ON  solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
+                        AND  solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
+                        AND  solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+                        AND  solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
+                        AND  solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
 
                  INNER JOIN  compras.solicitacao
                          ON  solicitacao.exercicio       = solicitacao_item.exercicio
@@ -1145,8 +1169,12 @@ class TComprasMapaItem extends Persistente
 
                          --  BUSCANDO A DOTACAO
                   LEFT JOIN  orcamento.despesa
-                         ON  mapa_item_dotacao.exercicio   = despesa.exercicio
-                        AND  mapa_item_dotacao.cod_despesa = despesa.cod_despesa
+                         ON  (			mapa_item_dotacao.exercicio   = despesa.exercicio
+                        		AND  	mapa_item_dotacao.cod_despesa = despesa.cod_despesa
+                             )
+                         OR  (			solicitacao_item_dotacao.exercicio   = despesa.exercicio
+                        		AND  	solicitacao_item_dotacao.cod_despesa = despesa.cod_despesa
+                             )
 
                   LEFT JOIN  orcamento.conta_despesa
                          ON  conta_despesa.exercicio = despesa.exercicio
@@ -1154,8 +1182,12 @@ class TComprasMapaItem extends Persistente
 
                          --  BUSCANDO O DESDOBRAMENTO
                   LEFT JOIN  orcamento.conta_despesa as desdobramento
-                         ON  desdobramento.exercicio = mapa_item_dotacao.exercicio
-                        AND  desdobramento.cod_conta = mapa_item_dotacao.cod_conta
+                         ON  (			mapa_item_dotacao.exercicio = desdobramento.exercicio
+                        		AND  	mapa_item_dotacao.cod_conta = desdobramento.cod_conta
+                             )
+                         OR  (			solicitacao_item_dotacao.exercicio = desdobramento.exercicio
+                        		AND  	solicitacao_item_dotacao.cod_conta = desdobramento.cod_conta
+                             )
 
                          --  BUSCANDO A RESERVA DE SALDOS
                   LEFT JOIN  compras.mapa_item_reserva
@@ -1171,8 +1203,13 @@ class TComprasMapaItem extends Persistente
                         AND  mapa_item_reserva.cod_conta             = mapa_item_dotacao.cod_conta
 
                   LEFT JOIN  orcamento.reserva_saldos
-                         ON  mapa_item_reserva.cod_reserva       = reserva_saldos.cod_reserva
-                        AND  mapa_item_reserva.exercicio_reserva = reserva_saldos.exercicio
+                         ON  (			mapa_item_reserva.cod_reserva       = reserva_saldos.cod_reserva
+                        		AND  	mapa_item_reserva.exercicio_reserva = reserva_saldos.exercicio
+                             )
+                         OR  (			mapa_item_reserva.cod_reserva IS NULL
+                        		AND  	solicitacao_homologada_reserva.cod_reserva = reserva_saldos.cod_reserva
+                        		AND  	solicitacao_homologada_reserva.exercicio   = reserva_saldos.exercicio
+                             )
 
                       WHERE  1=1 ";
 

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterVeiculo.php 62593 2015-05-21 18:35:18Z jean $
+    * $Id: OCManterVeiculo.php 62905 2015-07-07 14:49:50Z carlos.silva $
 
     * Casos de uso: uc-03.02.06
 */
@@ -1136,6 +1136,7 @@ switch ($stCtrl) {
         $stJs .= "$('stDocumento').selectedIndex = '".$arDocumentos[$inCount]['cod_documento']."';";
         $stJs .= "$('stExercicio').value = '".$arDocumentos[$inCount]['ano_documento']."';";
         $stJs .= "$('inMes').selectedIndex = '".$arDocumentos[$inCount]['mes']."';";
+        
         if ($arDocumentos[$inCount]['situacao']) {
             $stJs .= "$('stSituacao1').checked = true;";
             $stJs .= "$('spnEmpenho').innerHTML = '".montaEmpenho()."';";
@@ -1143,8 +1144,6 @@ switch ($stCtrl) {
             $stJs .= "$('inCodEntidadeOculto').value = '".$arDocumentos[$inCount]['cod_entidade']."';";
             $stJs .= "$('stNomEntidade').selectedIndex = '".$arDocumentos[$inCount]['cod_entidade']."';";
             $stJs .= "$('inCodigoEmpenho').value = '".$arDocumentos[$inCount]['cod_empenho']."';";
-            //$stJs .= "$('stNomFornecedor').value = '".$arDocumentos[$inCount]['nom_empenho']."';";
-            //$stJs .= "$('stNomFornecedor').innerHTML = '".$arDocumentos[$inCount]['nom_empenho']."';";
         } else {
             $stJs .= "$('stSituacao2').checked = true;";
         }
@@ -1168,6 +1167,7 @@ switch ($stCtrl) {
         $stJs .= "jq('#stNomLocatario').html ('".$arLocacoes[$inCount]['stNomLocatario']."');";
         $stJs .= "jq('#inNumEmpenhoLocacao').val ('".$arLocacoes[$inCount]['inNumEmpenhoLocacao']."');";
         $stJs .= "jq('#inValorLocacao').val ('".$arLocacoes[$inCount]['inValorLocacao']."');";
+        $stJs .= "jq('#stNomEntidadeLocacao').val ('".$arLocacoes[$inCount]['inCodEntidadeLocacao']."');";
 
         $stJs .= "$('incluiDadosLocacao').value = 'Alterar';";
         $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'alterarLocacao\',\'hdnIdLocacao,stProcessoLocacao,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodEntidadeLocacao,inCodLocatario,stNomLocatario,inNumEmpenhoLocacao,inValorLocacao\');');";
@@ -1250,7 +1250,7 @@ switch ($stCtrl) {
             $stJs .= "$('stSituacao1').checked = false;";
             $stJs .= "$('stSituacao2').checked = false;";
             $stJs .= "$('incluiDocumento').value = 'Incluir';";
-            $stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'incluirDocumento\',\'stDocumento,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidadeOculto,inCodigoEmpenho\');');";
+            $stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'incluirDocumento\',\'stDocumento,stProcessoLocacao,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidadeOculto,inCodigoEmpenho\');');";
             //$stJs .= "$('incluiDocumento').setAttribute( 'onclick','montaParametrosGET(\'incluirDocumento\',\'stDocumento,stExercicio,inMes,stSituacao,stExercicioEmpenho,inCodEntidade,inCodigoEmpenho,stNomFornecedor\');');";
             $stJs .= "$('spnEmpenho').innerHTML = ''; ";
 
@@ -1367,7 +1367,7 @@ switch ($stCtrl) {
             $stJs .= "jq('#inNumEmpenhoLocacao').val('');";
 
             $stJs .= "$('incluiDadosLocacao').value = 'Incluir';";
-            $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'st\,stExercicioLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodLocatario,stNomLocatario,inValorLocacao,inCodEntidadeLocacao,stNomEntidadeLocacao,inNumEmpenhoLocacao\');');";
+            $stJs .= "$('incluiDadosLocacao').setAttribute( 'onclick','montaParametrosGET(\'incluirDadosLocacao\',\'st\,stExercicioLocacao,stProcessoLocacao,dtIniLocacao,dtFimLocacao,dtContrato,inCodLocatario,stNomLocatario,inValorLocacao,inCodEntidadeLocacao,stNomEntidadeLocacao,inNumEmpenhoLocacao\');');";
             Sessao::write('arLocacoes' , $arLocacoes);
 
             //se estivesse excluido, remove das excluidas

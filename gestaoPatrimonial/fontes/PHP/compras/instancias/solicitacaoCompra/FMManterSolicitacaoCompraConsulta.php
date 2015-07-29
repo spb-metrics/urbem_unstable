@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompraConsulta.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterSolicitacaoCompraConsulta.php 62979 2015-07-14 16:18:54Z michel $
 
  */
 
@@ -147,6 +147,12 @@ $obHdnCtrl->setValue ( ""       );
 $obForm = new Form;
 $obForm->setAction ( $pgProc  );
 $obForm->setTarget ( "oculto" );
+
+//Registro de Preço
+$obLblRegistroPreco = new Label;
+$obLblRegistroPreco->setId     ( 'stRegistroPreco' );
+$obLblRegistroPreco->setrotulo ( 'Registro de Preço' );
+$obLblRegistroPreco->setValue  ( ( ($obTComprasSolicitacao->getDado('registro_precos') == 't') ? 'Sim' : 'Não' ) );
 
 ////Exercicio
 $obLblExercicio = new Label;
@@ -281,6 +287,7 @@ $obFormulario->addHidden     ( $obHdnExercicio        );
 $obFormulario->addHidden     ( $obHdnCodEntidade      );
 $obFormulario->addHidden     ( $obHdnCodSolicitacao   );
 $obFormulario->addTitulo     ( 'Dados da Solicitação' );
+$obFormulario->addComponente ( $obLblRegistroPreco    );
 $obFormulario->addComponente ( $obLblExercicio        );
 $obFormulario->addComponente ( $obLblDataSolicitacao  );
 $obFormulario->addComponente ( $obILabelEntidade      );

@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: PRManterCadastroFerias.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterCadastroFerias.php 62879 2015-07-02 18:03:08Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -81,6 +81,8 @@ $obErro = new Erro;
 switch ($stAcao) {
     case "incluir":
         Sessao::setTrataExcecao(true);
+        
+        $boTransacao = Sessao::getTransacao()->inTransacao;
 
         $stNomeLote = $_POST['stNomeLote'];
         $arMeses    = array(1=>"Janeiro",
@@ -107,7 +109,7 @@ switch ($stAcao) {
                 case "cgm_contrato":
                     $obTPessoalLoteFerias = new TPessoalLoteFerias();
                     $stFiltro = " WHERE nome ilike '%contratos%' AND ano_competencia||mes_competencia = '".$stAnoCompetencia.$stMesCompetencia."'";
-                    $obTPessoalLoteFerias->recuperaTodos($rsLoteFeriasContrato,$stFiltro);
+                    $obTPessoalLoteFerias->recuperaTodos($rsLoteFeriasContrato,$stFiltro,"",$boTransacao);
                     break;
             }
 
@@ -146,7 +148,7 @@ switch ($stAcao) {
                     $obTPessoalLoteFerias->setDado("cod_regime",$_POST["inCodRegime"]);
                     $obTPessoalLoteFerias->setDado("mes_competencia",$stMesCompetencia);
                     $obTPessoalLoteFerias->setDado("ano_competencia",$stAnoCompetencia);
-                    $obTPessoalLoteFerias->inclusao();
+                    $obTPessoalLoteFerias->inclusao($boTransacao);
 
                     $stCodigosFiltro = explode(",", $_POST['stCodigos']);
 
@@ -156,7 +158,7 @@ switch ($stAcao) {
                             $obTPessoalLoteFeriasFiltro->setDado('cod_lote', $obTPessoalLoteFerias->getDado('cod_lote') );
                             foreach ($stCodigosFiltro as $inCodigoFiltro) {
                                 $obTPessoalLoteFeriasFiltro->setDado('cod_orgao', $inCodigoFiltro);
-                                $obTPessoalLoteFeriasFiltro->inclusao();
+                                $obTPessoalLoteFeriasFiltro->inclusao($boTransacao);
                             }
                             break;
                         case 'L':
@@ -165,7 +167,7 @@ switch ($stAcao) {
                             foreach ($stCodigosFiltro as $inCodigoFiltro) {
 
                                 $obTPessoalLoteFeriasFiltro->setDado('cod_local', $inCodigoFiltro);
-                                $obTPessoalLoteFeriasFiltro->inclusao();
+                                $obTPessoalLoteFeriasFiltro->inclusao($boTransacao);
                             }
                             break;
                         case 'F':
@@ -173,7 +175,7 @@ switch ($stAcao) {
                             $obTPessoalLoteFeriasFiltro->setDado('cod_lote', $obTPessoalLoteFerias->getDado('cod_lote') );
                             foreach ($stCodigosFiltro as $inCodigoFiltro) {
                                 $obTPessoalLoteFeriasFiltro->setDado('cod_cargo', $inCodigoFiltro);
-                                $obTPessoalLoteFeriasFiltro->inclusao();
+                                $obTPessoalLoteFeriasFiltro->inclusao($boTransacao);
                             }
                             break;
                     }
@@ -195,7 +197,7 @@ switch ($stAcao) {
             $obTAdministracaoConfiguracao->setDado("exercicio",Sessao::getExercicio());
             $obTAdministracaoConfiguracao->setDado("cod_modulo",22);
             $obTAdministracaoConfiguracao->setDado("parametro","dtContagemInicial".Sessao::getEntidade());
-            $obTAdministracaoConfiguracao->recuperaPorChave($rsConfiguracao);
+            $obTAdministracaoConfiguracao->recuperaPorChave($rsConfiguracao,$boTransacao);
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorNomeacaoPosse.class.php");
             $obTPessoalContratoServidorNomeacaoPosse = new TPessoalContratoServidorNomeacaoPosse();
@@ -212,7 +214,7 @@ switch ($stAcao) {
                     $dtInicial = $_REQUEST['dtInicial'];
                 } else {
                     $stFiltro = " WHERE cod_contrato = ".$arContrato["cod_contrato"];
-                    $obTPessoalFerias->recuperaTodos($rsFeriasContrato,$stFiltro, " ORDER BY cod_ferias DESC LIMIT 1 ");
+                    $obTPessoalFerias->recuperaTodos($rsFeriasContrato,$stFiltro, " ORDER BY cod_ferias DESC LIMIT 1 ",$boTransacao);
                     $rsFeriasContrato->setUltimoElemento();
                     if ($rsFeriasContrato->getCampo("dt_final_aquisitivo") != "") {
                         $arInicial  = explode("/",$rsFeriasContrato->getCampo("dt_final_aquisitivo"));
@@ -244,7 +246,8 @@ switch ($stAcao) {
                 $stFiltro  = " WHERE cod_contrato = ".$arContrato["cod_contrato"];
                 $stFiltro .= "   AND to_char(dt_inicial_aquisitivo,'dd/mm/yyyy') = '".$dtInicial."'";
                 $stFiltro .= "   AND to_char(dt_final_aquisitivo,'dd/mm/yyyy') = '".$dtFinal."'";
-                $obTPessoalFerias->recuperaTodos($rsFeriasPeriodo,$stFiltro, " ORDER BY cod_ferias LIMIT 1 ");
+                $stFiltro .= "   AND cod_forma NOT IN (3,4) ";
+                $obTPessoalFerias->recuperaTodos($rsFeriasPeriodo,$stFiltro, " ORDER BY cod_ferias LIMIT 1 ",$boTransacao);
 
                 $stFiltro  = "   AND ferias.cod_contrato = ".$arContrato["cod_contrato"];
                 $stFiltro .= "   AND to_char(dt_inicio,'dd/mm/yyyy') = '".$_REQUEST['dtInicialFerias']."'";
@@ -261,7 +264,7 @@ switch ($stAcao) {
                     $obTPessoalFerias->setDado("dias_abono"             , (trim($_REQUEST['inQuantDiasAbono']) != "") ? $_REQUEST['inQuantDiasAbono'] : $arContrato["dias_abono"]);
                     $obTPessoalFerias->setDado("dt_inicial_aquisitivo"  , $dtInicial);
                     $obTPessoalFerias->setDado("dt_final_aquisitivo"    , $dtFinal);
-                    $obTPessoalFerias->inclusao();
+                    $obTPessoalFerias->inclusao($boTransacao);
 
                     if (Sessao::read("boConcederFeriasLote")) {
 
@@ -271,32 +274,43 @@ switch ($stAcao) {
                             $obTPessoalLoteFeriasFiltro = new TPessoalLoteFeriasContrato();
                             $obTPessoalLoteFeriasFiltro->setDado('cod_lote', $obTPessoalLoteFerias->getDado('cod_lote') );
                             $obTPessoalLoteFeriasFiltro->setDado('cod_contrato', $arContrato["cod_contrato"]);
-                            $obTPessoalLoteFeriasFiltro->inclusao();
+                            $obTPessoalLoteFeriasFiltro->inclusao($boTransacao);
                         }
 
                         $obTPessoalLoteFeriasLote->obTPessoalFerias = &$obTPessoalFerias;
-                        $obTPessoalLoteFeriasLote->inclusao();
+                        $obTPessoalLoteFeriasLote->inclusao($boTransacao);
                     }
 
                     if ($inQuantDiasGozo) {
-                        $inCodMes = str_pad($_REQUEST['inCodMes'],2,"0",STR_PAD_LEFT);
-                        $obTPessoalLancamentoFerias->setDado("dt_inicio"              , $_REQUEST['dtInicialFerias']);
-                        $obTPessoalLancamentoFerias->setDado("dt_fim"                 , $_REQUEST['dtFinalFerias']);
-                        $obTPessoalLancamentoFerias->setDado("dt_retorno"             , $_REQUEST['dtRetornoFerias']);
-                        $obTPessoalLancamentoFerias->setDado("mes_competencia"        , $inCodMes);
-                        $obTPessoalLancamentoFerias->setDado("ano_competencia"        , $_REQUEST['inAno']);
-                        $obTPessoalLancamentoFerias->setDado("pagar_13"               , ($_REQUEST['boPagamento13']) ? true : false);
-                        $obTPessoalLancamentoFerias->setDado("cod_tipo"               , $_REQUEST['inCodTipo']);
-                        $obTPessoalLancamentoFerias->inclusao();
+                        $inCodMes = $request->get('inCodMes') ? $request->get('inCodMes') : $request->get('hdninCodMes');
+                        $inCodMes = str_pad($inCodMes,2,"0",STR_PAD_LEFT);
+                        $boPagar = $request->get('boPagamento13') ? $request->get('boPagamento13') : '';
+                        $boPagar13 = ($boPagar = 1) ? 'true' : 'false';
+                        
+                        $inCodTipo = $request->get('inCodTipo') ? $request->get('inCodTipo') : 1;
+                        $inAnoCompetencia = $request->get('inAno') ? $request->get('inAno') : $request->get('hdninAno');
+
+                        $obTPessoalLancamentoFerias->setDado("dt_inicio"              , $_REQUEST['dtInicialFerias'] );
+                        $obTPessoalLancamentoFerias->setDado("dt_fim"                 , $_REQUEST['dtFinalFerias']   );
+                        $obTPessoalLancamentoFerias->setDado("dt_retorno"             , $_REQUEST['dtRetornoFerias'] );
+                        $obTPessoalLancamentoFerias->setDado("mes_competencia"        , $inCodMes                    );
+                        $obTPessoalLancamentoFerias->setDado("ano_competencia"        , $inAnoCompetencia            );
+                        $obTPessoalLancamentoFerias->setDado("pagar_13"               , $boPagar13                   );
+                        $obTPessoalLancamentoFerias->setDado("cod_tipo"               , $inCodTipo                   );
+                        $obTPessoalLancamentoFerias->inclusao($boTransacao);
 
                         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsUltimaMovimentacao);
                         $arDataFinal = explode("/",$rsUltimaMovimentacao->getCampo("dt_final"));
-                        if ($inCodMes == $arDataFinal[1] and $_REQUEST['inAno'] == $arDataFinal[2]) {
-                            $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_contrato"            , $arContrato["cod_contrato"]);
-                            $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_periodo_movimentacao", $rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
-                            $obFFolhaPagamentoGeraRegistroFerias->setDado("exercicio", Sessao::getExercicio());
-                            $obFFolhaPagamentoGeraRegistroFerias->geraRegistroFerias($rsRegistroFerias);
+ 
+                        if ( ($boPagar != '') && ($request->get('inCodTipo',null) != null) ) {
+                            if ($inCodMes == $arDataFinal[1] and $_REQUEST['inAno'] == $arDataFinal[2]) {
+                                $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_contrato"            , $arContrato["cod_contrato"]);
+                                $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_periodo_movimentacao", $rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
+                                $obFFolhaPagamentoGeraRegistroFerias->setDado("exercicio", Sessao::getExercicio());
+                                $obFFolhaPagamentoGeraRegistroFerias->geraRegistroFerias($rsRegistroFerias,$boTransacao);
+                            }    
                         }
+
                         ###Assentamento###
                         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoAssentamento.class.php");
                         $obTPessoalAssentamentoAssentamento = new TPessoalAssentamentoAssentamento();
@@ -317,7 +331,7 @@ switch ($stAcao) {
                             if ( !$obErro->ocorreu() ) {
                                 $obTPessoalAssentamentoGeradoContratoServidor->setDado( "cod_assentamento_gerado" , $inCodAssentamentoGerado );
                                 $obTPessoalAssentamentoGeradoContratoServidor->setDado( "cod_contrato"            , $arContrato["cod_contrato"] );
-                                $obErro = $obTPessoalAssentamentoGeradoContratoServidor->inclusao( Sessao::getTransacao()->inTransacao );
+                                $obErro = $obTPessoalAssentamentoGeradoContratoServidor->inclusao( $boTransacao );
                             }
                             if ( !$obErro->ocorreu() ) {
                                 $inCodMes = str_pad($_REQUEST['inCodMes'],2,"0",STR_PAD_LEFT);
@@ -332,7 +346,7 @@ switch ($stAcao) {
                                 $obTPessoalAssentamentoGerado->setDado( "periodo_final"           , $_REQUEST['dtFinalFerias']                            );
                                 $obTPessoalAssentamentoGerado->setDado( "automatico"              , true                              );
                                 $obTPessoalAssentamentoGerado->setDado( "observacao"              , $stObservacao );
-                                $obErro = $obTPessoalAssentamentoGerado->inclusao( Sessao::getTransacao()->inTransacao );
+                                $obErro = $obTPessoalAssentamentoGerado->inclusao( $boTransacao );
                             }
                             if ( !$obErro->ocorreu() and !$_REQUEST['boPagamento13'] ) {
                                 $obFPessoalRegistrarEventoPorAssentamento->setDado("cod_contrato"       ,$arContrato["cod_contrato"]);
@@ -398,7 +412,7 @@ switch ($stAcao) {
             $stFiltro = " AND lote_ferias_lote.cod_lote = ".$_REQUEST["inCodLote"];
         } else {
             $obTPessoalLoteFeriasLote->setDado("cod_ferias",$_REQUEST['inCodFerias']);
-            $obTPessoalLoteFeriasLote->recuperaPorChave($rsLoteFeriasLote);
+            $obTPessoalLoteFeriasLote->recuperaPorChave($rsLoteFeriasLote,$boTransacao);
 
             $stFiltro = " AND lancamento_ferias.cod_ferias = ".$_REQUEST['inCodFerias'];
         }
@@ -406,7 +420,7 @@ switch ($stAcao) {
 
         while (!$rsLancamentoFerias->eof()) {
             $obTPessoalFerias->setDado("cod_ferias",$rsLancamentoFerias->getCampo("cod_ferias"));
-            $obTPessoalFerias->recuperaPorChave($rsFerias);
+            $obTPessoalFerias->recuperaPorChave($rsFerias,$boTransacao);
 
             $inCodContrato = $rsLancamentoFerias->getCampo("cod_contrato");
 
@@ -470,7 +484,7 @@ switch ($stAcao) {
 
                         $obTPessoalLoteFeriasPesquisa = new TPessoalLoteFerias();
                         $obTPessoalLoteFeriasPesquisa->setDado('cod_lote', $rsLancamentoFerias->getCampo('cod_lote'));
-                        $obTPessoalLoteFeriasPesquisa->recuperaPorChave($rsLoteFeriasPesquisa);
+                        $obTPessoalLoteFeriasPesquisa->recuperaPorChave($rsLoteFeriasPesquisa,$boTransacao);
 
                         $stObservacao = "Férias do lote ".$rsLoteFeriasPesquisa->getCampo('nome');
                     } else {
@@ -486,7 +500,7 @@ switch ($stAcao) {
                         $obTPessoalAssentamentoGeradoExcluido->setDado( "cod_assentamento_gerado" , $rsAssentamentoGerado->getCampo("cod_assentamento_gerado") );
                         $obTPessoalAssentamentoGeradoExcluido->setDado( "timestamp" , $rsAssentamentoGerado->getCampo("timestamp") );
                         $obTPessoalAssentamentoGeradoExcluido->setDado( "descricao" , "Exclusão de assentamento gerado por consequencia do cancelamento das férias que geraram o assentamento." );
-                        $obErro = $obTPessoalAssentamentoGeradoExcluido->inclusao();
+                        $obErro = $obTPessoalAssentamentoGeradoExcluido->inclusao($boTransacao);
                     }
                 }
 
@@ -501,30 +515,30 @@ switch ($stAcao) {
             $arExclui = validaExclusaoConcessao($inCodContrato,$inCodPeriodoMovimentacao);
             $stMensagem = "Competência ".$_REQUEST['inMesCompetencia']."/".$_REQUEST['inAnoCompetencia']." - Matrícula ".$_REQUEST['inRegistro']." cancelado com sucesso";
             if ($_GET["boConcederFeriasLote"] or $rsLoteFeriasLote->getNumLinhas() == 1) {
-                $obTPessoalLoteFeriasLote->exclusao();
+                $obTPessoalLoteFeriasLote->exclusao($boTransacao);
 
                 //exclui o contrato do filtro de lote, se houver
                 $obTPessoalLoteFeriasContrato->setDado('cod_contrato', $inCodContrato);
                 $obTPessoalLoteFeriasContrato->setDado('cod_lote', $obTPessoalLoteFeriasLote->getDado('cod_lote'));
-                $obTPessoalLoteFeriasContrato->exclusao();
+                $obTPessoalLoteFeriasContrato->exclusao($boTransacao);
 
                 if (!$_GET["boConcederFeriasLote"]) {
                     //Exclui o lote caso nao existam mais contratos/ferias vinculadas a ele
-                    $obTPessoalLoteFeriasLote->recuperaTodos($rsLoteFeriasLoteExcluir, " WHERE cod_lote = ".$rsLoteFeriasLote->getCampo('cod_lote'));
+                    $obTPessoalLoteFeriasLote->recuperaTodos($rsLoteFeriasLoteExcluir, " WHERE cod_lote = ".$rsLoteFeriasLote->getCampo('cod_lote'),"",$boTransacao );
                     if ($rsLoteFeriasLoteExcluir->getNumLinhas() <= 0) {
                         $obTPessoalLoteFerias->setDado('cod_lote', $rsLoteFeriasLote->getCampo('cod_lote'));
                         $obTPessoalLoteFeriasContrato->setDado('cod_contrato', '');
-                        $obTPessoalLoteFeriasContrato->exclusao();
-                        $obTPessoalLoteFeriasOrgao->exclusao();
-                        $obTPessoalLoteFeriasLocal->exclusao();
-                        $obTPessoalLoteFeriasFuncao->exclusao();
-                        $obTPessoalLoteFerias->exclusao();
+                        $obTPessoalLoteFeriasContrato->exclusao($boTransacao);
+                        $obTPessoalLoteFeriasOrgao->exclusao($boTransacao);
+                        $obTPessoalLoteFeriasLocal->exclusao($boTransacao);
+                        $obTPessoalLoteFeriasFuncao->exclusao($boTransacao);
+                        $obTPessoalLoteFerias->exclusao($boTransacao);
                     }
                 }
             }
 
-            $obTPessoalLancamentoFerias->exclusao();
-            $obTPessoalFerias->exclusao();
+            $obTPessoalLancamentoFerias->exclusao($boTransacao);
+            $obTPessoalFerias->exclusao($boTransacao);
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
             $obTPessoalContrato = new TPessoalContrato();
@@ -536,7 +550,7 @@ switch ($stAcao) {
             $obTFolhaPagamentoDeducaoDependente->setDado("numcgm",$rsCGM->getCampo("numcgm"));
             $obTFolhaPagamentoDeducaoDependente->setDado("cod_periodo_movimentacao",$inCodPeriodoMovimentacao);
             $obTFolhaPagamentoDeducaoDependente->setDado("cod_tipo",1);
-            $obTFolhaPagamentoDeducaoDependente->exclusao();
+            $obTFolhaPagamentoDeducaoDependente->exclusao($boTransacao);
 
             if ($arExclui['ferias']) {
                 if ($rsPeriodoMovimentacao->getNumLinhas() > 0) {
@@ -583,11 +597,11 @@ switch ($stAcao) {
                             $obTFolhaPagamentoRegistroEvento->recuperaRegistrosEventos($rsRegistrosEventos,$stFiltro);
                             while (!($rsRegistrosEventos->eof())) {
                                 $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_registro",$rsRegistrosEventos->getCampo("cod_registro"));
-                                $obTFolhaPagamentoEventoCalculadoDependente->exclusao();
-                                $obTFolhaPagamentoEventoCalculado->exclusao();
-                                $obTFolhaPagamentoLogErroCalculo->exclusao();
-                                $obTFolhaPagamentoRegistroEventoParcela->exclusao();
-                                $obTFolhaPagamentoUltimoRegistroEvento->exclusao();
+                                $obTFolhaPagamentoEventoCalculadoDependente->exclusao($boTransacao);
+                                $obTFolhaPagamentoEventoCalculado->exclusao($boTransacao);
+                                $obTFolhaPagamentoLogErroCalculo->exclusao($boTransacao);
+                                $obTFolhaPagamentoRegistroEventoParcela->exclusao($boTransacao);
+                                $obTFolhaPagamentoUltimoRegistroEvento->exclusao($boTransacao);
                                 $rsRegistrosEventos->proximo();
                             }
                         }
@@ -596,11 +610,11 @@ switch ($stAcao) {
                         $obTFolhaPagamentoRegistroEventoFerias->setDado("cod_evento"  ,$rsRegistroFerias->getCampo("cod_evento"));
                         $obTFolhaPagamentoRegistroEventoFerias->setDado("desdobramento"  ,$rsRegistroFerias->getCampo("desdobramento"));
                         $obTFolhaPagamentoRegistroEventoFerias->setDado("timestamp"   ,$rsRegistroFerias->getCampo("timestamp"));
-                        $obTFolhaPagamentoLogErroCalculoFerias->exclusao();
-                        $obTFolhaPagamentoEventoFeriasCalculadoDependente->exclusao();
-                        $obTFolhaPagamentoEventoFeriasCalculado->exclusao();
-                        $obTFolhaPagamentoRegistroEventoFeriasParcela->exclusao();
-                        $obTFolhaPagamentoUltimoRegistroEventoFerias->exclusao();
+                        $obTFolhaPagamentoLogErroCalculoFerias->exclusao($boTransacao);
+                        $obTFolhaPagamentoEventoFeriasCalculadoDependente->exclusao($boTransacao);
+                        $obTFolhaPagamentoEventoFeriasCalculado->exclusao($boTransacao);
+                        $obTFolhaPagamentoRegistroEventoFeriasParcela->exclusao($boTransacao);
+                        $obTFolhaPagamentoUltimoRegistroEventoFerias->exclusao($boTransacao);
                         $rsRegistroFerias->proximo();
                     }
 
@@ -625,12 +639,12 @@ switch ($stAcao) {
                             $obTFolhaPagamentoRegistroEvento->setDado("cod_registro",$rsEventosCalculados->getCampo("cod_registro"));
                             $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro",$rsEventosCalculados->getCampo("cod_registro"));
 
-                            $obTFolhaPagamentoEventoCalculadoDependente->exclusao();
-                            $obTFolhaPagamentoEventoCalculado->exclusao();
-                            $obTFolhaPagamentoLogErroCalculo->exclusao();
-                            $obTFolhaPagamentoUltimoRegistroEvento->exclusao();
-                            $obTFolhaPagamentoRegistroEvento->exclusao();
-                            $obTFolhaPagamentoRegistroEventoPeriodo->exclusao();
+                            $obTFolhaPagamentoEventoCalculadoDependente->exclusao($boTransacao);
+                            $obTFolhaPagamentoEventoCalculado->exclusao($boTransacao);
+                            $obTFolhaPagamentoLogErroCalculo->exclusao($boTransacao);
+                            $obTFolhaPagamentoUltimoRegistroEvento->exclusao($boTransacao);
+                            $obTFolhaPagamentoRegistroEvento->exclusao($boTransacao);
+                            $obTFolhaPagamentoRegistroEventoPeriodo->exclusao($boTransacao);
                             $rsEventosCalculados->proximo();
                         }
                         #########################################################################
@@ -664,16 +678,16 @@ switch ($stAcao) {
                                 $obTFolhaPagamentoEventoComplementarCalculado->setDado("cod_registro",$rsEventosCalculados->getCampo("cod_registro"));
                                 $obTFolhaPagamentoEventoComplementarCalculadoDependente->setDado("cod_registro",$rsEventosCalculados->getCampo("cod_registro"));
                                 $obTFolhaPagamentoLogErroCalculoComplementar->setDado("cod_registro",$rsEventosCalculados->getCampo("cod_registro"));
-                                $obTFolhaPagamentoEventoComplementarCalculado->exclusao();
-                                $obTFolhaPagamentoEventoComplementarCalculadoDependente->exclusao();
-                                $obTFolhaPagamentoLogErroCalculoComplementar->exclusao();
+                                $obTFolhaPagamentoEventoComplementarCalculado->exclusao($boTransacao);
+                                $obTFolhaPagamentoEventoComplementarCalculadoDependente->exclusao($boTransacao);
+                                $obTFolhaPagamentoLogErroCalculoComplementar->exclusao($boTransacao);
                                 $rsEventosCalculados->proximo();
                             }
                             while (!$rsUltimoRegistroEventoComplementar->eof()) {
                                 $obTFolhaPagamentoUltimoRegistroEventoComplementar->setDado("cod_registro",$rsUltimoRegistroEventoComplementar->getCampo("cod_registro"));
                                 $obTFolhaPagamentoRegistroEventoComplementar->setDado("cod_registro",$rsUltimoRegistroEventoComplementar->getCampo("cod_registro"));
-                                $obTFolhaPagamentoUltimoRegistroEventoComplementar->exclusao();
-                                $obTFolhaPagamentoRegistroEventoComplementar->exclusao();
+                                $obTFolhaPagamentoUltimoRegistroEventoComplementar->exclusao($boTransacao);
+                                $obTFolhaPagamentoRegistroEventoComplementar->exclusao($boTransacao);
                                 $rsUltimoRegistroEventoComplementar->proximo();
                             }
                         }
@@ -690,9 +704,9 @@ switch ($stAcao) {
                 $obTFolhaPagamentoEventoCalculado->recuperaEventosCalculados($rsEventosSalarioCalculado,$stFiltro);
                 while (!$rsEventosSalarioCalculado->eof()) {
                     $obTFolhaPagamentoEventoCalculadoDependente->setDado("cod_registro",$rsEventosSalarioCalculado->getCampo("cod_registro"));
-                    $obTFolhaPagamentoEventoCalculadoDependente->exclusao();
+                    $obTFolhaPagamentoEventoCalculadoDependente->exclusao($boTransacao);
                     $obTFolhaPagamentoEventoCalculado->setDado("cod_registro",$rsEventosSalarioCalculado->getCampo("cod_registro"));
-                    $obTFolhaPagamentoEventoCalculado->exclusao();
+                    $obTFolhaPagamentoEventoCalculado->exclusao($boTransacao);
                     $rsEventosSalarioCalculado->proximo();
                 }
             }
@@ -706,20 +720,20 @@ switch ($stAcao) {
                 $obTFolhaPagamentoEventoComplementarCalculado->recuperaEventosCalculados($rsEventosComplementaresCalculados,$stFiltro);
                 while (!$rsEventosComplementaresCalculados->eof()) {
                     $obTFolhaPagamentoEventoComplementarCalculadoDependente->setDado("cod_registro",$rsEventosComplementaresCalculados->getCampo("cod_registro"));
-                    $obTFolhaPagamentoEventoComplementarCalculadoDependente->exclusao();
+                    $obTFolhaPagamentoEventoComplementarCalculadoDependente->exclusao($boTransacao);
                     $obTFolhaPagamentoEventoComplementarCalculado->setDado("cod_registro",$rsEventosComplementaresCalculados->getCampo("cod_registro"));
-                    $obTFolhaPagamentoEventoComplementarCalculado->exclusao();
+                    $obTFolhaPagamentoEventoComplementarCalculado->exclusao($boTransacao);
                     $rsEventosComplementaresCalculados->proximo();
                 }
             }
             $rsLancamentoFerias->proximo();
         }
         if ($_GET["boConcederFeriasLote"]) {
-            $obTPessoalLoteFeriasContrato->exclusao();
-            $obTPessoalLoteFeriasOrgao->exclusao();
-            $obTPessoalLoteFeriasLocal->exclusao();
-            $obTPessoalLoteFeriasFuncao->exclusao();
-            $obTPessoalLoteFerias->exclusao();
+            $obTPessoalLoteFeriasContrato->exclusao($boTransacao);
+            $obTPessoalLoteFeriasOrgao->exclusao($boTransacao);
+            $obTPessoalLoteFeriasLocal->exclusao($boTransacao);
+            $obTPessoalLoteFeriasFuncao->exclusao($boTransacao);
+            $obTPessoalLoteFerias->exclusao($boTransacao);
             $stMensagem = $_GET["stDescQuestao"]." canceladas com sucesso.";
         }
 

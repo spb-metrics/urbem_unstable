@@ -34,7 +34,7 @@
 
     * @ignore
 
-    * $Id: FMManterLogradouro.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterLogradouro.php 62960 2015-07-13 14:00:58Z evandro $
 
     * Casos de uso: uc-05.01.04
 */
@@ -439,7 +439,11 @@ $obSpnListarBairro->setId ( "spanListarBairro" );
 
 $obSpnListarCEP = New Span;
 $obSpnListarCEP->setId ( "spanListarCEP" );
-    //-------------------------------------------------------- FIM SPANS
+
+$obSpnListarHistorico = New Span;
+$obSpnListarHistorico->setId ( "spanListarHistorico" );
+
+//-------------------------------------------------------- FIM SPANS
 if ($stAcao <>'incluir') {
 
     //-------------------------------------------------------- OUTROS
@@ -509,6 +513,7 @@ if ($stAcao == "alterar" || $stAcao == "renomear") {
     $obFormulario->addComponente ( $obLblNomeUF        );
     $obFormulario->addComponente ( $obLblNomeMunicipio );
     $obFormulario->addComponente ( $obLblExtensao );
+    $obFormulario->addSpan       ( $obSpnListarHistorico );
 
 } elseif ($stAcao == "incluir") {
 

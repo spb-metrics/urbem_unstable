@@ -110,7 +110,6 @@ $obTxtExecutivo->setTitle       ( "Informe o código do orgão/unidade relativo 
 $obTxtExecutivo->setInteiro     ( true );
 $obTxtExecutivo->setSize        ( 3 );
 $obTxtExecutivo->setMaxLength   ( "4" );
-$obTxtExecutivo->setNull        ( false );
    
 $obTxtLegislativo = new Textbox;
 $obTxtLegislativo->setName        ( "inCodLegislativo" );
@@ -121,7 +120,6 @@ $obTxtLegislativo->setTitle       ( "Informe o código do orgão/unidade relativ
 $obTxtLegislativo->setInteiro     ( true );
 $obTxtLegislativo->setSize        ( 3 );
 $obTxtLegislativo->setMaxLength   ( "4" );
-$obTxtLegislativo->setNull        ( false );
 
 $obTxtRPPS = new Textbox;
 $obTxtRPPS->setName        ( "inCodRPPS" );

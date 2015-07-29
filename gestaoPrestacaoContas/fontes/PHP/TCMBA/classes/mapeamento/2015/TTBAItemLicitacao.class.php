@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63134 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -90,76 +90,136 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   lici.exercicio     \n";
-    $stSql .= "         ,lici.cod_licitacao     \n";
-    $stSql .= "         ,mait.cod_item     \n";
-    $stSql .= "         ,cait.descricao     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'dd/mm/yyyy') as data_homologacao     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'yyyymm') as competencia     \n";
-    $stSql .= "         ,sum(mait.quantidade) as qtd_licitacao     \n";
-    $stSql .= "         ,coalesce(sum(maia.qtd_anulacao),0.00) as qtd_anulacao     \n";
-    $stSql .= "         ,sum(mait.quantidade) - coalesce(sum(maia.qtd_anulacao),0.00) as qtd_saldo     \n";
-    $stSql .= "         ,unme.simbolo     \n";
-    $stSql .= " FROM     licitacao.licitacao            as lici     \n";
-    $stSql .= "         ,compras.mapa                   as mapa     \n";
-    $stSql .= "         ,compras.mapa_item              as mait     \n";
-    $stSql .= "         LEFT JOIN (     \n";
-    $stSql .= "             SELECT   maia.exercicio     \n";
-    $stSql .= "                     ,maia.cod_mapa     \n";
-    $stSql .= "                     ,maia.exercicio_solicitacao     \n";
-    $stSql .= "                     ,maia.cod_entidade     \n";
-    $stSql .= "                     ,maia.cod_solicitacao     \n";
-    $stSql .= "                     ,maia.cod_centro     \n";
-    $stSql .= "                     ,maia.cod_item     \n";
-    $stSql .= "                     ,maia.lote     \n";
-    $stSql .= "                     ,sum(quantidade) as qtd_anulacao     \n";
-    $stSql .= "             FROM    compras.mapa_item_anulacao as maia     \n";
-    $stSql .= "             WHERE   maia.exercicio='".$this->getDado('exercicio')."'                      \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     maia.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
-    $stSql .= "             GROUP BY maia.exercicio, maia.cod_mapa, maia.exercicio_solicitacao, maia.cod_entidade, maia.cod_solicitacao, maia.cod_centro, maia.cod_item, maia.lote     \n";
-    $stSql .= "          ) as maia     \n";
-    $stSql .= "         ON (     \n";
-    $stSql .= "                     maia.exercicio              = mait.exercicio     \n";
-    $stSql .= "             AND     maia.cod_mapa               = mait.cod_mapa     \n";
-    $stSql .= "             AND     maia.exercicio_solicitacao  = mait.exercicio_solicitacao     \n";
-    $stSql .= "             AND     maia.cod_entidade           = mait.cod_entidade     \n";
-    $stSql .= "             AND     maia.cod_solicitacao        = mait.cod_solicitacao     \n";
-    $stSql .= "             AND     maia.cod_centro             = mait.cod_centro     \n";
-    $stSql .= "             AND     maia.cod_item               = mait.cod_item     \n";
-    $stSql .= "             AND     maia.lote                   = mait.lote     \n";
-    $stSql .= "         )     \n";
-    $stSql .= "         ,almoxarifado.catalogo_item     as cait     \n";
-    $stSql .= "         ,administracao.unidade_medida   as unme     \n";
-    $stSql .= " WHERE   lici.exercicio      = mapa.exercicio     \n";
-    $stSql .= " AND     lici.cod_mapa       = mapa.cod_mapa     \n";
-    $stSql .= " AND     mapa.exercicio      = mait.exercicio     \n";
-    $stSql .= " AND     mapa.cod_mapa       = mait.cod_mapa     \n";
-    $stSql .= " AND     mait.cod_item       = cait.cod_item     \n";
-    $stSql .= " AND     cait.cod_grandeza   = unme.cod_grandeza     \n";
-    $stSql .= " AND     cait.cod_unidade    = unme.cod_unidade     \n";
-    $stSql .= " AND     lici.exercicio      = 2007     \n";
-    $stSql .= " AND     lici.exercicio='".$this->getDado('exercicio')."'                      \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     lici.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
-    $stSql .= " GROUP BY lici.exercicio     \n";
-    $stSql .= "         ,lici.cod_licitacao     \n";
-    $stSql .= "         ,mait.cod_item     \n";
-    $stSql .= "         ,cait.cod_item     \n";
-    $stSql .= "         ,cait.descricao     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'dd/mm/yyyy')     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'yyyymm')     \n";
-    $stSql .= "         ,unme.simbolo     \n";
-    $stSql .= " ORDER BY lici.exercicio     \n";
-    $stSql .= "         ,lici.cod_licitacao     \n";
-    $stSql .= "         ,mait.cod_item     \n";
-    $stSql .= "         ,cait.cod_item     \n";
-    $stSql .= "         ,cait.descricao     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'dd/mm/yyyy')     \n";
-    $stSql .= "         ,to_char(lici.timestamp,'yyyymm')     \n";
-    $stSql .= "         ,unme.simbolo     \n";
+    $stSql = " SELECT   licitacao.exercicio 
+                       ,licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS cod_licitacao
+                       ,mapa_item.cod_item
+                       ,catalogo_item.descricao
+                       ,TO_CHAR(homologacao.timestamp,'dd/mm/yyyy') AS data_homologacao     
+                       ,TO_CHAR(homologacao.timestamp,'yyyymm') AS competencia     
+                       ,COALESCE(SUM(mapa_item.quantidade),0.00) AS qtd_licitacao     
+                       ,COALESCE(SUM(mapa_item_anulacao.qtd_anulacao),0.00) AS qtd_anulacao     
+                       ,COALESCE(SUM(mapa_item.quantidade),0.00) - COALESCE(SUM(mapa_item_anulacao.qtd_anulacao),0.00) AS qtd_saldo     
+                       ,unidade_medida.simbolo
+                       ,1 AS tipo_registro
+                       , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+
+                FROM compras.mapa_item
+
+          INNER JOIN compras.mapa
+                  ON mapa.cod_mapa = mapa_item.cod_mapa
+                 AND mapa.exercicio = mapa_item.exercicio
+
+           LEFT JOIN (
+                        SELECT mapa_item_anulacao.exercicio     
+                              ,mapa_item_anulacao.cod_mapa     
+                              ,mapa_item_anulacao.exercicio_solicitacao     
+                              ,mapa_item_anulacao.cod_entidade     
+                              ,mapa_item_anulacao.cod_solicitacao     
+                              ,mapa_item_anulacao.cod_centro     
+                              ,mapa_item_anulacao.cod_item     
+                              ,mapa_item_anulacao.lote
+                              ,COALESCE(SUM(mapa_item_anulacao.quantidade),0.00) AS qtd_anulacao     
+                          FROM compras.mapa_item_anulacao
+                          WHERE mapa_item_anulacao.exercicio='".$this->getDado('exercicio')."'
+                            ";
+
+        if (trim($this->getDado('entidades'))) {
+            $stSql .= " AND mapa_item_anulacao.cod_entidade IN (".$this->getDado('entidades').")
+                      ";
+        }
+
+        $stSql .= "
+                          GROUP BY mapa_item_anulacao.exercicio
+                                 , mapa_item_anulacao.cod_mapa
+                                 , mapa_item_anulacao.exercicio_solicitacao
+                                 , mapa_item_anulacao.cod_entidade
+                                 , mapa_item_anulacao.cod_solicitacao
+                                 , mapa_item_anulacao.cod_centro
+                                 , mapa_item_anulacao.cod_item
+                                 , mapa_item_anulacao.lote     
+                    ) AS mapa_item_anulacao
+                 ON mapa_item_anulacao.exercicio = mapa_item.exercicio     
+                AND mapa_item_anulacao.cod_mapa = mapa_item.cod_mapa     
+                AND mapa_item_anulacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao     
+                AND mapa_item_anulacao.cod_entidade = mapa_item.cod_entidade     
+                AND mapa_item_anulacao.cod_solicitacao = mapa_item.cod_solicitacao     
+                AND mapa_item_anulacao.cod_centro = mapa_item.cod_centro     
+                AND mapa_item_anulacao.cod_item = mapa_item.cod_item     
+                AND mapa_item_anulacao.lote = mapa_item.lote
+
+         INNER JOIN licitacao.licitacao
+                 ON licitacao.exercicio_mapa = mapa.exercicio
+                AND licitacao.cod_mapa = mapa.cod_mapa
+
+         INNER JOIN licitacao.cotacao_licitacao
+                 ON cotacao_licitacao.cod_licitacao = licitacao.cod_licitacao
+                AND cotacao_licitacao.cod_modalidade = licitacao.cod_modalidade
+                AND cotacao_licitacao.cod_entidade = licitacao.cod_entidade
+                AND cotacao_licitacao.exercicio_licitacao = licitacao.exercicio
+
+         INNER JOIN licitacao.adjudicacao
+                 ON adjudicacao.cod_licitacao = cotacao_licitacao.cod_licitacao
+                AND adjudicacao.cod_modalidade = cotacao_licitacao.cod_modalidade
+                AND adjudicacao.cod_entidade = cotacao_licitacao.cod_entidade
+                AND adjudicacao.exercicio_licitacao = cotacao_licitacao.exercicio_licitacao
+                AND adjudicacao.lote = cotacao_licitacao.lote
+                AND adjudicacao.cod_cotacao = cotacao_licitacao.cod_cotacao
+                AND adjudicacao.cod_item = cotacao_licitacao.cod_item
+                AND adjudicacao.exercicio_cotacao = cotacao_licitacao.exercicio_cotacao
+                AND adjudicacao.cgm_fornecedor = cotacao_licitacao.cgm_fornecedor
+
+         INNER JOIN licitacao.homologacao
+                 ON homologacao.num_adjudicacao = adjudicacao.num_adjudicacao
+                AND homologacao.cod_entidade = adjudicacao.cod_entidade
+                AND homologacao.cod_modalidade = adjudicacao.cod_modalidade
+                AND homologacao.cod_licitacao = adjudicacao.cod_licitacao
+                AND homologacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
+                AND homologacao.cod_item = adjudicacao.cod_item
+                AND homologacao.cod_cotacao = adjudicacao.cod_cotacao
+                AND homologacao.lote = adjudicacao.lote
+                AND homologacao.exercicio_cotacao = adjudicacao.exercicio_cotacao
+                AND homologacao.cgm_fornecedor = adjudicacao.cgm_fornecedor
+
+         INNER JOIN almoxarifado.catalogo_item
+                 ON catalogo_item.cod_item = mapa_item.cod_item
+
+         INNER JOIN administracao.unidade_medida
+                 ON catalogo_item.cod_grandeza = unidade_medida.cod_grandeza
+                AND catalogo_item.cod_unidade = unidade_medida.cod_unidade
+
+              WHERE ";
+
+        if (trim($this->getDado('entidades'))) {
+            $stSql .= " licitacao.cod_entidade IN (".$this->getDado('entidades').")
+                    AND ";              
+        }
+
+        $stSql .= " licitacao.exercicio = '".$this->getDado('exercicio')."'
+                AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                                                          AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                AND licitacao.cod_modalidade NOT IN (8,9)
+
+            GROUP BY licitacao.exercicio     
+                    ,licitacao.cod_licitacao     
+                    ,mapa_item.cod_item     
+                    ,catalogo_item.cod_item     
+                    ,catalogo_item.descricao     
+                    ,data_homologacao    
+                    ,competencia
+                    ,unidade_medida.simbolo
+                    ,licitacao.cod_entidade
+                    ,licitacao.cod_modalidade
+
+            ORDER BY licitacao.exercicio     
+                    ,licitacao.cod_licitacao     
+                    ,mapa_item.cod_item     
+                    ,catalogo_item.cod_item     
+                    ,catalogo_item.descricao     
+                    ,data_homologacao
+                    ,competencia
+                    ,unidade_medida.simbolo
+                    
+        ";
 
     return $stSql;
 }

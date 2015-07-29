@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 62937 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,25 +41,10 @@
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/07/11 04:46:53  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoPrevisaoReceita.class.php" );
 
-/**
-  *
-  * Data de Criação: 09/07/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAPrevisaoReceita extends TOrcamentoPrevisaoReceita
 {
 /**
@@ -69,8 +54,6 @@ class TTBAPrevisaoReceita extends TOrcamentoPrevisaoReceita
 function TTBAPrevisaoReceita()
 {
     parent::TOrcamentoPrevisaoReceita();
-
-    $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
 function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -88,21 +71,33 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   cr.exercicio                                       \n";
-    $stSql .= "         ,replace(cr.cod_estrutural,'.','') as estrutural    \n";
-    $stSql .= "         ,sum(vl_periodo) as valor                           \n";
-    $stSql .= " FROM     orcamento.conta_receita    as cr                   \n";
-    $stSql .= "         ,orcamento.receita          as re                   \n";
-    $stSql .= "         ,orcamento.previsao_receita as pr                   \n";
-    $stSql .= " WHERE   cr.exercicio    = re.exercicio                      \n";
-    $stSql .= " AND     cr.cod_conta    = re.cod_conta                      \n";
-    $stSql .= " AND     re.exercicio    = pr.exercicio                      \n";
-    $stSql .= " AND     re.cod_receita  = pr.cod_receita                    \n";
-    $stSql .= " AND     cr.exercicio='".$this->getDado('exercicio')."'      \n";
-    $stSql .= " GROUP BY cr.exercicio, cr.cod_estrutural                    \n";
-    $stSql .= " ORDER BY cr.exercicio, cr.cod_estrutural                    \n";
+    $stSql = "
+        SELECT 1 AS tipo_registro
+              , conta_receita.exercicio      
+              , ".$this->getDado('inCodGestora')." AS unidade_gestora
+              , REPLACE(conta_receita.cod_estrutural,'.','') AS item_receita    
+              , REPLACE(SUM(previsao_receita.vl_periodo)::VARCHAR, '.', '') AS valor_receita                          
+         FROM orcamento.conta_receita
+             
+   INNER JOIN orcamento.receita
+           ON conta_receita.exercicio    = receita.exercicio                      
+          AND conta_receita.cod_conta    = receita.cod_conta                      
+   
+   INNER JOIN orcamento.previsao_receita
+           ON receita.exercicio    = previsao_receita.exercicio                      
+          AND receita.cod_receita  = previsao_receita.cod_receita                    
+  
+        WHERE conta_receita.exercicio = '".$this->getDado('stExercicio')."'      
+     
+     GROUP BY conta_receita.exercicio
+            , conta_receita.cod_estrutural                    
+     
+     ORDER BY conta_receita.exercicio
+            , conta_receita.cod_estrutural ";
 
     return $stSql;
 }
 
 }
+
+?>

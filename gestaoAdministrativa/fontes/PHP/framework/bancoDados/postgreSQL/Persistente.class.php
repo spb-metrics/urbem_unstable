@@ -33,7 +33,7 @@
     * @package Conectividade
     * @subpackage Persistente
 
-    $Id: Persistente.class.php 62212 2015-04-08 17:39:51Z diogo.zarpelon $
+    $Id: Persistente.class.php 63060 2015-07-20 20:35:00Z evandro $
 
     Casos de uso: uc-01.01.00
 
@@ -1301,12 +1301,242 @@ function montaRecuperaMaxTimestamp()
     * @param  Boolean $boTransacao
     * @return Boolean true
 */
-    public function validaExclusao($stFiltro = "" , $boTransacao = "")
-    {
-       $obErro = new Erro;
+public function validaExclusao($stFiltro = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    
+    $stTabelaPrincipal = $this->getTabela();    
+    //Busca as tabelas que são referenciadas pela tabela principal
+    $stSql = $this->buscaForeingKeys( $stTabelaPrincipal );
+    $this->setDebug($stSql);    
+    $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao, $obConexao);
+    
+    if ( !$obErro->ocorreu() ) {
+        foreach ($rsRecordSet->getElementos() as $chave => $valor) {
+            //Bucar chaves das tabela mae e fk
+            list($stTabelaFK,$stTabelaMae) = explode(' REFERENCES ',$valor['descricao_fk']);
+            //Retira tudo da string para pegar os campos que vem direto do banco
+            $stTabelaFK  = preg_replace("/.*\(/", "", $stTabelaFK);
+            $stTabelaMae = preg_replace("/.*\(/", "", $stTabelaMae);
+            //Remove aspas dos campo timestamp que vem do banco
+            $stTabelaFK  = preg_replace("/\"/", "", $stTabelaFK);
+            $stTabelaMae = preg_replace("/\"/", "", $stTabelaMae);
+            //Separada campos que vem na string
+            $arChaveTabelaFK  = explode(",",$stTabelaFK);
+            $arChaveTabelaMae = explode(",",$stTabelaMae);
+            //Retira qualquer espaco em branco de todos os campos
+            $arChaveTabelaFK  = array_map("trim",$arChaveTabelaFK);
+            $arChaveTabelaMae = array_map("trim",$arChaveTabelaMae);
+            //-----------------------------------------------------------------------------
 
-       return $obErro;
+            //Monta Select de cada tabela verificando se existe dados vinculados
+            $stSelect = "SELECT 1 \n FROM ".$valor['nome_tabela_mae']." , ".$valor['nome_tabela_fk'];
+            for($i=0;$i<count($arChaveTabelaMae);$i++){
+                if($i == 0 ) {                    
+                    $stWhere = "\n WHERE ".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];
+                } else {
+                    $stWhere .= "\n AND ".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];                    
+                }
+            }
+            //Monta filtro com os campos de chaves
+            $chaveFiltro = $this->montaFiltro();
+            $stSelect .= $stWhere."\n AND ".$chaveFiltro;
+            
+            //Executa o select com a relacao da tabela fk
+            $this->setDebug($stSelect);
+            $obErro = $obConexao->executaSQL($rsValidaRelacao, $stSelect, $boTransacao, $obConexao);
+
+            //Verifica se existe dados e evita delete no banco que causava erro de fk
+            $boValidaExclusao = true;
+            if (!$obErro->ocorreu()) {
+                if ($rsValidaRelacao->getNumLinhas() > 0 ) {
+                    $boValidaExclusao = false;
+                }
+            }else{
+                $boValidaExclusao = false;
+            }
+
+            //Seta mensagem padrao para o usuario, deve ser sobrescrita de acordo com cada regra e acao
+            if (!$boValidaExclusao) {
+                $obErro->setDescricao("Não é possivel excluir os dados porque o está sendo utilizado pelo sistema em outra ação! ");
+                return $obErro;
+            }
+        }
     }
+    return $obErro;
+}
+
+private function montaFiltro()
+{
+    $stTabela = $this->getTabela();
+    $stChave = $this->getCampoCod();
+    if ($stChave) {
+        $inValor = $this->getDado($stChave);
+        if ($inValor != "") {
+            foreach ($this->GetEstrutura() as $obCampo) {
+                if ( $obCampo->GetNomeCampo() == $stChave ) {
+                    switch ( strtolower( $obCampo->GetTipoCampo() ) ) {
+                        case("date"):
+                            $stChave = $stTabela.".".$stChave." = TO_DATE(''".$inValor."',,'dd/mm/yyyy') ";
+                        break;
+                        case("timestamp"):
+                        case("timestamp_now"):
+                            $stChave = $stTabela.".".$stChave." = TO_TIMESTAMP('".$inValor."','yyyy-mm-dd hh24:mi:ss.us') ";
+                        break;
+                        case("timestamp_date"):
+                            $stChave = $stTabela.".".$stChave." = TO_TIMESTAMP('".$inValor."','dd/mm/yyyy') ";
+                        break;
+                        case("data_hora"):
+                            $stChave = $stTabela.".".$stChave." = TO_DATE(''".$inValor."',,'dd/mm/yyyy') ";
+                        break;
+                        case("char"):
+                        case("text"):
+                        case("varchar"):
+                            $stChave = $stTabela.".".$stChave." = '".$inValor."' ";
+                        break;
+                        case("numeric"):
+                            if ( $obCampo->getCampoForeignKey() ) {
+                                $stConteudo = &$this->getDado( $stCampo );
+                            } else {
+                                $stConteudo = $obCampo->GetConteudo();
+                            }
+                            $nrValor = str_replace('.', '', $stConteudo );
+                            $nrValor = str_replace(',', '.', $nrValor );
+                            $stSql.= "\n    '".$nrValor."',";
+                        break;
+                        default:
+                            $stChave = $stTabela.".".$stChave." = ".$inValor." ";
+                        break;
+                    }
+                }
+            }
+        } else {
+            $stChave = $stTabela.".".$stChave." IS NULL ";
+        }
+    }
+    $stComplemento = $this->montaComplementoFiltro();
+    if ($stComplemento) {
+        if( $stChave )
+            $stChave = $stChave." AND ".$stComplemento;
+        else
+            $stChave = $stComplemento;
+    }
+
+    return $stChave;
+}
+
+private function montaComplementoFiltro()
+{
+    $stTabela = $this->getTabela();
+    $stComplementoChave = str_replace ( " ", "", $this->getComplementoChave() );
+    $stRetorno = "";
+    if ($stComplementoChave) {
+        $arComplementoChave = explode(",", $stComplementoChave);
+        foreach ($arComplementoChave as $stCampo) {
+            if ($stCampo) {
+                $inValor = $this->getDado($stCampo);
+                if ($inValor != "") {
+                      for ($inCount=0;$inCount<count($this->GetEstrutura());$inCount++) {
+                        $obCampo = $this->arEstrutura[$inCount];
+                        if ( $obCampo->GetNomeCampo() == $stCampo ) {
+                            $obCampo->SetTipoCampo(strtolower($obCampo->GetTipoCampo()));
+                            switch ($obCampo->GetTipoCampo()) {
+                                case("date"):
+                                    $stRetorno .= $stTabela.".".$stCampo." = TO_DATE('".$inValor."','dd/mm/yyyy') AND ";
+                                break;
+                                case("timestamp"):
+                                case("timestamp_now"):
+                                    $stRetorno .= $stTabela.".".$stCampo." = TO_TIMESTAMP('".$inValor."','yyyy-mm-dd hh24:mi:ss.us') AND ";
+                                break;
+                                case("timestamp_date"):
+                                    $stRetorno .= $stTabela.".".$stCampo." = TO_TIMESTAMP('".$inValor."','dd/mm/yyyy') AND ";
+                                break;
+                                case("data_hora"):
+                                    $stRetorno .= $stTabela.".".$stCampo." = TO_DATE(''".$inValor."',,'dd/mm/yyyy') AND ";
+                                break;
+                                case("char"):
+                                case("text"):
+                                case("varchar"):
+                                case(preg_match('/char.*/', $obCampo->GetTipoCampo()) ? true : false):
+                                    $stRetorno .= $stTabela.".".$stCampo." = '".$inValor."' AND ";
+                                break;
+                                case("numeric"):
+                                    if ( $obCampo->getCampoForeignKey() ) {
+                                        $stConteudo = &$this->getDado( $stCampo );
+                                    } else {
+                                        $stConteudo = $obCampo->GetConteudo();
+                                    }
+                                    $nrValor = str_replace('.', '', $stConteudo );
+                                    $nrValor = str_replace(',', '.', $nrValor );
+                                    $stSql.= "\n    '".$nrValor."',";
+                                break;
+                                case("boolean"):
+                                    if ( $obCampo->getCampoForeignKey() ) {
+                                        $stConteudo = &$this->getDado( $obCampo->GetNomeCampo() );
+                                    } else {
+                                        $stConteudo = $obCampo->GetConteudo();
+                                    }
+                                    if( $stConteudo == "true" || $stConteudo == "t")
+                                        $stValor = "true";
+                                    elseif( $stConteudo == "false" || $stConteudo == "f" || $stConteudo == false)
+                                        $stValor = "false";
+                                    $stRetorno .= $stTabela.".".$stCampo." = '".$stValor."' AND ";
+                                break;
+                                default:
+                                    $stRetorno .= $stTabela.".".$stCampo." = ".$inValor." AND ";
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                $stRetorno .= $stTabela.".".$stCampo." IS NULL AND ";
+            }
+        }
+        $stRetorno = substr( $stRetorno, 0, strlen( $stRetorno ) - 4 );
+    }
+
+    return $stRetorno;
+}
+
+private function buscaForeingKeys($stTabela)
+{
+
+    list($stSchema,$stTable) = explode('.',$stTabela);
+    
+    if (preg_match('/sw_/', $stSchema)){
+        $stTable = $stSchema;
+        $stSchema = 'public';
+    }
+
+    $stSql = "  SELECT  namespace_1.nspname AS schema_mae
+                      , class_1.relname     AS tabela_mae
+                      , namespace_2.nspname AS schema_fk
+                      , class_2.relname     AS tabela_fk
+                      , namespace_1.nspname||'.'||class_1.relname as nome_tabela_mae
+                      , namespace_2.nspname||'.'||class_2.relname as nome_tabela_fk
+                      , REPLACE(regexp_replace(pg_catalog.pg_get_constraintdef(pg_constraint.oid, true),'FOREIGN KEY ',namespace_2.nspname||'.'||class_2.relname),')','') as descricao_fk
+                FROM pg_namespace  AS namespace_1
+                JOIN pg_class      AS class_1
+                  ON namespace_1.oid = class_1.relnamespace
+                JOIN pg_constraint
+                  ON class_1.oid = pg_constraint.confrelid
+                JOIN pg_class      AS class_2
+                  ON pg_constraint.conrelid = class_2.oid
+                JOIN pg_namespace namespace_2
+                  ON class_2.relnamespace = namespace_2.oid
+                WHERE namespace_1.nspname = '".$stSchema."'
+                AND class_1.relname       = '".$stTable."'
+                ORDER BY namespace_1.nspname
+                       , class_1.relname
+                       , namespace_2.nspname
+                       , class_2.relname
+        ";
+    return $stSql;
+}
 
 
 /**

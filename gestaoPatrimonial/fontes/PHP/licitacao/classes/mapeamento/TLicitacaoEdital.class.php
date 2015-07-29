@@ -38,7 +38,7 @@
     $Author: grasiele $
     $Date: 2008-04-08 14:41:54 -0300 (Ter, 08 Abr 2008) $
 
-    $Id: TLicitacaoEdital.class.php 62270 2015-04-15 20:13:46Z arthur $
+    $Id: TLicitacaoEdital.class.php 63116 2015-07-27 20:27:08Z franver $
 
     * Casos de uso: uc-03.05.16
 */
@@ -548,7 +548,7 @@ class TLicitacaoEdital extends Persistente
         ";
         
         if ( $this->getDado( 'num_edital' ) ) {
-            $stSql .= " ll.num_edital = ". $this->getDado( 'num_edital' )." and ";
+            $stSql .= " le.num_edital = ". $this->getDado( 'num_edital' )." and ";
         }
 
         if ( $this->getDado( 'exercicio_licitacao' ) ) {

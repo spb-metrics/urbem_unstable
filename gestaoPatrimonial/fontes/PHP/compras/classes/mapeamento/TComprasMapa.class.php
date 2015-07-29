@@ -159,6 +159,7 @@ class TComprasMapa extends Persistente
                        ,  (total.total_mapa - total.total_mapa_anulado) as total_mapa
                        ,  COALESCE(anulacao.total_anulado, 0.00) as total_anulado
                        ,  COALESCE(total.total_mapa_anulado, 0.00) as total_mapa_anulado
+                       ,  solicitacao.registro_precos
 
                     FROM  compras.solicitacao
 
@@ -599,49 +600,7 @@ class TComprasMapa extends Persistente
         $stSql .= "                            AND eaa.cod_autorizacao   = eae.cod_autorizacao                                                                             \n";
         $stSql .= "                     WHERE ccd.cod_mapa       = mapa.cod_mapa                                                                                           \n";
         $stSql .= "                       AND ccd.exercicio_mapa = mapa.exercicio       ) )                                                                                \n";
-        // $stSql .= " AND ( not exists (                                                                                                                                     \n";
-        // $stSql .= "                    SELECT 1                                                                                                                            \n";
-        // $stSql .= "                      FROM                                                                                                                              \n";
-        // $stSql .= "                           licitacao.licitacao as ll                                                                                                    \n";
-        // $stSql .= "                           JOIN compras.mapa_cotacao as cmc                                                                                             \n";
-        // $stSql .= "                             ON (    ll.cod_mapa       = cmc.cod_mapa                                                                                   \n";
-        // $stSql .= "                                 AND ll.exercicio_mapa = cmc.exercicio_mapa )                                                                           \n";
-        // $stSql .= "                           JOIN licitacao.homologacao as lh                                                                                             \n";
-        // $stSql .= "                             ON (    lh.cod_cotacao       = cmc.cod_cotacao                                                                             \n";
-        // $stSql .= "                                 AND lh.exercicio_cotacao = cmc.exercicio_cotacao )                                                                     \n";
-        // $stSql .= "                           JOIN empenho.item_pre_empenho_julgamento as eipej                                                                            \n";
-        // $stSql .= "                             ON (    eipej.exercicio_julgamento = lh.exercicio_cotacao                                                                  \n";
-        // $stSql .= "                                 AND eipej.cod_cotacao          = lh.cod_cotacao                                                                        \n";
-        // $stSql .= "                                 AND eipej.cod_item             = lh.cod_item                                                                           \n";
-        // $stSql .= "                                 AND eipej.lote                 = lh.lote                                                                               \n";
-        // $stSql .= "                                 AND eipej.cgm_fornecedor       = lh.cgm_fornecedor )                                                                   \n";
-        // $stSql .= "                           JOIN empenho.autorizacao_empenho as eae                                                                                      \n";
-        // $stSql .= "                             ON (    eae.exercicio       = eipej.exercicio                                                                              \n";
-        // $stSql .= "                                 AND eae.cod_pre_empenho = eipej.cod_pre_empenho ) )                                                                    \n";
-        // $stSql .= "               or                                                                                                                                       \n";
-        // $stSql .= "           exists (                                                                                                                                     \n";
-        // $stSql .= "                    SELECT 1                                                                                                                            \n";
-        // $stSql .= "                      FROM                                                                                                                              \n";
-        // $stSql .= "                           licitacao.licitacao as ll                                                                                                    \n";
-        // $stSql .= "                           JOIN compras.mapa_cotacao as cmc                                                                                             \n";
-        // $stSql .= "                             ON (    ll.cod_mapa       = cmc.cod_mapa                                                                                   \n";
-        // $stSql .= "                                 AND ll.exercicio_mapa = cmc.exercicio_mapa )                                                                           \n";
-        // $stSql .= "                           JOIN licitacao.homologacao as lh                                                                                             \n";
-        // $stSql .= "                             ON (    lh.cod_cotacao       = cmc.cod_cotacao                                                                             \n";
-        // $stSql .= "                                 AND lh.exercicio_cotacao = cmc.exercicio_cotacao )                                                                     \n";
-        // $stSql .= "                           JOIN empenho.item_pre_empenho_julgamento as eipej                                                                            \n";
-        // $stSql .= "                             ON (    eipej.exercicio_julgamento = lh.exercicio_cotacao                                                                  \n";
-        // $stSql .= "                                 AND eipej.cod_cotacao          = lh.cod_cotacao                                                                        \n";
-        // $stSql .= "                                 AND eipej.cod_item             = lh.cod_item                                                                           \n";
-        // $stSql .= "                                 AND eipej.lote                 = lh.lote                                                                               \n";
-        // $stSql .= "                                 AND eipej.cgm_fornecedor       = lh.cgm_fornecedor )                                                                   \n";
-        // $stSql .= "                           JOIN empenho.autorizacao_empenho as eae                                                                                      \n";
-        // $stSql .= "                             ON (    eae.exercicio       = eipej.exercicio                                                                              \n";
-        // $stSql .= "                                 AND eae.cod_pre_empenho = eipej.cod_pre_empenho )                                                                      \n";
-        // $stSql .= "                           JOIN empenho.autorizacao_anulada as eaa                                                                                      \n";
-        // $stSql .= "                             ON (    eaa.exercicio       = eae.exercicio                                                                                \n";
-        // $stSql .= "                                 AND eaa.cod_entidade    = eae.cod_entidade                                                                             \n";
-        // $stSql .= "                                 AND eaa.cod_autorizacao = eae.cod_autorizacao ) ) )                                                                    \n";
+
         return $stSql;
     }
 
@@ -708,11 +667,13 @@ class TComprasMapa extends Persistente
         if ($stOrdem) {
             $stOrdem = " ORDER by $stOrdem ";
         }
-        $stGroupBy = "\n GROUP BY mapa.exercicio
+        $stGroupBy = "
+                GROUP BY mapa.exercicio
                        , mapa.cod_mapa
                        , mapa.cod_objeto
                        , mapa.timestamp
-                       , mapa.cod_tipo_licitacao ";
+                       , mapa.cod_tipo_licitacao \n";
+
         $stSql = $this->montaRecuperaMapaProcessoLicitatorio().$stFiltro.$stGroupBy.$stOrdem;
         $this->stDebug = $stSql;        
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -722,124 +683,117 @@ class TComprasMapa extends Persistente
 
     public function montaRecuperaMapaProcessoLicitatorio()
     {
-        $stSql = "  SELECT  mapa.exercicio
-                            , mapa.cod_mapa
-                            , mapa.cod_objeto
-                            , mapa.timestamp
-                            , to_char( mapa.timestamp, 'dd/mm/yyyy' ) as data
-                            , mapa.cod_tipo_licitacao
-                    FROM compras.mapa
+        $stSql = "  SELECT mapa.exercicio
+                         , mapa.cod_mapa
+                         , mapa.cod_objeto
+                         , mapa.timestamp
+                         , to_char( mapa.timestamp, 'dd/mm/yyyy' ) as data
+                         , mapa.cod_tipo_licitacao
+                      FROM compras.mapa
 
-                    LEFT JOIN compras.mapa_cotacao
-                           ON mapa_cotacao.cod_mapa  = mapa.cod_mapa
-                          AND mapa_cotacao.exercicio_mapa = mapa.exercicio
+                 LEFT JOIN compras.mapa_cotacao
+                        ON mapa_cotacao.cod_mapa  = mapa.cod_mapa
+                       AND mapa_cotacao.exercicio_mapa = mapa.exercicio
 
-                          -- AND NOT EXISTS
-                          --         ( SELECT 1
-                          --             FROM compras.cotacao_anulada
-                          --            WHERE cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
-                          --              AND cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
-                          --          )
+                 LEFT JOIN empenho.item_pre_empenho_julgamento
+                        ON item_pre_empenho_julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
+                       AND item_pre_empenho_julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
 
-                    LEFT JOIN  empenho.item_pre_empenho_julgamento
-                           ON  item_pre_empenho_julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
-                          AND  item_pre_empenho_julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
-
-                    WHERE 1=1
+                     WHERE 1=1
 
                     -- Teste para não listar mapas que já tiveram autorização de empenho realizada,
                     -- mesmo que a autorização tenha sido cancelada.
-                    AND item_pre_empenho_julgamento.cod_cotacao IS NULL
+                       AND item_pre_empenho_julgamento.cod_cotacao IS NULL
                     
                     ---- este sub select server pra verificar se existem itens não anulados para cada mapa
-                    AND EXISTS( SELECT  mapa_item.exercicio
-                                        , mapa_item.cod_entidade
-                                        , mapa_item.cod_solicitacao
-                                        , mapa_item.cod_mapa
-                                        , mapa_item.exercicio_solicitacao
-                                        , mapa_item.cod_item
-                                FROM compras.mapa_item
+                       AND EXISTS(SELECT mapa_item.exercicio
+                                       , mapa_item.cod_entidade
+                                       , mapa_item.cod_solicitacao
+                                       , mapa_item.cod_mapa
+                                       , mapa_item.exercicio_solicitacao
+                                       , mapa_item.cod_item
+                                    FROM compras.mapa_item
 
-                                LEFT JOIN (
-                                            SELECT  mapa_item_anulacao.exercicio
-                                                    , mapa_item_anulacao.cod_entidade
-                                                    , mapa_item_anulacao.cod_solicitacao
-                                                    , mapa_item_anulacao.cod_mapa
-                                                    , mapa_item_anulacao.cod_centro
-                                                    , mapa_item_anulacao.cod_item
-                                                    , mapa_item_anulacao.exercicio_solicitacao
-                                                    , mapa_item_anulacao.lote
-                                                    , sum ( mapa_item_anulacao.quantidade ) as quantidade
-                                                    , sum ( mapa_item_anulacao.vl_total )  as vl_total
+                               LEFT JOIN (SELECT mapa_item_anulacao.exercicio
+                                               , mapa_item_anulacao.cod_entidade
+                                               , mapa_item_anulacao.cod_solicitacao
+                                               , mapa_item_anulacao.cod_mapa
+                                               , mapa_item_anulacao.cod_centro
+                                               , mapa_item_anulacao.cod_item
+                                               , mapa_item_anulacao.exercicio_solicitacao
+                                               , mapa_item_anulacao.lote
+                                               , SUM( mapa_item_anulacao.quantidade ) as quantidade
+                                               , SUM( mapa_item_anulacao.vl_total )  as vl_total
                                             FROM compras.mapa_item_anulacao
-                                            GROUP BY  mapa_item_anulacao.exercicio
-                                                    , mapa_item_anulacao.cod_entidade
-                                                    , mapa_item_anulacao.cod_solicitacao
-                                                    , mapa_item_anulacao.cod_mapa
-                                                    , mapa_item_anulacao.cod_centro
-                                                    , mapa_item_anulacao.cod_item
-                                                    , mapa_item_anulacao.exercicio_solicitacao
-                                                    , mapa_item_anulacao.lote
-                                ) as anulacao
-                                     ON mapa_item.exercicio             = anulacao.exercicio
-                                    AND mapa_item.cod_entidade          = anulacao.cod_entidade
-                                    AND mapa_item.cod_solicitacao       = anulacao.cod_solicitacao
-                                    AND mapa_item.cod_mapa              = anulacao.cod_mapa
-                                    AND mapa_item.cod_centro            = anulacao.cod_centro
-                                    AND mapa_item.cod_item              = anulacao.cod_item
-                                    AND mapa_item.exercicio_solicitacao = anulacao.exercicio_solicitacao
-                                    AND mapa_item.lote                  = anulacao.lote
+                                        GROUP BY mapa_item_anulacao.exercicio
+                                               , mapa_item_anulacao.cod_entidade
+                                               , mapa_item_anulacao.cod_solicitacao
+                                               , mapa_item_anulacao.cod_mapa
+                                               , mapa_item_anulacao.cod_centro
+                                               , mapa_item_anulacao.cod_item
+                                               , mapa_item_anulacao.exercicio_solicitacao
+                                               , mapa_item_anulacao.lote
+                                         ) as anulacao
+                                      ON mapa_item.exercicio             = anulacao.exercicio
+                                     AND mapa_item.cod_entidade          = anulacao.cod_entidade
+                                     AND mapa_item.cod_solicitacao       = anulacao.cod_solicitacao
+                                     AND mapa_item.cod_mapa              = anulacao.cod_mapa
+                                     AND mapa_item.cod_centro            = anulacao.cod_centro
+                                     AND mapa_item.cod_item              = anulacao.cod_item
+                                     AND mapa_item.exercicio_solicitacao = anulacao.exercicio_solicitacao
+                                     AND mapa_item.lote                  = anulacao.lote
 
-                                WHERE mapa_item.quantidade > coalesce( anulacao.quantidade, 0 )
-                                AND mapa_item.vl_total   > coalesce( anulacao.vl_total,   0 )
-                                AND mapa_item.cod_mapa   = mapa.cod_mapa
-                                AND mapa_item.exercicio  = mapa.exercicio
-                    )
+                                   WHERE mapa_item.quantidade > coalesce( anulacao.quantidade, 0 )
+                                     AND mapa_item.vl_total   > coalesce( anulacao.vl_total,   0 )
+                                     AND mapa_item.cod_mapa   = mapa.cod_mapa
+                                     AND mapa_item.exercicio  = mapa.exercicio
+                                 )
 
                     --- verificando se o mapa já foi usado em outro processo (licitacao)
-                    AND NOT EXISTS (SELECT  licitacao.exercicio_mapa
+                       AND NOT EXISTS (SELECT licitacao.exercicio_mapa
                                             , licitacao.cod_mapa
-                                    FROM licitacao.licitacao
-                                    WHERE NOT EXISTS (  SELECT 1
-                                                        FROM licitacao.licitacao_anulada
-                                                        WHERE licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
-                                                        AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                                        AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
-                                                        AND licitacao_anulada.exercicio      = licitacao.exercicio
-                                                        )
-                                    AND licitacao.exercicio_mapa = mapa.exercicio
-                                    AND licitacao.cod_mapa       = mapa.cod_mapa
-                    )
+                                         FROM licitacao.licitacao
+                                        WHERE NOT EXISTS (SELECT 1
+                                                            FROM licitacao.licitacao_anulada
+                                                           WHERE licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
+                                                             AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                                             AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                                                             AND licitacao_anulada.exercicio      = licitacao.exercicio
+                                                         )
+                                          AND licitacao.exercicio_mapa = mapa.exercicio
+                                          AND licitacao.cod_mapa       = mapa.cod_mapa
+                                      )
 
-                    AND NOT EXISTS (SELECT 1
-                                    FROM compras.compra_direta
-                                    WHERE NOT EXISTS (  SELECT 1
-                                                        FROM compras.compra_direta_anulacao
-                                                        WHERE compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
-                                                        AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
-                                                        AND compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
-                                                        AND compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
-                                                       )
-                                    AND compra_direta.cod_mapa = mapa.cod_mapa
-                                    AND compra_direta.exercicio_mapa = mapa.exercicio
-                    )
+                       AND NOT EXISTS (SELECT 1
+                                         FROM compras.compra_direta
+                                        WHERE NOT EXISTS (SELECT 1
+                                                            FROM compras.compra_direta_anulacao
+                                                           WHERE compra_direta_anulacao.cod_modalidade     = compra_direta.cod_modalidade
+                                                             AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
+                                                             AND compra_direta_anulacao.cod_entidade       = compra_direta.cod_entidade
+                                                             AND compra_direta_anulacao.cod_compra_direta  = compra_direta.cod_compra_direta
+                                                         )
+                                          AND compra_direta.cod_mapa       = mapa.cod_mapa
+                                          AND compra_direta.exercicio_mapa = mapa.exercicio
+                                      )
                     --- verificando se todos os itens do mapa tem reserva de saldos
-                    AND NOT EXISTS (SELECT 1
-                                    FROM compras.mapa_item
-                                    WHERE NOT exists (  SELECT 1
-                                                        FROm compras.mapa_item_reserva
-                                                        WHERE mapa_item_reserva.exercicio_mapa      = mapa_item.exercicio
-                                                        AND mapa_item_reserva.cod_mapa              = mapa_item.cod_mapa
-                                                        AND mapa_item_reserva.exercicio_solicitacao = mapa_item.exercicio_solicitacao
-                                                        AND mapa_item_reserva.cod_entidade          = mapa_item.cod_entidade
-                                                        AND mapa_item_reserva.cod_solicitacao       = mapa_item.cod_solicitacao
-                                                        AND mapa_item_reserva.cod_centro            = mapa_item.cod_centro
-                                                        AND mapa_item_reserva.cod_item              = mapa_item.cod_item
-                                                        AND mapa_item_reserva.lote                  = mapa_item.lote
-                                                       )
-                                    AND mapa_item.exercicio = mapa.exercicio
-                                    AND mapa_item.cod_mapa  = mapa.cod_mapa
-                    ) ";
+                       AND NOT EXISTS (SELECT 1
+                                         FROM compras.mapa_item
+                                        WHERE NOT EXISTS (SELECT 1
+                                                            FROM compras.mapa_item_reserva
+                                                           WHERE mapa_item_reserva.exercicio_mapa        = mapa_item.exercicio
+                                                             AND mapa_item_reserva.cod_mapa              = mapa_item.cod_mapa
+                                                             AND mapa_item_reserva.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                                                             AND mapa_item_reserva.cod_entidade          = mapa_item.cod_entidade
+                                                             AND mapa_item_reserva.cod_solicitacao       = mapa_item.cod_solicitacao
+                                                             AND mapa_item_reserva.cod_centro            = mapa_item.cod_centro
+                                                             AND mapa_item_reserva.cod_item              = mapa_item.cod_item
+                                                             AND mapa_item_reserva.lote                  = mapa_item.lote
+                                                         )
+                                          AND mapa_item.exercicio = mapa.exercicio
+                                          AND mapa_item.cod_mapa  = mapa.cod_mapa
+                                      )
+        ";
 
         return $stSql;
     }
@@ -1010,6 +964,171 @@ class TComprasMapa extends Persistente
         $stSql .= "       AND mapa.exercicio = '".$this->getDado('exercicio')."'                                                                \n";
         $stSql .= "       AND mapa.cod_mapa  =  ".$this->getDado('cod_mapa')."                                                                  \n";
 
+        return $stSql;
+    }
+
+    /*
+        recupera mapas não anulados e que ainda não entraram em processo licitatorio ou que entraram em processo licitario que foi anulado
+        recupera mapas sem resarva de saldo
+    */
+    public function recuperaMapaSemReservaProcessoLicitatorio(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        if ($stOrdem) {
+            $stOrdem = " ORDER by $stOrdem ";
+        }
+        $stGroupBy = "
+                GROUP BY mapa.exercicio
+                       , mapa.cod_mapa
+                       , mapa.cod_objeto
+                       , mapa.timestamp
+                       , mapa.cod_tipo_licitacao \n";
+
+        $stSql = $this->montaRecuperaMapaSemReservaProcessoLicitatorio().$stFiltro.$stGroupBy.$stOrdem;
+        $this->stDebug = $stSql;        
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    private function montaRecuperaMapaSemReservaProcessoLicitatorio()
+    {
+        $stSql = "  SELECT mapa.exercicio
+                         , mapa.cod_mapa
+                         , mapa.cod_objeto
+                         , mapa.timestamp
+                         , to_char( mapa.timestamp, 'dd/mm/yyyy' ) as data
+                         , mapa.cod_tipo_licitacao
+                      FROM compras.mapa
+                 LEFT JOIN compras.mapa_cotacao
+                        ON mapa_cotacao.cod_mapa  = mapa.cod_mapa
+                       AND mapa_cotacao.exercicio_mapa = mapa.exercicio
+                 LEFT JOIN empenho.item_pre_empenho_julgamento
+                        ON item_pre_empenho_julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
+                       AND item_pre_empenho_julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
+                     WHERE 1=1
+                    -- Teste para não listar mapas que já tiveram autorização de empenho realizada,
+                    -- mesmo que a autorização tenha sido cancelada.
+                       AND item_pre_empenho_julgamento.cod_cotacao IS NULL
+                    ---- este sub select server pra verificar se existem itens não anulados para cada mapa
+                       AND EXISTS(SELECT mapa_item.exercicio
+                                       , mapa_item.cod_entidade
+                                       , mapa_item.cod_solicitacao
+                                       , mapa_item.cod_mapa
+                                       , mapa_item.exercicio_solicitacao
+                                       , mapa_item.cod_item
+                                    FROM compras.mapa_item
+                               LEFT JOIN (SELECT mapa_item_anulacao.exercicio
+                                               , mapa_item_anulacao.cod_entidade
+                                               , mapa_item_anulacao.cod_solicitacao
+                                               , mapa_item_anulacao.cod_mapa
+                                               , mapa_item_anulacao.cod_centro
+                                               , mapa_item_anulacao.cod_item
+                                               , mapa_item_anulacao.exercicio_solicitacao
+                                               , mapa_item_anulacao.lote
+                                               , SUM( mapa_item_anulacao.quantidade ) as quantidade
+                                               , SUM( mapa_item_anulacao.vl_total )  as vl_total
+                                            FROM compras.mapa_item_anulacao
+                                        GROUP BY mapa_item_anulacao.exercicio
+                                               , mapa_item_anulacao.cod_entidade
+                                               , mapa_item_anulacao.cod_solicitacao
+                                               , mapa_item_anulacao.cod_mapa
+                                               , mapa_item_anulacao.cod_centro
+                                               , mapa_item_anulacao.cod_item
+                                               , mapa_item_anulacao.exercicio_solicitacao
+                                               , mapa_item_anulacao.lote
+                                         ) as anulacao
+                                      ON mapa_item.exercicio             = anulacao.exercicio
+                                     AND mapa_item.cod_entidade          = anulacao.cod_entidade
+                                     AND mapa_item.cod_solicitacao       = anulacao.cod_solicitacao
+                                     AND mapa_item.cod_mapa              = anulacao.cod_mapa
+                                     AND mapa_item.cod_centro            = anulacao.cod_centro
+                                     AND mapa_item.cod_item              = anulacao.cod_item
+                                     AND mapa_item.exercicio_solicitacao = anulacao.exercicio_solicitacao
+                                     AND mapa_item.lote                  = anulacao.lote
+                                   WHERE mapa_item.quantidade > coalesce( anulacao.quantidade, 0 )
+                                     AND mapa_item.vl_total   > coalesce( anulacao.vl_total,   0 )
+                                     AND mapa_item.cod_mapa   = mapa.cod_mapa
+                                     AND mapa_item.exercicio  = mapa.exercicio)
+                    --- verificando se o mapa já foi usado em outro processo (licitacao)
+                       AND NOT EXISTS (SELECT licitacao.exercicio_mapa
+                                            , licitacao.cod_mapa
+                                         FROM licitacao.licitacao
+                                        WHERE NOT EXISTS (SELECT 1
+                                                            FROM licitacao.licitacao_anulada
+                                                           WHERE licitacao_anulada.cod_licitacao  = licitacao.cod_licitacao
+                                                             AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                                             AND licitacao_anulada.cod_entidade   = licitacao.cod_entidade
+                                                             AND licitacao_anulada.exercicio      = licitacao.exercicio
+                                                         )
+                                          AND licitacao.exercicio_mapa = mapa.exercicio
+                                          AND licitacao.cod_mapa       = mapa.cod_mapa)
+                       AND NOT EXISTS (SELECT 1
+                                         FROM compras.compra_direta
+                                        WHERE NOT EXISTS (SELECT 1
+                                                            FROM compras.compra_direta_anulacao
+                                                           WHERE compra_direta_anulacao.cod_modalidade     = compra_direta.cod_modalidade
+                                                             AND compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
+                                                             AND compra_direta_anulacao.cod_entidade       = compra_direta.cod_entidade
+                                                             AND compra_direta_anulacao.cod_compra_direta  = compra_direta.cod_compra_direta
+                                                         )
+                                          AND compra_direta.cod_mapa       = mapa.cod_mapa
+                                          AND compra_direta.exercicio_mapa = mapa.exercicio)
+        ";
+
+        return $stSql;
+    }
+
+    public function recuperaTipoMapa(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        if ($stOrdem) {
+            $stOrdem = " ORDER by $stOrdem ";
+        }
+        $stGroupBy = "
+                GROUP BY mapa.exercicio
+                       , mapa.cod_mapa
+                       , mapa.cod_objeto
+                       , mapa.timestamp
+                       , mapa.cod_tipo_licitacao
+                       , solicitacao.registro_precos
+        ";
+
+        $stSql = $this->montaRecuperaTipoMapa().$stFiltro.$stGroupBy.$stOrdem;
+        $this->stDebug = $stSql;        
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+    
+    private function montaRecuperaTipoMapa()
+    {
+        $stSql = "
+              SELECT mapa.exercicio
+                   , mapa.cod_mapa
+                   , mapa.cod_objeto
+                   , mapa.timestamp
+                   , mapa.cod_tipo_licitacao
+                   , solicitacao.registro_precos
+                FROM compras.mapa
+          INNER JOIN compras.mapa_solicitacao
+                  ON mapa_solicitacao.exercicio = mapa.exercicio
+                 AND mapa_solicitacao.cod_mapa  = mapa.cod_mapa
+          INNER JOIN compras.solicitacao_homologada
+                  ON solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                 AND solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                 AND solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+          INNER JOIN compras.solicitacao
+                  ON solicitacao.exercicio       = solicitacao_homologada.exercicio
+                 AND solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                 AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+               WHERE mapa.cod_mapa = ".$this->getDado('cod_mapa')."
+                 AND mapa.exercicio = '".$this->getDado('exercicio')."'
+        ";
         return $stSql;
     }
 }

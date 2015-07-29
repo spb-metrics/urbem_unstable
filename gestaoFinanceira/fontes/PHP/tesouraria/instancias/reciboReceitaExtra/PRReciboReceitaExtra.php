@@ -128,18 +128,6 @@ switch ($stAcao) {
 
         $obErro = new Erro;
 
-        if ( sistemaLegado::comparaDatas ($stUltimaData,  $_POST['dtDataEmissao'])) {
-            $obErro->setDescricao( 'A data de emissão do recibo deve ser maior ou igual a última data cadastrada.' );
-            SistemaLegado::executaFrameOculto( "window.parent.frames['telaPrincipal'].document.frm.Ok.disabled = false;" );
-        }
-
-        if ( !$obErro->ocorreu() ) {
-            if ( sistemaLegado::comparaDatas ($_POST['dtDataEmissao'], date('d/m/Y') )) {
-                $obErro->setDescricao( 'A data de emissão do recibo deve ser menor ou igual a data atual.' );
-                SistemaLegado::executaFrameOculto( "window.parent.frames['telaPrincipal'].document.frm.Ok.disabled = false;" );
-            }
-        }
-
         if ( !$obErro->ocorreu() ) {
          if ( str_replace(',','.',str_replace('.','',$_POST['txtValor'])) <= 0.00 ) {
                 $obErro->setDescricao('O valor deve ser maior do que zero.');

@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: SistemaLegado.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+ $Id: SistemaLegado.class.php 63138 2015-07-29 14:06:41Z evandro $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -1324,13 +1324,73 @@ public static function retornaInicialFinalMesesPeriodicidade(&$arDatas,$stTipoPe
         
         //Mes
         default:            
-            for ($i=$inPeriodo; $i <= $inPeriodo; $i++){ 
-                $arDatas[] = array( 'stDtInicial' => "01/".str_pad($i,2,"0",STR_PAD_LEFT)."/".$inExercicio
-                                    , 'stDtFinal' => SistemaLegado::retornaUltimoDiaMes($i,$inExercicio)
-                                    );
-            }
+            $arDatas['stDtInicial'] = "01/".str_pad($inPeriodo,2,"0",STR_PAD_LEFT)."/".$inExercicio;
+            $arDatas['stDtFinal']   = SistemaLegado::retornaUltimoDiaMes($inPeriodo,$inExercicio);
         break;
     }
+}
+
+/*******************************************************************************************************/
+/**** Retorna a String removendo os acentos e alguns simbolos                                       ****/
+/**** $string: string para ser removida os acentos e simbolos, pode ser um array                    ****/
+/**** Exemplo de uso .: removeAcentosSimbolos("áéíóçaaá");                                        ****/
+/**** Exemplo de uso .: removeAcentosSimbolos($arValores['campoString']);                         ****/
+/*******************************************************************************************************/
+public static function removeAcentosSimbolos(&$string)
+{
+    //Adicionando mapa de caracteres
+    $stMapaCaracteres = array( 'á' => 'a','à' => 'a','ã' => 'a','â' => 'a'
+                              ,'é' => 'e','ê' => 'e'
+                              ,'í' => 'i'
+                              ,'ó' => 'o','ô' => 'o','õ' => 'o'
+                              ,'ú' => 'u','ü' => 'u'
+                              ,'ç' => 'c'
+                              ,'Á' => 'A','À' => 'A','Ã' => 'A','Â' => 'A'
+                              ,'É' => 'E','Ê' => 'E'
+                              ,'Í' => 'I'
+                              ,'Ó' => 'O','Ô' => 'O','Õ' => 'O'
+                              ,'Ú' => 'U','Ü' => 'U'
+                              ,'Ç' => 'C'
+                              ,"'" => ''
+                              ,'ª' => ''
+                              ,'º' => ''
+                              ,'¿' => ''
+                              ,'°' => ''
+                              ,'²' => ''
+                              ,'³' => ''
+                              ,';' => ''
+                              ,'"' => ''
+                              ,'ñ' => 'n'
+                              ,'Ñ' => 'N'
+                              ,'–' => '-'
+                              ,"¨" => ''
+                            );
+    
+    //Buscando o tipo de dado que veio por parametro
+    if ( is_array($string) ) {
+        $stTipoDado = "array";
+    }elseif ( is_object($string) ) {
+        $stTipoDado = "objeto";
+    }else{
+        $stTipoDado = "string";
+    }
+    
+    //De acordo com cara tipo realiza as funcoes certas
+    switch ($stTipoDado) {
+            case 'array':
+                foreach ($string as $key => $value) {
+                    $string[$key] = strtr($value, $stMapaCaracteres);
+                }
+            break;
+            
+            case 'string':
+                $string = strtr($string, $stMapaCaracteres);
+            break;
+
+            default:
+                return $string;
+            break;
+        }    
 }
 
 }//END CLASS

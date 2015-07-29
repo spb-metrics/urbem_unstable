@@ -39,23 +39,6 @@
 
     * Casos de uso: uc-03.04.05
 */
-
-/**
-$Log$
-Revision 1.4  2007/03/15 15:00:01  bruce
-implementado controle do exercicio
-
-Revision 1.3  2007/02/06 18:58:52  bruce
-Bug #8270#
-
-Revision 1.2  2007/01/15 15:34:29  bruce
-alterado o componente IPopMapa pra aceitar tipos de busca diferentes.
-
-Revision 1.1  2006/10/23 16:44:11  tonismar
-IPopUpMapaCompras
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GP_COM_COMPONENTES."IMontaSolicitacao.class.php"                                    );

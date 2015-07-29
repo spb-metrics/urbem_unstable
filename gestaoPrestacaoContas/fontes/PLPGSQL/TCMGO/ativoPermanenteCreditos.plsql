@@ -26,39 +26,15 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 62845 $
+* $Revision: 63111 $
 * $Name$
-* $Author: jean $
-* $Date: 2015-06-29 10:16:59 -0300 (Seg, 29 Jun 2015) $
+* $Author: arthur $
+* $Date: 2015-07-27 15:34:04 -0300 (Seg, 27 Jul 2015) $
 *
 * Casos de uso: uc-02.02.11
 */
 
-/*
-$Log$
-Revision 1.2  2007/05/24 15:33:01  bruce
-corrigido o retorno da pl e feita ligação com a Unidade
-
-Revision 1.1  2007/05/18 16:02:42  bruce
-*** empty log message ***
-
-Revision 1.2  2007/05/15 20:46:31  bruce
-acrescentado o tipo de lançamento
-
-Revision 1.1  2007/05/15 13:43:55  bruce
-*** empty log message ***
-
-Revision 1.9  2006/07/14 17:58:30  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.8  2006/07/05 20:37:31  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
-CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (varchar, varchar, varchar, varchar, varchar) RETURNS SETOF RECORD AS $$
+CREATE OR REPLACE FUNCTION tcmgo.ativo_permanente_creditos (VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stFiltro            ALIAS FOR $2;
@@ -75,111 +51,122 @@ DECLARE
 
     reRegistro          RECORD;
     arRetorno           NUMERIC[];
-
 BEGIN
 
     arCodEntidade := string_to_array(stCodEntidades,',');
 
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
-                FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                    FROM
-                         contabilidade.plano_conta       as pc
-                        ,contabilidade.plano_analitica   as pa
-                        ,contabilidade.conta_debito      as cd
-                        ,contabilidade.valor_lancamento  as vl
-                        ,contabilidade.lancamento        as la
-                        ,contabilidade.lote              as lo
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cd.cod_plano
-                    AND     pa.exercicio    = cd.exercicio
-                    AND     cd.cod_lote     = vl.cod_lote
-                    AND     cd.tipo         = vl.tipo
-                    AND     cd.sequencia    = vl.sequencia
-                    AND     cd.exercicio    = vl.exercicio
-                    AND     cd.tipo_valor   = vl.tipo_valor
-                    AND     cd.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''D''
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    AND     pa.exercicio = ' || quote_literal(stExercicio) || '
-                    AND     cd.cod_entidade IN (' || stCodEntidades || ')
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                 WHERE
-                ' || stFiltro ;
-    EXECUTE stSql;
+                  FROM (
+                   SELECT plano_conta.cod_estrutural
+                        , plano_analitica.cod_plano
+                        , valor_lancamento.tipo_valor
+                        , valor_lancamento.vl_lancamento
+                        , valor_lancamento.cod_entidade
+                        , lote.cod_lote
+                        , lote.dt_lote
+                        , lote.exercicio
+                        , lote.tipo
+                        , valor_lancamento.sequencia
+                        , valor_lancamento.oid as oid_temp
+                    
+                    FROM contabilidade.plano_conta
+                       
+             INNER JOIN contabilidade.plano_analitica
+                     ON plano_conta.cod_conta = plano_analitica.cod_conta
+                    AND plano_conta.exercicio = plano_analitica.exercicio
+                   
+             INNER JOIN contabilidade.conta_debito   
+                     ON plano_analitica.cod_plano = conta_debito.cod_plano
+                    AND plano_analitica.exercicio = conta_debito.exercicio
+                    
+             INNER JOIN contabilidade.valor_lancamento
+                     ON conta_debito.cod_lote     = valor_lancamento.cod_lote
+                    AND conta_debito.tipo         = valor_lancamento.tipo
+                    AND conta_debito.sequencia    = valor_lancamento.sequencia
+                    AND conta_debito.exercicio    = valor_lancamento.exercicio
+                    AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor
+                    AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                    
+             INNER JOIN contabilidade.lancamento
+                     ON valor_lancamento.cod_lote     = lancamento.cod_lote
+                    AND valor_lancamento.tipo         = lancamento.tipo
+                    AND valor_lancamento.sequencia    = lancamento.sequencia
+                    AND valor_lancamento.exercicio    = lancamento.exercicio
+                    AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                    AND valor_lancamento.tipo_valor   = ''D''
+                    
+             INNER JOIN contabilidade.lote
+                     ON lancamento.cod_lote     = lote.cod_lote
+                    AND lancamento.exercicio    = lote.exercicio
+                    AND lancamento.tipo         = lote.tipo
+                    AND lancamento.cod_entidade = lote.cod_entidade
+                    
+                  WHERE plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
+                    AND conta_debito.cod_entidade IN (' || stCodEntidades || ')
+               
+               ORDER BY plano_conta.cod_estrutural
 
+                  ) AS tabela
+            WHERE ' || stFiltro ;
+    EXECUTE stSql;
+    
     stSql := 'CREATE TEMPORARY TABLE tmp_credito AS
                 SELECT *
-                FROM (
-                    SELECT
-                         pc.cod_estrutural
-                        ,pa.cod_plano
-                        ,vl.tipo_valor
-                        ,vl.vl_lancamento
-                        ,vl.cod_entidade
-                        ,lo.cod_lote
-                        ,lo.dt_lote
-                        ,lo.exercicio
-                        ,lo.tipo
-                        ,vl.sequencia
-                        ,vl.oid as oid_temp
-                    FROM
-                         contabilidade.plano_conta       as pc
-                        ,contabilidade.plano_analitica   as pa
-                        ,contabilidade.conta_credito     as cc
-                        ,contabilidade.valor_lancamento  as vl
-                        ,contabilidade.lancamento        as la
-                        ,contabilidade.lote              as lo
-                    WHERE   pc.cod_conta    = pa.cod_conta
-                    AND     pc.exercicio    = pa.exercicio
-                    AND     pa.cod_plano    = cc.cod_plano
-                    AND     pa.exercicio    = cc.exercicio
-                    AND     cc.cod_lote     = vl.cod_lote
-                    AND     cc.tipo         = vl.tipo
-                    AND     cc.sequencia    = vl.sequencia
-                    AND     cc.exercicio    = vl.exercicio
-                    AND     cc.tipo_valor   = vl.tipo_valor
-                    AND     cc.cod_entidade = vl.cod_entidade
-                    AND     vl.cod_lote     = la.cod_lote
-                    AND     vl.tipo         = la.tipo
-                    AND     vl.sequencia    = la.sequencia
-                    AND     vl.exercicio    = la.exercicio
-                    AND     vl.cod_entidade = la.cod_entidade
-                    AND     vl.tipo_valor   = ''C''
-                    AND     la.cod_lote     = lo.cod_lote
-                    AND     la.exercicio    = lo.exercicio
-                    AND     la.tipo         = lo.tipo
-                    AND     la.cod_entidade = lo.cod_entidade
-                    AND     pa.exercicio = ' || quote_literal(stExercicio) || '
-                    AND     cc.cod_entidade IN (' || stCodEntidades || ')
-                    ORDER BY pc.cod_estrutural
-                  ) as tabela
-                 WHERE
-                ' || stFiltro ;
-    EXECUTE stSql;
+                  FROM (
+                  SELECT plano_conta.cod_estrutural
+                       , plano_analitica.cod_plano
+                       , valor_lancamento.tipo_valor
+                       , valor_lancamento.vl_lancamento
+                       , valor_lancamento.cod_entidade
+                       , lote.cod_lote
+                       , lote.dt_lote
+                       , lote.exercicio
+                       , lote.tipo
+                       , valor_lancamento.sequencia
+                       , valor_lancamento.oid as oid_temp
+                    
+                    FROM contabilidade.plano_conta
 
+             INNER JOIN contabilidade.plano_analitica
+                     ON plano_conta.cod_conta = plano_analitica.cod_conta
+                    AND plano_conta.exercicio = plano_analitica.exercicio
+                    
+             INNER JOIN contabilidade.conta_credito
+                     ON plano_analitica.cod_plano = conta_credito.cod_plano
+                    AND plano_analitica.exercicio = conta_credito.exercicio
+
+             INNER JOIN contabilidade.valor_lancamento
+                     ON conta_credito.cod_lote     = valor_lancamento.cod_lote
+                    AND conta_credito.tipo         = valor_lancamento.tipo
+                    AND conta_credito.sequencia    = valor_lancamento.sequencia
+                    AND conta_credito.exercicio    = valor_lancamento.exercicio
+                    AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor
+                    AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                    
+             INNER JOIN contabilidade.lancamento
+                     ON valor_lancamento.cod_lote     = lancamento.cod_lote
+                    AND valor_lancamento.tipo         = lancamento.tipo
+                    AND valor_lancamento.sequencia    = lancamento.sequencia
+                    AND valor_lancamento.exercicio    = lancamento.exercicio
+                    AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                    AND valor_lancamento.tipo_valor   = ''C''
+                    
+             INNER JOIN contabilidade.lote
+                     ON lancamento.cod_lote     = lote.cod_lote
+                    AND lancamento.exercicio    = lote.exercicio
+                    AND lancamento.tipo         = lote.tipo
+                    AND lancamento.cod_entidade = lote.cod_entidade
+                    
+                  WHERE plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
+                    AND conta_credito.cod_entidade IN (' || stCodEntidades || ')
+                    
+               ORDER BY plano_conta.cod_estrutural
+               
+                ) AS tabela
+              WHERE ' || stFiltro ;
+    EXECUTE stSql;
+    
     CREATE UNIQUE INDEX unq_debito              ON tmp_debito           (cod_estrutural varchar_pattern_ops, oid_temp);
     CREATE UNIQUE INDEX unq_credito             ON tmp_credito          (cod_estrutural varchar_pattern_ops, oid_temp);
 
@@ -200,14 +187,14 @@ BEGIN
 
     stSql := 'CREATE TEMPORARY TABLE tmp_totaliza AS
                     SELECT * 
-                    FROM tmp_debito
-                    WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
-                    AND tipo = ''I''
+                      FROM tmp_debito
+                     WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
+                       AND tipo = ''I''
                 UNION
                     SELECT * 
-                    FROM tmp_credito
-                    WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
-                    AND tipo = ''I''
+                      FROM tmp_credito
+                     WHERE dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')
+                       AND tipo = ''I''
         ';
     EXECUTE stSql;
 
@@ -218,32 +205,31 @@ BEGIN
     ---------------------------------------
     FOR i IN 1..ARRAY_UPPER(arCodEntidade,1) LOOP
 
-        stSql :=' SELECT
-                         pc.cod_estrutural
-                        ,publico.fn_nivel(pc.cod_estrutural) as nivel
-                        ,pc.nom_conta
-                        ,unidade.num_orgao AS cod_orgao
-                        ,unidade.num_unidade AS cod_unidade
-                        ,0.00 as vl_saldo_anterior
-                        ,0.00 as vl_saldo_debitos
-                        ,0.00 as vl_saldo_creditos
-                        ,0.00 as vl_saldo_atual
-                        ,sc.nom_sistema
-                        ,ba.tipo_lancamento
-                    FROM
-                        contabilidade.plano_conta as pc
-    
-                        INNER JOIN contabilidade.sistema_contabil as sc
-                                ON pc.cod_sistema = sc.cod_sistema
-                               AND pc.exercicio   = sc.exercicio
+            stSql :='  SELECT plano_conta.cod_estrutural
+                            , publico.fn_nivel(plano_conta.cod_estrutural) as nivel
+                            , plano_conta.nom_conta
+                            , configuracao_orgao_unidade.num_orgao AS cod_orgao
+                            , configuracao_orgao_unidade.num_unidade AS cod_unidade
+                            , 0.00 as vl_saldo_anterior
+                            , 0.00 as vl_saldo_debitos
+                            , 0.00 as vl_saldo_creditos
+                            , 0.00 as vl_saldo_atual
+                            , sistema_contabil.nom_sistema
+                            , balanco_apcaaaa.tipo_lancamento
+                         
+                        FROM contabilidade.plano_conta
         
-                    INNER JOIN contabilidade.plano_analitica  as c_pa
-                            ON c_pa.cod_conta = pc.cod_conta
-                           AND c_pa.exercicio = pc.exercicio
+                    INNER JOIN contabilidade.sistema_contabil
+                            ON plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                           AND plano_conta.exercicio   = sistema_contabil.exercicio
+        
+                    INNER JOIN contabilidade.plano_analitica
+                            ON plano_analitica.cod_conta = plano_conta.cod_conta
+                           AND plano_analitica.exercicio = plano_conta.exercicio
     
-                        LEFT JOIN tcmgo.balanco_apcaaaa          as ba
-                               ON ba.cod_plano   = c_pa.cod_plano
-                              AND ba.exercicio   = c_pa.exercicio
+                        LEFT JOIN tcmgo.balanco_apcaaaa
+                               ON balanco_apcaaaa.cod_plano   = plano_analitica.cod_plano
+                              AND balanco_apcaaaa.exercicio   = plano_analitica.exercicio
     
                         INNER JOIN (SELECT exercicio, cod_entidade, tipo, cod_lote, sequencia, tipo_valor, cod_plano
                                       FROM contabilidade.conta_credito
@@ -251,20 +237,20 @@ BEGIN
                                     SELECT exercicio, cod_entidade, tipo, cod_lote, sequencia, tipo_valor, cod_plano
                                       FROM contabilidade.conta_debito
                                 ) AS contas
-                                ON contas.cod_plano = c_pa.cod_plano
-                               AND contas.exercicio = c_pa.exercicio
+                                ON contas.cod_plano = plano_analitica.cod_plano
+                               AND contas.exercicio = plano_analitica.exercicio
     
                         INNER JOIN contabilidade.valor_lancamento
                                 ON valor_lancamento.cod_entidade = contas.cod_entidade
-                               AND valor_lancamento.exercicio = contas.exercicio
-                               AND valor_lancamento.tipo = contas.tipo
-                               AND valor_lancamento.cod_lote = contas.cod_lote
-                               AND valor_lancamento.sequencia = contas.sequencia
-                               AND valor_lancamento.tipo_valor = contas.tipo_valor
+                               AND valor_lancamento.exercicio    = contas.exercicio
+                               AND valor_lancamento.tipo         = contas.tipo
+                               AND valor_lancamento.cod_lote     = contas.cod_lote
+                               AND valor_lancamento.sequencia    = contas.sequencia
+                               AND valor_lancamento.tipo_valor   = contas.tipo_valor
 
                         INNER JOIN tcmgo.configuracao_orgao_unidade
                                 ON configuracao_orgao_unidade.cod_entidade = contas.cod_entidade
-                               AND configuracao_orgao_unidade.exercicio = contas.exercicio
+                               AND configuracao_orgao_unidade.exercicio    = contas.exercicio
 
                         INNER JOIN orcamento.unidade
                                 ON unidade.exercicio = configuracao_orgao_unidade.exercicio
@@ -272,14 +258,16 @@ BEGIN
                                AND unidade.num_unidade = configuracao_orgao_unidade.num_unidade
 
                         
-                        WHERE pc.exercicio = ' || quote_literal(stExercicio) || '
+                        WHERE plano_conta.exercicio = ' || quote_literal(stExercicio) || '
+                          AND configuracao_orgao_unidade.cod_entidade = ' || arCodEntidade[i] || '
                             
-                   ORDER BY sc.nom_sistema, pc.cod_estrutural
-                ';
-
+                   ORDER BY sistema_contabil.nom_sistema
+                          , plano_conta.cod_estrutural ';
+                
                 FOR reRegistro IN EXECUTE stSql
                 LOOP
                     arRetorno := contabilidade.fn_totaliza_balancete_verificacao( publico.fn_mascarareduzida(reRegistro.cod_estrutural) , stDtInicial, stDtFinal);
+                    
                     reRegistro.vl_saldo_anterior := arRetorno[1];
                     reRegistro.vl_saldo_debitos  := arRetorno[2];
                     reRegistro.vl_saldo_creditos := arRetorno[3];

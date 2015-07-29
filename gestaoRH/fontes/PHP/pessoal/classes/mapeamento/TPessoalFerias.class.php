@@ -506,6 +506,7 @@ function montaVerificaDatasPeriodoAquisitivo()
              OR TO_DATE('".$this->getDado('dt_final_aquisitivo')."','dd/mm/yyyy') BETWEEN ferias.dt_inicial_aquisitivo   -- data inicial
                                                                                       AND ferias.dt_final_aquisitivo     -- data final
              )
+         AND cod_forma NOT IN (3,4)
     ";
     
     return $stSql;

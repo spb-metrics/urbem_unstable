@@ -31,14 +31,13 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoItem.php 62567 2015-05-20 19:39:59Z evandro $
-  * $Date: 2015-05-20 16:39:59 -0300 (Qua, 20 Mai 2015) $
-  * $Author: evandro $
-  * $Rev: 62567 $
+  * $Id: FMManterRegistroPrecoItem.php 62870 2015-07-01 13:39:45Z michel $
+  * $Date: 2015-07-01 10:39:45 -0300 (Qua, 01 Jul 2015) $
+  * $Author: michel $
+  * $Rev: 62870 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/IMontaQuantidadeValores.class.php';
-include_once CAM_GP_ALM_COMPONENTES.'IMontaItemUnidade.class.php';
 
 $obHdnInId = new Hidden;
 $obHdnInId->setName  ( 'inId' );
@@ -63,10 +62,6 @@ $obVlrPrecoUnitario->setValue('0,0000');
 $obVlrPrecoUnitario->setDecimais(4);
 $obVlrPrecoUnitario->setNull( false );
 $obVlrPrecoUnitario->setSize (23);
-
-$obMontaItemUnidade = new IMontaItemUnidade(new Form);
-$obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
-$obMontaItemUnidade->obIPopUpCatalogoItem->setNull(true);
 
 $obMontaQuantidadeValores = new IMontaQuantidadeValores();
 $obMontaQuantidadeValores->obValorUnitario->setRotulo('Valor da Cotação Unitária');
@@ -166,5 +161,6 @@ $obSpnItemBuscaInner->setId ('spnBuscaInnerItem');
 $obSpanListaItem = new Span();
 $obSpanListaItem->setID( 'spnListaItens' );
 
+$stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stAcao=".$stAcao."', 'montaItemBuscaInner');";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

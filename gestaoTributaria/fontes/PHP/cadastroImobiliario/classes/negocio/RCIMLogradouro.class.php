@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLogradouro.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMLogradouro.class.php 62960 2015-07-13 14:00:58Z evandro $
 
      * Casos de uso: uc-05.01.04
                      uc-04.04.07
@@ -324,15 +324,20 @@ function alterarLogradouro($boTransacao = "")
             $obErro = $this->validaNomeLogradouro( $boTransacao );
             if ( !$obErro->ocorreu() ) {
 
-                $this->obTNomeLogradouro->setDado( "cod_logradouro", $this->inCodigoLogradouro );
-                $this->obTNomeLogradouro->setDado( "cod_tipo"      , $this->inCodigoTipo       );
-                $this->obTNomeLogradouro->setDado( "nom_logradouro", $this->stNomeLogradouro   );
-                $obErro = $this->obTNomeLogradouro->alteracao ( $boTransacao );
-                if ( !$obErro->ocorreu() ) {
-                    $obErro = $this->salvarBairroLogradouro( $botransacao );
+                $boValidaAlterar = $this->validaAlteracao($boTransacao);
+                if ($boValidaAlterar) {
+                    $this->obTNomeLogradouro->setDado( "cod_logradouro", $this->inCodigoLogradouro );
+                    $this->obTNomeLogradouro->setDado( "cod_tipo"      , $this->inCodigoTipo       );
+                    $this->obTNomeLogradouro->setDado( "nom_logradouro", $this->stNomeLogradouro   );
+                
+                    $obErro = $this->obTNomeLogradouro->inclusao ( $boTransacao );
+                
                     if ( !$obErro->ocorreu() ) {
-                        $obErro = $this->salvarCEPs( $botransacao );
-                    }
+                        $obErro = $this->salvarBairroLogradouro( $botransacao );
+                        if ( !$obErro->ocorreu() ) {
+                            $obErro = $this->salvarCEPs( $botransacao );
+                        }
+                    }    
                 }
             }
         }
@@ -489,6 +494,72 @@ function listarLogradouros(&$rsRecordSet, $boTransacao = "")
     $obErro = $this->obTLogradouro->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
 
     return $obErro;
+}
+
+/**
+    * Lista os Logradouros conforme o filtro setado
+    * @access Public
+    * @param  Object $rsRecordSet Objeto RecordSet preenchido com os dados selecionados
+    * @param  Object $obTransacao Parâmetro Transação
+    * @return Object Objeto Erro
+*/
+function listarHistoricoLogradouros(&$rsRecordSet, $boTransacao = "")
+{
+    
+    $stFiltro = " WHERE sw_logradouro.cod_logradouro = ".$this->inCodigoLogradouro." 
+                    AND sw_nome_logradouro.timestamp <> (SELECT max(timestamp) 
+                                                            FROM sw_nome_logradouro as max 
+                                                            WHERE max.cod_logradouro = sw_nome_logradouro.cod_logradouro)
+                ";
+
+    if ($this->stNomeLogradouro) {
+        $stFiltro .= " AND UPPER( sw_nome_logradouro.nom_logradouro ) ";
+        $stFiltro .= "LIKE UPPER( '".htmlentitles($this->stNomeLogradouro, ENT_QUOTES, 'UTF-8')."%' ) ";
+    }
+    if ($this->inCodigoUF) {
+        $stFiltro .= "  AND sw_logradouro.cod_uf = ".$this->inCodigoUF." ";
+    }
+    if ($this->inCodigoMunicipio) {
+        $stFiltro .= "  AND sw_logradouro.cod_municipio = ".$this->inCodigoMunicipio." ";
+    }
+    $stOrder = " ORDER BY sw_nome_logradouro.nom_logradouro ";
+    $obErro = $this->obTLogradouro->recuperaHistoricoLogradouro( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+
+    return $obErro;
+}
+
+/**
+    * Valida se o nome do logradouro não existe na cidade infornmada
+    * @access Public
+    * @param  Object $obTransacao Parâmetro Transação
+    * @return Object Objeto Erro
+*/
+function validaAlteracao($boTransacao = "")
+{
+    $stFiltro = " WHERE sw_logradouro.cod_logradouro = ".$this->inCodigoLogradouro." ";
+    $stFiltro .= " AND sw_nome_logradouro.timestamp = (SELECT max(timestamp) 
+                                                            FROM sw_nome_logradouro as max 
+                                                            WHERE max.cod_logradouro = sw_nome_logradouro.cod_logradouro)
+                    ";
+    $stFiltro .= " AND UPPER( sw_nome_logradouro.nom_logradouro ) ";
+    $stFiltro .= " LIKE UPPER( '".htmlentities($this->stNomeLogradouro, ENT_QUOTES, 'UTF-8')."' )";
+    $stFiltro .= " AND sw_logradouro.cod_uf = ".$this->getCodigoUF()." ";
+    $stFiltro .= " AND sw_logradouro.cod_municipio = ".$this->inCodigoMunicipio." ";
+    $stFiltro .= " AND sw_tipo_logradouro.cod_tipo = ".$this->inCodigoTipo;
+    $stOrder = "";
+    $obErro = $this->obTLogradouro->recuperaHistoricoLogradouro( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+    
+    foreach ($rsRecordSet->getElementos() as $logradouro) {
+        if ( (trim($logradouro['nom_logradouro']) == trim($_REQUEST['stNomeLogradouro']) && ($logradouro['cod_tipo'] == $_REQUEST['inCodTipo']) ) ) {
+            return false;
+        }else{
+            $boValida = true;
+        }
+    }
+    if ( $_REQUEST['hdnNomeAntigo'] != $_REQUEST['stNomeLogradouro'] ) {        
+        $boValida = true;
+    }
+    return $boValida;
 }
 
 /**

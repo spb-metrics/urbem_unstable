@@ -27,7 +27,7 @@
  * Página de Processamento Manter Solicitação de Compra
  * Data de Criação   : 21/09/2006
 
- $Id: PRManterSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
 
  * @ignore
 
@@ -467,6 +467,13 @@ switch ($stAcao) {
         $boReservaRigida      = ($boReservaRigida      == 'true') ? true : false;
         $boDotacaoObrigatoria = ($boDotacaoObrigatoria == 'true') ? true : false;
         $boHomologaAutomatico = ($boHomologaAutomatico == 'true') ? true : false;
+        
+        //Se a Solicitação for Registro de Preço, Não efetua Reserva de Saldo e Dotação Orçamentária Não é Obrigatória
+        $boRegistroPreco = $_REQUEST['boRegistroPreco'];
+        if($boRegistroPreco=='true'){
+            $boReservaRigida = false;
+            $boDotacaoObrigatoria = false;
+        }
 
         # Verifica se o array de item não está vazio.
         if (count($arValores) == 0) {
@@ -563,6 +570,7 @@ switch ($stAcao) {
             $obTComprasSolicitacao->setDado('observacao'       , $_REQUEST['stObservacao']);
             $obTComprasSolicitacao->setDado('prazo_entrega'    , $_REQUEST['stPrazoEntrega']);
             $obTComprasSolicitacao->setDado('timestamp'        , $stDtSolicitacao);
+            $obTComprasSolicitacao->setDado('registro_precos'  , $boRegistroPreco);
             $obTComprasSolicitacao->alteracao();
 
             $inSolicitacao = $obTComprasSolicitacao->getDado("cod_solicitacao");
@@ -629,6 +637,62 @@ switch ($stAcao) {
                     $obTComprasSolicitacaoHomologacao->alteracao();
                 } else {
                     $obTComprasSolicitacaoHomologacao->inclusao();
+                }
+            }
+            
+            $arExclui = Sessao::read('arValoresExcluidos');
+
+            if (is_array($arExclui) && count($arExclui) > 0) {
+                # Rotina para tratar os ítens que foram excluidos da solicitação.
+                foreach ($arExclui as $stChave => $valor) {
+
+                    if ($valor['inCodDespesa'] && $valor['inCodEstrutural']) {
+                        $stFiltro = " WHERE  solicitacao_item_dotacao.cod_item        = ".$valor['inCodItem']."                                \n";
+                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_centro      = ".$valor['inCodCentroCusto']."                         \n";
+                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_despesa     = ".$valor['inCodDespesa']."                             \n";
+                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_conta       = ".$valor['inCodEstrutural']."                          \n";
+                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")." \n";
+                        $stFiltro.= "   AND  solicitacao_item_dotacao.exercicio       = '".$_REQUEST['hdnExercicio']."'                        \n";
+                        $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItemD, $stFiltro);
+
+                        if ($rsRecordSetItemD->getNumLinhas() > 0) {
+                            $obTComprasSolicitacaoItemDotacao->setDado("exercicio" 		 , $_REQUEST['hdnExercicio']);
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_entidade"	 , $_REQUEST['HdnCodEntidade']);
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_solicitacao" , $rsRecordSetItemD->getCampo("cod_solicitacao"));
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_centro"		 , $rsRecordSetItemD->getCampo("cod_centro"));
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_item"		 , $rsRecordSetItemD->getCampo("cod_item"));
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_despesa"     , $rsRecordSetItemD->getCampo("cod_despesa") );
+                            $obTComprasSolicitacaoItemDotacao->setDado("cod_conta"		 , $rsRecordSetItemD->getCampo("cod_conta") );
+                            $obTComprasSolicitacaoItemDotacao->exclusao();
+                        }
+
+                        $stFiltro  = " WHERE  solicitacao_item_dotacao.cod_item        = ".$valor['inCodItem']. "                               \n";
+                        $stFiltro .= "   AND  solicitacao_item_dotacao.cod_centro      = ".$valor['inCodCentroCusto']. "                        \n";
+                        $stFiltro .= "   AND  solicitacao_item_dotacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")." \n";
+                        $stFiltro .= "   AND  solicitacao_item_dotacao.exercicio       = '".$_REQUEST['hdnExercicio'] ."'                       \n";
+                        $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItem,$stFiltro);
+                    }
+
+                    $stFiltro = " WHERE  solicitacao_item.cod_item        = ".$valor['inCodItem']. "                                  \n";
+                    $stFiltro.= "   AND  solicitacao_item.cod_centro      = ".$valor['inCodCentroCusto']. "                           \n";
+                    $stFiltro.= "   AND  solicitacao_item.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")."    \n";
+                    $stFiltro.= "   AND  solicitacao_item.exercicio       = '".$_REQUEST['hdnExercicio'] ."'                          \n";
+                    $stFiltro.= "   AND  NOT EXISTS(SELECT *                                                                          \n";
+                    $stFiltro.= "                    FROM compras.solicitacao_item_anulacao                                           \n";
+                    $stFiltro.= "                   WHERE solicitacao_item.cod_item       =solicitacao_item_anulacao.cod_item         \n";
+                    $stFiltro.= "                     AND solicitacao_item.cod_entidade   =solicitacao_item_anulacao.cod_entidade     \n";
+                    $stFiltro.= "                     AND solicitacao_item.cod_centro     =solicitacao_item_anulacao.cod_centro       \n";
+                    $stFiltro.= "                     AND solicitacao_item.exercicio      =solicitacao_item_anulacao.exercicio        \n";
+                    $stFiltro.= "                     AND solicitacao_item.cod_solicitacao=solicitacao_item_anulacao.cod_solicitacao) \n";
+                    $obTComprasSolicitacaoItem->recuperaTodos($rsRecordSetItemAnulado,$stFiltro);
+
+                    if ($rsRecordSetItemAnulado->getNumLinhas() > 0) {
+                        $obTComprasSolicitacaoItem->setDado("exercicio", $_REQUEST['hdnExercicio']);
+                        $obTComprasSolicitacaoItem->setDado("cod_solicitacao", $obTComprasSolicitacao->getDado("cod_solicitacao"));
+                        $obTComprasSolicitacaoItem->setDado("cod_item", $valor['inCodItem']);
+                        $obTComprasSolicitacaoItem->setDado("cod_centro", $valor['inCodCentroCusto']);
+                        $obTComprasSolicitacaoItem->exclusao();
+                    }
                 }
             }
 
@@ -784,7 +848,7 @@ switch ($stAcao) {
                     $obTOrcamentoReservaSaldo->setDado('vl_reserva'         , $nuVlrReserva		   );
                     $obTOrcamentoReservaSaldo->setDado('dt_validade_final'  , '31/12/'.Sessao::getExercicio() );
 
-                    if ($boHomologaAutomatico && $nuVlrReserva > 0) {
+                    if ($boHomologaAutomatico && $nuVlrReserva > 0 && $boRegistroPreco=='false') {
                         if ($obTOrcamentoReservaSaldo->incluiReservaSaldo()) {
                             # Inclusão na tabela compras.solicitacao_homologada_reserva
                             $obTSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
@@ -803,62 +867,6 @@ switch ($stAcao) {
                 }
             }
 
-            $arExclui = Sessao::read('arValoresExcluidos');
-
-            if (is_array($arExclui) && count($arExclui) > 0) {
-                # Rotina para tratar os ítens que foram excluidos da solicitação.
-                foreach ($arExclui as $stChave => $valor) {
-
-                    if ($valor['inCodDespesa'] && $valor['inCodEstrutural']) {
-                        $stFiltro = " WHERE  solicitacao_item_dotacao.cod_item        = ".$valor['inCodItem']."                                \n";
-                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_centro      = ".$valor['inCodCentroCusto']."                         \n";
-                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_despesa     = ".$valor['inCodDespesa']."                             \n";
-                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_conta       = ".$valor['inCodEstrutural']."                          \n";
-                        $stFiltro.= "   AND  solicitacao_item_dotacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")." \n";
-                        $stFiltro.= "   AND  solicitacao_item_dotacao.exercicio       = '".$_REQUEST['hdnExercicio']."'                        \n";
-                        $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItemD, $stFiltro);
-
-                        if ($rsRecordSetItemD->getNumLinhas() > 0) {
-                            $obTComprasSolicitacaoItemDotacao->setDado("exercicio" 		 , $_REQUEST['hdnExercicio']);
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_entidade"	 , $_REQUEST['HdnCodEntidade']);
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_solicitacao" , $rsRecordSetItemD->getCampo("cod_solicitacao"));
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_centro"		 , $rsRecordSetItemD->getCampo("cod_centro"));
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_item"		 , $rsRecordSetItemD->getCampo("cod_item"));
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_despesa"     , $rsRecordSetItemD->getCampo("cod_despesa") );
-                            $obTComprasSolicitacaoItemDotacao->setDado("cod_conta"		 , $rsRecordSetItemD->getCampo("cod_conta") );
-                            $obTComprasSolicitacaoItemDotacao->exclusao();
-                        }
-
-                        $stFiltro  = " WHERE  solicitacao_item_dotacao.cod_item        = ".$valor['inCodItem']. "                               \n";
-                        $stFiltro .= "   AND  solicitacao_item_dotacao.cod_centro      = ".$valor['inCodCentroCusto']. "                        \n";
-                        $stFiltro .= "   AND  solicitacao_item_dotacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")." \n";
-                        $stFiltro .= "   AND  solicitacao_item_dotacao.exercicio       = '".$_REQUEST['hdnExercicio'] ."'                       \n";
-                        $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItem,$stFiltro);
-                    }
-
-                    $stFiltro = " WHERE  solicitacao_item.cod_item        = ".$valor['inCodItem']. "                                  \n";
-                    $stFiltro.= "   AND  solicitacao_item.cod_centro      = ".$valor['inCodCentroCusto']. "                           \n";
-                    $stFiltro.= "   AND  solicitacao_item.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")."    \n";
-                    $stFiltro.= "   AND  solicitacao_item.exercicio       = '".$_REQUEST['hdnExercicio'] ."'                          \n";
-                    $stFiltro.= "   AND  NOT EXISTS(SELECT *                                                                          \n";
-                    $stFiltro.= "                    FROM compras.solicitacao_item_anulacao                                           \n";
-                    $stFiltro.= "                   WHERE solicitacao_item.cod_item       =solicitacao_item_anulacao.cod_item         \n";
-                    $stFiltro.= "                     AND solicitacao_item.cod_entidade   =solicitacao_item_anulacao.cod_entidade     \n";
-                    $stFiltro.= "                     AND solicitacao_item.cod_centro     =solicitacao_item_anulacao.cod_centro       \n";
-                    $stFiltro.= "                     AND solicitacao_item.exercicio      =solicitacao_item_anulacao.exercicio        \n";
-                    $stFiltro.= "                     AND solicitacao_item.cod_solicitacao=solicitacao_item_anulacao.cod_solicitacao) \n";
-                    $obTComprasSolicitacaoItem->recuperaTodos($rsRecordSetItemAnulado,$stFiltro);
-
-                    if ($rsRecordSetItemAnulado->getNumLinhas() > 0) {
-                        $obTComprasSolicitacaoItem->setDado("exercicio", $_REQUEST['hdnExercicio']);
-                        $obTComprasSolicitacaoItem->setDado("cod_solicitacao", $obTComprasSolicitacao->getDado("cod_solicitacao"));
-                        $obTComprasSolicitacaoItem->setDado("cod_item", $valor['inCodItem']);
-                        $obTComprasSolicitacaoItem->setDado("cod_centro", $valor['inCodCentroCusto']);
-                        $obTComprasSolicitacaoItem->exclusao();
-                    }
-                }
-            }
-
             if ($_REQUEST['boRelatorio']) {
                 $pgDestino = $pgRel;
             } elseif ($boHomologaAutomatico == 'true') {
@@ -867,7 +875,7 @@ switch ($stAcao) {
                 $pgDestino = $pgList;
             }
 
-            SistemaLegado::alertaAviso($pgDestino."&dtSolicitacao=".$stDtSolicitacaoFormatada."&stHoraSolicitacao=".$stHoraSolicitacao."&inSolicitacao=".$inSolicitacao."&inEntidade=".$obTComprasSolicitacao->getDado('cod_entidade'),"Número da solicitação: ".$inSolicitacao,"alterar", "aviso", Sessao::getId(),"");
+            SistemaLegado::alertaAviso($pgDestino."&dtSolicitacao=".$stDtSolicitacaoFormatada."&stHoraSolicitacao=".$stHoraSolicitacao."&inSolicitacao=".$inSolicitacao."&inEntidade=".$obTComprasSolicitacao->getDado('cod_entidade')."&boRegistroPreco=".$boRegistroPreco,"Número da solicitação: ".$inSolicitacao,"alterar", "aviso", Sessao::getId(),"");
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem), "n_alterar", "erro" );
             SistemaLegado::LiberaFrames(true,true);
@@ -884,8 +892,6 @@ switch ($stAcao) {
         $obTComprasSolicitacaoItemDotacao = new TComprasSolicitacaoItemDotacao();
         $obTComprasSolicitacaoEntrega     = new TComprasSolicitacaoEntrega();
         $obTComprasObjeto                 = new TComprasObjeto();
-        //$obTOrcamentoContaDespesa         = new TOrcamentoContaDespesa();
-        //$obTComprasSolicitacaoItemDotacao = new TComprasSolicitacaoItemDotacao();
         $obTOrcamentoContaDespesa         = new TOrcamentoContaDespesa();
         $obTOrcamentoReservaSaldo 		  = new TOrcamentoReservaSaldos;
         $obTSolicitacaoHomologadaReserva  = new TComprasSolicitacaoHomologadaReserva;
@@ -902,6 +908,13 @@ switch ($stAcao) {
         $boReservaRigida      = ( $boReservaRigida      == 'true' ) ? true : false;
         $boDotacaoObrigatoria = ( $boDotacaoObrigatoria == 'true' ) ? true : false;
         $boHomologaAutomatico = ( $boHomologaAutomatico == 'true' ) ? true : false;
+        
+        //Se a Solicitação for Registro de Preço, Não efetua Reserva de Saldo e Dotação Orçamentária Não é Obrigatória
+        $boRegistroPreco = $_REQUEST['boRegistroPreco'];
+        if($boRegistroPreco=='true'){
+            $boReservaRigida = false;
+            $boDotacaoObrigatoria = false;
+        }
 
         # Valida a data da solicitação que deve ser informada obrigatoriamente.
         if ( !empty($_REQUEST['stDtSolicitacao']) ) {
@@ -995,15 +1008,16 @@ switch ($stAcao) {
             $stHoraSolicitacao = date('H:i:s.ms');
 
             //inclui a solicitação
-            $obTComprasSolicitacao->setDado('exercicio'        , Sessao::getExercicio());
-            $obTComprasSolicitacao->setDado('cod_entidade'     , $_REQUEST['HdnCodEntidade']);
-            $obTComprasSolicitacao->setDado('cod_almoxarifado' , $_REQUEST['inCodAlmoxarifado']);
-            $obTComprasSolicitacao->setDado('cgm_solicitante'  , $_REQUEST['inCGM']);
-            $obTComprasSolicitacao->setDado('cgm_requisitante' , Sessao::read('numCgm'));
-            $obTComprasSolicitacao->setDado('cod_objeto'       , $obInObjeto);
-            $obTComprasSolicitacao->setDado('observacao'       , $_REQUEST['stObservacao']);
-            $obTComprasSolicitacao->setDado('prazo_entrega'    , $_REQUEST['stPrazoEntrega']);
-            $obTComprasSolicitacao->setDado('timestamp'        , $stDtSolicitacao." ".$stHoraSolicitacao);
+            $obTComprasSolicitacao->setDado('exercicio'         , Sessao::getExercicio());
+            $obTComprasSolicitacao->setDado('cod_entidade'      , $_REQUEST['HdnCodEntidade']);
+            $obTComprasSolicitacao->setDado('cod_almoxarifado'  , $_REQUEST['inCodAlmoxarifado']);
+            $obTComprasSolicitacao->setDado('cgm_solicitante'   , $_REQUEST['inCGM']);
+            $obTComprasSolicitacao->setDado('cgm_requisitante'  , Sessao::read('numCgm'));
+            $obTComprasSolicitacao->setDado('cod_objeto'        , $obInObjeto);
+            $obTComprasSolicitacao->setDado('observacao'        , $_REQUEST['stObservacao']);
+            $obTComprasSolicitacao->setDado('prazo_entrega'     , $_REQUEST['stPrazoEntrega']);
+            $obTComprasSolicitacao->setDado('timestamp'         , $stDtSolicitacao." ".$stHoraSolicitacao);
+            $obTComprasSolicitacao->setDado('registro_precos'   , $boRegistroPreco);
             $obTComprasSolicitacao->inclusao();
 
             # Monta a Hora para enviar ao relatório.
@@ -1115,7 +1129,8 @@ switch ($stAcao) {
                     $nuVlReserva = 0;
                     $nuVlReserva = str_replace(',','.',str_replace('.','',$arItens['nuVlTotal']));
 
-                    if ($nuVlReserva > 0) {
+                    //Faz a inclusão na tabela orcamento.reserva_saldos se NÃO for Registro de Preço
+                    if ($nuVlReserva > 0 && $boRegistroPreco=='false') {
                         //inclusão na tabela orcamento.reserva_saldo
                         $obTOrcamentoReservaSaldo->proximoCod( $inCodReserva );
 
@@ -1170,7 +1185,8 @@ switch ($stAcao) {
                     }
                 }
 
-                if ($boIncluiHomologacaoReserva == true) {
+                //Faz a inclusão na tabela compras.solicitacao_homologada_reserva se NÃO for Registro de Preço
+                if ($boIncluiHomologacaoReserva == true && $boRegistroPreco=='false') {
                     foreach ($arValores as $arItens) {
                         $nuVlReserva = str_replace(',','.',str_replace('.','',$arItens['nuVlTotal']));
                         if ($nuVlReserva > 0) {

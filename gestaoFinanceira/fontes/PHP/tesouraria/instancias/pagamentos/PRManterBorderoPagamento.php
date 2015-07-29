@@ -40,28 +40,6 @@
     * Casos de uso: uc-02.04.20,uc-02.03.28
 */
 
-/*
-$Log$
-Revision 1.19  2007/04/30 19:21:28  cako
-implementação uc-02.03.28
-
-Revision 1.18  2007/03/30 21:58:02  cako
-Bug #7884#
-
-Revision 1.17  2007/01/24 19:05:28  cako
-Bug #7884#
-
-Revision 1.16  2006/10/23 16:32:51  domluc
-Add opção para multiplos boletins
-
-Revision 1.15  2006/08/10 14:24:25  jose.eduardo
-Bug #6368#
-
-Revision 1.14  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php"      );
@@ -186,10 +164,9 @@ switch ($stAcao) {
                     $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setValoresPagos( $arNotaPaga );
                 }
                 if (!$obErro->ocorreu()) {
-//echo
+
                     $obErro = $obRTesourariaBoletim->roUltimoPagamento->pagar( $boTransacao );
-//              }
-//              if (!$obErro->ocorreu()) {
+
                     $obRTesourariaBoletim->roUltimoBordero->roUltimaTransacaoPagamento->setCodOrdem ($arItens['inNumOrdemPagamentoCredor']);
                     $obRTesourariaBoletim->roUltimoBordero->roUltimaTransacaoPagamento->roRTesourariaBordero->obROrcamentoEntidade->setCodigoEntidade($arItens['inCodigoEntidade']);
                     $obRTesourariaBoletim->roUltimoBordero->roUltimaTransacaoPagamento->roRTesourariaBordero->setExercicio($_REQUEST['stExercicio']);
@@ -242,14 +219,21 @@ switch ($stAcao) {
                 SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=incluir", "Ação ".$nomAcao." concluída com sucesso! (".$obRTesourariaBoletim->roUltimoBordero->getCodBordero() ."/". Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");
 
             $stCodOrdem = substr($stCodOrdem,0,strlen($stCodOrdem)-1);
-            $stCaminho = CAM_GF_TES_INSTANCIAS."pagamentos/OCRelatorioBordero.php";
+            
+	    $stCaminho = CAM_GF_TES_INSTANCIAS."pagamentos/OCRelatorioBordero.php";
             $stCampos  = "?".Sessao::getId()."&stAcao=imprimir&stCaminho=".$stCaminho;
             $stCampos .= "&inCodBordero=".$obRTesourariaBoletim->roUltimoBordero->getCodBordero();
             $stCampos .= "&stExercicio=".$obRTesourariaBoletim->roUltimoBordero->getExercicio();
             $stCampos .= "&inCodEntidade=".$obRTesourariaBoletim->roUltimoBordero->obROrcamentoEntidade->getCodigoEntidade();
             $stCampos .= "&stTipoBordero=P";
             $stCampos .= "&stCodOrdem=".$stCodOrdem;
+            
+            // Passagem de parametros para a geração do relatório conforme o exercicio logado
+            if ( Sessao::getExercicio() >= '2015' )
+                Sessao::write('relatorioBordero', $_REQUEST);
+                
             $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTesourariaBorderoPagamento );
+            
         } else {
             SistemaLegado::exibeAviso(urlencode("Erro ao executar ação: ".$nomAcao." (".$obErro->getDescricao().")"),"","erro");
         }
@@ -263,7 +247,6 @@ switch ($stAcao) {
     case 'alterar':
 
     break;
-
 }
 
 ?>

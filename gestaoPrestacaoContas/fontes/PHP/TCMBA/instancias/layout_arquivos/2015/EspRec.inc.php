@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 62931 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -41,7 +41,7 @@
     * Casos de uso: uc-06.03.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBAContaReceita.class.php" );
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAContaReceita.class.php" );
     $obTMapeamento = new TTBAContaReceita();
     $obTMapeamento->setDado('inMes'      , $inMes );
     $obTMapeamento->setDado('stEntidades', $stEntidades );
@@ -60,7 +60,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("estrutural");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cd_item_receita"); //Ainda nao tem as tabela interna. 
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");

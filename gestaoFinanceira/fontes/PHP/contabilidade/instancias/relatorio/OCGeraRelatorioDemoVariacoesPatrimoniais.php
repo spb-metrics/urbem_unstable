@@ -40,43 +40,53 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
-include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                    );
-include_once (CAM_FW_LEGADO."funcoesLegado.lib.php"    );
+include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
+
+$stDataIncial = $request->get('stDataInicial');
+$stDataFinal  = $request->get('stDataFinal');
 
 $obTOrcamentoEntidade = new TOrcamentoEntidade();
 $obTOrcamentoEntidade->setDado( 'exercicio'   , Sessao::getExercicio() );
-$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")" );
+$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$request->get('inCodEntidade')).")" );
 
-$preview = new PreviewBirt(2,9,14);
+if ($request->get("stEstrutural") == "false") {
+    $preview = new PreviewBirt(2,9,14);
+    $preview->addParametro( 'dt_inicial', $stDataIncial );
+    $preview->addParametro( 'dt_final'  , $stDataFinal  );
+    $preview->addParametro( 'data_inicial_nota', sistemaLegado::dataToSql($stDataIncial) );
+    $preview->addParametro( 'data_final_nota'  , sistemaLegado::dataToSql($stDataFinal));
+} else {
+    $preview = new PreviewBirt(2,9,19);
+    $preview->addParametro( 'dt_inicial', '01/01/'.Sessao::getExercicio() );
+    $preview->addParametro( 'dt_final'  , '31/12/'.Sessao::getExercicio() );
+    $preview->addParametro( 'data_inicial_nota', Sessao::getExercicio().'-01-01');
+    $preview->addParametro( 'data_final_nota'  , Sessao::getExercicio().'-12-31');
+}
+
 $preview->setTitulo('Demonstração das Variações do Patrimoniais');
-$preview->setVersaoBirt( '2.5.0' );
-
 $preview->addParametro ( 'exercicio', Sessao::getExercicio() );
 $preview->addParametro ( 'exercicio_anterior', (Sessao::getExercicio() - 1));
+$preview->addParametro ( 'cod_entidades', implode(',',$request->get('inCodEntidade')));
 
-$preview->addParametro ( 'cod_entidades', implode(',',$_REQUEST['inCodEntidade']));
-if ( count($_REQUEST['inCodEntidade']) == 1 ) {
-    $CodEntidade=$_REQUEST['inCodEntidade'][0];
-    $preview->addParametro( 'entidade', $CodEntidade );
+if ( count($request->get('inCodEntidade')) == 1 ) {    
+    $arCodEntidades = $request->get('inCodEntidade');
+    $inCodEntidade  = $arCodEntidades[0];
+
+    $preview->addParametro( 'entidade', $inCodEntidade );
     $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
-
 } else {
     $rsEntidade->setPrimeiroElemento();
     while ( !$rsEntidade->eof() ) {
         if (preg_match("/prefeitura.*/i", $rsEntidade->getCampo( 'nom_cgm' ))) {
             $preview->addParametro( 'entidade', $rsEntidade->getCampo('cod_entidade') );
-            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm'));
+            $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm')  );
             break;
         }
         $rsEntidade->proximo();
     }
 }
 
-$preview->addParametro( 'dt_inicial', $_REQUEST['stDataInicial'] );
-$preview->addParametro( 'dt_final', $_REQUEST['stDataFinal'] );
-$preview->addParametro('data_inicial_nota',implode('-',array_reverse(explode('/', $_POST['stDataInicial']))));
-$preview->addParametro('data_final_nota'  ,implode('-',array_reverse(explode('/', $_POST['stDataFinal']))));
 $preview->addAssinaturas(Sessao::read('assinaturas'));
-
 $preview->preview();
+
 ?>

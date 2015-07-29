@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 62954 $
     $Name$
     $Autor: $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -40,22 +40,9 @@
     * Casos de uso: uc-06.05.00
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/02 18:17:23  hboaventura
-inclusão do caso de uso uc-06.05.00
-
-Revision 1.1  2007/09/25 21:44:35  hboaventura
-adicionando arquivos
-
-Revision 1.1  2007/09/25 01:14:45  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GPC_TCMBA_MAPEAMENTO ."TTBATipoBem.class.php" );
+include_once ( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBATipoBem.class.php" );
 
 SistemaLegado::BloqueiaFrames();
 
@@ -68,19 +55,9 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-//include_once ($pgJS);
-
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao');
 
-//SistemaLegado::executaFramePrincipal( "buscaDado('MontaListaUniOrcam');" );
-
-//*****************************************************//
-// Define COMPONENTES DO FORMULARIO
-//*****************************************************//
 //Instancia o formulário
 $obForm = new Form;
 $obForm->setAction( $pgProc );
@@ -96,12 +73,8 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
-$obPersistente = new TTBATipoBem();
-
-$obPersistente->recuperaNaturezaGrupo($rsRecordSet,' ORDER BY grupo.cod_natureza, grupo.cod_grupo');
-
-// SistemaLegado::mostravar($rsRecordSetLista);
-// SistemaLegado::mostravar($rsRecordSetCombo);
+$obTTBATipoBem = new TTBATipoBem();
+$obTTBATipoBem->recuperaNaturezaGrupo($rsRecordSet,' ORDER BY grupo.cod_natureza, grupo.cod_grupo');
 
 $obLista = new Lista;
 $obLista->setTitulo ( "Relacionamento com Documentos Exigidos - Tipos de Certidão TCMBA");
@@ -167,6 +140,7 @@ $obFormulario->addSpan( $obSpnLista );
 $obFormulario->defineBarra( array( new Ok(true) ) );
 $obFormulario->show();
 
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 SistemaLegado::LiberaFrames();
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

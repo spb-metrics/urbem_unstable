@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLLogradouros.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLLogradouros.php 63009 2015-07-16 14:36:54Z evandro $
 
     * Casos de uso: uc-05.01.20
 */
@@ -167,7 +167,7 @@ $obTxtCodUF->setSize               ( 8                        );
 $obTxtCodUF->setMaxLength          ( 8                        );
 $obTxtCodUF->setNull               ( true                     );
 $obTxtCodUF->setInteiro            ( true                     );
-$obTxtCodUF->obEvento->setOnChange ( "buscaValor('buscaMunicipio');" );
+$obTxtCodUF->obEvento->setOnChange ( "buscaValor('preencheMunicipio');" );
 
 $obCmbUF = new Select;
 $obCmbUF->setName               ( "inCodUF"                 );
@@ -212,23 +212,42 @@ $obCmbOrder->setCampoDesc          ( "stOrder"        );
 $obCmbOrder->setNull               ( false            );
 $obCmbOrder->setStyle              ( "width: 200px"   );
 
+// Mostrar Historico do logradouro
+$obRadMostrarHistoricoSim = new Radio();
+$obRadMostrarHistoricoSim->setId     ('boHistorico');
+$obRadMostrarHistoricoSim->setName   ('boHistorico');
+$obRadMostrarHistoricoSim->setValue  ('S');
+$obRadMostrarHistoricoSim->setRotulo ('Mostrar Histórico do Logradouro');
+$obRadMostrarHistoricoSim->setLabel  ('Sim');
+
+$obRadMostrarHistoricoNao = new Radio();
+$obRadMostrarHistoricoNao->setId      ('boHistorico');
+$obRadMostrarHistoricoNao->setName    ('boHistorico');
+$obRadMostrarHistoricoNao->setValue   ('N');
+$obRadMostrarHistoricoNao->setRotulo  ('Mostrar Histórico do Logradouro');
+$obRadMostrarHistoricoNao->setLabel   ('Não');
+$obRadMostrarHistoricoNao->setChecked (true);
+
+$arMostrarHistorico = array($obRadMostrarHistoricoSim, $obRadMostrarHistoricoNao);
+
 $obFormulario = new Formulario;
-$obFormulario->addForm( $obForm );
-$obFormulario->setAjuda ( "UC-05.01.20" );
-$obFormulario->addHidden( $obHdnCaminho );
-$obFormulario->addHidden( $obHdnAcao    );
-$obFormulario->addHidden( $obHdnCtrl    );
-$obFormulario->addTitulo( "Dados para filtro"        );
-$obFormulario->addComponente( $obCmbTipoLogradouro );
-$obFormulario->addComponente( $obTxtNom );
-$obFormulario->agrupaComponentes( array( $obCodInicio, $obLblPeriodo ,$obCodTermino) );
-$obFormulario->addComponente( $obTxtNomBairro );
-$obFormulario->agrupaComponentes( array( $obCodInicioBairro, $obLblPeriodoBairro ,$obCodTerminoBairro ) );
-$obFormulario->agrupaComponentes( array( $obCEPInicio, $obLblCEP ,$obCEPTermino) );
+$obFormulario->addForm               ( $obForm );
+$obFormulario->setAjuda              ( "UC-05.01.20" );
+$obFormulario->addHidden             ( $obHdnCaminho );
+$obFormulario->addHidden             ( $obHdnAcao    );
+$obFormulario->addHidden             ( $obHdnCtrl    );
+$obFormulario->addTitulo             ( "Dados para filtro"        );
+$obFormulario->addComponente         ( $obCmbTipoLogradouro );
+$obFormulario->addComponente         ( $obTxtNom );
+$obFormulario->agrupaComponentes     ( array( $obCodInicio, $obLblPeriodo ,$obCodTermino) );
+$obFormulario->addComponente         ( $obTxtNomBairro );
+$obFormulario->agrupaComponentes     ( array( $obCodInicioBairro, $obLblPeriodoBairro ,$obCodTerminoBairro ) );
+$obFormulario->agrupaComponentes     ( array( $obCEPInicio, $obLblCEP ,$obCEPTermino) );
 $obFormulario->addComponenteComposto ( $obTxtCodUF, $obCmbUF               );
 $obFormulario->addComponenteComposto ( $obTxtCodMunicipio, $obCmbMunicipio );
-$obFormulario->addComponente( $obCmbOrder );
+$obFormulario->addComponente         ( $obCmbOrder );
+$obFormulario->agrupaComponentes     ($arMostrarHistorico     );
 $obFormulario->OK();
-$obFormulario->setFormFocus( $obCmbTipoLogradouro->getid() );
+$obFormulario->setFormFocus          ( $obCmbTipoLogradouro->getid() );
 $obFormulario->show();
 ?>

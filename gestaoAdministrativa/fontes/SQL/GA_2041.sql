@@ -41,6 +41,8 @@ UPDATE administracao.funcionalidade SET nom_funcionalidade = 'Manutenção do CG
 -- Ticket #23077
 ----------------
 
+UPDATE sw_tipo_logradouro SET nom_tipo = 'Não Informado' WHERE cod_tipo = 0;
+
 UPDATE administracao.funcionalidade SET ordem = 5 WHERE cod_funcionalidade = 40;
 
 INSERT
@@ -166,7 +168,7 @@ INSERT
 VALUES
      ( 493
      , 4
-     , 'Manutenção de LBairro'
+     , 'Manutenção de Bairro'
      , 'instancias/bairro/'
      , 4
      , TRUE
@@ -259,4 +261,11 @@ VALUES
      , 'Excluir Bairro'
      , TRUE
      );
+
+
+----------------
+-- Ticket #23074
+----------------
+
+UPDATE administracao.modulo SET nom_modulo = 'URBEM' WHERE cod_modulo = 0;
 

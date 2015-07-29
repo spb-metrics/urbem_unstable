@@ -40,13 +40,6 @@
     * Casos de uso: uc-02.04.20
 */
 
-/*
-$Log$
-Revision 1.10  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
 //Novo Relatorio apartir de 2015 e será feito em MPDF

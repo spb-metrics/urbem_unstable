@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: FMRelatorioManterSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: FMRelatorioManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
 
   Caso de uso: uc-03.04.01
 
@@ -42,26 +42,26 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 
 if (isset($_REQUEST['cod_solicitacao']) && isset($_REQUEST['cod_entidade'])) {
-    $_REQUEST['inSolicitacao'] = $_REQUEST['cod_solicitacao'];
-    $_REQUEST['inEntidade'] = $_REQUEST['cod_entidade'];
+    $_REQUEST['inSolicitacao']  = $_REQUEST['cod_solicitacao'];
+    $_REQUEST['inEntidade']     = $_REQUEST['cod_entidade'];
 }
 
 $obBirtPreview = new PreviewBirt(3, 35, 2);
 
 # Relatório desenvolvido na versão 2.1.3, manter essa versão, não migrar.
-$obBirtPreview->setVersaoBirt('2.5.0');
 $obBirtPreview->setTitulo    ('Relatório de Solicitação de Compra' );
 
 # Parâmetros
-$obBirtPreview->addParametro ("cod_solicitacao"		  , $_REQUEST['inSolicitacao'] );
-$obBirtPreview->addParametro ("cod_entidade"		  , $_REQUEST['inEntidade'] );
-$obBirtPreview->addParametro ("entidade"			  , $_REQUEST['inEntidade'] );
-$obBirtPreview->addParametro ("data"				  , $_REQUEST['dtSolicitacao'] );
-$obBirtPreview->addParametro ("hora"				  , $_REQUEST['stHoraSolicitacao']);
-$obBirtPreview->addParametro ("exercicio" 			  , Sessao::getExercicio() );
-$obBirtPreview->addParametro ("exercicio_solicitacao" , $_REQUEST['exercicio'] );
-$obBirtPreview->addParametro ("cod_acao" 			  , 1580 );
-$obBirtPreview->addParametro ("incluir_assinaturas"	  , $boIncluirAssinaturas);
+$obBirtPreview->addParametro ("cod_solicitacao"         , $_REQUEST['inSolicitacao'] );
+$obBirtPreview->addParametro ("cod_entidade"            , $_REQUEST['inEntidade'] );
+$obBirtPreview->addParametro ("entidade"                , $_REQUEST['inEntidade'] );
+$obBirtPreview->addParametro ("data_solicitacao"        , $_REQUEST['dtSolicitacao'] );
+$obBirtPreview->addParametro ("hora_solicitacao"        , $_REQUEST['stHoraSolicitacao']);
+$obBirtPreview->addParametro ("exercicio"               , Sessao::getExercicio() );
+$obBirtPreview->addParametro ("exercicio_solicitacao"   , $_REQUEST['exercicio'] );
+$obBirtPreview->addParametro ("cod_acao"                , 1580 );
+$obBirtPreview->addParametro ("incluir_assinaturas"     , $boIncluirAssinaturas);
+$obBirtPreview->addParametro ("boRegistroPreco"         , ($_REQUEST['boRegistroPreco']=='true') ? 'Sim' : 'Não' );
 $obBirtPreview->addAssinaturas( Sessao::read('assinaturas'));
 
 $obBirtPreview->preview();

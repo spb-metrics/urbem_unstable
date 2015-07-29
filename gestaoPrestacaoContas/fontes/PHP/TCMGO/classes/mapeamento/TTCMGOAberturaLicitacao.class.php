@@ -284,18 +284,18 @@ class TTCMGOAberturaLicitacao extends Persistente
                             , dt_recebimento_doc
                             , tipo_licitacao
                             , natureza_objeto
-                            , objeto
                             , regime_execucao_obras
                             , num_convidado
                             , clausula_prorrogacao
                             , undade_medida_prazo_execucao
                             , prazo_execucao
-                            , forma_pagamento
                             , citerio_aceitabilidade
                             , desconto_tabela
                             , licitacao.cod_licitacao
                             , licitacao.cod_modalidade
-
+							, objeto.descricao
+                            , edital.condicoes_pagamento
+							
                     ORDER BY licitacao.cod_licitacao
                            , licitacao.cod_modalidade
                            , num_processo_licitatorio ";

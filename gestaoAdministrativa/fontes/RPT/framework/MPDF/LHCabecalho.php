@@ -36,7 +36,7 @@
               <td colspan="3"><?php echo $stCampoPeriodo ?></td>
             </tr>
             <tr class="thalign">
-              <td class="th4">Emissão: {DATE j/m/Y}</td>
+              <td class="th4">Emissão: {DATE d/m/Y}</td>
               <td class="th5">Hora: {DATE H:i:s}</td>
               <td>Página: {PAGENO} de {nbpg}</td>
             </tr>

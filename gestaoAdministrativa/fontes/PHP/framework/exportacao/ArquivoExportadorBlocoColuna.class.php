@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: ArquivoExportadorBlocoColuna.class.php 62759 2015-06-16 18:00:15Z jean $
+$Id: ArquivoExportadorBlocoColuna.class.php 63081 2015-07-22 18:56:09Z jean $
 
 Casos de uso: uc-01.01.00
 */
@@ -321,6 +321,7 @@ function FormataTipoDado($stCampo)
                         if ($this->stAlinhamento=='D') {
                             $this->stAlinhamento= STR_PAD_LEFT;
                         }
+                        $stCampo = str_replace ("-", "", $stCampo);
                         $this->stPreenchimento  = '-' . str_pad($this->stPreenchimento,$this->inTamanhoFixo -1 ,'0',$this->stAlinhamento);
                     }
                 break;
@@ -339,6 +340,15 @@ function FormataTipoDado($stCampo)
                 break;
 
                 case "TCE_RN":
+                    $stCampo = str_replace (".", "", $stCampo);
+                    if ($stCampo<0) {
+                        if ($this->stAlinhamento=='D') {
+                            $this->stAlinhamento= STR_PAD_LEFT;
+                        }
+                        $stCampo = str_replace ("-", "", $stCampo);
+                        $this->stPreenchimento  = '-' . str_pad($this->stPreenchimento,$this->inTamanhoFixo -1 ,'0',$this->stAlinhamento);
+                    }
+                break;
                 case 'TCE_MG':
                     $stCampo = str_replace (".", ",", $stCampo);
                 break;
@@ -391,6 +401,15 @@ function FormataTipoDado($stCampo)
 
                     break;
                }
+
+               if (strpos($stCampo,'-') !== FALSE) {
+                    $arData = explode('-',$stCampo);
+
+                    if (strlen($arData[0]) == 4) {
+                        $stCampo = SistemaLegado::dataToBr($stCampo);
+                    }
+               }
+               
                $this->inTamanhoMaximo  = null;
                $arCampo = explode("/",trim($stCampo));
                $stCampo = implode("",$arCampo);
@@ -446,10 +465,23 @@ function Formatar()
                     $this->stAlinhamento = STR_PAD_BOTH;
                 break;
             }
-            if ( strlen($stCampo) > $this->inTamanhoFixo ) {
-                $stCampo = substr($stCampo,0,$this->inTamanhoFixo );
+
+            switch (trim($this->roBloco->roArquivo->getTipoDocumento())) {
+                case 'TCM_BA':
+                    if ( mb_strlen($stCampo) > $this->inTamanhoFixo ) {
+                        $stCampo = mb_substr($stCampo,0,$this->inTamanhoFixo );
+                    }
+                break;
+                
+                default:
+                    if ( strlen($stCampo) > $this->inTamanhoFixo ) {
+                        $stCampo = substr($stCampo,0,$this->inTamanhoFixo );
+                    }
+                break;
             }
+
             $stCampo = str_pad($stCampo,$this->inTamanhoFixo,$this->stPreenchimento,$this->stAlinhamento);
+            
         } elseif (!$this->inTamanhoFixo && $this->inTamanhoMaximo) {
             if ( strlen($stCampo) > $this->inTamanhoMaximo ) {
                 $stCampo = substr($stCampo,0,$this->inTamanhoMaximo);

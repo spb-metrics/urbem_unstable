@@ -46,6 +46,7 @@ function buscaPopup()
     $stExercicio = $_REQUEST['stExercicioMapa'];
     $stJs = null;
     $stMensagem = '';
+
     if ($inCodigo != "") {
             $arMapa = explode ( '/', $inCodigo );
 
@@ -66,12 +67,59 @@ function buscaPopup()
                     }
 
                     $rsMapa = new RecordSet;
-
+                    $inCodLicitacaoMapa = 0;
+                    $inHdnCodLicitacao = 0;
                     switch ($_REQUEST['stTipoBusca']) {
                             case 'processoLicitatorio':
-                                    $stFiltro  = "and mapa.cod_mapa = ".$arMapa[0];
-                                    $stFiltro .= "and mapa.exercicio = '".$arMapa[1]."'";
-                                    $obTComprasMapa->recuperaMapaProcessoLicitatorio ($rsMapa, $stFiltro );
+                                $stFiltro  = "and mapa.cod_mapa = ".$arMapa[0];
+                                $stFiltro .= "and mapa.exercicio = '".$arMapa[1]."'";
+                                $boModalidade = false;
+                                if ( $_REQUEST['stAcao'] == 'alterar' ){
+                                    $arModalidade = explode('-',$_REQUEST['stModalidade']);
+                                    $inCodModalidade = trim($arModalidade[0]);
+                                    $inHdnCodLicitacao = $_REQUEST['hdnCodLicitacao'];
+                                    
+                                    $inCodLicitacaoMapa = SistemaLegado::pegaDado('cod_licitacao','licitacao.licitacao'," WHERE exercicio_mapa = '".$arMapa[1]."' AND cod_mapa = ".$arMapa[0]);
+                                    $stExercicioLicitacaoMapa = SistemaLegado::pegaDado('exercicio','licitacao.licitacao'," WHERE exercicio_mapa = '".$arMapa[1]."' AND cod_mapa = ".$arMapa[0]);
+                                
+                                    if ($inCodModalidade == 3 || $inCodModalidade == 6 || $inCodModalidade == 7 ) {
+                                        $boModalidade = false;
+                                        $stFiltro .= " \n";
+                                    } else {
+                                        $boModalidade = true;
+                                        $stFiltro .= "
+                                            AND EXISTS(SELECT mp.exercicio
+                                                            , mp.cod_mapa
+                                                            , mp.cod_objeto
+                                                            , mp.timestamp
+                                                            , mp.cod_tipo_licitacao
+                                                            , solicitacao.registro_precos
+                                                         FROM compras.mapa AS mp
+                                                   INNER JOIN compras.mapa_solicitacao
+                                                           ON mapa_solicitacao.exercicio = mp.exercicio
+                                                          AND mapa_solicitacao.cod_mapa  = mp.cod_mapa
+                                                   INNER JOIN compras.solicitacao_homologada
+                                                           ON solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                                                          AND solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                                                          AND solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                                                   INNER JOIN compras.solicitacao
+                                                           ON solicitacao.exercicio       = solicitacao_homologada.exercicio
+                                                          AND solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                                                          AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+                                                        WHERE mp.cod_mapa = mapa.cod_mapa
+                                                          AND mp.exercicio = mapa.exercicio
+                                                          AND solicitacao.registro_precos IS FALSE
+                                                     GROUP BY mp.exercicio
+                                                            , mp.cod_mapa
+                                                            , mp.cod_objeto
+                                                            , mp.timestamp
+                                                            , mp.cod_tipo_licitacao
+                                                            , solicitacao.registro_precos )
+                                        \n";
+                                    }
+                                }
+
+                                $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio($rsMapa, $stFiltro );
                             break ;
                             default:
                                     $stFiltro  = "where mapa.cod_mapa = ".$arMapa[0];
@@ -80,7 +128,7 @@ function buscaPopup()
                             break;
                     }
 
-                    if ( $rsMapa->getNumLinhas()<=0 ) {
+                    if ( $rsMapa->getNumLinhas()<=0 AND $inCodLicitacaoMapa !=$inHdnCodLicitacao) {
 
                             $boMapa = sistemaLegado::pegaDado('cod_mapa','compras.mapa',' where cod_mapa = '.$arMapa[0].' and exercicio = \''.$arMapa[1].'\' ' );
 
@@ -103,7 +151,11 @@ function buscaPopup()
                             if (!$boMapa) {
                                     $stJs .= "alertaAviso('@Código do Mapa (". $arMapa[0] . '/' . $arMapa[1]  .") não encontrado.', 'form','erro','".Sessao::getId()."');";
                             } elseif ($boProcessoLicitatorio) {
+                                if ($boModalidade == true && $_REQUEST['stAcao'] == 'alterar') {
+                                    $stJs .= "alertaAviso('@O Mapa (". $arMapa[0] . '/' . $arMapa[1]  ."). A Modalidade desse Processo Licitatório, não é compativel com o mapa de Registro de Preços.', 'form','erro','".Sessao::getId()."');";
+                                } else {
                                     $stJs .= "alertaAviso('@O Mapa (". $arMapa[0] . '/' . $arMapa[1]  .") está em Processo Licitatório.', 'form','erro','".Sessao::getId()."');";
+                                }
                             } elseif ($boCompraDireta) {
                                     $stJs .= "alertaAviso('@O Mapa (". $arMapa[0] . '/' . $arMapa[1]  .") está vinculado a uma Compra Direta.', 'form','erro','".Sessao::getId()."');";
                             } elseif ( $rsMapaReserva->getNumLinhas() <= 0 ) {

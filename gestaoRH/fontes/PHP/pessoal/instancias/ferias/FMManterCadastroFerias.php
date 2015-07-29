@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: FMManterCadastroFerias.php 62702 2015-06-09 20:53:34Z carlos.silva $
+    $Id: FMManterCadastroFerias.php 62873 2015-07-01 20:29:22Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -219,19 +219,29 @@ $obHdnDataFinal->setValue                       ( $dtFinal                      
 
 $rsFormasPagamento = new recordset();
 
+if ( $request->get('inCodRegime') != "") {
 
-if ($_REQUEST['inCodRegime'] != "") {
     $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
-    $stFiltro  = " AND cod_regime = ".$_REQUEST['inCodRegime']." \n";
-    $stFiltro .= "GROUP BY forma_pagamento_ferias.cod_forma      \n";
-    $stFiltro .= "       , forma_pagamento_ferias.codigo         \n";
-    $stFiltro .= "       , forma_pagamento_ferias.dias           \n";
-    $stFiltro .= "       , forma_pagamento_ferias.abono            ";
-    $obTPessoalFormaPagamentoFerias->recuperaRelacionamento($rsFormasPagamento,$stFiltro);
+    $stFiltro  = "  AND cod_regime = ".$request->get('inCodRegime')." 
+                    AND ferias.cod_contrato = ".$request->get('inCodContrato')."
+                    AND dt_inicial_aquisitivo = TO_DATE('".$request->get('dtInicial')."','dd/mm/yyyy')
+                    AND dt_final_aquisitivo = TO_DATE('".$request->get('dtFinal')."','dd/mm/yyyy') 
+                ";
+    $obTPessoalFormaPagamentoFerias->recuperaDiasFeriasRestantes($rsFormasPagamento,$stFiltro,"",$boTransacao);
+
+    if ($rsFormasPagamento->getNumLinhas() < 0) {
+        $stFiltro  = " AND cod_regime = ".$request->get('inCodRegime')." \n";
+        $stFiltro .= "GROUP BY forma_pagamento_ferias.cod_forma      \n";
+        $stFiltro .= "       , forma_pagamento_ferias.codigo         \n";
+        $stFiltro .= "       , forma_pagamento_ferias.dias           \n";
+        $stFiltro .= "       , forma_pagamento_ferias.abono            ";
+        $stFiltro .= " ORDER BY codigo ";
+        $obTPessoalFormaPagamentoFerias->recuperaRelacionamento($rsFormasPagamento,$stFiltro);    
+    }
 
     $obHdnRegime =  new Hidden;
-    $obHdnRegime->setName                        ( "inCodRegime"                                                             );
-    $obHdnRegime->setValue                       ( $_REQUEST['inCodRegime']                                                              );
+    $obHdnRegime->setName                        ( "inCodRegime" );
+    $obHdnRegime->setValue                       ( $_REQUEST['inCodRegime'] );
 }
 
 $obCmbFormasPagamento = new Select;

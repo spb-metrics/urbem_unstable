@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterUnidadeGestora.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterUnidadeGestora.php 62862 2015-06-30 20:37:22Z jean $
 
     * Casos de uso: uc-06.05.00
 */
@@ -41,7 +41,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracaoEntidade.class.php");
 include_once(CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
-include_once(CAM_GPC_TCMBA_MAPEAMENTO."TTBAConfiguracaoEntidade.class.php");
+include_once(CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAConfiguracaoEntidade.class.php");
 
 $stPrograma = "ManterUnidadeGestora";
 $pgFilt = "FL".$stPrograma.".php";

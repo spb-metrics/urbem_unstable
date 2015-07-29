@@ -92,7 +92,7 @@ foreach($ar_versao as $ar_dados_gestao):
         foreach($arArquivosSql as $stArquivoSql):
             list($null,$stNomArquivo) = explode('_',substr($stArquivoSql, 0, strpos($stArquivoSql,'.')));
             // busca no array de arquivos somente pelos nomes e versao
-            preg_match("/(G.*)\_(.*)\.sql$/", $stArquivoSql, &$arquivos);
+            preg_match("/(G.*)\_(.*)\.sql$/", $stArquivoSql, $arquivos);
             list($stNomArquivo,$stSiglaGestao,$stVersaoBanco ) = $arquivos;
 
             if ((integer) $stVersaoBanco > $versao_db_cliente && (integer) $stVersaoBanco <= $versao_db_min) {

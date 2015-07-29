@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
-  * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+  * $Id: OCManterRegistroPreco.php 62915 2015-07-08 14:10:35Z michel $
+  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
   * $Author: michel $
-  * $Rev: 62832 $
+  * $Rev: 62915 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -50,7 +50,8 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
-function validaNroAdesao($stCodAdesao, $inCodEntidade) {
+function validaNroAdesao($stCodAdesao, $inCodEntidade)
+{
     $stCodProcessoAdesao = explode('/', $stCodAdesao);
     
     if ( array_key_exists( 1, $stCodProcessoAdesao) ) {
@@ -63,15 +64,16 @@ function validaNroAdesao($stCodAdesao, $inCodEntidade) {
         $stCodProcessoAdesaoTMP = str_pad($stCodProcessoAdesao[0], 12, "0", STR_PAD_LEFT) .'/'.$stExercicioAdesao;
         $stJs .= "jQuery('#stCodigoProcessoAdesao').val('".$stCodProcessoAdesaoTMP."'); \n";
     } else {
-        $stJs .= "jQuery('#stCodigoProcessoAdesao').val(''); \n";
-        $stJs .= "jQuery('#stCodigoProcessoAdesao').focus(); \n";
+        $stJs .= "jQuery('#stCodigoProcessoAdesao').val('');                            \n";
+        $stJs .= "jQuery('#stCodigoProcessoAdesao').focus();                            \n";
         $stJs .= "alertaAviso('Número de Processo de Adesão não pode ser igual a 0 (zero).','form','erro','".Sessao::getId()."'); \n";
     }
     
     return $stJs;
 }
 
-function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEntidade) {
+function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEntidade)
+{
     if($stCodProcesso!=NULL&&$stExercicioRegistroPrecos!=NULL&&$inCodEntidade!=NULL){
         $rsProcessoRegistroPrecos = new RecordSet();
         $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
@@ -81,19 +83,19 @@ function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEnt
         $obTTCEMGRegistroPrecos->recuperaPorChave($rsProcessoRegistroPrecos);
         
         if ( $rsProcessoRegistroPrecos->getNumLinhas() > 0 ) {
-            $stJs .= "jQuery('#stCodigoProcesso').val(''); \n";
+            $stJs .= "jQuery('#stCodigoProcesso').val('');                      \n";
             $stJs .= "alertaAviso('Já existe um número de processo igual para a mesma entidade no mesmo exercício (".str_pad($stCodProcesso, 7, "0", STR_PAD_LEFT) .'/'.$stExercicioRegistroPrecos.")','form','erro','".Sessao::getId()."'); \n";
         }else{
             $stCodProcesso = str_pad($stCodProcesso, 12, "0", STR_PAD_LEFT);
-            $stJs .= "jQuery('#stCodigoProcesso').val('".$stCodProcesso."'); \n";
+            $stJs .= "jQuery('#stCodigoProcesso').val('".$stCodProcesso."');    \n";
         }
     }
 
     return $stJs;
 }
 
-function montaFormLote() {
-
+function montaFormLote()
+{
     $obTxtCodigoLote = new TextBox();
     $obTxtCodigoLote->setRotulo('Número do Lote');
     $obTxtCodigoLote->setTitle('Número do Lote.');
@@ -111,10 +113,10 @@ function montaFormLote() {
     $obTxtDescricaoLote->setMaxCaracteres(250);
     
     $obVlrPercentualLote = new Porcentagem();
-    $obVlrPercentualLote->setId( 'nuPercentualLote' );
-    $obVlrPercentualLote->setName( 'nuPercentualLote' );
-    $obVlrPercentualLote->setRotulo( 'Percentual por Lote' );
-    $obVlrPercentualLote->setTitle( 'Selecione o percentual de desconto por Lote' );
+    $obVlrPercentualLote->setId('nuPercentualLote');
+    $obVlrPercentualLote->setName('nuPercentualLote');
+    $obVlrPercentualLote->setRotulo('Percentual por Lote');
+    $obVlrPercentualLote->setTitle('Selecione o percentual de desconto por Lote');
     $obVlrPercentualLote->setValue(0);
 
     $obFormulario = new Formulario();
@@ -124,13 +126,12 @@ function montaFormLote() {
     $obFormulario->addComponente( $obVlrPercentualLote );
 
     $obFormulario->montaInnerHTML();
-    $stHtml .= $obFormulario->getHTML();
+    $stHtml = $obFormulario->getHTML();
 
-    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery; \n";
-    $stJs .= "jQuery('#spnLote').html('".$stHtml."'); ";    
-    $stJs .= "jQuery('#nuPercentualItem').attr('disabled', 'disabled'); ";
-    $stJs .= " if (jQuery('#inDescontoTabela:checked').val() == 2) { jQuery('#nuPercentualLote').attr('disabled', 'disabled'); } "; 
-    
+    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                                                            \n";
+    $stJs .= "jQuery('#spnLote').html('".$stHtml."');                                                                               \n";    
+    $stJs .= "jQuery('#nuPercentualItem').attr('disabled', 'disabled');                                                             \n";
+    $stJs .= " if (jQuery('#inDescontoTabela:checked').val() == 2) { jQuery('#nuPercentualLote').attr('disabled', 'disabled'); }    \n";
     $stJs .= montaLoteAbaQuantitativo();
     
     return $stJs;
@@ -142,14 +143,13 @@ function buscaDescricaoLote($inCodLote)
    
     if (is_array($arItens) && count($arItens) > 0) {
         foreach ($arItens as $item) {
-            if ($item['stCodigoLote'] == $inCodLote) {
+            if ($item['stCodigoLote']==$inCodLote) {
                 return "jQuery('#txtDescricaoLote').val('".$item['txtDescricaoLote']."'); ";
             }
         }    
     }
-    
-    return "jQuery('#txtDescricaoLote').val(''); ";
 
+    return "jQuery('#txtDescricaoLote').val(''); ";
 }
 
 function incluirListaItens()
@@ -161,11 +161,8 @@ function incluirListaItens()
     # Validação necessária para não permitir a mesma descrição de lote para lotes no mesmo processo.
     if (is_array($arItens) && count($arItens) > 0) {
         foreach ($arItens as $item) {
-            if ($_REQUEST['txtDescricaoLote'] == $item['txtDescricaoLote'] &&            
-                $_REQUEST['stCodigoLote'] != $item['stCodigoLote'] && isset($_REQUEST['stCodigoLote'])) {
-
+            if ($_REQUEST['txtDescricaoLote']==$item['txtDescricaoLote'] && $_REQUEST['stCodigoLote']!=$item['stCodigoLote'] && isset($_REQUEST['stCodigoLote'])){
                 $obErro->setDescricao("Não é permitido a mesma descrição para lotes diferentes no mesmo processo");
-
                 break;
             }
         }
@@ -177,15 +174,16 @@ function incluirListaItens()
     }
 
     if (!$obErro->ocorreu()) {
-        if ($_REQUEST['dtCotacao'] != "" &&
-            $_REQUEST['inCodItem'] != "" &&
-            $_REQUEST['inNumItemLote'] != "" &&
-            $_REQUEST['nuVlReferencia'] > '0,0000' &&
-            $_REQUEST['nuQuantidade'] > '0,0000' &&
-            $_REQUEST['nuVlTotal'] > '0,0000' &&
-            $_REQUEST['stNomItem'] != "" &&
-            $_REQUEST['inNumCGMVencedor'] != "" &&
-            $_REQUEST['inOrdemClassifFornecedor'] != "") {
+        if ($_REQUEST['dtCotacao']                  != ""       &&
+            $_REQUEST['inCodItem']                  != ""       &&
+            $_REQUEST['inNumItemLote']              != ""       &&
+            $_REQUEST['nuVlReferencia']              > '0,0000' &&
+            $_REQUEST['nuQuantidade']                > '0,0000' &&
+            $_REQUEST['nuVlTotal']                   > '0,0000' &&
+            $_REQUEST['stNomItem']                  != ""       &&
+            $_REQUEST['inNumCGMVencedor']           != ""       &&
+            $_REQUEST['inOrdemClassifFornecedor']   != ""
+        ) {
             
             $arItens = Sessao::read('arItens');
             $arItensRemovido = Sessao::read('arItensRemovido');
@@ -204,25 +202,25 @@ function incluirListaItens()
             }
     
             $arItensCotacao = array();
-            $arItensCotacao['inCodItem']        = $_REQUEST['inCodItem'];
-            $arItensCotacao['inNumItemLote']    = $_REQUEST['inNumItemLote'];
+            $arItensCotacao['inCodItem']                = $_REQUEST['inCodItem'];
+            $arItensCotacao['inNumItemLote']            = $_REQUEST['inNumItemLote'];
             $arItensCotacao['inOrdemClassifFornecedor'] = $_REQUEST['inOrdemClassifFornecedor'];
-            $arItensCotacao['stNomItem']        = $_REQUEST['stNomItem'];
-            $arItensCotacao['stNomUnidade']     = $_REQUEST['stNomUnidade'];
-            $arItensCotacao['nuVlReferencia']   = $_REQUEST['nuVlReferencia'];
-            $arItensCotacao['nuQuantidade']     = $_REQUEST['nuQuantidade'];
-            $arItensCotacao['nuVlTotal']        = $_REQUEST['nuVlTotal'];
-            $arItensCotacao['dtCotacao']        = $_REQUEST['dtCotacao'];
-            $arItensCotacao['stCodigoLote']     = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
-            $arItensCotacao['nuPercentualLote'] = $_REQUEST['nuPercentualLote'];
-            $arItensCotacao['txtDescricaoLote'] = $_REQUEST['txtDescricaoLote'];
-            $arItensCotacao['nuVlUnitario']     = $_REQUEST['nuVlUnitario'];
-            $arItensCotacao['nuQtdeLicitada']   = $_REQUEST['nuQtdeLicitada'];
-            $arItensCotacao['nuQtdeAderida']    = $_REQUEST['nuQtdeAderida'];
-            $arItensCotacao['nuPercentualItem'] = $_REQUEST['nuPercentualItem'];
-            $arItensCotacao['inNumCGMVencedor'] = $_REQUEST['inNumCGMVencedor'];
-            $arItensCotacao['inId']             = $inIdMax;
-            $arItensCotacao['stNomCGMVencedor'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
+            $arItensCotacao['stNomItem']                = $_REQUEST['stNomItem'];
+            $arItensCotacao['stNomUnidade']             = $_REQUEST['stNomUnidade'];
+            $arItensCotacao['nuVlReferencia']           = $_REQUEST['nuVlReferencia'];
+            $arItensCotacao['nuQuantidade']             = $_REQUEST['nuQuantidade'];
+            $arItensCotacao['nuVlTotal']                = $_REQUEST['nuVlTotal'];
+            $arItensCotacao['dtCotacao']                = $_REQUEST['dtCotacao'];
+            $arItensCotacao['stCodigoLote']             = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
+            $arItensCotacao['nuPercentualLote']         = $_REQUEST['nuPercentualLote'];
+            $arItensCotacao['txtDescricaoLote']         = $_REQUEST['txtDescricaoLote'];
+            $arItensCotacao['nuVlUnitario']             = $_REQUEST['nuVlUnitario'];
+            $arItensCotacao['nuQtdeLicitada']           = $_REQUEST['nuQtdeLicitada'];
+            $arItensCotacao['nuQtdeAderida']            = $_REQUEST['nuQtdeAderida'];
+            $arItensCotacao['nuPercentualItem']         = $_REQUEST['nuPercentualItem'];
+            $arItensCotacao['inNumCGMVencedor']         = $_REQUEST['inNumCGMVencedor'];
+            $arItensCotacao['inId']                     = $inIdMax;
+            $arItensCotacao['stNomCGMVencedor']         = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
            
             if ($arItens != "") {
                 foreach ($arItens as $arrItem) {
@@ -240,7 +238,6 @@ function incluirListaItens()
                     }
                 }
             }
-    
         } else {
            $obErro->setDescricao("Informe Todos os campos!");
         }
@@ -264,123 +261,93 @@ function incluirListaItens()
 function alterarListaItens()
 {
     $obErro  = new Erro();
-
     $arItens = Sessao::read('arItens');
     
-    if ($_REQUEST['stAcao'] == 'incluir') {
-        # Validação necessária para não permitir a mesma descrição de lote para lotes no mesmo processo.
-        if (is_array($arItens) && count($arItens) > 0) {
-            foreach ($arItens as $item) {
-                if ($_REQUEST['txtDescricaoLote'] == $item['txtDescricaoLote'] &&            
-                    $_REQUEST['stCodigoLote'] != $item['stCodigoLote'] && isset($_REQUEST['stCodigoLote'])) {
-    
-                    $obErro->setDescricao("Não é permitido a mesma descrição para lotes diferentes no mesmo processo");
-    
-                    break;
-                }
+    # Validação necessária para não permitir a mesma descrição de lote para lotes no mesmo processo.
+    if (is_array($arItens) && count($arItens) > 0) {
+        foreach ($arItens as $item) {
+            if ($_REQUEST['txtDescricaoLote']==$item['txtDescricaoLote'] && $_REQUEST['stCodigoLote']!=$item['stCodigoLote'] && isset($_REQUEST['stCodigoLote'])) {
+                $obErro->setDescricao("Não é permitido a mesma descrição para lotes diferentes no mesmo processo");
+                break;
             }
         }
+    }
     
-        # Validação para não permitir cadastrar lote = 0 (zero)
-        if (isset($_REQUEST['stCodigoLote']) && $_REQUEST['stCodigoLote'] == 0) {
+    # Validação para não permitir cadastrar lote = 0 (zero)
+    if (!$obErro->ocorreu()) {
+        if (isset($_REQUEST['stCodigoLote']) && $_REQUEST['stCodigoLote']== 0) {
             $obErro->setDescricao("Código de Lote não pode ser igual a 0.");
         }
-
-        $_REQUEST['stCodigoLote'] = (isset($_REQUEST['stCodigoLote'])) ? $_REQUEST['stCodigoLote'] : 0;
+    }
     
-        if (!$obErro->ocorreu()) {
-            if ($_REQUEST['dtCotacao'] != "" &&
-                $_REQUEST['inCodItem'] != "" &&
-                $_REQUEST['inNumItemLote'] != "" &&
-                $_REQUEST['nuVlReferencia'] > '0,0000' &&
-                $_REQUEST['nuQuantidade'] > '0,0000' &&
-                $_REQUEST['nuVlTotal'] > '0,0000' &&
-                $_REQUEST['stNomItem'] != "" &&
-                $_REQUEST['inNumCGMVencedor'] != "" &&
-                $_REQUEST['inOrdemClassifFornecedor'] != "") {
-            
-                foreach ($arItens as $key => $arItem) {
-                    if($arItem['inId'] != $_REQUEST['inIdItem']){
-                        if ($arItem['inNumItemLote'] == $_REQUEST['inNumItemLote'] && $arItem['stCodigoLote'] == $_REQUEST['stCodigoLote'] && $arItem['inNumCGMVencedor'] == $_REQUEST['inNumCGMVencedor']) {
-                            $obErro->setDescricao("Este Número de Item já está na lista!");
-                            break;
-                        }
-                        if ($arItem['inNumItemLote'] == $_REQUEST['inNumItemLote'] && $arItem['stCodigoLote'] == $_REQUEST['stCodigoLote'] && $arItem['inCodItem'] != $_REQUEST['inCodItem'] ) {
-                            $obErro->setDescricao("Este Número de Item já está na lista!");
-                            break;
-                        }
-                        if ($arItem['inCodItem'] == $_REQUEST['inCodItem'] && $arItem['inNumCGMVencedor'] == $_REQUEST['inNumCGMVencedor']) {
-                            $obErro->setDescricao("Este Item já está na lista, para esse CGM de Fornecedor!");
-                            break;
-                        }                    
-                    }
+    if (!$obErro->ocorreu()) {
+        foreach ($arItens as $key => $arItem) {
+            if($arItem['inId'] != $_REQUEST['inIdItem']){
+                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$_REQUEST['stCodigoLote'] && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
+                    $obErro->setDescricao("Este Número de Item já está na lista!");
+                    break;
                 }
-                
-                if (!$obErro->ocorreu()) {
-                    foreach ($arItens as $key => $arItem) {
-                        if ($arItem['inId'] == $_REQUEST['inIdItem']) {
-                
-                            $arItens[$key]['nuVlReferencia']   = $_REQUEST['nuVlReferencia'];
-                            $arItens[$key]['inNumItemLote']    = $_REQUEST['inNumItemLote'];
-                            $arItens[$key]['inOrdemClassifFornecedor']    = $_REQUEST['inOrdemClassifFornecedor'];
-                            $arItens[$key]['nuQuantidade']     = $_REQUEST['nuQuantidade'];
-                            $arItens[$key]['nuVlTotal']        = $_REQUEST['nuVlTotal'];
-                            $arItens[$key]['dtCotacao']        = $_REQUEST['dtCotacao'];
-                            $arItens[$key]['stCodigoLote']     = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
-                            $arItens[$key]['nuPercentualLote'] = $_REQUEST['nuPercentualLote'];
-                            $arItens[$key]['txtDescricaoLote'] = $_REQUEST['txtDescricaoLote'];
-                            $arItens[$key]['nuVlUnitario']     = $_REQUEST['nuVlUnitario'];
-                            $arItens[$key]['nuQtdeLicitada']   = $_REQUEST['nuQtdeLicitada'];
-                            $arItens[$key]['nuQtdeAderida']    = $_REQUEST['nuQtdeAderida'];        
-                            $arItens[$key]['nuPercentualItem'] = $_REQUEST['nuPercentualItem'];
-                            $arItens[$key]['inNumCGMVencedor'] = $_REQUEST['inNumCGMVencedor'];
-                            $arItens[$key]['stNomCGMVencedor'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
-                        
-                            Sessao::write('arItens', $arItens);
-                        
-                            break;
-                        }
-                    }
+                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$_REQUEST['stCodigoLote'] && $arItem['inCodItem']!=$_REQUEST['inCodItem']){
+                    $obErro->setDescricao("Este Número de Item já está na lista!");
+                    break;
                 }
-        
-            } else {
-               $obErro->setDescricao("Informe Todos os campos!");
+                if ($arItem['inCodItem']==$_REQUEST['inCodItem'] && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
+                    $obErro->setDescricao("Este Item já está na lista, para esse CGM de Fornecedor!");
+                    break;
+                }                    
             }
         }
-    }else{
-        foreach ($arItens as $key => $arItem) {
-            if ($arItem['inId'] == $_REQUEST['inIdItem']) {
-                
-                $arItens[$key]['nuVlReferencia']   = $_REQUEST['nuVlReferencia'];
-                $arItens[$key]['inNumItemLote']    = $_REQUEST['inNumItemLote'];
-                $arItens[$key]['inOrdemClassifFornecedor']    = $_REQUEST['inOrdemClassifFornecedor'];
-                $arItens[$key]['nuQuantidade']     = $_REQUEST['nuQuantidade'];
-                $arItens[$key]['nuVlTotal']        = $_REQUEST['nuVlTotal'];
-                $arItens[$key]['dtCotacao']        = $_REQUEST['dtCotacao'];
-                $arItens[$key]['stCodigoLote']     = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
-                $arItens[$key]['nuPercentualLote'] = $_REQUEST['nuPercentualLote'];
-                $arItens[$key]['txtDescricaoLote'] = $_REQUEST['txtDescricaoLote'];
-                $arItens[$key]['nuVlUnitario']     = $_REQUEST['nuVlUnitario'];
-                $arItens[$key]['nuQtdeLicitada']   = $_REQUEST['nuQtdeLicitada'];
-                $arItens[$key]['nuQtdeAderida']    = $_REQUEST['nuQtdeAderida'];        
-                $arItens[$key]['nuPercentualItem'] = $_REQUEST['nuPercentualItem'];
-                $arItens[$key]['inNumCGMVencedor'] = $_REQUEST['inNumCGMVencedor'];
-                $arItens[$key]['stNomCGMVencedor'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
-                        
-                Sessao::write('arItens', $arItens);
-                        
-            break;
-            }
+    }
+    
+    if (!$obErro->ocorreu()) {
+        if ($_REQUEST['dtCotacao']                  == ""       ||
+            $_REQUEST['inCodItem']                  == ""       ||
+            $_REQUEST['inNumItemLote']              == ""       ||
+            $_REQUEST['nuVlReferencia']             == ""       ||
+            $_REQUEST['nuVlReferencia']             <= '0,0000' ||
+            $_REQUEST['nuQuantidade']               == ""       ||
+            $_REQUEST['nuQuantidade']               <= '0,0000' ||
+            $_REQUEST['nuVlTotal']                  == ""       ||
+            $_REQUEST['nuVlTotal']                  <= '0,0000' ||
+            $_REQUEST['inNumCGMVencedor']           == ""       ||
+            $_REQUEST['inOrdemClassifFornecedor']   == ""
+        ){
+            $obErro->setDescricao("Informe Todos os campos!");
         }
     }
     
     if ($obErro->ocorreu()) {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     } else {
+        $_REQUEST['stCodigoLote'] = (isset($_REQUEST['stCodigoLote'])) ? $_REQUEST['stCodigoLote'] : 0;
+
+        foreach ($arItens as $key => $arItem) {
+            if ($arItem['inId'] == $_REQUEST['inIdItem']) {
+                $arItens[$key]['nuVlReferencia']            = $_REQUEST['nuVlReferencia'];
+                $arItens[$key]['inNumItemLote']             = $_REQUEST['inNumItemLote'];
+                $arItens[$key]['inOrdemClassifFornecedor']  = $_REQUEST['inOrdemClassifFornecedor'];
+                $arItens[$key]['nuQuantidade']              = $_REQUEST['nuQuantidade'];
+                $arItens[$key]['nuVlTotal']                 = $_REQUEST['nuVlTotal'];
+                $arItens[$key]['dtCotacao']                 = $_REQUEST['dtCotacao'];
+                $arItens[$key]['stCodigoLote']              = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
+                $arItens[$key]['nuPercentualLote']          = $_REQUEST['nuPercentualLote'];
+                $arItens[$key]['txtDescricaoLote']          = $_REQUEST['txtDescricaoLote'];
+                $arItens[$key]['nuVlUnitario']              = $_REQUEST['nuVlUnitario'];
+                $arItens[$key]['nuQtdeLicitada']            = $_REQUEST['nuQtdeLicitada'];
+                $arItens[$key]['nuQtdeAderida']             = $_REQUEST['nuQtdeAderida'];        
+                $arItens[$key]['nuPercentualItem']          = $_REQUEST['nuPercentualItem'];
+                $arItens[$key]['inNumCGMVencedor']          = $_REQUEST['inNumCGMVencedor'];
+                $arItens[$key]['stNomCGMVencedor']          = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
+
+                Sessao::write('arItens', $arItens);
+
+                break;
+            }
+        }
+
         $stJs .= limparFormItem();
         $stJs .= montaListaItens();
-        $stJs .= montaItemBuscaInner();
-        
+
         $boLote = ($_REQUEST['stCodigoLote']>0) ? true : false;
         $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
     }
@@ -390,23 +357,20 @@ function alterarListaItens()
 
 function montaItemBuscaInner()
 {
-    include_once( CAM_GP_ALM_COMPONENTES."IPopUpItem.class.php" );
+    include_once( CAM_GP_ALM_COMPONENTES.'IMontaItemUnidade.class.php' );
+    
+    $obMontaItemUnidade = new IMontaItemUnidade(new Form);
+    $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
+    $obMontaItemUnidade->obIPopUpCatalogoItem->setNull(true);
 
-    $obIPopUpCatalogoItem = new IPopUpItem(new Form);
-    $obIPopUpCatalogoItem->setRotulo("*Item");
-    $obIPopUpCatalogoItem->setNull           ( true );
-    $obIPopUpCatalogoItem->setRetornaUnidade ( true );
-
-    $obFormulario = new Formulario();    
-    $obFormulario->addComponente($obIPopUpCatalogoItem);
-
-    $obFormulario->montaInnerHTML();
-    $stHtml .= $obFormulario->getHTML();
+    $obFormularioItem = new Formulario();
+    $obMontaItemUnidade->geraFormulario($obFormularioItem);
+    $obFormularioItem->montaInnerHTML();
+    $stHtml = $obFormularioItem->getHTML();
 
     $stJs .= " jQuery('#spnBuscaInnerItem').html('".$stHtml."'); \n";
 
     return $stJs;
-    
 }
 
 
@@ -434,17 +398,17 @@ function montaListaItens()
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "Nro. Lote" );
-    $obLista->ultimoCabecalho->setWidth( 2 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "Nro. Item" );
-    $obLista->ultimoCabecalho->setWidth( 4 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "Descrição" );
-    $obLista->ultimoCabecalho->setWidth( 30 );
+    $obLista->ultimoCabecalho->setWidth( 26 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
@@ -484,12 +448,12 @@ function montaListaItens()
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "CGM Vencedor / Class" );
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 15 );
     $obLista->commitCabecalho();
         
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 1 );
     $obLista->commitCabecalho();
 
     $obLista->addDado();
@@ -529,21 +493,21 @@ function montaListaItens()
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "nuVlUnitario" );
-    $obLista->ultimoDado->setAlinhamento('CENTRO' );
+    $obLista->ultimoDado->setAlinhamento('DIREITA' );
     $obLista->commitDado();
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "nuQtdeLicitada" );
-    $obLista->ultimoDado->setAlinhamento('CENTRO' );
+    $obLista->ultimoDado->setAlinhamento('DIREITA' );
     $obLista->commitDado();
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "nuQtdeAderida" );
-    $obLista->ultimoDado->setAlinhamento('CENTRO' );
+    $obLista->ultimoDado->setAlinhamento('DIREITA' );
     $obLista->commitDado();
 
     $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "[stNomCGMVencedor]/[inOrdemClassifFornecedor]º" );
+    $obLista->ultimoDado->setCampo( "[inNumCGMVencedor] - [stNomCGMVencedor] / [inOrdemClassifFornecedor]º" );
     $obLista->ultimoDado->setAlinhamento('CENTRO' );
     $obLista->commitDado();
 
@@ -578,8 +542,23 @@ function alterarItem()
 {
     $arItens = Sessao::read('arItens');
     $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+    $boBloqueiaLote = false;
     $obErro = new Erro();
-    
+
+    //Procurar Número do Lote do Item a ser alterado
+    foreach ($arItens as $arItem) {
+        if ($arItem['inId'] == $_REQUEST['inId']) {
+            $stCodigoLote = $arItem['stCodigoLote'];
+        }
+    }
+
+    //Verificar se o Número do Lote possui mais itens, possuindo bloqueia a edição de Lote.
+    foreach ($arItens as $arItem) {
+        if ($arItem['inId'] != $_REQUEST['inId'] && $stCodigoLote == $arItem['stCodigoLote'] && $stCodigoLote != 0) {
+            $boBloqueiaLote = true;
+        }
+    }
+
     foreach ($arItens as $arItem) {
         if ($arItem['inId'] == $_REQUEST['inId']) {
             if ($obErro->ocorreu()) {
@@ -592,16 +571,25 @@ function alterarItem()
                 $stJs .= "jQuery('#btnSalvar').attr('onclick', 'montaParametrosGET(\'alterarListaItens\');');   \n";
     
                 # Preenche informações do Lote
-                $stJs .= "jQuery('#stCodigoLote').val('".$arItem['stCodigoLote']."');                           \n";
-                $stJs .= "jQuery('#txtDescricaoLote').val('".$arItem['txtDescricaoLote']."');                   \n";
-                $stJs .= "jQuery('#nuPercentualLote').val('".$arItem['nuPercentualLote']."');                   \n";
+                $nuPercentualLote = str_replace(".",",",$arItem['nuPercentualLote']);
+                $stJs .= "if(jQuery('#stCodigoLote')){                                                          \n";
+                $stJs .= "  jQuery('#stCodigoLote').val('".$arItem['stCodigoLote']."');                         \n";
+                $stJs .= "  jQuery('#txtDescricaoLote').val('".$arItem['txtDescricaoLote']."');                 \n";
+                $stJs .= "  jQuery('#nuPercentualLote').val('".$nuPercentualLote."');                           \n";
+                if($boBloqueiaLote){
+                    $stJs .= "  jQuery('#stCodigoLote').attr('readonly', 'readonly');                           \n";
+                    $stJs .= "  jQuery('#txtDescricaoLote').attr('readonly', 'readonly');                       \n";
+                    $stJs .= "  jQuery('#nuPercentualLote').attr('readonly', 'readonly');                       \n";
+                }
+                $stJs .= "}                                                                                     \n";
+
                 $stJs .= "jQuery('#inNumItemLote').val('".$arItem['inNumItemLote']."');                         \n";
                 $stJs .= "jQuery('#inOrdemClassifFornecedor').val('".$arItem['inOrdemClassifFornecedor']."');   \n";
                 $stJs .= "jQuery('#dtCotacao').val('".$arItem['dtCotacao']."');                                 \n";
                 
                 $stJs .= alteraItemLabel($arItem);
 
-                $stJs .= "jQuery('#imgBuscar').parent('a').css('visibility', 'hidden');                                     \n";
+                $stJs .= "jQuery('#imgBuscar').parent('a').css('visibility', 'hidden');                         \n";
                 $stJs .= "jQuery('#stUnidadeMedida').html('".$arItem['stNomUnidade']."');                       \n";
                 $stJs .= "jQuery('#nuVlReferencia').val('".$arItem['nuVlReferencia']."');                       \n";
                 $stJs .= "jQuery('#nuQuantidade').val('".$arItem['nuQuantidade']."');                           \n";
@@ -626,24 +614,33 @@ function alterarItem()
 
 function alteraItemLabel($arItem)
 {
+    $obTxtItem = new TextBox();
+    $obTxtItem->setName('inCodItem');
+    $obTxtItem->setId('inCodItem');
+    $obTxtItem->setRotulo('*Item');
+    $obTxtItem->setNull(true);
+    $obTxtItem->setValue( $arItem["inCodItem"]." - ".$arItem["stNomItem"] );
+    $obTxtItem->setLabel(true);
 
-    $stJs .= " jQuery('#stNomItem').parent().parent().parent().parent().parent().detach(); \n";
-    
-    $obLblItem = new Label();
-    $obLblItem->setRotulo    ("*Item");
-    $obLblItem->setName      ("lblItem");
-    $obLblItem->setId        ("lblItem");
+    $obLabelUnidadeMedida = new Label;
+    $obLabelUnidadeMedida->setRotulo('Unidade de Medida' );
+    $obLabelUnidadeMedida->setId    ('stUnidadeMedida'   );
+    $obLabelUnidadeMedida->setValue ('&nbsp;'            );
 
-    $obLblDescricaoItem = new Label();
-    $obLblDescricaoItem->setName     ("lblDescricaoItem");
-    $obLblDescricaoItem->setId       ("lblDescricaoItem");
-    $obLblDescricaoItem->setValue    ($arItem["inCodItem"]." - ".$arItem["stNomItem"]);
+    $obFormularioSpan = new Formulario;
+    $obFormularioSpan->addComponente( $obLabelUnidadeMedida );
+    $obFormularioSpan->montaInnerHTML();
 
-    $obFormulario = new Formulario();    
-    $obFormulario->agrupaComponentes( array($obLblItem,$obLblDescricaoItem) );
+    $obSpnInformacoesItem = new Span;
+    $obSpnInformacoesItem->setId ( "spnInformacoesItem" );
+    $obSpnInformacoesItem->setValue( $obFormularioSpan->getHTML() );
+
+    $obFormulario = new Formulario();
+    $obFormulario->addComponente( $obTxtItem );
+    $obFormulario->addSpan( $obSpnInformacoesItem );
 
     $obFormulario->montaInnerHTML();
-    $stHtml .= $obFormulario->getHTML();
+    $stHtml = $obFormulario->getHTML();
 
     $stJs .= " jQuery('#spnBuscaInnerItem').html('".$stHtml."'); \n";
 
@@ -667,7 +664,6 @@ function excluirItem()
                 if ($arItem['inNumItemLote'] == $arQuantitativo['inNumItemQ'] && $arItem['stCodigoLote'] == $arQuantitativo['inCodLoteQ']){
                     $stJs .= excluirQuantitativo($arQuantitativo['inId']);
                 }
-
             }
         }
     }
@@ -677,6 +673,7 @@ function excluirItem()
     Sessao::write('arItensRemovido', $arItensRemovido);
     Sessao::write('arItens', $arItens);
 
+    $stJs .= limparFormItem();
     $stJs .= montaListaItens();
 
     SistemaLegado::executaFrameOculto($stJs);
@@ -687,11 +684,14 @@ function limparFormItem()
     $stJs  = "var jQuery = window.parent.frames['telaPrincipal'].jQuery;    \n";
     $stJs .= "if(jQuery('#stCodigoLote')){                                  \n";
     $stJs .= "      jQuery('#stCodigoLote').val('');                        \n";
+    $stJs .= "      jQuery('#txtDescricaoLote').val('');                    \n";
+    $stJs .= "      jQuery('#nuPercentualLote').val('');                    \n";
+    $stJs .= "      jQuery('#stCodigoLote').removeAttr('readonly');         \n";
+    $stJs .= "      jQuery('#txtDescricaoLote').removeAttr('readonly');     \n";
+    $stJs .= "      jQuery('#nuPercentualLote').removeAttr('readonly');     \n";
     $stJs .= "}                                                             \n";
     $stJs .= "jQuery('#inNumItemLote').val('');                             \n";
     $stJs .= "jQuery('#inOrdemClassifFornecedor').val('');                  \n";
-    $stJs .= "jQuery('#txtDescricaoLote').val('');                          \n";
-    $stJs .= "jQuery('#nuPercentualLote').val('');                          \n";
     $stJs .= "jQuery('#dtCotacao').val('');                                 \n";
     $stJs .= "jQuery('input[name=inCodItem]').val('');                      \n";
     $stJs .= "jQuery('#stNomItem').html('&nbsp;');                          \n";
@@ -707,12 +707,32 @@ function limparFormItem()
     $stJs .= "jQuery('#inNomCGMVencedor').html('');                         \n";
     $stJs .= "jQuery('#dtCotacao').focus();                                 \n";
     $stJs .= "jQuery('#btnSalvar').val('Incluir Item');                     \n";
-    $stJs .= "jQuery('#btnSalvar').attr('onclick', 'montaParametrosGET(\'incluirListaItens\');');\n";
+    $stJs .= "jQuery('#btnSalvar').attr('onclick', 'montaParametrosGET(\'incluirListaItens\');');   \n";
     $stJs .= "jQuery('#stCtrl').val('incluirListaItens');                   \n";
     $stJs .= "jQuery('input[name=inCodItem]').removeAttr('readonly');       \n";
     $stJs .= "jQuery('#imgBuscar').css('visibility', '');                   \n";
+    
+    $arItens = Sessao::read('arItens');
+    $stJs .= "if((jQuery('#inDescontoTabelaSim'))&&(jQuery('#inProcessoPorLoteSim'))){              \n";
+    $stJs .= "  jQuery('#inDescontoTabelaNao').removeAttr('disabled');                              \n";
+    $stJs .= "  jQuery('#inDescontoTabelaSim').removeAttr('disabled');                              \n";
+    $stJs .= "  jQuery('#inProcessoPorLoteSim').removeAttr('disabled');                             \n";
+    $stJs .= "  jQuery('#inProcessoPorLoteNao').removeAttr('disabled');                             \n";
+    if(count($arItens)>0){
+        $stJs .= "  if(f.inProcessoPorLote.value==1)                                                \n";
+        $stJs .= "      jQuery('#inProcessoPorLoteNao').attr('disabled', 'disabled');               \n";
+        $stJs .= "  else                                                                            \n";
+        $stJs .= "      jQuery('#inProcessoPorLoteSim').attr('disabled', 'disabled');               \n";
+
+        $stJs .= "  if(f.inDescontoTabela.value==1)                                                 \n";
+        $stJs .= "      jQuery('#inDescontoTabelaNao').attr('disabled', 'disabled');                \n";
+        $stJs .= "  else                                                                            \n";
+        $stJs .= "      jQuery('#inDescontoTabelaSim').attr('disabled', 'disabled');                \n";
+    }
+    $stJs .= "}                                                                                     \n";
 
     $stJs .= montaListaItens();
+    $stJs .= montaItemBuscaInner();
     
     return $stJs;
 }
@@ -730,18 +750,18 @@ function buscaOrgaoGerenciador()
         $obRegra->listar ($rsCGM);
         
         if ( $rsCGM->getNumLinhas() <= 0) {
-            $stJs .= 'f.'.$stText.'.value = "";';
-            $stJs .= 'f.'.$stText.'.focus();';
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";';
-            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');";
+            $stJs .= "f.".$stText.".value = '';                                                                                                 \n";
+            $stJs .= "f.".$stText.".focus();                                                                                                    \n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                \n";
+            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                           \n";
         } else {
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull).'";'."\n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull)."';      \n";
         }
     } else {
-        $stJs .= 'f.'.$stText.'.value = "";'."\n";
-        $stJs .= 'f.'.$stText.'.focus();'."\n";
-        $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";'."\n";
-        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');"."\n";
+        $stJs .= "f.".$stText.".value = '';                                                                                                     \n";
+        $stJs .= "f.".$stText.".focus();                                                                                                        \n";
+        $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                    \n";
+        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                               \n";
     }
     
     return $stJs;
@@ -760,18 +780,18 @@ function buscaCGMResponsavel()
         $obRegra->listar ($rsCGM);
         
         if ( $rsCGM->getNumLinhas() <= 0) {
-            $stJs .= 'f.'.$stText.'.value = "";';
-            $stJs .= 'f.'.$stText.'.focus();';
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";';
-            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');";
+            $stJs .= "f.".$stText.".value = '';                                                                                                 \n";
+            $stJs .= "f.".$stText.".focus();                                                                                                    \n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                \n";
+            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                           \n";
         } else {
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull).'";'."\n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull)."';      \n";
         }
     } else {
-        $stJs .= 'f.'.$stText.'.value = "";'."\n";
-        $stJs .= 'f.'.$stText.'.focus();'."\n";
-        $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";'."\n";
-        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');"."\n";
+        $stJs .= "f.".$stText.".value = '';                                                                                                     \n";
+        $stJs .= "f.".$stText.".focus();                                                                                                        \n";
+        $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                    \n";
+        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                               \n";
     }
     
     return $stJs;
@@ -789,19 +809,19 @@ function buscaCGMVencedor()
         $obRegra->setNumCGM ($_REQUEST[$stText]);
         $obRegra->listar ($rsCGM);
         
-        if ( $rsCGM->getNumLinhas() <= 0) {
-            $stJs .= 'f.'.$stText.'.value = "";';
-            $stJs .= 'f.'.$stText.'.focus();';
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";';
-            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');";
+        if ($rsCGM->getNumLinhas() <= 0) {
+            $stJs .= "f.".$stText.".value = '';                                                                                                 \n";
+            $stJs .= "f.".$stText.".focus();                                                                                                    \n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                \n";
+            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                           \n";
         } else {
-            $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull).'";'."\n";
+            $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull)."';      \n";
         }
     } else {
-        $stJs .= 'f.'.$stText.'.value = "";'."\n";
-        $stJs .= 'f.'.$stText.'.focus();'."\n";
-        $stJs .= 'd.getElementById("'.$stSpan.'").innerHTML = "'.$stNull.'";'."\n";
-        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');"."\n";
+        $stJs .= "f.".$stText.".value = '';                                                                                                     \n";
+        $stJs .= "f.".$stText.".focus();                                                                                                        \n";
+        $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                    \n";
+        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                               \n";
     }
     
     return $stJs;
@@ -847,7 +867,6 @@ function incluirEmpenho()
     if (!empty($boValidaInclusao)) {
         $obErro->setDescricao("Este empenho já foi vinculado em outro Registro de Preços");
     } else {
-   
         if ( $rsLista->getNumLinhas() == 1 ) {
             $rsLista->addFormatacao("vl_empenhado","NUMERIC_BR");
             $arEmpenhoNovoTmp = $rsLista->getElementos();
@@ -861,24 +880,23 @@ function incluirEmpenho()
             $arEmpenhoNovo['inId']           = $inIdMax;
         }else{
             $obErro->setDescricao("Não existe registro desse empenho na entidade selecionada!");
-            $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+            $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');   \n";
         }
     
         if ($arEmpenhos != "") {
             foreach($arEmpenhos AS $arEmpenho){
-                if ( $arEmpenhoNovo['cod_entidade'] == $arEmpenho['cod_entidade'] AND
-                     $arEmpenhoNovo['exercicio']    == $arEmpenho['exercicio'] AND
-                     $arEmpenhoNovo['cod_empenho']  == $arEmpenho['cod_empenho'])
-                {
+                if ( $arEmpenhoNovo['cod_entidade'] == $arEmpenho['cod_entidade']   AND
+                     $arEmpenhoNovo['exercicio']    == $arEmpenho['exercicio']      AND
+                     $arEmpenhoNovo['cod_empenho']  == $arEmpenho['cod_empenho']
+                ){
                     $obErro->setDescricao("Este empenho já foi adicionado na lista de Empenhos!");
                 }
             }
         }
-    
     }
     
     if ($obErro->ocorreu()) {
-        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
         return $stJs;
     } else {
         $arEmpenhos[] = $arEmpenhoNovo;
@@ -917,9 +935,9 @@ function excluirEmpenho()
 
 function limparFormEmpenho()
 {
-    $stJs  = "var jQuery = window.parent.frames['telaPrincipal'].jQuery; \n";
-    $stJs .= "jQuery('#numEmpenho').val('');                             \n";
-    $stJs .= "jQuery('#stEmpenho').html('&nbsp;');                       \n";
+    $stJs  = "var jQuery = window.parent.frames['telaPrincipal'].jQuery;    \n";
+    $stJs .= "jQuery('#numEmpenho').val('');                                \n";
+    $stJs .= "jQuery('#stEmpenho').html('&nbsp;');                          \n";
     
     return $stJs;
 }
@@ -1018,7 +1036,7 @@ function incluirListaOrgaos()
 
     if (is_array($arOrgaos) && count($arOrgaos) > 0) {
         foreach($arOrgaos as $arOrgao) {
-            if ( $arOrgao['stExercicioOrgao'] == $_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM'] == $_REQUEST['inMontaCodOrgaoM'] && $arOrgao['inMontaCodUnidadeM'] == $_REQUEST['inMontaCodUnidadeM']) {
+            if ( $arOrgao['stExercicioOrgao']==$_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM']==$_REQUEST['inMontaCodOrgaoM'] && $arOrgao['inMontaCodUnidadeM']==$_REQUEST['inMontaCodUnidadeM']) {
                 $obErro->setDescricao('Não é permitido adicionar Orgão e Unidade iguais para o mesmo exercicio.');
             }
             if ( $_REQUEST['inOrgaoGerenciador'] == 1 ) {
@@ -1038,13 +1056,14 @@ function incluirListaOrgaos()
     }
     
     if(!$obErro->ocorreu()) {
-        if ($_REQUEST['stExercicioOrgao'] != "" &&
-            $_REQUEST['stUnidadeOrcamentaria'] != "" &&
+        if ($_REQUEST['stExercicioOrgao']       != "" &&
+            $_REQUEST['stUnidadeOrcamentaria']  != "" &&
             $_REQUEST['inNaturezaProcedimento'] != "" &&
-            $_REQUEST['inMontaCodOrgaoM'] != "" &&
-            $_REQUEST['inMontaCodUnidadeM'] != "" &&
-            $_REQUEST['inOrgaoGerenciador'] != "") {
-        
+            $_REQUEST['inMontaCodOrgaoM']       != "" &&
+            $_REQUEST['inMontaCodUnidadeM']     != "" &&
+            $_REQUEST['inOrgaoGerenciador']     != "" &&
+            $_REQUEST['inResponsavel']          != ""
+        ){
             $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
             
             $arOrgaoRegPreg = array();
@@ -1061,8 +1080,10 @@ function incluirListaOrgaos()
             $arOrgaoRegPreg['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
             $arOrgaoRegPreg['dtAdesao']                  = $_REQUEST['dtAdesao'];
             $arOrgaoRegPreg['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
+            $arOrgaoRegPreg['inResponsavel']             = $_REQUEST['inResponsavel'];
+            $arOrgaoRegPreg['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
+            $arOrgaoRegPreg['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
             $arOrgaoRegPreg['inId']                      = $inIdMax;
-           
         } else {
            $obErro->setDescricao("Informe Todos os campos com *!");
         }
@@ -1072,7 +1093,6 @@ function incluirListaOrgaos()
     } else {
         $arOrgaos[] = $arOrgaoRegPreg;
         Sessao::write('arOrgaos', $arOrgaos);
-        $stJs .= montaListaOrgaos();
         $stJs .= limparFormOrgaos();
         $stJs .= preencheComboOrgaoAbaQuantitativo();
     }
@@ -1099,27 +1119,27 @@ function montaListaOrgaos()
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 2 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Exercício Orgão Unidade");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->addConteudo("Exercício");
+    $obLista->ultimoCabecalho->setWidth( 2 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Orgão");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 15 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Unidade");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 15 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Gerenciador");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 1 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
@@ -1128,23 +1148,28 @@ function montaListaOrgaos()
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("CGM do Responsável");
+    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->commitCabecalho();
+    
+    $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Nro. Processo de Adesão");
-    $obLista->ultimoCabecalho->setWidth( 7 );
+    $obLista->ultimoCabecalho->setWidth( 6 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Data da Adesão");
-    $obLista->ultimoCabecalho->setWidth( 7 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Data da Intenção");
-    $obLista->ultimoCabecalho->setWidth( 7 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 1 );
     $obLista->commitCabecalho();
     
     $obLista->addDado();
@@ -1170,6 +1195,11 @@ function montaListaOrgaos()
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "stNaturezaProcedimento" );
     $obLista->ultimoDado->setAlinhamento('CENTER' );
+    $obLista->commitDado();
+    
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "inStNomResponsavel" );
+    $obLista->ultimoDado->setAlinhamento('ESQUERDA' );
     $obLista->commitDado();
 
     $obLista->addDado();
@@ -1229,6 +1259,11 @@ function limparFormOrgaos()
     $stJs .= "jQuery('input:radio[name=\"inOrgaoGerenciador\"][value=\"2\"]').attr(\"checked\",false);      \n";    
     $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"1\"]').attr(\"checked\",false);  \n";
     $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"2\"]').attr(\"checked\",false);  \n";
+    $stJs .= "jQuery('#inNaturezaProcedimento1').removeAttr('disabled');                                    \n";
+    $stJs .= "jQuery('#inNaturezaProcedimento2').removeAttr('disabled');                                    \n";
+    $stJs .= "jQuery('#inResponsavel').val('');                                                             \n";
+    $stJs .= "jQuery('input[name=stNomResponsavel]').val('');                                               \n";
+    $stJs .= "jQuery('#stNomResponsavel').html('&nbsp;');                                                   \n";
     $stJs .= "jQuery('#stCodigoProcessoAdesao').val('');                                                    \n";
     $stJs .= "jQuery('#dtAdesao').val('');                                                                  \n";
     $stJs .= "jQuery('#dtPublicacaoAvisoIntencao').val('');                                                 \n";
@@ -1328,6 +1363,10 @@ function alterarOrgao()
                 $stJs .= "jQuery('#inNaturezaProcedimento2').attr('disabled', 'disabled');                      \n";
             }
             
+            $stJs .= "jQuery('#inResponsavel').val('".$arOrgao['inResponsavel']."');                            \n";
+            $stJs .= "jQuery('input[name=stNomResponsavel]').val('".$arOrgao['stNomResponsavel']."');           \n";
+            $stNomResponsavel = ($arOrgao['stNomResponsavel']!='') ? $arOrgao['stNomResponsavel'] : '&nbsp;';
+            $stJs .= "jQuery('#stNomResponsavel').html('".$stNomResponsavel."');                                \n";
             $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"".$inNaturezaSelecionada."\"]').attr(\"checked\",true); \n";
             $stJs .= "jQuery('#stCodigoProcessoAdesao').val('".$arOrgao['stCodigoProcessoAdesao']."');          \n";
             $stJs .= "jQuery('#dtAdesao').val('".$arOrgao['dtAdesao']."');                                      \n";
@@ -1348,7 +1387,7 @@ function alterarListaOrgaos()
         foreach($arOrgaos as $arOrgao) {
             if ($arOrgao['inId'] != $_REQUEST['inHndIdOrgao']) {
                 $arComparaUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
-                if ( $arOrgao['stExercicioOrgao'] == $_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM'] == $arComparaUnidadeOrcamentaria[0] && $arOrgao['inMontaCodUnidadeM'] == $arComparaUnidadeOrcamentaria[1]) {
+                if ( $arOrgao['stExercicioOrgao']==$_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM']==$arComparaUnidadeOrcamentaria[0] && $arOrgao['inMontaCodUnidadeM']==$arComparaUnidadeOrcamentaria[1]) {
                     $obErro->setDescricao('Não é permitido adicionar Orgão e Unidade iguais para o mesmo exercicio.');
                 }
                 if ( $_REQUEST['inOrgaoGerenciador'] == 1 ) {
@@ -1359,31 +1398,44 @@ function alterarListaOrgaos()
             }
         }
     }
-
-    if ( !$obErro->ocorreu() ) {
-        foreach ($arOrgaos as $key => $arOrgao) {
-            if ($arOrgao['inId'] == $_REQUEST['inHndIdOrgao']) {
-                
-                $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
-                $arOrgaos[$key]['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
-                $arOrgaos[$key]['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
-                $arOrgaos[$key]['stMontaCodOrgaoM']          = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]);
-                $arOrgaos[$key]['stMontaCodUnidadeM']        = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]." AND num_unidade = ".(int)$arUnidadeOrcamentaria[1]);
-                $arOrgaos[$key]['inMontaCodOrgaoM']          = (int) $arUnidadeOrcamentaria[0];
-                $arOrgaos[$key]['inMontaCodUnidadeM']        = (int) $arUnidadeOrcamentaria[1];
-                $arOrgaos[$key]['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
-                $arOrgaos[$key]['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
-                $arOrgaos[$key]['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
-                $arOrgaos[$key]['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
-                $arOrgaos[$key]['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
-                $arOrgaos[$key]['dtAdesao']                  = $_REQUEST['dtAdesao'];
-                $arOrgaos[$key]['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
-
-                break;
+    
+    if(!$obErro->ocorreu()) {
+        if ($_REQUEST['stExercicioOrgao']       != "" &&
+            $_REQUEST['stUnidadeOrcamentaria']  != "" &&
+            $_REQUEST['inNaturezaProcedimento'] != "" &&
+            $_REQUEST['inMontaCodOrgaoM']       != "" &&
+            $_REQUEST['inMontaCodUnidadeM']     != "" &&
+            $_REQUEST['inOrgaoGerenciador']     != "" &&
+            $_REQUEST['inResponsavel']          != ""
+        ){
+            foreach ($arOrgaos as $key => $arOrgao) {
+                if ($arOrgao['inId'] == $_REQUEST['inHndIdOrgao']) {
+                    $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
+                    $arOrgaos[$key]['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
+                    $arOrgaos[$key]['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
+                    $arOrgaos[$key]['stMontaCodOrgaoM']          = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]);
+                    $arOrgaos[$key]['stMontaCodUnidadeM']        = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]." AND num_unidade = ".(int)$arUnidadeOrcamentaria[1]);
+                    $arOrgaos[$key]['inMontaCodOrgaoM']          = (int) $arUnidadeOrcamentaria[0];
+                    $arOrgaos[$key]['inMontaCodUnidadeM']        = (int) $arUnidadeOrcamentaria[1];
+                    $arOrgaos[$key]['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
+                    $arOrgaos[$key]['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
+                    $arOrgaos[$key]['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
+                    $arOrgaos[$key]['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
+                    $arOrgaos[$key]['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
+                    $arOrgaos[$key]['dtAdesao']                  = $_REQUEST['dtAdesao'];
+                    $arOrgaos[$key]['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
+                    $arOrgaos[$key]['inResponsavel']             = $_REQUEST['inResponsavel'];
+                    $arOrgaos[$key]['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
+                    $arOrgaos[$key]['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
+    
+                    break;
+                }
             }
+        } else {
+           $obErro->setDescricao("Informe Todos os campos com *!");
         }
     }
-    
+
     if ($obErro->ocorreu()) {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     } else {
@@ -1404,8 +1456,8 @@ function preencheComboOrgaoAbaQuantitativo()
     
     $stExercicioOrgaoQ = (isset($_REQUEST['stExercicioOrgaoQ'])) ? $_REQUEST['stExercicioOrgaoQ'] : Sessao::getExercicio();
 
-    $stJs .= "f.inCodOrgaoQ.options.length = 0;                                      \n";
-    $stJs .= "f.inCodOrgaoQ.options[".$inContador++."] = new Option('Selecione',''); \n";
+    $stJs .= "f.inCodOrgaoQ.options.length = 0;                                                     \n";
+    $stJs .= "f.inCodOrgaoQ.options[".$inContador++."] = new Option('Selecione','');                \n";
     
     foreach( $arOrgaos as $arOrgao) {
         if($stExercicioOrgaoQ==$arOrgao['stExercicioOrgao']){
@@ -1417,10 +1469,10 @@ function preencheComboOrgaoAbaQuantitativo()
         $stJs .= "f.inCodOrgaoQ.options[".$inContador++."] = new Option('".$arOrgao."','".$key."'); \n";    
     }
     
-    $stJs .= "if(f.inCodUnidadeQ){                                              \n";
-    $stJs .= "      f.inCodUnidadeQ.options.length = 0;                         \n";
-    $stJs .= "      f.inCodUnidadeQ.options[0] = new Option('Selecione','');    \n";
-    $stJs .= "}                                                                 \n";
+    $stJs .= "if(f.inCodUnidadeQ){                                                                  \n";
+    $stJs .= "      f.inCodUnidadeQ.options.length = 0;                                             \n";
+    $stJs .= "      f.inCodUnidadeQ.options[0] = new Option('Selecione','');                        \n";
+    $stJs .= "}                                                                                     \n";
 
     return $stJs;
 }
@@ -1454,7 +1506,7 @@ function preencheComboUnidadeAbaQuantitativo($inCodUnidadeQ = "")
     $obFormulario->montaInnerHTML();
     $stHtml .= $obFormulario->getHTML();
 
-    $stJs .= "jQuery('#spnCodUnidadeQ').html('".$stHtml."'); ";    
+    $stJs .= "jQuery('#spnCodUnidadeQ').html('".$stHtml."');                                        \n";
 
     return $stJs;
 }
@@ -1466,17 +1518,16 @@ function preencheLoteOuNumItemAbaQuantitativo($boLote = false)
     $arLote = array();
     $inContador = 0;
 
-    if ( $boLote )
-    {
+    if ( $boLote ){
         foreach ($arItens as $arItem) {
             $arLote[$arItem['stCodigoLote']] = $arItem['stCodigoLote'].' - '.$arItem['txtDescricaoLote'];
         }    
 
-        $stJs .= "f.inCodLoteQ.options.length = 0;                     \n";
-        $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('Selecione','');\n";
+        $stJs .= "f.inCodLoteQ.options.length = 0;                                                  \n";
+        $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('Selecione','');             \n";
         
         foreach( $arLote as $key => $value) {
-            $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('".$value."','".$key."'); \n";
+            $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('".$value."','".$key."');\n";
         }
         
         $_REQUEST['inCodLoteQ'] = NULL;
@@ -1493,13 +1544,13 @@ function preencheNumItemAbaQuantitativo($boValidaCodLote = false)
     $arItensTMP = array();
     $inContador = 0;
 
-    $stJs .= "f.inCodFornecedorQ.options.length = 0;\n";
-    $stJs .= "f.inCodFornecedorQ.options[0] = new Option('Selecione',''); \n";
-    $stJs .= "f.inNumItemQ.options.length = 0;\n";
-    $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('Selecione',''); \n";
+    $stJs .= "f.inCodFornecedorQ.options.length = 0;                                                \n";
+    $stJs .= "f.inCodFornecedorQ.options[0] = new Option('Selecione','');                           \n";
+    $stJs .= "f.inNumItemQ.options.length = 0;                                                      \n";
+    $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('Selecione','');                 \n";
     foreach( $arItens as $arItem) {
         if ( $boValidaCodLote ) {
-            if ( isset($_REQUEST['inCodLoteQ']) && $_REQUEST['inCodLoteQ'] == $arItem['stCodigoLote'] ){
+            if ( isset($_REQUEST['inCodLoteQ']) && $_REQUEST['inCodLoteQ']==$arItem['stCodigoLote'] ){
                 $arItensTMP[$arItem['inNumItemLote']] = $arItem['inNumItemLote']." - ". $arItem['stNomItem'];
             }
         } else {
@@ -1508,11 +1559,11 @@ function preencheNumItemAbaQuantitativo($boValidaCodLote = false)
     }
 
     foreach( $arItensTMP as $key => $arItem) {
-        $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('".$arItem."',".$key."); \n"; 
+        $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('".$arItem."',".$key.");     \n"; 
     }
-    
-    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000'; \n";
-    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');\n";
+
+    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                                \n";
+    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');                                            \n";
 
     return $stJs;
 }
@@ -1532,17 +1583,17 @@ function montaLoteAbaQuantitativo()
     $obFormulario1->montaInnerHTML();
     $stHtml .= $obFormulario1->getHTML();
 
-    $stJs .= "jQuery('#spnLoteQuantitativo').html('".$stHtml."');\n";
-    
+    $stJs .= "jQuery('#spnLoteQuantitativo').html('".$stHtml."');                                   \n";
+
     return $stJs;
 }
 
 function retornaNatureza()
 {
-    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery; \n";
-    $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"2\"]').removeAttr('disabled'); \n";
-    $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"1\"]').attr('checked',false); \n";
-    
+    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                                    \n";
+    $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"2\"]').removeAttr('disabled');   \n";
+    $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"1\"]').attr('checked',false);    \n";
+
     return $stJs;
 }
 
@@ -1553,8 +1604,8 @@ function preencheComboFornecedorAbaQuantitativo()
     $inContador = 0;
     $inCloLoteV = (isset($_REQUEST['inCodLoteQ']) && $_REQUEST['inCodLoteQ'] != '') ? $_REQUEST['inCodLoteQ'] : 0;
 
-    $stJs .= "f.inCodFornecedorQ.options.length = 0;\n";
-    $stJs .= "f.inCodFornecedorQ.options[".$inContador++."] = new Option('Selecione',''); \n";
+    $stJs .= "f.inCodFornecedorQ.options.length = 0;                                        \n";
+    $stJs .= "f.inCodFornecedorQ.options[".$inContador++."] = new Option('Selecione','');   \n";
 
     foreach( $arItens as $arItem) {
         if ( $arItem["inNumItemLote"] == $_REQUEST['inNumItemQ'] && $arItem["stCodigoLote"] == $inCloLoteV) {
@@ -1562,9 +1613,9 @@ function preencheComboFornecedorAbaQuantitativo()
             $stJs .= "f.inCodFornecedorQ.options[".$inContador++."] = new Option('".$arItem["inNumCGMVencedor"]." - ".$arItem['stNomCGMVencedor']."','".$arItem["inNumCGMVencedor"]."'); \n"; 
         }
     }
-    
-    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000'; \n";
-    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');\n";
+
+    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                        \n";
+    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');                                    \n";
 
     return $stJs;
 }
@@ -1574,14 +1625,14 @@ function preencheSpanQuantidadeFornecidaAbaQuantitativo()
     $arItens = Sessao::read('arItens');
     $arItensTMP = array();
     $inContador = 0;
-    
-    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000'; \n";
-    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');\n";
-    
+
+    $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                        \n";
+    $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');                                    \n";
+
     foreach( $arItens as $arItem) {
-        if ( $arItem["inNumItemLote"] == $_REQUEST['inNumItemQ'] && $arItem["inNumCGMVencedor"] == $_REQUEST['inCodFornecedorQ']) {
-            $stJs .= "f.nuHdnQtdeFornecida.value = ".$arItem['nuQuantidade']."; \n";
-            $stJs .= "jQuery('#nuQtdeFornecida').html('".$arItem['nuQuantidade']."');\n"; 
+        if ( $arItem["inNumItemLote"]==$_REQUEST['inNumItemQ'] && $arItem["inNumCGMVencedor"]==$_REQUEST['inCodFornecedorQ']) {
+            $stJs .= "f.nuHdnQtdeFornecida.value = ".$arItem['nuQuantidade'].";             \n";
+            $stJs .= "jQuery('#nuQtdeFornecida').html('".$arItem['nuQuantidade']."');       \n"; 
         }
     }
     return $stJs;
@@ -1589,20 +1640,19 @@ function preencheSpanQuantidadeFornecidaAbaQuantitativo()
 
 function incluirListaQuantitativo()
 {
-
     $obErro  = new Erro();
     $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
     $arOrgaoItemQuantitativosRemovido = Sessao::read('arOrgaoItemQuantitativosRemovido');
     $arItens = Sessao::read('arItens');
     $inIdMax=0;
 
-    if ($_REQUEST['inCodOrgaoQ'] != "" &&
-        $_REQUEST['inCodUnidadeQ'] != "" &&
-        $_REQUEST['inNumItemQ'] != "" &&
-        $_REQUEST['inCodFornecedorQ'] != "" &&
-        $_REQUEST['stExercicioOrgaoQ'] != "" &&
-        $_REQUEST['nuQtdeOrgao'] > '0,0000') {
-        
+    if ($_REQUEST['inCodOrgaoQ']        != "" &&
+        $_REQUEST['inCodUnidadeQ']      != "" &&
+        $_REQUEST['inNumItemQ']         != "" &&
+        $_REQUEST['inCodFornecedorQ']   != "" &&
+        $_REQUEST['stExercicioOrgaoQ']  != "" &&
+        $_REQUEST['nuQtdeOrgao']         > '0,0000'
+    ) {
         foreach( $arOrgaoItemQuantitativos as $arQuantitativo) {
             $inIdMax = ($arQuantitativo['inId']>$inIdMax||$arQuantitativo['inId']==$inIdMax) ? $arQuantitativo['inId']+1 : $inIdMax;
         }
@@ -1611,7 +1661,7 @@ function incluirListaQuantitativo()
                 $inIdMax = ($arQuantitativoRemovido['inId']>$inIdMax||$arQuantitativoRemovido['inId']==$inIdMax) ? $arQuantitativoRemovido['inId']+1 : $inIdMax;
             }
         }
-        
+
         $arOrgaoItemQuantitativo['stExercicioOrgao'] = $_REQUEST['stExercicioOrgaoQ'];
         $arOrgaoItemQuantitativo['inCodOrgaoQ']      = $_REQUEST['inCodOrgaoQ'];
         $arOrgaoItemQuantitativo['stNomOrgaoQ']      = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgaoQ']."' AND num_orgao = ".$_REQUEST['inCodOrgaoQ']);
@@ -1631,7 +1681,7 @@ function incluirListaQuantitativo()
         $arOrgaoItemQuantitativo['stNomFornecedorQ'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inCodFornecedorQ']);
         $arOrgaoItemQuantitativo['nuQtdeOrgao']      = $_REQUEST['nuQtdeOrgao'];
         $arOrgaoItemQuantitativo['inId']             = $inIdMax;
-       
+
         if ($arOrgaoItemQuantitativos != "") {
             foreach ($arOrgaoItemQuantitativos as $arOrgaoItemQuanti) {
                 if ($arOrgaoItemQuanti['stExercicioOrgao'] == $arOrgaoItemQuantitativo['stExercicioOrgao'] &&
@@ -1639,23 +1689,21 @@ function incluirListaQuantitativo()
                     $arOrgaoItemQuanti['inCodUnidadeQ']    == $arOrgaoItemQuantitativo['inCodUnidadeQ'] &&
                     $arOrgaoItemQuanti['inCodLoteQ']       == $arOrgaoItemQuantitativo['inCodLoteQ'] &&
                     $arOrgaoItemQuanti['inNumItemQ']       == $arOrgaoItemQuantitativo['inNumItemQ'] &&
-                    $arOrgaoItemQuanti['inCodFornecedorQ'] == $arOrgaoItemQuantitativo['inCodFornecedorQ'] ) {
-                    
+                    $arOrgaoItemQuanti['inCodFornecedorQ'] == $arOrgaoItemQuantitativo['inCodFornecedorQ']
+                ) {
                     $obErro->setDescricao("Estes valores informados já estão na lista!");
-                    
                     break;
                 }
             }
         }
-
     } else {
        $obErro->setDescricao("Informe Todos os campos!");
     }
-    
+
     if ( (float)number_format($_REQUEST['nuHdnQtdeFornecida'], 4, ',', '.') < (float)number_format($_REQUEST['nuQtdeOrgao'], 4, ',', '.') ) {
         $obErro->setDescricao("A quantidade informada não pode ser maior do que a quantidade fornecida!");
     }
-    
+
     if ($obErro->ocorreu()) {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     } else {
@@ -1665,7 +1713,8 @@ function incluirListaQuantitativo()
         $stJs .= montaListaOrgaoItemQuantitativos();
         $stJs .= limparFormOrgaoItemQuantitativos();
         $stJs .= preencheComboOrgaoAbaQuantitativo();
-        $stJs .= preencheLoteOuNumItemAbaQuantitativo();
+        $boLote = ($_REQUEST['inCodLoteQ']>0) ? true : false;
+        $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
     }
     
     return $stJs;
@@ -1673,11 +1722,12 @@ function incluirListaQuantitativo()
 
 function montaListaOrgaoItemQuantitativos()
 {
-        $rsRecordSet = new RecordSet();
+    $rsRecordSet = new RecordSet();
     
     if (Sessao::read('arOrgaoItemQuantitativos') != "") {
         $rsRecordSet->preenche(Sessao::read('arOrgaoItemQuantitativos'));
     }
+    $rsRecordSet->ordena('inCodLoteQ');
 
     $obLista = new Lista;
     $obLista->setMostraPaginacao( false );
@@ -1687,27 +1737,27 @@ function montaListaOrgaoItemQuantitativos()
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 1 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Exercício Orgão Unidade");
-    $obLista->ultimoCabecalho->setWidth( 6 );
+    $obLista->ultimoCabecalho->addConteudo("Exercício Orgão");
+    $obLista->ultimoCabecalho->setWidth( 2 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Orgão");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 13 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Unidade");
-    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->ultimoCabecalho->setWidth( 13 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Lote");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 2 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
@@ -1717,22 +1767,22 @@ function montaListaOrgaoItemQuantitativos()
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Item");
-    $obLista->ultimoCabecalho->setWidth( 12 );
+    $obLista->ultimoCabecalho->setWidth( 16 );
     $obLista->commitCabecalho();
     
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Fornecedor");
-    $obLista->ultimoCabecalho->setWidth( 8 );
+    $obLista->ultimoCabecalho->setWidth( 10 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Quantidade");
-    $obLista->ultimoCabecalho->setWidth( 7 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 3 );
+    $obLista->ultimoCabecalho->setWidth( 1 );
     $obLista->commitCabecalho();
     
     $obLista->addDado();
@@ -1762,17 +1812,17 @@ function montaListaOrgaoItemQuantitativos()
     
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "[inCodItemQ] - [stNomItemQ]" );
-    $obLista->ultimoDado->setAlinhamento('CENTER' );
+    $obLista->ultimoDado->setAlinhamento('ESQUERDA' );
     $obLista->commitDado();
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "[inCodFornecedorQ] - [stNomFornecedorQ]" );
-    $obLista->ultimoDado->setAlinhamento('CENTER' );
+    $obLista->ultimoDado->setAlinhamento('ESQUERDA' );
     $obLista->commitDado();
 
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "nuQtdeOrgao" );
-    $obLista->ultimoDado->setAlinhamento('CENTER' );
+    $obLista->ultimoDado->setAlinhamento('DIREITA' );
     $obLista->commitDado();
 
     $obLista->addAcao();
@@ -1963,6 +2013,15 @@ function alterarQuantitativo()
 
             $stJs .= preencheComboUnidadeAbaQuantitativo($arQuantitativo['inCodUnidadeQ']);
 
+            $inCodLoteQ = $arQuantitativo['inCodLoteQ'];
+            $boLote = (isset($inCodLoteQ)) ? TRUE : FALSE;
+            $_REQUEST['inCodLoteQ'] = $inCodLoteQ;
+
+            $stJs .= preencheNumItemAbaQuantitativo($boLote);
+
+            if($inCodLoteQ>0)
+                $stJs .= "jQuery('#inCodLoteQ').val('".$inCodLoteQ."');                                                     \n";
+
             $stJs .= "jQuery('#inNumItemQ').val('".$arQuantitativo['inNumItemQ']."');                                       \n";
             $stJs .= "jQuery('#inHdnCodItemQ').val('".$arQuantitativo['inCodItemQ']."');                                    \n";
             $_REQUEST['inNumItemQ'] = $arQuantitativo['inNumItemQ'];
@@ -1972,7 +2031,6 @@ function alterarQuantitativo()
             $stJs .= "jQuery('#inCodFornecedorQ').change();                                                                 \n";
             $stJs .= "jQuery('#nuQtdeOrgao').focus();                                                                       \n";
             $stJs .= "jQuery('#nuQtdeOrgao').val('".str_replace('.', ',',$arQuantitativo['nuQtdeOrgao'])."');               \n";
-            
 
             break;
         }
@@ -1988,18 +2046,17 @@ function alterarListaQuantitativo()
     $arItens = Sessao::read('arItens');
     $qtdSomaItem = 0;
 
-    if ($_REQUEST['inCodOrgaoQ'] != "" && $_REQUEST['inCodUnidadeQ'] != "" && $_REQUEST['inNumItemQ'] != ""  && $_REQUEST['inCodFornecedorQ'] != "" && $_REQUEST['stExercicioOrgaoQ'] != "" && $_REQUEST['nuQtdeOrgao'] > '0,0000') {
+    if ($_REQUEST['inCodOrgaoQ']!="" && $_REQUEST['inCodUnidadeQ']!="" && $_REQUEST['inNumItemQ']!=""  && $_REQUEST['inCodFornecedorQ']!="" && $_REQUEST['stExercicioOrgaoQ']!="" && $_REQUEST['nuQtdeOrgao']>'0,0000'){
         foreach ($arOrgaoItemQuantitativos as $key => $value) {
             if ($value['inId'] != $_REQUEST['inHndIdItemQ']) {
-                if ($_REQUEST['inCodOrgaoQ']                == $value['inCodOrgaoQ'] &&
-                    $_REQUEST['inCodUnidadeQ']              == $value['inCodUnidadeQ'] &&
-                    $_REQUEST['inNumItemQ']                 == $value['inNumItemQ'] &&
-                    $_REQUEST['inCodFornecedorQ']           == $value['inCodFornecedorQ'] &&
-                    $_REQUEST['inCodLoteQ']                 == $value['inCodLoteQ'] &&
-                    $arOrgaoItemQuanti['stExercicioOrgao']  == $arOrgaoItemQuantitativo['stExercicioOrgao'] ) {
-                    
+                if ($_REQUEST['inCodOrgaoQ']                == $value['inCodOrgaoQ']        &&
+                    $_REQUEST['inCodUnidadeQ']              == $value['inCodUnidadeQ']      &&
+                    $_REQUEST['inNumItemQ']                 == $value['inNumItemQ']         &&
+                    $_REQUEST['inCodFornecedorQ']           == $value['inCodFornecedorQ']   &&
+                    $_REQUEST['inCodLoteQ']                 == $value['inCodLoteQ']         &&
+                    $arOrgaoItemQuanti['stExercicioOrgao']  == $arOrgaoItemQuantitativo['stExercicioOrgao']
+                ) {
                     $obErro->setDescricao("Estes valores informados já estão na lista!");
-                    
                     break;
                 }
             }
@@ -2055,7 +2112,8 @@ function alterarListaQuantitativo()
         $stJs .= montaListaOrgaoItemQuantitativos();
         $stJs .= limparFormOrgaoItemQuantitativos();
         $stJs .= preencheComboOrgaoAbaQuantitativo();
-        $stJs .= preencheLoteOuNumItemAbaQuantitativo();
+        $boLote = ($_REQUEST['inCodLoteQ']>0) ? true : false;
+        $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
     }
     
     return $stJs;
@@ -2068,20 +2126,41 @@ function verificaExercicioLicitacao()
     $stExercicioLicitacao           = ( isset($_REQUEST['stExercicioLicitacao'])        ) ? $_REQUEST['stExercicioLicitacao']           : NULL;
     
     if(($stExercicioRegistroPrecos!=NULL&&$stExercicioProcessoLicitacao!=NULL)&&$stExercicioProcessoLicitacao<$stExercicioRegistroPrecos){
-        $stJs .= "jQuery('#stExercicioProcessoLicitacao').val(''); \n";
+        $stJs .= "jQuery('#stExercicioProcessoLicitacao').val('');                  \n";
         $stMsg .= "@Exercício do Processo de Licitação deve ser maior ou igual ao Exercício do Registro de Preços";
     }
     if(($stExercicioRegistroPrecos!=NULL&&$stExercicioLicitacao!=NULL)&&$stExercicioLicitacao<$stExercicioRegistroPrecos){
         $stJs .= "jQuery('#stExercicioLicitacao').val(''); \n";
         $stJs .= "f.inCodLicitacao.options.length = 0; \n";
-        $stJs .= "f.inCodLicitacao.options[0] = new Option('Selecione',''); \n";
+        $stJs .= "f.inCodLicitacao.options[0] = new Option('Selecione','');         \n";
         $stMsg .= "@Exercício da Licitação deve ser maior ou igual ao Exercício do Registro de Preços";
     }
 
     if($stMsg)
-        $stJs .= "alertaAviso('".$stMsg."','form','erro','".Sessao::getId()."'); \n";
+        $stJs .= "alertaAviso('".$stMsg."','form','erro','".Sessao::getId()."');    \n";
     elseif(!is_null($stExercicioLicitacao))
         $stJs .= carregaLicitacao();
+
+    return $stJs;
+}
+
+function LimparForm()
+{
+    Sessao::write('arOrgaos'                        , array());
+    Sessao::write('arOrgaosRemovido'                , array());
+    Sessao::write('arOrgaoItemQuantitativos'        , array());
+    Sessao::write('arOrgaoItemQuantitativosRemovido', array());
+    Sessao::write('arItens'                         , array());
+    Sessao::write('arItensRemovido'                 , array());
+    Sessao::write('arEmpenhos'                      , array());
+    Sessao::write('arEmpenhosRemovidos'             , array());
+
+    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;    \n";
+    $stJs .= "document.frm.reset();                                         \n";
+    $stJs .= limparFormOrgaos();
+    $stJs .= limparFormItem();
+    $stJs .= limparFormOrgaoItemQuantitativos();
+    $stJs .= limparFormEmpenho();
 
     return $stJs;
 }
@@ -2124,7 +2203,7 @@ switch ($stCtrl)
     break;
 
     case "buscaOrgaoGerenciador":
-        echo buscaOrgaoGerenciador();
+        $stJs .= buscaOrgaoGerenciador();
     break;
 
     case "buscaCGMResponsavel":
@@ -2148,9 +2227,8 @@ switch ($stCtrl)
         break;
     
     case "preencheInner":
-
-        $numEmpenho = $request->get('numEmpenho');
-        $inCodEntidade = $request->get('inCodEntidade');
+        $numEmpenho         = $request->get('numEmpenho');
+        $inCodEntidade      = $request->get('inCodEntidade');
         $stExercicioEmpenho = $request->get('stExercicioEmpenho');
 
         if ($inCodEntidade!=NULL and $stExercicioEmpenho!=NULL and $numEmpenho!=NULL) {
@@ -2165,33 +2243,32 @@ switch ($stCtrl)
             $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
 
             if ($rsRecordSet->getNumLinhas() > 0) {
-                $stJs  = 'd.getElementById("stEmpenho").innerHTML = "'.$rsRecordSet->getCampo('credor').'";';
+                $stJs  = "d.getElementById('stEmpenho').innerHTML = '".$rsRecordSet->getCampo('credor')."';                                         \n";
     
             } else {
                 $stJs  = "alertaAviso('Empenho não cadastrado ou não pertence a Modalidade Registro de Preços','form','erro','".Sessao::getId()."');\n";
-                $stJs .= 'd.getElementById("stEmpenho").innerHTML = "&nbsp;";';
-                $stJs .= "f.numEmpenho.value = '';";
+                $stJs .= "d.getElementById('stEmpenho').innerHTML = '&nbsp;';                                                                       \n";
+                $stJs .= "f.numEmpenho.value = '';                                                                                                  \n";
             }
         } else {
             if ($inCodEntidade==NULL) {
-                $stJs  = "alertaAviso('Informe a entidade.','form','erro','".Sessao::getId()."');\n";
-                $stJs .= "f.inCodEntidade.focus();\n";
+                $stJs  = "alertaAviso('Informe a entidade.','form','erro','".Sessao::getId()."');                                                   \n";
+                $stJs .= "f.inCodEntidade.focus();                                                                                                  \n";
             }
             if ($stExercicioEmpenho==NULL) {
-                $stJs  = "alertaAviso('Informe o exercício do empenho.','form','erro','".Sessao::getId()."');\n";
-                $stJs .= "f.stExercicioEmpenho.focus();\n";
+                $stJs  = "alertaAviso('Informe o exercício do empenho.','form','erro','".Sessao::getId()."');                                       \n";
+                $stJs .= "f.stExercicioEmpenho.focus();                                                                                             \n";
             }
             if ($numEmpenho==NULL) {
-                $stJs  = 'd.getElementById("stEmpenho").innerHTML = "&nbsp;";';
-                $stJs .= "f.numEmpenho.value = '';";
+                $stJs  = "d.getElementById('stEmpenho').innerHTML = '&nbsp;';                                                                       \n";
+                $stJs .= "f.numEmpenho.value = '';                                                                                                  \n";
             }
-            $stJs .= "f.numEmpenho.value = '';";
+            $stJs .= "f.numEmpenho.value = '';                                                                                                      \n";
         }
     
         echo $stJs;
         
         break;
-    
     case "incluirListaOrgaos":
         $stJs .= incluirListaOrgaos();
         break;
@@ -2250,6 +2327,12 @@ switch ($stCtrl)
         break;
     case 'verificaExercicioLicitacao':
         $stJs .= verificaExercicioLicitacao();
+        break;
+    case 'montaItemBuscaInner':
+        $stJs .= montaItemBuscaInner();
+        break;
+    case 'LimparForm':
+        $stJs .= LimparForm();
         break;
 }
 

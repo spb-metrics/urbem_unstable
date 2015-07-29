@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterOrdemPagamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRManterOrdemPagamento.php 63012 2015-07-16 17:20:41Z carlos.silva $
 
     * Casos de uso: uc-02.03.05
                     uc-02.03.04
@@ -370,27 +370,15 @@ function incluirReciboExtra($obREmpenhoOrdemPagamento, $boTransacao = "")
     include_once CAM_GF_TES_MAPEAMENTO.'TTesourariaReciboExtraRecurso.class.php';
     include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoOrdemPagamentoReciboExtra.class.php';
 
+    global $request;
+    
     $obErro = new Erro;
     $obTReciboExtra = new TTesourariaReciboExtra;
     $obTReciboExtra->setDado('cod_entidade', $_POST['inCodEntidade']);
     $obTReciboExtra->setDado('tipo_recibo','R');
     $obTReciboExtra->setDado('exercicio',Sessao::getExercicio());
     $obTReciboExtra->recuperaUltimaDataRecibo($rsDataRecibo, $boTransacao);
-    $stUltimaData = substr($rsDataRecibo->getCampo( 'data' ), 0, 10 );
-    $stUltimaData = explode('-', $stUltimaData);
-    if (count($stUltimaData) > 0) {
-        $stUltimaData = $stUltimaData[2].'/'.$stUltimaData[1].'/'.$stUltimaData[0];
-    } else {
-        $stUltimaData = '01/01/'.Sessao::getExercicio();
-    }
-
-    if (sistemaLegado::comparaDatas($_REQUEST['stDtOrdem'], $stUltimaData)) {
-        $dtEmissao = $_REQUEST['stDtOrdem'];
-    } else {
-        $dtEmissao = $stUltimaData;
-    }
-    unset($stUltimaData);
-
+    
     //$boFlagTransacao = false;
     $obTransacao = new Transacao;
 
@@ -403,7 +391,7 @@ function incluirReciboExtra($obREmpenhoOrdemPagamento, $boTransacao = "")
             $obTReciboExtra->setDado('cod_recibo_extra', $inCodigoRecibo);
             $obTReciboExtra->setDado('cod_plano', $arDadosRetencao['cod_reduzido']);
             $obTReciboExtra->setDado('valor', str_replace(",", ".", str_replace(".", "", $arDadosRetencao['nuValor'])));
-            $obTReciboExtra->setDado('timestamp', substr($dtEmissao, 6, 4).'-'.substr($dtEmissao, 3, 2).'-'.substr($dtEmissao,0,2).date(' H:i:s.ms'));
+            $obTReciboExtra->setDado('timestamp', substr($request->get('stDtOrdem'), 6, 4).'-'.substr($request->get('stDtOrdem'), 3, 2).'-'.substr($request->get('stDtOrdem'),0,2).date(' H:i:s.ms'));
             $obErro = $obTReciboExtra->inclusao($boTransacao);
 
             if (!$obErro->ocorreu() && $_REQUEST['stFornecedor'] != "") {

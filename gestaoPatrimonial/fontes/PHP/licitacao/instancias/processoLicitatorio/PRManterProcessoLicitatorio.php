@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: PRManterProcessoLicitatorio.php 62579 2015-05-21 13:49:37Z evandro $
+    $Id: PRManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
 
 */
 
@@ -190,7 +190,7 @@ switch ($stAcao) {
                     if (($_REQUEST['inCodModalidade'] == 3 ||
                          $_REQUEST['inCodModalidade'] == 6 ||
                          $_REQUEST['inCodModalidade'] == 7
-                       ) && $_REQUEST['boRegistroModalidade'] == 1) {
+                       ) && $_REQUEST['boHdnTipoRegistroPrecos'] == 1) {
                         $obTLicitacaoLicitacao->setDado('registro_precos'  , 't' );
                     } else {
                         $obTLicitacaoLicitacao->setDado('registro_precos'  , 'f' );
@@ -515,7 +515,7 @@ switch ($stAcao) {
                 if (($_REQUEST['inCodModalidade'] == 3 ||
                      $_REQUEST['inCodModalidade'] == 6 ||
                      $_REQUEST['inCodModalidade'] == 7
-                    ) && $_REQUEST['boRegistroModalidade'] == 1) {
+                    ) && $_REQUEST['boHdnTipoRegistroPrecos'] == 1) {
                      $obTLicitacaoLicitacao->setDado('registro_precos', true);
                 } else {
                      $obTLicitacaoLicitacao->setDado('registro_precos', false);

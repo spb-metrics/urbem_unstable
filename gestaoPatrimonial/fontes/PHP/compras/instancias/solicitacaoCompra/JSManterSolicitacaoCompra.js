@@ -35,7 +35,7 @@
  
  * Casos de uso: uc-03.04.01
   
- $Id: JSManterSolicitacaoCompra.js 59612 2014-09-02 12:00:51Z gelson $ 
+ $Id: JSManterSolicitacaoCompra.js 62979 2015-07-14 16:18:54Z michel $ 
 
  */
 ?>
@@ -114,11 +114,13 @@
   
    function excluirListaItens(inIndice){
       ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice,'excluirListaItens');
+      setTimeout('document.getElementById("stIncluirAssinaturasSim").focus();', 650);
+      setTimeout('LiberaFrames();', 700);
    }
   
    function alterarListaItens(inIndice){
-      ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice+'&alterar=true','montaDotacao');
-      ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice+'&alterar=true','alterarListaItens');
+      ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice+'&alterar=true'+'&boRegistroPreco='+document.frm.boRegistroPreco.value,'montaDotacao');
+      ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>&id='+inIndice+'&alterar=true'+'&inCodEntidade='+document.frm.inCodEntidade.value,'alterarListaItens');
    }
   
    function LimparOutraSolicitacao(){
@@ -130,38 +132,33 @@
    }
   
    function LimparItensSolicitacao(){
-      document.frm.inCodItem.value                         = "";
+      document.frm.inCodItem.value                                = "";
+      document.frm.HdnCodItem.value                               = "";
       if( document.frm.inCodUnidadeMedida ){
-           document.frm.inCodUnidadeMedida.value                = "";
+           document.frm.inCodUnidadeMedida.value                  = "";
       }
-      document.frm.inCodCentroCusto.value                  = "";
-      //  document.frm.inCodDespesa.value                      = "";
-      document.frm.HdninCodCentroCusto.value               = "";
-      //document.frm.HdninCodDespesa.value                   = "";
-      document.frm.nuVlUnitario.value                      = "";
-      document.frm.nuQuantidade.value                      = "";
-      document.frm.nuVlTotal.value                         = "";
+      document.frm.inCodCentroCusto.value                         = "";
+      document.frm.HdninCodCentroCusto.value                      = "";
+      document.frm.nuVlUnitario.value                             = "";
+      document.frm.nuQuantidade.value                             = "";
+      document.frm.nuVlTotal.value                                = "";
       if (document.frm.nuVlTotalReservado){
-           document.frm.nuVlTotalReservado.value                = "0,00";
+           document.frm.nuVlTotalReservado.value                  = "0,00";
       }
       if( document.frm.stNomUnidade ){
-           document.frm.stNomUnidade.value                      = "";
+           document.frm.stNomUnidade.value                        = "";
       }
-      document.frm.stNomCentroCusto.value                  = "";
-      document.frm.stComplemento.value                     = "";
-      //document.frm.stNomDespesa.value                      = "";
-      document.getElementById("stNomItem").innerHTML       = "&nbsp;";
+      document.frm.stNomCentroCusto.value                         = "";
+      document.frm.stComplemento.value                            = "";
+      document.getElementById("stNomItem").innerHTML              = "&nbsp;";
       if( document.getElementById("stUnidadeMedida") ){
-           document.getElementById("stUnidadeMedida").innerHTML = "&nbsp;";
+           document.getElementById("stUnidadeMedida").innerHTML   = "&nbsp;";
       }
-      //document.getElementById("stNomDespesa").innerHTML    = "&nbsp;";
-      document.getElementById("stNomCentroCusto").innerHTML= "&nbsp;";
-      document.getElementById("lblSaldoEstoque").innerHTML = "&nbsp;";
-      document.getElementById("spnVlrReferencia").innerHTML = "&nbsp;";
-      //document.getElementById("spnSaldoDotacao").innerHTML = "&nbsp;";
-      //document.getElementById("lblSaldoEstoque").innerHTML = "&nbsp;";
-      document.getElementById("spnDotacao").innerHTML = "";
-      document.getElementById('incluiItem').value          ='Incluir';
+      document.getElementById("stNomCentroCusto").innerHTML       = "&nbsp;";
+      document.getElementById("lblSaldoEstoque").innerHTML        = "&nbsp;";
+      document.getElementById("spnDotacao").innerHTML             = "";
+      document.getElementById("spnVlrReferencia").innerHTML       = "";
+      document.getElementById('incluiItem').value                 = 'Incluir';
       document.getElementById('incluiItem').setAttribute('onclick','JavaScript:goOculto(\'incluirListaItens\',true,\'false\');');	
       document.frm.inCodItem.focus();
    }
@@ -178,64 +175,42 @@
    }
   
    function goOcultoOutraSolicitacao(stControle,verifica){
+      var erro     = false;
+      var mensagem = "";
   
-     document.frm.stCtrl.value = stControle;
-  
-     var erro     = false;
-     var mensagem = "";
-  
-     campo  = document.frm.stExercicioSolicitacao.value.length;
-     vcampo = document.frm.stExercicioSolicitacao.value;
-  
-     if(campo == 0 | vcampo == '0'){
-      mensagem += "@O campo exercício é obrigatório";
-      erro = true;
-     }
-  
-     campo  = document.frm.inCodEntidadeSolicitacao.value.length;
-     vcampo = document.frm.inCodEntidadeSolicitacao.value;
-  
-     if(campo == 0 | vcampo == '0'){
-      mensagem += "@O campo entidade é obrigatório";
-      erro = true;
-     }
-  
-     campo  = document.frm.inCodSolicitacao.value.length;
-     vcampo = document.frm.inCodSolicitacao.value;
-  
-     if(campo == 0 | vcampo == '0'){
-      mensagem += "@O campo solicitação é obrigatório";
-      erro = true;
-     }
-  
-     if(erro==true){
-       alertaAviso(mensagem,'form','erro','<?=Sessao::getId()?>');
-     }else{
-       var campo = new String();
-       var cmp   = new Number(0);
-         while(cmp in document.forms[0].elements){       		
-              if(cmp !=14) {	
-                  campo+="&"+document.forms[0].elements[cmp].name+"="+document.forms[0].elements[cmp].value;
-              }	
-           cmp++;
-         }
-       ajaxJavaScript('<?=$pgOcul."?".Sessao::getId()?>'+campo,document.frm.stCtrl.value);
-       document.frm.action                         = '<?=$pgProc;?>?<?=Sessao::getId();?>';
-       document.frm.stCtrl.value                   = "";
-       LimparOutraSolicitacao();
-     }
+      campo  = document.frm.stExercicioSolicitacao.value.length;
+      vcampo = document.frm.stExercicioSolicitacao.value;
+   
+      if(campo == 0 | vcampo == '0'){
+         mensagem += "@O campo exercício é obrigatório";
+         erro = true;
+      }
+   
+      campo  = document.frm.inCodEntidadeSolicitacao.value.length;
+      vcampo = document.frm.inCodEntidadeSolicitacao.value;
+   
+      if(campo == 0 | vcampo == '0'){
+         mensagem += "@O campo entidade é obrigatório";
+         erro = true;
+      }
+   
+      campo  = document.frm.inCodSolicitacao.value.length;
+      vcampo = document.frm.inCodSolicitacao.value;
+   
+      if(campo == 0 | vcampo == '0'){
+         mensagem += "@O campo solicitação é obrigatório";
+         erro = true;
+      }
+   
+      if(erro==true){
+         alertaAviso(mensagem,'form','erro','<?=Sessao::getId()?>');
+      }else{
+         montaParametrosGET( stControle );
+         LimparOutraSolicitacao();
+      }
    }
   
    function goOculto(stControle,verifica,alterar){
-  
-      if(document.frm.stCtrl.value=="" | document.frm.stCtrl.value=="buscaDespesaDiverso"){
-         document.frm.stCtrl.value = stControle;
-      }
-  
-      if(document.frm.stCtrl.value=="alteradoListaItens"){
-         document.frm.stCtrl.value = "alteradoListaItens";
-      }
-  
       document.frm.HdnNomItem.value        = document.getElementById("stNomItem").innerHTML;
       document.frm.HdnNomUnidade.value     = document.getElementById("stUnidadeMedida").innerHTML;
       document.frm.HdnNomCentroCusto.value = document.getElementById("stNomCentroCusto").innerHTML;
@@ -300,16 +275,7 @@
       if(erro & verifica){
          alertaAviso(mensagem,'form','erro','<?=Sessao::getId()?>');
       }else{
-         var campo = new String();
-         var cmp   = new Number(0);
-         while(cmp in document.forms[0].elements){
-           campo+="&"+document.forms[0].elements[cmp].name+"="+document.forms[0].elements[cmp].value;
-           cmp++;
-         }
-
-         ajaxJavaScriptPost(stControle, alterar);
-         //<?=$pgOcul."?".Sessao::getId()?>'+campo,document.frm.stCtrl.value+'&alterar='+alterar);
-         // document.frm.action       = '<?=$pgProc;?>?<?=Sessao::getId();?>';
+         montaParametrosGET( stControle );
       }
    }
   
@@ -322,17 +288,15 @@
       document.getElementById("nuSaldoDotacao").innerHTML = "&nbsp;";
    }
   
-   function preencheValorReservado (valor){
-      var x = new Number(0);
-      while ( x < document.frm.elements.length ){
-         if ( document.frm.elements[x].type == "text" ){
-            if ( document.frm.elements[x].name=="nuVlTotalReservado" ){
-                document.frm.elements[x].value = valor;
-                break;
-            }
-         }
-         x++;
-      }
+   function preencheValorReservado (valor, despesa){
+      var stTarget   = document.frm.target;
+      var stAction   = document.frm.action;
+      document.frm.stCtrl.value = 'calculaValorReservadoDotacao';
+      document.frm.target ='oculto';
+      document.frm.action ='<?=$pgOcul;?>?<?=Sessao::getId();?>&stCtrl=calculaValorReservadoDotacao&nuVlTotal='+valor+'&inCodDespesa='+despesa;
+      document.frm.submit();
+      document.frm.action = stAction;
+      document.frm.target = stTarget;
    }
   
    function setFocusEntidade(){

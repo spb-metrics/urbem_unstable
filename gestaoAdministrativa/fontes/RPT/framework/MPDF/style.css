@@ -142,35 +142,53 @@ h5 {
     background-color: #c0c0c0;
 }
 
-/* Tabulação à esqueda de 3mm. Nivel 1.*/
+/* Tabulação à esqueda de 2mm. Nivel 1.*/
 .tabulacao_nivel_1 {
     padding-left: 2mm;
 }
 
-/* Tabulação à esqueda de 3mm. Nivel 1.*/
+/* Tabulação à esqueda de 4mm. Nivel 2.*/
 .tabulacao_nivel_2 {
     padding-left: 4mm;
 }
 
-/* Tabulação à esqueda de 3mm. Nivel 1.*/
+/* Tabulação à esqueda de 6mm. Nivel 3.*/
 .tabulacao_nivel_3 {
     padding-left: 6mm;
 }
 
-/* Tabulação à esqueda de 3mm. Nivel 1.*/
+/* Tabulação à esqueda de 8mm. Nivel 4.*/
 .tabulacao_nivel_4 {
     padding-left: 8mm;
 }
 
+/* Tabulação à esqueda de 10mm. Nivel 5.*/
+.tabulacao_nivel_5 {
+    padding-left: 10mm;
+}
+
+/* Tabulação à esqueda de 12mm. Nivel 6.*/
+.tabulacao_nivel_6 {
+    padding-left: 12mm;
+}
 /* Altera o tamanho da fonte para 8px*/
 .font_size_8 {
     font-size: 8px;
 }
-
+/* Altera o tamanho da fonte para 9px*/
+.font_size_9 {
+    font-size: 9px;
+}
 
 /* Estilo do Rodapé */
-body footer table tfoot tr td {
+body footer {
     width: 100%;
+    border-top: 1px solid black;
+    background-color: #FFFFFF;
+    font-weight: normal;
+}
+body table tfoot tr td {
+    /*width: 100%;*/
     border-top: 1px solid black;
     background-color: #FFFFFF;
     font-weight: normal;

@@ -32,7 +32,7 @@
 
  * @ignore
 
- * $Id: OCLogradouros.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: OCLogradouros.php 63009 2015-07-16 14:36:54Z evandro $
 
  * Casos de uso: uc-05.01.20
  */
@@ -87,9 +87,12 @@ $obRCIMRelatorioLogradouros->setCodTermino      ( $arFiltro['inCodTermino']     
 $obRCIMRelatorioLogradouros->setCodTerminoBairro( $arFiltro['inCodTerminoBairro'] );
 $obRCIMRelatorioLogradouros->setCodTerminoCEP   ( str_replace("-", "", $arFiltro['inCEPTermino'])       );
 $obRCIMRelatorioLogradouros->setOrder           ( $arFiltro['stOrder']            );
+$obRCIMRelatorioLogradouros->setMostrarHistorico( $arFiltro['boHistorico'] );
+
 // GERA RELATORIO A PARTIR DO FILTRO SETADO
 $obRCIMRelatorioLogradouros->geraRecordSet( $rsLogradouros );
-Sessao::write('sessao_transf5',  $rsLogradouros);
+Sessao::write('mostrar_historico', $arFiltro['boHistorico'] );
+Sessao::write('dados_relatorio',   $rsLogradouros );
 $obRRelatorio->executaFrameOculto( "OCGeraRelatorioLogradouros.php" );
 
 // SELECIONA ACAO

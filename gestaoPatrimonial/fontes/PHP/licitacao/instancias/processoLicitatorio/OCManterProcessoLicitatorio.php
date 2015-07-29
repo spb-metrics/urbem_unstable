@@ -31,7 +31,7 @@
 
   * Casos de uso: uc-03.05.15
 
-  $Id: OCManterProcessoLicitatorio.php 62579 2015-05-21 13:49:37Z evandro $
+  $Id: OCManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
 
   */
 
@@ -566,7 +566,6 @@ function montaListaItens($rsItens)
 
     $table->setRecordset( $rsItens );
     $table->setSummary('Itens');
-    //$table->setConditional( true , "#ddd" );
 
     $table->Head->addCabecalho( 'Item' , 40  );
     $table->Head->addCabecalho( 'Centro de Custo', 25 );
@@ -979,72 +978,110 @@ switch ($stCtrl) {
 
     case 'vlTotalReferencia':
         $stJs = '';
-
+        
         if (!empty($_REQUEST['mapaCompras'])) {
-
+            $rsRecordSet     = new RecordSet();
             $mapaCompras = explode("/",$_REQUEST['mapaCompras']);
-
             $inCodMapa       = $mapaCompras[0];
             $stExercicioMapa = $mapaCompras[1];
-            $rsRecordSet='';
+            
+            if (empty($stExercicioMapa)) {
+                $stExercicioMapa = Sessao::getExercicio();
+            }
+            
             $boLimpa = true;
 
-            $stFiltro  = " AND mapa.cod_mapa  =  ".$inCodMapa;
-            $stFiltro .= " AND mapa.exercicio = '".$stExercicioMapa."'";
-            $stFiltro .= " AND not exists( SELECT                                                                                           ";
-            $stFiltro .= "                        cotacao.cod_cotacao                                                                       ";
-            $stFiltro .= "                      , cotacao.exercicio                                                                         ";
-            $stFiltro .= "                      , max(cotacao.timestamp) as timestamp                                                       ";
-            $stFiltro .= "                   FROM                                                                                           ";
-            $stFiltro .= "                        compras.cotacao                                                                           ";
-            $stFiltro .= "                        INNER JOIN empenho.item_pre_empenho_julgamento                                            ";
-            $stFiltro .= "                                ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao                  ";
-            $stFiltro .= "                               AND item_pre_empenho_julgamento.exercicio   = cotacao.exercicio                    ";
-            $stFiltro .= "                        INNER JOIN empenho.item_pre_empenho                                                       ";
-            $stFiltro .= "                                ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho ";
-            $stFiltro .= "                               AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio       ";
-            $stFiltro .= "                               AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item        ";
-            $stFiltro .= "                        INNER JOIN empenho.pre_empenho                                                            ";
-            $stFiltro .= "                                ON item_pre_empenho.exercicio = pre_empenho.exercicio                             ";
-            $stFiltro .= "                               AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho                 ";
-            $stFiltro .= "                        INNER JOIN empenho.autorizacao_empenho                                                    ";
-            $stFiltro .= "                                ON autorizacao_empenho.exercicio       = pre_empenho.exercicio                    ";
-            $stFiltro .= "                               AND autorizacao_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho              ";
-            $stFiltro .= "                        INNER JOIN compras.mapa_cotacao                                                           ";
-            $stFiltro .= "                                ON mapa_cotacao.exercicio_cotacao = cotacao.exercicio                             ";
-            $stFiltro .= "                               AND mapa_cotacao.cod_cotacao       = cotacao.cod_cotacao                           ";
-            $stFiltro .= "                  WHERE                                                                                           ";
-            $stFiltro .= "                        mapa_cotacao.exercicio_mapa = mapa.exercicio                                              ";
-            $stFiltro .= "                    AND mapa_cotacao.cod_mapa       = mapa.cod_mapa                                               ";
-            $stFiltro .= "               GROUP BY                                                                                           ";
-            $stFiltro .= "                        cotacao.exercicio                                                                         ";
-            $stFiltro .= "                      , cotacao.cod_cotacao )                                                                     ";
+            $stFiltro  = " AND mapa.cod_mapa  =  ".$inCodMapa."
+                           AND mapa.exercicio = '".$stExercicioMapa."'
+                           AND NOT EXISTS(SELECT cotacao.cod_cotacao
+                                               , cotacao.exercicio
+                                               , max(cotacao.timestamp) as timestamp
+                                            FROM compras.cotacao
+                                      INNER JOIN empenho.item_pre_empenho_julgamento
+                                              ON item_pre_empenho_julgamento.cod_cotacao = cotacao.cod_cotacao
+                                             AND item_pre_empenho_julgamento.exercicio   = cotacao.exercicio
+                                      INNER JOIN empenho.item_pre_empenho                                                       
+                                              ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+                                             AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+                                             AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+                                      INNER JOIN empenho.pre_empenho
+                                              ON item_pre_empenho.exercicio = pre_empenho.exercicio
+                                             AND item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                      INNER JOIN empenho.autorizacao_empenho
+                                              ON autorizacao_empenho.exercicio       = pre_empenho.exercicio
+                                             AND autorizacao_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                      INNER JOIN compras.mapa_cotacao
+                                              ON mapa_cotacao.exercicio_cotacao = cotacao.exercicio
+                                             AND mapa_cotacao.cod_cotacao       = cotacao.cod_cotacao
+                                           WHERE mapa_cotacao.exercicio_mapa = mapa.exercicio
+                                             AND mapa_cotacao.cod_mapa       = mapa.cod_mapa
+                                        GROUP BY cotacao.exercicio                                                                         
+                                               , cotacao.cod_cotacao )";
 
-            $obTComprasMapa = new TComprasMapa;
-            $obTComprasMapa->recuperaMapaProcessoLicitatorio($rsRecordSet, $stFiltro);
+            if ( $_REQUEST['stAcao'] == 'alterar' ){
+                $arModalidade = explode('-',$_REQUEST['stModalidade']);
+                $inCodModalidade = trim($arModalidade[0]);
+                $inHdnCodLicitacao = $_REQUEST['inCodLicitacao'];
+                $stHdnExercicioLicitacao = $_REQUEST['stExercicioLicitacao'];
+                
+                $inCodLicitacaoMapa = SistemaLegado::pegaDado('cod_licitacao','licitacao.licitacao'," WHERE exercicio_mapa = '".$stExercicioMapa."' AND cod_mapa = ".$inCodMapa);
+                $stExercicioLicitacaoMapa = SistemaLegado::pegaDado('exercicio','licitacao.licitacao'," WHERE exercicio_mapa = '".$stExercicioMapa."' AND cod_mapa = ".$inCodMapa);
+            
+                if ($_REQUEST['inCodModalidade'] == 3 || $_REQUEST['inCodModalidade'] == 6 || $_REQUEST['inCodModalidade'] == 7 ) {
+                    $stComplementoFiltro .= " \n";
+                } else {
+                    $stComplementoFiltro .= "
+                        AND EXISTS(SELECT mp.exercicio
+                                        , mp.cod_mapa
+                                        , mp.cod_objeto
+                                        , mp.timestamp
+                                        , mp.cod_tipo_licitacao
+                                        , solicitacao.registro_precos
+                                     FROM compras.mapa AS mp
+                               INNER JOIN compras.mapa_solicitacao
+                                       ON mapa_solicitacao.exercicio = mp.exercicio
+                                      AND mapa_solicitacao.cod_mapa  = mp.cod_mapa
+                               INNER JOIN compras.solicitacao_homologada
+                                       ON solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                                      AND solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                                      AND solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                               INNER JOIN compras.solicitacao
+                                       ON solicitacao.exercicio       = solicitacao_homologada.exercicio
+                                      AND solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                                      AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+                                    WHERE mp.cod_mapa = mapa.cod_mapa
+                                      AND mp.exercicio = mapa.exercicio
+                                      AND solicitacao.registro_precos IS FALSE
+                                 GROUP BY mp.exercicio
+                                        , mp.cod_mapa
+                                        , mp.cod_objeto
+                                        , mp.timestamp
+                                        , mp.cod_tipo_licitacao
+                                        , solicitacao.registro_precos )
+                    \n";
+                }
+            }
+            $obTComprasMapa = new TComprasMapa();
+            $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio($rsRecordSet, $stFiltro.$stComplementoFiltro);
 
-            if ($rsRecordSet!='') {
+            if ($rsRecordSet->getNumLinhas() > 0 || ($_REQUEST['stAcao'] == 'alterar' AND $inCodLicitacaoMapa == $inHdnCodLicitacao AND $stExercicioLicitacaoMapa == $stHdnExercicioLicitacao)) {
                 if (empty($stExercicioMapa)) {
                     $stExercicioMapa = Sessao::getExercicio();
                 }
+                $stFiltro  = " AND mapa.cod_mapa  = ".$inCodMapa;
+                $stFiltro .= " AND mapa.exercicio = '".$stExercicioMapa."'";
+                $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio($rsMapa, $stFiltro );
 
-                $stFiltro  = " AND  mapa.cod_mapa  = ".$inCodMapa;
-                $stFiltro .= " AND  mapa.exercicio = '".$stExercicioMapa."'";
-                $obTComprasMapa->recuperaMapaProcessoLicitatorio($rsMapa, $stFiltro );
-
-                if ($rsMapa->getNumLinhas() > 0) {
-
-                    $obTComprasMapa->setDado('cod_mapa'       , $inCodMapa);
-                    $obTComprasMapa->setDado('exercicio_mapa' , $stExercicioMapa);
+                if ($rsMapa->getNumLinhas() > 0 || ($_REQUEST['stAcao'] == 'alterar' AND $inCodLicitacaoMapa == $inHdnCodLicitacao AND $stExercicioLicitacaoMapa == $stHdnExercicioLicitacao)) {
+                    $obTComprasMapa->setDado('cod_mapa'      , $inCodMapa);
+                    $obTComprasMapa->setDado('exercicio_mapa', $stExercicioMapa);
                     $obTComprasMapa->recuperaMapaCotacaoValida($rsCotacao);
-
                     if ($rsCotacao->getNumLinhas() > 0) {
                         include_once( CAM_GP_COM_MAPEAMENTO."TComprasJulgamento.class.php");
-                        $obTComprasJulgamento = new TComprasJulgamento;
+                        $obTComprasJulgamento = new TComprasJulgamento();
                         $stFiltro  = " WHERE julgamento.exercicio   = '".$rsCotacao->getCampo('exercicio_cotacao')."'";
                         $stFiltro .= "   AND julgamento.cod_cotacao = ". $rsCotacao->getCampo('cod_cotacao');
                         $obTComprasJulgamento->recuperaJulgamentoAutorizacao($rsAutorizacao, $stFiltro);
-
                         if ($rsAutorizacao->getNumLinhas() > 0) {
                             $boExecuta = false;
                         } else {
@@ -1055,13 +1092,13 @@ switch ($stCtrl) {
                     }
 
                     if ($boExecuta) {
-                        $obTComprasMapaItem = new TComprasMapaItem;
-                        $obTComprasMapaItem->setDado('cod_mapa'  , $inCodMapa);
-                        $obTComprasMapaItem->setDado('exercicio' , $stExercicioMapa);
+                        $obTComprasMapaItem = new TComprasMapaItem();
+                        $obTComprasMapaItem->setDado('cod_mapa' , $inCodMapa);
+                        $obTComprasMapaItem->setDado('exercicio', $stExercicioMapa);
                         $obTComprasMapaItem->recuperaValorTotal($rsVlTotal);
 
                         $intTotalReferencial = $rsVlTotal->getCampo('vl_total');
-                        $rsVlTotal->addFormatacao ( 'vl_total', 'NUMERIC_BR' );
+                        $rsVlTotal->addFormatacao('vl_total','NUMERIC_BR');
                         //// buscando o tipo de cotação
 
                         if ($rsVlTotal->getNumLinhas() > 0) {
@@ -1069,19 +1106,49 @@ switch ($stCtrl) {
                             $stJs .= "d.getElementById('stValorReferencial').value = '".$intTotalReferencial."';\n";
 
                             # Buscando o objeto
-                            $obTComprasMapa->setDado('cod_mapa'  , $inCodMapa);
-                            $obTComprasMapa->setDado('exercicio' , $stExercicioMapa);
+                            $obTComprasMapa->setDado('cod_mapa' , $inCodMapa);
+                            $obTComprasMapa->setDado('exercicio', $stExercicioMapa);
                             $obTComprasMapa->recuperaMapaObjeto($rsMapa);
 
                             $boLimpa = false;
-                            $txtObjeto = $rsMapa->getCampo( 'descricao' );
+                            $txtObjeto = $rsMapa->getCampo('descricao');
                             $txtObjeto = nl2br(addslashes(str_replace("\r\n", "\n", preg_replace("/(\r\n|\n|\r)/", "", $txtObjeto))));
-                            $stJs .= "d.getElementById('txtObjeto').innerHTML = '$txtObjeto'  ;";
-                            $stJs .= "d.getElementById('stObjeto' ).value     = '".$rsMapa->getCampo ( 'cod_objeto' )."';\n";
-                            $txtTipoCotacao = $rsMapa->getCampo ( 'cod_tipo_licitacao' ) . ' - ' .$rsMapa->getCampo ( 'tipo_licitacao' ) ;
-                            $stJs .= "d.getElementById('stTipoCotacao').innerHTML     = '$txtTipoCotacao';\n";
-                            $stJs .= "f.inCodTipoCotacao.value  = '".  $rsMapa->getCampo ( 'cod_tipo_licitacao' ) ."';\n";
+                            $stJs .= "d.getElementById('txtObjeto').innerHTML = '$txtObjeto';\n";
+                            $stJs .= "d.getElementById('stObjeto' ).value = '".$rsMapa->getCampo('cod_objeto')."';\n";
+                            $txtTipoCotacao = $rsMapa->getCampo('cod_tipo_licitacao').' - '.$rsMapa->getCampo('tipo_licitacao');
+                            $stJs .= "d.getElementById('stTipoCotacao').innerHTML = '".$txtTipoCotacao."';\n";
+                            $stJs .= "f.inCodTipoCotacao.value = '".$rsMapa->getCampo('cod_tipo_licitacao')."';\n";
+                            
+                            $obTComprasMapa->recuperaTipoMapa($rsTipoMapa);
+                            if ($rsTipoMapa->getCampo('registro_precos') == 't') {
+                                $txtRegistroPrecos = 'Sim';
+                                $inTipoRegistroPrecos = 1;
+                                $stCodModalidade = 'IN (3,6,7)';
+                            } else {
+                                $txtRegistroPrecos = 'Não';
+                                $inTipoRegistroPrecos = 0;
+                                $stCodModalidade = 'NOT IN (4,5,10,11)';
+                            }
 
+                            $stJs .= "d.getElementById('txtTipoRegistroPrecos').innerHTML = '$txtRegistroPrecos';\n";
+                            $stJs .= "d.getElementById('boHdnTipoRegistroPrecos').value = '$inTipoRegistroPrecos';\n";
+
+                            include_once(CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php");
+                            $obComprasModalidade = new TComprasModalidade();
+                            $rsModalidade = new RecordSet();
+                            $stFiltro = " WHERE	cod_modalidade ".$stCodModalidade." ";
+                        
+                            $obComprasModalidade->recuperaTodos($rsModalidade,$stFiltro,"ORDER BY cod_modalidade",$boTransacao);
+                            
+                            $stJs .= "jQuery('#inCodModalidade').removeOption(/./); \n";
+                            $stJs .= "jQuery('#inCodModalidade').addOption('','Selecione'); \n";
+                            while(!$rsModalidade->eof())
+                            {
+                                $stJs .= "jQuery('#inCodModalidade').addOption('".$rsModalidade->getCampo('cod_modalidade')."','".$rsModalidade->getCampo('cod_modalidade').' - '.$rsModalidade->getCampo('descricao')."'); \n";
+                                $rsModalidade->proximo();
+                            }
+                            
+                            $stJs .= "jQuery('#inCodModalidade').val(''); \n";
                         }
                     } else {
                         $stJs .= "alertaAviso('Mapa de compras '".$_REQUEST['mapaCompras']."' já está em processo licitatório.','form','erro','".Sessao::getId()."');";
@@ -1089,29 +1156,42 @@ switch ($stCtrl) {
                 }
             } else {
                 include_once CAM_GP_COM_MAPEAMENTO."TComprasCompraDireta.class.php";
-                $obTComprasCompraDireta = new TComprasCompraDireta;
+                $obTComprasCompraDireta = new TComprasCompraDireta();
                 $stFiltro  = " WHERE compra_direta.exercicio_mapa = '".$stExercicioMapa."'";
                 $stFiltro .= "   AND compra_direta.cod_mapa       =  ".$inCodMapa;
                 $obTComprasCompraDireta->recuperaMapaCompraDireta($rsRecordSet, $stFiltro);
-
                 if ($rsRecordSet->getNumLinhas() > 0) {
                     $boLimpa = true;
-                    $stJs .= "alertaAviso('Mapa de compras (".$_REQUEST['mapaCompras'].") já está sendo utilizado pela compra direta.','form','erro','".Sessao::getId()."');";
+                    $stJs .= "alertaAviso('Mapa de compras (".$_REQUEST['mapaCompras'].") já está sendo utilizado pela compra direta.','form','erro','".Sessao::getId()."');\n";
+                } else {
+                    $boLimpa = false;
                 }
 
                 if (!$boLimpa) {
                     include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php");
-                    $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
+                    $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
                     $obTLicitacaoLicitacao->setDado('cod_mapa'       , $inCodMapa);
                     $obTLicitacaoLicitacao->setDado('exercicio_mapa' , $stExercicioMapa);
                     $obTLicitacaoLicitacao->recuperaLicitacao($rsRecordSet);
 
                     if ($rsRecordSet->getNumLinhas() > 0) {
                         $boLimpa = true;
-                        $stJs .= "alertaAviso('Mapa de compras (".$_REQUEST['mapaCompras'].") já está sendo utilizado pela licitação.','form','erro','".Sessao::getId()."');";
+                        $stJs .= "alertaAviso('Mapa de compras (".$_REQUEST['mapaCompras'].") já está sendo utilizado pela licitação.','form','erro','".Sessao::getId()."');\n";
+                    } else {
+                        $boLimpa = false;
                     }
                 }
 
+                if (!$boLimpa) {
+                    $obTComprasMapa->setDado('cod_mapa' , $inCodMapa);
+                    $obTComprasMapa->setDado('exercicio', $stExercicioMapa);
+                    $obTComprasMapa->recuperaTipoMapa($rsRecordSet);
+
+                    if ($rsRecordSet->getNumLinhas() > 0 && $rsRecordSet->getCampo('registro_precos') == 't' ) {
+                        $boLimpa = true;
+                        $stJs .= "alertaAviso('Mapa de compras (".$_REQUEST['mapaCompras']."). A Modalidade desse Processo Licitatório, não é compativel com o mapa de Registro de Preços.','form','erro','".Sessao::getId()."');\n";
+                    }
+                }                
             }
 
             if ($boLimpa) {
@@ -1121,8 +1201,11 @@ switch ($stCtrl) {
                 $stJs .= "jQuery('#stTipoCotacao').val('');            \n";
                 $stJs .= "jQuery('#stObjeto').val('');                 \n";
                 $stJs .= "jQuery('#txtObjeto').html('&nbsp;');         \n";
+                $stJs .= "jQuery('#txtTipoRegistroPrecos').html('&nbsp;'); \n";
+                $stJs .= "jQuery('#boHdnTipoRegistroPrecos').val(''); \n";
+                $stJs .= "jQuery('#inCodModalidade').removeOption(/./); \n";
+                $stJs .= "jQuery('#inCodModalidade').addOption('','Selecione');\n";
             }
-
         } else {
             $stJs .= "jQuery('#stValorReferencia').html('&nbsp;'); \n";
             $stJs .= "jQuery('#stValorReferencial').val('');       \n";
@@ -1130,8 +1213,11 @@ switch ($stCtrl) {
             $stJs .= "jQuery('#stTipoCotacao').val('');            \n";
             $stJs .= "jQuery('#stObjeto').val('');                 \n";
             $stJs .= "jQuery('#txtObjeto').html('&nbsp;');         \n";
+            $stJs .= "jQuery('#txtTipoRegistroPrecos').html('&nbsp;'); \n";
+            $stJs .= "jQuery('#boHdnTipoRegistroPrecos' ).val(''); \n";
+            $stJs .= "jQuery('#inCodModalidade').removeOption(/./); \n";
+            $stJs .= "jQuery('#inCodModalidade').addOption('','Selecione');\n";
         }
-
     break;
 
     case 'incluirDocumento':
@@ -1236,78 +1322,27 @@ switch ($stCtrl) {
     
         $stJs .= "f.stDtLicitacao.value='".$dtLicitacao."';";
 
+        if ($rsLicitacao->getCampo('registro_precos') == 't') {
+            $txtRegistroPrecos = 'Sim';
+            $inTipoRegistroPrecos = 1;
+            $stCodModalidade = 'IN (3,6,7)';
+        } else {
+            $txtRegistroPrecos = 'Não';
+            $inTipoRegistroPrecos = 0;
+            $stCodModalidade = 'NOT IN (4,5,10,11)';
+        }
+
+        $stJs .= "d.getElementById('txtTipoRegistroPrecos').innerHTML = '$txtRegistroPrecos';\n";
+        $stJs .= "d.getElementById('boHdnTipoRegistroPrecos').value = '$inTipoRegistroPrecos';\n";
+
+        
         include_once(TLIC."TLicitacaoTipoChamadaPublica.class.php");
         $obLicitacaoTipoChamadaPublica = new TLicitacaoTipoChamadaPublica;
         $obLicitacaoTipoChamadaPublica->setDado('cod_tipo',$rsLicitacao->getCampo("tipo_chamada_publica"));
         $obLicitacaoTipoChamadaPublica->recuperaPorChave($rsTipoChamadaPublica);
             
         switch ($_REQUEST['inCodModalidade']) {
-            case 3:
-            case 6:
-            case 7:
-                $obRadioRegistroPrecosSim = new Radio;
-                $obRadioRegistroPrecosSim->setRotulo  ('Registro de Preços');
-                $obRadioRegistroPrecosSim->setLabel   ('Sim');
-                $obRadioRegistroPrecosSim->setName    ('boRegistroModalidade');
-                $obRadioRegistroPrecosSim->setId      ('boRegistroModalidade');
-                $obRadioRegistroPrecosSim->setTitle   ('Informe se existe registros de preços.');
-                $obRadioRegistroPrecosSim->setValue   (1);
-                $obRadioRegistroPrecosSim->setNull    (false);
-                $obRadioRegistroPrecosSim->setChecked (false);
-        
-                $obRadioRegistroPrecosNao = new Radio;
-                $obRadioRegistroPrecosNao->setLabel   ('Não');
-                $obRadioRegistroPrecosNao->setTitle   ('Informe se existe registros de preços.');
-                $obRadioRegistroPrecosNao->setName    ('boRegistroModalidade');
-                $obRadioRegistroPrecosNao->setId      ('boRegistroModalidade');
-                $obRadioRegistroPrecosNao->setValue   (0);
-                $obRadioRegistroPrecosNao->setNull    (false);
-                $obRadioRegistroPrecosNao->setChecked (true);
-
-                if ($rsLicitacao->getCampo('registro_precos') == 't') {
-                    $obRadioRegistroPrecosSim->setChecked (true);
-                    $obRadioRegistroPrecosNao->setChecked (false);
-                }
-
-                $obFormulario = new Formulario();
-                $obFormulario->agrupaComponentes(array($obRadioRegistroPrecosSim,$obRadioRegistroPrecosNao));
-                $obFormulario->montaInnerHTML();
-                $stHTML = $obFormulario->getHTML();
-                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-            break;
-
             case 8:
-                $obRadioChamadaPublicaSim = new Radio;
-                $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
-                $obRadioChamadaPublicaSim->setLabel      ('Sim');
-                $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
-                $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
-                $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
-                $obRadioChamadaPublicaSim->setValue      (1);
-                $obRadioChamadaPublicaSim->setNull       (false);
-                $obRadioChamadaPublicaSim->setChecked    (false);
-        
-                $obRadioChamadaPublicaNao = new Radio;
-                $obRadioChamadaPublicaNao->setLabel   ('Não');
-                $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
-                $obRadioChamadaPublicaNao->setName    ('boRegistroModalidade');
-                $obRadioChamadaPublicaNao->setId      ('boRegistroModalidade');
-                $obRadioChamadaPublicaNao->setValue   (0);
-                $obRadioChamadaPublicaNao->setNull    (false);
-                $obRadioChamadaPublicaNao->setChecked (true);
-
-                if ($rsTipoChamadaPublica->getCampo('cod_tipo') != 0) {
-                    $obRadioChamadaPublicaSim->setChecked (true);
-                    $obRadioChamadaPublicaNao->setChecked (false);
-                }
-
-                $obFormulario = new Formulario();
-                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
-                $obFormulario->montaInnerHTML();
-                $stHTML = $obFormulario->getHTML();
-                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-            break;
-
             case 9:
                 $obRadioChamadaPublicaSim = new Radio;
                 $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
@@ -1514,6 +1549,7 @@ switch ($stCtrl) {
         $stHTML = $obFormulario->getHTML();
         $stJs .= "d.getElementById('spnMaxMin').innerHTML = '".$stHTML."';\n";
         $stJs .= "f.inCGM.focus();\n";
+        $stJs .= " jq('#stChaveProcesso').focus(); \n ";
     break;
 
     case "limpar":
@@ -1533,11 +1569,11 @@ case 'validaMapa':
         $arMapa = explode('/',$_REQUEST['stMapaCompras']);
 
         include ( CAM_GP_COM_MAPEAMENTO."TComprasMapaSolicitacao.class.php" );
-        $obTComprasMapaSolicitacao = new TComprasMapaSolicitacao;
-        $obTComprasMapaSolicitacao->setDado( 'cod_mapa'  , $arMapa[0]);
-        $obTComprasMapaSolicitacao->setDado( 'exercicio' ,  Sessao::getExercicio() );
+        $obTComprasMapaSolicitacao = new TComprasMapaSolicitacao();
+        $obTComprasMapaSolicitacao->setDado('cod_mapa' , $arMapa[0]);
+        $obTComprasMapaSolicitacao->setDado('exercicio', Sessao::getExercicio() );
         $obTComprasMapaSolicitacao->recuperaMaiorDataSolicitacaoMapa($rsRecordSet);
-
+        
         if ($rsRecordSet->getNumLinhas() > 0) {
             if (!SistemaLegado::comparaDatas($_REQUEST['stDtLicitacao'],$rsRecordSet->getCampo('dt_solicitacao'),true)) {
                $stJs .= "alertaAviso( 'A data da Licitação deve ser igual ou maior do que a maior data das solicitações do mapa (".$rsRecordSet->getCampo('dt_solicitacao').").','form','erro','".Sessao::getId()."');";
@@ -1549,14 +1585,6 @@ case 'validaMapa':
     break;
 
 case 'validaDtLicitacao':
-    //if ($_REQUEST['stDtLicitacao'] != '') {
-    //    if (SistemaLegado::comparaDatas( $_REQUEST['stDtLicitacao'] , date('d/m/Y'))) {
-    //       $stJs .= "alertaAviso( 'A Data da Licitação (".$_REQUEST['stDtLicitacao'].") não pode ser maior que a data atual (".date('d/m/Y').")!','form','erro','".Sessao::getId()."');";
-    //       $stJs .= "f.stDtLicitacao.value='';";
-    //       $stJs .= "f.stDtLicitacao.focus();";
-    //    }
-    //}
-    
     if ($_REQUEST['stMapaCompras'] != '' and $_REQUEST['stDtLicitacao'] != '') {
         $arMapa = array();
         $arMapa = explode('/',$_REQUEST['stMapaCompras']);
@@ -1655,62 +1683,7 @@ case 'validaDtLicitacao':
     case 'recuperaRegistroModalidade':
         
         switch ($_REQUEST['inCodModalidade']) {
-            case 3:
-            case 6:
-            case 7:
-                $obRadioRegistroPrecosSim = new Radio;
-                $obRadioRegistroPrecosSim->setRotulo     ('Registro de Preços');
-                $obRadioRegistroPrecosSim->setLabel      ('Sim');
-                $obRadioRegistroPrecosSim->setName       ('boRegistroModalidade');
-                $obRadioRegistroPrecosSim->setId         ('boRegistroModalidade');
-                $obRadioRegistroPrecosSim->setTitle      ('Informe se existe registros de preços.');
-                $obRadioRegistroPrecosSim->setValue      (1);
-                $obRadioRegistroPrecosSim->setNull       (false);
-                $obRadioRegistroPrecosSim->setChecked    (false);
-        
-                $obRadioRegistroPrecosNao = new Radio;
-                $obRadioRegistroPrecosNao->setLabel   ('Não');
-                $obRadioRegistroPrecosNao->setTitle   ('Informe se existe registros de preços.');
-                $obRadioRegistroPrecosNao->setName    ('boRegistroModalidade');
-                $obRadioRegistroPrecosNao->setId      ('boRegistroModalidade');
-                $obRadioRegistroPrecosNao->setValue   (0);
-                $obRadioRegistroPrecosNao->setNull    (false);
-                $obRadioRegistroPrecosNao->setChecked (true);
-
-                $obFormulario = new Formulario();
-                $obFormulario->agrupaComponentes(array($obRadioRegistroPrecosSim,$obRadioRegistroPrecosNao));
-                $obFormulario->montaInnerHTML();
-                $stHTML = $obFormulario->getHTML();
-                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-            break;
-            
             case 8:            
-                $obRadioChamadaPublicaSim = new Radio;
-                $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
-                $obRadioChamadaPublicaSim->setLabel      ('Sim');
-                $obRadioChamadaPublicaSim->setName       ('boRegistroModalidade');
-                $obRadioChamadaPublicaSim->setId         ('boRegistroModalidade');
-                $obRadioChamadaPublicaSim->setTitle      ('Informe se existe chamada pública.');
-                $obRadioChamadaPublicaSim->setValue      (1);
-                $obRadioChamadaPublicaSim->setNull       (false);
-                $obRadioChamadaPublicaSim->setChecked    (false);
-        
-                $obRadioChamadaPublicaNao = new Radio;
-                $obRadioChamadaPublicaNao->setLabel   ('Não');
-                $obRadioChamadaPublicaNao->setTitle   ('Informe se existe chamada pública.');
-                $obRadioChamadaPublicaNao->setName    ('boRegistroModalidade');
-                $obRadioChamadaPublicaNao->setId      ('boRegistroModalidade');
-                $obRadioChamadaPublicaNao->setValue   (0);
-                $obRadioChamadaPublicaNao->setNull    (false);
-                $obRadioChamadaPublicaNao->setChecked (true);
-
-                $obFormulario = new Formulario();
-                $obFormulario->agrupaComponentes(array($obRadioChamadaPublicaSim,$obRadioChamadaPublicaNao));
-                $obFormulario->montaInnerHTML();
-                $stHTML = $obFormulario->getHTML();
-                $stJs .= "d.getElementById('spnRegistroModalidade').innerHTML = '".$stHTML."';\n";
-            break;
-            
             case 9:
                 $obRadioChamadaPublicaSim = new Radio;
                 $obRadioChamadaPublicaSim->setRotulo     ('Chamada Pública');
@@ -1817,8 +1790,7 @@ case 'validaDtLicitacao':
     break;
 
     case 'montaItensAlterar':
-
-        list($inCodMapa , $stExercicioMapa) = explode('/' , $_REQUEST['stMapaCompras']);
+        list($inCodMapa, $stExercicioMapa) = explode('/', $_REQUEST['stMapaCompras']);
         $stExercicioMapa = ($stExercicioMapa == '') ? Sessao::getExercicio() : $stExercicioMapa;
         $boExecuta = false;
         if (($_REQUEST['hdnMapaCompras'] == ($inCodMapa.'/'.$stExercicioMapa)) || $_REQUEST['boAlteraAnula']) {
@@ -1829,42 +1801,33 @@ case 'validaDtLicitacao':
                 $boCompraDireta = SistemaLegado::pegaDado ("cod_compra_direta","compras.compra_direta"," where cod_mapa = ".$inCodMapa." and exercicio_mapa ='".$stExercicioMapa."'" );
 
                 include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapa.class.php';
-                $obTComprasMapa = new TComprasMapa;
-                $stFiltro .= " \nAND  mapa.cod_mapa  = ".$inCodMapa;
-                $stFiltro .= " AND  mapa.exercicio = '".$stExercicioMapa."'";
-                
-                $obTComprasMapa->recuperaMapaProcessoLicitatorio($rsComprasMapa, $stFiltro);
-                
+                $obTComprasMapa = new TComprasMapa();
+                $stFiltro .= " AND mapa.cod_mapa  = ".$inCodMapa;
+                $stFiltro .= " AND mapa.exercicio = '".$stExercicioMapa."' ";
+                $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio($rsComprasMapa, $stFiltro);
                 //Mantendo a validacao original
                 if ( $rsComprasMapa->getNumLinhas() >= 1 ) {
                     $boExecuta = true;
                 }
-                
             }
-
         }
 
         if ($boExecuta) {
             include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaItem.class.php';
             include_once CAM_GP_ALM_MAPEAMENTO.'TAlmoxarifadoCatalogoItem.class.php';
 
-            $obTAlmoxarifadoCatalogoItem = new TAlmoxarifadoCatalogoItem;
+            $obTAlmoxarifadoCatalogoItem = new TAlmoxarifadoCatalogoItem();
             $obTComprasMapaItem = new TComprasMapaItem();
-
-            $obTComprasMapaItem->setDado( 'exercicio', $stExercicioMapa );
-            $obTComprasMapaItem->setDado( 'cod_mapa', $inCodMapa );
-
+            $obTComprasMapaItem->setDado('exercicio', $stExercicioMapa );
+            $obTComprasMapaItem->setDado('cod_mapa' , $inCodMapa );
             $obTComprasMapaItem->recuperaItensCompraDireta( $rsMapaItens );
             // somar total do mapa
-
             while ( !$rsMapaItens->eof() ) {
                 // Recupera o valor da última compra do ítem.
                 $obTAlmoxarifadoCatalogoItem->setDado('cod_item'  , $rsMapaItens->getCampo('cod_item'));
                 $obTAlmoxarifadoCatalogoItem->setDado('exercicio' , $stExercicioMapa);
                 $obTAlmoxarifadoCatalogoItem->recuperaValorItemUltimaCompra($rsItemUltimaCompra);
-
-                $rsMapaItens->setCampo ( 'valor_ultima_compra' , $rsItemUltimaCompra->getCampo('vl_unitario_ultima_compra') );
-
+                $rsMapaItens->setCampo('valor_ultima_compra', $rsItemUltimaCompra->getCampo('vl_unitario_ultima_compra') );
                 $rsMapaItens->proximo();
             }
       
@@ -1872,14 +1835,11 @@ case 'validaDtLicitacao':
             
             $stJs = montaListaItens( $rsMapaItens ) ;
         } else {
-            $stJs  = "$('spnItens').innerHTML= '';\n";
-          
+            $stJs = "$('spnItens').innerHTML= '';\n";
         }
-
     break;
-
-
 }
-    echo $stJs;
+
+echo $stJs;
 
 ?>

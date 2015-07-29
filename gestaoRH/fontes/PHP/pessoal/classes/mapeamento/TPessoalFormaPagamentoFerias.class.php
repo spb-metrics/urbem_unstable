@@ -84,4 +84,33 @@ function montaRecuperaRelacionamento()
 
     return $stSql;
 }
+
+
+function recuperaDiasFeriasRestantes(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stOrdem = $stOrdem ? $stOrdem : " ORDER BY cod_forma ";
+    $stSql  = $this->montaRecuperaDiasFeriasRestantes().$stFiltro.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
+
+
+function montaRecuperaDiasFeriasRestantes()
+{
+    $stSql = "  SELECT DISTINCT 
+                        forma_pagamento_ferias.*
+                FROM  pessoal.forma_pagamento_ferias
+                    , pessoal.configuracao_forma_pagamento_ferias
+                    , pessoal.ferias
+                WHERE forma_pagamento_ferias.cod_forma = configuracao_forma_pagamento_ferias.cod_forma     
+                  AND ferias.cod_forma = forma_pagamento_ferias.cod_forma 
+            ";
+    return $stSql;
+}
+
+}//end of class

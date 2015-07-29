@@ -145,7 +145,7 @@ if ($stAcao == "consultar") {
     }
 }
 if ($stAcao == "excluir") {
-    $stFiltro = " WHERE ano_competencia = '".$_REQUEST["inAno"]."' AND mes_competencia = '".str_pad($_REQUEST["inCodMes"],2,'0',STR_PAD_LEFT)."'";
+    $stFiltro = " WHERE ano_competencia = '".$_REQUEST["inAno"]."' AND mes_competencia >= '".str_pad($_REQUEST["inCodMes"],2,'0',STR_PAD_LEFT)."'";
 }
 
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php");

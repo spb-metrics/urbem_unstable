@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMBairro.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMBairro.class.php 63129 2015-07-28 20:08:28Z evandro $
 
      * Casos de uso: uc-05.01.05
 */
@@ -225,7 +225,7 @@ function getTransacao() { return $this->obTransacao;       }
      * Método construtor
      * @access Private
 */
-function RCIMBairro()
+function __construct()
 {
     $this->obTBairro          = new TBairro;
     $this->obTBairroMunicipio = new TBairroMunicipio;
@@ -346,26 +346,39 @@ function excluirBairro($boTransacao = "")
 {
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+    if (!$obErro->ocorreu()) {
+        $this->obTBairro->setDado( "cod_bairro",    $this->inCodigoBairro    );
+        $this->obTBairro->setDado( "cod_uf",        $this->inCodigoUF        );
+        $this->obTBairro->setDado( "cod_municipio", $this->inCodigoMunicipio );
+        $this->obTBairro->recuperaPorChave($rsBairro,$boTransacao);
+
+        if ( $rsBairro->getNumLinhas() > 0 ) {
+            $obErro = $this->obTBairro->exclusao( $boTransacao );
+        }
+    }
+
+
     if ( !$obErro->ocorreu() ) {
         $obTCIMBairroAliquota = new TCIMBairroAliquota;
-        $obTCIMBairroAliquota->setDado( "cod_bairro", $this->inCodigoBairro );
-        $obTCIMBairroAliquota->setDado( "cod_uf", $this->inCodigoUF );
-        $obTCIMBairroAliquota->setDado( "cod_municipio", $this->inCodigoMunicipio );
-        $obTCIMBairroAliquota->exclusao( $boTransacao );
-
+        $obTCIMBairroAliquota->setDado( "cod_bairro"    ,  $this->inCodigoBairro );
+        $obTCIMBairroAliquota->setDado( "cod_uf"        , $this->inCodigoUF );
+        $obTCIMBairroAliquota->setDado( "cod_municipio" , $this->inCodigoMunicipio );
+        $obErro = $obTCIMBairroAliquota->exclusao( $boTransacao );
+    }
+    if (!$obErro->ocorreu()) {
         $obTCIMBairroValorM2 = new TCIMBairroValorM2;
         $obTCIMBairroValorM2->setDado( "cod_bairro", $this->inCodigoBairro );
         $obTCIMBairroValorM2->setDado( "cod_uf", $this->inCodigoUF );
         $obTCIMBairroValorM2->setDado( "cod_municipio", $this->inCodigoMunicipio );
-        $obTCIMBairroValorM2->exclusao( $boTransacao );
-
-        $this->obTBairro->setDado( "cod_bairro",    $this->inCodigoBairro    );
-        $this->obTBairro->setDado( "cod_uf",        $this->inCodigoUF        );
-        $this->obTBairro->setDado( "cod_municipio", $this->inCodigoMunicipio );
-        $obErro = $this->obTBairro->exclusao( $boTransacao );
+        $obErro = $obTCIMBairroValorM2->exclusao( $boTransacao );    
     }
-    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTBairro );
-
+   
+    if (!$obErro->ocorreu()) {
+        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTBairro );
+    }else{
+        $obErro->setDescricao("Bairro está em uso pelo sistema!");
+    }
+    
     return $obErro;
 }
 
@@ -440,7 +453,7 @@ function validaNomeBairro($boTransacao = "")
     $stFiltro .= " AND B.COD_MUNICIPIO = ".$this->inCodigoMunicipio;
     $stOrdem = " ";
     $obErro = $this->obTBairro->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
-    //$this->obTBairro->debug();
+    
     if ( !$obErro->ocorreu() and !$rsRecordSet->eof() ) {
         $obErro->setDescricao( "Já existe um bairro com este nome cadastrado nesta cidade!" );
     }
@@ -479,7 +492,7 @@ function listarUF(&$rsResultado , $boTransacao = "")
 function listarMunicipios(&$rsRecordSet , $boTransacao = "")
 {
     $stFiltro = "";
-    if ($this->inCodigoUF) {
+    if ( $this->inCodigoUF || $this->getCodigoUF() ) {
         $stFiltro .= " cod_uf = ".$this->inCodigoUF." AND ";
     }
     if ($this->inCodigoMunicipio) {

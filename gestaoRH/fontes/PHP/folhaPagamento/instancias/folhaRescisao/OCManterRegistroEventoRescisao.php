@@ -274,6 +274,7 @@ function montaListaEventos($arEventos)
                 break;
         }
         $arEvento['nuQuantidadeEvento'] = ($arEvento['nuQuantidadeParcelasEvento'] != "" ? number_format($arEvento['nuQuantidadeEvento']) . "/" . $arEvento['nuQuantidadeParcelasEvento'] : $arEvento['nuQuantidadeEvento']);
+        $arEvento['stCampoNomEvento'] = 'inCodigoEvento';
         $arEventos[$inIndex] = $arEvento;
     }
 
@@ -342,6 +343,7 @@ function montaListaEventos($arEventos)
     $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('montaAlterarEvento');");
     $obLista->ultimaAcao->addCampo("1","inId");
     $obLista->ultimaAcao->addCampo("2","inCodigoEvento");
+    $obLista->ultimaAcao->addCampo("3","stCampoNomEvento");
     $obLista->commitAcao();
 
     $obLista->addAcao();
@@ -647,28 +649,33 @@ function montaAlterarEvento()
     $obRFolhaPagamentoEvento->setCodigo( $arEvento['inCodigoEvento'] );
     $obRFolhaPagamentoEvento->listarEvento( $rsEvento );
     $stJs .= preencheDescEvento();
-    $stJs .= "f.inCodigoEvento.value = '".$arEvento['inCodigoEvento']."';                                   \n";
-    $stJs .= "f.hdnDescEvento.value = '".$arEvento['stDescricao']."';                                       \n";
-    $stJs .= "d.getElementById('stEvento').innerHTML = '".$arEvento['stDescricao']."';                      \n";
+
+    $stJs .= "jq('#inCodigoEvento').val('".$arEvento['inCodigoEvento']."'); \n";
+    $stJs .= "jq('#hdnDescEvento').val('".$arEvento['stDescricao']."'); \n";
+    $stJs .= "jq('#stEvento').html('".$arEvento['stDescricao']."'); \n";
+
     if ($rsEvento->getCampo('fixado') == 'V') {
-        $stJs .= "f.nuValorEvento.value = '".$arEvento['nuValorEvento']."';                                 \n";
-        $stJs .= "f.nuQuantidadeEvento.value = '".$arEvento['nuQuantidadeEvento']."';                       \n";
+        $stJs .= "jq('#nuValorEvento').val('".$arEvento['nuValorEvento']."'); \n";
+        $stJs .= "jq('#nuQuantidadeEvento').val('".$arEvento['nuQuantidadeEvento']."'); \n";
+
         if ($rsEvento->getCampo('apresenta_parcela') != 'f') {
-            $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$arEvento['nuQuantidadeParcelasEvento']."';   \n";
+            $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$arEvento['nuQuantidadeParcelasEvento']."'); \n";
         }
     }
     if ($rsEvento->getCampo('fixado') == 'Q') {
-        $stJs .= "f.nuQuantidadeEvento.value = '".$arEvento['nuQuantidadeEvento']."';                       \n";
+        $stJs .= "jq('#nuQuantidadeEvento').val('".$arEvento['nuQuantidadeEvento']."'); \n";
+
         if ($rsEvento->getCampo('apresenta_parcela') != 'f') {
-            $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$arEvento['nuQuantidadeParcelasEvento']."';   \n";
+            $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$arEvento['nuQuantidadeParcelasEvento']."'); \n";
         }
     }
     Sessao::write('inIdEditar',$_GET['inId']);
     Sessao::write('inCodRegistro',$arEvento['inCodRegistro']);
-    $stJs .= "f.stDesdobramento.value = '".$arEvento['stDesdobramento']."';                                 \n";
-    $stJs .= "f.stCmbDesdobramento.value = '".$arEvento['stDesdobramento']."';                              \n";
-    $stJs .= "f.btAlterarEvento.disabled = false;                                                           \n";
-    $stJs .= "f.btIncluirEvento.disabled = true;                                                            \n";
+
+    $stJs .= "jq('#stDesdobramento').val('".$arEvento['stDesdobramento']."');                               \n";
+    $stJs .= "jq('#stCmbDesdobramento').val('".$arEvento['stDesdobramento']."');                            \n";
+    $stJs .= "jq('#btAlterarEvento').prop('disabled', false);                                               \n";
+    $stJs .= "jq('#btIncluirEvento').prop('disabled', true);                                                \n";
 
     return $stJs;
 }

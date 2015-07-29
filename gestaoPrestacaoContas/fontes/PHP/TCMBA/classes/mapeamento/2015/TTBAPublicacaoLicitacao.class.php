@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63106 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -96,24 +96,44 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   edit.exercicio     \n";
-    $stSql .= "         ,edit.cod_licitacao     \n";
-    $stSql .= "         ,to_char(pued.data_publicacao,'dd/mm/yyyy') as data_publicacao     \n";
-    $stSql .= "         ,cgm.nom_cgm as nome_veiculo     \n";
-    $stSql .= "         ,substr(pued.oid,3,6)::integer as numero     \n";
-    $stSql .= "         ,to_char(pued.data_publicacao,'yyyymm') as competencia     \n";
-    $stSql .= " FROM     licitacao.edital               as edit     \n";
-    $stSql .= "         ,licitacao.publicacao_edital    as pued     \n";
-    $stSql .= "         ,licitacao.veiculos_publicidade as vepu     \n";
-    $stSql .= "         ,sw_cgm                         as cgm     \n";
-    $stSql .= " WHERE   edit.exercicio      = pued.exercicio     \n";
-    $stSql .= " AND     edit.num_edital     = pued.num_edital     \n";
-    $stSql .= " AND     pued.numcgm         = vepu.numcgm     \n";
-    $stSql .= " AND     vepu.numcgm         = cgm.numcgm     \n";
-    $stSql .= " AND     edit.exercicio='".$this->getDado('exercicio')."'                      \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     edit.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
+    $stSql = " 
+            SELECT tabela.*
+                  , ROW_NUMBER() OVER (PARTITION BY num_processo) AS sequencial
+
+              FROM (
+
+              SELECT 1 AS tipo_registro                                                
+                     , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                     , licitacao.exercicio_processo::VARCHAR||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||licitacao.cod_processo::VARCHAR AS num_processo
+                     , TO_CHAR(publicacao_edital.data_publicacao,'dd/mm/yyyy') AS data_publicacao 
+                     , sw_cgm.nom_cgm AS nome_veiculo                                   
+                     , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia         
+
+               FROM licitacao.edital
+
+         INNER JOIN licitacao.publicacao_edital
+                 ON publicacao_edital.num_edital = edital.num_edital
+                AND publicacao_edital.exercicio = edital.exercicio
+
+         INNER JOIN licitacao.veiculos_publicidade
+                 ON veiculos_publicidade.numcgm = publicacao_edital.numcgm
+
+         INNER JOIN sw_cgm
+                 ON sw_cgm.numcgm = veiculos_publicidade.numcgm
+
+         INNER JOIN licitacao.licitacao
+                 ON licitacao.cod_licitacao = edital.cod_licitacao
+                AND licitacao.cod_modalidade = edital.cod_modalidade
+                AND licitacao.cod_entidade = edital.cod_entidade
+                AND licitacao.exercicio = edital.exercicio_licitacao
+
+              WHERE edital.exercicio = '".$this->getDado('exercicio')."'                
+                AND publicacao_edital.data_publicacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                AND edital.cod_entidade IN (".$this->getDado('entidades').")
+              ) AS tabela
+
+          ORDER BY num_processo
+            ";
 
     return $stSql;
 }

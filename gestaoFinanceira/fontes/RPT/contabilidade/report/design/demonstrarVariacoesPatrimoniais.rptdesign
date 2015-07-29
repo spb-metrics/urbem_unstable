@@ -255,8 +255,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="assinaturas" id="3533">
@@ -858,7 +857,7 @@ if (this.getRowData().getColumnValue('linha') == 1){
                                         <property name="fontSize">8pt</property>
                                         <structure name="numberFormat">
                                             <property name="category">Currency</property>
-                                            <property name="pattern">#,##0.0</property>
+                                            <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
                                         </structure>
                                         <property name="textAlign">right</property>
                                         <property name="resultSetColumn">saldo_anterior</property>
